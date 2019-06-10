@@ -69,7 +69,6 @@ class GiphyEmbedFactoryTest extends ContainerTestCase {
         $finalUrl = 'https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif';
 
         $this->httpClient->addMockResponse(
-            HttpRequest::METHOD_GET,
             $endpoint,
             new HttpResponse(
                 200,

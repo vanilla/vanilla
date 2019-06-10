@@ -15,7 +15,7 @@ use Garden\Http\HttpResponse;
  */
 class MockHttpClient extends HttpClient {
 
-    private $mockedResponses = [];
+    use MockResponseTrait;
 
     /**
      * The default constructor adds request sending middleware. We don't want to do that.
@@ -32,40 +32,13 @@ class MockHttpClient extends HttpClient {
     }
 
     /**
-     * Make the lookup key for a mock response.
-     *
-     * @param string $method
-     * @param string $uri
-     *
-     * @return string
-     */
-    private function makeMockResponseKey(string $method, string $uri): string {
-        return $method . '-' . $uri;
-    }
-
-    /**
-     * Add a single response to be queued up if a request is created.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param HttpResponse $response
-     *
-     * @return $this
-     */
-    public function addMockResponse(string $method, string $uri, HttpResponse $response): MockHttpClient {
-        $key = $this->makeMockResponseKey($method, $uri);
-        $this->mockedResponses[$key] = $response;
-        return $this;
-    }
-
-    /**
      * Instead of making a web request, check our predefined responses and return one of those.
      *
      * @overrid
      * @inheritdoc
      */
     public function request(string $method, string $uri, $body, array $headers = [], array $options = []) {
-        $key = $this->makeMockResponseKey($method, $uri);
+        $key = $this->makeMockResponseKey($uri, $method);
 
         // Lookup an existing mock response or send back a 404.
         $response = $this->mockedResponses[$key] ?? new HttpResponse(404);

@@ -32,6 +32,13 @@ class MockEmbedFactory extends AbstractEmbedFactory {
     }
 
     /**
+     * @param bool $canHandleEmptyPaths
+     */
+    public function setCanHandleEmptyPaths(bool $canHandleEmptyPaths): void {
+        $this->canHandleEmptyPaths = $canHandleEmptyPaths;
+    }
+
+    /**
      * Configure the embed that will be returned by createEmbedForUrl and createEmbedFromData.
      * @param AbstractEmbed $embedToCreate
      */

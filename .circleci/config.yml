@@ -168,7 +168,7 @@ jobs:
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps
-            - *attach_workspac
+            - *attach_workspace
             - *set_hosts
             - *run_php_lint
     php_73_lint:

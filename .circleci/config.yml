@@ -38,10 +38,6 @@ aliases:
         run:
             name: Configuring Hosts
             command: |
-                # Add github to known hosts
-                if [ ! -n "$(grep "^github.com " ~/.ssh/known_hosts)" ]; then ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null; fi
-                cat ~/.ssh/known_hosts
-
                 # Localhost redirects
                 echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
                 cat /etc/hosts
@@ -100,7 +96,7 @@ jobs:
                     node --version
                     yarn --version
             - checkout:
-                path: ~/workspace/frontend # Repository will be named repo.
+                path: ~/workspace/frontend
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -168,7 +164,8 @@ jobs:
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps
-            - *attach_workspace
+            - checkout:
+                path: ~/workspace/php
             - *set_hosts
             - *run_php_lint
     php_73_lint:
@@ -177,7 +174,8 @@ jobs:
     php_72_tests:
         docker: *php72
         steps: &php_unit_test_steps
-            - *attach_workspace
+            - checkout:
+                path: ~/workspace/php
             - *set_hosts
             - run:
                 name: Test setup
@@ -234,10 +232,12 @@ workflows:
     version: 2
     commit:
         jobs:
-            - frontend_setup
             - php_setup
             - php_73_integration
             - php_72_integration
+            - php_73_lint
+            - php_72_lint
+            - frontend_setup
             - frontend_lint:
                 requires:
                     - frontend_setup
@@ -250,13 +250,7 @@ workflows:
             - frontend_test:
                 requires:
                     - frontend_setup
-            - php_73_lint:
-                requires:
-                    - php_setup
             - php_73_tests:
-                requires:
-                    - php_setup
-            - php_72_lint:
                 requires:
                     - php_setup
             - php_72_tests:

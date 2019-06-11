@@ -1,11 +1,16 @@
 version: 2
 aliases:
     - &php72
-        - image: circleci/php:7.3.5
+        - image: circleci/php:7.3.5-node
         - image: mysql:5.7.26
     - &php73
-        - image: circleci/php:7.3.5
+        - image: circleci/php:7.2.19-node
         - image: mysql:5.7.26
+          environment:
+            MYSQL_USER: root
+            MYSQL_DATABASE: vanilla_test
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+            MYSQL_ROOT_PASSWORD: ''
     - &node
         - image: circleci/node:lts-browsers
     - &run_yarn
@@ -15,6 +20,12 @@ aliases:
                 cd ~/workspace/frontend
                 yarn install --pure-lockfile
                 yarn install-all
+    - &set_hosts
+        run:
+            name: Configuring Hosts
+            command: |
+                echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+                cat /etc/hosts
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
@@ -61,11 +72,7 @@ aliases:
             root: ~/workspace
             paths:
                 - php
-        - run:
-            name: Update hosts File
-            command: |
-                echo 127.0.0.1 localhost | sudo tee -a /etc/hosts
-                cat /etc/hosts
+        - *set_hosts
         - run:
             name: Test setup
             command: |
@@ -73,20 +80,25 @@ aliases:
                 cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
         - *await_mysql
         - run:
+            name: Install openapi validator module
+            command: |
+                cd ~/workspace/php/plugins/swagger/
+                yarn install --pure-lockfile
+        - run:
             name: Prepare Database Dependencies
             command: |
-                sudo apt update && sudo apt install zlib1g-dev libsqlite3-dev
-                sudo docker-php-ext-install pdo pdo_mysql
+                # sudo apt update && sudo apt install zlib1g-dev libsqlite3-dev
+                sudo docker-php-ext-install pdo pdo_mysql gd
                 sudo apt-get install mysql-client
-        - run:
-            name: Create Test Table
-            command: |
-                mysql -h 127.0.0.1 -u root -e "create database vanilla_test;"
+        # - run:
+        #     name: Create Test Table
+        #     command: |
+        #         mysql -h 127.0.0.1 -u root -e "create database vanilla_test;"
         - run:
             name: Library Tests
             command: |
                 cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library" --stop-on-failure
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
         - run:
             name: Formatting Tests
             command: |

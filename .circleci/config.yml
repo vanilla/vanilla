@@ -39,7 +39,9 @@ aliases:
             name: Configuring Hosts
             command: |
                 # Add github to known hosts
+                mkdir ~/.ssh
                 touch ~/.ssh/known_hosts
+                ssh-keyscan github.com
                 ssh-keyscan github.com >> ~/.ssh/known_hosts
                 # Localhost redirects
                 echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts

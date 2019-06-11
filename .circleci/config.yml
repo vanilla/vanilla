@@ -1,37 +1,26 @@
 version: 2
 aliases:
+    - &db_env
+        MYSQL_USER: travis
+        MYSQL_DATABASE: vanilla_test
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        MYSQL_ROOT_PASSWORD: ''
     - &php72
         - image: circleci/php:7.3.5-node
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: root
-                MYSQL_DATABASE: vanilla_test
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
+          environment: *db_env
     - &php73
         - image: circleci/php:7.2.19-node
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: root
-                MYSQL_DATABASE: vanilla_test
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
+          environment: *db_env
     - &php_apiv0_72
         - image: circleci/php:7.2.19-fpm-stretch
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: root
-                MYSQL_DATABASE: vanilla_test
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
+          environment: *db_env
     - &php_apiv0_73
         - image: circleci/php:7.3.6-fpm-stretch
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: root
-                MYSQL_DATABASE: vanilla_test
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
+          environment: *db_env
     - &install_nginx
         run:
             name: Installting NGINX
@@ -155,7 +144,7 @@ jobs:
                     - frontend
     frontend_build:
         docker: *node
-        resource_class: xlarge
+        resource_class: medium
         steps:
             - *attach_workspace
             - run:
@@ -165,7 +154,7 @@ jobs:
                     yarn build
     frontend_test:
         docker: *node
-        resource_class: xlarge
+        resource_class: medium
         steps:
             - *attach_workspace
             - run:
@@ -216,11 +205,11 @@ jobs:
             - *run_php_lint
     php_72_tests:
         docker: *php72
-        resource_class: xlarge
+        resource_class: medium
         steps: *php_unit_test_steps
     php_72_integration:
         docker: *php_apiv0_72
-        resource_class: xlarge
+        resource_class: medium
         steps: *php_integration_test_steps
     php_73_lint:
         docker: *php73
@@ -229,11 +218,11 @@ jobs:
             - *run_php_lint
     php_73_tests:
         docker: *php73
-        resource_class: xlarge
+        resource_class: medium
         steps: *php_unit_test_steps
     php_73_integration:
         docker: *php_apiv0_73
-        resource_class: xlarge
+        resource_class: medium
         steps: *php_integration_test_steps
 
 workflows:

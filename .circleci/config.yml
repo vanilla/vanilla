@@ -87,7 +87,7 @@ aliases:
                 sleep 1
                 done
                 echo Failed waiting for MySQL && exit 1
-    - phpunit_steps: &phpunit_steps
+    - php_unit_test_steps: &php_unit_test_steps
         - *attach_workspace
         - *set_hosts
         - run:
@@ -107,6 +107,27 @@ aliases:
             command: |
                 cd ~/workspace/php
                 ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+    - php_integration_test_steps: &php_integration_test_steps
+        - checkout:
+            path: ~/workspace/php
+        - *install_nginx
+        - *run_composer
+        - *prepare_mysql
+        - *await_mysql
+        - run: |
+            cd  ~/workspace/php
+            ls -l tests/travis
+            ./tests/travis/circleci-setup.sh
+        - run:
+            name: Models Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
+        - run:
+            name: Models Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
 jobs:
     frontend_setup:
         docker: *node
@@ -184,15 +205,6 @@ jobs:
                 root: ~/workspace
                 paths:
                     - php
-    php_73_lint:
-        docker: *php73
-        steps:
-            - *attach_workspace
-            - *run_php_lint
-    php_73_tests:
-        docker: *php73
-        resource_class: xlarge
-        steps: *phpunit_steps
     php_72_lint:
         docker: *php72
         steps:
@@ -201,36 +213,33 @@ jobs:
     php_72_tests:
         docker: *php72
         resource_class: xlarge
-        steps: *phpunit_steps
+        steps: *php_unit_test_steps
     php_72_integration:
         docker: *php_apiv0_72
+        resource_class: xlarge
+        steps: *php_integration_test_steps
+    php_73_lint:
+        docker: *php73
         steps:
-            - checkout:
-                path: ~/workspace/php
-            - *install_nginx
-            - *run_composer
-            - *prepare_mysql
-            - *await_mysql
-            - run: |
-                cd  ~/workspace/php
-                ls -l tests/travis
-                ./tests/travis/circleci-setup.sh
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/php
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
-            # - run:
-            #     name: Models Tests
-            #     command: |
-            #         cd ~/workspace/php
-            #         ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+            - *attach_workspace
+            - *run_php_lint
+    php_73_tests:
+        docker: *php73
+        resource_class: xlarge
+        steps: *php_unit_test_steps
+    php_73_integration:
+        docker: *php_apiv0_73
+        resource_class: xlarge
+        steps: *php_integration_test_steps
+
 workflows:
     version: 2
     commit:
         jobs:
             - frontend_setup
             - php_setup
+            - php_73_integration
+            - php_72_integration
             - frontend_lint:
                 requires:
                     - frontend_setup

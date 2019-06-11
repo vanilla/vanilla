@@ -120,7 +120,7 @@ class APIv0 extends HttpClient {
     /**
      * Get a connection to the database.
      *
-     * @param bool $db Whther or not to add the db name to the DSN.
+     * @param bool $db Whether or not to add the db name to the DSN.
      * @return \PDO Returns a connection to the database.
      */
     public function getPDO($db = true) {

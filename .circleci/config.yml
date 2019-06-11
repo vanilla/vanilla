@@ -119,9 +119,8 @@ aliases:
             command: |
                 cd  ~/workspace/php
                 ls -l tests/travis
-                sudo ./tests/travis/create-nginx-conf.sh
-                nginx -c nginx/nginx.conf
                 php-fpm --daemonize
+                sudo ./tests/travis/start-nginx.sh
         - run:
             name: Models Tests
             command: |

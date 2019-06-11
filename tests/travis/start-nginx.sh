@@ -29,3 +29,6 @@ tpl "$TEMPLATES/nginx/sites-enabled/default-site.conf.tpl" "$DIR/nginx/sites-ena
 
 # Copy the config changer that will allow Vanilla to use a different config file per host.
 cp "$TEMPLATES/vanilla/conf/bootstrap.before.php" "$ROOT/conf"
+
+# Start nginx
+nginx -c "$DIR/nginx/nginx.conf"

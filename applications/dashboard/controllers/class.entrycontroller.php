@@ -1896,7 +1896,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($user->UserID, true);
-                    redirectTo('/');
+                    $this->setRedirectTo('/', false);
                 }
             }
 

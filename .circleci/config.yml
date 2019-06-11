@@ -167,8 +167,7 @@ jobs:
     php_72_tests:
         docker: *php72
         steps: &php_unit_test_steps
-            - checkout:
-                path: ~/workspace/php
+            - *attach_workspace
             - *set_hosts
             - run:
                 name: Test setup
@@ -190,11 +189,9 @@ jobs:
     php_72_integration:
         docker: *php72
         steps: &php_integration_test_steps
-            - checkout:
-                path: ~/workspace/php
+            - *attach_workspace
             - *set_hosts
             - *install_nginx
-            - *run_composer
             - *prepare_mysql
             - *await_mysql
             - run:
@@ -244,8 +241,10 @@ workflows:
         jobs:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
-            - php_72_integration
             - php_72_lint
+            - php_72_integration:
+                requires:
+                    - php_setup
             - php_72_tests:
                 requires:
                     - php_setup
@@ -275,12 +274,18 @@ workflows:
             - dependency_audit
             # PHP and serverside
             - php_setup
-            - php_71_integration
             - php_71_lint
-            - php_72_integration
             - php_72_lint
-            - php_73_integration
             - php_73_lint
+            - php_71_integration:
+                requires:
+                    - php_setup
+            - php_72_integration:
+                requires:
+                    - php_setup
+            - php_73_integration:
+                requires:
+                    - php_setup
             - php_71_tests:
                 requires:
                     - php_setup

@@ -65,6 +65,9 @@ aliases:
                 sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
                 sudo docker-php-ext-install pdo pdo_mysql gd
                 sudo apt-get install mysql-client
+                # Create the SQL "travis" user. Once we remove travis this should no longer be necessary.
+                mysql -h 127.0.0.1 -u root -e \
+                    "CREATE USER 'travis'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'travis'@'127.0.0.1' IDENTIFIED BY '';"
     - &await_mysql
         run:
             name: Waiting for MySQL to be ready

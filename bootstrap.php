@@ -173,6 +173,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
 
+    ->rule(\Vanilla\Web\HttpStrictTransportSecurity\HttpStrictTransportSecurityModel::class)
+    ->addAlias('HstsModel')
+
     ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
     ->setShared(true)
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])

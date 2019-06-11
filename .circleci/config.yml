@@ -10,7 +10,7 @@ aliases:
                 MYSQL_ROOT_PASSWORD: ''
     - &php73
         - image: circleci/php:7.2.19-node
-        - image: mysql:5.7.26x
+        - image: mysql:5.7.26
           environment:
                 MYSQL_USER: root
                 MYSQL_DATABASE: vanilla_test

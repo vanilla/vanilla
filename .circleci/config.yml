@@ -53,17 +53,19 @@ aliases:
                 cd ~/workspace/php
                 VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
     - &run_php_lint
-        run: |
-            cd ~/workspace/php
-            # Validate syntax in all the files
-            tests/travis/php-lint.sh ./applications
-            tests/travis/php-lint.sh ./conf
-            tests/travis/php-lint.sh ./library
-            tests/travis/php-lint.sh ./plugins
-            tests/travis/php-lint.sh ./themes
+        run:
+            name: Linting PHP
+            command: |
+                cd ~/workspace/php
+                # Validate syntax in all the files
+                tests/travis/php-lint.sh ./applications
+                tests/travis/php-lint.sh ./conf
+                tests/travis/php-lint.sh ./library
+                tests/travis/php-lint.sh ./plugins
+                tests/travis/php-lint.sh ./themes
 
-            # Run code sniffer on the diffed files.
-            composer lint-diff
+                # Run code sniffer on the diffed files.
+                composer lint-diff
     - &prepare_mysql
         run:
             name: Prepare Database Dependencies
@@ -86,51 +88,6 @@ aliases:
                 sleep 1
                 done
                 echo Failed waiting for MySQL && exit 1
-    - php_unit_test_steps: &php_unit_test_steps
-        - *attach_workspace
-        - *set_hosts
-        - run:
-            name: Test setup
-            command: |
-                cd ~/workspace/php
-                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-        - *prepare_mysql
-        - *await_mysql
-        - run:
-            name: Library Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
-        - run:
-            name: APIv2 Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
-    - php_integration_test_steps: &php_integration_test_steps
-        - checkout:
-            path: ~/workspace/php
-        - *set_hosts
-        - *install_nginx
-        - *run_composer
-        - *prepare_mysql
-        - *await_mysql
-        - run:
-            name: Starrt PHP-FPM/Nginx
-            command: |
-                cd  ~/workspace/php
-                ls -l tests/travis
-                php-fpm --daemonize
-                sudo ./tests/travis/start-nginx.sh
-        - run:
-            name: APIv0 Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
-        - run:
-            name: Models Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
 jobs:
     frontend_setup:
         docker: *node
@@ -142,9 +99,12 @@ jobs:
                     yarn --version
             - checkout:
                 path: ~/workspace/frontend # Repository will be named repo.
-            - run: |
-                cd ~/workspace/frontend
-                rm -rf .git
+            - run:
+                # Makes workspace persisting much faster if not needed.
+                name: Cleaning up git directory
+                command: |
+                    cd ~/workspace/frontend
+                    rm -rf .git
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_yarn
@@ -205,23 +165,65 @@ jobs:
                     - php
     php_72_lint:
         docker: *php72
-        steps:
+        steps: &php_lint_steps
+            - *set_hosts
             - *attach_workspace
             - *run_php_lint
-    php_72_tests:
-        docker: *php72
-        steps: *php_unit_test_steps
-    php_72_integration:
-        docker: *php_apiv0_72
-        steps: *php_integration_test_steps
     php_73_lint:
         docker: *php73
-        steps:
+        steps: *php_lint_steps
+    php_72_tests:
+        docker: *php72
+        steps: &php_unit_test_steps
             - *attach_workspace
-            - *run_php_lint
+            - *set_hosts
+            - run:
+                name: Test setup
+                command: |
+                    cd ~/workspace/php
+                    cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+            - *prepare_mysql
+            - *await_mysql
+            - run:
+                name: Library Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+            - run:
+                name: APIv2 Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
     php_73_tests:
         docker: *php73
         steps: *php_unit_test_steps
+    php_72_integration:
+        docker: *php_apiv0_72
+        steps: &php_integration_test_steps
+            - checkout:
+                path: ~/workspace/php
+            - *set_hosts
+            - *install_nginx
+            - *run_composer
+            - *prepare_mysql
+            - *await_mysql
+            - run:
+                name: Starrt PHP-FPM/Nginx
+                command: |
+                    cd  ~/workspace/php
+                    ls -l tests/travis
+                    php-fpm --daemonize
+                    sudo ./tests/travis/start-nginx.sh
+            - run:
+                name: APIv0 Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
+            - run:
+                name: Models Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
     php_73_integration:
         docker: *php_apiv0_73
         steps: *php_integration_test_steps

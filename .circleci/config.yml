@@ -5,20 +5,16 @@ aliases:
         MYSQL_PASSWORD: ''
         MYSQL_DATABASE: vanilla_test
         MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    - &php71
+        - image: circleci/php:7.1.30-fpm-stretch-node
+        - image: mysql:5.7.26
+          environment: *db_env
     - &php72
-        - image: circleci/php:7.3.5-node
+        - image: circleci/php:7.2.19-fpm-stretch-node
         - image: mysql:5.7.26
           environment: *db_env
     - &php73
-        - image: circleci/php:7.2.19-node
-        - image: mysql:5.7.26
-          environment: *db_env
-    - &php_apiv0_72
-        - image: circleci/php:7.2.19-fpm-stretch
-        - image: mysql:5.7.26
-          environment: *db_env
-    - &php_apiv0_73
-        - image: circleci/php:7.3.6-fpm-stretch
+        - image: circleci/php:7.3.6-fpm-stretch-node
         - image: mysql:5.7.26
           environment: *db_env
     - &install_nginx
@@ -145,7 +141,7 @@ jobs:
                 cd ~/workspace/frontend
                 yarn check-types
     php_setup:
-        docker: *php73
+        docker: *php72
         steps:
             - run:
                 name: Versions
@@ -168,9 +164,6 @@ jobs:
                 path: ~/workspace/php
             - *set_hosts
             - *run_php_lint
-    php_73_lint:
-        docker: *php73
-        steps: *php_lint_steps
     php_72_tests:
         docker: *php72
         steps: &php_unit_test_steps
@@ -194,11 +187,8 @@ jobs:
                 command: |
                     cd ~/workspace/php
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
-    php_73_tests:
-        docker: *php73
-        steps: *php_unit_test_steps
     php_72_integration:
-        docker: *php_apiv0_72
+        docker: *php72
         steps: &php_integration_test_steps
             - checkout:
                 path: ~/workspace/php
@@ -224,19 +214,42 @@ jobs:
                 command: |
                     cd ~/workspace/php
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+    php_73_lint:
+        docker: *php73
+        steps: *php_lint_steps
+    php_73_tests:
+        docker: *php73
+        steps: *php_unit_test_steps
     php_73_integration:
-        docker: *php_apiv0_73
+        docker: *php73
         steps: *php_integration_test_steps
+    php_71_lint:
+        docker: *php71
+        steps: *php_lint_steps
+    php_71_tests:
+        docker: *php71
+        steps: *php_unit_test_steps
+    php_71_integration:
+        docker: *php71
+        steps: *php_integration_test_steps
+    dependency_audit:
+        docker: *php72
+        steps:
+            - checkout
+            - run: yarn audit
 
 workflows:
     version: 2
     commit:
         jobs:
+            # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
-            - php_73_integration
             - php_72_integration
-            - php_73_lint
             - php_72_lint
+            - php_72_tests:
+                requires:
+                    - php_setup
+            # JS and browsers
             - frontend_setup
             - frontend_lint:
                 requires:
@@ -250,9 +263,44 @@ workflows:
             - frontend_test:
                 requires:
                     - frontend_setup
-            - php_73_tests:
+    nightly:
+        triggers:
+            - schedule:
+                cron: "0 0 * * *" # Once a day.
+                filters:
+                    branches:
+                        only:
+                            - master
+        jobs:
+            - dependency_audit
+            # PHP and serverside
+            - php_setup
+            - php_71_integration
+            - php_71_lint
+            - php_72_integration
+            - php_72_lint
+            - php_73_integration
+            - php_73_lint
+            - php_71_tests:
                 requires:
                     - php_setup
             - php_72_tests:
                 requires:
                     - php_setup
+            - php_73_tests:
+                requires:
+                    - php_setup
+            ## JS & browsers
+            - frontend_setup
+            - frontend_lint:
+                requires:
+                    - frontend_setup
+            - frontend_typechecker:
+                requires:
+                    - frontend_setup
+            - frontend_build:
+                requires:
+                    - frontend_setup
+            - frontend_test:
+                requires:
+                    - frontend_setup

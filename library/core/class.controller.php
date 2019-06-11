@@ -13,6 +13,7 @@
  */
 
 use \Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\HttpStrictTransportSecurity\HttpStrictTransportSecurityModel;
 
 /**
  * Controller base class.
@@ -270,6 +271,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                 'vary' => \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE,
             ]);
         }
+
+        $hsts = Gdn::factory('HstsModel');
+        $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];

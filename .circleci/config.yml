@@ -123,7 +123,7 @@ aliases:
                 php-fpm --daemonize
                 sudo ./tests/travis/start-nginx.sh
         - run:
-            name: Models Tests
+            name: APIv0 Tests
             command: |
                 cd ~/workspace/php
                 ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"

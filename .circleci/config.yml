@@ -5,13 +5,17 @@ aliases:
         - image: mysql:5.7.26
           environment:
                 MYSQL_USER: travis
-                MYSQL_ALLOW_EMPTY_PASSWORD: true
+                MYSQL_DATABASE: vanilla_tests
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                MYSQL_ROOT_PASSWORD: ''
     - &php73
         - image: circleci/php:7.3.5
         - image: mysql:5.7.26
           environment:
                 MYSQL_USER: travis
-                MYSQL_ALLOW_EMPTY_PASSWORD: true
+                MYSQL_DATABASE: vanilla_tests
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                MYSQL_ROOT_PASSWORD: ''
     - &node
         - image: circleci/node:lts-browsers
     - &run_yarn

@@ -137,7 +137,6 @@
         "sass-loader": "7.1.0",
         "sinon": "7.3.2",
         "style-loader": "0.23.1",
-        "swagger-cli": "2.2.1",
         "terser-webpack-plugin": "1.2.3",
         "ts-lint": "4.5.1",
         "ts-node": "8.1.0",

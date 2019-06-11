@@ -1,7 +1,7 @@
 <?php
 
 use VanillaTests\NullContainer;
-
+error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
     'PHPUnit\\Framework\\TestCase' => 'PHPUnit_Framework_TestCase', // See https://github.com/php-fig/log/pull/52

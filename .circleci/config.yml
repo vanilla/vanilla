@@ -85,31 +85,17 @@ aliases:
                 cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
         - *await_mysql
         - run:
-            name: Install openapi validator module
-            command: |
-                cd ~/workspace/php/plugins/swagger-ui/
-                yarn install --pure-lockfile
-        - run:
             name: Prepare Database Dependencies
             command: |
                 sudo apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
                 sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
                 sudo docker-php-ext-install pdo pdo_mysql gd
                 sudo apt-get install mysql-client
-        # - run:
-        #     name: Create Test Table
-        #     command: |
-        #         mysql -h 127.0.0.1 -u root -e "create database vanilla_test;"
         - run:
             name: Library Tests
             command: |
                 cd ~/workspace/php
                 ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
-        - run:
-            name: Formatting Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Formatting"
         - run:
             name: APIv2 Tests
             command: |

@@ -110,6 +110,7 @@ aliases:
     - php_integration_test_steps: &php_integration_test_steps
         - checkout:
             path: ~/workspace/php
+        - *set_hosts
         - *install_nginx
         - *run_composer
         - *prepare_mysql

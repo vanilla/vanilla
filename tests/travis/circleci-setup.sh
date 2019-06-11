@@ -6,6 +6,21 @@ set -x
 # Start php-fpm
 php-fpm --daemonize
 
+DIR=$(realpath $(dirname "$0"))
+TEMPLATES="$DIR/templates"
+ROOT=$(realpath "$DIR/../..")
+PORT=9000
+SERVER="/tmp/php.sock"
+
+function tpl {
+    sed \
+        -e "s|{DIR}|$DIR|g" \
+        -e "s|{ROOT}|$ROOT|g" \
+        -e "s|{PORT}|$PORT|g" \
+        -e "s|{SERVER}|$SERVER|g" \
+        < $1 > $2
+}
+
 # Make some working directories.
 sudo mkdir "$DIR/nginx"
 sudo mkdir "$DIR/nginx/sites-enabled"

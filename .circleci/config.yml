@@ -1,21 +1,11 @@
 version: 2
 aliases:
     - &php72
-        - image: php:7.3.6-apache-stretch
+        - image: circleci/php:7.3.5
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: travis
-                MYSQL_DATABASE: vanilla_tests
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
     - &php73
         - image: circleci/php:7.3.5
         - image: mysql:5.7.26
-          environment:
-                MYSQL_USER: travis
-                MYSQL_DATABASE: vanilla_tests
-                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-                MYSQL_ROOT_PASSWORD: ''
     - &node
         - image: circleci/node:lts-browsers
     - &run_yarn
@@ -72,6 +62,11 @@ aliases:
             paths:
                 - php
         - run:
+            name: Update hosts File
+            command: |
+                echo 127.0.0.1 localhost | sudo tee -a /etc/hosts
+                cat /etc/hosts
+        - run:
             name: Test setup
             command: |
                 cd ~/workspace/php
@@ -86,7 +81,7 @@ aliases:
         - run:
             name: Create Test Table
             command: |
-                mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
+                mysql -h 127.0.0.1 -u root -e "create database vanilla_test;"
         - run:
             name: Library Tests
             command: |

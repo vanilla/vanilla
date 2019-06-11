@@ -120,6 +120,7 @@ class APIv0 extends HttpClient {
     /**
      * Get a connection to the database.
      *
+     * @param bool $db Whether or not to add the db name to the DSN.
      * @return \PDO Returns a connection to the database.
      */
     public function getPDO($db = true) {
@@ -166,14 +167,12 @@ class APIv0 extends HttpClient {
      * {@inheritdoc}
      */
     public function handleErrorResponse(HttpResponse $response, $options = []) {
-        if ($this->val('throw', $options, $this->throwExceptions)) {
+        $options += ['throw' => $this->throwExceptions];
+
+        if ($options['throw']) {
             $body = $response->getBody();
             if (is_array($body)) {
-                $message = $this->val(
-                    'Exception',
-                    $body,
-                    $this->val('message', $body, $response->getReasonPhrase())
-                );
+                $message = $body['Exception'] ?? ($body['message'] ?? $response->getReasonPhrase());
             } else {
                 $message = $response->getRawBody();
             }
@@ -185,6 +184,7 @@ class APIv0 extends HttpClient {
      * Install Vanilla.
      *
      * @param string $title The title of the app.
+     * @throws \Exception Throws an exception if Vanilla fails to install.
      */
     public function install($title = '') {
         $this->createDatabase();
@@ -193,7 +193,7 @@ class APIv0 extends HttpClient {
         $configPath = $this->getConfigPath();
         touch($configPath);
         chmod($configPath, 0777);
-        $apiKey = sha1(openssl_random_pseudo_bytes(16));
+        $apiKey = sha1(random_bytes(16));
         $this->saveToConfig([
             'Garden.Errors.StackTrace' => true,
             'Test.APIKey' => $apiKey,
@@ -240,8 +240,9 @@ class APIv0 extends HttpClient {
 
     /**
      * {@inheritdoc}
+     * @throws \Exception Throws an exception when Vanilla isn't properly configured.
      */
-    public function createRequest($method, $uri, $body, array $headers = [], array $options = []) {
+    public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = []) {
         $request = parent::createRequest($method, $uri, $body, $headers, $options);
 
         // Add the cookie of the calling user.
@@ -285,6 +286,7 @@ class APIv0 extends HttpClient {
      * the current configured salt will be used.
      * @param string $algo The algorithm used to sign the cookie.
      * @return string Returns a string that can be used as a Vanilla session cookie.
+     * @throws \Exception Throws an exception when there is no cookie salt configured.
      */
     public function vanillaCookieString($userID, $secret = '', $algo = 'md5') {
         $expires = strtotime('+2 days');
@@ -333,6 +335,7 @@ class APIv0 extends HttpClient {
      * @param array $params Any parameters to send with the SQL.
      * @param bool $returnStatement Whether or not to return the {@link \PDOStatement} associated with the query.
      * @return array|\PDOStatement
+     * @throws \Exception Throws an exception if the query fails.
      */
     public function query($sql, array $params = [], $returnStatement = false) {
         $pdo = $this->getPDO();
@@ -404,6 +407,7 @@ class APIv0 extends HttpClient {
      *
      * @param string $username The username or email of the user.
      * @param string $password The password of the user.
+     * @return HttpResponse Returns the response for signing in the user.
      */
     public function signInUser($username, $password) {
         $r = $this->post(
@@ -477,6 +481,7 @@ class APIv0 extends HttpClient {
      * @param string|int $userKey The user ID or username of the user.
      * @param bool $throw Whether or not to throw an exception if the user isn't found.
      * @return array Returns the found user as an array.
+     * @throws \Exception Throws an exception when the user isn't found and `$throw` is **true**.
      */
     public function queryUserKey($userKey, $throw = false) {
         if (is_numeric($userKey)) {
@@ -494,6 +499,7 @@ class APIv0 extends HttpClient {
      * @param array $where An array in the form **[field => value]**.
      * @param bool $throw Whether or not to throw an exception if the user isn't found.
      * @return array|null Returns the user array or null if no user is found.
+     * @throws \Exception Throws an exception when the user isn't found.
      */
     public function queryUser($where, $throw = false) {
         // Build the where clause from the where array.
@@ -515,7 +521,7 @@ class APIv0 extends HttpClient {
 
         $attributes = @unserialize($row['Attributes']);
         $row['Attributes'] = $attributes;
-        $row['tk'] = val('TransientKey', $attributes);
+        $row['tk'] = $attributes['TransientKey'] ?? '';
 
         return $row;
     }

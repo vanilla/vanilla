@@ -52,11 +52,15 @@ aliases:
     - &run_php_lint
         run: |
             cd ~/workspace/php
+            # Validate syntax in all the files
             tests/travis/php-lint.sh ./applications
             tests/travis/php-lint.sh ./conf
             tests/travis/php-lint.sh ./library
             tests/travis/php-lint.sh ./plugins
             tests/travis/php-lint.sh ./themes
+
+            # Run code sniffer on the diffed files.
+            composer lint-diff
     - &prepare_mysql
         run:
             name: Prepare Database Dependencies
@@ -147,7 +151,6 @@ jobs:
                     - frontend
     frontend_build:
         docker: *node
-        resource_class: medium
         steps:
             - *attach_workspace
             - run:
@@ -157,7 +160,6 @@ jobs:
                     yarn build
     frontend_test:
         docker: *node
-        resource_class: medium
         steps:
             - *attach_workspace
             - run:
@@ -191,9 +193,6 @@ jobs:
                     composer --version
             - checkout:
                 path: ~/workspace/php # Repository will be named repo.
-            - run: |
-                cd ~/workspace/php
-                rm -rf .git
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
@@ -208,11 +207,9 @@ jobs:
             - *run_php_lint
     php_72_tests:
         docker: *php72
-        resource_class: medium
         steps: *php_unit_test_steps
     php_72_integration:
         docker: *php_apiv0_72
-        resource_class: medium
         steps: *php_integration_test_steps
     php_73_lint:
         docker: *php73
@@ -221,11 +218,9 @@ jobs:
             - *run_php_lint
     php_73_tests:
         docker: *php73
-        resource_class: medium
         steps: *php_unit_test_steps
     php_73_integration:
         docker: *php_apiv0_73
-        resource_class: medium
         steps: *php_integration_test_steps
 
 workflows:

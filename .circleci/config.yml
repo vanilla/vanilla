@@ -1,7 +1,7 @@
 version: 2
 aliases:
     - &php72
-        - image: circleci/php:7.2.9
+        - image: php:7.3.6-apache-stretch
         - image: mysql:5.7.26
           environment:
                 MYSQL_USER: travis
@@ -50,7 +50,23 @@ aliases:
                 done
                 echo Failed waiting for MySQL && exit 1
     - phpunit_steps: &phpunit_steps
-        - *attach_workspace
+        - run:
+            name: Versions
+            command: |
+                php --version
+                composer --version
+        - checkout:
+            path: ~/workspace/php # Repository will be named repo.
+        - run: |
+            cd ~/workspace/php
+            rm -rf .git
+        # We explcitly don't cache dependencies.
+        # The cache validation & fetching seems to take longer than fetching from source.
+        - *run_composer
+        - persist_to_workspace:
+            root: ~/workspace
+            paths:
+                - php
         - run:
             name: Test setup
             command: |
@@ -68,15 +84,15 @@ aliases:
             command: |
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run:
+            name: Library Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library" --stop-on-failure
+        - run:
             name: Formatting Tests
             command: |
                 cd ~/workspace/php
                 ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Formatting"
-        - run:
-            name: Library Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
         - run:
             name: APIv2 Tests
             command: |

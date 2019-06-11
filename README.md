@@ -3,7 +3,7 @@
 [![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
 ![](https://img.shields.io/travis/php-v/vanilla/vanilla.svg)
-![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_2.8.1.svg)
+![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_2.8.4.svg)
 
 ## Howdy, Stranger!
 
@@ -70,8 +70,8 @@ The `release/VERSION+BUILD` branches are production-ready branches for our cloud
 |                     | Active Release      | Deprecated Release  |
 | ------------------- | ------------------- | ------------------- |
 | **Version**         | `2.8`               | `2.6`               |
-| **Initial Release** | 8 Feb 2019          | 17 Aug 2018         |
-| **Last Updated**    | 23 Apr 2019 (2.8.3) | 28 Oct 2018 (2.6.4) |
+| **Initial Release** |  8 Feb 2019         | 17 Aug 2018         |
+| **Last Updated**    |  4 Jun 2019 (2.8.4) | 28 Oct 2018 (2.6.4) |
 | **EOL**             | Next release        | **8 Feb 2019**      |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.

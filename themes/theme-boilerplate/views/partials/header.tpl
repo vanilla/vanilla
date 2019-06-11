@@ -31,7 +31,9 @@
                 </div>
                 {if $User.SignedIn}
                     <button class="mobileMeBox-button">
-                        {module name="UserPhotoModule"}
+                        <span class="Photo PhotoWrap">
+                            <img src="{$User.Photo|escape:'html'}" class="ProfilePhotoSmall" alt="{t c='Avatar'}">
+                        </span>
                     </button>
                 {/if}
             </div>

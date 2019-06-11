@@ -71,9 +71,6 @@ class Gdn {
     /** @var object  */
     protected static $_Config = null;
 
-    /** @var Gdn_Factory The factory used to create core objects in the application. */
-    protected static $_Factory = null;
-
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
     protected static $_FactoryOverwrite = true;
 
@@ -185,18 +182,18 @@ class Gdn {
      * Get an object from the factory.
      *
      * @param string $alias The alias of the class.
+     *
+     * @return mixed|null Either the requested class instance or null.
      */
-    public static function factory($alias = false) {
-        if ($alias === false) {
-            return static::getFactory();
+    public static function factory($alias = null) {
+        if (!$alias) {
+            return null;
         }
-
         // Get the arguments to pass to the factory.
         $args = func_get_args();
         array_shift($args);
 
         // Get the item from the container.
-        // This code has been brought in from {@link Gdn_Factory::factory()}.
         $dic = static::getContainer();
         try {
             if (!$dic->has($alias) && $dic->has("Gdn_$alias")) {
@@ -211,39 +208,24 @@ class Gdn {
     }
 
     /**
-     * Get or lazy-create the factory.
+     * Checks whether or not a container alias exists.
      *
-     * @return Gdn_Factory
-     */
-    private static function getFactory() {
-        deprecated('Gdn::getFactory()');
-        if (is_null(self::$_Factory)) {
-            static::setFactory(new Gdn_Factory(static::getContainer()));
-            static::factoryOverwrite(false);
-        }
-        return self::$_Factory;
-    }
-
-    /**
-     * Checks whether or not a factory alias exists.
+     * @param string $alias The alias for the container to check for.
      *
-     * @param string $alias The alias of the factory to check for.
-     * @return boolean Whether or not a factory definintion exists.
-     * @see Gdn_Factory::exists()
+     * @return boolean Whether or not a container rule exists.
      */
     public static function factoryExists($alias) {
         return static::getContainer()->hasRule($alias);
     }
 
     /**
-     * Install a class to the factory.
+     * Add a rule to the container.
      *
      * @param string $alias An alias for the class that will be used to retreive instances of it.
      * @param string $className The actual name of the class.
      * @param string $path The path to the class' file. You can prefix the path with ~ to start at the application root.
      * @param string $factoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
      * @param mixed $data Additional data for the installation.
-     * @see Gdn_Factory::install()
      */
     public static function factoryInstall($alias, $className, $path = '', $factoryType = self::FactorySingleton, $data = null) {
         // Don't overwrite an existing definition.
@@ -289,36 +271,6 @@ class Gdn {
             default:
                 throw new \Exception("Unknown factory type '$factoryType'.", 500);
         }
-    }
-
-    /**
-     * Installs a dependency to the factory.
-     *
-     * @param string $alias The alias of the class that will have the dependency.
-     * @param string $propertyName The name of the property on the class that will have the dependency.
-     * @param string $sourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
-     * @see Gdn_Factory::instalDependency()
-     */
-    public static function factoryInstallDependency($alias, $propertyName, $sourceAlias) {
-        deprecated('Gdn::factoryInstallDependency()');
-    }
-
-    /**
-     * Installs a dependency to the factory with the settings from a configuration.
-     *
-     * @deprecated
-     */
-    public static function factoryInstallDependencyFromConfig() {
-        deprecated('Gdn::factoryInstallDependencyFromConfig()');
-    }
-
-    /**
-     * Installs a class to the factory with the settings from a configuration.
-     *
-     * @deprecated
-     */
-    public static function factoryInstallFromConfig() {
-        deprecated('Gdn::factoryInstallFromConfig()');
     }
 
     /**
@@ -585,19 +537,6 @@ class Gdn {
     }
 
     /**
-     * Set the object used as the factory for the api.
-     *
-     * @param Gdn_Factory $factory The object used as the factory.
-     * @param boolean $override whether to override the property if it is already set.
-     */
-    public static function setFactory($factory, $override = true) {
-        deprecated('Gdn::setFactory()');
-        if ($override || is_null(self::$_Factory)) {
-            self::$_Factory = $factory;
-        }
-    }
-
-    /**
      * Get the global container.
      *
      * @return \Garden\Container\Container Returns the container.
@@ -629,7 +568,6 @@ class Gdn {
          * Reset all of the cached objects that are fetched from the container.
          */
         self::$_Config = null;
-        self::$_Factory = null;
         self::$_FactoryOverwrite = true;
         self::$_Locale = null;
         self::$_Request = null;

@@ -90,6 +90,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ThemeManager')
 
+    // File base theme api provider
+    ->rule(\Vanilla\Models\ThemeModel::class)
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
+
     // Logger
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)

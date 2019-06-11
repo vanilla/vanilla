@@ -815,7 +815,7 @@ class EntryController extends Gdn_Controller {
             if (!$userSelect || $userSelect == 'other') {
                 // The user entered a username. Validate it.
                 $connectNameEntered = true;
-                if ($this->Form->validateRule('ConnectName', 'ValidateRequired')) {
+                if (!empty($this->Form->getFormValue('ConnectName'))) {
                     $connectName = $this->Form->getFormValue('ConnectName');
                     $user = false;
 
@@ -848,9 +848,7 @@ class EntryController extends Gdn_Controller {
                 if ($allowConnect) {
                     // If the user is connecting to their current account, make sure it was intentional.
                     if (intval($user['UserID']) === intval(Gdn::session()->UserID)) {
-                        if (!Gdn::session()->validateTransientKey($this->Form->getFormValue('TransientKey'))) {
-                            throw permissionException();
-                        }
+                        $this->Request->isAuthenticatedPostBack(true);
                     } else {
                         $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
                         if ($hasPassword) {
@@ -1898,7 +1896,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($user->UserID, true);
-                    redirectTo('/');
+                    $this->setRedirectTo('/', false);
                 }
             }
 

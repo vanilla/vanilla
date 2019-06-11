@@ -92,7 +92,7 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
                 'height' => $height,
                 'url' => $urlToCheck, // The original URL.
                 'type' => CodePenEmbed::TYPE,
-                'cpID' => $cpId,
+                'codepenID' => $cpId,
                 'frameSrc' => $frameSrc,
             ],
             $embedData,
@@ -125,7 +125,6 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
     }
 }
 JSON;
-
 
         $oldData = json_decode($oldDataJSON, true);
         $dataEmbed = $this->factory->createEmbedFromData($oldData);

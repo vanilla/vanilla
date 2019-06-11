@@ -9,17 +9,14 @@ namespace Vanilla\EmbeddedContent\Embeds;
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
-use Vanilla\EmbeddedContent\EmbedUtils;
 
 /**
- * Factory for the GiphyEmbed.
+ * Factory for the ImgurEmbed.
  */
-class GiphyEmbedFactory extends AbstractEmbedFactory {
+class ImgurEmbedFactory extends AbstractEmbedFactory {
 
-    const GPH_IS = "gph.is";
-    const GIPHY_COM = "giphy.com";
-    const MEDIA_GIPHY_COM = "media.giphy.com";
-    const OEMBED_URL_BASE = "https://giphy.com/services/oembed";
+    const IMGUR_COM = "imgur.com";
+    const OEMBED_URL_BASE = "https://api.imgur.com/oembed";
 
     /**
      * @var string A regexp to match the full URL of a giphy embed.
@@ -43,7 +40,7 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedDomains(): array {
-        return [self::GPH_IS, self::GIPHY_COM];
+        return [self::IMGUR_COM];
     }
 
     /**
@@ -51,17 +48,10 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain): string {
-        switch ($domain) {
-            case self::GPH_IS:
-                // Anything goes here. This is giphy's URL shortening service.
-                return "/.+/";
-            case self::GIPHY_COM:
-                return "/\/(gifs|stories)\/.+/";
-            case self::MEDIA_GIPHY_COM:
-                return self::FULL_SLUG_REGEX;
-            default:
-                return "/^$/";
-        }
+        // Imgur paths are incredibly complicated.
+        // See https://www.reddit.com/r/redditdev/comments/35bb7i/imgur_link_format/ for examples.
+        // We will pretty much always hit their API, so a pretty freeform slug should suffice.
+        return '/.+/';
     }
 
     /**
@@ -95,7 +85,14 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
         preg_match(self::FULL_SLUG_REGEX, $fullUrl, $matches);
         $id = $matches['postID'] ?? null;
 
-        [$height, $width] = EmbedUtils::extractDimensions($response);
+        $width = $response['width'] ?? null;
+        $height = $response['height'] ?? null;
+
+        // If we don't have our width/height ratio, fall back to a 16/9 ratio.
+        if ($width === null || $response === null) {
+            $width = 16;
+            $height = 9;
+        }
 
         $data = [
             'type' => GiphyEmbed::TYPE,

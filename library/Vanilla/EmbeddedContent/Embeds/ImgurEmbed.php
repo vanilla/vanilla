@@ -12,11 +12,11 @@ use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
 
 /**
- * Embed data object for the giphy.
+ * Embed data object for imgur.
  */
-class GiphyEmbed extends AbstractEmbed {
+class ImgurEmbed extends AbstractEmbed {
 
-    const TYPE = "giphy";
+    const TYPE = "imgur";
 
     /**
      * @inheritdoc
@@ -30,7 +30,8 @@ class GiphyEmbed extends AbstractEmbed {
      */
     public function normalizeData(array $data): array {
         $data = EmbedUtils::remapProperties($data, [
-            'giphyID' => 'attributes.postID',
+            'imgurID' => 'attributes.postID',
+            'isAlbum' => 'attributes.isAlbum',
         ]);
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
@@ -43,7 +44,8 @@ class GiphyEmbed extends AbstractEmbed {
         return Schema::parse([
             'height:i',
             'width:i',
-            'giphyID:s',
+            'imgurID:s',
+            'isAlbum:b',
         ]);
     }
 }

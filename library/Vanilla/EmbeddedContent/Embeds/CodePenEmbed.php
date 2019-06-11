@@ -32,7 +32,7 @@ class CodePenEmbed extends AbstractEmbed {
             'width:i',
             'name:s',
             'frameSrc:s',
-            'cpID:s',
+            'codepenID:s',
         ]);
     }
 
@@ -41,7 +41,7 @@ class CodePenEmbed extends AbstractEmbed {
      */
     public function normalizeData(array $data): array {
         $data = EmbedUtils::remapProperties($data, [
-            'cpID' => 'attributes.id',
+            'codepenID' => 'attributes.id',
             'frameSrc' => 'attributes.embedUrl',
         ]);
         $data = EmbedUtils::ensureDimensions($data);

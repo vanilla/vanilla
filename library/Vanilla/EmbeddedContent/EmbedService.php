@@ -7,6 +7,7 @@
 namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
+use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbedFactory;
 
@@ -68,7 +69,8 @@ class EmbedService implements EmbedCreatorInterface {
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
         $this->setFallbackFactory($dic->get(LinkEmbedFactory::class))
-            ->registerFactory($dic->get(GiphyEmbedFactory::class));
+            ->registerFactory($dic->get(GiphyEmbedFactory::class))
+            ->registerFactory($dic->get(CodePenEmbedFactory::class));
 //        $this->setFallbackFactory($dic->get(Embeds\LinkEmbed::class))
 //            ->addEmbed($dic->get(Embeds\QuoteEmbed::class))
 //            ->addEmbed($dic->get(Embeds\TwitterEmbed::class))

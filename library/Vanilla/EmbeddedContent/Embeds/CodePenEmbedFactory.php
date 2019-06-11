@@ -93,7 +93,7 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
             'name' => $response['title'] ?? null,
             'height' => $height,
             'width' => $width,
-            'cpID' => $frameAttrs['id'] ?? null,
+            'codepenID' => $frameAttrs['id'] ?? null,
             'frameSrc' => $frameAttrs['src'] ?? null,
         ];
 

@@ -36,5 +36,59 @@ echo $form->errors();
             <?php echo $form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
             </div>
         </li>
+
+        <h2 class="help-title"><?php echo t('Http strict transport security (hsts) directives').':'; ?></h2>
+        <span>(Learn more about hsts: <a href="https://hstspreload.org/">https://hstspreload.org/</a>)</span>
+
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $form->label('Max-age', 'Garden.Security.Hsts.MaxAge'); ?>
+                <div class="info">
+                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('We recommend to enable this directive as your first directive with value of WEEK, and then increase it to MONTH and YEAR once you see your site works as expected.'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->radioList('Garden.Security.Hsts.MaxAge',
+                    [
+                        604800 => t('Week'),
+                        2592000 => t('Month'),
+                        31536000 => t('Year'),
+                        63072000 => t('2 Years')
+                    ]
+                ); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $form->label('IncludeSubDomains', 'Garden.Security.Hsts.IncludeSubDomains'); ?>
+                <div class="info">
+                    <p>
+                        <?php
+                        echo t(
+                            'Security.Hsts.IncludeSubDomains',
+                            'If this optional parameter is specified, this rule applies to all of the site\'s subdomains as well.'
+                        );
+                        ?>
+                    </p>
+                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Enable this feature if you are sure that all your subdomains are configured for https and have valid certificates installed'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->checkBox('Garden.Security.Hsts.IncludeSubDomains'); ?>
+            </div>
+        </li>
+
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $form->label('Preload', 'Garden.Security.Hsts.Preload'); ?>
+                <div class="info">
+                    <p class="warning"><strong><?php echo t('Warning'); ?>:</strong>
+                        <?php echo t('It\'s great to support HSTS preloading as a best practice. However, you need to check requirements and submit your site to hstspreload.org to ensure that it is successfully preloaded (i.e. to get the full protection of the intended configuration).'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->checkBox('Garden.Security.Hsts.Preload'); ?>
+            </div>
+        </li>
     </ul>
 <?php echo $form->close('Save'); ?>

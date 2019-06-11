@@ -114,10 +114,14 @@ aliases:
         - *run_composer
         - *prepare_mysql
         - *await_mysql
-        - run: |
-            cd  ~/workspace/php
-            ls -l tests/travis
-            ./tests/travis/circleci-setup.sh
+        - run:
+            name: Starrt PHP-FPM/Nginx
+            command: |
+                cd  ~/workspace/php
+                ls -l tests/travis
+                sudo ./tests/travis/create-nginx-conf.sh
+                nginx -c nginx/nginx.conf
+                php-fpm --daemonize
         - run:
             name: Models Tests
             command: |

@@ -2,9 +2,9 @@ version: 2
 aliases:
     - &db_env
         MYSQL_USER: travis
+        MYSQL_PASSWORD: ''
         MYSQL_DATABASE: vanilla_test
         MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-        MYSQL_ROOT_PASSWORD: ''
     - &php72
         - image: circleci/php:7.3.5-node
         - image: mysql:5.7.26

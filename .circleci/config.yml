@@ -38,6 +38,10 @@ aliases:
         run:
             name: Configuring Hosts
             command: |
+                # Add github to known hosts
+                if [ ! -n "$(grep "^github.com " ~/.ssh/known_hosts)" ]; then ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null; fi
+                cat ~/.ssh/known_hosts
+
                 # Localhost redirects
                 echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
                 cat /etc/hosts
@@ -63,7 +67,7 @@ aliases:
                 tests/travis/php-lint.sh ./themes
 
                 # Run code sniffer on the diffed files.
-                composer lint-diff
+                ./tests/travis/diff-standards.sh
     - &prepare_mysql
         run:
             name: Prepare Database Dependencies

@@ -25,7 +25,7 @@ echo "Verify changed code against coding standards."
 echo "Updating available refs..."
 [ $TRAVIS ] && echo "travis_fold:start:coding_standards_setup"
 git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-yes | git fetch --all
+git fetch --all
 
 GIT_DIFF=$(git diff $DIFF_BRANCH '*.php')
 if [ -z "$GIT_DIFF" ]; then

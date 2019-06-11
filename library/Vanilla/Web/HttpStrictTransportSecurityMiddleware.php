@@ -44,6 +44,4 @@ class HttpStrictTransportSecurityMiddleware {
 
         return $response;
     }
-
-
 }

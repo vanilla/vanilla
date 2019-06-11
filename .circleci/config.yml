@@ -3,14 +3,19 @@ aliases:
     - &php72
         - image: circleci/php:7.3.5-node
         - image: mysql:5.7.26
+          environment:
+                MYSQL_USER: root
+                MYSQL_DATABASE: vanilla_test
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                MYSQL_ROOT_PASSWORD: ''
     - &php73
         - image: circleci/php:7.2.19-node
         - image: mysql:5.7.26
           environment:
-            MYSQL_USER: root
-            MYSQL_DATABASE: vanilla_test
-            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-            MYSQL_ROOT_PASSWORD: ''
+                MYSQL_USER: root
+                MYSQL_DATABASE: vanilla_test
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                MYSQL_ROOT_PASSWORD: ''
     - &node
         - image: circleci/node:lts-browsers
     - &run_yarn
@@ -82,14 +87,15 @@ aliases:
         - run:
             name: Install openapi validator module
             command: |
-                cd ~/workspace/php/plugins/swagger/
+                cd ~/workspace/php/plugins/swagger-ui/
                 yarn install --pure-lockfile
         - run:
             name: Prepare Database Dependencies
             command: |
-                # sudo apt update && sudo apt install zlib1g-dev libsqlite3-dev
-                sudo docker-php-ext-install pdo pdo_mysql gd
-                sudo apt-get install mysql-client
+                apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
+                docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+                docker-php-ext-install pdo pdo_mysql gd
+                apt-get install mysql-client
         # - run:
         #     name: Create Test Table
         #     command: |

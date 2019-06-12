@@ -40,6 +40,14 @@ export default class Builder {
     }
 
     /**
+     * Run just the install step of the build.
+     */
+    public async installOnly() {
+        await this.entryModel.init();
+        await this.installNodeModules();
+    }
+
+    /**
      * Run the build based on the provided options.
      */
     public async build() {

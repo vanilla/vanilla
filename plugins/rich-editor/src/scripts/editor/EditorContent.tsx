@@ -201,9 +201,12 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement
             return;
         }
         // Sync the text areas together.
-        const handleChange = () => {
-            textArea.value = JSON.stringify(quill.getContents().ops);
-        };
+        // Throttled to keep performance up on slower devices.
+        const handleChange = throttle(() => {
+            requestAnimationFrame(() => {
+                textArea.value = JSON.stringify(quill.getContents().ops);
+            });
+        }, 1000 / 60); // 60FPS
         quill.on(Quill.events.TEXT_CHANGE, handleChange);
 
         // Listen for the legacy form event if applicable and clear the form.

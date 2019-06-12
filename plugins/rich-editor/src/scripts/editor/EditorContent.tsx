@@ -172,9 +172,7 @@ function useOperationsQueue() {
                 quill.updateContents([offsetOperations, ...operation]);
             }
         });
-        return () => {
-            clearOperationsQueue && clearOperationsQueue();
-        };
+        clearOperationsQueue && clearOperationsQueue();
     }, [quill, operationsQueue, clearOperationsQueue]);
 }
 

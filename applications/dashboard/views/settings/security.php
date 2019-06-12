@@ -29,7 +29,7 @@ echo $form->errors();
                     );
                     ?>
                     </p>
-                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
+                    <p><?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap">
@@ -46,8 +46,7 @@ echo $form->errors();
             <div class="label-wrap">
                 <?php echo $form->label('Max-age', 'Garden.Security.Hsts.MaxAge'); ?>
                 <div class="info">
-                    <p><strong><?php echo t('Note'); ?>:</strong>
-                        <?php echo t(
+                    <p><?php echo t(
                             'We recommend starting with a max age of 1 week'
                                     . ' and then increasing it to 1 month then 1 year once you see your site works as expected.'
                         ); ?>
@@ -78,7 +77,7 @@ echo $form->errors();
                         );
                         ?>
                     </p>
-                    <p><?php echo t('Note: Only enable this feature if you are sure that all of your subdomains are configured for HTTPS with valid certificates.'); ?></p>
+                    <p><?php echo t('Warning: Only enable this feature if you are sure that all of your subdomains are configured for HTTPS with valid certificates.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">

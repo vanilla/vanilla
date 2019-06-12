@@ -37,7 +37,7 @@ echo $form->errors();
             </div>
         </li>
     </ul>
-    <h2 class="subheading"><?php echo t('Http strict transport security (hsts) directives').':'; ?></h2>
+    <h2 class="subheading"><?php echo t('HTTP Strict Transport Security (HSTS) Directives'); ?></h2>
     <ul>
         <li>
             <div class="info">Learn more about hsts: <a href="https://hstspreload.org/">https://hstspreload.org/</a></div>

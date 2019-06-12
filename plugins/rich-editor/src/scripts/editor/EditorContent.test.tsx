@@ -18,7 +18,7 @@ describe("EditorContent", () => {
             expect(quill.getContents().ops).deep.eq(initialValue);
         });
 
-        it.only("can sync updates from quill to the textarea", async () => {
+        it("can sync updates from quill to the textarea", async () => {
             const { quill, textarea } = await setupLegacyEditor([]);
             const valueToSet = [OpUtils.op("Test Header"), OpUtils.heading(2)];
             quill.setContents(valueToSet, Quill.sources.USER);

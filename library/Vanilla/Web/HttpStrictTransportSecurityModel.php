@@ -21,7 +21,7 @@ class HttpStrictTransportSecurityModel {
     const INCLUDE_SUBDOMAINS_KEY = 'Garden.Security.Hsts.IncludeSubDomains';
     const PRELOAD_KEY = 'Garden.Security.Hsts.Preload';
 
-    const DEFAULT_TTL = 63072000; // 2 years
+    const DEFAULT_TTL = 604800; // 1 week
     const DEFAULT_INCLUDE_SUBDOMAINS = false;
     const DEFAULT_PRELOAD = false;
 

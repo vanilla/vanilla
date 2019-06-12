@@ -13,7 +13,7 @@
  */
 
 use \Vanilla\Web\Asset\LegacyAssetModel;
-use Vanilla\Web\HttpStrictTransportSecurity\HttpStrictTransportSecurityModel;
+use Vanilla\Web\HttpStrictTransportSecurityModel;
 
 /**
  * Controller base class.

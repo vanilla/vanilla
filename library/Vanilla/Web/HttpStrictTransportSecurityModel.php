@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Web\HttpStrictTransportSecurity;
+namespace Vanilla\Web;
 
 use Vanilla\Contracts\ConfigurationInterface;
 

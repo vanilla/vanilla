@@ -8,7 +8,7 @@ namespace Vanilla\Web;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
-use Vanilla\Web\HttpStrictTransportSecurity\HttpStrictTransportSecurityModel;
+use Vanilla\Web\HttpStrictTransportSecurityModel;
 
 /**
  * Dispatcher middleware for handling HSTS header.

@@ -47,8 +47,9 @@ echo $form->errors();
                 <?php echo $form->label('Max Age', 'Garden.Security.Hsts.MaxAge'); ?>
                 <div class="info">
                     <p><?php echo t(
-                            'We recommend starting with a max age of 1 week'
-                                    . ' and then increasing it to 1 month then 1 year once you see your site works as expected.'
+                            'Security.Hsts.MaxAgeRecommendation',
+                            'We recommend starting with a max age of 1 week'.
+                                ' and then increasing it to 1 month then 1 year once you see your site works as expected.'
                         ); ?>
                     </p>
                 </div>

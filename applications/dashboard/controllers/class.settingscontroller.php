@@ -8,7 +8,7 @@
  * @since 2.0
  */
 use Vanilla\Addon;
-use Vanilla\Web\HttpStrictTransportSecurity\HttpStrictTransportSecurityModel as HstsModel;
+use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 
 /**
  * Handles /settings endpoint.

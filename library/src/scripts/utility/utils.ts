@@ -403,3 +403,14 @@ export function guessOperatingSystem(): OS {
 
     return OS.UNKNOWN;
 }
+
+/**
+ * Simple utility function for waiting some duration in promise.
+ *
+ * @param duration The amount of time to wait.
+ */
+export function promiseTimeout(duration: number): Promise<void> {
+    return new Promise(resolve => {
+        setTimeout(resolve, duration);
+    });
+}

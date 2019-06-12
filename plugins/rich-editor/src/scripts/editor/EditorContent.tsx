@@ -24,7 +24,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
 interface IProps {
-    legacyTextArea?: HTMLInputElement;
+    legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
 }
 
@@ -183,7 +183,7 @@ function useOperationsQueue() {
  *
  * Once we rewrite the post page, this should no longer be necessary.
  */
-function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
+function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
 
     useEffect(() => {
@@ -275,7 +275,7 @@ function useGlobalSelectionHandler() {
  * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
  * This only works for PASTE. Not editing the contents.
  */
-function useDebugPasteListener(textArea?: HTMLInputElement) {
+function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
     useEffect(() => {
         if (!legacyMode || !textArea || !debug() || !quill) {

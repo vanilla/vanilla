@@ -37,10 +37,10 @@ echo $form->errors();
             </div>
         </li>
     </ul>
-    <h2 class="subheading"><?php echo t('HTTP Strict Transport Security (HSTS) Directives'); ?></h2>
+    <h2 class="subheading"><?php echo t('HTTP Strict Transport Security (HSTS) Settings'); ?></h2>
     <ul>
         <li>
-            <div class="info">Learn more about hsts: <a href="https://hstspreload.org/">https://hstspreload.org/</a></div>
+            <div class="info"><?php echo sprintf(t('Learn more about HSTS at %s.'), '<a href="https://hstspreload.org/">https://hstspreload.org/</a>'); ?></div>
         </li>
         <li class="form-group">
             <div class="label-wrap">
@@ -48,8 +48,8 @@ echo $form->errors();
                 <div class="info">
                     <p><strong><?php echo t('Note'); ?>:</strong>
                         <?php echo t(
-                            'We recommend to enable this directive as your first directive with a value of WEEK'
-                                    . 'and then increase it to MONTH and YEAR once you see your site works as expected.'
+                            'We recommend starting with a max age of 1 week'
+                                    . ' and then increasing it to 1 month then 1 year once you see your site works as expected.'
                         ); ?>
                     </p>
                 </div>
@@ -57,10 +57,10 @@ echo $form->errors();
             <div class="input-wrap inline">
                 <?php echo $form->radioList('Garden.Security.Hsts.MaxAge',
                     [
-                        604800 => t('Week'),
-                        2592000 => t('Month'),
-                        31536000 => t('Year'),
-                        63072000 => t('2 Years')
+                        604800 => plural(1, '%s week', '%s weeks'),
+                        2592000 => plural(1, '%s month', '%s months'),
+                        31536000 => plural(1, '%s year', '%s years'),
+                        63072000 => plural(2, '%s year', '%s years')
                     ],
                     ['class' => 'inline']
                 ); ?>
@@ -74,11 +74,11 @@ echo $form->errors();
                         <?php
                         echo t(
                             'Security.Hsts.IncludeSubDomains',
-                            'If this optional parameter is specified, this rule applies to all of the site\'s subdomains as well.'
+                            'When enabled, this rule applies to all of your site\'s subdomains as well.'
                         );
                         ?>
                     </p>
-                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Enable this feature if you are sure that all your subdomains are configured for https and have valid certificates installed.'); ?></p>
+                    <p><?php echo t('Note: Only enable this feature if you are sure that all of your subdomains are configured for HTTPS with valid certificates.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">
@@ -90,8 +90,8 @@ echo $form->errors();
             <div class="label-wrap-wide">
                 <?php echo $form->label('Preload', 'Garden.Security.Hsts.Preload'); ?>
                 <div class="info">
-                    <p class="warning"><strong><?php echo t('Warning'); ?>:</strong>
-                        <?php echo t('It\'s great to support HSTS preloading as a best practice. However, you need to check requirements and submit your site to hstspreload.org to ensure that it is successfully preloaded (i.e. to get the full protection for the intended configuration).'); ?></p>
+                    <p class="warning">
+                        <?php echo t('You must submit your site to hstspreload.org to get full protection.', 'Warning: It\'s great to support HSTS preloading as a best practice. However, you must submit your site to hstspreload.org to ensure that it is successfully pre-loaded (i.e. to get the full protection for the intended configuration).'); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">

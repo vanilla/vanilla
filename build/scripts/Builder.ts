@@ -44,7 +44,7 @@ export default class Builder {
      */
     public async installOnly() {
         await this.entryModel.init();
-        await this.installNodeModules();
+        await installLerna();
     }
 
     /**

@@ -16,5 +16,9 @@
         "@babel/preset-react": "^7.0.0",
         "@babel/preset-typescript": "^7.3.3",
         "@babel/runtime": "^7.4.5"
-    }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "gitHead": "16da130ee797f992978becbea3e4879c3321f1f3"
 }

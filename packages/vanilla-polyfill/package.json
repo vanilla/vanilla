@@ -6,5 +6,9 @@
     "dependencies": {
         "@webcomponents/webcomponentsjs": "^2.2.10",
         "core-js": "^3.1.2"
-    }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "gitHead": "16da130ee797f992978becbea3e4879c3321f1f3"
 }

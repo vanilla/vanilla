@@ -1546,7 +1546,6 @@ class SettingsController extends DashboardController {
 
         // Create a model to save configuration settings
         $validation = new Gdn_Validation();
-        //$validation->applyRule('Garden.Registration.InviteTarget', 'UrlString');
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $registrationOptions = [
@@ -1576,7 +1575,6 @@ class SettingsController extends DashboardController {
         } else {
             // Define some validation rules for the fields being saved
             $configurationModel->Validation->applyRule('Garden.Registration.Method', 'Required');
-            $configurationModel->Validation->applyRule('Garden.Registration.InviteTarget', 'UrlString', 'Invitation Target cannot be numeric, contain special characters or spaces.');
 
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
             $invitationRoleIDs = $this->Form->getValue('InvitationRoleID');
@@ -1597,8 +1595,6 @@ class SettingsController extends DashboardController {
 
                 // Get the updated InviteTarget
                 $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
-                // Save to config
-                saveToConfig('Garden.Registration.InviteTarget', $this->InviteTarget);
 
                 // Get the updated Expiration Length
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');

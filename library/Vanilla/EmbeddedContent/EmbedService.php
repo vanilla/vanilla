@@ -7,8 +7,11 @@
 namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
+use Garden\Schema\ValidationException;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbedFactory;
 
 /**
@@ -70,6 +73,7 @@ class EmbedService implements EmbedCreatorInterface {
         $dic = \Gdn::getContainer();
         $this->setFallbackFactory($dic->get(LinkEmbedFactory::class))
             ->registerFactory($dic->get(GiphyEmbedFactory::class))
+            ->registerFactory($dic->get(ImgurEmbedFactory::class))
             ->registerFactory($dic->get(CodePenEmbedFactory::class));
 //        $this->setFallbackFactory($dic->get(Embeds\LinkEmbed::class))
 //            ->addEmbed($dic->get(Embeds\QuoteEmbed::class))
@@ -115,8 +119,12 @@ class EmbedService implements EmbedCreatorInterface {
     public function createEmbedFromData(array $data): AbstractEmbed {
         // Fallback in case we have bad data (will fallback to fallback embed).
         $url = $data['url'] ?? null;
-        $factory = $this->getFactoryForUrl($url);
-        return $factory->createEmbedFromData($data);
+        try {
+            $factory = $this->getFactoryForUrl($url);
+            return $factory->createEmbedFromData($data);
+        } catch (ValidationException $e) {
+            return new ErrorEmbed($e, $data);
+        }
     }
 
     /**

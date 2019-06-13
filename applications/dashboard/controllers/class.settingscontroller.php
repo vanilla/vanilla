@@ -1510,6 +1510,9 @@ class SettingsController extends DashboardController {
         // Get the currently selected Expiration Length
         $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
 
+        // Get target
+        $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+
         // Registration methods.
         $this->RegistrationMethods = [
             // 'Closed' => "Registration is closed.",
@@ -1543,12 +1546,14 @@ class SettingsController extends DashboardController {
 
         // Create a model to save configuration settings
         $validation = new Gdn_Validation();
+        //$validation->applyRule('Garden.Registration.InviteTarget', 'UrlString');
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $registrationOptions = [
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.InviteExpiration',
-            'Garden.Registration.ConfirmEmail'
+            'Garden.Registration.ConfirmEmail',
+            'Garden.Registration.InviteTarget'
         ];
         $configurationModel->setField($registrationOptions);
 
@@ -1571,6 +1576,7 @@ class SettingsController extends DashboardController {
         } else {
             // Define some validation rules for the fields being saved
             $configurationModel->Validation->applyRule('Garden.Registration.Method', 'Required');
+            $configurationModel->Validation->applyRule('Garden.Registration.InviteTarget', 'UrlString', 'Invitation Target cannot be numeric, contain special characters or spaces.');
 
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
             $invitationRoleIDs = $this->Form->getValue('InvitationRoleID');
@@ -1588,6 +1594,10 @@ class SettingsController extends DashboardController {
 
             // Save!
             if ($this->Form->save() !== false) {
+
+                //Save target to config
+                saveToConfig('Garden.Registration.InviteTarget', $this->Form->getValue('Garden.Registration.InviteTarget'));
+
                 // Get the updated Expiration Length
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));

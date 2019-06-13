@@ -25,9 +25,7 @@ import classNames from "classnames";
 import { components } from "react-select";
 import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";
-import { OptionProps } from "react-select/lib/components/Option";
 import AsyncCreatable from "react-select/lib/AsyncCreatable";
-import { visibility } from "@library/styles/styleHelpers";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -49,7 +47,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     titleAsComponent?: React.ReactNode;
     isLoading?: boolean;
     onSearch: () => void;
-    optionComponent?: React.ComponentType<OptionProps<any>>;
+    optionComponent?: React.ComponentType<any>;
     getRef?: any;
     buttonClassName?: string;
     buttonLoaderClassName?: string;

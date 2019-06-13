@@ -34,6 +34,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
+        $this->ClassName = "EmojiExtenderPlugin";
     }
 
     /**

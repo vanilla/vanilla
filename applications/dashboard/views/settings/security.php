@@ -44,7 +44,7 @@ echo $form->errors();
         </li>
         <li class="form-group">
             <div class="label-wrap">
-                <?php echo $form->label('Max-age', 'Garden.Security.Hsts.MaxAge'); ?>
+                <?php echo $form->label('Max Age', 'Garden.Security.Hsts.MaxAge'); ?>
                 <div class="info">
                     <p><?php echo t(
                             'Security.Hsts.MaxAgeRecommendation',
@@ -68,7 +68,7 @@ echo $form->errors();
         </li>
         <li class="form-group">
             <div class="label-wrap-wide">
-                <?php echo $form->label('Include subdomains', 'Garden.Security.Hsts.IncludeSubDomains'); ?>
+                <?php echo $form->label('Include Subdomains', 'Garden.Security.Hsts.IncludeSubDomains'); ?>
                 <div class="info">
                     <p>
                         <?php
@@ -78,7 +78,7 @@ echo $form->errors();
                         );
                         ?>
                     </p>
-                    <p><?php echo t('Warning: Only enable this feature if you are sure that all of your subdomains are configured for HTTPS with valid certificates.'); ?></p>
+                    <p><?php echo t('Security.Hsts.HTTPSWarning', 'Warning: Only enable this feature if you are sure all your subdomains are configured for HTTPS with valid certificates.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">
@@ -91,7 +91,11 @@ echo $form->errors();
                 <?php echo $form->label('Preload', 'Garden.Security.Hsts.Preload'); ?>
                 <div class="info">
                     <p class="warning">
-                        <?php echo t('You must submit your site to hstspreload.org to get full protection.', 'Warning: It\'s great to support HSTS preloading as a best practice. However, you must submit your site to hstspreload.org to ensure that it is successfully pre-loaded (i.e. to get the full protection for the intended configuration).'); ?></p>
+                        <?php echo t(
+                                'Security.Hsts.SubmitWarning',
+                                'Warning: It\'s great to support HSTS preloading as a best practice. However, you must submit your site to hstspreload.org '.
+                                    'to ensure that it is successfully pre-loaded (i.e. to get the full protection for the intended configuration).'
+                        ); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">

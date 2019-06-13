@@ -3,6 +3,8 @@
     "version": "3.0.0",
     "private": true,
     "devDependencies": {
+        "@vanilla/library": "^3.0.0",
+        "@vanilla/utils": "^3.0.0",
         "bower": "1.8.8",
         "fibers": "4.0.1",
         "grunt": "1.0.4",
@@ -18,9 +20,7 @@
         "grunt-wiredep": "3.0.x",
         "load-grunt-tasks": "4.0.0",
         "sass": "1.20.1",
-        "time-grunt": "2.0.0",
-        "@vanilla/utils": "*",
-        "@vanilla/library": "*"
+        "time-grunt": "2.0.0"
     },
     "scripts": {
         "install": "bower install",

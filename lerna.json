@@ -1,7 +1,15 @@
 {
-    "packages": ["packages/*", "library", "applications/dashboard", "applications/vanilla", "plugins/*"],
+    "packages": [
+        "packages/*",
+        "library",
+        "applications/dashboard",
+        "applications/vanilla",
+        "plugins/*"
+    ],
     "version": "3.0.0",
     "npmClient": "yarn",
     "useWorkspaces": true,
-    "npmClientArgs": ["--pure-lockfile"]
+    "npmClientArgs": [
+        "--pure-lockfile"
+    ]
 }

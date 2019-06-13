@@ -3,7 +3,7 @@
     "version": "3.0.0",
     "private": true,
     "dependencies": {
-        "@vanilla/utils": "*",
-        "@vanilla/library": "*"
+        "@vanilla/library": "^3.0.0",
+        "@vanilla/utils": "^3.0.0"
     }
 }

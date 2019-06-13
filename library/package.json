@@ -3,6 +3,6 @@
     "version": "3.0.0",
     "private": true,
     "dependencies": {
-        "@vanilla/utils": "*"
+        "@vanilla/utils": "^3.0.0"
     }
 }

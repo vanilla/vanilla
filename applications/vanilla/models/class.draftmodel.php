@@ -8,6 +8,7 @@
  * @since 2.0
  */
 use Garden\EventManager;
+
 /**
  * Manages unpublished drafts of comments and discussions.
  */

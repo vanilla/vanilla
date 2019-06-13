@@ -81,7 +81,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
                 window.quill = null;
             };
         }
-    }, [mountRef, extraOptions, setQuillInstance]);
+        // Causes an infinite loops if we specify mountRef.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [extraOptions, setQuillInstance]);
     return ref.current;
 }
 

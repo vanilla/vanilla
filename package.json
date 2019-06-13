@@ -171,8 +171,9 @@
         "tar": ">=4.4.2"
     },
     "scripts": {
-        "pre-push": "yarn build && yarn test && yarn check-types",
+        "publish-all": "lerna publish from-package",
         "install-all": "ts-node -P build/tsconfig.json build/scripts/install.ts",
+        "pre-push": "yarn build && yarn test && yarn check-types",
         "build": "ts-node -P build/tsconfig.json build/scripts/build.ts",
         "build:dev": "yarn run build --mode=development",
         "build:analyze": "yarn run build --mode=analyze",

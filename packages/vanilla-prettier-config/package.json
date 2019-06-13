@@ -2,7 +2,6 @@
     "name": "@vanilla/prettier-config",
     "version": "3.0.0",
     "main": "index.js",
-    "gitHead": "16da130ee797f992978becbea3e4879c3321f1f3",
     "publishConfig": {
         "access": "public"
     }

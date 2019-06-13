@@ -1543,8 +1543,8 @@ class SettingsController extends DashboardController {
         $registrationOptions = [
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.InviteExpiration',
-            'Garden.Registration.ConfirmEmail',
-            'Garden.Registration.InviteTarget'
+            'Garden.Registration.InviteTarget',
+            'Garden.Registration.ConfirmEmail'
         ];
         $configurationModel->setField($registrationOptions);
 
@@ -1586,8 +1586,10 @@ class SettingsController extends DashboardController {
             // Save!
             if ($this->Form->save() !== false) {
 
-                //Save target to config
-                saveToConfig('Garden.Registration.InviteTarget', $this->Form->getValue('Garden.Registration.InviteTarget'));
+                // Get the updated InviteTarget
+                $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+                // Save to config
+                saveToConfig('Garden.Registration.InviteTarget', $this->InviteTarget);
 
                 // Get the updated Expiration Length
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');

@@ -78,7 +78,7 @@ echo $form->errors();
                         );
                         ?>
                     </p>
-                    <p><?php echo t('Security.Hsts.HTTPSWarning', 'Warning: Only enable this feature if you are sure that all of your subdomains are configured for HTTPS with valid certificates.'); ?></p>
+                    <p><?php echo t('Security.Hsts.HTTPSWarning', 'Warning: Only enable this feature if you are sure all your subdomains are configured for HTTPS with valid certificates.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap-right">

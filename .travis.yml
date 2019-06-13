@@ -76,6 +76,10 @@ jobs:
         - cat /tmp/access.log
     # Frontend JS Job
     - name: JS Build / Test
+      install:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
+        - yarn install --pure-lockfile
       language: node_js
       node_js: lts/*
       addons:
@@ -91,11 +95,6 @@ jobs:
         - yarn test
         - ./tests/travis/audit.sh
         - set +e
-
-install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
-  - export PATH=$HOME/.yarn/bin:$PATH
-  - yarn install --pure-lockfile
 
 cache:
   directories:

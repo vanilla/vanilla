@@ -342,11 +342,13 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * Redirect to the OAuth redirect page with a verification nonce.
      *
      * @param EntryController $sender The controller initiating the request.
-     * @param string $target Where to redirect after signing in.
+     * @param  string $state The state to pass along the OAuth2 flow.
      */
     public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
         $state = $this->decodeState($state);
         $url = $this->realAuthorizeUri($state);
+
+        \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         redirectTo($url, 302, false);
     }
 

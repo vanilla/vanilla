@@ -5,7 +5,7 @@
  */
 
 import Header from "quill/formats/header";
-import { slugify } from "@library/utility/utils";
+import { slugify } from "@vanilla/utils";
 
 interface IValue {
     level: 2;

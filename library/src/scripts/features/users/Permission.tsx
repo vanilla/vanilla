@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
 import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import apiv2 from "@library/apiv2";

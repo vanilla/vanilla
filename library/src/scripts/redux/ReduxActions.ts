@@ -6,7 +6,7 @@
 
 import { IApiError, IApiResponse } from "@library/@types/api/core";
 import { AxiosResponse, AxiosInstance } from "axios";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { ThunkDispatch, ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AsyncActionCreators } from "typescript-fsa";

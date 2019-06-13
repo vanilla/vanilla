@@ -5,8 +5,8 @@
 import apiv2 from "@library/apiv2";
 import { ISelectLookupProps, SelectLookup } from "@library/forms/select/SelectLookup";
 import { t } from "@library/utility/appUtils";
-import CategorySuggestionActions from "@vanilla/categories/CategorySuggestionActions";
-import { IForumStoreState } from "@vanilla/redux/state";
+import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/CategorySuggestionActions";
+import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import React from "react";
 import { connect } from "react-redux";
 import { OptionProps } from "react-select/lib/components/Option";

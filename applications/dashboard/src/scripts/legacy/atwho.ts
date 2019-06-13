@@ -6,7 +6,7 @@
  */
 
 import { formatUrl, getMeta } from "@library/utility/appUtils";
-import { log, matchAtMention as _matchAtMention } from "@library/utility/utils";
+import { logDebug, matchAtMention as _matchAtMention } from "@vanilla/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.
@@ -314,7 +314,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             insert_tpl: "${atwho-data-value}",
             callbacks: {
                 matcher: matchFakeEmoji,
-                tplEval: (tpl, map) => log(map),
+                tplEval: (tpl, map) => logDebug(map),
             },
             limit: maxSuggestions,
             data: emojiList,

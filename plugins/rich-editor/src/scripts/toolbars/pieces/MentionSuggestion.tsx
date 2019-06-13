@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { splitStringLoosely } from "@library/utility/utils";
+import { splitStringLoosely } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { IUserFragment } from "@library/@types/api/users";
 

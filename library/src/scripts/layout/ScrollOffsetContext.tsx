@@ -4,7 +4,7 @@
  */
 
 import React, { useContext } from "react";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 import { style } from "typestyle";
 
 type ScollOffsetSetter = (offset: number) => void;

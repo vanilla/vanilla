@@ -1,32 +1,15 @@
 {
+    "extends": "@vanilla/tsconfig/base.json",
     "compilerOptions": {
-        "allowJs": true,
-        "jsx": "react",
-        "lib": ["es2018", "dom", "dom.iterable"],
-        "noImplicitThis": true,
-        "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node",
-        "strictNullChecks": true,
-        "target": "esnext",
-        "module": "esnext",
-        "isolatedModules": false,
         "baseUrl": ".",
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
-            "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
+            "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
-            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
-            "@testroot/*": ["./tests/javascript/*"]
+            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"]
         },
-        "typeRoots": ["@types", "./node_modules/@types"],
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "plugins": [
-            {
-                "name": "typescript-tslint-plugin"
-            }
-        ]
+        "typeRoots": ["@types", "./node_modules/@types"]
     },
     "include": ["**/*.ts", "**/*.tsx"],
     "exclude": ["**/*.js", "**/*.jsx"]

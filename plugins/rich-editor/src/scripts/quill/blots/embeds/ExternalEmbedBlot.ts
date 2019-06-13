@@ -8,7 +8,7 @@ import { setData, getData, escapeHTML } from "@library/dom/domUtils";
 import uniqueId from "lodash/uniqueId";
 import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/content/embeds/embedUtils";
 import { t } from "@library/utility/appUtils";
-import { logError, capitalizeFirstLetter } from "@library/utility/utils";
+import { logError, capitalizeFirstLetter } from "@vanilla/utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";

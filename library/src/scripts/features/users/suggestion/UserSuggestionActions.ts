@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
 import { IUsersStoreState } from "@library/features/users/userModel";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";

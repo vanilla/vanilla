@@ -25,8 +25,8 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 
     const modulePaths = [
         "node_modules",
-        path.join(VANILLA_ROOT, "node_modules"),
         ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
+        path.join(VANILLA_ROOT, "node_modules"),
     ];
 
     const aliases = Object.keys(entryModel.aliases).join(", ");
@@ -52,7 +52,7 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
-                        const modulesRequiringTranspilation = ["quill", "p-debounce"];
+                        const modulesRequiringTranspilation = ["quill", "p-debounce", "@vanilla/.*"];
                         const exlusionRegex = new RegExp(
                             `node_modules\/(${modulesRequiringTranspilation.join("|")})\/`,
                         );
@@ -65,7 +65,7 @@ ${chalk.green(aliases)}`;
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: [require.resolve("@vanillaforums/babel-preset")],
+                                presets: [require.resolve("@vanilla/babel-preset")],
                                 plugins: babelPlugins,
                                 cacheDirectory: true,
                             },

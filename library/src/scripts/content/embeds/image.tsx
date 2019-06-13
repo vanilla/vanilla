@@ -6,7 +6,7 @@
 import React from "react";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";
 import { registerEmbedComponent } from "@library/content/embeds/embedUtils";
-import { sanitizeUrl } from "@library/utility/utils";
+import { sanitizeUrl } from "@vanilla/utils";
 
 export function initImageEmbeds() {
     registerEmbedComponent("image", ImageEmbed);

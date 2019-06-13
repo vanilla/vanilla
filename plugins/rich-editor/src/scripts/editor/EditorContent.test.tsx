@@ -8,7 +8,7 @@ import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupLegacyEditor } from "@rich-editor/__tests__/quillUtils";
 import { expect } from "chai";
 import Quill from "quill/core";
-import { promiseTimeout } from "@library/utility/utils";
+import { promiseTimeout } from "@vanilla/utils";
 
 describe("EditorContent", () => {
     describe("legacyTextAreaSync", () => {

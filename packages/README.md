@@ -1,6 +1,6 @@
 # What is this?
 
-_Looking for publishing/installation instructions? [See here](#publishing-and-installation)._
+_Looking for publishing/installation instructions? [See here](#installation-and-publishing)._
 
 These packages are the beginning of a monorepo setup, containing as many of vanilla's published modules in 1 place.
 

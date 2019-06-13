@@ -11,7 +11,7 @@
     "icon": "google_signin.png",
     "key": "googlesignin",
     "type": "addon",
-    "documentationUrl": "https://docs.vanillaforums.com/help/sso/social-connect/#google-signin",
+    "documentationUrl": "https://docs.vanillaforums.com/help/sso/social-connect/#google",
     "authors": [
         {
             "name": "Support",

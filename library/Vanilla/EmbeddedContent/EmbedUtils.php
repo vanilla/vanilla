@@ -29,8 +29,8 @@ class EmbedUtils {
 
         // If we don't have our width/height ratio, fall back to a 16/9 ratio.
         if ($width === null || $response === null) {
-            $width = 16;
-            $height = 9;
+            $width = 16 * 20;
+            $height = 9 * 20;
         }
 
         return [$height, $width];

@@ -58,7 +58,6 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      * Use the page scraper to scrape page data.
      *
      * @inheritdoc
-     * @throws \Exception If the scrape fails.
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $response = $this->httpClient->get(
@@ -85,21 +84,12 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         preg_match(self::FULL_SLUG_REGEX, $fullUrl, $matches);
         $id = $matches['postID'] ?? null;
 
-        $width = $response['width'] ?? null;
-        $height = $response['height'] ?? null;
-
-        // If we don't have our width/height ratio, fall back to a 16/9 ratio.
-        if ($width === null || $response === null) {
-            $width = 16;
-            $height = 9;
-        }
-
         $data = [
             'type' => GiphyEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? '',
-            'height' => $height,
-            'width' => $width,
+            'height' => $response['height'] ?? null,
+            'width' => $response['width'] ?? null,
             'giphyID' => $id,
         ];
 

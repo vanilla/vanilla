@@ -18,6 +18,8 @@ use Garden\Http\HttpClient;
  */
 abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
+    const WILDCARD_DOMAIN = "*";
+
     /**
      * @var bool Set this flag if you want the embed to be able empty paths.
      *      Eg. http://test.com with no path on the end.
@@ -47,7 +49,7 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         $domain = $pieces['host'] ?? '';
         $domainMatches = false;
         foreach ($this->getSupportedDomains() as $supportedDomain) {
-            if ($domain === $supportedDomain || stringEndsWith($domain, ".{$supportedDomain}")) {
+            if ($supportedDomain === self::WILDCARD_DOMAIN || $domain === $supportedDomain || stringEndsWith($domain, ".{$supportedDomain}")) {
                 $domainMatches = true;
                 break;
             }

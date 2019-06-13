@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\ImageEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbedFactory;
 
@@ -74,7 +75,8 @@ class EmbedService implements EmbedCreatorInterface {
         $this->setFallbackFactory($dic->get(LinkEmbedFactory::class))
             ->registerFactory($dic->get(GiphyEmbedFactory::class))
             ->registerFactory($dic->get(ImgurEmbedFactory::class))
-            ->registerFactory($dic->get(CodePenEmbedFactory::class));
+            ->registerFactory($dic->get(CodePenEmbedFactory::class))
+            ->registerFactory($dic->get(ImageEmbedFactory::class), self::PRIORITY_LOW);
 //        $this->setFallbackFactory($dic->get(Embeds\LinkEmbed::class))
 //            ->addEmbed($dic->get(Embeds\QuoteEmbed::class))
 //            ->addEmbed($dic->get(Embeds\TwitterEmbed::class))

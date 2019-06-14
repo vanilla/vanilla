@@ -165,20 +165,7 @@ class MediaApiController extends AbstractApiController {
      * @return Schema
      */
     protected function fullSchema() {
-        $schema = Schema::parse([
-            'mediaID:i' => 'The ID of the record.',
-            'url:s' => 'The URL of the file.',
-            'name:s' => 'The original filename of the upload.',
-            'type:s' => 'MIME type',
-            'size:i' =>'File size in bytes',
-            'width:i|n?' => 'Image width',
-            'height:i|n?' => 'Image height',
-            'dateInserted:dt' => 'When the media item was created.',
-            'insertUserID:i' => 'The user that created the media item.',
-            'foreignType:s|n' => 'Table the media is linked to.',
-            'foreignID:i|n' => 'The ID of the table.'
-        ]);
-        return $schema;
+        return new \Vanilla\EmbeddedContent\VanillaMediaSchema(true);
     }
 
     /**

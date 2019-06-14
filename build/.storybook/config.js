@@ -10,7 +10,6 @@ import { configure, addDecorator } from "@storybook/react";
 import {checkA11y, withA11Y} from "@storybook/addon-a11y";
 import { withKnobs } from "@storybook/addon-knobs";
 import { withViewport } from "@storybook/addon-viewport";
-import { withStorySource } from "@storybook/addon-storysource";
 import { withNotes } from "@storybook/addon-notes";
 import { withConsole } from "@storybook/addon-console";
 import { withActions } from "@storybook/addon-actions";
@@ -36,11 +35,10 @@ function loadStories() {
 addDecorator(checkA11y);
 addDecorator(withKnobs);
 addDecorator(withView);
-addDecorator(withViewport);
-addDecorator(withA11Y);
-addDecorator(withActions);
-addDecorator(withConsole);
-addDecorator(withNotes);
-addDecorator(withStorySource());
+// addDecorator(withViewport);
+// addDecorator(withA11Y);
+// addDecorator(withActions);
+// addDecorator(withConsole);
+// addDecorator(withNotes);
 
 configure(loadStories, module);

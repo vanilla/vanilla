@@ -85,7 +85,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         $id = $matches['postID'] ?? null;
 
         $data = [
-            'type' => GiphyEmbed::TYPE,
+            'embedType' => GiphyEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? '',
             'height' => $response['height'] ?? null,
@@ -93,13 +93,6 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
             'giphyID' => $id,
         ];
 
-        return new GiphyEmbed($data);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createEmbedFromData(array $data): AbstractEmbed {
         return new GiphyEmbed($data);
     }
 }

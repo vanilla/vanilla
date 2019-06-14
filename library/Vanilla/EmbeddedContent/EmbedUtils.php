@@ -7,8 +7,6 @@
 
 namespace Vanilla\EmbeddedContent;
 
-use Garden\Http\HttpResponse;
-
 /**
  * Simple static embed utilities.
  */
@@ -57,13 +55,14 @@ class EmbedUtils {
      * @return array
      */
     public static function remapProperties(array $data, array $modifications): array {
-        foreach ($modifications as $key => $value) {
-            if (isset($data[$key])) {
+        foreach ($modifications as $newName => $oldName) {
+            $hasExistingNewValue = valr($newName, $data, null);
+            if ($hasExistingNewValue !== null) {
                 continue;
             }
 
-            $oldValue = valr($value, $data);
-            setvalr($key, $data, $oldValue);
+            $oldValue = valr($oldName, $data);
+            setvalr($newName, $data, $oldValue);
         }
         return $data;
     }

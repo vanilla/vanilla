@@ -98,7 +98,7 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
         [$height, $width] = EmbedUtils::extractDimensions($response);
 
         $data = [
-            'type' => GiphyEmbed::TYPE,
+            'embedType' => GiphyEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? '',
             'height' => $height,
@@ -106,13 +106,6 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
             'giphyID' => $id,
         ];
 
-        return new GiphyEmbed($data);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createEmbedFromData(array $data): AbstractEmbed {
         return new GiphyEmbed($data);
     }
 }

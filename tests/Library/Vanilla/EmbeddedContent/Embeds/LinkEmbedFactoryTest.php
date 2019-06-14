@@ -12,7 +12,7 @@ use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
-use Vanilla\EmbeddedContent\Embeds\LinkEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\ScrapeEmbedFactory;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockPageScraper;
@@ -22,7 +22,7 @@ use VanillaTests\Fixtures\MockPageScraper;
  */
 class LinkEmbedFactoryTest extends ContainerTestCase {
 
-    /** @var LinkEmbedFactory */
+    /** @var ScrapeEmbedFactory */
     private $factory;
 
     /** @var MockPageScraper */
@@ -34,7 +34,7 @@ class LinkEmbedFactoryTest extends ContainerTestCase {
     public function setUp() {
         parent::setUp();
         $this->pageScraper = new MockPageScraper();
-        $this->factory = new LinkEmbedFactory($this->pageScraper);
+        $this->factory = new ScrapeEmbedFactory($this->pageScraper);
     }
 
 

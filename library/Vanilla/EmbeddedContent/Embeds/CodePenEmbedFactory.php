@@ -88,7 +88,7 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
         [$height, $width] = EmbedUtils::extractDimensions($response);
         $frameAttrs = $this->parseSimpleAttrs($response['html'] ?? '', 'iframe') ?? [];
         $data = [
-            'type' => CodePenEmbed::TYPE,
+            'embedType' => CodePenEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? null,
             'height' => $height,
@@ -97,13 +97,6 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
             'frameSrc' => $frameAttrs['src'] ?? null,
         ];
 
-        return new CodePenEmbed($data);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createEmbedFromData(array $data): AbstractEmbed {
         return new CodePenEmbed($data);
     }
 }

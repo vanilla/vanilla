@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
+use Vanilla\EmbeddedContent\VanillaMediaSchema;
 
 /**
  * Image data object.
@@ -47,10 +48,6 @@ class ImageEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     protected function schema(): Schema {
-        return Schema::parse([
-            'height:i',
-            'width:i',
-            'originalUrl:s?'
-        ]);
+        return new VanillaMediaSchema(true);
     }
 }

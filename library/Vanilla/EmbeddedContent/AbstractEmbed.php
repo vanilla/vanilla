@@ -33,6 +33,7 @@ abstract class AbstractEmbed implements \JsonSerializable {
      */
     public function __construct(array $data) {
         // Validate the data before assigning local variables.
+        $data = $this->normalizeCommonData($data);
         $normalizedData = $this->normalizeData($data);
         $validatedData = $this->fullSchema()->validate($normalizedData);
         $this->data = $validatedData;
@@ -64,11 +65,24 @@ abstract class AbstractEmbed implements \JsonSerializable {
      */
     public function renderHtml(): string {
         $viewPath = dirname(__FILE__) . '/AbstractEmbed.twig';
-        // MAYBE??        $viewPath = realpath('./AbstractEmbed.twig');
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
             'embedJson' => json_encode($this->data),
         ]);
+    }
+
+    /**
+     * Some types of data normalization are quite common with the original embeds.
+     * This will be performed here.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function normalizeCommonData(array $data): array {
+        $data = EmbedUtils::remapProperties($data, [
+            'embedType' => 'type',
+        ]);
+        return $data;
     }
 
     /**
@@ -115,7 +129,7 @@ abstract class AbstractEmbed implements \JsonSerializable {
                 'type' => 'string',
                 'format' => 'uri',
             ],
-            'type:s' => [
+            'embedType:s' => [
                 'enum' => $this->getAllowedTypes(),
             ],
             'name:s?'

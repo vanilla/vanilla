@@ -19,6 +19,7 @@ use Garden\Http\HttpClient;
 abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
     const WILDCARD_DOMAIN = "*";
+    const NO_MATCH_DOMAIN = "!";
 
     /**
      * @var bool Set this flag if you want the embed to be able empty paths.

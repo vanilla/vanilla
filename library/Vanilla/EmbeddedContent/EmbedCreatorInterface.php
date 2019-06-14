@@ -20,13 +20,4 @@ interface EmbedCreatorInterface {
      * @throws \Garden\Schema\ValidationException Creation of embed classes use Garden\Schema.
      */
     public function createEmbedForUrl(string $url): AbstractEmbed;
-
-    /**
-     * Create an embed class from already fetched data.
-     * Implementations should be fast and capable of running in loop on every page load.
-     *
-     * @param array $data
-     * @return AbstractEmbed
-     */
-    public function createEmbedFromData(array $data): AbstractEmbed;
 }

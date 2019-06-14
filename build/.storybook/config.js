@@ -34,11 +34,11 @@ function loadStories() {
 
 addDecorator(checkA11y);
 addDecorator(withKnobs);
-addDecorator(withView);
-// addDecorator(withViewport);
+// addDecorator(withView);
+addDecorator(withViewport);
 // addDecorator(withA11Y);
 // addDecorator(withActions);
-// addDecorator(withConsole);
+addDecorator((storyFn, context) => withConsole()(storyFn)(context));
 // addDecorator(withNotes);
 
 configure(loadStories, module);

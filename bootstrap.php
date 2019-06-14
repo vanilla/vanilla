@@ -350,6 +350,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Analytics\Client::class)
     ->setShared(true)
     ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
+
     ->rule(Vanilla\Scheduler\SchedulerInterface::class)
     ->setClass(Vanilla\Scheduler\DummyScheduler::class)
     ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])

@@ -4,7 +4,7 @@
  */
 
 import React, { createRef, useContext, useEffect, useState } from "react";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 
 type FontSizeSetter = (fontSize: number | null) => void;
 

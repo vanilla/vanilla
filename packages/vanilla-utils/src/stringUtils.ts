@@ -1,118 +1,9 @@
 /**
- * General utility functions.
- * This file should have NO external dependencies other than javascript.
+ * Utilities related to strings.
  *
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-/**
- * @type {boolean} The current debug setting.
- * @private
- */
-let _debug = false;
-
-/**
- * Get or set the debug flag.
- *
- * @param newValue - The new value of debug.
- * @returns the current debug setting.
- */
-export function debug(newValue?: boolean): boolean {
-    if (newValue !== undefined) {
-        _debug = newValue;
-    }
-
-    return _debug;
-}
-
-type NormalCallback = (...args: any[]) => any;
-type PromiseCallback = (...args: any[]) => Promise<any>;
-
-export type PromiseOrNormalCallback = NormalCallback | PromiseCallback;
-
-/**
- * Resolve an array of functions that return promises sequentially.
- *
- * @param promiseFunctions - The functions to execute.
- *
- * @returns An array of all results in sequential order.
- *
- * @example
- * const urls = ['/url1', '/url2', '/url3']
- * const functions = urls.map(url => () => fetch(url))
- * resolvePromisesSequentially(funcs)
- *   .then(console.log)
- *   .catch(console.error)
- */
-export function resolvePromisesSequentially(promiseFunctions: PromiseOrNormalCallback[]): Promise<any[]> {
-    if (!Array.isArray(promiseFunctions)) {
-        throw new Error("First argument needs to be an array of Promises");
-    }
-
-    return new Promise((resolve, reject) => {
-        let count = 0;
-        let results = [];
-
-        function iterationFunction(previousPromise, currentPromise) {
-            return previousPromise
-                .then(result => {
-                    if (count++ !== 0) {
-                        results = results.concat(result);
-                    }
-
-                    return currentPromise(result, results, count);
-                })
-                .catch(err => reject(err));
-        }
-
-        promiseFunctions = promiseFunctions.concat(() => Promise.resolve());
-
-        promiseFunctions.reduce(iterationFunction, Promise.resolve(false)).then(() => {
-            resolve(results);
-        });
-    });
-}
-
-/**
- * Log something to console.
- *
- * This only prints in debug mode.
- *
- * @param value - The value to log.
- */
-export function log(...value: any[]) {
-    if (_debug) {
-        // tslint:disable-next-line:no-console
-        console.log(...value);
-    }
-}
-
-/**
- * Log an error to console.
- *
- * @param value - The value to log.
- */
-export function logError(...value: any[]) {
-    if (!_debug && process.env.NODE_ENV === "test") {
-        return;
-    }
-    // tslint:disable-next-line:no-console
-    console.error(...value);
-}
-
-/**
- * Log a warning to console.
- *
- * @param value - The value to log.
- */
-export function logWarning(...value: any[]) {
-    if (!_debug && process.env.NODE_ENV === "test") {
-        return;
-    }
-    // tslint:disable-next-line:no-console
-    console.warn(...value);
-}
 
 /**
  * A simple, fast method of hashing a string. Similar to Java's hash function.
@@ -196,36 +87,6 @@ export function splitStringLoosely(toSplit: string, splitWith: string): string[]
     });
 }
 
-interface IClass {
-    new (): any;
-}
-
-export function isInstanceOfOneOf(needle: any, haystack: IClass[]) {
-    for (const classItem of haystack) {
-        if (needle instanceof classItem) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-export function simplifyFraction(numerator: number, denominator: number) {
-    const findGCD = (a, b) => {
-        return b ? findGCD(b, a % b) : a;
-    };
-    const gcd = findGCD(numerator, denominator);
-
-    numerator = numerator / gcd;
-    denominator = denominator / gcd;
-
-    return {
-        numerator,
-        denominator,
-        shorthand: denominator + ":" + numerator,
-    };
-}
-
 interface IMentionMatch {
     match: string;
     rawMatch: string;
@@ -303,59 +164,6 @@ export function matchAtMention(
     return null;
 }
 
-/** This should mirror extensions allowed in Vanilla\ImageResizer.php */
-const IMAGE_REGEX = /^image\/(gif|jpe?g|png)/i;
-
-/**
- * A filter for use with [].filter
- *
- * Matches only image image type files.
- * @private
- *
- * @param file - A File object.
- * @see https://developer.mozilla.org/en-US/docs/Web/API/File
- *
- * @returns Whether or not the file is an acceptable image
- */
-export function isFileImage(file: File): boolean {
-    if (IMAGE_REGEX.test(file.type)) {
-        return true;
-    }
-
-    log("Filtered out non-image file: ", file.name);
-    return false;
-}
-
-export function capitalizeFirstLetter(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * Transform an array of objects and an map of objets with a given key.
- *
- * Objects that do not contain the given key are dropped.
- *
- * @param array The array to go through.
- * @param key The key to lookup.
- */
-export function indexArrayByKey<T extends object>(
-    array: T[],
-    key: string,
-): {
-    [key: string]: T;
-} {
-    const object = {};
-    for (const item of array) {
-        if (key in item) {
-            if (!(item[key] in object)) {
-                object[item[key]] = [];
-            }
-            object[item[key]].push(item);
-        }
-    }
-    return object;
-}
-
 const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/|\/)/;
 
 /**
@@ -377,29 +185,22 @@ export function sanitizeUrl(url: string) {
     }
 }
 
-export enum OS {
-    IOS = "ios",
-    ANDROID = "android",
-    UNKNOWN = "unkwown",
+/**
+ * Capitalize the first character of a string.
+ *
+ * @param str The string to modify.
+ */
+export function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
- * Provide relatively rough detection of mobile OS.
+ * Simple utility function for waiting some duration in promise.
  *
- * This is not even close to perfect but can be used to try and offer,
- * OS specific input elements for things like datetimes.
+ * @param duration The amount of time to wait.
  */
-export function guessOperatingSystem(): OS {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    if (/android/i.test(userAgent)) {
-        return OS.ANDROID;
-    }
-
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return OS.IOS;
-    }
-
-    return OS.UNKNOWN;
+export function promiseTimeout(duration: number): Promise<void> {
+    return new Promise(resolve => {
+        setTimeout(resolve, duration);
+    });
 }

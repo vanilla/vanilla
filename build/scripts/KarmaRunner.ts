@@ -6,17 +6,21 @@
 
 import path from "path";
 import { makeTestConfig } from "./configs/makeTestConfig";
-import { VANILLA_ROOT, TEST_FILE_ROOTS } from "./env";
+import { VANILLA_ROOT, TEST_FILE_ROOTS, PACKAGES_TEST_ENTRY } from "./env";
 import { IBuildOptions, BuildMode } from "./options";
 import EntryModel from "./utility/EntryModel";
 // tslint:disable-next-line
 const Karma = require("karma");
 
+const TS_PROCESSORS = ["webpack", "sourcemap"];
+
 export class KarmaRunner {
-    private files: string[] = [];
+    private files: string[] = [PACKAGES_TEST_ENTRY];
     private preprocessors: {
         [key: string]: string[];
-    } = {};
+    } = {
+        [PACKAGES_TEST_ENTRY]: TS_PROCESSORS,
+    };
     private entryModel: EntryModel;
 
     public constructor(private options: IBuildOptions) {
@@ -36,14 +40,14 @@ export class KarmaRunner {
     private initFileDirs = () => {
         TEST_FILE_ROOTS.forEach(fileRoot => {
             const { normalize, join } = path;
-            const tsPath = normalize(join(fileRoot, "src/scripts/**/*.test.ts"));
-            const tsxPath = normalize(join(fileRoot, "src/scripts/**/*.test.tsx"));
-            const setupPath = normalize(join(fileRoot, "src/scripts/__tests__/setup.ts"));
+            const tsPath = normalize(join(fileRoot, "src/**/*.test.ts"));
+            const tsxPath = normalize(join(fileRoot, "src/**/*.test.tsx"));
+            const setupPath = normalize(join(fileRoot, "src/**/__tests__/setup.ts"));
 
             this.files.push(setupPath);
-            this.preprocessors[tsPath] = ["webpack", "sourcemap"];
-            this.preprocessors[tsxPath] = ["webpack", "sourcemap"];
-            this.preprocessors[setupPath] = ["webpack", "sourcemap"];
+            this.preprocessors[tsPath] = TS_PROCESSORS;
+            this.preprocessors[tsxPath] = TS_PROCESSORS;
+            this.preprocessors[setupPath] = TS_PROCESSORS;
         });
     };
 

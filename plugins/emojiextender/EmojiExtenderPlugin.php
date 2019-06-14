@@ -34,6 +34,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
+        $this->ClassName = "EmojiExtenderPlugin";
     }
 
     /**
@@ -116,7 +117,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      */
     public function getEmojiSets() {
         if (!isset($this->emojiSets)) {
-            $root = '/plugins/EmojiExtender/emoji';
+            $root = '/plugins/emojiextender/emoji';
 
             $this->addEmojiSet(
                 '',

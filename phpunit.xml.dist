@@ -22,6 +22,7 @@
         <env name="TEST_DB_NAME" value="vanilla_test"/>
         <env name="TEST_DB_USER" value="travis" />
         <env name="TEST_DB_PASSWORD" value="" />
+        <env name="TEST_DB_HOST" value="127.0.0.1" />
     </php>
 
     <testsuites>

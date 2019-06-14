@@ -11,7 +11,7 @@ import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
 import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
-import { installNodeModulesInDir } from "./utility/moduleUtils";
+import { installLerna } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { print, fail } from "./utility/utils";
 import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
@@ -40,11 +40,19 @@ export default class Builder {
     }
 
     /**
+     * Run just the install step of the build.
+     */
+    public async installOnly() {
+        await this.entryModel.init();
+        await installLerna();
+    }
+
+    /**
      * Run the build based on the provided options.
      */
     public async build() {
         await this.entryModel.init();
-        await this.installNodeModules();
+        await installLerna();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -52,23 +60,6 @@ export default class Builder {
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
         }
-    }
-
-    /**
-     * Install node modules for all addons providing source files.
-     */
-    private async installNodeModules() {
-        // Make an exception for the old dashboard node_modules. We don't want to install these.
-        // Eventually they will be untangled but for now they trigger bower component installation.
-        // That does not work in CI.
-        const dashboardPath = path.resolve(VANILLA_APPS, "dashboard");
-        const installableAddons = this.entryModel.addonDirs.filter(addonDir => addonDir !== dashboardPath);
-
-        const originalDir = process.cwd();
-        // Install the node modules.
-        return await Promise.all(installableAddons.map(installNodeModulesInDir)).then(() => {
-            process.chdir(originalDir);
-        });
     }
 
     /**

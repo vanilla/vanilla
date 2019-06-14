@@ -56,6 +56,7 @@ echo '</div>';
 ?>
     <div class="Buttons">
         <?php
+        $this->fireEvent('AfterPassword');
         echo $this->Form->button('Sign In', ['class' => 'Button Primary']);
         echo $this->Form->checkBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
         ?>

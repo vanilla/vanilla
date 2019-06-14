@@ -47,7 +47,7 @@ export const titleBarVariables = useThemeCache(() => {
         spacer: 8,
     });
 
-    const buttonSize = formElementVars.sizing.height;
+    const buttonSize = globalVars.buttonIcon.size;
     const button = makeThemeVars("button", {
         borderRadius: globalVars.border.radius,
         size: buttonSize,
@@ -344,7 +344,7 @@ export const titleBarClasses = useThemeCache(() => {
         "button",
         {
             color: vars.colors.fg.toString(),
-            height: px(vars.sizing.height),
+            height: px(vars.button.size),
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),

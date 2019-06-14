@@ -6,7 +6,7 @@
 import React from "react";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";
 import { IEmbedProps, registerEmbedComponent } from "@library/content/embeds/embedUtils";
-import { simplifyFraction } from "@library/utility/utils";
+import { simplifyFraction } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 import { delegateEvent } from "@library/dom/domUtils";
 import ReactDOM from "react-dom";

@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api/users";
-import { capitalizeFirstLetter } from "@library/utility/utils";
+import { capitalizeFirstLetter } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 import { PublishStatus } from "@library/@types/api/core";
 import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";

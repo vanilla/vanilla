@@ -190,21 +190,7 @@ class MediaTest extends AbstractAPIv2Test {
      */
     public function provideScrapeUrls() {
         $empty = new Attributes();
-        $testBaseUrl = getenv('TEST_BASEURL');
         $urls = [
-            [
-                "{$testBaseUrl}/tests/fixtures/html/og.htm",
-                'link',
-                [
-                    'name' => 'Online Community Software and Customer Forum Software by Vanilla Forums',
-                    'body' => 'Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.',
-                    'photoUrl' => 'https://vanillaforums.com/images/metaIcons/vanillaForums.png',
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => $empty,
-                ],
-                true
-            ],
             [
                 'https://example.com/image.bmp',
                 'image',

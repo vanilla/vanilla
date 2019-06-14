@@ -10,7 +10,7 @@ import { attachment, emoji, image } from "@library/icons/editorIcons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { isFileImage } from "@library/utility/utils";
+import { isFileImage } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 

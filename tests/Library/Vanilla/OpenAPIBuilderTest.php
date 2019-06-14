@@ -38,7 +38,7 @@ class OpenAPIBuilderTest extends TestCase {
 
         $dir = getcwd();
         chdir(PATH_ROOT);
-        exec("yarn swagger-cli validate $path", $output, $result);
+        exec("npx swagger-cli@2.2.1 validate $path", $output, $result);
         chdir($dir);
         $this->assertSame(0, $result);
     }

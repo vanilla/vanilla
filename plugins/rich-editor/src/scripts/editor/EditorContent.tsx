@@ -7,7 +7,7 @@
 import { userContentClasses } from "@library/content/userContentStyles";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
 import { useLastValue } from "@library/dom/hookUtils";
-import { debug } from "@library/utility/utils";
+import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
@@ -24,7 +24,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
 interface IProps {
-    legacyTextArea?: HTMLInputElement;
+    legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
 }
 
@@ -172,9 +172,7 @@ function useOperationsQueue() {
                 quill.updateContents([offsetOperations, ...operation]);
             }
         });
-        return () => {
-            clearOperationsQueue && clearOperationsQueue();
-        };
+        clearOperationsQueue && clearOperationsQueue();
     }, [quill, operationsQueue, clearOperationsQueue]);
 }
 
@@ -183,7 +181,7 @@ function useOperationsQueue() {
  *
  * Once we rewrite the post page, this should no longer be necessary.
  */
-function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
+function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
 
     useEffect(() => {
@@ -201,9 +199,12 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
             return;
         }
         // Sync the text areas together.
-        const handleChange = () => {
-            textArea.value = JSON.stringify(quill.getContents().ops);
-        };
+        // Throttled to keep performance up on slower devices.
+        const handleChange = throttle(() => {
+            requestAnimationFrame(() => {
+                textArea.value = JSON.stringify(quill.getContents().ops);
+            });
+        }, 1000 / 60); // 60FPS
         quill.on(Quill.events.TEXT_CHANGE, handleChange);
 
         // Listen for the legacy form event if applicable and clear the form.
@@ -275,7 +276,7 @@ function useGlobalSelectionHandler() {
  * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
  * This only works for PASTE. Not editing the contents.
  */
-function useDebugPasteListener(textArea?: HTMLInputElement) {
+function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
     useEffect(() => {
         if (!legacyMode || !textArea || !debug() || !quill) {

@@ -10,7 +10,7 @@
 import { onReady } from "@library/utility/appUtils";
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { Reducer, ReducersMapObject } from "redux";
 
 let haveGot = false;

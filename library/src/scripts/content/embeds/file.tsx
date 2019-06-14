@@ -10,7 +10,7 @@ import { onContent } from "@library/utility/appUtils";
 import React from "react";
 import ReactDOM from "react-dom";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
-import { sanitizeUrl } from "@library/utility/utils";
+import { sanitizeUrl } from "@vanilla/utils";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);

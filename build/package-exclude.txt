@@ -19,6 +19,7 @@
 */**/readme.*
 */**/README.*
 */**/travis.ini
+packages/**
 applications/dashboard/styleguide/**
 applications/dashboard/template/**
 applications/dashboard/scss/**

@@ -8,11 +8,10 @@
 import "focus-visible";
 import smoothscroll from "smoothscroll-polyfill";
 import twemoji from "twemoji";
-import { hashString } from "../utility/utils";
+import { hashString } from "@vanilla/utils";
 import React from "react";
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
-import { spawn } from "child_process";
 
 smoothscroll.polyfill();
 

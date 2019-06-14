@@ -4,32 +4,16 @@
  *
  * @see {AssetModel::getInlinePolyfillJSContent()} for how the build polyfill entry gets added to the page.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import "@babel/polyfill";
+import "core-js/stable";
 import "@webcomponents/webcomponentsjs";
 
-/**
- * Polyfill forEach on NodeList.
- *
- * This can be removed once v3 of core-js is released
- * https://github.com/zloirock/core-js/issues/329.
- *
- * Polyfill included here is taken from Mozilla.
- * https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
- */
-function polyfillNodeListForEach() {
-    if (NodeList && !NodeList.prototype.forEach) {
-        NodeList.prototype.forEach = function forEach(callback, thisArg) {
-            thisArg = thisArg || window;
-            for (let i = 0; i < this.length; i++) {
-                callback.call(thisArg, this[i], i, this);
-            }
-        };
-    }
-}
+polyfillClosest();
+polyfillRemove();
+polyfillCustomEvent();
 
 /**
  * Polyfill Element.closest() on IE 9+.
@@ -43,12 +27,12 @@ function polyfillNodeListForEach() {
 export function polyfillClosest() {
     if (!Element.prototype.matches) {
         Element.prototype.matches =
-            (Element as any).prototype.msMatchesSelector || (Element as any).prototype.webkitMatchesSelector;
+            (Element).prototype.msMatchesSelector || (Element).prototype.webkitMatchesSelector;
     }
 
     if (!Element.prototype.closest) {
         Element.prototype.closest = function closest(s) {
-            let el: Node | null = this;
+            let el = this;
             if (document.documentElement && !document.documentElement.contains(el)) {
                 return null;
             }
@@ -111,10 +95,5 @@ function polyfillCustomEvent() {
 
     CustomEvent.prototype = window.Event.prototype;
 
-    window.CustomEvent = CustomEvent as any;
+    window.CustomEvent = CustomEvent;
 }
-
-polyfillNodeListForEach();
-polyfillClosest();
-polyfillRemove();
-polyfillCustomEvent();

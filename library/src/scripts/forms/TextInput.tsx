@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { slugify } from "@library/utility/utils";
+import { slugify } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
 

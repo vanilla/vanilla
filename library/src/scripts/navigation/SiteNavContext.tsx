@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 

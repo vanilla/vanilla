@@ -6,7 +6,6 @@
 
 import { getOptions } from "../options";
 import { print, fail } from "./utils";
-import chalk from "chalk";
 import { spawn } from "child_process";
 
 /**
@@ -14,14 +13,13 @@ import { spawn } from "child_process";
  *
  * @param options
  */
-export async function installNodeModulesInDir(dir: string) {
+export async function installLerna() {
     const options = await getOptions();
 
     try {
-        print(`Installing node modules for directory: ${chalk.yellow(dir)}`);
-        process.chdir(dir);
+        print(`Installing node_modules with lerna.`);
         const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
-        await spawnChildProcess("yarn", ["install", "--pure-lockfile"], spawnOptions);
+        await spawnChildProcess("yarn", ["bootstrap"], spawnOptions);
     } catch (err) {
         fail(`\nNode module installation failed.\n    ${err}\n`);
     }

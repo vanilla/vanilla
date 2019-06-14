@@ -9,7 +9,7 @@ import React, { ComponentClass } from "react";
 import ReactDOM from "react-dom";
 import gdn from "@library/gdn";
 import { RouteProps } from "react-router";
-import { logError, PromiseOrNormalCallback } from "@library/utility/utils";
+import { logError, PromiseOrNormalCallback } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
 
 /**

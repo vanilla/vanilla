@@ -2537,7 +2537,10 @@ class CategoryModel extends Gdn_Model {
             $category = self::categories($category);
         }
 
-        return self::categories(val('PermissionCategoryID', $category));
+        $category = self::categories(val('PermissionCategoryID', $category));
+        // Ensure all of our values are processed properly.
+        self::calculate($category);
+        return $category;
     }
 
     /**

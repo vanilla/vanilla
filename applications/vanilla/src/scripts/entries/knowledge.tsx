@@ -4,6 +4,6 @@
  */
 
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { forumReducer } from "@vanilla/redux/reducer";
+import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 
 registerReducer("forum", forumReducer);

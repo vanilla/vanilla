@@ -131,13 +131,21 @@ if (!$hasUserID) {
                 <?php endif; ?>
 
                 <?php $this->fireEvent('RegisterBeforePassword'); ?>
-                <li id="ConnectPassword">
-                    <?php
+
+                <?php
+                /**
+                 *  HidePassword can be passed by any plugin that hooks into
+                 *  the EntryController that has rules that require this form to be
+                 *  shown but not the Password Field.
+                 */
+                if (!$this->data('HidePassword')) {
+                    echo '<li id="ConnectPassword">';
                     echo $this->Form->label('Password', 'ConnectPassword');
                     echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
                     echo $this->Form->input('ConnectPassword', 'password');
-                    ?>
-                </li>
+                    echo '</li>';
+                }
+                ?>
             </ul>
 
             <?php

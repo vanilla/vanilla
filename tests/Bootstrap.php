@@ -219,6 +219,9 @@ class Bootstrap {
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
 
+            ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
+            ->addAlias('HstsModel')
+
             ->rule('@api-v2-route')
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])

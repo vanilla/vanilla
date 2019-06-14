@@ -1,0 +1,8 @@
+{
+    "name": "@vanilla/library",
+    "version": "3.0.0",
+    "private": true,
+    "dependencies": {
+        "@vanilla/utils": "*"
+    }
+}

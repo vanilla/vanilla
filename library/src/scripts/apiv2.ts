@@ -6,7 +6,7 @@
  */
 
 import { formatUrl, t, getMeta } from "@library/utility/appUtils";
-import { indexArrayByKey } from "@library/utility/utils";
+import { indexArrayByKey } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\EmbeddedContent;
 
+use PHPUnit\Framework\Warning;
 use Vanilla\EmbeddedContent\EmbedService;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;
@@ -71,16 +72,8 @@ class EmbedServiceTest extends ContainerTestCase {
 
         $url = 'https://test.com';
         $urlEmbed = $this->embedService->createEmbedForUrl($url);
-        $dataEmbed = $this->embedService->createEmbedFromData([
-            'url' => $url,
-        ]);
         $this->assertSame(
-            $dataEmbed,
             $urlEmbed,
-            'The same factory should match in the same order'
-        );
-        $this->assertSame(
-            $dataEmbed,
             $embed1,
             'Factories registered first should match first'
         );
@@ -91,16 +84,8 @@ class EmbedServiceTest extends ContainerTestCase {
         $this->embedService->registerFactory($factory2, EmbedService::PRIORITY_HIGH);
 
         $urlEmbed = $this->embedService->createEmbedForUrl($url);
-        $dataEmbed = $this->embedService->createEmbedFromData([
-            'url' => $url,
-        ]);
         $this->assertSame(
-            $dataEmbed,
             $urlEmbed,
-            'The same factory should match in the same order'
-        );
-        $this->assertSame(
-            $dataEmbed,
             $embed2,
             'High priority items are respected'
         );
@@ -111,16 +96,8 @@ class EmbedServiceTest extends ContainerTestCase {
         $this->embedService->registerFactory($factory2);
 
         $urlEmbed = $this->embedService->createEmbedForUrl($url);
-        $dataEmbed = $this->embedService->createEmbedFromData([
-            'url' => $url,
-        ]);
         $this->assertSame(
-            $dataEmbed,
             $urlEmbed,
-            'The same factory should match in the same order'
-        );
-        $this->assertSame(
-            $dataEmbed,
             $embed2,
             'Low priority items are respected'
         );
@@ -139,16 +116,8 @@ class EmbedServiceTest extends ContainerTestCase {
 
         $url = 'https://test.com/asdfasdf';
         $urlEmbed = $this->embedService->createEmbedForUrl($url);
-        $dataEmbed = $this->embedService->createEmbedFromData([
-            'url' => $url,
-        ]);
         $this->assertSame(
-            $dataEmbed,
             $urlEmbed,
-            'The same factory should match as a fallback.'
-        );
-        $this->assertSame(
-            $dataEmbed,
             $fallbackEmbed,
             'The fallback embed should be returned.'
         );

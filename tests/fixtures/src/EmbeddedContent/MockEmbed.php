@@ -39,7 +39,7 @@ class MockEmbed extends AbstractEmbed {
      */
     public static function nullEmbed(): MockEmbed {
         return new MockEmbed([
-            'type' => self::TYPE,
+            'embedType' => self::TYPE,
             'url' => 'https://test.com',
             'testProp' => 'test',
         ]);

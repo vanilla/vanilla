@@ -91,7 +91,7 @@ class GiphyEmbedFactoryTest extends ContainerTestCase {
                 'name' => $title,
                 'height' => $height,
                 'url' => $urlToCheck, // The original URL.
-                'type' => GiphyEmbed::TYPE,
+                'embedType' => GiphyEmbed::TYPE,
                 'giphyID' => 'kW8mnYSNkUYKc',
             ],
             $embedData,
@@ -99,30 +99,7 @@ class GiphyEmbedFactoryTest extends ContainerTestCase {
         );
 
         // Just verify that this doesn't throw an exception.
-        $dataEmbed = $this->factory->createEmbedFromData($embedData);
-        $this->assertInstanceOf(GiphyEmbed::class, $dataEmbed);
-    }
-
-    /**
-     * Ensure we can create giphy embed from the old data format that might still
-     * live in the DB.
-     */
-    public function testLegacyDataFormat() {
-        $oldDataJSON = <<<JSON
-{
-    "url": "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
-    "type": "giphy",
-    "name": "Funny Cat GIF - Find & Share on GIPHY",
-    "body": null,
-    "photoUrl": null,
-    "height": 720,
-    "width": 720,
-    "attributes": { "postID": "JIX9t2j0ZTN9S" }
-}
-JSON;
-
-        $oldData = json_decode($oldDataJSON, true);
-        $dataEmbed = $this->factory->createEmbedFromData($oldData);
+        $dataEmbed = new GiphyEmbed($embedData);
         $this->assertInstanceOf(GiphyEmbed::class, $dataEmbed);
     }
 }

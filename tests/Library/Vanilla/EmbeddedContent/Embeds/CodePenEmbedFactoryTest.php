@@ -91,7 +91,7 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
                 'name' => $name,
                 'height' => $height,
                 'url' => $urlToCheck, // The original URL.
-                'type' => CodePenEmbed::TYPE,
+                'embedType' => CodePenEmbed::TYPE,
                 'codepenID' => $cpId,
                 'frameSrc' => $frameSrc,
             ],
@@ -100,34 +100,7 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
         );
 
         // Just verify that this doesn't throw an exception.
-        $dataEmbed = $this->factory->createEmbedFromData($embedData);
-        $this->assertInstanceOf(CodePenEmbed::class, $dataEmbed);
-    }
-
-    /**
-     * Ensure we can create giphy embed from the old data format that might still
-     * live in the DB.
-     */
-    public function testLegacyDataFormat() {
-        $oldDataJSON = <<<JSON
-{
-    "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",
-    "type": "codepen",
-    "name": null,
-    "body": null,
-    "photoUrl": null,
-    "height": 300,
-    "width": null,
-    "attributes": {
-        "id": "cp_embed_YoKYVv",
-        "embedUrl": "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?theme-id=0",
-        "style": { "width": " 100%", "overflow": "hidden" }
-    }
-}
-JSON;
-
-        $oldData = json_decode($oldDataJSON, true);
-        $dataEmbed = $this->factory->createEmbedFromData($oldData);
+        $dataEmbed = new CodePenEmbed($embedData);
         $this->assertInstanceOf(CodePenEmbed::class, $dataEmbed);
     }
 }

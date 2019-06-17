@@ -90,11 +90,4 @@ class MockEmbedFactory extends AbstractEmbedFactory {
     public function createEmbedForUrl(string $url): AbstractEmbed {
         return $this->embedToCreate;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function createEmbedFromData(array $data): AbstractEmbed {
-        return $this->embedToCreate;
-    }
 }

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
+use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
@@ -20,7 +21,7 @@ use VanillaTests\Fixtures\MockPageScraper;
 /**
  * Tests for the giphy embed and factory.
  */
-class LinkEmbedFactoryTest extends ContainerTestCase {
+class ScrapeEmbedFactoryTest extends ContainerTestCase {
 
     /** @var ScrapeEmbedFactory */
     private $factory;
@@ -28,13 +29,17 @@ class LinkEmbedFactoryTest extends ContainerTestCase {
     /** @var MockPageScraper */
     private $pageScraper;
 
+    /** @var HttpClient */
+    private $httpClient;
+
     /**
      * Set the factory and client.
      */
     public function setUp() {
         parent::setUp();
         $this->pageScraper = new MockPageScraper();
-        $this->factory = new ScrapeEmbedFactory($this->pageScraper);
+        $this->httpClient = new MockHttpClient();
+        $this->factory = new ScrapeEmbedFactory($this->pageScraper, $this->httpClient);
     }
 
 
@@ -42,23 +47,23 @@ class LinkEmbedFactoryTest extends ContainerTestCase {
      * Test that all giphy domain types are supported.
      *
      * @param string $urlToTest
-     * @dataProvider unsupportedDomains
+     * @dataProvider supportedDomains
      */
     public function testSupportedDomains(string $urlToTest) {
-        $this->assertFalse(
+        $this->assertTrue(
             $this->factory->canHandleUrl($urlToTest),
-            "LinkEmbedFactory should not match any URLs. It should exclusively be a fallback."
+            "LinkEmbedFactory should match every URL."
         );
     }
 
     /**
      * @return array
      */
-    public function unsupportedDomains(): array {
+    public function supportedDomains(): array {
         return [
             ['https://tasdfasdf.com/asdfasd4-23e1//asdf31/1324'],
             ['http://asd.com'], // Empty paths.
-            ['https://testasd.com/']
+            ['https://testasd.com/.png']
         ];
     }
 
@@ -86,39 +91,12 @@ class LinkEmbedFactoryTest extends ContainerTestCase {
             [
                 'name' => $name,
                 'url' => $urlToCheck, // The original URL.
-                'type' => LinkEmbed::TYPE,
+                'embedType' => LinkEmbed::TYPE,
                 'body' => $description,
                 'photoUrl' => $images[0],
             ],
             $embedData,
             'Data cna be fetched over the network to create the embed from a URL.'
         );
-
-        // Just verify that this doesn't throw an exception.
-        $dataEmbed = $this->factory->createEmbedFromData($embedData);
-        $this->assertInstanceOf(LinkEmbed::class, $dataEmbed);
-    }
-
-    /**
-     * Ensure we can create giphy embed from the old data format that might still
-     * live in the DB.
-     */
-    public function testLegacyDataFormat() {
-        $oldDataJSON = <<<JSON
-{
-    "url": "https://vanillaforums.com/en/",
-    "type": "link",
-    "name": "Online Community Software and Customer Forum Software by Vanilla Forums",
-    "body": "Engage your customers with a vibrant and modern online customer community forum.",
-    "photoUrl": "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
-    "height": null,
-    "width": null,
-    "attributes": []
-}
-JSON;
-
-        $oldData = json_decode($oldDataJSON, true);
-        $dataEmbed = $this->factory->createEmbedFromData($oldData);
-        $this->assertInstanceOf(LinkEmbed::class, $dataEmbed);
     }
 }

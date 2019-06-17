@@ -198,10 +198,10 @@ class EmbedService implements EmbedCreatorInterface {
     /**
      * Set the defaultEmbed.
      *
-     * @param FallbackEmbedFactory $fallbackFactory
+     * @param AbstractEmbedFactory $fallbackFactory
      * @return $this
      */
-    public function setFallbackFactory(FallbackEmbedFactory $fallbackFactory) {
+    public function setFallbackFactory(AbstractEmbedFactory $fallbackFactory) {
         $this->fallbackFactory = $fallbackFactory;
         return $this;
     }

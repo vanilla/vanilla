@@ -6,9 +6,11 @@ jQuery(document).ready(function($) {
     if (selected == 'Invitation') {
         $('#InvitationSettings').show();
         $('#InvitationExpiration').show();
+        $('#InvitationTarget').show();
     } else {
         $('#InvitationSettings').hide();
         $('#InvitationExpiration').hide();
+        $('#InvitationTarget').hide();
     }
 
     // Show/Hide the CaptchaSettings depending on the selected registration method
@@ -29,9 +31,11 @@ jQuery(document).ready(function($) {
         if ($(this).val() == 'Invitation') {
             $('#InvitationSettings').slideDown('fast');
             $('#InvitationExpiration').slideDown('fast');
+            $('#InvitationTarget').slideDown('fast');
         } else {
             $('#InvitationSettings').slideUp('fast');
             $('#InvitationExpiration').slideUp('fast');
+            $('#InvitationTarget').slideUp('fast');
         }
 
         // Show/Hide the CaptchaSettings depending on the selected registration method

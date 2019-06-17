@@ -49,6 +49,10 @@ class QuoteEmbed extends AbstractEmbed {
             'insertUser' => 'attributes.insertUser',
         ]);
 
+        // Format the body.
+        $data['body'] = \Gdn_Format::quoteEmbed($data['bodyRaw'], $data['format']);
+        unset($data['bodyRaw']);
+
         return $data;
     }
 
@@ -57,7 +61,7 @@ class QuoteEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'bodyRaw:s|a', // The raw body of the comment. This can be an array of rich operations or a string for other formats
+            'body:s',
             'format:s',
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),

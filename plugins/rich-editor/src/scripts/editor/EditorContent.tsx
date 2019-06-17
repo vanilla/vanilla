@@ -367,6 +367,9 @@ function useSynchronization() {
             return;
         }
 
+        // Call intially with the value.
+        updateHandler(Quill.events.TEXT_CHANGE, null, null, Quill.sources.API);
+
         quill.on(Quill.events.EDITOR_CHANGE, updateHandler);
         return () => {
             quill.off(Quill.events.EDITOR_CHANGE, updateHandler);

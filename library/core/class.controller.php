@@ -14,6 +14,8 @@
 
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
+use Vanilla\Web\ContentSecurityPolicy\Policy;
 
 /**
  * Controller base class.
@@ -274,6 +276,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         $hsts = Gdn::factory('HstsModel');
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
+
+        $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
+        if ($cspFrameAncestors = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS)) {
+            $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspFrameAncestors;
+        }
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];

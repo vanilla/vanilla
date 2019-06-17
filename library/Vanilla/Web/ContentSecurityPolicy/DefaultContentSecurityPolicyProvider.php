@@ -54,7 +54,7 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
         $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, '\'self\'');
         if ($whitelist = $this->config->get('Garden.TrustedDomains', false)) {
             $trusteddDomains = is_string($whitelist) ? explode("\n", $whitelist) : [];
-            if(count($trusteddDomains) > 0) {
+            if (count($trusteddDomains) > 0) {
                 $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, implode(' ', $trusteddDomains));
             }
         }

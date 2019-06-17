@@ -278,9 +278,8 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
         $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
-        if ($cspFrameAncestors = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS)) {
-            $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspFrameAncestors;
-        }
+        $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
+
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];

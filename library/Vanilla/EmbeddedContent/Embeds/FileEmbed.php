@@ -31,8 +31,10 @@ class FileEmbed extends AbstractEmbed {
         // The legacy file embeds have everything underneath attributes.
         $attributes = $data['attributes'] ?? null;
         if ($attributes !== null) {
-            $data = $attributes;
+            $data += $attributes;
         }
+
+        // The `type` field may contain the mime-type data.
 
         return $data;
     }

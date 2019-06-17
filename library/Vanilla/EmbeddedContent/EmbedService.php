@@ -8,7 +8,6 @@ namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
 use Garden\Schema\ValidationException;
-use mysql_xdevapi\Exception;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
@@ -16,7 +15,6 @@ use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
-use Vanilla\EmbeddedContent\Embeds\ImageEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
@@ -114,13 +112,13 @@ class EmbedService implements EmbedCreatorInterface {
             // CodePen
             ->registerFactory($dic->get(CodePenEmbedFactory::class))
             ->registerEmbed(CodePenEmbed::class, CodePenEmbed::TYPE)
-            // Images
-            ->registerFactory($dic->get(ImageEmbedFactory::class), self::PRIORITY_LOW)
+            // Scrape-able Embeds
+            ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)
+            ->registerEmbed(LinkEmbed::class, LinkEmbed::TYPE)
             // Files - No factory for the file embed. Only comes from media endpoint.
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
-            ->registerEmbed(LinkEmbed::class, LinkEmbed::TYPE)
-            ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
+            // Internal Vanilla quote embed.
 //            ->registerFactory(VimeoEmbedFactory::class)
 //            ->registerFactory(WistiaFactory::class)
 //            ->registerFactory(YoutubeFactory::class)
@@ -159,7 +157,7 @@ class EmbedService implements EmbedCreatorInterface {
      */
     public function createEmbedFromData(array $data): AbstractEmbed {
         // Fallback in case we have bad data (will fallback to fallback embed).
-        $type = $data['type'] ?? null;
+        $type = $data['embedType'] ?? $data['type'] ?? null;
         try {
             $embedClass = $this->registeredEmbeds[$type] ?? null;
             if ($embedClass === null) {

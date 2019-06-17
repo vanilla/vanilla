@@ -39,11 +39,24 @@ class ErrorEmbed extends AbstractEmbed {
         }
 
         if (debug()) {
-            $data['exception'] = $exception;
+            $data['exception'] = $exception->getMessage();
         }
 
         $this->data = $data;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderHtml(): string {
+        $viewPath = dirname(__FILE__) . '/ErrorEmbed.twig';
+        return $this->renderTwig($viewPath, [
+            'url' => $this->getUrl(),
+            'embedJson' => json_encode($this->data),
+            'errorMessage' => $this->exception->getMessage(),
+        ]);
+    }
+
 
     /**
      * @inheritdoc

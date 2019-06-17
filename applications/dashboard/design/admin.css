@@ -9630,7 +9630,8 @@ button.close {
   word-break: break-word;
 }
 
-.category-url-code {
+.category-url-code,
+.invite-url-code {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;

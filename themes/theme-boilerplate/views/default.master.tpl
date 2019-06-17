@@ -55,7 +55,11 @@
                                 <div class="Frame-row SearchBoxMobile">
                                     {if !$SectionGroups && !inSection(["SearchResults"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {module name="AdvancedSearchModule"}
+                                            {if $hasAdvancedSearch === true}
+                                                {module name="AdvancedSearchModule"}
+                                            {else}
+                                                {searchbox}
+                                            {/if}
                                         </div>
                                     {/if}
                                 </div>

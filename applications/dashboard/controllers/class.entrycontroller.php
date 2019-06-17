@@ -1825,7 +1825,7 @@ class EntryController extends Gdn_Controller {
 
         if (!is_numeric($userID)
             || $passwordResetKey == ''
-            || $this->UserModel->getAttribute($userID, 'PasswordResetKey', '') != $passwordResetKey
+            || hash_equals($this->UserModel->getAttribute($userID, 'PasswordResetKey', ''), $passwordResetKey) === false
         ) {
             $this->Form->addError('Failed to authenticate your password reset request. Try using the reset request form again.');
             Logger::event(

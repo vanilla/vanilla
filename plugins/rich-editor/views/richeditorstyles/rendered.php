@@ -627,13 +627,93 @@ $embedOperations = '[
     }
 ]';
 
+$quoteEmbeds = <<<QUOTES
+[
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+                    "type": "quote",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": null,
+                    "width": null,
+                    "attributes": {
+                        "discussionID": 8,
+                        "name": "test file upload",
+                        "bodyRaw": [
+                            {
+                                "insert": {
+                                    "embed-external": {
+                                        "data": {
+                                            "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip",
+                                            "type": "file",
+                                            "attributes": {
+                                                "mediaID": 62,
+                                                "name": "___img_onload_prompt(1)_ (2).zip",
+                                                "path": "150/LKE0S2FWLFUP.zip",
+                                                "type": "application/zip",
+                                                "size": 41,
+                                                "active": 1,
+                                                "insertUserID": 4,
+                                                "dateInserted": "2019-06-14 14:09:38",
+                                                "foreignID": 4,
+                                                "foreignTable": "embed",
+                                                "imageWidth": null,
+                                                "imageHeight": null,
+                                                "thumbWidth": null,
+                                                "thumbHeight": null,
+                                                "thumbPath": null,
+                                                "foreignType": "embed",
+                                                "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip"
+                                            }
+                                        },
+                                        "loaderData": {
+                                            "type": "file",
+                                            "file": [],
+                                            "progressEventEmitter": {
+                                                "listeners": [null]
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            { "insert": "File Upload" }
+                        ],
+                        "dateInserted": "2019-06-14T14:09:45+00:00",
+                        "dateUpdated": null,
+                        "insertUser": {
+                            "userID": 4,
+                            "name": "Karen A. Thomas",
+                            "photoUrl": "https://images.v-cdn.net/stubcontent/avatar_01.png",
+                            "dateLastActive": "2019-06-14T18:32:27+00:00"
+                        },
+                        "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+                        "format": "Rich"
+                    }
+                },
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://dev.vanilla.localhost/discussion/8/test-file-upload"
+                }
+            }
+        }
+    }
+]
+QUOTES;
+
+
 echo "<div class='Item-Body'><div class='Message userContent'>";
-echo "<h1>Inline operations</h1>";
+echo "<h2>Inline operations</h2>";
 echo Gdn_Format::rich($inlineOperations);
 echo "<hr>";
-echo "<h1>Block operations</h1>";
+echo "<h2>Block operations</h2>";
 echo Gdn_Format::rich($blockOperations);
 echo "<hr>";
-echo "<h1>Embed operations</h1>";
+echo "<h2>Embed operations</h2>";
 echo Gdn_Format::rich($embedOperations);
+echo "<h2>Quotes</h2>";
+echo Gdn_Format::rich($quoteEmbeds);
 echo "</div></div>";

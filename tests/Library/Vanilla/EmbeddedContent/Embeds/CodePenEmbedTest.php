@@ -8,7 +8,6 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
-use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use VanillaTests\ContainerTestCase;
 
 /**

@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-
 /**
  * Class StaticContentController
  */

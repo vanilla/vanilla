@@ -76,7 +76,7 @@ echo $this->Form->errors(); ?>
     </div>
     <div class="input-wrap invite-url-code">
         <?php
-            echo '<div class="community-domain">';
+            echo '<div class="community-domain padded-right">';
             echo    Gdn::request()->urlDomain().(Gdn::request()->getRoot() !== '' ? Gdn::request()->getRoot().'/' : '/');
             echo '</div>';
             echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget]); ?>

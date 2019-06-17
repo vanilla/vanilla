@@ -67,7 +67,7 @@ abstract class AbstractEmbed implements \JsonSerializable {
         $viewPath = dirname(__FILE__) . '/AbstractEmbed.twig';
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
-            'embedJson' => json_encode($this->data),
+            'data' => $this->data,
         ]);
     }
 

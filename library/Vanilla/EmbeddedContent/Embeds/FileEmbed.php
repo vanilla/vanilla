@@ -8,7 +8,7 @@ namespace Vanilla\EmbeddedContent\Embeds;
 
 use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
-use Vanilla\EmbeddedContent\VanillaMediaSchema;
+use Vanilla\Models\VanillaMediaSchema;
 
 /**
  * File Embed data object.
@@ -49,7 +49,7 @@ class FileEmbed extends AbstractEmbed {
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
             'name' => $this->data['name'],
-            'embedJson' => json_encode($this->data),
+            'data' => $this->data,
         ]);
     }
 

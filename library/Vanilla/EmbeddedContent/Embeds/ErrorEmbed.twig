@@ -1,4 +1,4 @@
-<a href="{{ sanitizeUrl(url) }}" data-embedJson="{{ embedJson }}" class="embedLinkLoader">
+<a href="{{ sanitizeUrl(url) }}" data-embedJson="{{ data|json_encode }}" class="embedLinkLoader">
     {{ url }}
     <svg class="embedLinkLoader-failIcon" title="${title}" aria-label="${title}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
         <title>{{ errorMessage }}</title>

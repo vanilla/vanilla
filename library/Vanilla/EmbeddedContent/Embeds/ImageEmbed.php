@@ -10,7 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
-use Vanilla\EmbeddedContent\VanillaMediaSchema;
+use Vanilla\Models\VanillaMediaSchema;
 
 /**
  * Image data object.

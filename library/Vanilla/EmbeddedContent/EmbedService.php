@@ -18,6 +18,7 @@ use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\ScrapeEmbedFactory;
 
 /**
@@ -119,6 +120,7 @@ class EmbedService implements EmbedCreatorInterface {
             // Files - No factory for the file embed. Only comes from media endpoint.
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
             // Internal Vanilla quote embed.
+            ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
 //            ->registerFactory(VimeoEmbedFactory::class)
 //            ->registerFactory(WistiaFactory::class)
 //            ->registerFactory(YoutubeFactory::class)

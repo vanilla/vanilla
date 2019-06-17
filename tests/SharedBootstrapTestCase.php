@@ -18,8 +18,9 @@ use Garden\Container\Container;
  */
 class SharedBootstrapTestCase extends TestCase {
 
-    use BootstrapTrait;
-
+    use BootstrapTrait {
+        setupBeforeClass as private bootstrapBeforeClass;
+    }
     /**
      * Bootstrap the first test cases and reuse the same container/bootstrap for subsequent test cases.
      */
@@ -33,7 +34,7 @@ class SharedBootstrapTestCase extends TestCase {
             if (!self::containerIsNull($currentContainer)) {
                 $containerCorruption = true;
             } else {
-                BootstrapTrait::setUpBeforeClass();
+                self::bootstrapBeforeClass();
             }
         } else {
             if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {
@@ -64,12 +65,5 @@ class SharedBootstrapTestCase extends TestCase {
      */
     protected static function getBootstrapFolderName() {
         return 'sharedbootstrap';
-    }
-
-    /**
-     * Cleanup the container after testing is done.
-     */
-    public static function tearDownAfterClass() {
-        Bootstrap::cleanUpGlobals();
     }
 }

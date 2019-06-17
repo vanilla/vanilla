@@ -52,7 +52,7 @@ class ErrorEmbed extends AbstractEmbed {
         $viewPath = dirname(__FILE__) . '/ErrorEmbed.twig';
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
-            'embedJson' => json_encode($this->data),
+            'data' => $this->data,
             'errorMessage' => $this->exception->getMessage(),
         ]);
     }

@@ -61,8 +61,10 @@ class EmbedUtils {
                 continue;
             }
 
-            $oldValue = valr($oldName, $data);
-            setvalr($newName, $data, $oldValue);
+            $oldValue = valr($oldName, $data, null);
+            if ($oldValue !== null) {
+                setvalr($newName, $data, $oldValue);
+            }
         }
         return $data;
     }

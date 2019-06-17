@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\EmbeddedContent;
+namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
 

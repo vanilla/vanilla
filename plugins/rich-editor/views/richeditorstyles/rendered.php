@@ -160,7 +160,7 @@ $blockOperations = '[
     { "insert": "}" },
     { "attributes": { "codeBlock": true }, "insert": "\n" },
     { "insert": "\nH2 Here. Spoiler next" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     { "insert": "Some Spoiler content with formatting " },
     { "attributes": { "bold": true }, "insert": "bold" },
     { "insert": " " },
@@ -211,7 +211,7 @@ $blockOperations = '[
 
 $embedOperations = '[
     { "insert": "Imgur:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -230,7 +230,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Image:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -256,7 +256,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Twitter:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -279,7 +279,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Getty:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -312,7 +312,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Vimeo:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -340,7 +340,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Youtube:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -369,7 +369,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Instagram:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -396,7 +396,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Soundcloud:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -424,7 +424,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Giphy:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -447,7 +447,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Twitch:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -467,7 +467,7 @@ $embedOperations = '[
         }
     },
     { "insert": "External No Image" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -490,7 +490,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Exernal With Image" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -510,7 +510,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Wistia:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -531,29 +531,6 @@ $embedOperations = '[
                     }
                 },
                 "loaderData": { "type": "link", "link": "https://dave.wistia.com/medias/0k5h1g1chs", "loaded": true }
-            }
-        }
-    },
-    { "insert": "CodePen:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
-    {
-        "insert": {
-            "embed-external": {
-                "data": {
-                    "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",
-                    "type": "codepen",
-                    "name": null,
-                    "body": null,
-                    "photoUrl": null,
-                    "height": 300,
-                    "width": null,
-                    "attributes": {
-                        "id": "cp_embed_YoKYVv",
-                        "embedUrl": "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?theme-id=0",
-                        "style": { "width": " 100%", "overflow": "hidden" }
-                    }
-                },
-                "loaderData": { "type": "link", "link": "https://codepen.io/hiroshi_m/pen/YoKYVv" }
             }
         }
     },
@@ -585,8 +562,31 @@ $embedOperations = '[
             }
         }
     },
+    { "insert": "CodePen:" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",
+                    "type": "codepen",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": 300,
+                    "width": null,
+                    "attributes": {
+                        "id": "cp_embed_YoKYVv",
+                        "embedUrl": "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?theme-id=0",
+                        "style": { "width": " 100%", "overflow": "hidden" }
+                    }
+                },
+                "loaderData": { "type": "link", "link": "https://codepen.io/hiroshi_m/pen/YoKYVv" }
+            }
+        }
+    },
     { "insert": "File Upload" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -627,8 +627,10 @@ $embedOperations = '[
     }
 ]';
 
-$quoteEmbeds = <<<QUOTES
+$quoteEmbeds = '
 [
+    { "insert": "Discussion Quote" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -700,10 +702,40 @@ $quoteEmbeds = <<<QUOTES
                 }
             }
         }
+    },
+    { "insert": "Comment Quote" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+                    "type": "quote",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": null,
+                    "width": null,
+                    "attributes": {
+                        "commentID": 5,
+                        "bodyRaw": [{ "insert": "Testtes test\n" }],
+                        "dateInserted": "2019-06-17T18:52:20+00:00",
+                        "dateUpdated": null,
+                        "insertUser": {
+                            "userID": 2,
+                            "name": "admin",
+                            "photoUrl": "https://dev.vanilla.localhost/uploads/userpics/022/nWZ7BPS4F5HHQ.png",
+                            "dateLastActive": "2019-06-17T15:09:52+00:00"
+                        },
+                        "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+                        "format": "Rich"
+                    }
+                },
+                "loaderData": { "type": "link", "link": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5" }
+            }
+        }
     }
-]
-QUOTES;
-
+]';
 
 echo "<div class='Item-Body'><div class='Message userContent'>";
 echo "<h2>Inline operations</h2>";

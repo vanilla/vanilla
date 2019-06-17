@@ -58,7 +58,7 @@ const customViewports = {
     "panelLayout_twoColumns": {
         name: 'Panel Layout - Two Columns',
         styles: {
-            width: unit(panelLayoutBreakPoints.twoColumns),
+            width: unit(panelLayoutBreakPoints.twoColumn),
             height: '1000px',
         },
     },

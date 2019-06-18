@@ -20,23 +20,25 @@ import { initSpoilers } from "@library/content/spoilers";
 import { initQuoteEmbeds, mountQuoteEmbeds } from "@library/content/embeds/quote";
 import { initFileEmbeds, mountFileEmbeds } from "@library/content/embeds/file";
 import { initCodeHighlighting } from "@library/content/code";
+import { mountAllEmbeds } from "@library/embeddedContent/embedService";
 
 export function initAllUserContent() {
     // User content
     initEmojiSupport();
     initSpoilers();
-    initCodePenEmbeds();
-    initGettyEmbeds();
-    initGiphyEmbeds();
-    initImageEmbeds();
-    initImgurEmbeds();
-    initInstagramEmbeds();
-    initLinkEmbeds();
-    initSoundcloudEmbeds();
-    initTwitterEmbeds();
-    initVideoEmbeds();
-    initQuoteEmbeds();
-    initFileEmbeds();
+    mountAllEmbeds();
+    // initCodePenEmbeds();
+    // initGettyEmbeds();
+    // initGiphyEmbeds();
+    // initImageEmbeds();
+    // initImgurEmbeds();
+    // initInstagramEmbeds();
+    // initLinkEmbeds();
+    // initSoundcloudEmbeds();
+    // initTwitterEmbeds();
+    // initVideoEmbeds();
+    // initQuoteEmbeds();
+    // initFileEmbeds();
     initCodeHighlighting();
 }
 
@@ -45,10 +47,11 @@ export function initAllUserContent() {
  * This is ideal for something like react's `componentDidMount`.
  */
 export function convertAllUserContent() {
-    void convertGettyEmbeds();
-    void convertImgurEmbeds();
-    void convertInstagramEmbeds();
-    void convertTwitterEmbeds();
-    void mountQuoteEmbeds();
-    void mountFileEmbeds();
+    mountAllEmbeds();
+    // void convertGettyEmbeds();
+    // void convertImgurEmbeds();
+    // void convertInstagramEmbeds();
+    // void convertTwitterEmbeds();
+    // void mountQuoteEmbeds();
+    // void mountFileEmbeds();
 }

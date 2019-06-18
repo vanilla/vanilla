@@ -14,6 +14,7 @@ import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
+import SmartLink from "@library/routing/links/SmartLink";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -40,8 +41,8 @@ export default class Attachment extends React.Component<IProps> {
 
         return (
             <div className={classNames("attachment", className, classes.root)}>
-                <a
-                    href={url}
+                <SmartLink
+                    to={url}
                     className={classNames("attachment-link", "attachment-box", classes.link, classes.box)}
                     type={mimeType}
                     download={name}
@@ -65,7 +66,7 @@ export default class Attachment extends React.Component<IProps> {
                             </span>
                         </div>
                     </div>
-                </a>
+                </SmartLink>
             </div>
         );
     }

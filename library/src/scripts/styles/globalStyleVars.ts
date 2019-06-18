@@ -19,7 +19,6 @@ export const globalVariables = useThemeCache(() => {
 
     const elementaryColors = {
         black: color("#000"),
-        grey: color("#555a62"),
         white: color("#fff"),
         transparent: `transparent`,
     };

@@ -12,10 +12,8 @@ import { ColorValues } from "@library/forms/buttonStyles";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
-    const shadowBaseColor = globalVars.elementaryColors.grey;
-
+    const shadowBaseColor = globalVars.mainColors.bg;
     const makeShadow = (opacity: number = 0.3) => `0 1px 3px 0 ${shadowBaseColor.fade(opacity)}`;
-
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
             boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}`,

@@ -20,5 +20,10 @@ storiesOf("CoreComponents/DateTime", module).add("DateTime", () => {
     );
 
     const day = date("timestamp", new Date("Jan 20 2017"));
-    return <DateTime timestamp={new Date(day).toISOString()} mode={mode as "relative"} />;
+    return (
+        <>
+            <DateTime timestamp={new Date(day).toISOString()} mode={mode as "relative"} />
+            <br />
+        </>
+    );
 });

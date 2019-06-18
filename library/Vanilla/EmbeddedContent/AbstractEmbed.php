@@ -43,6 +43,11 @@ abstract class AbstractEmbed implements \JsonSerializable {
      * @return array|mixed
      */
     public function jsonSerialize() {
+        foreach ($this->data as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $this->data[$key] = $value->format(\DateTime::RFC3339);
+            }
+        }
         return $this->data;
     }
 
@@ -67,7 +72,7 @@ abstract class AbstractEmbed implements \JsonSerializable {
         $viewPath = dirname(__FILE__) . '/AbstractEmbed.twig';
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
-            'data' => $this->data,
+            'data' => $this
         ]);
     }
 

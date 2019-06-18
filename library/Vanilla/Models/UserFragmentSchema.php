@@ -15,14 +15,14 @@ use Garden\Schema\Schema;
 class UserFragmentSchema extends Schema {
 
     /**
-     * Override constructor to initaliaze schema.
+     * Override constructor to initialize schema.
      */
     public function __construct() {
-        parent::__construct([
+        parent::__construct($this->parseInternal([
             'userID:i', // The ID of the user.
             'name:s', // The username of the user.
             'photoUrl:s', // The URL of the user\'s avatar picture.
             'dateLastActive:dt|n', // Time the user was last active.
-        ]);
+        ]));
     }
 }

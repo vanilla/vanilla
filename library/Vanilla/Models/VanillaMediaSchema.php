@@ -15,7 +15,7 @@ use Garden\Schema\Schema;
 class VanillaMediaSchema extends Schema {
 
     /**
-     * Override constructor to initaliaze schema.
+     * Override constructor to initialize schema.
      *
      * @param bool $withDbFields Whether or not DB related fields should be optional in the schema.
      */
@@ -42,6 +42,6 @@ class VanillaMediaSchema extends Schema {
             $fields += $ownDBFields;
         }
 
-        parent::__construct($fields);
+        parent::__construct($this->parseInternal($fields));
     }
 }

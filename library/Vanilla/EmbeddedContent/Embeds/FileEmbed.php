@@ -31,7 +31,7 @@ class FileEmbed extends AbstractEmbed {
         // The legacy file embeds have everything underneath attributes.
         $attributes = $data['attributes'] ?? null;
         if ($attributes !== null) {
-            $data += $attributes;
+            $data = $attributes + $data;
         }
 
         // The `type` field may contain the mime-type data.
@@ -49,7 +49,7 @@ class FileEmbed extends AbstractEmbed {
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
             'name' => $this->data['name'],
-            'data' => $this->data,
+            'data' => $this,
         ]);
     }
 

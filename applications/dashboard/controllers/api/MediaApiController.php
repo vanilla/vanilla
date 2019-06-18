@@ -81,7 +81,7 @@ class MediaApiController extends AbstractApiController {
 
         $row = $this->mediaByUrl($query['url']);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->permission('Garden.Moderation.Manage');
+            $this->permission('Garden.Community.Manage');
         }
 
         $this->mediaModel->deleteID($row['MediaID']);
@@ -154,7 +154,7 @@ class MediaApiController extends AbstractApiController {
             // Make sure we can still perform uploads.
             $this->permission("Garden.Uploads.Add");
         } else {
-            $this->permission("Garden.Moderation.Manage");
+            $this->permission("Garden.Community.Manage");
         }
     }
 
@@ -195,7 +195,7 @@ class MediaApiController extends AbstractApiController {
 
         $row = $this->mediaByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->permission('Garden.Moderation.Manage');
+            $this->permission('Garden.Community.Manage');
         }
 
         $row = $this->normalizeOutput($row);
@@ -221,7 +221,7 @@ class MediaApiController extends AbstractApiController {
 
         $row = $this->mediaByUrl($query['url']);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->permission('Garden.Moderation.Manage');
+            $this->permission('Garden.Community.Manage');
         }
 
         $row = $this->normalizeOutput($row);

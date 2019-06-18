@@ -682,7 +682,7 @@ $quoteEmbeds = '
                                     }
                                 }
                             },
-                            { "insert": "File Upload" }
+                            { "insert": "Aliquam egestas nulla ipsum, tempor pellentesque urna finibus id. Cras lacinia posuere quam vitae congue. Phasellus eget odio tincidunt, posuere dui at, ultrices ante. Praesent pharetra rutrum faucibus. Donec in lobortis urna, et lobortis enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec consequat justo id condimentum venenatis. Vestibulum mattis blandit leo, nec viverra ante molestie at. Suspendisse vel erat et nisi scelerisque volutpat ut eget urna. Morbi pulvinar posuere nisl.\nSed maximus in nisl lacinia scelerisque. Aliquam gravida, ligula ut varius feugiat, purus tellus faucibus nibh, ut scelerisque dolor velit gravida justo. Pellentesque accumsan velit sed rutrum imperdiet. Fusce vulputate enim sed felis ornare, et feugiat risus varius. Nam nibh massa, sodales sed lorem eu, rhoncus laoreet nibh. Nullam eu urna erat. Curabitur consectetur interdum libero, ut facilisis tellus vulputate id. Ut mollis dolor id rutrum aliquam. Aliquam id auctor velit, a efficitur nunc. Curabitur mollis dui non efficitur volutpat. Vestibulum laoreet iaculis congue. Duis laoreet quam eu justo ullamcorper finibus.\n" }
                         ],
                         "dateInserted": "2019-06-14T14:09:45+00:00",
                         "dateUpdated": null,
@@ -748,4 +748,26 @@ echo "<h2>Embed operations</h2>";
 echo Gdn_Format::rich($embedOperations);
 echo "<h2>Quotes</h2>";
 echo Gdn_Format::rich($quoteEmbeds);
-echo "</div></div>";
+echo "
+<h2>Spacer</h2>
+<p>
+<strong>This text is here to add some space for testing scroll position</strong>
+</p>
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nec risus a erat fermentum posuere quis ut mi. Donec luctus lacinia augue fringilla sodales. Nullam pharetra auctor tellus tincidunt luctus. Mauris sed maximus eros. Donec dictum, ante ac convallis consectetur, metus tortor accumsan lorem, in sagittis augue ligula et sapien. Donec vulputate euismod elit sit amet ultricies. Nullam sit amet rhoncus mauris, ac sodales velit.
+</p>
+<h2 id='scroll'>Scrollable heading. Go to <a href='#scroll'>#scroll</a></h2>
+<p>
+Aliquam egestas nulla ipsum, tempor pellentesque urna finibus id. Cras lacinia posuere quam vitae congue. Phasellus eget odio tincidunt, posuere dui at, ultrices ante. Praesent pharetra rutrum faucibus. Donec in lobortis urna, et lobortis enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec consequat justo id condimentum venenatis. Vestibulum mattis blandit leo, nec viverra ante molestie at. Suspendisse vel erat et nisi scelerisque volutpat ut eget urna. Morbi pulvinar posuere nisl.
+</p>
+<p>
+Sed maximus in nisl lacinia scelerisque. Aliquam gravida, ligula ut varius feugiat, purus tellus faucibus nibh, ut scelerisque dolor velit gravida justo. Pellentesque accumsan velit sed rutrum imperdiet. Fusce vulputate enim sed felis ornare, et feugiat risus varius. Nam nibh massa, sodales sed lorem eu, rhoncus laoreet nibh. Nullam eu urna erat. Curabitur consectetur interdum libero, ut facilisis tellus vulputate id. Ut mollis dolor id rutrum aliquam. Aliquam id auctor velit, a efficitur nunc. Curabitur mollis dui non efficitur volutpat. Vestibulum laoreet iaculis congue. Duis laoreet quam eu justo ullamcorper finibus.
+</p>
+<p>
+Sed feugiat varius vehicula. Integer dignissim at eros non fermentum. Vestibulum venenatis, purus a rhoncus suscipit, libero est euismod orci, vitae suscipit ligula felis non quam. Pellentesque vel interdum odio. Aenean vel est mattis, consectetur neque et, vestibulum nisi. Maecenas at imperdiet est. Sed fermentum ipsum condimentum ex lacinia, vitae accumsan massa sagittis. Aenean vel tortor leo. Suspendisse ut augue justo. Nullam arcu nunc, varius et porttitor in, pulvinar sed ex. Integer tristique vehicula nunc, vitae dapibus tellus interdum ut. Pellentesque auctor ex a molestie ultrices. Nulla sed diam purus. Aenean eu purus pellentesque, consequat mauris eget, rutrum sapien. In sed magna magna.
+</p>
+<p>
+Aenean fringilla tortor tellus, in elementum ligula ornare quis. Nam maximus vitae nibh at gravida. Vivamus eget magna leo. Integer rhoncus in tortor eget commodo. Quisque a magna in lectus malesuada dapibus ut quis quam. Praesent accumsan, justo et ornare ultricies, massa ex tincidunt arcu, sed volutpat orci nibh vel tortor. Vestibulum id sodales magna, at iaculis metus. Ut vel mauris enim. Sed molestie metus a molestie fermentum.
+</p>
+</div>
+";

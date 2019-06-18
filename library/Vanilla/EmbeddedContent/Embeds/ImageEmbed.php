@@ -8,7 +8,6 @@ namespace Vanilla\EmbeddedContent\Embeds;
 
 use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
-use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Models\VanillaMediaSchema;
 
@@ -31,6 +30,12 @@ class ImageEmbed extends AbstractEmbed {
      */
     public function normalizeData(array $data): array {
         $data = EmbedUtils::ensureDimensions($data);
+        $data['size'] = $data['size'] ?? 0;
+
+        $name = $data['name'] ?? null;
+        if ($name === null) {
+            $data['name'] = basename($data['url']);
+        }
         return $data;
     }
 
@@ -48,6 +53,6 @@ class ImageEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     protected function schema(): Schema {
-        return new VanillaMediaSchema(true);
+        return new VanillaMediaSchema(false);
     }
 }

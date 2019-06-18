@@ -60,7 +60,7 @@ class MediaApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
         $row = $this->mediaByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->permission('Garden.Moderation.Manage');
+            $this->permission('Garden.Community.Manage');
         }
 
         $this->mediaModel->deleteID($id);

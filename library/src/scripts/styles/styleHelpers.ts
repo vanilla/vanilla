@@ -949,6 +949,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
         },
         hover: {
             color: colorOut(mergedColors.hover),
+            cursor: "pointer",
         },
         focus: {
             color: colorOut(mergedColors.focus),
@@ -958,6 +959,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
         },
         active: {
             color: colorOut(mergedColors.active),
+            cursor: "pointer",
         },
         visited: {
             color: colorOut(mergedColors.visited),

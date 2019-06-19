@@ -8,12 +8,8 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Garden\Http\HttpClient;
-use Garden\Http\HttpRequest;
-use Garden\Http\HttpResponse;
-use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
-use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
-use Vanilla\EmbeddedContent\Embeds\ScrapeEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockPageScraper;

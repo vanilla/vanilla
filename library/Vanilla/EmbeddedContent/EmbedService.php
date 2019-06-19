@@ -9,17 +9,17 @@ namespace Vanilla\EmbeddedContent;
 use Garden\Container;
 use Garden\Schema\ValidationException;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
-use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
-use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
-use Vanilla\EmbeddedContent\Embeds\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
-use Vanilla\EmbeddedContent\Embeds\ScrapeEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\GiphyEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\ImgurEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
 
 /**
  * Manage scraping embed data and generating markup.

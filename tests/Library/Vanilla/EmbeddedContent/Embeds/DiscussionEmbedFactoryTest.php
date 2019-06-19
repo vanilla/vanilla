@@ -10,8 +10,8 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Garden\Web\RequestInterface;
-use Vanilla\EmbeddedContent\Embeds\CommentEmbedFactory;
-use Vanilla\EmbeddedContent\Embeds\DiscussionEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**

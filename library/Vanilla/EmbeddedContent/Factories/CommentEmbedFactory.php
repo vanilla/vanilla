@@ -5,12 +5,13 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\EmbeddedContent\Embeds;
+namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Web\Asset\SiteAsset;
 
 /**
@@ -69,5 +70,4 @@ class CommentEmbedFactory extends AbstractEmbedFactory {
         $comment = $this->commentApi->get_quote($id);
         return new QuoteEmbed($comment);
     }
-
 }

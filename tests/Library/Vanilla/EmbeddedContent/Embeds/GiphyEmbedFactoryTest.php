@@ -7,10 +7,9 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
-use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
-use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\GiphyEmbedFactory;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 

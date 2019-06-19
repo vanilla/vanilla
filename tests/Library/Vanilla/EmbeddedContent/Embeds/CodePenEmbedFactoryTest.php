@@ -11,7 +11,7 @@ namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
-use Vanilla\EmbeddedContent\Embeds\CodePenEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 

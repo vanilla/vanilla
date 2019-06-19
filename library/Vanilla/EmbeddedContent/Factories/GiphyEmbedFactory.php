@@ -4,19 +4,23 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\EmbeddedContent\Embeds;
+namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
+use Vanilla\EmbeddedContent\EmbedUtils;
 
 /**
- * Factory for the ImgurEmbed.
+ * Factory for the GiphyEmbed.
  */
-class ImgurEmbedFactory extends AbstractEmbedFactory {
+class GiphyEmbedFactory extends AbstractEmbedFactory {
 
-    const IMGUR_COM = "imgur.com";
-    const OEMBED_URL_BASE = "https://api.imgur.com/oembed";
+    const GPH_IS = "gph.is";
+    const GIPHY_COM = "giphy.com";
+    const MEDIA_GIPHY_COM = "media.giphy.com";
+    const OEMBED_URL_BASE = "https://giphy.com/services/oembed";
 
     /**
      * @var string A regexp to match the full URL of a giphy embed.
@@ -40,7 +44,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedDomains(): array {
-        return [self::IMGUR_COM];
+        return [self::GPH_IS, self::GIPHY_COM];
     }
 
     /**
@@ -48,16 +52,24 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain): string {
-        // Imgur paths are incredibly complicated.
-        // See https://www.reddit.com/r/redditdev/comments/35bb7i/imgur_link_format/ for examples.
-        // We will pretty much always hit their API, so a pretty freeform slug should suffice.
-        return '/.+/';
+        switch ($domain) {
+            case self::GPH_IS:
+                // Anything goes here. This is giphy's URL shortening service.
+                return "/.+/";
+            case self::GIPHY_COM:
+                return "/\/(gifs|stories)\/.+/";
+            case self::MEDIA_GIPHY_COM:
+                return self::FULL_SLUG_REGEX;
+            default:
+                return "/^$/";
+        }
     }
 
     /**
      * Use the page scraper to scrape page data.
      *
      * @inheritdoc
+     * @throws \Exception If the scrape fails.
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $response = $this->httpClient->get(
@@ -84,12 +96,14 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         preg_match(self::FULL_SLUG_REGEX, $fullUrl, $matches);
         $id = $matches['postID'] ?? null;
 
+        [$height, $width] = EmbedUtils::extractDimensions($response);
+
         $data = [
             'embedType' => GiphyEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? '',
-            'height' => $response['height'] ?? null,
-            'width' => $response['width'] ?? null,
+            'height' => $height,
+            'width' => $width,
             'giphyID' => $id,
         ];
 

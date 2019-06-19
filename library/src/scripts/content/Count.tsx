@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { countClasses } from "@library/content/countStyles";
-import { ColorValues } from "@library/forms/buttonStyles";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 
 export interface IProps {
     className?: string;

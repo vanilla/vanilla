@@ -233,7 +233,7 @@ export const splashVariables = useThemeCache(() => {
     };
 });
 
-export const splashStyles = useThemeCache(() => {
+export const splashClasses = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
     const formElementVars = formElementsVariables();
@@ -280,6 +280,8 @@ export const splashStyles = useThemeCache(() => {
     const text = style("text", {
         color: colorOut(vars.colors.contrast),
     });
+
+    const searchButton = generateButtonClass(vars.searchButtonType, "splashSearchButton");
 
     const buttonOverwrite = style("buttonOverwrite", {
         color: vars.colors.input,
@@ -390,8 +392,8 @@ export const splashStyles = useThemeCache(() => {
         text,
         icon,
         buttonOverwrite,
-        searchButton,
         searchContainer,
+        searchButton,
         input,
         buttonLoader,
         titleAction,

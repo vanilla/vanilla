@@ -5,8 +5,7 @@
  */
 
 import { percent } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
-import { ColorValues } from "@library/forms/buttonStyles";
+import { ColorValues, paddings, unit } from "@library/styles/styleHelpers";
 import {
     FontFamilyProperty,
     FontSizeProperty,

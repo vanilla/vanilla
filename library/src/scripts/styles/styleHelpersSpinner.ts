@@ -2,7 +2,7 @@ import { keyframes } from "typestyle";
 import { ColorHelper, deg, percent, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ContentProperty, DisplayProperty, PositionProperty } from "csstype";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { debugHelper, defaultTransition, unit } from "@library/styles/styleHelpers";
 
 const spinnerOffset = 73;
 const spinnerLoaderAnimation = keyframes({

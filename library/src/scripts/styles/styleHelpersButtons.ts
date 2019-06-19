@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { logDebug } from "packages/vanilla-utils";
+import { ILinkStates } from "@library/styles/styleHelpersLinks";
+import { logDebug } from "@vanilla/utils/src/debugUtils";
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {

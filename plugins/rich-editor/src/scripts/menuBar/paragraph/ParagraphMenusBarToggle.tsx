@@ -262,7 +262,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private get verticalOffset(): number {
         return this.props.legacyMode
             ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET
-            : richEditorVariables().moderFrame.padding * -1 + ParagraphMenusBarToggle.DEFAULT_OFFSET;
+            : richEditorVariables().modernFrame.padding * -1 + ParagraphMenusBarToggle.DEFAULT_OFFSET;
     }
 
     /**

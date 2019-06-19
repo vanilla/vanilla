@@ -150,7 +150,7 @@ export const richEditorVariables = useThemeCache(() => {
 
     const richEditorWidth = 8 * sizing.emojiSize;
 
-    const moderFrame = makeThemeVars("modernFrame", {
+    const modernFrame = makeThemeVars("modernFrame", {
         padding: 16,
         margin: 16,
     });
@@ -178,6 +178,6 @@ export const richEditorVariables = useThemeCache(() => {
         emojiFooter,
         iconWrap,
         richEditorWidth,
-        moderFrame,
+        modernFrame,
     };
 });

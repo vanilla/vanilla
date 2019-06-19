@@ -19,7 +19,6 @@ export const globalVariables = useThemeCache(() => {
 
     const elementaryColors = {
         black: color("#000"),
-        grey: color("#555a62"),
         white: color("#fff"),
         transparent: `transparent`,
     };
@@ -34,7 +33,7 @@ export const globalVariables = useThemeCache(() => {
     colorPrimary = initialMainColors.primary;
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.05),
+        secondary: emphasizeLightness(colorPrimary, 0.15),
     });
 
     const mainColors = {
@@ -71,9 +70,10 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
+    const defaultLinkColor = emphasizeLightness(colorPrimary, 0.065);
     const links = makeThemeVars("links", {
         colors: {
-            default: mainColors.primary,
+            default: defaultLinkColor,
             hover: mainColors.secondary,
             focus: mainColors.secondary,
             accessibleFocus: mainColors.secondary,

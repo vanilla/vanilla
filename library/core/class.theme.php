@@ -383,8 +383,11 @@ class Gdn_Theme {
      */
     public static function logo($properties = []) {
         $logo = c('Garden.Logo');
+        $title = c('Garden.Title', 'Title');
 
         if ($logo) {
+            $properties += ['alt' => $title];
+
             // Only trim slash from relative paths.
             if (!stringBeginsWith($logo, '//')) {
                 $logo = ltrim($logo, '/');
@@ -399,15 +402,11 @@ class Gdn_Theme {
             if (empty($properties['title']) && c('Garden.LogoTitle')) {
                 $properties['title'] = c('Garden.LogoTitle');
             }
-        }
 
-        // Use the site title as alt if none was given.
-        $title = c('Garden.Title', 'Title');
-        if (empty($properties['alt'])) {
-            $properties['alt'] = $title;
+            echo img(Gdn_Upload::url($logo), $properties);
+        } else {
+            echo htmlEsc($title);
         }
-
-        echo $logo ? img(Gdn_Upload::url($logo), $properties) : $title;
     }
 
     /**

@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { appearance, colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent } from "csx";
@@ -107,10 +107,13 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const close = style("close", {
+        ...appearance(),
+        cursor: "pointer",
         height: unit(formElVars.sizing.height),
         width: unit(formElVars.sizing.height),
         flexBasis: unit(formElVars.sizing.height),
         padding: 0,
+        border: 0,
     });
 
     return {

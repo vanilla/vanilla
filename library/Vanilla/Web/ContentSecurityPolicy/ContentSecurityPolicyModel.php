@@ -10,6 +10,7 @@ namespace Vanilla\Web\ContentSecurityPolicy;
  * Content security policies model.
  */
 class ContentSecurityPolicyModel {
+    const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
 
     /** @var array List of providers. */
     private $providers = [];
@@ -49,5 +50,27 @@ class ContentSecurityPolicyModel {
      */
     public function getNonce(): string {
         return $this->nonce;
+    }
+
+    /**
+     * Compose content security header string from policies list
+     *
+     * @param string $filter CSP directive to filter out
+     * @return string
+     */
+    public function getHeaderString(string $filter = 'all'): string {
+        $directives = [];
+        $policies = $this->getPolicies();
+        foreach ($policies as $policy) {
+            $directive = $policy->getDirective();
+            if ($directive === 'all' || $directive === $filter) {
+                if (array_key_exists($directive, $directives)) {
+                    $directives[$directive] .= ' ' . $policy->getArgument();
+                } else {
+                    $directives[$directive] = $directive . ' ' . $policy->getArgument();
+                }
+            }
+        }
+        return implode('; ', $directives);
     }
 }

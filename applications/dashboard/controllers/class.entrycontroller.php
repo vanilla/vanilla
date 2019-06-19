@@ -432,7 +432,7 @@ class EntryController extends Gdn_Controller {
         $currentData = $this->Form->formValues();
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
         $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
-        unset($filteredData['Roles'], $filteredData['RoleID']);
+        unset($filteredData['Roles'], $filteredData['RoleID'], $filteredData['RankID']);
         $this->Form->formValues($filteredData);
 
         // Fire ConnectData event & error handling.

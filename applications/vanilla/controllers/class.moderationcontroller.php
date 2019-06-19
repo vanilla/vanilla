@@ -352,6 +352,9 @@ class ModerationController extends VanillaController {
         if ($DiscussionID) {
             $CheckedDiscussions = (array)$DiscussionID;
             $ClearSelection = false;
+            $discussion = $DiscussionModel->getID($DiscussionID, DATASET_TYPE_ARRAY);
+            $this->setData('CategoryID', $discussion['CategoryID']);
+            $this->setData('DiscussionType', $discussion['Type']);
         } else {
             $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
             if (!is_array($CheckedDiscussions)) {
@@ -368,6 +371,7 @@ class ModerationController extends VanillaController {
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
+
         $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);

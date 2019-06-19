@@ -48,8 +48,14 @@ if (!$hasUserID) {
     <div class="FormWrapper">
         <?php
         echo $this->Form->open();
-        echo $this->Form->errors();
-        if ($ConnectName || $ConnectPhoto) : ?>
+            echo $this->Form->errors();
+
+        /**
+         *  HideName can be passed by any plugin that hooks into
+         *  the EntryController that has rules that require this form to be
+         *  shown but not the Name Field.
+         */
+        if ($ConnectName || $ConnectPhoto || !$this->data('HideName')) : ?>
             <div class="MeBox">
                 <?php
                 if ($ConnectPhoto) {

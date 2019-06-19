@@ -274,7 +274,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             ]);
         }
 
-        $hsts = Gdn::factory('HstsModel');
+        $hsts = Gdn::getContainer()->get('HstsModel');
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
         $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);

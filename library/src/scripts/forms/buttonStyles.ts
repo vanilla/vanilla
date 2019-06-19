@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     allButtonStates,
     borders,
+    borderType,
     colorOut,
     flexHelper,
     fonts,
@@ -19,10 +20,11 @@ import {
     userSelect,
 } from "@library/styles/styleHelpers";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import { ColorValues } from "@library/styles/styleHelpersColors";
+import merge from "lodash/merge";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -64,8 +66,10 @@ export const buttonGlobalVariables = useThemeCache(() => {
 export const transparentColor = "transparent" as ColorValues;
 
 export interface IButtonType {
-    colors: {
+    name: string;
+    colors?: {
         bg?: ColorValues;
+        fg?: ColorValues;
     };
     sizing?: {
         minHeight?: TLength;
@@ -77,8 +81,8 @@ export interface IButtonType {
         side?: TLength;
     };
     fonts?: IFont;
-    borders?: IBordersSameAllSidesStyles;
-    hover: {
+    borders?: borderType;
+    hover?: {
         fg?: ColorValues;
         colors?: {
             bg?: ColorValues;
@@ -86,7 +90,7 @@ export interface IButtonType {
         borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
-    focus: {
+    focus?: {
         fg?: ColorValues;
         colors?: {
             bg?: ColorValues;
@@ -94,7 +98,7 @@ export interface IButtonType {
         borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
-    active: {
+    active?: {
         fg?: ColorValues;
         colors?: {
             bg?: ColorValues;
@@ -102,7 +106,7 @@ export interface IButtonType {
         borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
-    focusAccessible: {
+    focusAccessible?: {
         fg?: ColorValues;
         colors?: {
             bg?: ColorValues;
@@ -117,6 +121,7 @@ export const buttonVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("button");
 
     const standard: IButtonType = makeThemeVars("basic", {
+        name: ButtonTypes.STANDARD,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
             bg: globalVars.mainColors.bg,
@@ -175,6 +180,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const compact: IButtonType = makeThemeVars("compact", {
+        name: ButtonTypes.COMPACT,
         colors: {
             bg: globalVars.mainColors.bg,
         },
@@ -208,6 +214,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const compactPrimary: IButtonType = makeThemeVars("compactPrimary", {
+        name: ButtonTypes.COMPACT_PRIMARY,
         colors: {
             bg: globalVars.mainColors.bg,
         },
@@ -256,6 +263,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const primary: IButtonType = makeThemeVars("primary", {
+        name: ButtonTypes.PRIMARY,
         colors: {
             bg: globalVars.mainColors.primary,
         },
@@ -314,6 +322,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const transparent: IButtonType = makeThemeVars("transparent", {
+        name: ButtonTypes.TRANSPARENT,
         colors: {
             bg: transparentColor,
         },
@@ -347,6 +356,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const translucid: IButtonType = makeThemeVars("translucid", {
+        name: ButtonTypes.TRANSLUCID,
         colors: {
             bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.1),
         },
@@ -393,6 +403,7 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const inverted: IButtonType = makeThemeVars("inverted", {
+        name: ButtonTypes.INVERTED,
         colors: {
             bg: globalVars.mainColors.fg,
         },
@@ -432,8 +443,8 @@ export const buttonVariables = useThemeCache(() => {
         transparent,
         compact,
         compactPrimary,
-        inverted,
         translucid,
+        inverted,
     };
 });
 
@@ -458,24 +469,39 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     font: "inherit",
 });
 
-export const overwriteButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
-    return generateButtonClass(buttonTypeVars, buttonName, setZIndexOnState);
+export const overwriteButtonClass = (
+    buttonTypeVars: IButtonType,
+    overwriteVars: IButtonType,
+    setZIndexOnState = false,
+) => {
+    const buttonVars = merge(buttonTypeVars, overwriteVars);
+    // append names for debugging purposes
+    buttonVars.name = `${buttonTypeVars.name}-${overwriteVars.name}`;
+    return generateButtonClass(buttonVars, setZIndexOnState);
 };
 
-export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
-    const globalVars = globalVariables();
+export const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
-    const style = styleFactory(`button-${buttonName}`);
+    const style = styleFactory(`button-${buttonTypeVars.name}`);
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
-    return style(buttonResetMixin(), {
+    // Make sure we have the second level, if it was empty
+    buttonTypeVars = merge(buttonTypeVars, {
+        colors: {},
+        hover: {},
+        focus: {},
+        active: {},
+        focusAccessible: {},
+    });
+
+    return style({
+        ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
         ...borders(buttonTypeVars.borders),
-        ...userSelect(),
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight
                 ? buttonDimensions.minHeight
@@ -502,7 +528,9 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
             ...buttonGlobals.font,
             ...buttonTypeVars.fonts,
         }),
-        backgroundColor: colorOut(buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg),
+        backgroundColor: colorOut(
+            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
+        ),
         $nest: {
             "&:not([disabled])": {
                 $nest: {
@@ -512,33 +540,33 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                     "&:hover": {
                         zIndex,
                         backgroundColor: colorOut(
-                            buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
+                            buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
                                 ? buttonTypeVars.hover.colors.bg
                                 : undefined,
                         ),
-                        ...borders(buttonTypeVars.hover.borders ? buttonTypeVars.hover.borders : undefined),
+                        ...borders(buttonTypeVars.hover!.borders ? buttonTypeVars.hover!.borders : undefined),
                         ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
                     },
                     "&:focus": {
                         zIndex,
                         backgroundColor: colorOut(
-                            buttonTypeVars.focus.colors && buttonTypeVars.focus.colors.bg
-                                ? buttonTypeVars.focus.colors.bg
+                            buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
+                                ? buttonTypeVars.focus!.colors.bg
                                 : undefined,
                         ),
-                        color: colorOut(buttonTypeVars.focus.fg),
-                        ...borders(buttonTypeVars.focus.borders ? buttonTypeVars.focus.borders : undefined),
+                        color: colorOut(buttonTypeVars.focus!.fg),
+                        ...borders(buttonTypeVars.focus!.borders ? buttonTypeVars.focus!.borders : undefined),
                         ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
                     },
                     "&:active": {
                         zIndex,
                         backgroundColor: colorOut(
-                            buttonTypeVars.active.colors && buttonTypeVars.active.colors.bg
-                                ? buttonTypeVars.active.colors.bg
+                            buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
+                                ? buttonTypeVars.active!.colors.bg
                                 : undefined,
                         ),
-                        color: colorOut(buttonTypeVars.active.fg),
-                        ...borders(buttonTypeVars.active.borders ? buttonTypeVars.active.borders : undefined),
+                        color: colorOut(buttonTypeVars.active!.fg),
+                        ...borders(buttonTypeVars.active!.borders ? buttonTypeVars.active!.borders : undefined),
                         ...fonts(
                             buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
                         ),
@@ -546,13 +574,15 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                     "&.focus-visible": {
                         zIndex,
                         backgroundColor: colorOut(
-                            buttonTypeVars.focusAccessible.colors && buttonTypeVars.focusAccessible.colors.bg
-                                ? buttonTypeVars.focusAccessible.colors.bg
+                            buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
+                                ? buttonTypeVars.focusAccessible!.colors.bg
                                 : undefined,
                         ),
-                        color: colorOut(buttonTypeVars.focusAccessible.fg),
+                        color: colorOut(buttonTypeVars.focusAccessible!.fg),
                         ...borders(
-                            buttonTypeVars.focusAccessible.borders ? buttonTypeVars.focusAccessible.borders : undefined,
+                            buttonTypeVars.focusAccessible!.borders
+                                ? buttonTypeVars.focusAccessible!.borders
+                                : undefined,
                         ),
                         ...fonts(
                             buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
@@ -587,13 +617,13 @@ export enum ButtonTypes {
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
-        primary: generateButtonClass(vars.primary, ButtonTypes.PRIMARY),
-        standard: generateButtonClass(vars.standard, ButtonTypes.STANDARD),
-        transparent: generateButtonClass(vars.transparent, ButtonTypes.TRANSPARENT),
-        compact: generateButtonClass(vars.compact, ButtonTypes.COMPACT),
-        compactPrimary: generateButtonClass(vars.compactPrimary, ButtonTypes.COMPACT_PRIMARY),
-        translucid: generateButtonClass(vars.translucid, ButtonTypes.TRANSLUCID),
-        inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
+        primary: generateButtonClass(vars.primary),
+        standard: generateButtonClass(vars.standard),
+        transparent: generateButtonClass(vars.transparent),
+        compact: generateButtonClass(vars.compact),
+        compactPrimary: generateButtonClass(vars.compactPrimary),
+        translucid: generateButtonClass(vars.translucid),
+        inverted: generateButtonClass(vars.inverted),
         icon: buttonUtilityClasses().buttonIcon,
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,

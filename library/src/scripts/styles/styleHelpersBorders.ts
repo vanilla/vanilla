@@ -20,9 +20,9 @@ export interface IBordersSameAllSidesStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
+export type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
 
-interface IBorderStyles extends ISingleBorderStyle {
+export interface IBorderStyles extends ISingleBorderStyle {
     all?: ISingleBorderStyle;
     topBottom?: ISingleBorderStyle;
     leftRight?: ISingleBorderStyle;
@@ -33,7 +33,9 @@ interface IBorderStyles extends ISingleBorderStyle {
     radius?: radiusType;
 }
 
-interface IBorderRadii {
+export type borderType = ISingleBorderStyle | IBorderStyles;
+
+export interface IBorderRadii {
     all?: BorderRadiusProperty<TLength> | number;
     top?: BorderRadiusProperty<TLength> | number;
     bottom?: BorderRadiusProperty<TLength> | number;

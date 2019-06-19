@@ -54,7 +54,9 @@ export const splashVariables = useThemeCache(() => {
         primary: globalVars.mainColors.primary,
         secondary: globalVars.mainColors.secondary,
         contrast: globalVars.elementaryColors.white,
-        input: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+        borderColor: globalVars.mainColors.fg.fade(0.4),
     });
 
     const outerBackground: IBackground = makeThemeVars("outerBackground", {
@@ -131,11 +133,11 @@ export const splashVariables = useThemeCache(() => {
             width: 705,
         },
         font: {
-            color: colors.input,
+            color: colors.fg,
             size: formElVars.giantInput.fontSize,
         },
         border: {
-            leftColor: colors.input.fade(0.4),
+            leftColor: colors.borderColor,
             radius: globalVars.border.radius,
         },
     });
@@ -147,6 +149,7 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const searchButtonType: IButtonType = makeThemeVars("buttonTypeSplash", {
+        name: "buttonTypeSplash",
         spinnerColor: colors.contrast,
         colors: {
             bg: colors.contrast,
@@ -156,7 +159,7 @@ export const splashVariables = useThemeCache(() => {
             width: 0,
         },
         fonts: {
-            color: colors.input,
+            color: colors.fg,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
         },
@@ -281,24 +284,22 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    const searchButton = generateButtonClass(vars.searchButtonType, "splashSearchButton");
-
-    const buttonOverwrite = style("buttonOverwrite", {
-        color: vars.colors.input,
-        $nest: {
-            [`&, &.${searchBarClasses().actionButton}`]: {
-                ...borders({
-                    left: {
-                        color: vars.searchBar.border.leftColor,
-                    },
-                    radius: {
-                        right: vars.searchButton.borderRadius,
-                        left: 0,
-                    },
-                }),
+    const searchButton = overwriteButtonClass(vars.searchButtonType, {
+        name: "splashSearchButton",
+        colors: {
+            fg: vars.colors.fg,
+            bg: vars.colors.bg,
+        },
+        borders: {
+            left: {
+                color: vars.searchBar.border.leftColor,
+            },
+            radius: {
+                right: vars.searchButton.borderRadius,
+                left: 0,
             },
         },
-    } as any);
+    });
 
     const valueContainer = style("valueContainer", {
         $nest: {
@@ -391,7 +392,6 @@ export const splashClasses = useThemeCache(() => {
         title,
         text,
         icon,
-        buttonOverwrite,
         searchContainer,
         searchButton,
         input,

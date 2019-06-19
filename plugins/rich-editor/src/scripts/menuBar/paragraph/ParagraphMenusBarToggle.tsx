@@ -34,6 +34,7 @@ import React from "react";
 import { style } from "typestyle";
 import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -255,15 +256,13 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         };
     }
 
-    private static readonly DEFAULT_OFFSET = 2;
-    private static readonly LEGACY_EXTRA_OFFSET = 2;
+    private static readonly DEFAULT_OFFSET = -1;
+    private static readonly LEGACY_EXTRA_OFFSET = -1;
 
     private get verticalOffset(): number {
-        const calculatedOffset =
-            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) ||
-            ParagraphMenusBarToggle.DEFAULT_OFFSET;
-        const extraOffset = this.props.legacyMode ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET : 0;
-        return calculatedOffset + extraOffset;
+        return this.props.legacyMode
+            ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET
+            : richEditorVariables().moderFrame.padding * -1 + ParagraphMenusBarToggle.DEFAULT_OFFSET;
     }
 
     /**

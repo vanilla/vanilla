@@ -3438,6 +3438,8 @@ class UserModel extends Gdn_Model {
 
         $userData = $dataSet->firstRow();
 
+        self::rateLimit($userData);
+
         $passwordHash = new Gdn_PasswordHash();
         $hashMethod = val('HashMethod', $userData);
         if (!$passwordHash->checkPassword($password, $userData->Password, $hashMethod, $userData->Name)) {
@@ -4724,9 +4726,8 @@ class UserModel extends Gdn_Model {
      * Check and apply login rate limiting
      *
      * @param array $user
-     * @param bool $passwordOK
      */
-    public static function rateLimit($user, $passwordOK) {
+    public static function rateLimit($user) {
         if (Gdn::cache()->activeEnabled()) {
             // Rate limit using Gdn_Cache.
             $userRateKey = formatString(self::LOGIN_RATE_KEY, ['Source' => $user->UserID]);

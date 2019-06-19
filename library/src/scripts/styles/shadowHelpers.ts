@@ -8,11 +8,11 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { ColorValues } from "@library/forms/buttonStyles";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
-    const shadowBaseColor = globalVars.mainColors.bg;
+    const shadowBaseColor = globalVars.mainColors.fg;
     const makeShadow = (opacity: number = 0.3) => `0 1px 3px 0 ${shadowBaseColor.fade(opacity)}`;
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         return {

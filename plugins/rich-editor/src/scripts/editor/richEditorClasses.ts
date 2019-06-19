@@ -20,7 +20,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { calc, important, percent, quote } from "csx";
+import { calc, important, percent, quote, translateY } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
@@ -93,7 +93,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         top: unit(vars.pilcrow.offset),
         left: 0,
         marginLeft: unit(-globalVars.gutter.quarter + (!legacyMode ? -(globalVars.gutter.size + 6) : 0)),
-        transform: `translateX(-100%)`,
+        transform: `translateX(-100%) translateY(-50%)`,
         height: unit(vars.paragraphMenuHandle.size),
         width: unit(globalVars.icon.sizes.default),
         animationName: vars.pilcrow.animation.name,
@@ -106,7 +106,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 cursor: "default",
             },
             "&.isMenuInset": {
-                transform: "none",
+                transform: translateY("-50%"),
             },
         },
     });
@@ -333,8 +333,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const close = style("close", {
-        ...absolutePosition.middleRightOfParent(6),
+        ...absolutePosition.middleRightOfParent(),
         ...userSelect(),
+        ...appearance(),
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),
         lineHeight: unit(vars.menuButton.size),
@@ -342,6 +343,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         textAlign: "center",
         background: "transparent",
         cursor: "pointer",
+        border: 0,
+        outline: 0,
     });
 
     const flyoutDescription = style("flyoutDescription", {

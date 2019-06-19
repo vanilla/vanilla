@@ -31,7 +31,12 @@ if ($CountNotAllowed > 0) {
             <?php
             echo '<p><div class="Category">';
             echo $this->Form->label('Category', 'CategoryID'), ' ';
-            echo $this->Form->categoryDropDown();
+            $options = [
+                'Value' => $this->Data('CategoryID'),
+                'IncludeNull' => true,
+                'DiscussionType' => $this->Data('DiscussionType'),
+            ];
+            echo $this->Form->categoryDropDown('CategoryID', $options);
             echo '</div></p>';
             ?>
         </li>

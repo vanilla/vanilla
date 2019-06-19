@@ -434,7 +434,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      * @return string Returns the sign-in URL.
      */
-    public function authorizeUri($state = []): string {
+    public function authorizeUri($state = []) {
         $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state)]);
 
         return url("entry/{$this->providerKey}-redirect{$params}", true);

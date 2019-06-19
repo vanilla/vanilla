@@ -62,9 +62,10 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         // Track user selection events.
-        this.quill.on("selection-change", (range, oldRange, source) => {
-            if (range && source !== Quill.sources.SILENT) {
-                this.lastGoodSelection = range;
+        this.quill.on(Quill.events.EDITOR_CHANGE, (type, value, oldValue, source) => {
+            const selection = this.quill.getSelection();
+            if (selection && source !== Quill.sources.SILENT) {
+                this.lastGoodSelection = selection;
             }
         });
 

@@ -22,7 +22,7 @@ describe("EditorContent", () => {
             const { quill, textarea } = await setupLegacyEditor([]);
             const valueToSet = [OpUtils.op("Test Header"), OpUtils.heading(2)];
             quill.setContents(valueToSet, Quill.sources.USER);
-            await promiseTimeout(0); // 1 tick for form to update.
+            await promiseTimeout(1000); // 1 tick isn't always enough, so we bumped up to 1000
             expect(JSON.parse(textarea.value)).deep.eq(valueToSet);
         });
     });

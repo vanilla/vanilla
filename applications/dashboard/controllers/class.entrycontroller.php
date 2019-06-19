@@ -1081,7 +1081,7 @@ class EntryController extends Gdn_Controller {
                         $passwordChecked = $passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user));
 
                         // Rate limiting
-                        Gdn::userModel()->rateLimit($user, $passwordChecked);
+                        Gdn::userModel()->rateLimit($user);
 
                         if ($passwordChecked) {
                             // Update weak passwords

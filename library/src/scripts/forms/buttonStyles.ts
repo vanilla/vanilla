@@ -5,24 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    allButtonStates,
-    borders,
-    colorOut,
-    flexHelper,
-    fonts,
-    IBordersSameAllSidesStyles,
-    IFont,
-    modifyColorBasedOnLightness,
-    spinnerLoader,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { borders, IBordersSameAllSidesStyles, spinnerLoader, unit, userSelect } from "@library/styles/styleHelpers";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, important, percent, px } from "csx";
-import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
+import { important, percent, px } from "csx";
+import { ColorValues } from "@library/styles/styleHelpersColors";
+import { IFont } from "@library/styles/styleHelpersFonts";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -60,8 +49,6 @@ export const buttonGlobalVariables = useThemeCache(() => {
         colors,
     };
 });
-
-export type ColorValues = ColorHelper | "transparent" | undefined;
 
 export const transparentColor = "transparent" as ColorValues;
 
@@ -459,6 +446,10 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     color: "inherit",
     font: "inherit",
 });
+
+export const overwriteButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
+    return generateButtonClass(buttonTypeVars, buttonName, setZIndexOnState);
+};
 
 export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();

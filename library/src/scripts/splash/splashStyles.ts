@@ -11,19 +11,19 @@ import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShado
 import { important, percent, px, quote, translateX } from "csx";
 import {
     centeredBackgroundProps,
-    colorOut,
     fonts,
     getBackgroundImage,
     IBackground,
     IFont,
-    modifyColorBasedOnLightness,
     paddings,
     unit,
+    colorOut,
     background,
     absolutePosition,
     borders,
+    modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
-import { transparentColor, IButtonType, generateButtonClass } from "@library/forms/buttonStyles";
+import { transparentColor, IButtonType, generateButtonClass, overwriteButtonClass } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
 import { TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -281,22 +281,6 @@ export const splashStyles = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    const searchButton = generateButtonClass(vars.searchButtonType, "splashSearchButton");
-
-    const valueContainer = style("valueContainer", {
-        $nest: {
-            [`&, &.${searchBarClasses().valueContainer}`]: {
-                ...borders({
-                    color: vars.colors.contrast,
-                    radius: {
-                        right: 0,
-                        left: vars.searchBar.border.radius,
-                    },
-                }),
-            },
-        },
-    });
-
     const buttonOverwrite = style("buttonOverwrite", {
         color: vars.colors.input,
         $nest: {
@@ -313,6 +297,20 @@ export const splashStyles = useThemeCache(() => {
             },
         },
     } as any);
+
+    const valueContainer = style("valueContainer", {
+        $nest: {
+            [`&, &.${searchBarClasses().valueContainer}`]: {
+                ...borders({
+                    color: vars.colors.contrast,
+                    radius: {
+                        right: 0,
+                        left: vars.searchBar.border.radius,
+                    },
+                }),
+            },
+        },
+    });
 
     const searchContainer = style("searchContainer", {
         position: "relative",

@@ -12,6 +12,7 @@ import { element } from "prop-types";
 import Attachment from "@library/content/attachments/Attachment";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
+import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 
 // Methods
 export interface IBaseEmbedProps {
@@ -67,3 +68,4 @@ export function mountAllEmbeds(root: HTMLElement = document.body) {
 registerEmbed("quote", QuoteEmbed);
 registerEmbed("file", FileEmbed);
 registerEmbed("link", LinkEmbed);
+registerEmbed("twitch", VideoEmbed);

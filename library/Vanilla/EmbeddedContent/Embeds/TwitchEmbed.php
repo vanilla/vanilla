@@ -18,6 +18,32 @@ class TwitchEmbed extends AbstractEmbed {
     const TYPE = "twitch";
 
     /**
+     * Generate an embed frame URL from a type and ID.
+     *
+     * @param string $id
+     * @param string $type
+     * @return string|null
+     */
+    private function frameSourceFromID(string $id, string $type): ?string {
+        switch ($type) {
+            case "channel":
+                return "https://player.twitch.tv/?channel=".urlencode($id);
+                break;
+            case "clip":
+                return "https://clips.twitch.tv/embed?clip=".urlencode($id);
+                break;
+            case "collection":
+                return "https://player.twitch.tv/?collection=".urlencode($id);
+                break;
+            case "video":
+                return "https://player.twitch.tv/?video=".urlencode($id);
+                break;
+        }
+
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function getAllowedTypes(): array {
@@ -36,14 +62,27 @@ class TwitchEmbed extends AbstractEmbed {
     }
 
     /**
+     * @return array|mixed
+     */
+    public function jsonSerialize() {
+        $data = parent::jsonSerialize();
+        if (array_key_exists("twitchID", $data)) {
+            list($type, $id) = explode(":", $data["twitchID"]);
+            $data["frameSrc"] = $this->frameSourceFromID($id, $type);
+        }
+        return $data;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function schema(): Schema {
         return Schema::parse([
             "height:i",
             "width:i",
-            "twitchID:s",
-            "time:s?",
+            "frameSrc:s|n",
+            "photoUrl:s?",
+            "time:s?"
         ]);
     }
 }

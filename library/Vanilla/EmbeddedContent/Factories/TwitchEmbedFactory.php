@@ -94,6 +94,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
             "name" => $response["title"] ?? null,
             "height" => $response["height"] ?? null,
             "width" => $response["width"] ?? null,
+            "photoUrl" => $response["thumbnail_url"] ?? null,
             "twitchID" => $twitchID,
             "time" => $parameters["time"] ?? $parameters["t"] ?? null,
         ];

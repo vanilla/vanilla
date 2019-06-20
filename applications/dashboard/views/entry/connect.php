@@ -55,7 +55,7 @@ if (!$hasUserID) {
          *  the EntryController that has rules that require this form to be
          *  shown but not the Name Field.
          */
-        if ($ConnectName || $ConnectPhoto || !$this->data('HideName')) : ?>
+        if ($ConnectName || $ConnectPhoto && !$this->data('HideName')) : ?>
             <div class="MeBox">
                 <?php
                 if ($ConnectPhoto) {
@@ -105,7 +105,7 @@ if (!$hasUserID) {
 
                 <?php
                     $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
-                    if ($displayConnectName) : ?>
+                    if ($displayConnectName && !$this->data('HideName')) : ?>
                 <li>
                     <?php
 

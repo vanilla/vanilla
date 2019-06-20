@@ -757,15 +757,6 @@ class Gdn_Request implements RequestInterface {
             $rawPort = $hostParts[1];
         }
 
-        if ($allowedHost = Gdn::config('Garden.Security.Host')) {
-            if ($host != $allowedHost) {
-                throw new Exception('Host is incorrect. Try: '.$allowedHost);
-            }
-        } else {
-            $config = Gdn::getContainer()->get(self::AliasConfig);
-            $config = new Gdn_Configuration();
-            if ($config->defaultPath())
-        }
         $this->_environmentElement('HOST', $host);
         $this->_environmentElement('METHOD', $_SERVER['REQUEST_METHOD'] ?? 'CONSOLE');
 

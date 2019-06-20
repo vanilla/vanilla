@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useCallback } from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { simplifyFraction } from "@vanilla/utils";
-import { t } from "@library/utility/appUtils";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { t } from "@library/utility/appUtils";
+import { simplifyFraction } from "@vanilla/utils";
+import classNames from "classnames";
+import React, { useCallback, useState } from "react";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -29,15 +30,20 @@ export function VideoEmbed(props: IProps) {
 
     let ratioClass: string | undefined;
     const ratio = simplifyFraction(height || 3, width || 4);
+    console.log(ratio);
     switch (ratio.shorthand) {
         case "21:9":
             ratioClass = "is21by9";
-        case "16:9":
-            ratioClass = "is16by9";
+            break;
         case "4:3":
             ratioClass = "is4by3";
+            break;
         case "1:1":
             ratioClass = "is1by1";
+            break;
+        case "16:9":
+        default:
+            ratioClass = "is16by9";
     }
 
     const style: React.CSSProperties = ratioClass
@@ -47,14 +53,14 @@ export function VideoEmbed(props: IProps) {
           };
 
     const thumbnail = (
-        <div className={`embedVideo-ratio ${ratioClass}`} style={style}>
-            <button type="button" aria-label={name || undefined} className="embedVideo-playButton">
-                <img
-                    onClick={togglePlaying}
-                    src={photoUrl || undefined}
-                    role="presentation"
-                    className="embedVideo-thumbnail"
-                />
+        <div style={style}>
+            <button
+                type="button"
+                aria-label={name || undefined}
+                className="embedVideo-playButton"
+                onClick={togglePlaying}
+            >
+                <img src={photoUrl || undefined} role="presentation" className="embedVideo-thumbnail" />
                 <span className="embedVideo-scrim" />
                 <PlayIcon />
             </button>
@@ -64,7 +70,11 @@ export function VideoEmbed(props: IProps) {
     const content = isPlaying ? <VideoIframe url={frameSrc} /> : thumbnail;
     return (
         <EmbedContainer className="embedVideo" inEditor={props.inEditor}>
-            <EmbedContent type={embedType} inEditor={props.inEditor}>
+            <EmbedContent
+                type={embedType}
+                inEditor={props.inEditor}
+                className={classNames("embedVideo-ratio", ratioClass)}
+            >
                 {content}
             </EmbedContent>
         </EmbedContainer>

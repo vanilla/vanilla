@@ -22,7 +22,7 @@
  * any of its methods of constants.
  *
  */
-class Gdn_OAuth2 extends Gdn_Plugin {
+class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
     /** @var string token provided by authenticator  */
     protected $accessToken;
@@ -53,6 +53,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
     /** @var  @var string optional set the settings view */
     protected $settingsView;
+
+    /**
+     * @var SsoUtils
+     */
+    private $ssoUtils;
 
     /**
      * Set up OAuth2 access properties.
@@ -307,6 +312,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
+        $sender->registerCallback("entryController_{$this->providerKey}Redirect_create", [$this, 'entryRedirectEndpoint']);
         $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
         $sender->registerCallback("settingsController_{$this->providerKey}_create", [$this, 'settingsEndpoint']);
     }
@@ -330,6 +336,20 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
         ];
         return $formFields;
+    }
+
+    /**
+     * Redirect to the OAuth redirect page with a verification nonce.
+     *
+     * @param EntryController $sender The controller initiating the request.
+     * @param  string $state The state to pass along the OAuth2 flow.
+     */
+    public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
+        $state = $this->decodeState($state);
+        $url = $this->realAuthorizeUri($state);
+
+        \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        redirectTo($url, 302, false);
     }
 
 
@@ -409,13 +429,25 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     /** ------------------- Connection Related Methods --------------------- */
 
     /**
+     * Return the URL that sign-in buttons should use.
+     *
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     * @return string Returns the sign-in URL.
+     */
+    public function authorizeUri($state = []): string {
+        $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state)]);
+
+        return url("entry/{$this->providerKey}-redirect{$params}", true);
+    }
+
+    /**
      * Create the URI that can return an authorization.
      *
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      *
      * @return string Endpoint of the provider.
      */
-    public function authorizeUri($state = []) {
+    protected function realAuthorizeUri(array $state = []): string {
         $provider = $this->provider();
 
         $uri = val('AuthorizeUrl', $provider);
@@ -431,9 +463,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         // allow child class to overwrite or add to the authorize URI.
         $get = array_merge($defaultParams, $this->authorizeUriParams);
 
-        if (is_array($state)) {
-            $get['state'] = http_build_query($state);
-        }
+        $state['token'] = $this->ssoUtils->getStateToken();
+        $get['state'] = $this->encodeState($state);
 
         return $uri.'?'.http_build_query($get);
     }
@@ -442,12 +473,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     /**
      * Generic API uses ProxyRequest class to fetch data from remote endpoints.
      *
-     * @param $uri Endpoint on provider's server.
+     * @param string $uri Endpoint on provider's server.
      * @param string $method HTTP method required by provider.
      * @param array $params Query string.
      * @param array $options Configuration options for the request (e.g. Content-Type).
      *
-     * @return mixed|type.
+     * @return mixed.
      *
      * @throws Exception.
      * @throws Gdn_UserException.
@@ -545,10 +576,15 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $this->log('Profile', $profile);
 
         if ($state) {
-            parse_str($state, $state);
+            $rawState = $state;
+            $state = $this->decodeState($state);
         } else {
             $state = ['r' => 'entry', 'uid' => null, 'd' => 'none'];
         }
+
+        $suppliedStateToken = $state['token'] ?? '';
+        $this->ssoUtils->verifyStateToken($this->providerKey, $suppliedStateToken);
+
         switch ($state['r']) {
             case 'profile':
                 // This is a connect request from the user's profile.
@@ -831,7 +867,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
         $url = $this->authorizeUri(['target' => $target]);
-        $providerName = val('Name', $this->provider);
+        $providerName = $this->provider['Name'] ?? 'OAuth';
         $linkLabel = sprintf(t('Sign in with %s'), $providerName);
         $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
         return $result;
@@ -917,6 +953,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         return $result;
     }
 
+    /**
+     * Inject dependencies without affecting subclass constructors.
+     *
+     * @param SsoUtils $ssoUtils Used to generate SSO tokens.
+     */
+    public function setDependencies(SsoUtils $ssoUtils) {
+        $this->ssoUtils = $ssoUtils;
+    }
 
     /**
      * When DB_Logger is turned on, log SSO data.
@@ -932,6 +976,40 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $message,
                 $data
             );
+        }
+    }
+
+    /**
+     * Encode an array into a state parameter.
+     *
+     * Some OAuth servers will mess up double URL encoding so use something safe here.
+     *
+     * @param array $state The state to encode.
+     * @return string Returns the encoded state.
+     */
+    protected function encodeState(array $state): string {
+        return base64_encode(json_encode($state));
+    }
+
+    /**
+     * Decode a state string into its original array.
+     *
+     * If the state cannot be decoded this method returns an empty string so the caller should be responsible for
+     * propagating any errors.
+     *
+     * @param string $state The state to decode.
+     * @return array Returns the decoded state.
+     */
+    protected function decodeState(string $state): array {
+        if (empty($state)) {
+            return [];
+        } else {
+            $r = json_decode(base64_decode($state), true);
+            if (is_array($r)) {
+                return $r;
+            } else {
+                return [];
+            }
         }
     }
 }

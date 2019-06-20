@@ -36,7 +36,7 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
-export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean, callback: () => void) {
+export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean, callback?: () => void) {
     const type = data.embedType || null;
     if (type === null) {
         logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
@@ -59,7 +59,7 @@ export function mountAllEmbeds(root: HTMLElement = document.body) {
     const mountPoints = root.querySelectorAll("[data-embedjson]");
     for (const mountPoint of mountPoints) {
         const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        void mountEmbed(mountPoint as HTMLElement, parsedData, false);
+        mountEmbed(mountPoint as HTMLElement, parsedData, false);
     }
 }
 

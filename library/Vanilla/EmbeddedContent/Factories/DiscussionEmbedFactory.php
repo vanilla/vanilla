@@ -53,7 +53,8 @@ class DiscussionEmbedFactory extends AbstractEmbedFactory {
         $root = SiteAsset::joinWebPath($this->request->getRoot(), '/discussion');
         $root = str_replace('/', '\/', $root);
 
-        return "/^$root\/(?<discussionID>\d+)/i";
+        $regex = "/$root\/(?<discussionID>\d+)/i";
+        return $regex;
     }
 
     /**
@@ -64,11 +65,14 @@ class DiscussionEmbedFactory extends AbstractEmbedFactory {
         $id = $matches['discussionID'] ?? null;
 
         if ($id === null) {
-            throw new NotFoundException('Comment');
+            throw new NotFoundException('Discussion');
         }
 
         $discussion = $this->discussionApi->get_quote($id);
-        return new QuoteEmbed($discussion);
+        $data = $discussion + [
+                'embedType' => QuoteEmbed::TYPE,
+            ];
+        return new QuoteEmbed($data);
     }
 
 }

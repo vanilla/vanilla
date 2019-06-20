@@ -53,7 +53,7 @@ class CommentEmbedFactory extends AbstractEmbedFactory {
         $root = SiteAsset::joinWebPath($this->request->getRoot(), '/discussion/comment');
         $root = str_replace('/', '\/', $root);
 
-        return "/^$root\/(?<commentID>\d+)/i";
+        return "/$root\/(?<commentID>\d+)/i";
     }
 
     /**
@@ -68,6 +68,9 @@ class CommentEmbedFactory extends AbstractEmbedFactory {
         }
 
         $comment = $this->commentApi->get_quote($id);
-        return new QuoteEmbed($comment);
+        $data = $comment + [
+            'embedType' => QuoteEmbed::TYPE,
+        ];
+        return new QuoteEmbed($data);
     }
 }

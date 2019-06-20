@@ -17,6 +17,8 @@ use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
@@ -126,6 +128,9 @@ class EmbedService implements EmbedCreatorInterface {
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
+            ->registerFactory($dic->get(DiscussionEmbedFactory::class))
+            ->registerFactory($dic->get(CommentEmbedFactory::class))
+
 //            ->registerFactory(VimeoEmbedFactory::class)
 //            ->registerFactory(WistiaFactory::class)
 //            ->registerFactory(YoutubeFactory::class)

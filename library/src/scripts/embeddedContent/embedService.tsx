@@ -55,7 +55,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
     console.log("Mounting embed", data, "over element", element);
 
     return new Promise(resolve => {
-        mountReact(<EmbedClass {...data} />, mountPoint, resolve);
+        mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, resolve);
     });
 }
 
@@ -63,7 +63,7 @@ export function mountAllEmbeds(root: HTMLElement = document.body) {
     const mountPoints = root.querySelectorAll("[data-embedjson]");
     for (const mountPoint of mountPoints) {
         const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        mountEmbed(mountPoint as HTMLElement, parsedData, false);
+        void mountEmbed(mountPoint as HTMLElement, parsedData, false);
     }
 }
 

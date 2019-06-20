@@ -6,7 +6,7 @@
 import React from "react";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { mountReact } from "@library/dom/domUtils";
-import { logWarning, logDebug } from "@vanilla/utils";
+import { logWarning, logDebug, debug } from "@vanilla/utils";
 import { onReady } from "@library/utility/appUtils";
 import { element } from "prop-types";
 import Attachment from "@library/content/attachments/Attachment";
@@ -36,7 +36,7 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
-export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
+export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean, callback: () => void) {
     const type = data.embedType || null;
     if (type === null) {
         logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
@@ -52,11 +52,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
         return;
     }
 
-    console.log("Mounting embed", data, "over element", element);
-
-    return new Promise(resolve => {
-        mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, resolve);
-    });
+    mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, callback);
 }
 
 export function mountAllEmbeds(root: HTMLElement = document.body) {

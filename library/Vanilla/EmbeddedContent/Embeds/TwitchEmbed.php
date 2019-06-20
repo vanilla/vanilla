@@ -43,6 +43,7 @@ class TwitchEmbed extends AbstractEmbed {
             "height:i",
             "width:i",
             "twitchID:s",
+            "time:s?",
         ]);
     }
 }

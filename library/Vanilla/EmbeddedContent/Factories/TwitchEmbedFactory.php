@@ -16,7 +16,8 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
  */
 class TwitchEmbedFactory extends AbstractEmbedFactory {
 
-    const SUPPORTED_DOMAINS = ["clips.twitch.tv", "www.twitch.tv"];
+    const CLIPS_DOMAIN = "clips.twitch.tv";
+    const PRIMARY_DOMAINS = ["www.twitch.tv", "twitch.tv"];
 
     const OEMBED_URL_BASE = "https://api.twitch.tv/v5/oembed";
 
@@ -36,15 +37,18 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedDomains(): array {
-        return self::SUPPORTED_DOMAINS;
+        return self::PRIMARY_DOMAINS + [self::CLIPS_DOMAIN];
     }
 
     /**
-     * We pass along to the oembed service. If it can't parse the URL, then we definitely can't.
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain): string {
-        return "/.+/";
+        if ($domain === self::CLIPS_DOMAIN) {
+            return "`^/(?!embed)[^/]+`";
+        } else {
+            return "`^/(?!directory|downloads|jobs|turbo)`";
+        }
     }
 
     /**
@@ -53,6 +57,8 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
+        $twitchID = $this->idFromUrl($url);
+
         $response = $this->httpClient->get(
             self::OEMBED_URL_BASE,
             ["url" => $url]
@@ -62,37 +68,62 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
         // {
         //     "version": 1,
         //     "type": "video",
-        //     "twitch_type": "clip",
-        //     "title": "Lights! Camera! Action!",
+        //     "twitch_type": "vod",
+        //     "title": "Movie Magic",
         //     "author_name": "Jerma985",
         //     "author_url": "https://www.twitch.tv/jerma985",
-        //     "curator_name": "funkengines",
-        //     "curator_url": "https://www.twitch.tv/funkengines",
         //     "provider_name": "Twitch",
         //     "provider_url": "https://www.twitch.tv/",
-        //     "thumbnail_url": "https://clips-media-assets2.twitch.tv/AT-cm%7C267415465-preview.jpg",
-        //     "video_length": 32,
-        //     "created_at": "2018-07-07T01:15:04Z",
-        //     "game": "Dark Souls",
-        //     "html": "<iframe src=\"https://clips.twitch.tv/embed?clip=KnottyOddFishShazBotstix&autoplay=false\" width=\"620\" height=\"351\" frameborder=\"0\" scrolling=\"no\" allowfullscreen></iframe>",
-        //     "width": 620,
-        //     "height": 351,
-        //     "request_url": "https://www.twitch.tv/jerma985/clip/KnottyOddFishShazBotstix?filter=clips&range=all&sort=time",
-        //     "author_thumbnail_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/jerma985-profile_image-447425e773e6fd5c-150x150.jpeg",
-        //     "author_id": "23936415",
-        //     "view_count": 329483,
-        //     "twitch_content_id": "267415465"
+        //     "thumbnail_url": "https://static-cdn.jtvnw.net/s3_vods/aa1bb413e849cf63b446_jerma985_34594404336_1230815694/thumb/thumb0-640x360.jpg",
+        //     "video_length": 19593,
+        //     "created_at": "2019-06-19T21:22:59Z",
+        //     "game": "The Movies",
+        //     "html": "<iframe src=\"https://player.twitch.tv/?%21branding=&amp;autoplay=false&amp;video=v441409883\" width=\"500\" height=\"281\" frameborder=\"0\" scrolling=\"no\" allowfullscreen></iframe>",
+        //     "width": 500,
+        //     "height": 281,
+        //     "request_url": "https://www.twitch.tv/videos/441409883"
         //   }
+
+        $query = parse_url($url, PHP_URL_QUERY);
+        $parameters = [];
+        parse_str($query ?? "", $parameters);
 
         $data = [
             "embedType" => TwitchEmbed::TYPE,
-            "url" => $response["request_url"] ?? null,
-            "name" => $response["title"] ?? "",
+            "url" => $url,
+            "name" => $response["title"] ?? null,
             "height" => $response["height"] ?? null,
             "width" => $response["width"] ?? null,
-            "twitchID" => $response["twitch_content_id"] ?? null,
+            "twitchID" => $twitchID,
+            "time" => $parameters["time"] ?? $parameters["t"] ?? null,
         ];
 
         return new TwitchEmbed($data);
+    }
+
+    /**
+     * Given a Twitch URL, generate a unique ID.
+     *
+     * @param string $url
+     * @return string|null
+     */
+    private function idFromUrl(string $url): ?string {
+        $host = parse_url($url, PHP_URL_HOST);
+        $path = parse_url($url, PHP_URL_PATH);
+
+        if ($host === false || $host === null || $path === false || $path === null) {
+            return null;
+        }
+
+        if ($host === "clips.twitch.tv" || preg_match("`/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
+            return "clip:{$clipsMatch['clipID']}";
+        } elseif (preg_match("`/(?<type>videos|collections)/(?<id>[^/]+)`", $path, $videosMatch)) {
+            $type = $videosMatch["type"] === "videos" ? "video" : "collection";
+            return "{$type}:{$videosMatch['id']}";
+        } elseif (preg_match("`/(?<channel>[^/]+)`", $path, $channelMatch)) {
+            return "channel:{$channelMatch['channel']}";
+        }
+
+        return null;
     }
 }

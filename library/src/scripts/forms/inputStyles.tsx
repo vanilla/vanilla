@@ -8,7 +8,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     borders,
     colorOut,
-    IBordersSameAllSidesStyles,
+    IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
 } from "@library/styles/styleHelpers";
@@ -38,7 +38,7 @@ export const inputVariables = useThemeCache(() => {
         size: globalVars.fonts.size.large,
     });
 
-    const border: IBordersSameAllSidesStyles = makeThemeVars("borders", globalVars.border);
+    const border: IBordersWithRadius = makeThemeVars("borders", globalVars.border);
 
     return {
         colors,

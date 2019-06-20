@@ -8,7 +8,7 @@ import {
     absolutePosition,
     allLinkStates,
     borders,
-    IBordersSameAllSidesStyles,
+    IBordersWithRadius,
     margins,
     unit,
     userSelect,
@@ -25,7 +25,7 @@ export const attachmentVariables = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("attachment");
 
-    const border: IBordersSameAllSidesStyles = {
+    const border: IBordersWithRadius = {
         color: globalVars.mixBgAndFg(0.2),
         style: "solid",
         width: formElementVars.border.width,

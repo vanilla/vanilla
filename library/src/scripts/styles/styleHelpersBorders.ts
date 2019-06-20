@@ -16,20 +16,20 @@ interface ISingleBorderStyle {
     style?: BorderStyleProperty;
 }
 
-export interface IBordersSameAllSidesStyles extends ISingleBorderStyle {
+export interface IBordersWithRadius extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
 export type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
 
 export interface IBorderStyles extends ISingleBorderStyle {
-    all?: ISingleBorderStyle;
-    topBottom?: ISingleBorderStyle;
-    leftRight?: ISingleBorderStyle;
-    top?: ISingleBorderStyle;
-    bottom?: ISingleBorderStyle;
-    left?: ISingleBorderStyle;
-    right?: ISingleBorderStyle;
+    all?: IBordersWithRadius;
+    topBottom?: IBordersWithRadius;
+    leftRight?: IBordersWithRadius;
+    top?: IBordersWithRadius;
+    bottom?: IBordersWithRadius;
+    left?: IBordersWithRadius;
+    right?: IBordersWithRadius;
     radius?: radiusType;
 }
 
@@ -82,6 +82,10 @@ const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
 
+    if (debug) {
+        window.console.log("coming in: ", props);
+    }
+
     const output: NestedCSSProperties = {
         borderLeft: undefined,
         borderRight: undefined,
@@ -100,43 +104,42 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
             if (props.radius.all) {
                 globalRadiusFound = true;
                 output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-            } else {
-                if (props.radius.top) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.top);
-                    output.borderTopLeftRadius = unit(props.radius.top);
-                }
-                if (props.radius.bottom) {
-                    specificRadiusFound = true;
-                    output.borderBottomRightRadius = unit(props.radius.bottom);
-                    output.borderBottomLeftRadius = unit(props.radius.bottom);
-                }
-                if (props.radius.right) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.right);
-                    output.borderBottomRightRadius = unit(props.radius.right);
-                }
-                if (props.radius.left) {
-                    specificRadiusFound = true;
-                    output.borderTopLeftRadius = unit(props.radius.left);
-                    output.borderBottomLeftRadius = unit(props.radius.left);
-                }
-                if (props.radius.topRight) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.topRight);
-                }
-                if (props.radius.topLeft) {
-                    specificRadiusFound = true;
-                    output.borderTopLeftRadius = unit(props.radius.topLeft);
-                }
-                if (props.radius.bottomRight) {
-                    specificRadiusFound = true;
-                    output.borderBottomLeftRadius = unit(props.radius.bottomRight);
-                }
-                if (props.radius.topLeft) {
-                    specificRadiusFound = true;
-                    output.borderBottomRightRadius = unit(props.radius.bottomLeft);
-                }
+            }
+            if (props.radius.top) {
+                specificRadiusFound = true;
+                output.borderTopRightRadius = unit(props.radius.top);
+                output.borderTopLeftRadius = unit(props.radius.top);
+            }
+            if (props.radius.bottom) {
+                specificRadiusFound = true;
+                output.borderBottomRightRadius = unit(props.radius.bottom);
+                output.borderBottomLeftRadius = unit(props.radius.bottom);
+            }
+            if (props.radius.right) {
+                specificRadiusFound = true;
+                output.borderTopRightRadius = unit(props.radius.right);
+                output.borderBottomRightRadius = unit(props.radius.right);
+            }
+            if (props.radius.left) {
+                specificRadiusFound = true;
+                output.borderTopLeftRadius = unit(props.radius.left);
+                output.borderBottomLeftRadius = unit(props.radius.left);
+            }
+            if (props.radius.topRight) {
+                specificRadiusFound = true;
+                output.borderTopRightRadius = unit(props.radius.topRight);
+            }
+            if (props.radius.topLeft) {
+                specificRadiusFound = true;
+                output.borderTopLeftRadius = unit(props.radius.topLeft);
+            }
+            if (props.radius.bottomRight) {
+                specificRadiusFound = true;
+                output.borderBottomLeftRadius = unit(props.radius.bottomRight);
+            }
+            if (props.radius.topLeft) {
+                specificRadiusFound = true;
+                output.borderBottomRightRadius = unit(props.radius.bottomLeft);
             }
         }
     }
@@ -192,6 +195,10 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
         output.borderStyle = props.style ? props.style : globalVars.border.style;
         output.borderColor = props.color ? colorOut(props.color) : colorOut(globalVars.border.color);
         output.borderWidth = props.width ? unit(props.width) : unit(globalVars.border.width);
+    }
+
+    if (debug) {
+        window.console.log("going out: ", output);
     }
 
     return output;

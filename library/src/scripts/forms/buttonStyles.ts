@@ -12,7 +12,7 @@ import {
     colorOut,
     flexHelper,
     fonts,
-    IBordersSameAllSidesStyles,
+    IBordersWithRadius,
     IFont,
     modifyColorBasedOnLightness,
     spinnerLoader,
@@ -87,7 +87,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBordersSameAllSidesStyles;
+        borders?: IBordersWithRadius;
         fonts?: IFont;
     };
     focus?: {
@@ -95,7 +95,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBordersSameAllSidesStyles;
+        borders?: IBordersWithRadius;
         fonts?: IFont;
     };
     active?: {
@@ -103,7 +103,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBordersSameAllSidesStyles;
+        borders?: IBordersWithRadius;
         fonts?: IFont;
     };
     focusAccessible?: {
@@ -111,7 +111,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBordersSameAllSidesStyles;
+        borders?: IBordersWithRadius;
         fonts?: IFont;
     };
 }
@@ -496,12 +496,17 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnStat
         focusAccessible: {},
     });
 
+    const debug = buttonTypeVars.name === "splashSearchButton";
+    if (debug) {
+        window.console.log("buttonTypeVars.borders: ", buttonTypeVars.borders);
+    }
+
     return style({
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
-        ...borders(buttonTypeVars.borders),
+        ...borders(buttonTypeVars.borders, debug),
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight
                 ? buttonDimensions.minHeight

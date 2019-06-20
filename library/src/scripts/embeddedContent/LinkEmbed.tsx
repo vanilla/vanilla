@@ -11,6 +11,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import TruncatedText from "@library/content/TruncatedText";
 import { EmbedTitle } from "@library/embeddedContent/EmbedTitle";
+import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     photoUrl?: string;
@@ -31,20 +32,22 @@ export function LinkEmbed(props: IProps) {
 
     return (
         <EmbedContainer className="embedText embedLink">
-            <SmartLink className="embedLink-link" to={url} rel="noreferrer">
-                <article className="embedText-body embedLink-body">
-                    {linkImage}
-                    <div className="embedText-main embedLink-main">
-                        <div className="embedText-header embedLink-header">
-                            {title}
-                            {source}
+            <EmbedContent type="link">
+                <SmartLink className="embedLink-link" to={url} rel="noreferrer">
+                    <article className="embedText-body embedLink-body">
+                        {linkImage}
+                        <div className="embedText-main embedLink-main">
+                            <div className="embedText-header embedLink-header">
+                                {title}
+                                {source}
+                            </div>
+                            <TruncatedText tag="div" className="embedLink-excerpt" useMaxHeight={true}>
+                                {body}
+                            </TruncatedText>
                         </div>
-                        <TruncatedText tag="div" className="embedLink-excerpt" useMaxHeight={true}>
-                            {body}
-                        </TruncatedText>
-                    </div>
-                </article>
-            </SmartLink>
+                    </article>
+                </SmartLink>
+            </EmbedContent>
         </EmbedContainer>
     );
 }

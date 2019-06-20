@@ -14,6 +14,7 @@ import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/e
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
+import { mountEmbed } from "@library/embeddedContent/embedService";
 
 const DATA_KEY = "__embed-data__";
 
@@ -109,47 +110,56 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      */
     public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
+
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
-        jsEmbed.classList.remove(FOCUS_CLASS);
+        jsEmbed.tabIndex = -1;
 
-        const descriptionNode = document.createElement("span");
-        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
-        descriptionNode.classList.add("sr-only");
-        descriptionNode.id = uniqueId("richEditor-embed-description-");
+        // const embedExternal = document.createElement("div");
+        // embedExternal.classList.add("embedExternal");
+        // embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
 
-        const embedExternal = document.createElement("div");
-        embedExternal.classList.add("embedExternal");
-        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
+        // const descriptionNode = document.createElement("span");
+        // descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
+        // descriptionNode.classList.add("sr-only");
+        // descriptionNode.id = uniqueId("richEditor-embed-description-");
 
-        const embedExternalContent = document.createElement("div");
-        embedExternalContent.classList.add(FOCUS_CLASS);
-        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
-        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
-        embedExternalContent.classList.add("embedExternal-content");
-        embedExternalContent.tabIndex = -1;
+        // const embedExternalContent = document.createElement("div");
+        // embedExternalContent.classList.add(FOCUS_CLASS);
+        // embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
+        // embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
+        // embedExternalContent.classList.add("embedExternal-content");
+        // embedExternalContent.tabIndex = -1;
 
         // Append these nodes.
         loaderElement && jsEmbed.appendChild(loaderElement);
-        jsEmbed.appendChild(embedExternal);
-        jsEmbed.appendChild(descriptionNode);
-        embedExternal.appendChild(embedExternalContent);
+        // jsEmbed.appendChild(embedExternal);
+        // jsEmbed.appendChild(descriptionNode);
+        // embedExternal.appendChild(embedExternalContent);
 
-        setImmediate(() => {
-            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
-                .then(() => {
-                    forceSelectionUpdate();
-                    loaderElement && loaderElement.remove();
-                })
-                .catch(e => {
-                    forceSelectionUpdate();
-                    logError(e);
-                    const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-                    embedExternal.remove();
-                    descriptionNode.remove();
-                    loaderElement && loaderElement.remove();
-                    jsEmbed.appendChild(warning);
-                });
+        setImmediate(async () => {
+            // Do something with loader content if we have it?
+            // loaderElement && loaderElement.remove();
+
+            try {
+                await mountEmbed(jsEmbed, data, true);
+                // Remove the focus class. It should be handled by the mounted embed at this point.
+                jsEmbed.classList.remove(FOCUS_CLASS);
+
+                forceSelectionUpdate();
+            } catch (e) {
+                forceSelectionUpdate();
+                logError(e);
+                const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
+
+                // Cleanup existing HTML.
+                embedExternal.remove();
+                descriptionNode.remove();
+                loaderElement && loaderElement.remove();
+
+                // Add the warning.
+                jsEmbed.appendChild(warning);
+            }
         });
 
         return jsEmbed;

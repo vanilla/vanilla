@@ -1,3 +1,5 @@
-<a href="{{ sanitizeUrl(url) }}" data-embedJson="{{ data|json_encode }}">
-    {{ url }}
-</a>
+<div class="js-embed" data-embedJson="{{ data|json_encode }}">
+    <a href="{{ sanitizeUrl(url) }}">
+        {{ url }}
+    </a>
+</div>

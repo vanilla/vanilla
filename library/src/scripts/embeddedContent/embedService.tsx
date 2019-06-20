@@ -36,29 +36,34 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
+export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
+    const type = data.embedType || null;
+    if (type === null) {
+        logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
+        return;
+    }
+    const EmbedClass = getEmbedForType(type);
+    if (EmbedClass === null) {
+        logWarning(
+            `Attempted to mount embed type ${type} on element`,
+            mountPoint,
+            `but could not find registered embed.`,
+        );
+        return;
+    }
+
+    console.log("Mounting embed", data, "over element", element);
+
+    return new Promise(resolve => {
+        mountReact(<EmbedClass {...data} />, mountPoint, resolve);
+    });
+}
+
 export function mountAllEmbeds(root: HTMLElement = document.body) {
     const mountPoints = root.querySelectorAll("[data-embedjson]");
     for (const mountPoint of mountPoints) {
         const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        const type = parsedData.embedType || null;
-        if (type === null) {
-            logWarning(`Found embed with data`, parsedData, `and no type on element`, mountPoint);
-            continue;
-        }
-
-        const EmbedClass = getEmbedForType(type);
-        if (EmbedClass === null) {
-            logWarning(
-                `Attempted to mount embed type ${type} on element`,
-                mountPoint,
-                `but could not find registered embed.`,
-            );
-            continue;
-        }
-
-        console.log("Mounting embed", parsedData, "over element", element);
-
-        mountReact(<EmbedClass {...parsedData} />, mountPoint as HTMLElement, undefined, { overwrite: true });
+        mountEmbed(mountPoint as HTMLElement, parsedData, false);
     }
 }
 

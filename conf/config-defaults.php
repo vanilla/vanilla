@@ -83,7 +83,6 @@ $Configuration['Garden']['Password']['MinLength'] = 6;
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
 // Garden security features
-$Configuration['Garden']['Security']['Host'] = false;
 $Configuration['Garden']['Security']['Hsts']['IncludeSubDomains'] = false;
 $Configuration['Garden']['Security']['Hsts']['Preload'] = false;
 $Configuration['Garden']['Security']['Hsts']['MaxAge'] = 604800;

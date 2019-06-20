@@ -53,7 +53,7 @@ export const globalVariables = useThemeCache(() => {
         return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const feedbackColors = makeThemeVars("feedbackColors", {
+    const messageColors = makeThemeVars("messageColors", {
         warning: {
             fg: color("#4b5057"),
             bg: color("#fff1ce"),
@@ -186,7 +186,7 @@ export const globalVariables = useThemeCache(() => {
 
     const embed = makeThemeVars("embed", {
         error: {
-            bg: feedbackColors.error,
+            bg: messageColors.error,
         },
         focus: {
             color: mainColors.primary,
@@ -309,7 +309,7 @@ export const globalVariables = useThemeCache(() => {
         utility,
         elementaryColors,
         mainColors,
-        feedbackColors,
+        messageColors,
         body,
         border,
         meta,

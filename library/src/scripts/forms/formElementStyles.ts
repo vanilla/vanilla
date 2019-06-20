@@ -107,7 +107,7 @@ export const accessibleErrorClasses = useThemeCache(() => {
         alignItems: "center",
     });
     const paragraph = style("paragraph", {
-        color: colorOut(globalVars.feedbackColors.error.fg),
+        color: colorOut(globalVars.messageColors.error.fg),
         fontSize: unit(globalVars.fonts.size.small),
     });
 
@@ -123,8 +123,8 @@ export const formErrorClasses = useThemeCache(() => {
     const vars = formElementsVariables();
 
     const root = style({
-        backgroundColor: colorOut(varsGlobal.feedbackColors.error.fg),
-        color: colorOut(varsGlobal.feedbackColors.error.fg),
+        backgroundColor: colorOut(varsGlobal.messageColors.error.fg),
+        color: colorOut(varsGlobal.messageColors.error.fg),
         marginBottom: unit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,

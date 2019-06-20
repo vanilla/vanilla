@@ -21,7 +21,7 @@ export const countVariables = useThemeCache(() => {
     });
 
     const notifications = themeVars("notifications", {
-        bg: globalVars.feedbackColors.deleted.bg,
+        bg: globalVars.messageColors.deleted.bg,
     });
 
     return {

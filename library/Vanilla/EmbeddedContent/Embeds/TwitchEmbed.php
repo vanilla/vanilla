@@ -25,22 +25,12 @@ class TwitchEmbed extends AbstractEmbed {
      * @return string|null
      */
     private function frameSourceFromID(string $id, string $type): ?string {
-        switch ($type) {
-            case "channel":
-                return "https://player.twitch.tv/?channel=".urlencode($id);
-                break;
-            case "clip":
-                return "https://clips.twitch.tv/embed?clip=".urlencode($id);
-                break;
-            case "collection":
-                return "https://player.twitch.tv/?collection=".urlencode($id);
-                break;
-            case "video":
-                return "https://player.twitch.tv/?video=".urlencode($id);
-                break;
+        if ($type === "clip") {
+            return "https://clips.twitch.tv/embed?clip=".urlencode($id);
+        } else {
+            $query = http_build_query([$type => $id]);
+            return "https://player.twitch.tv/?" . $query;
         }
-
-        return null;
     }
 
     /**
@@ -80,9 +70,9 @@ class TwitchEmbed extends AbstractEmbed {
         return Schema::parse([
             "height:i",
             "width:i",
-            "frameSrc:s|n",
             "photoUrl:s?",
-            "time:s?"
+            "time:s?",
+            "twitchID:s",
         ]);
     }
 }

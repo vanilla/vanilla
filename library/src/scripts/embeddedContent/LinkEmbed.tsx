@@ -8,16 +8,19 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import { metasClasses } from "@library/styles/metasStyles";
+import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
+import TruncatedText from "@library/content/TruncatedText";
+import { EmbedTitle } from "@library/embeddedContent/EmbedTitle";
 
 interface IProps extends IBaseEmbedProps {
-    photoUrl: string;
+    photoUrl?: string;
     body: string;
 }
 
 export function LinkEmbed(props: IProps) {
     const { name, url, photoUrl, body } = props;
     const classesMetas = metasClasses();
-    const title = name ? <h3 className="embedText-title">{name}</h3> : null;
+    const title = name ? <EmbedTitle>{name}</EmbedTitle> : null;
 
     const source = <span className={classNames("embedLink-source", classesMetas.metaStyle)}>{url}</span>;
 
@@ -27,17 +30,21 @@ export function LinkEmbed(props: IProps) {
     }
 
     return (
-        <SmartLink className="embedLink-link" to={url} rel="noreferrer">
-            <article className="embedText-body embedLink-body">
-                {linkImage}
-                <div className="embedText-main embedLink-main">
-                    <div className="embedText-header embedLink-header">
-                        {title}
-                        {source}
+        <EmbedContainer className="embedText embedLink">
+            <SmartLink className="embedLink-link" to={url} rel="noreferrer">
+                <article className="embedText-body embedLink-body">
+                    {linkImage}
+                    <div className="embedText-main embedLink-main">
+                        <div className="embedText-header embedLink-header">
+                            {title}
+                            {source}
+                        </div>
+                        <TruncatedText tag="div" className="embedLink-excerpt" useMaxHeight={true}>
+                            {body}
+                        </TruncatedText>
                     </div>
-                    <div className="embedLink-excerpt">{body}</div>
-                </div>
-            </article>
-        </SmartLink>
+                </article>
+            </SmartLink>
+        </EmbedContainer>
     );
 }

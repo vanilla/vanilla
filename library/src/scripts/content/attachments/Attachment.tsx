@@ -15,12 +15,12 @@ import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
+import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 
 export interface IFileAttachment {
     name: string; // File name
     title?: string; // Optional other label for file
     dateUploaded: string;
-    className?: string;
     mimeType?: string;
     deleteAttachment?: () => void;
 }
@@ -33,29 +33,23 @@ interface IProps extends IFileAttachment {
 
 export default class Attachment extends React.Component<IProps> {
     public render() {
-        const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
+        const { title, name, url, dateUploaded, type, mimeType, size } = this.props;
         const label = title || name;
         const classes = attachmentClasses();
         const iconClasses = attachmentIconClasses();
         const classesMetas = metasClasses();
 
         return (
-            <div className={classNames("attachment", className, classes.root)}>
-                <SmartLink
-                    to={url}
-                    className={classNames("attachment-link", "attachment-box", classes.link, classes.box)}
-                    type={mimeType}
-                    download={name}
-                    tabIndex={1}
-                >
+            <EmbedContainer size={EmbedContainerSize.SMALL} withPadding>
+                <div className={classes.box}>
                     {type && (
-                        <div className={classNames("attachment-format", classes.format)}>
-                            {getAttachmentIcon(type, iconClasses.root)}
-                        </div>
+                        <div className={classNames(classes.format)}>{getAttachmentIcon(type, iconClasses.root)}</div>
                     )}
-                    <div className={classNames("attachment-main", classes.main)}>
-                        <div className={classNames("attachment-title", classes.title)}>{label}</div>
-                        <div className={classNames("attachment-metas", "metas", classes.metas, classesMetas.root)}>
+                    <div className={classNames(classes.main)}>
+                        <SmartLink to={url} className={classes.link} type={mimeType} download={name} tabIndex={1}>
+                            <div className={classNames(classes.title)}>{label}</div>
+                        </SmartLink>
+                        <div className={classNames(classes.metas, classesMetas.root)}>
                             {dateUploaded && (
                                 <span className={classesMetas.meta}>
                                     <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
@@ -66,8 +60,8 @@ export default class Attachment extends React.Component<IProps> {
                             </span>
                         </div>
                     </div>
-                </SmartLink>
-            </div>
+                </div>
+            </EmbedContainer>
         );
     }
 }

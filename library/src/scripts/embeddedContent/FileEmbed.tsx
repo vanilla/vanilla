@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import Attachment from "@library/content/attachments/Attachment";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";

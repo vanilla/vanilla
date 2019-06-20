@@ -6,19 +6,12 @@
 import React from "react";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";
 import { sanitizeUrl } from "@vanilla/utils";
-import { getData, setData } from "@library/dom/domUtils";
-import debounce from "lodash/debounce";
-import shave from "shave";
 import { registerEmbedComponent } from "@library/content/embeds/embedUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
 
 export function initLinkEmbeds() {
     registerEmbedComponent("link", LinkEmbed);
-    truncateEmbedLinks();
-
-    // Retruncate links when the window resizes.
-    window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
 }
 
 export class LinkEmbed extends BaseEmbed {
@@ -59,37 +52,5 @@ export class LinkEmbed extends BaseEmbed {
                 </article>
             </a>
         );
-    }
-}
-
-/**
- * Truncate embed link excerpts in a container
- *
- * @param container - Element containing embeds to truncate
- */
-export function truncateEmbedLinks(container = document.body) {
-    const embeds = container.querySelectorAll(".embedLink-excerpt");
-    embeds.forEach(el => {
-        let untruncatedText = getData(el, "untruncatedText");
-
-        if (!untruncatedText) {
-            untruncatedText = el.innerHTML;
-            setData(el, "untruncatedText", untruncatedText);
-        } else {
-            el.innerHTML = untruncatedText;
-        }
-        truncateTextBasedOnMaxHeight(el);
-    });
-}
-
-/**
- * Truncate element text based on max-height
- *
- * @param excerpt - The excerpt to truncate.
- */
-function truncateTextBasedOnMaxHeight(excerpt: Element) {
-    const maxHeight = parseInt(getComputedStyle(excerpt)["max-height"], 10);
-    if (maxHeight && maxHeight > 0) {
-        shave(excerpt, maxHeight);
     }
 }

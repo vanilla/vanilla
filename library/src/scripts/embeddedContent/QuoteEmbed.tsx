@@ -13,6 +13,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import DateTime from "@library/content/DateTime";
 import { chevronUp, bottomChevron } from "@library/icons/common";
 import CollapsableUserContent from "@library/content/CollapsableContent";
+import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 
 interface IProps extends IBaseEmbedProps {
     body: string;
@@ -51,47 +52,51 @@ export function QuoteEmbed(props: IProps) {
     const userUrl = makeProfileUrl(insertUser.name);
 
     return (
-        <blockquote className={bodyClasses}>
-            <div className="embedText-header embedQuote-header">
-                {title}
-                <SmartLink to={userUrl} className="embedQuote-userLink">
-                    <span className="embedQuote-userPhotoWrap">
-                        <img
-                            src={insertUser.photoUrl}
-                            alt={insertUser.name}
-                            className="embedQuote-userPhoto"
-                            tabIndex={-1}
-                        />
-                    </span>
-                    <span className="embedQuote-userName">{insertUser.name}</span>
-                </SmartLink>
-                <SmartLink to={url} className="embedQuote-metaLink">
-                    <DateTime timestamp={dateInserted} className="embedText-dateTime embedQuote-dateTime meta" />
-                </SmartLink>
+        <EmbedContainer>
+            <blockquote className={bodyClasses}>
+                <div className="embedText-header embedQuote-header">
+                    {title}
+                    <SmartLink to={userUrl} className="embedQuote-userLink">
+                        <span className="embedQuote-userPhotoWrap">
+                            <img
+                                src={insertUser.photoUrl}
+                                alt={insertUser.name}
+                                className="embedQuote-userPhoto"
+                                tabIndex={-1}
+                            />
+                        </span>
+                        <span className="embedQuote-userName">{insertUser.name}</span>
+                    </SmartLink>
+                    <SmartLink to={url} className="embedQuote-metaLink">
+                        <DateTime timestamp={dateInserted} className="embedText-dateTime embedQuote-dateTime meta" />
+                    </SmartLink>
 
-                {needsCollapseButton && (
-                    <button
-                        type="button"
-                        className="embedQuote-collapseButton"
-                        aria-label={t("Toggle Quote")}
-                        onClick={toggleCollapseState}
-                        aria-pressed={isCollapsed}
-                    >
-                        {isCollapsed ? bottomChevron("embedQuote-chevronDown") : chevronUp("embedquote-chevronDown")}
-                    </button>
-                )}
-            </div>
-            <div className="embedText-main embedQuote-main">
-                <div className="embedQuote-excerpt">
-                    <CollapsableUserContent
-                        setNeedsCollapser={setNeedsCollapseButton}
-                        isCollapsed={isCollapsed}
-                        id={id}
-                        preferredMaxHeight={100}
-                        dangerouslySetInnerHTML={{ __html: body }}
-                    />
+                    {needsCollapseButton && (
+                        <button
+                            type="button"
+                            className="embedQuote-collapseButton"
+                            aria-label={t("Toggle Quote")}
+                            onClick={toggleCollapseState}
+                            aria-pressed={isCollapsed}
+                        >
+                            {isCollapsed
+                                ? bottomChevron("embedQuote-chevronDown")
+                                : chevronUp("embedquote-chevronDown")}
+                        </button>
+                    )}
                 </div>
-            </div>
-        </blockquote>
+                <div className="embedText-main embedQuote-main">
+                    <div className="embedQuote-excerpt">
+                        <CollapsableUserContent
+                            setNeedsCollapser={setNeedsCollapseButton}
+                            isCollapsed={isCollapsed}
+                            id={id}
+                            preferredMaxHeight={100}
+                            dangerouslySetInnerHTML={{ __html: body }}
+                        />
+                    </div>
+                </div>
+            </blockquote>
+        </EmbedContainer>
     );
 }

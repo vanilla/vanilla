@@ -52,19 +52,11 @@ export function QuoteEmbed(props: IProps) {
     const userUrl = makeProfileUrl(insertUser.name);
 
     return (
-        <EmbedContainer>
+        <EmbedContainer className="embedText embedQuote">
             <blockquote className={bodyClasses}>
                 <div className="embedText-header embedQuote-header">
                     {title}
                     <SmartLink to={userUrl} className="embedQuote-userLink">
-                        <span className="embedQuote-userPhotoWrap">
-                            <img
-                                src={insertUser.photoUrl}
-                                alt={insertUser.name}
-                                className="embedQuote-userPhoto"
-                                tabIndex={-1}
-                            />
-                        </span>
                         <span className="embedQuote-userName">{insertUser.name}</span>
                     </SmartLink>
                     <SmartLink to={url} className="embedQuote-metaLink">

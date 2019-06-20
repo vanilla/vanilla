@@ -8,6 +8,7 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 
 /**
  * Handles /settings endpoint.
@@ -727,6 +728,9 @@ class SettingsController extends DashboardController {
         $configurationModel->setField([
             'Garden.TrustedDomains',
             'Garden.Format.WarnLeaving',
+            HstsModel::MAX_AGE_KEY,
+            HstsModel::INCLUDE_SUBDOMAINS_KEY,
+            HstsModel::PRELOAD_KEY,
         ]);
 
         // Set the model on the form.
@@ -752,6 +756,11 @@ class SettingsController extends DashboardController {
             $trustedDomains = implode("\n", $trustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
+
+            $this->Form->setFormValue(HstsModel::INCLUDE_SUBDOMAINS_KEY, $this->Form->getValue(HstsModel::INCLUDE_SUBDOMAINS_KEY) === '1');
+            $this->Form->setFormValue(HstsModel::PRELOAD_KEY, $this->Form->getValue(HstsModel::PRELOAD_KEY) === '1');
+
+            $this->Form->setFormValue(HstsModel::MAX_AGE_KEY, (int)$this->Form->getValue(HstsModel::MAX_AGE_KEY));
 
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));

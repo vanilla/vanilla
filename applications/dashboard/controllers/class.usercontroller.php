@@ -314,7 +314,7 @@ class UserController extends DashboardController {
             $passwordChecked = $passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user));
 
             // Rate limiting
-            Gdn::userModel()->rateLimit($user, $passwordChecked);
+            Gdn::userModel()->rateLimit($user);
 
             if ($passwordChecked) {
                 $this->setData('User', arrayTranslate((array)$user, ['UserID', 'Name', 'Email', 'PhotoUrl']));

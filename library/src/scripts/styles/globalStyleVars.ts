@@ -33,7 +33,7 @@ export const globalVariables = useThemeCache(() => {
     colorPrimary = initialMainColors.primary;
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.15),
+        secondary: emphasizeLightness(colorPrimary, 0.065),
     });
 
     const mainColors = {
@@ -70,14 +70,15 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const defaultLinkColor = emphasizeLightness(colorPrimary, 0.065);
+    const linkColorDefault = mainColors.secondary;
+    const linkColorState = emphasizeLightness(colorPrimary, 0.09);
     const links = makeThemeVars("links", {
         colors: {
-            default: defaultLinkColor,
-            hover: mainColors.secondary,
-            focus: mainColors.secondary,
-            accessibleFocus: mainColors.secondary,
-            active: mainColors.secondary,
+            default: linkColorDefault,
+            hover: linkColorState,
+            focus: linkColorState,
+            accessibleFocus: linkColorState,
+            active: linkColorState,
             visited: undefined,
         },
     });

@@ -13,6 +13,9 @@
  */
 
 use \Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\HttpStrictTransportSecurityModel;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
+use Vanilla\Web\ContentSecurityPolicy\Policy;
 
 /**
  * Controller base class.
@@ -267,9 +270,16 @@ class Gdn_Controller extends Gdn_Pluggable {
         } else {
             $this->_Headers = array_merge($this->_Headers, [
                 'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::PUBLIC_CACHE,
-                'vary' => \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE,
+                'Vary' => \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE,
             ]);
         }
+
+        $hsts = Gdn::getContainer()->get('HstsModel');
+        $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
+
+        $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
+        $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
+
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];

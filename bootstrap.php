@@ -173,6 +173,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
 
+    ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
+    ->addAlias('HstsModel')
+
     ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
     ->setShared(true)
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
@@ -193,6 +196,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)

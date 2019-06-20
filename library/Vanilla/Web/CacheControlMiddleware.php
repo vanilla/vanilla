@@ -80,4 +80,16 @@ class CacheControlMiddleware {
 
         return $response;
     }
+
+    /**
+     * A convenience method for sending cache control headers directly to the response with the `header()` function.
+     *
+     * @param string $cacheControl The value of the cache control header.
+     */
+    public static function sendCacheControlHeaders(string $cacheControl) {
+        header("Cache-Control: $cacheControl");
+        foreach (static::getHttp10Headers($cacheControl) as $key => $value) {
+            header("$key: $value");
+        }
+    }
 }

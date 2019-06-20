@@ -82,6 +82,11 @@ $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url 
 $Configuration['Garden']['Password']['MinLength'] = 6;
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
+// Garden security features
+$Configuration['Garden']['Security']['Hsts']['IncludeSubDomains'] = false;
+$Configuration['Garden']['Security']['Hsts']['Preload'] = false;
+$Configuration['Garden']['Security']['Hsts']['MaxAge'] = 604800;
+
 // Outgoing email.
 $Configuration['Garden']['Email']['UseSmtp'] = false;
 $Configuration['Garden']['Email']['SmtpHost'] = '';

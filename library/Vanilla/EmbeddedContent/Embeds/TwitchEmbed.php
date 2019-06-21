@@ -90,7 +90,7 @@ class TwitchEmbed extends AbstractEmbed {
 
         switch ($host) {
             case "clips.twitch.tv":
-                return $query["clip"] ?? null;
+                return "clip:{$query["clip"]}" ?? null;
             case "player.twitch.tv":
                 if (array_key_exists("video", $query)) {
                     return "video:{$query['video']}";

@@ -30,7 +30,10 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
     public function getPolicies(): array {
         $policies = [];
         $policies = array_merge($policies, $this->getScriptSources());
-        $policies = array_merge($policies, $this->getFrameAncestors());
+
+        if ($this->config->get("Garden.Embed.Allow")) {
+            $policies = array_merge($policies, $this->getFrameAncestors());
+        }
 
         return $policies;
     }

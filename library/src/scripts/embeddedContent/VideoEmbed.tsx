@@ -30,7 +30,6 @@ export function VideoEmbed(props: IProps) {
 
     let ratioClass: string | undefined;
     const ratio = simplifyFraction(height || 3, width || 4);
-    console.log(ratio);
     switch (ratio.shorthand) {
         case "21:9":
             ratioClass = "is21by9";

@@ -452,17 +452,22 @@ $embedOperations = '[
         "insert": {
             "embed-external": {
                 "data": {
-                    "url": "https://www.twitch.tv/videos/277077149",
+                    "url": "http://clips.twitch.tv/KnottyOddFishShazBotstix",
                     "type": "twitch",
-                    "name": "SamedWii Zeldaérobic",
+                    "name": "Lights! Camera! Action!",
                     "body": null,
-                    "photoUrl":
-                        "https://static-cdn.jtvnw.net/s3_vods/9e05228597e840e180f3_hoopyjv_29218011904_894795907/thumb/thumb0-640x360.jpg",
-                    "height": 281,
-                    "width": 500,
-                    "attributes": { "videoID": "277077149", "embedUrl": "https://player.twitch.tv/?video=v277077149" }
+                    "photoUrl": "https://clips-media-assets2.twitch.tv/AT-cm%7C267415465-preview.jpg",
+                    "height": 351,
+                    "width": 620,
+                    "attributes": {
+                        "videoID": "KnottyOddFishShazBotstix",
+                        "embedUrl": "https://clips.twitch.tv/embed?clip=KnottyOddFishShazBotstix"
+                    }
                 },
-                "loaderData": { "type": "link", "link": "https://www.twitch.tv/videos/277077149", "loaded": true }
+                "loaderData": {
+                    "type": "link",
+                    "link": "http://clips.twitch.tv/KnottyOddFishShazBotstix"
+                }
             }
         }
     },

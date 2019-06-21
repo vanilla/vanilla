@@ -44,9 +44,10 @@ class TwitchEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     public function normalizeData(array $data): array {
-        $data = EmbedUtils::remapProperties($data, [
-            "twitchID" => "attributes.videoID",
-        ]);
+        $embedUrl = $data["attributes"]["embedUrl"] ?? null;
+        if (is_string($embedUrl)) {
+            $data["twitchID"] = $this->urlToID($embedUrl);
+        }
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
     }
@@ -74,5 +75,32 @@ class TwitchEmbed extends AbstractEmbed {
             "time:s?",
             "twitchID:s",
         ]);
+    }
+
+    /**
+     * Given an embed URL, convert it to a type:id string.
+     *
+     * @param string $url
+     * @return string|null
+     */
+    private function urlToID(string $url): ?string {
+        $host = parse_url($url, PHP_URL_HOST);
+        $query = [];
+        parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $query);
+
+        switch ($host) {
+            case "clips.twitch.tv":
+                return $query["clip"] ?? null;
+            case "player.twitch.tv":
+                if (array_key_exists("video", $query)) {
+                    return "video:{$query['video']}";
+                } elseif (array_key_exists("collection", $query)) {
+                    return "collection:{$query['collection']}";
+                } elseif (array_key_exists("channel", $query)) {
+                    return "channel:{$query['channel']}";
+                }
+            default:
+                return null;
+        }
     }
 }

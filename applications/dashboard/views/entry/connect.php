@@ -48,7 +48,7 @@ if (!$hasUserID) {
     <div class="FormWrapper">
         <?php
         echo $this->Form->open();
-            echo $this->Form->errors();
+        echo $this->Form->errors();
 
         /**
          *  HideName can be passed by any plugin that hooks into

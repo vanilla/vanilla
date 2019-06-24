@@ -22,7 +22,7 @@ interface IProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>,
 }
 
 export function EmbedContainer(props: IProps) {
-    const { size, inEditor, ...htmlProps } = props;
+    const { size, inEditor, withPadding, ...htmlProps } = props;
     const classes = embedContainerClasses();
 
     return (
@@ -31,7 +31,7 @@ export function EmbedContainer(props: IProps) {
             className={classNames(
                 "embedExternal",
                 // "js-embed",
-                classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!props.inEditor, !!props.withPadding),
+                classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!props.inEditor, !!withPadding),
                 props.className,
             )}
         >

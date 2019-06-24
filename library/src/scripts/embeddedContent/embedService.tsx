@@ -11,6 +11,7 @@ import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
+import { TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
 
@@ -72,6 +73,7 @@ registerEmbed("imgur", ImgurEmbed);
 registerEmbed("link", LinkEmbed);
 registerEmbed("quote", QuoteEmbed);
 registerEmbed("twitch", VideoEmbed);
+registerEmbed("twitter", TwitterEmbed);
 registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);
 registerEmbed("youtube", VideoEmbed);

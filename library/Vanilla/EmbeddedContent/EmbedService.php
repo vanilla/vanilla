@@ -30,6 +30,8 @@ use Vanilla\EmbeddedContent\Factories\WistiaEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
 use Vanilla\EmbeddedContent\Factories\VimeoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\VimeoEmbed;
+use Vanilla\EmbeddedContent\Factories\TwitterEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -126,7 +128,10 @@ class EmbedService implements EmbedCreatorInterface {
             // Twitch
             ->registerFactory($dic->get(TwitchEmbedFactory::class))
             ->registerEmbed(TwitchEmbed::class, TwitchEmbed::TYPE)
-            // Wistia
+            // Twitter
+            ->registerFactory($dic->get(TwitterEmbedFactory::class))
+            ->registerEmbed(TwitterEmbed::class, TwitterEmbed::TYPE)
+            // Vimeo
             ->registerFactory($dic->get(VimeoEmbedFactory::class))
             ->registerEmbed(VimeoEmbed::class, VimeoEmbed::TYPE)
             // Wistia

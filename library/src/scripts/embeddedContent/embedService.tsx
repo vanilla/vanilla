@@ -3,16 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { mountReact } from "@library/dom/domUtils";
-import { logWarning, logDebug, debug } from "@vanilla/utils";
-import { onReady } from "@library/utility/appUtils";
-import { element } from "prop-types";
-import Attachment from "@library/content/attachments/Attachment";
+import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
+import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
+import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
+import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
+import { logWarning } from "@vanilla/utils";
+import React from "react";
 
 // Methods
 export interface IBaseEmbedProps {
@@ -65,9 +65,12 @@ export function mountAllEmbeds(root: HTMLElement = document.body) {
 }
 
 // Default embed registration
-registerEmbed("quote", QuoteEmbed);
+registerEmbed("codepen", CodePenEmbed);
 registerEmbed("file", FileEmbed);
+registerEmbed("giphy", GiphyEmbed);
+registerEmbed("imgur", ImgurEmbed);
 registerEmbed("link", LinkEmbed);
+registerEmbed("quote", QuoteEmbed);
 registerEmbed("twitch", VideoEmbed);
 registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);

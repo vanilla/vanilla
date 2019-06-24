@@ -87,15 +87,18 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
         // }
 
         [$height, $width] = EmbedUtils::extractDimensions($response);
-        $frameAttrs = $this->parseSimpleAttrs($response['html'] ?? '', 'iframe') ?? [];
+        $frameAttributes = $this->parseSimpleAttrs($response['html'] ?? '', 'iframe') ?? [];
+        $embedPath = parse_url($frameAttributes["src"] ?? "", PHP_URL_PATH) ?? "";
+        preg_match("`/?(?<author>[\w-]+)/embed/(?:preview/)?(?<codePenID>[\w-]+)`", $embedPath, $pathMatches);
+
         $data = [
             'embedType' => CodePenEmbed::TYPE,
             'url' => $url,
             'name' => $response['title'] ?? null,
             'height' => $height,
             'width' => $width,
-            'codepenID' => $frameAttrs['id'] ?? null,
-            'frameSrc' => $frameAttrs['src'] ?? null,
+            'codePenID' => $pathMatches["codePenID"] ?? null,
+            'author' => $pathMatches["author"] ?? null,
         ];
 
         return new CodePenEmbed($data);

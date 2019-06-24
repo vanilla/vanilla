@@ -28,11 +28,11 @@ class CodePenEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'height:i',
-            'width:i',
-            'name:s',
-            'frameSrc:s',
-            'codepenID:s',
+            "height:i",
+            "width:i",
+            "name:s?",
+            "codePenID:s",
+            "author:s",
         ]);
     }
 
@@ -40,14 +40,29 @@ class CodePenEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     public function normalizeData(array $data): array {
-        $data = EmbedUtils::remapProperties($data, [
-            'codepenID' => 'attributes.id',
-            'frameSrc' => 'attributes.embedUrl',
-        ]);
-        $data = EmbedUtils::ensureDimensions($data);
-        if ($data['name'] === null) {
-            $data['name'] = '(Unknown Name)';
+        $legacyUrl = $data["attributes"]["embedUrl"];
+        if ($legacyUrl && $legacyIDs = $this->urlToIDs($legacyUrl)) {
+            $data = array_merge($data, $legacyIDs);
         }
+
+        $data = EmbedUtils::ensureDimensions($data);
+
         return $data;
+    }
+
+    /**
+     * Given a CodePen embed URL, attempt to retrieve the author and pen IDs.
+     *
+     * @param string $url
+     * @return string|null
+     */
+    private function urlToIDs(string $url): ?array {
+        if (!preg_match("`/?(?<author>[\w-]+)/embed/(?:preview/)?(?<codePenID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)) {
+            return null;
+        }
+        return [
+            "author" => $matches["author"],
+            "codePenID" => $matches["codePenID"],
+        ];
     }
 }

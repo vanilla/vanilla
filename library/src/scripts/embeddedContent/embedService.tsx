@@ -69,5 +69,6 @@ registerEmbed("quote", QuoteEmbed);
 registerEmbed("file", FileEmbed);
 registerEmbed("link", LinkEmbed);
 registerEmbed("twitch", VideoEmbed);
+registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);
 registerEmbed("youtube", VideoEmbed);

@@ -16,6 +16,7 @@ export function initVideoEmbeds() {
     registerEmbedComponent("vimeo", VideoEmbed);
     registerEmbedComponent("twitch", VideoEmbed);
     registerEmbedComponent("wistia", VideoEmbed);
+    registerEmbedComponent("youtube", VideoEmbed);
     delegateEvent("click", ".js-playVideo", handlePlayVideo);
 }
 

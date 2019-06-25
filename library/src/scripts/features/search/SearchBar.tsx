@@ -298,7 +298,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 baseClass={this.props.buttonBaseClass}
                                 className={classNames(
                                     "searchBar-submitButton",
-                                    classes.actionButton,
                                     this.props.buttonClassName,
                                     {
                                         isLarge: this.props.isBigInput,

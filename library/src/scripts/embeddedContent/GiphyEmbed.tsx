@@ -30,7 +30,7 @@ export function GiphyEmbed(props: IProps): JSX.Element {
     const src = `https://giphy.com/embed/${props.giphyID}`;
 
     return (
-        <EmbedContainer inEditor={props.inEditor}>
+        <EmbedContainer className="embedGiphy" inEditor={props.inEditor}>
             <EmbedContent type="giphy" inEditor={props.inEditor}>
                 <div className="embedExternal-ratio" style={ratioStyle}>
                     <iframe src={src} className="giphy-embed embedGiphy-iframe" />

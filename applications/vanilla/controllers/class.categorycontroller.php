@@ -71,7 +71,7 @@ class CategoryController extends VanillaController {
         $form = new Gdn_Form();
         $categoryID = $form->getFormValue('CategoryID', $categoryID);
         $followed = $form->getFormValue('Followed', null);
-        $hasPermission = $categoryModel::checkPermission($categoryModel->CategoryID, 'Vanilla.Discussions.View');
+        $hasPermission = $categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View');
         if (!$hasPermission) {
             throw permissionException('Vanilla.Discussion.View');
         }

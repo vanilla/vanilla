@@ -32,6 +32,8 @@ use Vanilla\EmbeddedContent\Factories\VimeoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\VimeoEmbed;
 use Vanilla\EmbeddedContent\Factories\TwitterEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
+use Vanilla\EmbeddedContent\Factories\SoundCloudEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\SoundCloudEmbed;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -125,6 +127,9 @@ class EmbedService implements EmbedCreatorInterface {
             // CodePen
             ->registerFactory($dic->get(CodePenEmbedFactory::class))
             ->registerEmbed(CodePenEmbed::class, CodePenEmbed::TYPE)
+            // SoundCloud
+            ->registerFactory($dic->get(SoundCloudEmbedFactory::class))
+            ->registerEmbed(SoundCloudEmbed::class, SoundCloudEmbed::TYPE)
             // Twitch
             ->registerFactory($dic->get(TwitchEmbedFactory::class))
             ->registerEmbed(TwitchEmbed::class, TwitchEmbed::TYPE)

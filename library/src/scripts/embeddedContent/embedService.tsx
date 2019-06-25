@@ -10,8 +10,9 @@ import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
-import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
+import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
+import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
 
@@ -72,6 +73,7 @@ registerEmbed("giphy", GiphyEmbed);
 registerEmbed("imgur", ImgurEmbed);
 registerEmbed("link", LinkEmbed);
 registerEmbed("quote", QuoteEmbed);
+registerEmbed("soundcloud", SoundCloudEmbed);
 registerEmbed("twitch", VideoEmbed);
 registerEmbed("twitter", TwitterEmbed);
 registerEmbed("vimeo", VideoEmbed);

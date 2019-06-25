@@ -165,7 +165,7 @@ class MediaApiController extends AbstractApiController {
      * @return Schema
      */
     protected function fullSchema() {
-        return new \Vanilla\EmbeddedContent\VanillaMediaSchema(true);
+        return new \Vanilla\Models\VanillaMediaSchema(true);
     }
 
     /**

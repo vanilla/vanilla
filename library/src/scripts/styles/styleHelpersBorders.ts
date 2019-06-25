@@ -9,15 +9,17 @@ import { BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty } from "
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { unit, ifExistsWithFallback } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import merge from "lodash/merge";
+import {Omit} from "@library/@types/utils";
 
-interface ISingleBorderStyle {
+export interface ISingleBorderStyle {
     color?: ColorValues;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
 }
 
 export interface IBordersWithRadius extends ISingleBorderStyle {
-    radius?: BorderRadiusProperty<TLength>;
+    radius?: radiusType;
 }
 
 export type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
@@ -33,7 +35,7 @@ export interface IBorderStyles extends ISingleBorderStyle {
     radius?: radiusType;
 }
 
-export type borderType = ISingleBorderStyle | IBorderStyles;
+export type borderType = IBordersWithRadius | IBorderStyles;
 
 export interface IBorderRadii {
     all?: BorderRadiusProperty<TLength> | number;
@@ -79,6 +81,14 @@ const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?
     return convert(output);
 };
 
+export const mergeIfNoGlobal = (globalStyles: IBorderStyles | undefined, overwriteStyles: IBorderStyles | undefined) => {
+    if (globalStyles) {
+        return merge(globalStyles, overwriteStyles);
+    } else {
+        return overwriteStyles;
+    }
+};
+
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
 
@@ -93,6 +103,10 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
         borderBottom: undefined,
     };
 
+    if(debug) {
+        window.console.log("border radii: ", props.radius);
+    }
+
     // Set border radii
     let globalRadiusFound = false;
     let specificRadiusFound = false;
@@ -101,43 +115,43 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
             output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
             globalRadiusFound = true;
         } else {
-            if (props.radius.all) {
+            if (props.radius.all !== undefined) {
                 globalRadiusFound = true;
                 output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
             }
-            if (props.radius.top) {
+            if (props.radius.top !== undefined) {
                 specificRadiusFound = true;
                 output.borderTopRightRadius = unit(props.radius.top);
                 output.borderTopLeftRadius = unit(props.radius.top);
             }
-            if (props.radius.bottom) {
+            if (props.radius.bottom !== undefined) {
                 specificRadiusFound = true;
                 output.borderBottomRightRadius = unit(props.radius.bottom);
                 output.borderBottomLeftRadius = unit(props.radius.bottom);
             }
-            if (props.radius.right) {
+            if (props.radius.right !== undefined) {
                 specificRadiusFound = true;
                 output.borderTopRightRadius = unit(props.radius.right);
                 output.borderBottomRightRadius = unit(props.radius.right);
             }
-            if (props.radius.left) {
+            if (!!props.radius.left !== undefined) {
                 specificRadiusFound = true;
                 output.borderTopLeftRadius = unit(props.radius.left);
                 output.borderBottomLeftRadius = unit(props.radius.left);
             }
-            if (props.radius.topRight) {
+            if (props.radius.topRight !== undefined) {
                 specificRadiusFound = true;
                 output.borderTopRightRadius = unit(props.radius.topRight);
             }
-            if (props.radius.topLeft) {
+            if (props.radius.topLeft !== undefined) {
                 specificRadiusFound = true;
                 output.borderTopLeftRadius = unit(props.radius.topLeft);
             }
-            if (props.radius.bottomRight) {
+            if (props.radius.bottomRight !== undefined) {
                 specificRadiusFound = true;
                 output.borderBottomLeftRadius = unit(props.radius.bottomRight);
             }
-            if (props.radius.topLeft) {
+            if (props.radius.topLeft !== undefined) {
                 specificRadiusFound = true;
                 output.borderBottomRightRadius = unit(props.radius.bottomLeft);
             }
@@ -150,7 +164,7 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
 
     // Set border styles
     let borderSet = false;
-    if (props.all) {
+    if (props.all !== undefined) {
         output.borderTop = singleBorder(props.all);
         output.borderRight = singleBorder(props.all);
         output.borderBottom = singleBorder(props.all);

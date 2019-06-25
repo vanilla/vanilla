@@ -135,8 +135,11 @@ export const splashVariables = useThemeCache(() => {
         border: {
             leftColor: colors.borderColor,
             width: globalVars.border.width,
-            // radius: globalVars.border.radius,
-            radius: 49,
+            radius: {
+                // right: globalVars.border.radius, // change back
+                right: 49,
+                left: 0,
+            },
         },
     });
 
@@ -163,10 +166,10 @@ export const splashVariables = useThemeCache(() => {
             left: {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
-                radius: 0,
             },
-            right: {
-                radius: searchBar.border.radius,
+            radius: {
+                left: 0,
+                right: unit(searchBar.border.radius),
             },
         },
         fonts: {

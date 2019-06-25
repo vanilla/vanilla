@@ -7,7 +7,7 @@ helpAsset($this->data('Title'), t('Content flagged as spam is stored here for mo
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
-<div class="toolbar flex-wrap">
+<div class="toolbar flex-wrap js-toolbar-sticky">
     <div class="toolbar-buttons">
         <?php
         echo anchor(t('Spam'), '#', ['class' => 'SpamButton btn btn-primary']);

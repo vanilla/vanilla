@@ -17,7 +17,7 @@ class VanillaMediaSchema extends Schema {
     /**
      * Override constructor to initialize schema.
      *
-     * @param bool $withDbFields Whether or not DB related fields should be optional in the schema.
+     * @param bool $withDbFields Whether or not DB fields should be included in the schema.
      */
     public function __construct(bool $withDbFields) {
         $fields = [
@@ -31,15 +31,16 @@ class VanillaMediaSchema extends Schema {
             'height:i|n?', // Image height
         ];
 
-        $ownDBFields = [
-            'mediaID:i', // The ID of the record.
-            'dateInserted:dt', // When the media item was created.
-            'insertUserID:i', // The user that created the media item.
-            'foreignType:s|n', // Table the media is linked to.
-            'foreignID:i|n', // The ID of the table
-        ];
-        if (!$withDbFields) {
-            $fields += $ownDBFields;
+        if ($withDbFields) {
+            $ownDBFields = [
+                'mediaID:i', // The ID of the record.
+                'dateInserted:dt', // When the media item was created.
+                'insertUserID:i', // The user that created the media item.
+                'foreignType:s|n', // Table the media is linked to.
+                'foreignID:i|n', // The ID of the table
+            ];
+
+            $fields = array_merge($fields, $ownDBFields);
         }
 
         parent::__construct($this->parseInternal($fields));

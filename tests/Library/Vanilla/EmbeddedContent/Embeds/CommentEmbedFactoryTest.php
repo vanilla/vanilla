@@ -57,10 +57,4 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
             [static::bootstrap()->getBaseUrl() . '/discussion/comment/asdfads', false, "It should fail on a bad ID."],
         ];
     }
-
-    /**
-     * Test network request fetching and handling.
-     */
-    public function testCreateEmbedForUrl() {
-    }
 }

@@ -30,9 +30,11 @@ class ImgurEmbed extends AbstractEmbed {
      */
     public function normalizeData(array $data): array {
         $data = EmbedUtils::remapProperties($data, [
-            'imgurID' => 'attributes.postID',
-            'isAlbum' => 'attributes.isAlbum',
+            "imgurID" => "attributes.postID",
         ]);
+        if (array_key_exists("imgurID", $data) && ($data["attributes"]["isAlbum"] ?? false)) {
+            $data["imgurID"] = "a/{$data['imgurID']}";
+        }
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
     }
@@ -42,10 +44,9 @@ class ImgurEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'height:i',
-            'width:i',
-            'imgurID:s',
-            'isAlbum:b',
+            "height:i",
+            "width:i",
+            "imgurID:s",
         ]);
     }
 }

@@ -10,20 +10,18 @@ use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
+use Vanilla\Utility\HtmlParserTrait;
 
 /**
  * Factory for the ImgurEmbed.
  */
 class ImgurEmbedFactory extends AbstractEmbedFactory {
 
-    const IMGUR_COM = "imgur.com";
-    const OEMBED_URL_BASE = "https://api.imgur.com/oembed";
+    use HtmlParserTrait;
 
-    /**
-     * @var string A regexp to match the full URL of a giphy embed.
-     * @example https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif
-     */
-    const FULL_SLUG_REGEX = "/\/media\/(?<postID>[a-zA-Z0-9]+)\/giphy\.gif$/";
+    const DOMAINS = ["imgur.com"];
+
+    const OEMBED_URL_BASE = "https://api.imgur.com/oembed";
 
     /** @var HttpClient */
     private $httpClient;
@@ -41,7 +39,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedDomains(): array {
-        return [self::IMGUR_COM];
+        return self::DOMAINS;
     }
 
     /**
@@ -52,7 +50,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         // Imgur paths are incredibly complicated.
         // See https://www.reddit.com/r/redditdev/comments/35bb7i/imgur_link_format/ for examples.
         // We will pretty much always hit their API, so a pretty freeform slug should suffice.
-        return '/.+/';
+        return "`.*`";
     }
 
     /**
@@ -63,27 +61,23 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $response = $this->httpClient->get(
             self::OEMBED_URL_BASE,
-            [ 'url' => $url ]
+            ["url" => $url]
         );
 
         // Example Response JSON
         // {
-        //     "width": 650,
-        //     "author_url": "https://giphy.com/",
-        //     "title": "Saved
-        // By The Bell Hello GIF - Find & Share on GIPHY",
-        //     "url": "https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif",
-        //     "type": "photo",
-        //     "provider_name": "GIPHY",
-        //     "provider_url": "https://giphy.com/",
-        //     "author_name": "GIPHY",
-        //     "height": 491
+        //     "version": "1.0",
+        //     "type": "rich",
+        //     "provider_name": "Imgur",
+        //     "provider_url": "https://imgur.com",
+        //     "width": 540,
+        //     "height": 500,
+        //     "html": "<blockquote class=\"imgur-embed-pub\" lang=\"en\" data-id=\"a/Pt2cHff\"><a href=\"https://imgur.com/a/Pt2cHff\">Very scary birb </a></blockquote><script async src=\"//s.imgur.com/min/embed.js\" charset=\"utf-8\"></script>",
+        //     "author_name": "monalistic",
+        //     "author_url": "https://imgur.com/user/monalistic"
         // }
 
-        // Parse the ID out of the URL.
-        $fullUrl = $response['url'] ?? null;
-        preg_match(self::FULL_SLUG_REGEX, $fullUrl, $matches);
-        $id = $matches['postID'] ?? null;
+        $blockAttributes = $this->parseSimpleAttrs($response["html"], "blockquote");
 
         $data = [
             'embedType' => ImgurEmbed::TYPE,
@@ -91,7 +85,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
             'name' => $response['title'] ?? '',
             'height' => $response['height'] ?? null,
             'width' => $response['width'] ?? null,
-            'giphyID' => $id,
+            "imgurID" => $blockAttributes["data-id"] ?? null,
         ];
 
         return new ImgurEmbed($data);

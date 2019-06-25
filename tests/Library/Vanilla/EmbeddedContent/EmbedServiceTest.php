@@ -26,16 +26,18 @@ class EmbedServiceTest extends ContainerTestCase {
      */
     public function setUp() {
         parent::setUp();
-        $this->container->rule(\Gdn_Cache::class)
+        $container = \Gdn::getContainer();
+        $container->rule(\Gdn_Cache::class)
             ->setClass(NullCache::class);
-        $this->embedService = $this->container->get(EmbedService::class);
+        $this->resetEmbedService();
     }
 
     /**
      * Get a new copy of the embed service.
      */
     private function resetEmbedService() {
-        $this->embedService = $this->container->get(EmbedService::class);
+        $container = \Gdn::getContainer();
+        $this->embedService = $container->get(EmbedService::class);
     }
 
     /**

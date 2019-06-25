@@ -49,6 +49,3 @@ JSON;
         $this->assertInstanceOf(FileEmbedTest::class, $dataEmbed);
     }
 }
-
-
-

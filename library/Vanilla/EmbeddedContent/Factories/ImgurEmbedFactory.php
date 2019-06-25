@@ -65,6 +65,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "version": "1.0",
         //     "type": "rich",
@@ -76,6 +77,7 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         //     "author_name": "monalistic",
         //     "author_url": "https://imgur.com/user/monalistic"
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         $blockAttributes = $this->parseSimpleAttrs($response["html"], "blockquote");
 

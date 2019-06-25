@@ -65,6 +65,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "version": 1,
         //     "type": "video",
@@ -83,6 +84,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
         //     "height": 281,
         //     "request_url": "https://www.twitch.tv/videos/441409883"
         //   }
+        // phpcs:enable Generic.Files.LineLength
 
         $query = parse_url($url, PHP_URL_QUERY);
         $parameters = [];

@@ -61,6 +61,7 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "type": "rich",
         //     "version": "1.0",
@@ -76,6 +77,7 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
         //     "thumbnail_width": 170,
         //     "terms_of_use_url": "http://www.gettyimages.com/Corporate/Terms.aspx"
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         $data = [
             "embedType" => GettyImagesEmbed::TYPE,

@@ -99,6 +99,7 @@ class TwitchEmbed extends AbstractEmbed {
                 } elseif (array_key_exists("channel", $query)) {
                     return "channel:{$query['channel']}";
                 }
+                // Nothing we can identify? Fall through to the default.
             default:
                 return null;
         }

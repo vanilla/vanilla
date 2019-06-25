@@ -74,5 +74,4 @@ class DiscussionEmbedFactory extends AbstractEmbedFactory {
             ];
         return new QuoteEmbed($data);
     }
-
 }

@@ -68,6 +68,7 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "type": "video",
         //     "provider_url": "https://www.youtube.com/",
@@ -83,6 +84,7 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
         //     "width": 480,
         //     "height": 270
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         $parameters = [];
         parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $parameters);

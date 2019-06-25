@@ -66,6 +66,7 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //    "success": true,
         //    "type": "rich",
@@ -85,6 +86,7 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
         //          src='https://codepen.io/hiroshi_m/embed/preview/YoKYVv?height=300&amp;slug-hash=YoKYVv&amp;default-tabs=css,result&amp;host=https://codepen.io'
         //      ></iframe>"
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         [$height, $width] = EmbedUtils::extractDimensions($response);
         $frameAttributes = $this->parseSimpleAttrs($response['html'] ?? '', 'iframe') ?? [];

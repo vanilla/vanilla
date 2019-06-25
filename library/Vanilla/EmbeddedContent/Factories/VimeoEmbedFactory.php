@@ -58,6 +58,7 @@ class VimeoEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "type": "video",
         //     "version": "1.0",
@@ -81,6 +82,7 @@ class VimeoEmbedFactory extends AbstractEmbedFactory {
         //     "video_id": 207028770,
         //     "uri": "/videos/207028770"
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         $data = [
             "embedType" => VimeoEmbed::TYPE,

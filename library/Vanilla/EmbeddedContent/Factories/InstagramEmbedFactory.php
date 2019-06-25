@@ -61,6 +61,7 @@ class InstagramEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "version": "1.0",
         //     "title": "Stranger Things 3 Trailer: *exists*\nYou: LOOK AT MY MEME!",
@@ -78,6 +79,8 @@ class InstagramEmbedFactory extends AbstractEmbedFactory {
         //     "thumbnail_width": 612,
         //     "thumbnail_height": 612
         // }
+        // phpcs:enable Generic.Files.LineLength
+
         $sourceAttributes = $this->parseSimpleAttrs($response["html"], "blockquote");
 
         $data = [

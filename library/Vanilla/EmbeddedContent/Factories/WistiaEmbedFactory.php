@@ -60,6 +60,7 @@ class WistiaEmbedFactory extends AbstractEmbedFactory {
         );
 
         // Example Response JSON
+        // phpcs:disable Generic.Files.LineLength
         // {
         //     "version": "1.0",
         //     "type": "video",
@@ -75,6 +76,7 @@ class WistiaEmbedFactory extends AbstractEmbedFactory {
         //     "player_color": "54bbff",
         //     "duration": 40.264
         // }
+        // phpcs:enable Generic.Files.LineLength
 
         $data = [
             "embedType" => WistiaEmbed::TYPE,

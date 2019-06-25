@@ -34,6 +34,8 @@ use Vanilla\EmbeddedContent\Factories\TwitterEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
 use Vanilla\EmbeddedContent\Factories\SoundCloudEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\SoundCloudEmbed;
+use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -124,6 +126,9 @@ class EmbedService implements EmbedCreatorInterface {
             // Imgur
             ->registerFactory($dic->get(ImgurEmbedFactory::class))
             ->registerEmbed(ImgurEmbed::class, ImgurEmbed::TYPE)
+            // Instagram
+            ->registerFactory($dic->get(InstagramEmbedFactory::class))
+            ->registerEmbed(InstagramEmbed::class, InstagramEmbed::TYPE)
             // CodePen
             ->registerFactory($dic->get(CodePenEmbedFactory::class))
             ->registerEmbed(CodePenEmbed::class, CodePenEmbed::TYPE)

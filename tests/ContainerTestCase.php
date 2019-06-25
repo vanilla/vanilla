@@ -15,14 +15,17 @@ use PHPUnit\Framework\TestCase;
  */
 class ContainerTestCase extends TestCase {
 
-    /** @var Container */
-    protected $container;
-
     /**
      * Setup the container.
      */
-    public function setUp() {
-        $this->container = new Container();
-        \Gdn::setContainer($this->container);
+    public function setUpBeforeClass() {
+        \Gdn::setContainer(new Container());
+    }
+
+    /**
+     * Reset the container.
+     */
+    public function tearDownAfterClass() {
+        \Gdn::setContainer(new NullContainer());
     }
 }

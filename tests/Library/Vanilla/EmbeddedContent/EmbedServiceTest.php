@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\EmbeddedContent;
 
-use PHPUnit\Framework\Warning;
 use Vanilla\EmbeddedContent\EmbedService;
 use VanillaTests\ContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;

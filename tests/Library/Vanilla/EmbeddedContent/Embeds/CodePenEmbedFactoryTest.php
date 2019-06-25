@@ -66,7 +66,7 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
         $width = 500;
         $height = 400;
         $frameSrc = 'https://codepen.io/hiroshi_m/embed/preview/YoKYVv?height=300';
-        $cpId = 'cp_embed_YoKYVv';
+        $cpId = 'YoKYVv';
 
         $this->httpClient->addMockResponse(
             $endpoint,
@@ -77,7 +77,7 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
                     'width' => $width,
                     'title' => $name,
                     'height' => $height,
-                    'html' => "<iframe id='$cpId' src='$frameSrc'></iframe>",
+                    'html' => "<iframe id='cp_embed_$cpId' src='$frameSrc'></iframe>",
                 ])
             )
         );
@@ -92,8 +92,8 @@ class CodePenEmbedFactoryTest extends ContainerTestCase {
                 'height' => $height,
                 'url' => $urlToCheck, // The original URL.
                 'embedType' => CodePenEmbed::TYPE,
-                'codepenID' => $cpId,
-                'frameSrc' => $frameSrc,
+                'codePenID' => $cpId,
+                'author' => 'hiroshi_m',
             ],
             $embedData,
             'Data can be fetched over the network to create the embed from a URL.'

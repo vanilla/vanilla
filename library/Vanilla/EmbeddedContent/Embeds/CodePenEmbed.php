@@ -40,7 +40,7 @@ class CodePenEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     public function normalizeData(array $data): array {
-        $legacyUrl = $data["attributes"]["embedUrl"];
+        $legacyUrl = $data["attributes"]["embedUrl"] ?? null;
         if ($legacyUrl && $legacyIDs = $this->urlToIDs($legacyUrl)) {
             $data = array_merge($data, $legacyIDs);
         }

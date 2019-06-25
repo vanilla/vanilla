@@ -18,14 +18,14 @@ class ContainerTestCase extends TestCase {
     /**
      * Setup the container.
      */
-    public function setUpBeforeClass() {
+    public static function setUpBeforeClass() {
         \Gdn::setContainer(new Container());
     }
 
     /**
      * Reset the container.
      */
-    public function tearDownAfterClass() {
+    public static function tearDownAfterClass() {
         \Gdn::setContainer(new NullContainer());
     }
 }

@@ -6,6 +6,7 @@
 import { mountReact } from "@library/dom/domUtils";
 import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
+import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
@@ -70,6 +71,8 @@ export function mountAllEmbeds(root: HTMLElement = document.body) {
 // Default embed registration
 registerEmbed("codepen", CodePenEmbed);
 registerEmbed("file", FileEmbed);
+registerEmbed("gettyimages", GettyImagesEmbed);
+registerEmbed("getty", GettyImagesEmbed);
 registerEmbed("giphy", GiphyEmbed);
 registerEmbed("imgur", ImgurEmbed);
 registerEmbed("instagram", InstagramEmbed);

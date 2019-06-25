@@ -36,6 +36,8 @@ use Vanilla\EmbeddedContent\Factories\SoundCloudEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\SoundCloudEmbed;
 use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
+use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -120,6 +122,10 @@ class EmbedService implements EmbedCreatorInterface {
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
         $this
+            // Getty Images
+            ->registerFactory($dic->get(GettyImagesEmbedFactory::class))
+            ->registerEmbed(GettyImagesEmbed::class, GettyImagesEmbed::TYPE)
+            ->registerEmbed(GettyImagesEmbed::class, GettyImagesEmbed::LEGACY_TYPE)
             // Giphy
             ->registerFactory($dic->get(GiphyEmbedFactory::class))
             ->registerEmbed(GiphyEmbed::class, GiphyEmbed::TYPE)

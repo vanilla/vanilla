@@ -400,33 +400,17 @@ class MediaTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Called after each test is executed.
-     *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    public function tearDown() {
-        // Make sure fetching page info is re-disabled, after every test.
-        $this->setNetworkEnabled(false);
-    }
-
-    /**
      * Test scraping pages with /media/scrape.
      *
      * @dataProvider provideScrapeUrls
      * @param array $url
      * @param string $type
      * @param array $info
-     * @param bool $networkEnabled
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      * @large
      */
-    public function testScrape($url, $type, array $info, $networkEnabled = false) {
-        // Fetching is disabled by default in tests. Should it be enabled for this test?
-        if ($networkEnabled) {
-            $this->setNetworkEnabled($networkEnabled);
-        }
+    public function testScrape($url, $type, array $info) {
         $result = $this->api()->post('media/scrape', ['url' => $url]);
         $this->assertEquals(201, $result->getStatusCode());
 
@@ -456,18 +440,5 @@ class MediaTest extends AbstractAPIv2Test {
         $body = $result->getBody();
         $this->assertEquals($url, $body['url']);
         $this->assertEquals($type, $body['type']);
-    }
-
-    /**
-     * Set the "network enabled" flag of the embed manager to allow (or disallow) embed objects using network requests.
-     *
-     * @param bool $networkEnabled
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    private function setNetworkEnabled($networkEnabled) {
-        /** @var EmbedManager $embedManager */
-        $embedManager = static::container()->get(EmbedManager::class);
-        $embedManager->setNetworkEnabled($networkEnabled);
     }
 }

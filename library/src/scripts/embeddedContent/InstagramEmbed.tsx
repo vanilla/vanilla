@@ -30,8 +30,8 @@ export function InstagramEmbed(props: IProps): JSX.Element {
     return (
         <EmbedContainer inEditor={props.inEditor}>
             <EmbedContent type="codepen" inEditor={props.inEditor}>
-                <div class="embedExternal embedInstagram">
-                    <div class="embedExternal-content">
+                <div className="embedExternal embedInstagram">
+                    <div className="embedExternal-content">
                         <blockquote
                             className="instagram-media"
                             data-instgrm-captioned

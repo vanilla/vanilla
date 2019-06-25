@@ -4,9 +4,10 @@
  */
 
 export interface IScrapeData {
+    embedType: string;
     type: string;
     url: string;
-    name?: string | null;
+    name?: string;
     body?: string | null;
     photoUrl?: string | null;
     height?: number | null;

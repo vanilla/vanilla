@@ -17,6 +17,7 @@ import { attachmentIconClasses } from "@library/content/attachments/attachmentIc
 import classNames from "classnames";
 
 interface IProps extends IFileAttachment {
+    className: string;
     type: AttachmentType;
     size: number; // bytes
     progressEventEmitter?: ProgressEventEmitter;
@@ -42,7 +43,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const classesMetas = metasClasses();
         return (
             <div
-                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
+                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
                 tabIndex={0}
                 aria-label={t("Uploading...")}
             >

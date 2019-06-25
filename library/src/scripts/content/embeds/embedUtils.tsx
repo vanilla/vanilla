@@ -18,6 +18,7 @@ export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
 export type IEmbedData = IScrapeData | IFileUploadData;
 
 export interface IFileUploadData {
+    embedType: "file";
     type: "file";
     url: string;
     attributes: {

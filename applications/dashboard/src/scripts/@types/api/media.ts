@@ -5,7 +5,6 @@
 
 export interface IScrapeData {
     embedType: string;
-    type: string;
     url: string;
     name?: string;
     body?: string | null;

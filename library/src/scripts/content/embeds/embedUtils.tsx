@@ -19,7 +19,6 @@ export type IEmbedData = IScrapeData | IFileUploadData;
 
 export interface IFileUploadData {
     embedType: "file";
-    type: "file";
     url: string;
     attributes: {
         mediaID: number;
@@ -77,24 +76,24 @@ export function registerEmbedComponent(type: string, component: React.ComponentC
  */
 export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor = true): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (!data.type) {
+        if (!data.embedType) {
             throw new Error("The embed type was not provided.");
         }
 
-        if (data.type === "link") {
+        if (data.embedType === "link") {
             elements.root.classList.add("embedText");
             elements.content.classList.add("embedText-content");
             elements.content.classList.add("embedLink-content");
         }
 
-        if (data.type === "quote") {
+        if (data.embedType === "quote") {
             elements.root.classList.add("embedText");
             elements.content.classList.add("embedText-content");
             elements.content.classList.add("embedQuote-content");
         }
 
-        const renderer = data.type && embedRenderers[data.type];
-        const Component = data.type && embedComponents[data.type];
+        const renderer = data.embedType && embedRenderers[data.embedType];
+        const Component = data.embedType && embedComponents[data.embedType];
 
         if (renderer) {
             return renderer(elements, data, inEditor);
@@ -104,7 +103,7 @@ export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor
                 elements.content,
             );
         } else {
-            throw new Error("Could not find a renderer for the embed type - " + data.type);
+            throw new Error("Could not find a renderer for the embed type - " + data.embedType);
         }
     });
 }

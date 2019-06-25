@@ -69,7 +69,7 @@ export async function convertTwitterEmbeds() {
                 const url = contentElement.getAttribute("data-tweeturl") || "";
 
                 const renderData: IEmbedData = {
-                    type: "twitter",
+                    embedType: "twitter",
                     url,
                     attributes: { statusID },
                 };

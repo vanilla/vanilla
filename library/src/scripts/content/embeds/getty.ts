@@ -48,7 +48,7 @@ export async function convertGettyEmbeds() {
             const tld = post.getAttribute("data-tld");
             const i360 = post.getAttribute("data-is360");
             const data: IEmbedData = {
-                type: "getty",
+                embedType: "getty",
                 url,
                 height,
                 width,

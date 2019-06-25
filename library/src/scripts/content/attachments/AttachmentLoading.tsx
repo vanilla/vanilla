@@ -17,7 +17,7 @@ import { attachmentIconClasses } from "@library/content/attachments/attachmentIc
 import classNames from "classnames";
 
 interface IProps extends IFileAttachment {
-    className: string;
+    className?: string;
     type: AttachmentType;
     size: number; // bytes
     progressEventEmitter?: ProgressEventEmitter;

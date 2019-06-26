@@ -1019,7 +1019,7 @@ class ProfileController extends Gdn_Controller {
     public function preferences($userReference = '', $username = '', $userID = '') {
         $this->addJsFile('profile.js');
         $session = Gdn::session();
-        $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit']);
+        $this->permission('Garden.SignIn.Allow');
 
         // Get user data
         $this->getUserInfo($userReference, $username, $userID, true);

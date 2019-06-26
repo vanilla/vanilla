@@ -19,7 +19,7 @@ interface IProps extends IBaseEmbedProps {
  * A class for rendering CodePen embeds.
  */
 export function CodePenEmbed(props: IProps): JSX.Element {
-    const src = `https://codepen.io/${props.author}/embed/${props.codePenID}`;
+    const src = `https://codepen.io/${props.author}/embed/preview/${props.codePenID}`;
 
     return (
         <EmbedContainer inEditor={props.inEditor}>

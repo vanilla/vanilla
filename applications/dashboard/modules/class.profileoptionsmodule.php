@@ -18,7 +18,7 @@ class ProfileOptionsModule extends Gdn_Module {
     public function __construct() {
         $this->profileOptionsDropdown = new DropdownModule();
         $this->profileOptionsDropdown->setView('dropdown-navbutton');
-        $this->profileOptionsDropdown->setTrigger(sprite('SpEditProfile', 'Sprite16').' <span class="Hidden">'.t('Edit Profile').'</span>', 'button', 'ProfileButtons Button-EditProfile');
+        $this->profileOptionsDropdown->setTrigger(sprite('SpEditProfile', 'Sprite16').' <span class="Hidden">'.t('Edit Profile').'</span>', 'button', 'ProfileButtons Button-EditProfileProfileButtons Button-EditProfile');
         $this->fetchProfileOptionsData();
     }
 
@@ -34,7 +34,7 @@ class ProfileOptionsModule extends Gdn_Module {
         if (hasEditProfile($controller->User->UserID)) {
             $this->profileOptionsDropdown->addLink(t('Edit Profile'), userUrl($controller->User, '', 'edit'), 'edit-profile');
         } else {
-            $this->profileOptionsDropdown->addLinkIf($session->isValid() && $userID == $session->UserID, t('Preferences'), userUrl($controller->User, '', 'preferences'), 'preferences');
+            $this->profileOptionsDropdown->addLinkIf($session->isValid() && $userID == $session->UserID && hasEditProfile($userID), t('Preferences'), userUrl($controller->User, '', 'preferences'), 'preferences');
         }
 
         if ($userID != $session->UserID && multiCheckPermission(['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban'])) {

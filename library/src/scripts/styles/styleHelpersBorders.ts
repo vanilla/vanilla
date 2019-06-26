@@ -22,16 +22,32 @@ export interface IBordersWithRadius extends ISingleBorderStyle {
     radius?: radiusValue;
 }
 
+
 export type radiusValue = BorderRadiusProperty<TLength> | string;
 
+
+export interface borderStylesBySideTop extends ISingleBorderStyle  {
+    radius?: radiusValue | ITopBorderRadii,
+}
+export interface borderStylesBySideBottom extends ISingleBorderStyle  {
+    radius?: radiusValue | IBottomBorderRadii,
+}
+
+export interface borderStylesBySideRight extends ISingleBorderStyle  {
+    radius?: radiusValue | IRightBorderRadii,
+}
+export interface borderStylesBySideLeft extends ISingleBorderStyle  {
+    radius?: radiusValue | ILeftBorderRadii,
+}
+
 export interface IBorderStyles extends ISingleBorderStyle {
-    all?: IBordersWithRadius;
-    topBottom?: IBordersWithRadius;
-    leftRight?: IBordersWithRadius;
-    top?: IBordersWithRadius;
-    bottom?: IBordersWithRadius;
-    left?: IBordersWithRadius;
-    right?: IBordersWithRadius;
+    all?: ISingleBorderStyle;
+    topBottom?: ISingleBorderStyle;
+    leftRight?: ISingleBorderStyle;
+    top?: borderStylesBySideTop;
+    bottom?: borderStylesBySideBottom;
+    left?: borderStylesBySideRight;
+    right?: borderStylesBySideLeft;
     radius?: radiusValue | IBorderRadii;
 }
 

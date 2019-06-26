@@ -15,6 +15,7 @@ import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import { fileUploadError } from "@library/icons/fileTypes";
 import classNames from "classnames";
+import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 
 interface IProps extends IFileAttachment {
     message: string;
@@ -38,8 +39,8 @@ export default class AttachmentError extends React.Component<IProps> {
         const classesMetas = metasClasses();
 
         return (
-            <div
-                className={classNames("attachment", "hasError", classes.root, this.props.className, FOCUS_CLASS)}
+            <EmbedContainer
+                className={classNames("hasError", FOCUS_CLASS)}
                 tabIndex={0}
                 aria-describedby={this.descrID}
                 aria-label={t("Error")}
@@ -76,7 +77,7 @@ export default class AttachmentError extends React.Component<IProps> {
                         onClick={this.props.deleteAttachment}
                     />
                 </div>
-            </div>
+            </EmbedContainer>
         );
     }
 }

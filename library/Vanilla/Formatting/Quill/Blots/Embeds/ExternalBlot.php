@@ -7,7 +7,7 @@
 namespace Vanilla\Formatting\Quill\Blots\Embeds;
 
 use Gdn;
-use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Parser;
 
@@ -16,8 +16,8 @@ use Vanilla\Formatting\Quill\Parser;
  */
 class ExternalBlot extends AbstractBlot {
 
-    /** @var EmbedManager */
-    private $embedManager;
+    /** @var EmbedService */
+    private $embedService;
 
     /**
      * @inheritDoc
@@ -42,8 +42,7 @@ class ExternalBlot extends AbstractBlot {
         if ($this->content !== '') {
             $this->content .= "\n";
         }
-        /** @var EmbedManager embedManager */
-        $this->embedManager = Gdn::getContainer()->get(EmbedManager::class);
+        $this->embedService = Gdn::getContainer()->get(EmbedService::class);
     }
 
     /**
@@ -56,8 +55,7 @@ class ExternalBlot extends AbstractBlot {
     }
 
     /**
-     * Render out the content of the blot using the EmbedManager.
-     * @see EmbedManager
+     * Render out the content of the blot using the EmbedService.
      * @inheritDoc
      */
     public function render(): string {
@@ -68,7 +66,7 @@ class ExternalBlot extends AbstractBlot {
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
         $data = $value['data'] ?? $value;
         try {
-            return "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
+            return $this->embedService->createEmbedFromData($data)->renderHtml();
         } catch (\Exception $e) {
             // TODO: Add better error handling here.
             return '';

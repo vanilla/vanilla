@@ -94,7 +94,7 @@ export default class EmbedInsertionModule extends Module {
         const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
             return {
                 url: data.url,
-                type: "file",
+                embedType: "file",
                 attributes: data,
             };
         });

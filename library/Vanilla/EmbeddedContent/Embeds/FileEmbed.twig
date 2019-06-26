@@ -1,0 +1,8 @@
+<a
+    href="{{ url }}"
+    download
+    aria-label="{{ name }}"
+    data-embedjson="{{ data|json_encode }}"
+>
+    {{ name ?: url }}
+</a>

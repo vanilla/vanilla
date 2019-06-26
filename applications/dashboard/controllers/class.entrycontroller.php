@@ -856,7 +856,10 @@ class EntryController extends Gdn_Controller {
                             try {
                                 $password = $this->Form->getFormValue('ConnectPassword');
                                 $name = $this->Form->getFormValue('ConnectName');
-                                if (!$passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name)) {
+
+                                $passwordChecked = $passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name);
+                                Gdn::userModel()->rateLimit((object)$user, $passwordChecked);
+                                if (!$passwordChecked) {
                                     if ($connectNameEntered) {
                                         $this->addCredentialErrorToForm('The username you entered has already been taken.');
                                     } else {

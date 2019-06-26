@@ -12,8 +12,8 @@ import {
     colorOut,
     flexHelper,
     fonts, IBorderRadii,
-    IBordersWithRadius,
-    IFont,
+    IBordersWithRadius, IBottomBorderRadii,
+    IFont, ILeftBorderRadii, IRightBorderRadii, ITopBorderRadii,
     modifyColorBasedOnLightness,
     spinnerLoader,
     unit,
@@ -549,6 +549,11 @@ const cleanUpBorderValues = (values) => {
 }
 
 export const calculateBorders = (borderStyles: IBorderStyles | undefined | null, debug = false) => {
+
+    if (debug) {
+        window.console.log("raw data: ", borderStyles);
+    }
+
     if (borderStyles) {
         let output;
         let hasGlobalStyles = false;
@@ -586,10 +591,10 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 bottomLeft: undefined,
             },
         };
-
-        if (debug) {
-            window.console.log("calculateBorders == in == ", borderStyles);
-        }
+        //
+        // if (debug) {
+        //     window.console.log("calculateBorders == in == ", borderStyles);
+        // }
 
         // Global - globalResult
         // ----------------------------
@@ -605,14 +610,12 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
             globalResult.style = borderStyles.style;
             hasGlobalStyles = true;
         }
-        if (borderStyles.radius) {
-            globalResult.radius = borderStyles.radius;
-            hasGlobalStyles = true;
-        }
+
 
         // Detailed - detailedResult
         // ----------------------------
         // All (can be redundat if both global and all are set)
+
         if (borderStyles.all) {
             const borderStylesAll = borderStyles.all;
             if (borderStylesAll.color) {
@@ -636,15 +639,10 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 detailedResult.left.style = borderStylesAll.style;
                 hasDetailedStyles = true;
             }
-            if (borderStylesAll.radius) {
-                detailedResult.radius = {
-                    topRight: borderStylesAll.radius,
-                    bottomRight: borderStylesAll.radius,
-                    bottomLeft: borderStylesAll.radius,
-                    topLeft: borderStylesAll.radius,
-                };
-                hasDetailedStyles = true;
-            }
+        }
+
+        if(debug) {
+            window.console.log("2 ================ spot check: ", detailedResult);
         }
 
         // Detailed - 2 Sides
@@ -666,15 +664,11 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 detailedResult.bottom.style = stylesTopBottom.style;
                 hasDetailedStyles = true;
             }
-            // A bit odd to declare it this way but I kept it for consistency
-            if (stylesTopBottom.radius) {
-                detailedResult.radius.topRight = stylesTopBottom.radius;
-                detailedResult.radius.bottomRight = stylesTopBottom.radius;
-                detailedResult.radius.topLeft = stylesTopBottom.radius;
-                detailedResult.radius.bottomLeft = stylesTopBottom.radius;
-                hasDetailedStyles = true;
-            }
         }
+
+        // if(debug) {
+        //     window.console.log("================ spot check: ", detailedResult);
+        // }
 
         if (borderStyles.leftRight) {
             const stylesLeftRight = borderStyles.leftRight;
@@ -691,14 +685,6 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
             if (stylesLeftRight.style) {
                 detailedResult.left.style = stylesLeftRight.style;
                 detailedResult.right.style = stylesLeftRight.style;
-                hasDetailedStyles = true;
-            }
-            // A bit odd to declare it this way but I kept it for consistency
-            if (stylesLeftRight.radius) {
-                detailedResult.radius.topRight = stylesLeftRight.radius;
-                detailedResult.radius.bottomRight = stylesLeftRight.radius;
-                detailedResult.radius.topLeft = stylesLeftRight.radius;
-                detailedResult.radius.bottomLeft = stylesLeftRight.radius;
                 hasDetailedStyles = true;
             }
         }
@@ -719,8 +705,14 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 hasDetailedStyles = true;
             }
             if (borderStyles.top.radius) {
-                detailedResult.radius.topRight = borderStyles.top.radius!.right ? borderStyles.top.radius.right! : borderStyles.top.radius;
-                detailedResult.radius.topLeft = borderStyles.top.radius!.left ? borderStyles.top.radius.left! : borderStyles.top.radius;
+                const topRadius = borderStyles.top.radius as ITopBorderRadii;
+                if (typeof topRadius === "object") {
+                    detailedResult.radius.topRight = topRadius.right ? topRadius.right : undefined;
+                    detailedResult.radius.topLeft = topRadius.left ? topRadius.left : undefined;
+                } else {
+                    detailedResult.radius.topRight = topRadius;
+                    detailedResult.radius.topLeft = topRadius;
+                }
                 hasDetailedStyles = true;
             }
         }
@@ -739,8 +731,14 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 hasDetailedStyles = true;
             }
             if (borderStyles.right.radius) {
-                detailedResult.radius.topRight = borderStyles.right.radius;
-                detailedResult.radius.bottomRight = borderStyles.right.radius;
+                const rightBorderRadius = borderStyles.right.radius as IRightBorderRadii;
+                if (typeof rightBorderRadius === "object") {
+                    detailedResult.radius.topRight = rightBorderRadius.top ? rightBorderRadius.top : undefined;
+                    detailedResult.radius.bottomtLeft = rightBorderRadius.bottom ? rightBorderRadius.bottom : undefined;
+                } else {
+                    detailedResult.radius.rightRight = rightBorderRadius;
+                    detailedResult.radius.rightLeft = rightBorderRadius;
+                }
                 hasDetailedStyles = true;
             }
         }
@@ -759,9 +757,17 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 detailedResult.bottom.style = borderStyles.bottom.style;
                 hasDetailedStyles = true;
             }
+
+
             if (borderStyles.bottom.radius) {
-                detailedResult.radius.bottomRight = borderStyles.bottom.radius;
-                detailedResult.radius.bottomLeft = borderStyles.bottom.radius;
+                const bottomBorderRadius = borderStyles.bottom.radius as IBottomBorderRadii;
+                if (typeof bottomBorderRadius === "object") {
+                    detailedResult.radius.bottomRight = bottomBorderRadius.right ? bottomBorderRadius.right : undefined;
+                    detailedResult.radius.bottomtLeft = bottomBorderRadius.left ? bottomBorderRadius.left : undefined;
+                } else {
+                    detailedResult.radius.bottomRight = bottomBorderRadius;
+                    detailedResult.radius.bottomtLeft = bottomBorderRadius;
+                }
                 hasDetailedStyles = true;
             }
         }
@@ -779,9 +785,16 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 detailedResult.left.style = borderStyles.left.style;
                 hasDetailedStyles = true;
             }
+
             if (borderStyles.left.radius) {
-                detailedResult.radius.bottomLeft = borderStyles.left.radius;
-                detailedResult.radius.topLeft = borderStyles.left.radius;
+                const leftRadius = borderStyles.left.radius as ILeftBorderRadii;
+                if (typeof leftRadius === "object") {
+                    detailedResult.radius.topLeft = leftRadius.top ? leftRadius.top : undefined;
+                    detailedResult.radius.bottomtLeft = leftRadius.bottom ? leftRadius.bottom : undefined;
+                } else {
+                    detailedResult.radius.topLeft = leftRadius;
+                    detailedResult.radius.rightLeft = leftRadius;
+                }
                 hasDetailedStyles = true;
             }
         }
@@ -804,8 +817,8 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                 }
 
                 if (radius.bottom) {
-                    detailedResult.radius.bottomRight = radius.top;
-                    detailedResult.radius.bottomLeft = radius.top;
+                    detailedResult.radius.bottomRight = radius.bottom;
+                    detailedResult.radius.bottomLeft = radius.bottom;
                     hasDetailedStyles = true;
                 }
 
@@ -854,10 +867,10 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
         cleanUpBorderValues(globalResult);
         cleanUpBorderValues(detailedResult);
 
-        if (debug) {
-            window.console.log("globalResult == step == ", globalResult);
-            window.console.log("detailedResult == step == ", detailedResult);
-        }
+        // if (debug) {
+        //     window.console.log("globalResult == step == ", globalResult);
+        //     window.console.log("detailedResult == step == ", detailedResult);
+        // }
 
         if (hasGlobalStyles && !hasDetailedStyles) {
             output = globalResult;
@@ -867,20 +880,10 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
             output = merge(globalResult, detailedResult);
         }
 
-        // Clean up
 
-
-
-
-
-
-
-
-
-
-        if (debug) {
-            window.console.log("output: ", output);
-        }
+        // if (debug) {
+        //     window.console.log("output: ", output);
+        // }
         return output;
     } else {
         return null;
@@ -905,9 +908,9 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnStat
     });
 
     const debug = buttonTypeVars.name === "splashSearchButton";
-    if (debug) {
-        window.console.log("buttonTypeVars.borders: ", calculateBorders(buttonTypeVars.borders, true));
-    }
+    // if (debug) {
+    //     window.console.log("buttonTypeVars.borders: ", calculateBorders(buttonTypeVars.borders, true));
+    // }
 
     const defaultBorder = calculateBorders(buttonTypeVars.borders, debug);
     const hoverBorder = buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, borders(buttonTypeVars.hover.borders)) : defaultBorder;

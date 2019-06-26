@@ -169,7 +169,7 @@ export const splashVariables = useThemeCache(() => {
             },
             radius: {
                 left: 0,
-                right: unit(searchBar.border.radius),
+                right: searchBar.border.radius,
             },
         },
         fonts: {
@@ -318,7 +318,7 @@ export const splashClasses = useThemeCache(() => {
                         right: 0,
                         left: vars.searchBar.border.radius,
                     },
-                }),
+                } as any),
             },
         },
     });

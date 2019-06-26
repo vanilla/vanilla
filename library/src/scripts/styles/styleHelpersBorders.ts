@@ -19,10 +19,10 @@ export interface ISingleBorderStyle {
 }
 
 export interface IBordersWithRadius extends ISingleBorderStyle {
-    radius?: radiusType;
+    radius?: radiusValue;
 }
 
-export type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
+export type radiusValue = BorderRadiusProperty<TLength> | string;
 
 export interface IBorderStyles extends ISingleBorderStyle {
     all?: IBordersWithRadius;
@@ -32,17 +32,42 @@ export interface IBorderStyles extends ISingleBorderStyle {
     bottom?: IBordersWithRadius;
     left?: IBordersWithRadius;
     right?: IBordersWithRadius;
-    radius?: radiusType;
+    radius?: radiusValue | IBorderRadii;
 }
 
 export type borderType = IBordersWithRadius | IBorderStyles;
 
+export interface IBorderRadiiDown {
+    left?: BorderRadiusProperty<TLength> | number,
+    right: BorderRadiusProperty<TLength> | number,
+}
+
+export interface IBorderRadiiBottom {
+    left?: BorderRadiusProperty<TLength> | number,
+    right: BorderRadiusProperty<TLength> | number,
+}
+
+export interface IBorderRadiiRight {
+    top?: BorderRadiusProperty<TLength> | number,
+    bottom: BorderRadiusProperty<TLength> | number,
+}
+
+export interface IBorderRadiiLeft {
+    top?: BorderRadiusProperty<TLength> | number,
+    bottom: BorderRadiusProperty<TLength> | number,
+}
+
+export interface ITopBorderRadii {left?: radiusValue; right?: radiusValue};
+export interface IBottomBorderRadii {left?: radiusValue, right?: radiusValue};
+export interface ILeftBorderRadii {top?: radiusValue, bottom?: radiusValue};
+export interface IRightBorderRadii {top?: radiusValue, bottom?: radiusValue};
+
 export interface IBorderRadii {
     all?: BorderRadiusProperty<TLength> | number;
-    top?: BorderRadiusProperty<TLength> | number;
-    bottom?: BorderRadiusProperty<TLength> | number;
-    left?: BorderRadiusProperty<TLength> | number;
-    right?: BorderRadiusProperty<TLength> | number;
+    top?: BorderRadiusProperty<TLength> | number | ITopBorderRadii;
+    bottom?: BorderRadiusProperty<TLength> | number | IBottomBorderRadii;
+    left?: BorderRadiusProperty<TLength> | number | ILeftBorderRadii;
+    right?: BorderRadiusProperty<TLength> | number | IRightBorderRadii;
     topRight?: BorderRadiusProperty<TLength> | number;
     topLeft?: BorderRadiusProperty<TLength> | number;
     bottomLeft?: BorderRadiusProperty<TLength> | number;
@@ -91,10 +116,10 @@ export const mergeIfNoGlobal = (globalStyles: IBorderStyles | undefined, overwri
 
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
-
-    if (debug) {
-        window.console.log("coming in: ", props);
-    }
+    //
+    // if (debug) {
+    //     window.console.log("coming in: ", props);
+    // }
 
     const output: NestedCSSProperties = {
         borderLeft: undefined,
@@ -102,10 +127,10 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
         borderTop: undefined,
         borderBottom: undefined,
     };
-
-    if(debug) {
-        window.console.log("border radii: ", props.radius);
-    }
+    //
+    // if(debug) {
+    //     window.console.log("border radii: ", props.radius);
+    // }
 
     // Set border radii
     let globalRadiusFound = false;
@@ -121,23 +146,41 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
             }
             if (props.radius.top !== undefined) {
                 specificRadiusFound = true;
-                output.borderTopRightRadius = unit(props.radius.top);
-                output.borderTopLeftRadius = unit(props.radius.top);
+                output.borderTopRightRadius = unit(props.radius.topRight);
+                output.borderTopLeftRadius = unit(props.radius.topLeft);
+                if (props.radius.topRight) {
+                    output.borderTopRightRadius = unit(props.radius.topRight);
+                }
+                if (props.radius.topLeft) {
+                    output.borderTopLeftRadius = unit(props.radius.topLeft);
+                }
             }
             if (props.radius.bottom !== undefined) {
                 specificRadiusFound = true;
-                output.borderBottomRightRadius = unit(props.radius.bottom);
-                output.borderBottomLeftRadius = unit(props.radius.bottom);
+                if (props.radius.bottomRight) {
+                    output.borderBottomRightRadius = unit(props.radius.bottomRight);
+                }
+                if (props.radius.bottomLeft) {
+                    output.borderBottomLeftRadius = unit(props.radius.bottomLeft);
+                }
             }
             if (props.radius.right !== undefined) {
                 specificRadiusFound = true;
-                output.borderTopRightRadius = unit(props.radius.right);
-                output.borderBottomRightRadius = unit(props.radius.right);
+                if (props.radius.topRight) {
+                    output.borderTopRightRadius = unit(props.radius.topRight);
+                }
+                if (props.radius.bottomRight) {
+                    output.borderBottomRightRadius = unit(props.radius.bottomRight);
+                }
             }
-            if (!!props.radius.left !== undefined) {
+            if (props.radius.left !== undefined) {
                 specificRadiusFound = true;
-                output.borderTopLeftRadius = unit(props.radius.left);
-                output.borderBottomLeftRadius = unit(props.radius.left);
+                if (props.radius.topLeft) {
+                    output.borderTopLeftRadius = unit(props.radius.topLeft);
+                }
+                if (props.radius.bottomLeft) {
+                    output.borderBottomLeftRadius = unit(props.radius.bottomLeft);
+                }
             }
             if (props.radius.topRight !== undefined) {
                 specificRadiusFound = true;
@@ -211,9 +254,9 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
         output.borderWidth = props.width ? unit(props.width) : unit(globalVars.border.width);
     }
 
-    if (debug) {
-        window.console.log("going out: ", output);
-    }
+    // if (debug) {
+    //     window.console.log("going out: ", output);
+    // }
 
     return output;
 };

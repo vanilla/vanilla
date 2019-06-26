@@ -856,7 +856,10 @@ class EntryController extends Gdn_Controller {
                             try {
                                 $password = $this->Form->getFormValue('ConnectPassword');
                                 $name = $this->Form->getFormValue('ConnectName');
-                                if (!$passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name)) {
+
+                                $passwordChecked = $passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name);
+                                Gdn::userModel()->rateLimit((object)$user, $passwordChecked);
+                                if (!$passwordChecked) {
                                     if ($connectNameEntered) {
                                         $this->addCredentialErrorToForm('The username you entered has already been taken.');
                                     } else {
@@ -1081,7 +1084,7 @@ class EntryController extends Gdn_Controller {
                         $passwordChecked = $passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user));
 
                         // Rate limiting
-                        Gdn::userModel()->rateLimit($user, $passwordChecked);
+                        Gdn::userModel()->rateLimit($user);
 
                         if ($passwordChecked) {
                             // Update weak passwords
@@ -1825,7 +1828,7 @@ class EntryController extends Gdn_Controller {
 
         if (!is_numeric($userID)
             || $passwordResetKey == ''
-            || $this->UserModel->getAttribute($userID, 'PasswordResetKey', '') != $passwordResetKey
+            || hash_equals($this->UserModel->getAttribute($userID, 'PasswordResetKey', ''), $passwordResetKey) === false
         ) {
             $this->Form->addError('Failed to authenticate your password reset request. Try using the reset request form again.');
             Logger::event(

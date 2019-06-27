@@ -258,6 +258,7 @@ class MediaItemModule extends Gdn_Module {
 
     /**
      * Add a meta item that displays beside the title.
+     *
      * @param string $meta An HTML-formatted string.
      * @return $this
      */

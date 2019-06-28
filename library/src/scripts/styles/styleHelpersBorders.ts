@@ -53,25 +53,25 @@ export interface IBorderStyles extends ISingleBorderStyle {
 
 export type borderType = IBordersWithRadius | IBorderStyles;
 
-export interface IBorderRadiiDown {
-    left?: BorderRadiusProperty<TLength> | number,
-    right: BorderRadiusProperty<TLength> | number,
-}
-
-export interface IBorderRadiiBottom {
-    left?: BorderRadiusProperty<TLength> | number,
-    right: BorderRadiusProperty<TLength> | number,
-}
-
-export interface IBorderRadiiRight {
-    top?: BorderRadiusProperty<TLength> | number,
-    bottom: BorderRadiusProperty<TLength> | number,
-}
-
-export interface IBorderRadiiLeft {
-    top?: BorderRadiusProperty<TLength> | number,
-    bottom: BorderRadiusProperty<TLength> | number,
-}
+// export interface IBorderRadiiDown {
+//     left?: BorderRadiusProperty<TLength> | number,
+//     right: BorderRadiusProperty<TLength> | number,
+// }
+//
+// export interface IBorderRadiiBottom {
+//     left?: BorderRadiusProperty<TLength> | number,
+//     right: BorderRadiusProperty<TLength> | number,
+// }
+//
+// export interface IBorderRadiiRight {
+//     top?: BorderRadiusProperty<TLength> | number,
+//     bottom: BorderRadiusProperty<TLength> | number,
+// }
+//
+// export interface IBorderRadiiTopBottom {
+//     top?: BorderRadiusProperty<TLength> | number,
+//     bottom: BorderRadiusProperty<TLength> | number,
+// }
 
 export interface ITopBorderRadii {left?: radiusValue; right?: radiusValue};
 export interface IBottomBorderRadii {left?: radiusValue, right?: radiusValue};

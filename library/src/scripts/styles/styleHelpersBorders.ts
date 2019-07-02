@@ -10,7 +10,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { unit, ifExistsWithFallback } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import merge from "lodash/merge";
-import {Omit} from "@library/@types/utils";
+import {ColorHelper} from "csx";
 
 export interface ISingleBorderStyle {
     color?: ColorValues;
@@ -22,55 +22,60 @@ export interface IBordersWithRadius extends ISingleBorderStyle {
     radius?: radiusValue;
 }
 
-
 export type radiusValue = BorderRadiusProperty<TLength> | string;
 
-
-export interface borderStylesBySideTop extends ISingleBorderStyle  {
-    radius?: radiusValue | ITopBorderRadii,
-}
-export interface borderStylesBySideBottom extends ISingleBorderStyle  {
-    radius?: radiusValue | IBottomBorderRadii,
+export interface IBorderStylesAll extends ISingleBorderStyle  {
+    radius?: radiusValue;
 }
 
-export interface borderStylesBySideRight extends ISingleBorderStyle  {
-    radius?: radiusValue | IRightBorderRadii,
-}
-export interface borderStylesBySideLeft extends ISingleBorderStyle  {
-    radius?: radiusValue | ILeftBorderRadii,
+export interface IBorderStylesBySideTop extends ISingleBorderStyle  {
+    radius?: ITopBorderRadii;
 }
 
-export interface IBorderStyles extends ISingleBorderStyle {
-    all?: ISingleBorderStyle;
+export interface IBorderStylesBySideBottom extends ISingleBorderStyle  {
+    radius?: IBottomBorderRadii;
+}
+
+export interface IBorderStylesBySideRight extends ISingleBorderStyle  {
+    radius?: IRightBorderRadii;
+}
+
+export interface IBorderStylesBySideLeft extends ISingleBorderStyle  {
+    radius?: ILeftBorderRadii;
+}
+
+
+export interface IBorderStyles extends ISingleBorderStyle  {
+    all?: IBorderStylesAll;
     topBottom?: ISingleBorderStyle;
     leftRight?: ISingleBorderStyle;
-    top?: borderStylesBySideTop;
-    bottom?: borderStylesBySideBottom;
-    left?: borderStylesBySideRight;
-    right?: borderStylesBySideLeft;
-    radius?: radiusValue | IBorderRadii;
+    top?: IBorderStylesBySideTop;
+    bottom?: IBorderStylesBySideBottom;
+    left?: IBorderStylesBySideRight;
+    right?: IBorderStylesBySideLeft;
+    radius?: radiusValue | IBorderRadiiDeclaration;
 }
 
 export type borderType = IBordersWithRadius | IBorderStyles;
 
 // export interface IBorderRadiiDown {
-//     left?: BorderRadiusProperty<TLength> | number,
-//     right: BorderRadiusProperty<TLength> | number,
+//     left?: BorderRadiusValue,
+//     right: BorderRadiusValue,
 // }
 //
 // export interface IBorderRadiiBottom {
-//     left?: BorderRadiusProperty<TLength> | number,
-//     right: BorderRadiusProperty<TLength> | number,
+//     left?: BorderRadiusValue,
+//     right: BorderRadiusValue,
 // }
 //
 // export interface IBorderRadiiRight {
-//     top?: BorderRadiusProperty<TLength> | number,
-//     bottom: BorderRadiusProperty<TLength> | number,
+//     top?: BorderRadiusValue,
+//     bottom: BorderRadiusValue,
 // }
 //
 // export interface IBorderRadiiTopBottom {
-//     top?: BorderRadiusProperty<TLength> | number,
-//     bottom: BorderRadiusProperty<TLength> | number,
+//     top?: BorderRadiusValue,
+//     bottom: BorderRadiusValue,
 // }
 
 export interface ITopBorderRadii {left?: radiusValue; right?: radiusValue};
@@ -78,19 +83,77 @@ export interface IBottomBorderRadii {left?: radiusValue, right?: radiusValue};
 export interface ILeftBorderRadii {top?: radiusValue, bottom?: radiusValue};
 export interface IRightBorderRadii {top?: radiusValue, bottom?: radiusValue};
 
-export interface IBorderRadii {
-    all?: BorderRadiusProperty<TLength> | number;
-    top?: BorderRadiusProperty<TLength> | number | ITopBorderRadii;
-    bottom?: BorderRadiusProperty<TLength> | number | IBottomBorderRadii;
-    left?: BorderRadiusProperty<TLength> | number | ILeftBorderRadii;
-    right?: BorderRadiusProperty<TLength> | number | IRightBorderRadii;
-    topRight?: BorderRadiusProperty<TLength> | number;
-    topLeft?: BorderRadiusProperty<TLength> | number;
-    bottomLeft?: BorderRadiusProperty<TLength> | number;
-    bottomRight?: BorderRadiusProperty<TLength> | number;
+export type BorderRadiusValue = BorderRadiusProperty<TLength> | number | undefined;
+
+export interface IRadiusDeclaration {
+    all?: BorderRadiusValue;
+    top?: BorderRadiusValue | ITopBorderRadii;
+    bottom?: BorderRadiusValue | IBottomBorderRadii;
+    left?: BorderRadiusValue | ILeftBorderRadii;
+    right?: BorderRadiusValue | IRightBorderRadii;
+    topRight?: BorderRadiusValue;
+    topLeft?: BorderRadiusValue;
+    bottomLeft?: BorderRadiusValue;
+    bottomRight?: BorderRadiusValue;
 }
 
-export const borderRadii = (props: IBorderRadii) => {
+export interface IBorderRadiiDeclaration extends IBorderRadiusOutput, IRadiusDeclaration {
+    radius?: IRadiusDeclaration | BorderRadiusValue;
+}
+
+export interface IBorderRadiusOutput {
+    borderTopRightRadius?: BorderRadiusValue;
+    borderTopLeftRadius?: BorderRadiusValue;
+    borderBottomRightRadius?: BorderRadiusValue;
+    borderBottomLeftRadius?: BorderRadiusValue;
+}
+
+/*
+    This interface is used to gather all the styles and overwrites.
+*/
+export interface IBorderStylesWIP {
+    all?: {
+        color?: ColorValues,
+        width?: BorderWidthProperty<TLength> | number,
+        style?: BorderStyleProperty,
+    } | BorderStyleProperty;
+    top?: {
+        color?: ColorValues,
+        width?: BorderWidthProperty<TLength> | number,
+        style?: BorderStyleProperty,
+    };
+    right?: {
+        color?: ColorValues,
+        width?: BorderWidthProperty<TLength> | number,
+        style?: BorderStyleProperty,
+    };
+    bottom?: {
+        color?: ColorValues,
+        width?: BorderWidthProperty<TLength> | number,
+        style?: BorderStyleProperty,
+    };
+    left?: {
+        color?: ColorValues,
+        width?: BorderWidthProperty<TLength> | number,
+        style?: BorderStyleProperty,
+    };
+    radius?: {
+        topRight?: BorderRadiusValue,
+        bottomRight?: BorderRadiusValue,
+        topLeft?: BorderRadiusValue,
+        bottomLeft?: BorderRadiusValue,
+    };
+}
+
+// This is the final outputted format before we generate the actual styles.
+export interface IBorderFinalStyles extends IBorderRadiusOutput{
+    borderTop?: BorderRadiusValue;
+    borderRight?: BorderRadiusValue;
+    borderBottom?: BorderRadiusValue;
+    borderLeft?: BorderRadiusValue;
+}
+
+export const borderRadii = (props: IBorderRadiiDeclaration) => {
     return {
         borderTopLeftRadius: unit(ifExistsWithFallback([props.all, props.top, props.left, props.topLeft, undefined])),
         borderTopRightRadius: unit(
@@ -105,30 +168,30 @@ export const borderRadii = (props: IBorderRadii) => {
     };
 };
 
-const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?: (value: any) => string) => {
-    let output = ultimateFallback;
-    const convert = unitFunction ? unitFunction : value => value.toString();
-    try {
-        const BreakException = {};
-        fallbacks.forEach((style, key) => {
-            if (!!style) {
-                output = style;
-                throw BreakException;
-            }
-        });
-    } catch (e) {
-        // break out of loop
-    }
-    return convert(output);
-};
+// const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?: (value: any) => string) => {
+//     let output = ultimateFallback;
+//     const convert = unitFunction ? unitFunction : value => value.toString();
+//     try {
+//         const BreakException = {};
+//         fallbacks.forEach((style, key) => {
+//             if (!!style) {
+//                 output = style;
+//                 throw BreakException;
+//             }
+//         });
+//     } catch (e) {
+//         // break out of loop
+//     }
+//     return convert(output);
+// };
 
-export const mergeIfNoGlobal = (globalStyles: IBorderStyles | undefined, overwriteStyles: IBorderStyles | undefined) => {
-    if (globalStyles) {
-        return merge(globalStyles, overwriteStyles);
-    } else {
-        return overwriteStyles;
-    }
-};
+// export const mergeIfNoGlobal = (globalStyles: IBorderStyles | undefined, overwriteStyles: IBorderStyles | undefined) => {
+//     if (globalStyles) {
+//         return merge(globalStyles, overwriteStyles);
+//     } else {
+//         return overwriteStyles;
+//     }
+// };
 
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
@@ -143,6 +206,15 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
         borderTop: undefined,
         borderBottom: undefined,
     };
+
+
+    // if (typeof borderStyles === "string") {
+    //     const shorthandStyles = borders(borderStyles);
+    //     if (shorthandStyles) {
+    //         output.bord
+    //     }
+    // }
+
     //
     // if(debug) {
     //     window.console.log("border radii: ", props.radius);

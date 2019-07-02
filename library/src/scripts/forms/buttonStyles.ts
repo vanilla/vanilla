@@ -11,7 +11,7 @@ import {
     borderType,
     colorOut,
     flexHelper,
-    fonts, IBorderRadii,
+    fonts, IBorderRadiiDeclaration,
     IBordersWithRadius, IBottomBorderRadii,
     IFont, ILeftBorderRadii, IRightBorderRadii, ITopBorderRadii,
     modifyColorBasedOnLightness,

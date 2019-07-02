@@ -1032,6 +1032,30 @@ if (!function_exists('hasEditProfile')) {
     }
 }
 
+if (!function_exists('hasViewProfile')) {
+    /**
+     * Determine whether or not a given user has the view profile link.
+     *
+     * @param int $userID The user ID to check.
+     * @return bool Return true if the user should have the view profile link or false otherwise.
+     */
+    function hasViewProfile($userID) {
+        if ($userID != Gdn::session()->UserID) {
+            return false;
+        }
+
+        $result = checkPermission('Garden.Profiles.View');
+
+        $result = $result && (
+                c('Garden.Profile.Titles') ||
+                c('Garden.Profile.Locations', false) ||
+                c('Garden.Registration.Method') != 'Connect'
+            );
+
+        return $result;
+    }
+}
+
 if (!function_exists('hoverHelp')) {
     /**
      * Add span with hover text to a string.

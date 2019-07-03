@@ -7,31 +7,25 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     allButtonStates,
-    borders,
-    borderType,
-    colorOut,
+    colorOut, ColorValues,
     flexHelper,
-    fonts, IBorderRadiiDeclaration,
-    IBordersWithRadius, IBottomBorderRadii,
-    IFont, ILeftBorderRadii, IRightBorderRadii, ITopBorderRadii,
+    IFont,
     modifyColorBasedOnLightness,
     spinnerLoader,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { ISingleBorderStyle, IBorderStyles} from "@library/styles/styleHelpersBorders";
 import merge from "lodash/merge";
-import {BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty} from "csstype";
-import {instanceOf} from "prop-types";
-import TabButtonList from "@library/navigation/tabs/TabButtonList";
-import {calculateBorders} from "@library/forms/borderStylesCalculator";
+import generateButtonClass from "./styleHelperButtonGenerator";
+import {IButtonType} from "@library/forms/styleHelperButtonInterface";
+
 
 export const buttonGlobalVariables = useThemeCache(() => {
+    // Fetch external global variables
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const makeThemeVars = variableFactory("button");
@@ -68,58 +62,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
     };
 });
 
-export const transparentColor = "transparent" as ColorValues;
 
-export interface IButtonType {
-    name: string;
-    colors?: {
-        bg?: ColorValues;
-        fg?: ColorValues;
-    };
-    borders?: IBorderStyles;
-    sizing?: {
-        minHeight?: TLength;
-        minWidth?: TLength;
-    };
-    padding?: {
-        top?: TLength;
-        bottom?: TLength;
-        side?: TLength;
-    };
-    fonts?: IFont;
-    hover?: {
-        fg?: ColorValues;
-        colors?: {
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    focus?: {
-        fg?: ColorValues;
-        colors?: {
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    active?: {
-        fg?: ColorValues;
-        colors?: {
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    focusAccessible?: {
-        fg?: ColorValues;
-        colors?: {
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-}
 
 export const buttonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -189,12 +132,12 @@ export const buttonVariables = useThemeCache(() => {
         colors: {
             bg: globalVars.mainColors.bg,
         },
+        borders: {
+            color: globalVars.elementaryColors.transparent,
+            radius: globalVars.border.radius,
+        },
         sizing: {
             minHeight: 24,
-        },
-        borders: {
-            color: transparentColor,
-            radius: globalVars.border.radius,
         },
         hover: {
             fonts: {
@@ -230,7 +173,7 @@ export const buttonVariables = useThemeCache(() => {
             minHeight: 24,
         },
         borders: {
-            color: transparentColor,
+            color: globalVars.elementaryColors.transparent,
             radius: globalVars.border.radius,
         },
         hover: {
@@ -329,7 +272,7 @@ export const buttonVariables = useThemeCache(() => {
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
         colors: {
-            bg: transparentColor,
+            bg: globalVars.elementaryColors.transparent,
         },
         fonts: {
             color: globalVars.mainColors.fg,
@@ -489,133 +432,6 @@ export const overwriteButtonClass = (
 
 
 
-
-export const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
-    const formElVars = formElementsVariables();
-    const buttonGlobals = buttonGlobalVariables();
-    const style = styleFactory(`button-${buttonTypeVars.name}`);
-    const zIndex = setZIndexOnState ? 1 : undefined;
-    const buttonDimensions = buttonTypeVars.sizing || false;
-
-    // Make sure we have the second level, if it was empty
-    buttonTypeVars = merge(buttonTypeVars, {
-        colors: {},
-        hover: {},
-        focus: {},
-        active: {},
-        borders: {},
-        focusAccessible: {},
-    });
-
-    const debug = buttonTypeVars.name === "splashSearchButton";
-
-
-    const defaultBorder = calculateBorders(buttonTypeVars.borders, debug);
-    const hoverBorder = buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, borders(buttonTypeVars.hover.borders)) : defaultBorder;
-    const activeBorder = buttonTypeVars.active && buttonTypeVars.active.borders ? merge(defaultBorder, borders(buttonTypeVars.active.borders)) : defaultBorder;
-    const focusBorder = buttonTypeVars.focus && buttonTypeVars.focus.borders ? merge(defaultBorder, borders(buttonTypeVars.focus.borders)) : defaultBorder;
-    const focusAccessibleBorder = buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders)) : defaultBorder;
-
-
-    return style({
-        ...buttonResetMixin(),
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        maxWidth: percent(100),
-        ...borders(defaultBorder, debug),
-        ...buttonSizing(
-            buttonDimensions && buttonDimensions.minHeight
-                ? buttonDimensions.minHeight
-                : buttonGlobals.sizing.minHeight,
-            buttonDimensions && buttonDimensions.minWidth ? buttonDimensions.minWidth : buttonGlobals.sizing.minWidth,
-            buttonTypeVars.fonts && buttonTypeVars.fonts.size ? buttonTypeVars.fonts.size : buttonGlobals.font.size,
-            buttonTypeVars.padding && buttonTypeVars.padding.side
-                ? buttonTypeVars.padding.side
-                : buttonGlobals.padding.side,
-            formElVars,
-        ),
-        display: "inline-flex",
-        alignItems: "center",
-        position: "relative",
-        textAlign: "center",
-        whiteSpace: "nowrap",
-        verticalAlign: "middle",
-        justifyContent: "center",
-        touchAction: "manipulation",
-        cursor: "pointer",
-        minWidth: buttonGlobals.sizing.minWidth,
-        minHeight: buttonGlobals.sizing.minHeight,
-        ...fonts({
-            ...buttonGlobals.font,
-            ...buttonTypeVars.fonts,
-        }),
-        backgroundColor: colorOut(
-            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
-        ),
-        ...defaultBorder,
-        $nest: {
-            "&:not([disabled])": {
-                $nest: {
-                    "&:not(.focus-visible)": {
-                        outline: 0,
-                    },
-                    "&:hover": {
-                        zIndex,
-                        backgroundColor: colorOut(
-                            buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
-                                ? buttonTypeVars.hover.colors.bg
-                                : undefined,
-                        ),
-                        ...hoverBorder,
-                        ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
-                    },
-                    "&:focus": {
-                        zIndex,
-                        backgroundColor: colorOut(
-                            buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
-                                ? buttonTypeVars.focus!.colors.bg
-                                : undefined,
-                        ),
-                        color: colorOut(buttonTypeVars.focus!.fg),
-                        ...focusBorder,
-                        ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
-                    },
-                    "&:active": {
-                        zIndex,
-                        backgroundColor: colorOut(
-                            buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
-                                ? buttonTypeVars.active!.colors.bg
-                                : undefined,
-                        ),
-                        color: colorOut(buttonTypeVars.active!.fg),
-                        ...activeBorder,
-                        ...fonts(
-                            buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
-                        ),
-                    },
-                    "&.focus-visible": {
-                        zIndex,
-                        backgroundColor: colorOut(
-                            buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
-                                ? buttonTypeVars.focusAccessible!.colors.bg
-                                : undefined,
-                        ),
-                        color: colorOut(buttonTypeVars.focusAccessible!.fg),
-                        ...focusAccessibleBorder,
-                        ...fonts(
-                            buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
-                                ? buttonTypeVars.focusAccessible.fonts
-                                : {},
-                        ),
-                    },
-                },
-            },
-            "&[disabled]": {
-                opacity: 0.5,
-            },
-        },
-    });
-};
 
 export enum ButtonTypes {
     STANDARD = "standard",

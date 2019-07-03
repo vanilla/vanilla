@@ -146,7 +146,7 @@ export interface IBorderStylesWIP {
 }
 
 // This is the final outputted format before we generate the actual styles.
-export interface IBorderFinalStyles extends IBorderRadiusOutput{
+export interface IBorderFinalStyles extends IBorderRadiusOutput {
     borderTop?: BorderRadiusValue;
     borderRight?: BorderRadiusValue;
     borderBottom?: BorderRadiusValue;

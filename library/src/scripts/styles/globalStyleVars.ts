@@ -3,7 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut, IBackground, emphasizeLightness } from "@library/styles/styleHelpers";
+import {
+    modifyColorBasedOnLightness,
+    colorOut,
+    IBackground,
+    emphasizeLightness,
+    ColorValues
+} from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -20,7 +26,7 @@ export const globalVariables = useThemeCache(() => {
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: `transparent`,
+        transparent: "transparent" as ColorValues,
     };
 
     const initialMainColors = makeThemeVars("mainColors", {

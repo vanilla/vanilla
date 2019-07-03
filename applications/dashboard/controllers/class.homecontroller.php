@@ -116,7 +116,8 @@ class HomeController extends Gdn_Controller {
      * @param string $target
      */
     public function leaving($target = '') {
-        $this->setData('Target', Gdn_Format::links($target));
+        $target = str_replace("\xE2\x80\xAE", '', $target);
+        $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');

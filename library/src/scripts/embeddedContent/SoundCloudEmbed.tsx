@@ -24,7 +24,7 @@ export function SoundCloudEmbed(props: IProps): JSX.Element {
 
     return (
         <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type="soundcloud" inEditor={props.inEditor}>
+            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
                 <div className="embedExternal embedSoundCloud">
                     <div className="embedExternal-content">
                         <iframe width="100%" scrolling="no" src={frameSource} />

@@ -29,7 +29,7 @@ export function GettyImagesEmbed(props: IProps): JSX.Element {
 
     return (
         <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type="gettyimages" inEditor={props.inEditor}>
+            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
                 <div className="embedExternal embedGetty">
                     <div className="embedExternal-content">
                         <a

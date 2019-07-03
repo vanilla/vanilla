@@ -20,7 +20,7 @@ interface IProps extends IBaseEmbedProps {
 export function TwitterEmbed(props: IProps): JSX.Element {
     return (
         <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type="twitter" inEditor={props.inEditor}>
+            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
                 <div className="embedExternal embedTwitter">
                     <div
                         className="embedExternal-content js-twitterCard"

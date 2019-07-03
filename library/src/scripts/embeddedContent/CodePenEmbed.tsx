@@ -23,7 +23,7 @@ export function CodePenEmbed(props: IProps): JSX.Element {
 
     return (
         <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type="codepen" inEditor={props.inEditor}>
+            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
                 <iframe src={src} height={props.height || 300} scrolling="no" />
             </EmbedContent>
         </EmbedContainer>

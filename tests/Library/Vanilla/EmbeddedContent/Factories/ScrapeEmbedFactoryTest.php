@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\EmbeddedContent\Embeds;
+namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;

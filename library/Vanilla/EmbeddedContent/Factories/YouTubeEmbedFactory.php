@@ -18,7 +18,7 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
 
     const SHORT_DOMAIN = "youtu.be";
 
-    const PRIMARY_DOMAINS = ["youtube.com", "m.youtube.com", "www.youtube.com"];
+    const PRIMARY_DOMAINS = ["youtube.com"];
 
     const OEMBED_URL_BASE = "https://www.youtube.com/oembed";
 

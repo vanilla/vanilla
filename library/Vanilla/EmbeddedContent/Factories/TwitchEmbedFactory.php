@@ -17,7 +17,7 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 class TwitchEmbedFactory extends AbstractEmbedFactory {
 
     const CLIPS_DOMAIN = "clips.twitch.tv";
-    const PRIMARY_DOMAINS = ["www.twitch.tv", "twitch.tv"];
+    const PRIMARY_DOMAINS = ["twitch.tv"];
 
     const OEMBED_URL_BASE = "https://api.twitch.tv/v5/oembed";
 

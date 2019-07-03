@@ -5,32 +5,31 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\EmbeddedContent\Embeds;
+namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Garden\Web\RequestInterface;
 use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
-use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
- * Tests for the discussion/quote embed.
+ * Tests for the comment/quote embed.
  */
-class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
+class CommentEmbedFactoryTest extends AbstractAPIv2Test {
 
     /** @var CommentEmbedFactory */
     private $factory;
 
-    /** @var \DiscussionsApiController */
-    private $discussionApi;
+    /** @var \CommentsApiController */
+    private $commentsApi;
 
     /**
      * Set the factory and client.
      */
     public function setUp() {
         parent::setUp();
-        $this->discussionApi = $this->createMock(\DiscussionsApiController::class);
+        $this->commentsApi = $this->createMock(\CommentsApiController::class);
         $request = self::container()->get(RequestInterface::class);
-        $this->factory = new DiscussionEmbedFactory($request, $this->discussionApi);
+        $this->factory = new CommentEmbedFactory($request, $this->commentsApi);
     }
 
 
@@ -49,13 +48,13 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
     public function supportedDomainsProvider(): array {
         return [
             // Allowed
-            [static::bootstrap()->getBaseUrl() . '/discussion/41342', true, "It should match a proper URL"],
+            [static::bootstrap()->getBaseUrl() . '/discussion/comment/41342', true, "It should match a proper URL"],
             // Not allowed
-            ['http://vanilla.test' . '/discussion/41342', false, "It should fail on a missing subpath."],
-            ['https://otherdomain.com' . '/discussion/41342', false, "It should fail on a bad domain."],
+            ['http://vanilla.test' . '/discussion/comment/41342', false, "It should match a proper URL"],
+            ['https://otherdomain.com' . '/discussion/comment/41342', false, "It should fail on a bad domain."],
             [static::bootstrap()->getBaseUrl() . '/discussions/comments/41342', false, "It should fail on a bad path 1."],
-            [static::bootstrap()->getBaseUrl() . '/discussion/comment/41342', false, "It should fail on a bad path 2"],
-            [static::bootstrap()->getBaseUrl() . '/discussion/asdfads', false, "It should fail on a bad ID."],
+            [static::bootstrap()->getBaseUrl() . '/discussion/41342', false, "It should fail on a bad path 2"],
+            [static::bootstrap()->getBaseUrl() . '/discussion/comment/asdfads', false, "It should fail on a bad ID."],
         ];
     }
 }

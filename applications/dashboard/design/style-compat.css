@@ -923,10 +923,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
   color: #555a62;
 }
-.userContent > *:not(.emoji):not(:last-child):not(br) {
+.userContent > *:not(.emoji):not(:last-child):not(br, .embedResponsive) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br) {
+.userContent > *:not(.emoji):first-child:not(br, .embedResponsive) {
   margin-top: -0.25em !important;
 }
 .userContent,

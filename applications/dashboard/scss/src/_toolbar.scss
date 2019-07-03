@@ -87,6 +87,13 @@
   }
 }
 
+.js-toolbar-sticky.is-stuck {
+  position: fixed;
+  top: $navbar-height;
+  background: $white;
+  z-index: 1000;
+}
+
 // Pager
 //
 // The pager element is used for pagination and for the date selector in the VanillaStats `dashboard/home`

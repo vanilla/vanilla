@@ -32,6 +32,10 @@ class Gdn_FileSystem {
     /** Op. */
     const O_READ = 4;
 
+    const TRUSTED_FOLDERS = [
+        PATH_UPLOADS,
+    ];
+
     /**
      * Searches the provided file path(s). Returns the first one it finds in the
      * filesystem.
@@ -301,9 +305,23 @@ class Gdn_FileSystem {
      * @param string $serveMode Whether to download the file as an attachment, or inline
      */
     public static function serveFile($file, $name = '', $mimeType = '', $serveMode = 'attachment') {
-
         $fileIsLocal = (substr($file, 0, 4) == 'http') ? false : true;
-        $fileAvailable = ($fileIsLocal) ? is_readable($file) : true;
+        if ($fileIsLocal) {
+            $fileAvailable = is_readable($file);
+            if (is_readable($file)) {
+                $fileAvailable = false;
+                $filePath = realpath($file);
+                foreach (self::TRUSTED_FOLDERS as $trustedFolder) {
+                    if (strncmp($filePath, $trustedFolder, strlen($trustedFolder)) === 0) {
+                        $fileAvailable = true;
+                        break;
+                    }
+                }
+            }
+        } else {
+            $fileAvailable = true;
+        }
+
 
         if ($fileAvailable) {
             // Close the database connection

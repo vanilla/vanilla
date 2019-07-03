@@ -2,6 +2,11 @@
     "name": "@vanilla/addon-dashboard",
     "version": "3.0.0",
     "private": true,
+    "workspaces": {
+        "nohoist": [
+            "grunt*"
+        ]
+    },
     "devDependencies": {
         "bower": "1.8.8",
         "fibers": "4.0.1",

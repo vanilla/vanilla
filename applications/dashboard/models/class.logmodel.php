@@ -305,10 +305,14 @@ class LogModel extends Gdn_Pluggable {
             $old = htmlspecialchars(val($key, $data, ''));
             $new = htmlspecialchars($data['_New'][$key]);
             $result = $this->formatDiff($old, $new);
+            $result = nl2br(trim(($result)));
+        } elseif (!empty($data['Format'])) {
+            $result = Gdn_Format::to($data[$key] ?? '', $data['Format']);
         } else {
             $result = htmlspecialchars(val($key, $data, ''));
+            $result = nl2br(trim(($result)));
         }
-        return nl2br(trim(($result)));
+        return $result;
     }
 
     /**

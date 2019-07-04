@@ -3860,7 +3860,7 @@ class UserModel extends Gdn_Model {
         // If CountInvitations is null (ie. never been set before) or it is a new month since the DateSetInvitations
         if ((empty($user->CountInvitations) && $user->CountInvitations !== 0 )
             || is_null($user->DateSetInvitations)
-            || date( "m Y", strtotime($user->DateSetInvitations)) !== date('m Y')) {
+            || date("m Y", strtotime($user->DateSetInvitations)) !== date('m Y')) {
             // Reset CountInvitations and DateSetInvitations
             $this->SQL->put(
                 $this->Name,

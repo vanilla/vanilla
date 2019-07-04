@@ -403,6 +403,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
             'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'],
             'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']],
+            'Response Type' => ['LabelCode' => 'Code Token', 'Description' => 'The response type send in the authorize uri (note: certain values can change the work flow ie. id_token)'],
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -455,9 +456,10 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $uri = val('AuthorizeUrl', $provider);
 
         $redirect_uri = '/entry/'.$this->getProviderKey();
+        $reponse_type = array_key_exists('Response Type', $provider) ? $provider['Response Type'] : 'code';
 
         $defaultParams = [
-            'response_type' => 'code',
+            'response_type' => $reponse_type,
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)

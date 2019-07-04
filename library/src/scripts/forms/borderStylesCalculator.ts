@@ -7,47 +7,56 @@
 import {
     borders,
     IBorderRadiusOutput,
-    IBorderStyles, IBorderStylesWIP, BorderRadiusValue, IRadiusDeclaration, radiusValue, IBorderStylesAll,
+    IBorderStyles,
+    IBorderStylesWIP,
+    BorderRadiusValue,
+    IRadiusShorthand,
+    radiusValue,
+    IBorderStylesAll,
+    IBorderRadiiDeclaration,
 } from "@library/styles/styleHelpersBorders";
 import merge from "lodash/merge";
-import {capitalizeFirstLetter} from "@vanilla/utils";
+import {capitalizeFirstLetter, logError} from "@vanilla/utils";
 import {BorderRadiusProperty} from "csstype";
 import {TLength} from "typestyle/lib/types";
-import {border} from "csx";
+import {border, borderStyle} from "csx";
 import {unit} from "@library/styles/styleHelpers";
+import {BorderOptions, BoxFunction} from "csx/lib/types";
 
 
 export const calculateBorders = (borderStyles: IBorderStyles | undefined | null, debug = false) => {
 
     if (debug) {
-        window.console.log("raw data: ", borderStyles);
+        window.console.log("");
+        window.console.log("calculate border: ", borderStyles);
     }
 
     if (!!borderStyles) {
-        let output;
-        let hasGlobalStyles = false;
-        let hasDetailedStyles = false;
-        const globalResult: any = {};
         const detailedResult: IBorderStylesWIP = {};
+        const emptyBorders = {top: {}, right:{}, bottom:{}, left: {}};
 
-        //
-        // if (debug) {
-        //     window.console.log("calculateBorders == in == ", borderStyles);
-        // }
-
-        // Global - globalResult
+        // Direct, global declaration for all
         // ----------------------------
         if (borderStyles.color !== undefined) {
-            globalResult.color = borderStyles.color;
-            hasGlobalStyles = true;
+            merge(detailedResult,emptyBorders);
+            detailedResult.top!.color = borderStyles.color;
+            detailedResult.right!.color = borderStyles.color;
+            detailedResult.bottom!.color = borderStyles.color;
+            detailedResult.left!.color = borderStyles.color;
         }
         if (borderStyles.width !== undefined) {
-            globalResult.width = borderStyles.width;
-            hasGlobalStyles = true;
+            merge(detailedResult, emptyBorders);
+            detailedResult.top!.width = borderStyles.width;
+            detailedResult.right!.width = borderStyles.width;
+            detailedResult.bottom!.width = borderStyles.width;
+            detailedResult.left!.width = borderStyles.width;
         }
         if (borderStyles.style !== undefined) {
-            globalResult.style = borderStyles.style;
-            hasGlobalStyles = true;
+            merge(detailedResult, emptyBorders);
+            detailedResult.top!.style = borderStyles.style;
+            detailedResult.right!.style = borderStyles.style;
+            detailedResult.bottom!.style = borderStyles.style;
+            detailedResult.left!.style = borderStyles.style;
         }
 
 
@@ -56,10 +65,36 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
         // All (can be redundat if both global and all are set)
 
         if (borderStyles.all !== undefined) {
-
+            // All styles declared as shorthand
             if (typeof borderStyles.all === "string") { // shorthand
-                const styles = border(borderStyles.all);
-                const breako = "here";
+                const borderObject = document.createElement("div");
+                borderObject.style.border = borderStyles.all;
+                const borderColor = borderObject.style.borderColor;
+                const borderStyle = borderObject.style.borderStyle;
+                const borderWidth = borderObject.style.borderWidth;
+
+                if (!!borderColor || !!borderStyle || !!borderWidth) {
+                    const borderStyles = {} as any;
+
+                    if (borderColor) {
+                        borderStyles.color = borderColor;
+                    }
+
+                    if (borderStyle) {
+                        borderStyles.style = borderStyle;
+                    }
+
+                    if (borderWidth) {
+                        borderStyles.width = borderWidth;
+                    }
+
+                    if (Object.keys(borderStyles).length !== 0) {
+                        detailedResult.top = borderStyles;
+                        detailedResult.right = borderStyles;
+                        detailedResult.bottom = borderStyles;
+                        detailedResult.left = borderStyles;
+                    }
+                }
             } else {
                 const hasColor = borderStyles.all.color !== undefined;
                 const hasWidth = borderStyles.all.width !== undefined;
@@ -85,28 +120,30 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
                     detailedResult.right!.color = borderStyles.all.color;
                     detailedResult.bottom!.color = borderStyles.all.color;
                     detailedResult.left!.color = borderStyles.all.color;
-                    hasDetailedStyles = true;
+
                 }
                 if (borderStyles.all.width !== undefined) {
                     detailedResult.top!.width = borderStyles.all.width;
                     detailedResult.right!.width = borderStyles.all.width;
                     detailedResult.bottom!.width = borderStyles.all.width;
                     detailedResult.left!.width = borderStyles.all.width;
-                    hasDetailedStyles = true;
+
                 }
                 if (borderStyles.all.style !== undefined) {
                     detailedResult.top!.style = borderStyles.all.style;
                     detailedResult.right!.style = borderStyles.all.style;
                     detailedResult.bottom!.style = borderStyles.all.style;
                     detailedResult.left!.style = borderStyles.all.style;
-                    hasDetailedStyles = true;
+
                 }
             }
         }
 
-        // if(debug) {
-        //     window.console.log("2 ================ spot check: ", detailedResult);
-        // }
+        // Here
+
+        if(debug) {
+            window.console.log("2 ================ end of 'all': ", detailedResult);
+        }
 
         // Detailed - 2 Sides
         // ----------------------------
@@ -125,17 +162,17 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
             if (hasColor) {
                 detailedResult.top!.color = borderStyles.topBottom.color;
                 detailedResult.bottom!.color = borderStyles.topBottom.color;
-                hasDetailedStyles = true;
+
             }
             if (hasWidth) {
                 detailedResult.top!.width = borderStyles.topBottom.width;
                 detailedResult.bottom!.width = borderStyles.topBottom.width;
-                hasDetailedStyles = true;
+
             }
             if (hasStyle) {
                 detailedResult.top!.style = borderStyles.topBottom.style;
                 detailedResult.bottom!.style = borderStyles.topBottom.style;
-                hasDetailedStyles = true;
+
             }
         }
 
@@ -158,17 +195,17 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
             if (borderStyles.leftRight.color !== undefined) {
                 detailedResult.left!.color = borderStyles.leftRight.color;
                 detailedResult.right!.color = borderStyles.leftRight.color;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.leftRight.width !== undefined) {
                 detailedResult.left!.width = borderStyles.leftRight.width;
                 detailedResult.right!.width = borderStyles.leftRight.width;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.leftRight.style !== undefined) {
                 detailedResult.left!.style = borderStyles.leftRight.style;
                 detailedResult.right!.style = borderStyles.leftRight.style;
-                hasDetailedStyles = true;
+
             }
         }
 
@@ -188,15 +225,15 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
 
             if (borderStyles.top!.color !== undefined) {
                 detailedResult.top!.color = borderStyles.top.color;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.top!.width !== undefined) {
                 detailedResult.top!.width = borderStyles.top.width;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.top!.style !== undefined) {
                 detailedResult.top!.style = borderStyles.top.style;
-                hasDetailedStyles = true;
+
             }
         }
 
@@ -214,15 +251,15 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
 
             if (borderStyles.right.color !== undefined) {
                 detailedResult.right!.color = borderStyles.right.color;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.right.width !== undefined) {
                 detailedResult.right!.width = borderStyles.right.width;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.right.style !== undefined) {
                 detailedResult.right!.style = borderStyles.right.style;
-                hasDetailedStyles = true;
+
             }
         }
 
@@ -241,15 +278,15 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
 
             if (borderStyles.bottom.color !== undefined) {
                 detailedResult.bottom!.color = borderStyles.bottom.color;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.bottom.width !== undefined) {
                 detailedResult.bottom!.width = borderStyles.bottom.width;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.bottom.style !== undefined) {
                 detailedResult.bottom!.style = borderStyles.bottom.style;
-                hasDetailedStyles = true;
+
             }
         }
 
@@ -266,43 +303,45 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
 
             if (borderStyles.left.color !== undefined) {
                 detailedResult.left!.color = borderStyles.left.color;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.left.width !== undefined) {
                 detailedResult.left!.width = borderStyles.left.width;
-                hasDetailedStyles = true;
+
             }
             if (borderStyles.left.style !== undefined) {
                 detailedResult.left!.style = borderStyles.left.style;
-                hasDetailedStyles = true;
+
             }
         }
 
         if (borderStyles.radius !== undefined) {
-            window.console.log("before: ", detailedResult);
-            const radius = borderRadiusCalculation(borderStyles.radius);
+
+            if (debug) {
+                window.console.log("before - borderRadiusCalculation: ", detailedResult);
+            }
+
+            const radius = borderRadiusCalculation(borderStyles.radius, debug);
             merge(detailedResult, radius);
-            window.console.log("after: ", detailedResult);
+/*
+
+ */
+            if (debug) {
+                window.console.log("after - borderRadiusCalculation: ", detailedResult);
+            }
         }
+
+
+
+
 
 
         if (debug) {
-            window.console.log("globalResult == step == ", globalResult);
-            window.console.log("detailedResult == step == ", detailedResult);
+            window.console.log("");
+            window.console.log("Final Output: ", detailedResult);
+            window.console.log("");
         }
-
-        if (hasGlobalStyles && !hasDetailedStyles) {
-            output = globalResult;
-        } else if (!hasGlobalStyles && hasDetailedStyles) {
-            output = detailedResult;
-        } else {
-            output = merge(globalResult, detailedResult);
-        }
-
-        if (debug) {
-            window.console.log("output: ", output);
-        }
-        return output;
+        return detailedResult;
     } else {
         return null;
     }
@@ -334,85 +373,87 @@ const setAllBorderRadii = (radius: BorderRadiusValue) => {
     };
 };
 
+const isStringOrNumber = (variable) => {
+    const type = typeof variable;
+    return !!type ? (type === "string" || type === "number") : false;
+};
 
-export const borderRadiusCalculation = (borderRadiusStyles: IBorderStyles | radiusValue | IRadiusDeclaration) => {
+const checkIfKeyExistsAndIsDefined = (haystack: IBorderRadiiDeclaration, needle:string) => {
+    return needle in haystack && haystack[needle] !== undefined;
+}
+/*
+    Can either be declared in the "radius" key explicitly, or as part of a side.
+    direct string or number -> same as "all"
+    all -> if has radius set all
+    topBottom-> ignored, should use all
+    leftRight-> ignored, should use all
+    top -> if has radius -> set topLeft and topRight radii
+    bottom -> if has radius -> set bottomLeft and bottomRight radii
+    left-> if has radius -> set topLeft and bottomLeft radii
+    right -> if has radius -> set topRight and bottomRight radii
+    radius-> takes precedence if set, since it's more explicit.
+    If string or number, take as is and set to all,
+    If object: first check for shorthand (IRadiusShorthand),
+    then for explicit sides (IBorderRadiusOutput)
+ */
+export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclaration | radiusValue, debug = false) => {
     let output: IBorderRadiusOutput = {};
-    window.console.log("borderRadiusStyles", borderRadiusStyles);
-
-    if (borderRadiusStyles !== undefined ) {
-        if (typeof borderRadiusStyles === "string" || typeof borderRadiusStyles === "number") {
-            merge(output, setAllBorderRadii(borderRadiusStyles as radiusValue));
-        } else {
-            if (borderRadiusStyles.all !== undefined) {
-                // const allStyles:BorderRadiusValue = borderRadiusStyles.all;
-                if (borderRadiusStyles.all === "string" || borderRadiusStyles.all === "number") {
-                    merge(output, setAllBorderRadii(borderRadiusStyles as radiusValue));
-                } else {
-                    if (borderRadiusStyles.all !== undefined) {
-                        merge(output, setAllBorderRadii(borderRadiusStyles.all as BorderRadiusValue));
-                    }
-
-                    // Top
-                    if (borderRadiusStyles.top !== undefined && borderRadiusStyles.top.radius !== undefined) {
-                        if (typeof borderRadiusStyles.top.radius === "object") {
-                            output.borderTopLeftRadius = borderRadiusStyles.top.radius.left;
-                            output.borderTopRightRadius = borderRadiusStyles.top.radius.right;
-                        } else {
-                            output.borderTopLeftRadius = borderRadiusStyles.top.radius;
-                            output.borderTopRightRadius = borderRadiusStyles.top.radius;
-                        }
-                    }
-
-                    // Right
-                    if (borderRadiusStyles.right !== undefined && borderRadiusStyles.right.radius !== undefined) {
-                        if (typeof borderRadiusStyles.right.radius === "object") {
-                            output.borderTopRightRadius = borderRadiusStyles.right.radius.top;
-                            output.borderBottomRightRadius = borderRadiusStyles.right.radius.bottom;
-                        } else {
-                            output.borderTopRightRadius = borderRadiusStyles.right.radius;
-                            output.borderBottomRightRadius = borderRadiusStyles.right.radius;
-                        }
-                    }
-
-                    // Bottom
-                    if (borderRadiusStyles.bottom !== undefined && borderRadiusStyles.bottom.radius !== undefined) {
-                        if (typeof borderRadiusStyles.bottom.radius === "object") {
-                            output.borderBottomLeftRadius = borderRadiusStyles.bottom.radius.left;
-                            output.borderBottomRightRadius = borderRadiusStyles.bottom.radius.right;
-                        } else {
-                            output.borderBottomLeftRadius = borderRadiusStyles.bottom.radius;
-                            output.borderBottomRightRadius = borderRadiusStyles.bottom.radius;
-                        }
-                    }
-
-                    // Left
-                    if (borderRadiusStyles.left !== undefined && borderRadiusStyles.left.radius !== undefined) {
-                        if (typeof borderRadiusStyles.left.radius === "object") {
-                            output.borderTopLeftRadius = borderRadiusStyles.left.radius.top;
-                            output.borderBottomLeftRadius = borderRadiusStyles.left.radius.bottom;
-                        } else {
-                            output.borderTopLeftRadius = borderRadiusStyles.left.radius;
-                            output.borderBottomLeftRadius = borderRadiusStyles.left.radius;
-                        }
-                    }
-
-                    // == Specified in "radius"
-                    if (borderRadiusStyles.radius !== undefined) {
-                        const radiusType = typeof borderRadiusStyles.radius;
-                        if ( radiusType === "string" || radiusType === "number") {
-                            merge(output, setAllBorderRadii(borderRadiusStyles.radius as BorderRadiusValue));
-                        } else if (radiusType === "object") {
-                            merge(output, borderRadiusCalculation(borderRadiusStyles.radius as any));
-                        }
-                    }
-                }
-            }
-
-
-        }
-
+    if (debug) {
+        window.console.log("borderRadiusStyles", borderRadiusStyles);
     }
 
+    if (borderRadiusStyles !== undefined ) {
+        if (isStringOrNumber(typeof borderRadiusStyles)) {
+            //string or number -> same as "all"
+            merge(output, setAllBorderRadii(borderRadiusStyles as BorderRadiusValue));
+        } else {
+            //all -> if has radius set all
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "all")) {
+                merge(output, setAllBorderRadii((borderRadiusStyles as IBorderRadiiDeclaration).all));
+            }
 
+            // top -> if has radius -> set topLeft and topRight radii
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "top")) {
+                output.borderTopRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+                output.borderTopLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+            }
+
+            // bottom -> if has radius -> set bottomLeft and bottomRight radii
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "top")) {
+                output.borderTopRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+                output.borderTopLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+            }
+            // left-> if has radius -> set topLeft and bottomLeft radii
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "left")) {
+                output.borderTopLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as BorderRadiusValue;
+                output.borderBottomLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as BorderRadiusValue;
+            }
+
+            // right -> if has radius -> set topRight and bottomRight radii
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "right")) {
+                output.borderTopRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as BorderRadiusValue;
+                output.borderBottomRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as BorderRadiusValue;
+            }
+
+            // Explicitly set corners
+            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "borderTopRightRadius")) {
+                output.borderTopRightRadius = (borderRadiusStyles as IBorderRadiusOutput).borderTopRightRadius;
+            }
+
+            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "borderBottomRightRadius")) {
+                output.borderBottomRightRadius = (borderRadiusStyles as IBorderRadiusOutput).borderBottomRightRadius;
+            }
+
+            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "borderBottomLeftRadius")) {
+                output.borderBottomLeftRadius = (borderRadiusStyles as IBorderRadiusOutput).borderBottomLeftRadius;
+            }
+            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "borderTopLeftRadius")) {
+                output.borderTopLeftRadius = (borderRadiusStyles as IBorderRadiusOutput).borderTopLeftRadius;
+            }
+        }
+    }
     return output;
 };
+
+
+

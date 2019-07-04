@@ -46,7 +46,7 @@ export interface IBorderStylesBySideLeft extends ISingleBorderStyle  {
 
 
 export interface IBorderStyles extends ISingleBorderStyle  {
-    all?: IBorderStylesAll;
+    all?: IBorderStylesAll | string;
     topBottom?: ISingleBorderStyle;
     leftRight?: ISingleBorderStyle;
     top?: IBorderStylesBySideTop;
@@ -85,21 +85,15 @@ export interface IRightBorderRadii {top?: radiusValue, bottom?: radiusValue};
 
 export type BorderRadiusValue = BorderRadiusProperty<TLength> | number | undefined;
 
-export interface IRadiusDeclaration {
+export interface IRadiusShorthand {
     all?: BorderRadiusValue;
     top?: BorderRadiusValue | ITopBorderRadii;
     bottom?: BorderRadiusValue | IBottomBorderRadii;
     left?: BorderRadiusValue | ILeftBorderRadii;
     right?: BorderRadiusValue | IRightBorderRadii;
-    topRight?: BorderRadiusValue;
-    topLeft?: BorderRadiusValue;
-    bottomLeft?: BorderRadiusValue;
-    bottomRight?: BorderRadiusValue;
 }
 
-export interface IBorderRadiiDeclaration extends IBorderRadiusOutput, IRadiusDeclaration {
-    radius?: IRadiusDeclaration | BorderRadiusValue;
-}
+export interface IBorderRadiiDeclaration extends IBorderRadiusOutput, IRadiusShorthand {}
 
 export interface IBorderRadiusOutput {
     borderTopRightRadius?: BorderRadiusValue;

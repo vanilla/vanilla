@@ -8,7 +8,7 @@ import {formElementsVariables} from "@library/forms/formElementStyles";
 import {styleFactory} from "@library/styles/styleUtils";
 import merge from "lodash/merge";
 import {calculateBorders} from "@library/forms/borderStylesCalculator";
-import {borders} from "@library/styles/styleHelpersBorders";
+import {borders, IBorderStyles} from "@library/styles/styleHelpersBorders";
 import {percent} from "csx";
 import {fonts} from "@library/styles/styleHelpersTypography";
 import {colorOut} from "@library/styles/styleHelpersColors";
@@ -22,20 +22,31 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
+    // TEMP
+    const debug = buttonTypeVars.name === "splashSearchButton";
+    //
+    if(debug) {
+        window.console.log("buttonTypeVars - before111: ", buttonTypeVars);
+    }
+
     // Make sure we have the second level, if it was empty
-    buttonTypeVars = merge(buttonTypeVars, {
+    buttonTypeVars = merge({
         colors: {},
         hover: {},
         focus: {},
         active: {},
         borders: {},
         focusAccessible: {},
-    });
+    } as IButtonType, buttonTypeVars);
 
-    const debug = buttonTypeVars.name === "splashSearchButton";
-
+    // if(debug) {
+    //     window.console.log("buttonTypeVars - after: ", buttonTypeVars);
+    // }
 
     const defaultBorder = calculateBorders(buttonTypeVars.borders, debug);
+
+
+
     const hoverBorder = buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, borders(buttonTypeVars.hover.borders)) : defaultBorder;
     const activeBorder = buttonTypeVars.active && buttonTypeVars.active.borders ? merge(defaultBorder, borders(buttonTypeVars.active.borders)) : defaultBorder;
     const focusBorder = buttonTypeVars.focus && buttonTypeVars.focus.borders ? merge(defaultBorder, borders(buttonTypeVars.focus.borders)) : defaultBorder;
@@ -47,7 +58,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
-        ...borders(defaultBorder, debug),
+        ...borders(defaultBorder!, debug),
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight
                 ? buttonDimensions.minHeight
@@ -136,7 +147,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 },
             },
             "&[disabled]": {
-                opacity: 0.5,
+                opacity: formElVars.disabled.opacity,
             },
         },
     });

@@ -23,11 +23,12 @@ import {
     borders,
     modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
-import { transparentColor, IButtonType, generateButtonClass, overwriteButtonClass } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
 import { TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import {IButtonType} from "@library/forms/styleHelperButtonInterface";
+import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
@@ -160,7 +161,7 @@ export const splashVariables = useThemeCache(() => {
         },
         borders: {
             all: {
-                color: transparentColor,
+                color: globalVars.elementaryColors.transparent,
                 width: 0,
             },
             left: {
@@ -225,7 +226,7 @@ export const splashVariables = useThemeCache(() => {
                 color: colors.contrast,
             },
         },
-    });
+    }) as IButtonType;
 
     return {
         outerBackground,
@@ -292,22 +293,8 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
+    window.console.log("vars.searchButton: ", vars.searchButton);
     const searchButton = generateButtonClass(vars.searchButton);
-
-    /*
-    const searchButton = generateButtonClass({
-        name: "splashSearchButton",
-        borders: {
-            left: {
-                color: vars.searchBar.border.leftColor,
-            },
-            radius: {
-                right: vars.searchButton.borderRadius,
-                left: 0,
-            },
-        },
-    });
-    */
 
     const valueContainer = style("valueContainer", {
         $nest: {

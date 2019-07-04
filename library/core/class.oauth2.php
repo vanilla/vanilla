@@ -381,6 +381,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
             $sender->Form->validateRule('ProfileUrl', 'isUrl', 'You must provide a complete URL in the Profile Url field.');
 
+
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
             $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
@@ -400,7 +401,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
-            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
+            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'],
+            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']],
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -465,6 +467,10 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         $state['token'] = $this->ssoUtils->getStateToken();
         $get['state'] = $this->encodeState($state);
+
+        if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
+            $get['Prompt'] = $provider['Prompt'];
+        }
 
         return $uri.'?'.http_build_query($get);
     }

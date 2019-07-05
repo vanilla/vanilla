@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import {IBorderStyles} from "@library/styles/styleHelpersBorders";
-import {IFont} from "@library/styles/styleHelpersTypography";
-import {ColorValues} from "@library/styles/styleHelpersColors";
-import {TLength} from "typestyle/lib/types";
+import { IBorderStyles } from "@library/styles/styleHelpersBorders";
+import { IFont } from "@library/styles/styleHelpersTypography";
+import { ColorValues } from "@library/styles/styleHelpersColors";
+import { TLength } from "typestyle/lib/types";
 
 export interface IButtonType {
     name: string;

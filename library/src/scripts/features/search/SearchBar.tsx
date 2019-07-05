@@ -296,13 +296,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 type="submit"
                                 id={this.searchButtonID}
                                 baseClass={this.props.buttonBaseClass}
-                                className={classNames(
-                                    "searchBar-submitButton",
-                                    this.props.buttonClassName,
-                                    {
-                                        isLarge: this.props.isBigInput,
-                                    },
-                                )}
+                                className={classNames("searchBar-submitButton", this.props.buttonClassName, {
+                                    isLarge: this.props.isBigInput,
+                                })}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? (

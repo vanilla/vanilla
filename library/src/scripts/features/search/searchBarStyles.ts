@@ -13,7 +13,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();

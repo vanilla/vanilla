@@ -7,7 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     allButtonStates,
-    colorOut, ColorValues,
+    colorOut,
+    ColorValues,
     flexHelper,
     IFont,
     modifyColorBasedOnLightness,
@@ -21,8 +22,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
-import {IButtonType} from "@library/forms/styleHelperButtonInterface";
-
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     // Fetch external global variables
@@ -61,8 +61,6 @@ export const buttonGlobalVariables = useThemeCache(() => {
         colors,
     };
 });
-
-
 
 export const buttonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -427,11 +425,6 @@ export const overwriteButtonClass = (
     buttonVars.name = `${buttonTypeVars.name}-${overwriteVars.name}`;
     return generateButtonClass(buttonVars, setZIndexOnState);
 };
-
-
-
-
-
 
 export enum ButtonTypes {
     STANDARD = "standard",

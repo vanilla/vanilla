@@ -212,7 +212,8 @@ export const dropDownClasses = useThemeCache(() => {
 
     // Contents (button or link)
     // Replaces: .dropDownItem-button, .dropDownItem-link
-    const action = style("action",
+    const action = style(
+        "action",
         {
             appearance: "none",
             display: "flex",

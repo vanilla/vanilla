@@ -15,7 +15,7 @@ import {
 import { px } from "csx";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();

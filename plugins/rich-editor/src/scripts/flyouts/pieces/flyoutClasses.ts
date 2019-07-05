@@ -10,7 +10,7 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { important } from "csx";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const richEditorFlyoutClasses = useThemeCache(() => {
     const vars = richEditorVariables();
@@ -33,7 +33,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
                 width: important(unit(vars.richEditorWidth) as string),
             },
         },
-    }as NestedCSSProperties);
+    } as NestedCSSProperties);
 
     const header = style("header", {
         position: "relative",

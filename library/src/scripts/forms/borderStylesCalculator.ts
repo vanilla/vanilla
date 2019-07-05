@@ -16,12 +16,12 @@ import {
     IBorderRadiiDeclaration,
 } from "@library/styles/styleHelpersBorders";
 import merge from "lodash/merge";
-import {capitalizeFirstLetter, logError} from "@vanilla/utils";
-import {BorderRadiusProperty} from "csstype";
-import {TLength} from "typestyle/lib/types";
-import {border, borderStyle} from "csx";
-import {unit} from "@library/styles/styleHelpers";
-import {BorderOptions, BoxFunction} from "csx/lib/types";
+import { capitalizeFirstLetter, logError } from "@vanilla/utils";
+import { BorderRadiusProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
+import { border, borderStyle } from "csx";
+import { unit } from "@library/styles/styleHelpers";
+import { BorderOptions, BoxFunction } from "csx/lib/types";
 
 /*
 export const calculateBorders = (borderStyles: IBorderStyles | undefined | null, debug = false) => {
@@ -322,12 +322,12 @@ export const setAllBorderRadii = (radius: BorderRadiusValue) => {
     };
 };
 
-const isStringOrNumber = (variable) => {
+const isStringOrNumber = variable => {
     const type = typeof variable;
-    return !!type ? (type === "string" || type === "number") : false;
+    return !!type ? type === "string" || type === "number" : false;
 };
 
-export const getValueIfItExists = (haystack: object, needle:string) => {
+export const getValueIfItExists = (haystack: object, needle: string) => {
     if (checkIfKeyExistsAndIsDefined(haystack, needle)) {
         return haystack[needle];
     } else {
@@ -335,7 +335,7 @@ export const getValueIfItExists = (haystack: object, needle:string) => {
     }
 };
 
-export const checkIfKeyExistsAndIsDefined = (haystack: object, needle:string) => {
+export const checkIfKeyExistsAndIsDefined = (haystack: object, needle: string) => {
     return needle in haystack && haystack[needle] !== undefined;
 };
 /*
@@ -359,11 +359,10 @@ export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclarat
         window.console.log("=====> border radius IN:", borderRadiusStyles);
     }
 
-    if (borderRadiusStyles !== undefined ) {
+    if (borderRadiusStyles !== undefined) {
         if (isStringOrNumber(typeof borderRadiusStyles)) {
             //string or number -> same as "all"
             merge(output, setAllBorderRadii(borderRadiusStyles as BorderRadiusValue));
-
         } else {
             //all -> if has radius set all
             const allValue = getValueIfItExists(borderRadiusStyles as IBorderRadiusOutput, "all");
@@ -395,29 +394,25 @@ export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclarat
             }
 
             // Explicitly set corners
-            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "topRight")) {
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiusOutput, "topRight")) {
                 output.topRight = (borderRadiusStyles as IBorderRadiusOutput).topRight;
             }
 
-            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "bottomRight")) {
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiusOutput, "bottomRight")) {
                 output.bottomRight = (borderRadiusStyles as IBorderRadiusOutput).bottomRight;
             }
 
-            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "bottomLeft")) {
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiusOutput, "bottomLeft")) {
                 output.bottomLeft = (borderRadiusStyles as IBorderRadiusOutput).bottomLeft;
             }
-            if (checkIfKeyExistsAndIsDefined((borderRadiusStyles as IBorderRadiusOutput), "topLeft")) {
+            if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiusOutput, "topLeft")) {
                 output.topLeft = (borderRadiusStyles as IBorderRadiusOutput).topLeft;
             }
         }
     }
     return output;
 
-
     if (debug) {
         window.console.log("=====> border radius OUT: ", output);
     }
 };
-
-
-

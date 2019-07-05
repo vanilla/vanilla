@@ -19,7 +19,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -174,7 +174,7 @@ export const modalClasses = useThemeCache(() => {
                 ...borders(),
             },
         },
-    }as NestedCSSProperties);
+    } as NestedCSSProperties);
 
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),

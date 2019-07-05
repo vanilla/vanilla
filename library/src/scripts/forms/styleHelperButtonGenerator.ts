@@ -4,16 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import {formElementsVariables} from "@library/forms/formElementStyles";
-import {styleFactory} from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { styleFactory } from "@library/styles/styleUtils";
 import merge from "lodash/merge";
-import {borders, IBorderStyles} from "@library/styles/styleHelpersBorders";
-import {percent} from "csx";
-import {fonts} from "@library/styles/styleHelpersTypography";
-import {colorOut} from "@library/styles/styleHelpersColors";
-import {buttonGlobalVariables, buttonResetMixin, buttonSizing} from "@library/forms/buttonStyles";
-import {IButtonType} from "@library/forms/styleHelperButtonInterface";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { borders, IBorderStyles } from "@library/styles/styleHelpersBorders";
+import { percent } from "csx";
+import { fonts } from "@library/styles/styleHelpersTypography";
+import { colorOut } from "@library/styles/styleHelpersColors";
+import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -25,20 +25,23 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     // TEMP
     const debug = buttonTypeVars.name === "splashSearchButton";
     //
-    if(debug) {
+    if (debug) {
         window.console.log("");
         window.console.log("Generate Button class, raw data: ", buttonTypeVars);
     }
 
     // Make sure we have the second level, if it was empty
-    buttonTypeVars = merge({
-        colors: {},
-        hover: {},
-        focus: {},
-        active: {},
-        borders: {},
-        focusAccessible: {},
-    } as IButtonType, buttonTypeVars);
+    buttonTypeVars = merge(
+        {
+            colors: {},
+            hover: {},
+            focus: {},
+            active: {},
+            borders: {},
+            focusAccessible: {},
+        } as IButtonType,
+        buttonTypeVars,
+    );
 
     // if(debug) {
     //     window.console.log("buttonTypeVars - after: ", buttonTypeVars);
@@ -50,13 +53,22 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         //console.log("1. defaultBorder: ", defaultBorder);
     }
 
-
-
-    const hoverBorder = buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, borders(buttonTypeVars.hover.borders)) : defaultBorder;
-    const activeBorder = buttonTypeVars.active && buttonTypeVars.active.borders ? merge(defaultBorder, borders(buttonTypeVars.active.borders)) : defaultBorder;
-    const focusBorder = buttonTypeVars.focus && buttonTypeVars.focus.borders ? merge(defaultBorder, borders(buttonTypeVars.focus.borders)) : defaultBorder;
-    const focusAccessibleBorder = buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders)) : defaultBorder;
-
+    const hoverBorder =
+        buttonTypeVars.hover && buttonTypeVars.hover.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.hover.borders))
+            : defaultBorder;
+    const activeBorder =
+        buttonTypeVars.active && buttonTypeVars.active.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.active.borders))
+            : defaultBorder;
+    const focusBorder =
+        buttonTypeVars.focus && buttonTypeVars.focus.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.focus.borders))
+            : defaultBorder;
+    const focusAccessibleBorder =
+        buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders))
+            : defaultBorder;
 
     return style({
         ...buttonResetMixin(),

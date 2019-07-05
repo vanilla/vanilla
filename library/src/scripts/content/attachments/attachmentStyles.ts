@@ -15,10 +15,10 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import {CSSProperties, NestedCSSProperties} from "typestyle/lib/types";
+import { CSSProperties, NestedCSSProperties } from "typestyle/lib/types";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -13,6 +13,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -143,7 +144,7 @@ export const searchBarClasses = useThemeCache(() => {
                     display: "none",
                 },
             },
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
@@ -151,7 +152,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
             },
         }),
-    );
+    ) as NestedCSSProperties;
 
     const results = style("results", {
         backgroundColor: colorOut(vars.results.bg),
@@ -199,7 +200,7 @@ export const searchBarClasses = useThemeCache(() => {
         }),
         ...shadow.dropDown(),
         zIndex: 1,
-    });
+    } as NestedCSSProperties);
 
     const valueContainer = style("valueContainer", {
         display: "flex",

@@ -219,15 +219,19 @@ export const userContentClasses = useThemeCache(() => {
     // These are temporarily kludged here due to lack of time.
     // They should be fully converted in the future but at the moment
     // Only the bare minimum is convverted in order to make the colors work.
-    const spoilersAndQuotes: NestedCSSSelectors = {
-        [`& .spoiler,
-          & .button-spoiler,
-          & .spoiler-icon`]: {
+    const spoilersAndQuotes = {
+        "& .spoiler": {
+            background: colorOut(vars.blocks.bg),
+            color: colorOut(vars.blocks.fg),
+        },
+        "& .button-spoiler": {
             background: colorOut(vars.blocks.bg),
             color: colorOut(vars.blocks.fg),
         },
         "& .spoiler-icon": {
             margin: 0,
+            background: colorOut(vars.blocks.bg),
+            color: colorOut(vars.blocks.fg),
         },
         "& .embedExternal-content": {
             borderRadius: vars.embeds.borderRadius,
@@ -263,7 +267,7 @@ export const userContentClasses = useThemeCache(() => {
                 color: vars.embeds.fg.fade(0.3),
             }),
         },
-    };
+    } as NestedCSSProperties;
 
     const root = style({
         // These CAN'T be flexed. That breaks margin collapsing.
@@ -285,7 +289,7 @@ export const userContentClasses = useThemeCache(() => {
             ...codeStyles,
             ...spoilersAndQuotes,
         },
-    });
+    } as NestedCSSProperties);
 
     return { root };
 });

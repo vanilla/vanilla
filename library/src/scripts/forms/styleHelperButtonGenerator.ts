@@ -7,13 +7,13 @@
 import {formElementsVariables} from "@library/forms/formElementStyles";
 import {styleFactory} from "@library/styles/styleUtils";
 import merge from "lodash/merge";
-import {calculateBorders} from "@library/forms/borderStylesCalculator";
 import {borders, IBorderStyles} from "@library/styles/styleHelpersBorders";
 import {percent} from "csx";
 import {fonts} from "@library/styles/styleHelpersTypography";
 import {colorOut} from "@library/styles/styleHelpersColors";
 import {buttonGlobalVariables, buttonResetMixin, buttonSizing} from "@library/forms/buttonStyles";
 import {IButtonType} from "@library/forms/styleHelperButtonInterface";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -26,7 +26,8 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     const debug = buttonTypeVars.name === "splashSearchButton";
     //
     if(debug) {
-        window.console.log("buttonTypeVars - before111: ", buttonTypeVars);
+        window.console.log("");
+        window.console.log("Generate Button class, raw data: ", buttonTypeVars);
     }
 
     // Make sure we have the second level, if it was empty
@@ -43,7 +44,11 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     //     window.console.log("buttonTypeVars - after: ", buttonTypeVars);
     // }
 
-    const defaultBorder = calculateBorders(buttonTypeVars.borders, debug);
+    const defaultBorder = borders(buttonTypeVars.borders, debug);
+
+    if (debug) {
+        //console.log("1. defaultBorder: ", defaultBorder);
+    }
 
 
 
@@ -58,7 +63,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
-        ...borders(defaultBorder!, debug),
+        // ...borders(defaultBorder, debug),
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight
                 ? buttonDimensions.minHeight
@@ -150,7 +155,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 opacity: formElVars.disabled.opacity,
             },
         },
-    });
+    } as NestedCSSProperties);
 };
 
 export default generateButtonClass;

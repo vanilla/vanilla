@@ -19,6 +19,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -118,7 +119,6 @@ export const modalClasses = useThemeCache(() => {
         // This is why fullscreen unsets the transforms.
         transform: translate(`-50%`, `-50%`),
         ...margins({ all: "auto" }),
-
         $nest: {
             "&&.isFullScreen": {
                 width: percent(100),
@@ -174,7 +174,7 @@ export const modalClasses = useThemeCache(() => {
                 ...borders(),
             },
         },
-    });
+    }as NestedCSSProperties);
 
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),

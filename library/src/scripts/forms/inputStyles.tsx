@@ -15,6 +15,7 @@ import {
 import { px } from "csx";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -70,10 +71,10 @@ export const inputClasses = useThemeCache(() => {
     };
 
     // Use as assignable unique style.
-    const text = style("text", textStyles);
+    const text = style("text", textStyles as NestedCSSProperties);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(".inputText", textStyles);
+    const applyInputCSSRules = () => cssRule(".inputText", textStyles as NestedCSSProperties);
 
     return { text, applyInputCSSRules };
 });

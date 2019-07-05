@@ -20,6 +20,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -148,7 +149,7 @@ export const checkRadioClasses = useThemeCache(() => {
         cursor: "pointer",
         backgroundColor: colorOut(vars.main.bg),
         ...borders(vars.border),
-    });
+    } as NestedCSSProperties);
 
     const radioIcon = style("radioIcon", {
         ...absolutePosition.middleLeftOfParent(),

@@ -146,7 +146,7 @@ export const dropDownClasses = useThemeCache(() => {
                 }),
             },
         },
-    });
+    } as NestedCSSProperties);
 
     const asModal = style("asModal", {
         $nest: {
@@ -160,7 +160,7 @@ export const dropDownClasses = useThemeCache(() => {
         ...shadows.dropDown(),
         backgroundColor: colorOut(globalVars.mainColors.bg),
         ...borders(),
-    });
+    } as NestedCSSProperties);
 
     const items = style("items", {
         fontSize: unit(globalVars.fonts.size.medium),
@@ -212,8 +212,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     // Contents (button or link)
     // Replaces: .dropDownItem-button, .dropDownItem-link
-    const action = style(
-        "action",
+    const action = style("action",
         {
             appearance: "none",
             display: "flex",
@@ -250,13 +249,13 @@ export const dropDownClasses = useThemeCache(() => {
                     borderColor: colorOut(globalVars.mainColors.primary),
                 },
             }),
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             fontSize: unit(vars.item.mobile.fontSize),
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
-        }),
-    );
+        } as NestedCSSProperties),
+    )
 
     const text = style("text", {
         display: "block",

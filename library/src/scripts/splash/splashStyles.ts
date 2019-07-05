@@ -24,7 +24,7 @@ import {
     modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
 import { assetUrl } from "@library/utility/appUtils";
-import { TLength } from "typestyle/lib/types";
+import {NestedCSSProperties, TLength} from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import {IButtonType} from "@library/forms/styleHelperButtonInterface";
@@ -293,7 +293,7 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    window.console.log("vars.searchButton: ", vars.searchButton);
+    // window.console.log("vars.searchButton: ", vars.searchButton);
     const searchButton = generateButtonClass(vars.searchButton);
 
     const valueContainer = style("valueContainer", {
@@ -308,7 +308,7 @@ export const splashClasses = useThemeCache(() => {
                 } as any),
             },
         },
-    });
+    } as NestedCSSProperties);
 
     const searchContainer = style("searchContainer", {
         position: "relative",

@@ -15,48 +15,43 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { transparentColor } from "@library/forms/buttonStyles";
+import {CSSProperties, NestedCSSProperties} from "typestyle/lib/types";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("attachment");
+    const makeThemeVars = variableFactory("attachment");
 
-    const border: IBordersWithRadius = {
+    const border: IBordersWithRadius = makeThemeVars("border", {
         color: globalVars.mixBgAndFg(0.2),
         style: "solid",
         width: formElementVars.border.width,
         radius: px(2),
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         width: globalVars.embed.sizing.width,
         maxWidth: percent(100),
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const padding = {
+    const padding = makeThemeVars("padding", {
         default: 12,
-        ...themeVars.subComponentStyles("padding"),
-    };
+    });
 
-    const text = {
+    const text = makeThemeVars("text", {
         fontSize: globalVars.fonts.size.medium,
-        ...themeVars.subComponentStyles("text"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         color: globalVars.mixBgAndFg(0.9),
-        ...themeVars.subComponentStyles("title"),
-    };
+    });
 
-    const loading = {
+    const loading = makeThemeVars("loading", {
         opacity: 0.5,
-    };
+    });
 
     return { border, padding, text, title, loading, sizing };
 });
@@ -109,7 +104,7 @@ export const attachmentClasses = useThemeCache(() => {
                 $nest: hoverFocusStates,
             },
         },
-    });
+    } as NestedCSSProperties);
 
     const link = style("link", {
         ...allLinkStates({
@@ -128,11 +123,11 @@ export const attachmentClasses = useThemeCache(() => {
         padding: px(vars.padding.default),
         width: percent(100),
         ...borders({
-            color: transparentColor,
+            color: globalVars.elementaryColors.transparent,
             width: 2,
             radius: 0,
         }),
-    });
+    } as NestedCSSProperties);
 
     const format = style("format", {
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),

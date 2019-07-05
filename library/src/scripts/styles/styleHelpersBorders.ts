@@ -212,18 +212,30 @@ const typeIsStringOrNumber = variable => {
     return type === "string" || type === "number";
 };
 
+const getSingleBorderStyle = (color, width, style) => {
+    const result: ISingleBorderStyle = {};
+    if (color) {
+        result.color = color;
+    }
+    if (width) {
+        result.width = width;
+    }
+    if (style) {
+        result.style = style;
+    }
+    return result;
+};
+
 /*
     Exports a standardized border style format from a flexible format (IBorderStyles)
  */
 
-export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false) => {
-    const globalVars = globalVariables();
-    //
-    // if (debug) {
-    //     window.console.log("coming in: ", props);
-    // }
-
+export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: boolean = false) => {
     const output: IBorderFinalStyles = {};
+
+    let outputCount = 0;
+
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Start of global values
     // Color
@@ -245,8 +257,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         });
     }
 
+    debug && console.log(outputCount++ + " - output: ", output);
+
     //Width
-    const globalWidth = getValueIfItExists(borderStyles, "color") as ColorValues;
+    const globalWidth = getValueIfItExists(borderStyles, "width") as ColorValues;
     if (globalWidth) {
         merge(output, {
             top: {
@@ -264,25 +278,28 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         });
     }
 
+    debug && console.log(outputCount++ + " - output: ", output);
     //Width
     const globalBorderStyle = getValueIfItExists(borderStyles, "style") as ColorValues;
     if (globalBorderStyle) {
         merge(output, {
             top: {
-                width: globalBorderStyle,
+                style: globalBorderStyle,
             },
             right: {
-                width: globalBorderStyle,
+                style: globalBorderStyle,
             },
             bottom: {
-                width: globalBorderStyle,
+                style: globalBorderStyle,
             },
             left: {
-                width: globalBorderStyle,
+                style: globalBorderStyle,
             },
         });
     }
     // End of global values
+
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // All (global styles, includes border radius
     const all = getValueIfItExists(borderStyles, "all");
@@ -299,8 +316,23 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         if (radius) {
             merge(output, typeIsStringOrNumber(radius) ? setAllBorderRadii(radius) : radius);
         }
-        merge(output, border);
+        merge(output, {
+            top: {
+                style: border,
+            },
+            right: {
+                style: border,
+            },
+            bottom: {
+                style: border,
+            },
+            left: {
+                style: border,
+            },
+        });
     }
+
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Top Bottom border styles (does not include border radius,
     // since it doesn't really make sense, it would be global, like "all")
@@ -309,18 +341,16 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = topBottom.color;
         const width = topBottom.width;
         const style = topBottom.style;
-        const topBottomStyles = {} as ISingleBorderStyle;
-        if (color) {
-            topBottomStyles.color = color;
+        const topBottomStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
+            merge(output, {
+                top: topBottomStyles,
+                bottom: topBottomStyles,
+            });
         }
-        if (width) {
-            topBottomStyles.width = width;
-        }
-        if (style) {
-            topBottomStyles.style = style;
-        }
-        merge(output, { top: topBottomStyles, bottom: topBottomStyles });
     }
+
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Left Right border styles (does not include border radius,
     // since it doesn't really make sense, it would be global, like "all")
@@ -329,42 +359,35 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = leftRight.color;
         const width = leftRight.width;
         const style = leftRight.style;
-        const leftRightStyles = {} as ISingleBorderStyle;
-        if (color) {
-            leftRightStyles.color = color;
+        const leftRightStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
+            merge(output, {
+                top: leftRightStyles,
+                bottom: leftRightStyles,
+            });
         }
-        if (width) {
-            leftRightStyles.width = width;
-        }
-        if (style) {
-            leftRightStyles.style = style;
-        }
-        merge(output, {
-            left: leftRightStyles,
-            right: leftRightStyles,
-        });
     }
 
+    debug && console.log(outputCount++ + " - output: ", output);
     // Top
     const top = getValueIfItExists(borderStyles, "top");
     if (top) {
         const color = top.color;
         const width = top.width;
         const style = top.style;
-        const topStyles = {} as ISingleBorderStyle;
-        if (color) {
-            top.color = color;
+        const topStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
+            merge(output, {
+                top: topStyles,
+                bottom: topStyles,
+            });
         }
-        if (width) {
-            top.width = width;
-        }
-        if (style) {
-            top.style = style;
-        }
+
+        debug && console.log(outputCount++ + " - output: ", output);
 
         const radius = getValueIfItExists(top, "radius");
         const radiusType = typeof radius;
-        if (radius) {
+        if (radiusType) {
             merge(output, {
                 top: topStyles,
                 radius: {
@@ -373,9 +396,12 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 },
             });
         } else {
-            merge(output, { top: topStyles });
+            merge(output, {
+                top: topStyles,
+            });
         }
     }
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Right
     const right = getValueIfItExists(borderStyles, "right");
@@ -383,20 +409,18 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = right.color;
         const width = right.width;
         const style = right.style;
-        const rightStyles = {} as ISingleBorderStyle;
-        if (color) {
-            right.color = color;
-        }
-        if (width) {
-            right.width = width;
-        }
-        if (style) {
-            right.style = style;
+        const rightStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
+            merge(output, {
+                top: rightStyles,
+                bottom: rightStyles,
+            });
         }
 
+        debug && console.log(outputCount++ + " - output: ", output);
         const radius = getValueIfItExists(right, "radius");
         const radiusType = typeof radius;
-        if (radius) {
+        if (radiusType) {
             merge(output, {
                 right: rightStyles,
                 radius: {
@@ -408,6 +432,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
             merge(output, { right: rightStyles });
         }
     }
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Bottom
     const bottom = getValueIfItExists(borderStyles, "bottom");
@@ -415,20 +440,19 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = bottom.color;
         const width = bottom.width;
         const style = bottom.style;
-        const bottomStyles = {} as ISingleBorderStyle;
-        if (color) {
-            bottom.color = color;
+        const bottomStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
+            merge(output, {
+                top: bottomStyles,
+                bottom: bottomStyles,
+            });
         }
-        if (width) {
-            bottom.width = width;
-        }
-        if (style) {
-            bottom.style = style;
-        }
+
+        debug && console.log(outputCount++ + " - output: ", output);
 
         const radius = getValueIfItExists(bottom, "radius");
         const radiusType = typeof radius;
-        if (radius) {
+        if (radiusType) {
             merge(output, {
                 bottom: bottomStyles,
                 radius: {
@@ -440,6 +464,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
             merge(output, { bottom: bottomStyles });
         }
     }
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Left
     const left = getValueIfItExists(borderStyles, "left");
@@ -447,31 +472,27 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = left.color;
         const width = left.width;
         const style = left.style;
-        const leftStyles = {} as ISingleBorderStyle;
-        if (color) {
-            left.color = color;
-        }
-        if (width) {
-            left.width = width;
-        }
-        if (style) {
-            left.style = style;
-        }
-
-        const radius = getValueIfItExists(left, "radius");
-        const radiusType = typeof radius;
-        if (radius) {
+        const leftStyles = getSingleBorderStyle(color, width, style);
+        if (color || width || style) {
             merge(output, {
                 left: leftStyles,
+            });
+        }
+
+        debug && console.log(outputCount++ + " - output: ", output);
+        const radiusType = typeof left;
+        if (radiusType) {
+            merge(output, {
                 radius: {
-                    topleft: radius,
-                    bottomleft: radius,
+                    topLeft: left,
+                    bottomLeft: left,
                 },
             });
         } else {
             merge(output, { left: leftStyles });
         }
     }
+    debug && console.log(outputCount++ + " - output: ", output);
 
     // Explicit radius values take precedence over shorthand declarations.
     const radiusFromBorderStyles = getValueIfItExists(borderStyles, "radius");
@@ -485,6 +506,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 bottomLeft: radiusFromBorderStyles,
             },
         });
+        debug && console.log(outputCount++ + " - output: ", output);
     } else {
         const topRight = getValueIfItExists(radiusFromBorderStyles, "topRight");
         const bottomRight = getValueIfItExists(radiusFromBorderStyles, "bottomRight");
@@ -509,162 +531,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 radius: radii,
             });
         }
+        debug && console.log(outputCount++ + " - output: ", output);
     }
 
-    //radius?: radiusValue | IBorderRadiiDeclaration;
-
-    /*
-    Final Output:
-    top?: BorderRadiusValue;
-    right?: BorderRadiusValue;
-    bottom?: BorderRadiusValue;
-    left?: BorderRadiusValue;
-    radius?: {
-        topRightRadius?: BorderRadiusValue;
-        topLeftRadius?: BorderRadiusValue;
-        bottomRightRadius?: BorderRadiusValue;
-        bottomLeftRadius?: BorderRadiusValue;
-    },
-    */
-
-    // if (typeof borderStyles === "string") {
-    //     const shorthandStyles = borders(borderStyles);
-    //     if (shorthandStyles) {
-    //         output.bord
-    //     }
-    // }
-
-    //
-    // if(debug) {
-    //     window.console.log("border radii: ", props.radius);
-    // }
-
-    // // Set border radii
-    // let globalRadiusFound = false;
-    // let specificRadiusFound = false;
-    // if (props.radius !== undefined) {
-    //     if (typeof props.radius === "string" || typeof props.radius === "number") {
-    //         output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-    //         globalRadiusFound = true;
-    //     } else {
-    //         if (props.radius.all !== undefined) {
-    //             globalRadiusFound = true;
-    //             output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-    //         }
-    //         if (props.radius.top !== undefined) {
-    //             specificRadiusFound = true;
-    //             output.topRightRadius = unit(props.radius.topRight);
-    //             output.topLeftRadius = unit(props.radius.topLeft);
-    //             if (props.radius.topRight) {
-    //                 output.topRightRadius = unit(props.radius.topRight);
-    //             }
-    //             if (props.radius.topLeft) {
-    //                 output.topLeftRadius = unit(props.radius.topLeft);
-    //             }
-    //         }
-    //         if (props.radius.bottom !== undefined) {
-    //             specificRadiusFound = true;
-    //             if (props.radius.bottomRight) {
-    //                 output.bottomRightRadius = unit(props.radius.bottomRight);
-    //             }
-    //             if (props.radius.bottomLeft) {
-    //                 output.bottomLeftRadius = unit(props.radius.bottomLeft);
-    //             }
-    //         }
-    //         if (props.radius.right !== undefined) {
-    //             specificRadiusFound = true;
-    //             if (props.radius.topRight) {
-    //                 output.topRightRadius = unit(props.radius.topRight);
-    //             }
-    //             if (props.radius.bottomRight) {
-    //                 output.bottomRightRadius = unit(props.radius.bottomRight);
-    //             }
-    //         }
-    //         if (props.radius.left !== undefined) {
-    //             specificRadiusFound = true;
-    //             if (props.radius.topLeft) {
-    //                 output.topLeftRadius = unit(props.radius.topLeft);
-    //             }
-    //             if (props.radius.bottomLeft) {
-    //                 output.bottomLeftRadius = unit(props.radius.bottomLeft);
-    //             }
-    //         }
-    //         if (props.radius.topRight !== undefined) {
-    //             specificRadiusFound = true;
-    //             output.topRightRadius = unit(props.radius.topRight);
-    //         }
-    //         if (props.radius.topLeft !== undefined) {
-    //             specificRadiusFound = true;
-    //             output.topLeftRadius = unit(props.radius.topLeft);
-    //         }
-    //         if (props.radius.bottomRight !== undefined) {
-    //             specificRadiusFound = true;
-    //             output.bottomLeftRadius = unit(props.radius.bottomRight);
-    //         }
-    //         if (props.radius.topLeft !== undefined) {
-    //             specificRadiusFound = true;
-    //             output.bottomRightRadius = unit(props.radius.bottomLeft);
-    //         }
-    //     }
-    // }
-    // Set fallback border radius if none found
-    // if (!globalRadiusFound && !specificRadiusFound) {
-    //     output.borderRadius = unit(globalVars.border.radius);
-    // }
-    //
-    // // Set border styles
-    // let borderSet = false;
-    // if (props.all !== undefined) {
-    //     output.borderTop = singleBorder(props.all);
-    //     output.borderRight = singleBorder(props.all);
-    //     output.borderBottom = singleBorder(props.all);
-    //     output.borderLeft = singleBorder(props.all);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.topBottom) {
-    //     output.borderTop = singleBorder(props.topBottom);
-    //     output.borderBottom = singleBorder(props.topBottom);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.leftRight) {
-    //     output.borderLeft = singleBorder(props.leftRight);
-    //     output.borderRight = singleBorder(props.leftRight);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.top) {
-    //     output.borderTop = singleBorder(props.top);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.bottom) {
-    //     output.borderBottom = singleBorder(props.bottom);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.right) {
-    //     output.borderRight = singleBorder(props.right);
-    //     borderSet = true;
-    // }
-    //
-    // if (props.left) {
-    //     output.borderLeft = singleBorder(props.left);
-    //     borderSet = true;
-    // }
-    //
-    // // If nothing was found, look for globals and fallback to global styles.
-    // if (!borderSet) {
-    //     output.borderStyle = props.style ? props.style : globalVars.border.style;
-    //     output.borderColor = props.color ? colorOut(props.color) : colorOut(globalVars.border.color);
-    //     output.borderWidth = props.width ? unit(props.width) : unit(globalVars.border.width);
-    // }
-
-    // if (debug) {
-    //     window.console.log("going out: ", output);
-    // }
-
+    debug && console.log("FINAL: ", output);
     return output;
 };
 

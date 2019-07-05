@@ -328,7 +328,7 @@ const isStringOrNumber = variable => {
 };
 
 export const getValueIfItExists = (haystack: object, needle: string) => {
-    if (checkIfKeyExistsAndIsDefined(haystack, needle)) {
+    if (!!haystack && checkIfKeyExistsAndIsDefined(haystack, needle)) {
         return haystack[needle];
     } else {
         return undefined;

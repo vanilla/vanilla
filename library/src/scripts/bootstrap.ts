@@ -27,10 +27,10 @@ onPageView((params: { history: History }) => {
     });
 });
 
-// logDebug("Bootstrapping");
+logDebug("Bootstrapping");
 _executeReady()
     .then(() => {
-        // logDebug("Bootstrapping complete.");
+        logDebug("Bootstrapping complete.");
         // Mount all data-react components.
         onContent(e => {
             _mountComponents(e.target);

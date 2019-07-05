@@ -60,11 +60,13 @@ blockquote, q {
 }
 
 textarea, input[type=text] {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .textarea-autosize {
-  transition: height 0.1s ease;
+  -webkit-transition: height 0.1s ease;
+          transition: height 0.1s ease;
   resize: none !important;
 }
 
@@ -731,8 +733,10 @@ div.FileUpload .CurrentImage {
 .ActivateSlider {
   display: inline-block;
   background: #bbb;
-  box-shadow: 0 10px 30px #333 inset;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  -webkit-box-shadow: 0 10px 30px #333 inset;
+          box-shadow: 0 10px 30px #333 inset;
+  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
   border: solid 1px #ccc;
   width: 125px;
   border-radius: 4px;
@@ -954,7 +958,8 @@ a.Small img {
 .DismissMessage.Box {
   background: #fff8ce;
   border: 1px solid #c5bea4;
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
   margin: 0 0 10px;
   /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
@@ -1134,8 +1139,10 @@ body > #Frame > .Head {
   border-radius: 2px;
   background: #fff;
   padding: 5px 0;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
@@ -1214,8 +1221,10 @@ body > #Frame > .Head {
   background: #fff;
   color: #000;
   border-radius: 2px;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   border: solid 1px #999;
 }
 
@@ -1801,7 +1810,8 @@ td.CheckBoxColumn {
 
 .SearchForm .InputBox {
   width: 100%;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
   border-radius: 0.35ex;
@@ -5221,7 +5231,8 @@ input + .ReactSprite {
 
 /* Token input */
 ul.token-input-list {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   border: 1px solid #aaa;
   color: #333;
   font-size: 15px;
@@ -5368,8 +5379,10 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   /* So high because a client actually had 99999 in a theme */
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .atwho-view .cur {
@@ -5497,7 +5510,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  transition: background-color 100ms;
+  -webkit-transition: background-color 100ms;
+          transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5748,7 +5762,8 @@ Styleguide Definitions
 .item-attachment .dl-columns dd {
   float: left;
   padding: 0 10px;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 /*
@@ -5969,7 +5984,8 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+          transition: all 0.2s ease;
   opacity: 1;
 }
 
@@ -6214,12 +6230,15 @@ img.jcrop-preview {
 }
 
 .flex {
+  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -6244,6 +6263,7 @@ img.jcrop-preview {
 }
 
 .grow {
+  -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
@@ -6256,6 +6276,7 @@ img.jcrop-preview {
 }
 
 .no-grow {
+  -webkit-box-flex: 0;
   -webkit-flex-grow: 0;
       -ms-flex-positive: 0;
           flex-grow: 0;

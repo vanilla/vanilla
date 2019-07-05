@@ -10,11 +10,11 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { unit, ifExistsWithFallback } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import merge from "lodash/merge";
-import {ColorHelper} from "csx";
+import { ColorHelper } from "csx";
 import {
     checkIfKeyExistsAndIsDefined,
     getValueIfItExists,
-    setAllBorderRadii
+    setAllBorderRadii,
 } from "@library/forms/borderStylesCalculator";
 
 export interface ISingleBorderStyle {
@@ -29,28 +29,27 @@ export interface IBordersWithRadius extends ISingleBorderStyle {
 
 export type radiusValue = BorderRadiusProperty<TLength> | string;
 
-export interface IBorderStylesAll extends ISingleBorderStyle  {
+export interface IBorderStylesAll extends ISingleBorderStyle {
     radius?: radiusValue;
 }
 
-export interface IBorderStylesBySideTop extends ISingleBorderStyle  {
+export interface IBorderStylesBySideTop extends ISingleBorderStyle {
     radius?: ITopBorderRadii;
 }
 
-export interface IBorderStylesBySideBottom extends ISingleBorderStyle  {
+export interface IBorderStylesBySideBottom extends ISingleBorderStyle {
     radius?: IBottomBorderRadii;
 }
 
-export interface IBorderStylesBySideRight extends ISingleBorderStyle  {
+export interface IBorderStylesBySideRight extends ISingleBorderStyle {
     radius?: IRightBorderRadii;
 }
 
-export interface IBorderStylesBySideLeft extends ISingleBorderStyle  {
+export interface IBorderStylesBySideLeft extends ISingleBorderStyle {
     radius?: ILeftBorderRadii;
 }
 
-
-export interface IBorderStyles extends ISingleBorderStyle  {
+export interface IBorderStyles extends ISingleBorderStyle {
     all?: IBorderStylesAll;
     topBottom?: ISingleBorderStyle;
     leftRight?: ISingleBorderStyle;
@@ -83,16 +82,29 @@ export type borderType = IBordersWithRadius | IBorderStyles;
 //     bottom: BorderRadiusValue,
 // }
 
-export interface ITopBorderRadii {left?: radiusValue; right?: radiusValue};
-export interface IBottomBorderRadii {left?: radiusValue, right?: radiusValue};
-export interface ILeftBorderRadii {top?: radiusValue, bottom?: radiusValue};
-export interface IRightBorderRadii {top?: radiusValue, bottom?: radiusValue};
+export interface ITopBorderRadii {
+    left?: radiusValue;
+    right?: radiusValue;
+}
+export interface IBottomBorderRadii {
+    left?: radiusValue;
+    right?: radiusValue;
+}
+export interface ILeftBorderRadii {
+    top?: radiusValue;
+    bottom?: radiusValue;
+}
+export interface IRightBorderRadii {
+    top?: radiusValue;
+    bottom?: radiusValue;
+}
 
 export type BorderRadiusValue = BorderRadiusProperty<TLength> | number | undefined;
 
 export interface IRadiusShorthand {
     all?: BorderRadiusValue;
     top?: BorderRadiusValue | ITopBorderRadii;
+
     bottom?: BorderRadiusValue | IBottomBorderRadii;
     left?: BorderRadiusValue | ILeftBorderRadii;
     right?: BorderRadiusValue | IRightBorderRadii;
@@ -111,46 +123,48 @@ export interface IBorderRadiusOutput {
     This interface is used to gather all the styles and overwrites.
 */
 export interface IBorderStylesWIP {
-    all?: {
-        color?: ColorValues,
-        width?: BorderWidthProperty<TLength> | number,
-        style?: BorderStyleProperty,
-    } | BorderStyleProperty;
+    all?:
+        | {
+              color?: ColorValues;
+              width?: BorderWidthProperty<TLength> | number;
+              style?: BorderStyleProperty;
+          }
+        | BorderStyleProperty;
     top?: {
-        color?: ColorValues,
-        width?: BorderWidthProperty<TLength> | number,
-        style?: BorderStyleProperty,
+        color?: ColorValues;
+        width?: BorderWidthProperty<TLength> | number;
+        style?: BorderStyleProperty;
     };
     right?: {
-        color?: ColorValues,
-        width?: BorderWidthProperty<TLength> | number,
-        style?: BorderStyleProperty,
+        color?: ColorValues;
+        width?: BorderWidthProperty<TLength> | number;
+        style?: BorderStyleProperty;
     };
     bottom?: {
-        color?: ColorValues,
-        width?: BorderWidthProperty<TLength> | number,
-        style?: BorderStyleProperty,
+        color?: ColorValues;
+        width?: BorderWidthProperty<TLength> | number;
+        style?: BorderStyleProperty;
     };
     left?: {
-        color?: ColorValues,
-        width?: BorderWidthProperty<TLength> | number,
-        style?: BorderStyleProperty,
+        color?: ColorValues;
+        width?: BorderWidthProperty<TLength> | number;
+        style?: BorderStyleProperty;
     };
     radius?: {
-        topRight?: BorderRadiusValue,
-        bottomRight?: BorderRadiusValue,
-        topLeft?: BorderRadiusValue,
-        bottomLeft?: BorderRadiusValue,
+        topRight?: BorderRadiusValue;
+        bottomRight?: BorderRadiusValue;
+        topLeft?: BorderRadiusValue;
+        bottomLeft?: BorderRadiusValue;
     };
 }
 
 // This is the final outputted format before we generate the actual styles.
-export interface IBorderFinalStyles  {
+export interface IBorderFinalStyles {
     top?: ISingleBorderStyle;
     right?: ISingleBorderStyle;
     bottom?: ISingleBorderStyle;
     left?: ISingleBorderStyle;
-    radius?: IBorderRadiusOutput,
+    radius?: IBorderRadiusOutput;
 }
 
 export const borderRadii = (props: IBorderRadiiDeclaration) => {
@@ -193,10 +207,10 @@ export const borderRadii = (props: IBorderRadiiDeclaration) => {
 //     }
 // };
 
-const typeIsStringOrNumber = (variable) => {
+const typeIsStringOrNumber = variable => {
     const type = typeof variable;
     return type === "string" || type === "number";
-}
+};
 
 /*
     Exports a standardized border style format from a flexible format (IBorderStyles)
@@ -214,7 +228,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
     // Start of global values
     // Color
     const globalColor = getValueIfItExists(borderStyles, "color") as ColorValues;
-    if(globalColor) {
+    if (globalColor) {
         merge(output, {
             top: {
                 color: globalColor,
@@ -222,10 +236,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
             right: {
                 color: globalColor,
             },
-            bottom:{
+            bottom: {
                 color: globalColor,
             },
-            left:{
+            left: {
                 color: globalColor,
             },
         });
@@ -233,7 +247,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
 
     //Width
     const globalWidth = getValueIfItExists(borderStyles, "color") as ColorValues;
-    if(globalWidth) {
+    if (globalWidth) {
         merge(output, {
             top: {
                 width: globalWidth,
@@ -241,10 +255,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
             right: {
                 width: globalWidth,
             },
-            bottom:{
+            bottom: {
                 width: globalWidth,
             },
-            left:{
+            left: {
                 width: globalWidth,
             },
         });
@@ -252,7 +266,7 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
 
     //Width
     const globalBorderStyle = getValueIfItExists(borderStyles, "style") as ColorValues;
-    if(globalBorderStyle) {
+    if (globalBorderStyle) {
         merge(output, {
             top: {
                 width: globalBorderStyle,
@@ -260,10 +274,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
             right: {
                 width: globalBorderStyle,
             },
-            bottom:{
+            bottom: {
                 width: globalBorderStyle,
             },
-            left:{
+            left: {
                 width: globalBorderStyle,
             },
         });
@@ -276,16 +290,16 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         const color = getValueIfItExists(all, "color");
         const width = getValueIfItExists(all, "width");
         const style = getValueIfItExists(all, "style");
-        const singleBorder = {
+        const border = {
             color,
             width,
             style,
         };
         const radius = getValueIfItExists(all, "radius");
-        const radiusType = typeof radius;
         if (radius) {
             merge(output, typeIsStringOrNumber(radius) ? setAllBorderRadii(radius) : radius);
         }
+        merge(output, border);
     }
 
     // Top Bottom border styles (does not include border radius,
@@ -305,9 +319,8 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         if (style) {
             topBottomStyles.style = style;
         }
-        merge(output, {top: topBottomStyles, bottom: topBottomStyles});
+        merge(output, { top: topBottomStyles, bottom: topBottomStyles });
     }
-
 
     // Left Right border styles (does not include border radius,
     // since it doesn't really make sense, it would be global, like "all")
@@ -326,7 +339,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         if (style) {
             leftRightStyles.style = style;
         }
-        merge(output, {top: leftRightStyles, bottom: leftRightStyles});
+        merge(output, {
+            left: leftRightStyles,
+            right: leftRightStyles,
+        });
     }
 
     // Top
@@ -354,10 +370,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 radius: {
                     topRight: radius,
                     topLeft: radius,
-                }
+                },
             });
         } else {
-            merge(output, {top: topStyles});
+            merge(output, { top: topStyles });
         }
     }
 
@@ -386,13 +402,12 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 radius: {
                     topRight: radius,
                     bottomRight: radius,
-                }
+                },
             });
         } else {
-            merge(output, {right: rightStyles});
+            merge(output, { right: rightStyles });
         }
     }
-
 
     // Bottom
     const bottom = getValueIfItExists(borderStyles, "bottom");
@@ -419,10 +434,10 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 radius: {
                     bottomRight: radius,
                     bottomLeft: radius,
-                }
+                },
             });
         } else {
-            merge(output, {bottom: bottomStyles});
+            merge(output, { bottom: bottomStyles });
         }
     }
 
@@ -451,30 +466,30 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
                 radius: {
                     topleft: radius,
                     bottomleft: radius,
-                }
+                },
             });
         } else {
-            merge(output, {left: leftStyles});
+            merge(output, { left: leftStyles });
         }
     }
 
     // Explicit radius values take precedence over shorthand declarations.
-    const borderRadii = getValueIfItExists(borderStyles, "radius");
+    const radiusFromBorderStyles = getValueIfItExists(borderStyles, "radius");
 
-    if (typeIsStringOrNumber(borderRadii)) {
+    if (typeIsStringOrNumber(radiusFromBorderStyles)) {
         merge(output, {
             radius: {
-                topRight: borderRadii,
-                topLeft: borderRadii,
-                bottomRight: borderRadii,
-                bottomLeft: borderRadii,
+                topRight: radiusFromBorderStyles,
+                topLeft: radiusFromBorderStyles,
+                bottomRight: radiusFromBorderStyles,
+                bottomLeft: radiusFromBorderStyles,
             },
         });
     } else {
-        const topRight = getValueIfItExists(borderRadii, "topRight");
-        const bottomRight = getValueIfItExists(borderRadii, "bottomRight");
-        const bottomLeft = getValueIfItExists(borderRadii, "bottomLeft");
-        const topLeft = getValueIfItExists(borderRadii, "topLeft");
+        const topRight = getValueIfItExists(radiusFromBorderStyles, "topRight");
+        const bottomRight = getValueIfItExists(radiusFromBorderStyles, "bottomRight");
+        const bottomLeft = getValueIfItExists(radiusFromBorderStyles, "bottomLeft");
+        const topLeft = getValueIfItExists(radiusFromBorderStyles, "topLeft");
         const radii = {} as IBorderRadiusOutput;
         if (topRight) {
             radii.topRight = topRight;
@@ -511,7 +526,6 @@ export const borders = (borderStyles: IBorderStyles = {}, debug: boolean = false
         bottomLeftRadius?: BorderRadiusValue;
     },
     */
-
 
     // if (typeof borderStyles === "string") {
     //     const shorthandStyles = borders(borderStyles);

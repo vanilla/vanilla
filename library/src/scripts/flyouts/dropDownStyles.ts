@@ -255,7 +255,7 @@ export const dropDownClasses = useThemeCache(() => {
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
         } as NestedCSSProperties),
-    )
+    );
 
     const text = style("text", {
         display: "block",

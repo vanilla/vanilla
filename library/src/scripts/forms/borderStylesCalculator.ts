@@ -333,11 +333,11 @@ export const getValueIfItExists = (haystack: object, needle:string) => {
     } else {
         return undefined;
     }
-}
+};
 
 export const checkIfKeyExistsAndIsDefined = (haystack: object, needle:string) => {
     return needle in haystack && haystack[needle] !== undefined;
-}
+};
 /*
     Can either be declared in the "radius" key explicitly, or as part of a side.
     direct string or number -> same as "all"
@@ -354,7 +354,7 @@ export const checkIfKeyExistsAndIsDefined = (haystack: object, needle:string) =>
     then for explicit sides (IBorderRadiusOutput)
  */
 export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclaration | radiusValue, debug = false) => {
-    let output: IBorderRadiusOutput = {};
+    const output: IBorderRadiusOutput = {};
     if (debug) {
         window.console.log("=====> border radius IN:", borderRadiusStyles);
     }

@@ -293,7 +293,6 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    // window.console.log("vars.searchButton: ", vars.searchButton);
     const searchButton = generateButtonClass(vars.searchButton);
 
     const valueContainer = style("valueContainer", {

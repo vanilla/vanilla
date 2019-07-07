@@ -12,6 +12,8 @@ import {
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
+import { TLength } from "typestyle/lib/types";
+import { BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty } from "csstype";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -340,6 +342,12 @@ export const globalVariables = useThemeCache(() => {
         userContentHyphenation,
     };
 });
+
+export interface IGlobalBorderStyles {
+    color: ColorValues;
+    width: BorderWidthProperty<TLength> | number;
+    style: BorderStyleProperty;
+}
 
 export enum IIconSizes {
     SMALL = "small",

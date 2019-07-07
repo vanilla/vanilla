@@ -7,7 +7,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { styleFactory } from "@library/styles/styleUtils";
 import merge from "lodash/merge";
-import { borders, IBorderStyles } from "@library/styles/styleHelpersBorders";
+import { borders, IBorderStyles, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
 import { percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { colorOut } from "@library/styles/styleHelpersColors";
@@ -43,39 +43,56 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         buttonTypeVars,
     );
 
-    // if(debug) {
-    //     window.console.log("buttonTypeVars - after: ", buttonTypeVars);
-    // }
-
-    const defaultBorder = borders(buttonTypeVars.borders, debug);
-
     if (debug) {
-        //console.log("1. defaultBorder: ", defaultBorder);
+        window.console.log("buttonTypeVars.borders: ", buttonTypeVars.borders);
     }
 
-    const hoverBorder =
+    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, debug);
+
+    const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
+        let output = {};
+        if (defaultBorderStyle) {
+            output = defaultBorderStyle;
+        }
+
+        if (stateStyles) {
+            merge(output, standardizeBorderStyle(stateStyles));
+        }
+
+        return output;
+    };
+
+    if (debug) {
+        console.log("1. defaultBorder: ", defaultBorder);
+    }
+
+    const hoverBorder = borders(
         buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.hover.borders))
-            : defaultBorder;
-    const activeBorder =
+            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.hover.borders)
+            : undefined,
+    );
+    const activeBorder = borders(
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.active.borders))
-            : defaultBorder;
-    const focusBorder =
+            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.active.borders)
+            : undefined,
+    );
+    const focusBorder = borders(
         buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.focus.borders))
-            : defaultBorder;
-    const focusAccessibleBorder =
+            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.focus.borders)
+            : undefined,
+    );
+    const focusAccessibleBorder = borders(
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders))
-            : defaultBorder;
+            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.focusAccessible.borders)
+            : undefined,
+    );
 
     return style({
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
-        // ...borders(defaultBorder, debug),
+        ...borders(defaultBorder),
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight
                 ? buttonDimensions.minHeight

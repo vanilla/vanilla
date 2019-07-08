@@ -3858,20 +3858,23 @@ class UserModel extends Gdn_Model {
             ->firstRow();
 
         // If CountInvitations is null (ie. never been set before) or it is a new month since the DateSetInvitations
-        if ($user->CountInvitations == '' || is_null($user->DateSetInvitations) || Gdn_Format::date($user->DateSetInvitations, '%m %Y') != Gdn_Format::date('', '%m %Y')) {
+        if ((empty($user->CountInvitations) && $user->CountInvitations !== 0 )
+            || is_null($user->DateSetInvitations)
+            || date("m Y", strtotime($user->DateSetInvitations)) !== date('m Y')) {
             // Reset CountInvitations and DateSetInvitations
             $this->SQL->put(
                 $this->Name,
                 [
                     'CountInvitations' => $inviteCount,
-                    'DateSetInvitations' => Gdn_Format::date('', '%Y-%m-01') // The first day of this month
+                    'DateSetInvitations' => date('Y-m-01') // The first day of this month
                 ],
                 ['UserID' => $userID]
             );
             return $inviteCount;
         } else {
             // Otherwise return CountInvitations
-            return $user->CountInvitations;
+            // or inviteCount if it was recently downsized for the User's Role
+            return min($inviteCount, $user->CountInvitations);
         }
     }
 

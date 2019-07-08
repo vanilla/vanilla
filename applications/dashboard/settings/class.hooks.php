@@ -204,12 +204,6 @@ class DashboardHooks extends Gdn_Plugin {
         if ($embed = c('Garden.Embed.Allow')) {
             // Record the remote url where the forum is being embedded.
             $remoteUrl = c('Garden.Embed.RemoteUrl');
-            if (!$remoteUrl) {
-                $remoteUrl = getIncomingValue('remote');
-                if ($remoteUrl) {
-                    saveToConfig('Garden.Embed.RemoteUrl', $remoteUrl);
-                }
-            }
             if ($remoteUrl) {
                 $sender->addDefinition('RemoteUrl', $remoteUrl);
             }

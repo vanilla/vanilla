@@ -82,7 +82,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         height: unit(vars.iconWrap.height),
         ...borders({
             radius: 3,
-            color: "transparent",
+            color: globalVars.elementaryColors.transparent,
         }),
     } as NestedCSSProperties);
 

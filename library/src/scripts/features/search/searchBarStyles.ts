@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { borderRadii, borders, colorOut, standardizeBorderStyle, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
@@ -125,7 +125,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    ...borders(buttonVariables().standard.borders),
+                                    ...borders(standardizeBorderStyle(buttonVariables().standard.borders)),
                                 },
                             },
                         },
@@ -196,7 +196,7 @@ export const searchBarClasses = useThemeCache(() => {
         left: 0,
         overflow: "hidden",
         ...borders({
-            radius: unit(vars.results.borderRadius),
+            radius: vars.results.borderRadius,
         }),
         ...shadow.dropDown(),
         zIndex: 1,

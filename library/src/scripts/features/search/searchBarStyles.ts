@@ -144,7 +144,7 @@ export const searchBarClasses = useThemeCache(() => {
                     display: "none",
                 },
             },
-        } as NestedCSSProperties,
+        },
         mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
@@ -152,7 +152,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
             },
         }),
-    ) as NestedCSSProperties;
+    );
 
     const results = style("results", {
         backgroundColor: colorOut(vars.results.bg),
@@ -200,7 +200,7 @@ export const searchBarClasses = useThemeCache(() => {
         }),
         ...shadow.dropDown(),
         zIndex: 1,
-    } as NestedCSSProperties);
+    });
 
     const valueContainer = style("valueContainer", {
         display: "flex",

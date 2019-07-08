@@ -104,7 +104,7 @@ export const attachmentClasses = useThemeCache(() => {
                 $nest: hoverFocusStates,
             },
         },
-    } as NestedCSSProperties);
+    });
 
     const link = style("link", {
         ...allLinkStates({
@@ -127,7 +127,7 @@ export const attachmentClasses = useThemeCache(() => {
             width: 2,
             radius: 0,
         }),
-    } as NestedCSSProperties);
+    });
 
     const format = style("format", {
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),

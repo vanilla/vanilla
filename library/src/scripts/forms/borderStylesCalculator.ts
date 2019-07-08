@@ -5,23 +5,12 @@
  */
 
 import {
-    borders,
-    IBorderRadiusOutput,
-    IBorderStyles,
-    IBorderStylesWIP,
     BorderRadiusValue,
-    IRadiusShorthand,
-    radiusValue,
-    IBorderStylesAll,
     IBorderRadiiDeclaration,
+    IBorderRadiusOutput,
+    radiusValue,
 } from "@library/styles/styleHelpersBorders";
 import merge from "lodash/merge";
-import { capitalizeFirstLetter, logError } from "@vanilla/utils";
-import { BorderRadiusProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
-import { border, borderStyle } from "csx";
-import { unit } from "@library/styles/styleHelpers";
-import { BorderOptions, BoxFunction } from "csx/lib/types";
 
 /*
 export const calculateBorders = (borderStyles: IBorderStyles | undefined | null, debug = false) => {

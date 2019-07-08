@@ -566,7 +566,7 @@ export const singleBorderStyle = (
         return;
     }
     const { color, width, style } = borderStyles;
-    let output: ISingleBorderStyle = {};
+    const output: ISingleBorderStyle = {};
     output.color = colorOut(borderStyles.color ? borderStyles.color : color) as ColorValues;
     output.width = unit(borderStyles.width ? borderStyles.width : width) as BorderWidthProperty<TLength>;
     output.style = borderStyles.style ? borderStyles.style : (style as BorderStyleProperty);
@@ -578,12 +578,10 @@ export const singleBorderStyle = (
     }
 };
 
-export interface IBorders extends IBorderFinalStyles, ISingleBorderStyle {}
-
 export const borders = (
     borderStyles?: IBordersWithRadius | IBorderFinalStyles | undefined,
     fallbackVariables: IGlobalBorderStyles = globalVariables().border,
-) => {
+): NestedCSSProperties => {
     let output: NestedCSSProperties = {};
     const globalStyles = borderStyles as ISingleBorderStyle;
     const detailedStyles = borderStyles as IBorderFinalStyles;

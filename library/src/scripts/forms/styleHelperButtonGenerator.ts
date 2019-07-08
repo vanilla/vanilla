@@ -4,22 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
-import merge from "lodash/merge";
-import {
-    borders,
-    IBorderFinalStyles,
-    IBorderStyles,
-    standardizeBorderStyle,
-} from "@library/styles/styleHelpersBorders";
-import { percent } from "csx";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import { colorOut } from "@library/styles/styleHelpersColors";
 import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { borders, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
+import { colorOut } from "@library/styles/styleHelpersColors";
+import { fonts } from "@library/styles/styleHelpersTypography";
+import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { globalVariables } from "@library/styles/globalStyleVars";
 
 const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
     let output = {};
@@ -47,8 +41,8 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     const debug = buttonTypeVars.name === "splashSearchButton";
     //
     if (debug) {
-        window.console.log("");
-        window.console.log("Generate Button class, raw data: ", buttonTypeVars);
+        debug && console.log("");
+        debug && console.log("Generate Button class, raw data: ", buttonTypeVars);
     }
 
     // Make sure we have the second level, if it was empty
@@ -65,18 +59,13 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     );
 
     if (debug) {
-        window.console.log("buttonTypeVars.borders: ", buttonTypeVars.borders);
+        debug && console.log("buttonTypeVars.borders: ", buttonTypeVars.borders);
     }
 
     const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, debug);
 
-    if (debug) {
-        window.console.log("defaultBorder: ", defaultBorder);
-    }
-
-    if (debug) {
-        console.log("1. defaultBorder: ", defaultBorder);
-    }
+    debug && debug && console.log("defaultBorder: ", defaultBorder);
+    debug && debug && console.log("1. defaultBorder: ", defaultBorder);
 
     const hoverBorder = borders(
         buttonTypeVars.hover && buttonTypeVars.hover.borders
@@ -99,10 +88,16 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             : undefined,
     );
 
-    if (debug) {
-        window.console.log("     color : ", buttonTypeVars.colors ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg);
-        window.console.log("background : ", buttonTypeVars.colors ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg);
-    }
+    debug &&
+        console.log(
+            "     color : ",
+            buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
+        );
+    debug &&
+        console.log(
+            "background : ",
+            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
+        );
 
     return style(
         DEBUG_STYLES as any,
@@ -111,8 +106,10 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             textOverflow: "ellipsis",
             overflow: "hidden",
             maxWidth: percent(100),
-            color: buttonTypeVars.colors ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
-            background: buttonTypeVars.colors ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
+            color: colorOut(
+                buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
+            ),
+            // background: colorOut(buttonTypeVars.colors ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg),
             backgroundColor: colorOut(
                 buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
             ),
@@ -120,7 +117,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 ...buttonGlobals.font,
                 ...buttonTypeVars.fonts,
             }),
-            ...borders(defaultBorder as IBorderFinalStyles),
+            ...borders(defaultBorder),
             ...buttonSizing(
                 buttonDimensions && buttonDimensions.minHeight
                     ? buttonDimensions.minHeight

@@ -3873,6 +3873,7 @@ class UserModel extends Gdn_Model {
             return $inviteCount;
         } else {
             // Otherwise return CountInvitations
+            // or inviteCount if it was recently downsized for the User's Role
             return min($inviteCount, $user->CountInvitations);
         }
     }

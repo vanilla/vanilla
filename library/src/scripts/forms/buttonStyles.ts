@@ -31,6 +31,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("button");
 
     const colors = makeThemeVars("colors", {
+        fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
     });
 

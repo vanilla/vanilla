@@ -27,32 +27,32 @@ export interface IButtonType {
     };
     fonts?: IFont;
     hover?: {
-        fg?: ColorValues;
         colors?: {
+            fg?: ColorValues;
             bg?: ColorValues;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     focus?: {
-        fg?: ColorValues;
         colors?: {
+            fg?: ColorValues;
             bg?: ColorValues;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     active?: {
-        fg?: ColorValues;
         colors?: {
+            fg?: ColorValues;
             bg?: ColorValues;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     focusAccessible?: {
-        fg?: ColorValues;
         colors?: {
+            fg?: ColorValues;
             bg?: ColorValues;
         };
         borders?: IBorderStyles;

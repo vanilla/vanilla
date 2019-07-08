@@ -157,7 +157,7 @@ export const splashVariables = useThemeCache(() => {
         spinnerColor: colors.contrast,
         colors: {
             fg: colors.fg,
-            bg: colors.contrast,
+            bg: colors.bg,
         },
         borders: {
             all: {

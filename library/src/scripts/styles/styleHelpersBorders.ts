@@ -583,10 +583,10 @@ export const borders = (
     const formatedGlobalStyles = singleBorder(globalStyles);
     if (formatedGlobalStyles) {
         output = {
-            top: formatedGlobalStyles,
-            right: formatedGlobalStyles,
-            bottom: formatedGlobalStyles,
-            left: formatedGlobalStyles,
+            borderTop: formatedGlobalStyles,
+            borderRight: formatedGlobalStyles,
+            borderBottom: formatedGlobalStyles,
+            borderLeft: formatedGlobalStyles,
         };
     }
 

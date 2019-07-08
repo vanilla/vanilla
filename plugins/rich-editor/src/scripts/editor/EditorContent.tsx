@@ -104,7 +104,7 @@ function useQuillAttributeSync(placeholder?: string) {
     );
 
     useEffect(() => {
-        if (quill) {
+        if (quill && !quill.root.classList.contains(classesRichEditor.text)) {
             // Initialize some CSS classes onto the quill root.
             quill.root.classList.value = quillRootClasses;
         }
@@ -331,24 +331,26 @@ function useUpdateHandler() {
 
     const handleUpdate = useCallback(
         throttle((type: string, newValue, oldValue, source: Sources) => {
-            if (!quill) {
-                return;
-            }
-            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
-                onChange(getOperations());
-            }
+            requestAnimationFrame(() => {
+                if (!quill) {
+                    return;
+                }
+                if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+                    onChange(getOperations());
+                }
 
-            let shouldDispatch = false;
-            if (type === Quill.events.SELECTION_CHANGE) {
-                shouldDispatch = true;
-            } else if (source !== Quill.sources.SILENT) {
-                shouldDispatch = true;
-            }
+                let shouldDispatch = false;
+                if (type === Quill.events.SELECTION_CHANGE) {
+                    shouldDispatch = true;
+                } else if (source !== Quill.sources.SILENT) {
+                    shouldDispatch = true;
+                }
 
-            if (shouldDispatch) {
-                editorContents.updateSelection(quill.getSelection());
-            }
-        }, 1000 / 60), // Throttle to 60 FPS.
+                if (shouldDispatch) {
+                    editorContents.updateSelection(quill.getSelection());
+                }
+            }); // Throttle to 60 FPS.
+        }, 1000 / 60),
         [quill, onChange, getOperations],
     );
 

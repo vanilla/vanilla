@@ -235,7 +235,12 @@ const getSingleBorderStyle = (color, width, style) => {
  */
 export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: boolean = false) => {
     let output: IBorderFinalStyles = {};
-    if (!borderStyles) {
+
+    if (debug) {
+        window.console.log("borderStyles - standardized: ", borderStyles);
+    }
+
+    if (borderStyles) {
         let outputCount = 0;
 
         debug && console.log(outputCount++ + " - output: ", output);
@@ -311,29 +316,28 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             const color = getValueIfItExists(all, "color");
             const width = getValueIfItExists(all, "width");
             const style = getValueIfItExists(all, "style");
-            const border = {
-                color,
-                width,
-                style,
-            };
-            const radius = getValueIfItExists(all, "radius");
-            if (radius) {
-                merge(output, typeIsStringOrNumber(radius) ? setAllBorderRadii(radius) : radius);
+
+            if (color || width || style) {
+                const allStyles: any = {};
+
+                if (color) {
+                    allStyles.color = color;
+                }
+
+                if (width) {
+                    allStyles.width = width;
+                }
+
+                if (style) {
+                    allStyles.style = style;
+                }
+                merge(output, singleBorderStyle(allStyles));
             }
-            merge(output, {
-                top: {
-                    style: border,
-                },
-                right: {
-                    style: border,
-                },
-                bottom: {
-                    style: border,
-                },
-                left: {
-                    style: border,
-                },
-            });
+
+            const radius = getValueIfItExists(all, "radius");
+            if (radius && typeIsStringOrNumber(radius)) {
+                merge(output, radius);
+            }
         }
 
         debug && console.log(outputCount++ + " - output: ", output);
@@ -366,8 +370,8 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             const leftRightStyles = getSingleBorderStyle(color, width, style);
             if (color || width || style) {
                 merge(output, {
-                    top: leftRightStyles,
-                    bottom: leftRightStyles,
+                    left: leftRightStyles,
+                    right: leftRightStyles,
                 });
             }
         }
@@ -416,8 +420,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             const rightStyles = getSingleBorderStyle(color, width, style);
             if (color || width || style) {
                 merge(output, {
-                    top: rightStyles,
-                    bottom: rightStyles,
+                    right: rightStyles,
                 });
             }
 
@@ -447,7 +450,6 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             const bottomStyles = getSingleBorderStyle(color, width, style);
             if (color || width || style) {
                 merge(output, {
-                    top: bottomStyles,
                     bottom: bottomStyles,
                 });
             }

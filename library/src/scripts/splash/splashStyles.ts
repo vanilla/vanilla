@@ -168,10 +168,7 @@ export const splashVariables = useThemeCache(() => {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
             },
-            radius: {
-                left: 0,
-                right: searchBar.border.radius,
-            },
+            radius: searchBar.border.radius,
         },
         fonts: {
             color: colors.fg,
@@ -293,17 +290,14 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    const searchButton = generateButtonClass(vars.searchButton);
+    const searchButton = generateButtonClass(vars.searchButton, true);
 
     const valueContainer = style("valueContainer", {
         $nest: {
             [`&, &.${searchBarClasses().valueContainer}`]: {
                 ...borders({
                     color: vars.colors.contrast,
-                    radius: {
-                        right: 0,
-                        left: vars.searchBar.border.radius,
-                    },
+                    radius: vars.searchBar.border.radius,
                 } as any),
             },
         },

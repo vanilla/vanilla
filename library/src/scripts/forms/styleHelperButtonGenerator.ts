@@ -7,7 +7,12 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
 import merge from "lodash/merge";
-import { borders, IBorderStyles, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
+import {
+    borders,
+    IBorderFinalStyles,
+    IBorderStyles,
+    standardizeBorderStyle,
+} from "@library/styles/styleHelpersBorders";
 import { percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { colorOut } from "@library/styles/styleHelpersColors";
@@ -115,7 +120,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 ...buttonGlobals.font,
                 ...buttonTypeVars.fonts,
             }),
-            ...borders(defaultBorder),
+            ...borders(defaultBorder as IBorderFinalStyles),
             ...buttonSizing(
                 buttonDimensions && buttonDimensions.minHeight
                     ? buttonDimensions.minHeight

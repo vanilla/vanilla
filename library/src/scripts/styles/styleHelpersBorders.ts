@@ -243,6 +243,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
     if (borderStyles) {
         let outputCount = 0;
 
+        // 0
         debug && console.log(outputCount++ + " - output: ", output);
 
         // Start of global values
@@ -266,6 +267,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             });
         }
 
+        // 1
         debug && console.log(outputCount++ + " - output: ", output);
 
         //Width
@@ -287,6 +289,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             });
         }
 
+        // 2
         debug && console.log(outputCount++ + " - output: ", output);
         //Width
         const globalBorderStyle = getValueIfItExists(borderStyles, "style") as ColorValues;
@@ -308,6 +311,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
         }
         // End of global values
 
+        // 3
         debug && console.log(outputCount++ + " - output: ", output);
 
         // All (global styles, includes border radius
@@ -340,6 +344,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             }
         }
 
+        // 4
         debug && console.log(outputCount++ + " - output: ", output);
 
         // Top Bottom border styles (does not include border radius,
@@ -358,6 +363,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             }
         }
 
+        // 5
         debug && console.log(outputCount++ + " - output: ", output);
 
         // Left Right border styles (does not include border radius,
@@ -544,9 +550,11 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
     debug && console.log("FINAL: ", output);
 
     if (Object.keys(output).length > 0) {
-        return output;
+        return {
+            border: output,
+        };
     } else {
-        return undefined;
+        return {};
     }
 };
 

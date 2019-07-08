@@ -16,6 +16,21 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
+const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
+    let output = {};
+    if (defaultBorderStyle) {
+        output = defaultBorderStyle;
+    }
+
+    if (stateStyles) {
+        merge(output, {
+            borders: standardizeBorderStyle(stateStyles),
+        });
+    }
+
+    return output;
+};
+
 const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
@@ -53,21 +68,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     if (debug) {
         window.console.log("defaultBorder: ", defaultBorder);
     }
-
-    const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
-        let output = {};
-        if (defaultBorderStyle) {
-            output = defaultBorderStyle;
-        }
-
-        if (stateStyles) {
-            merge(output, {
-                borders: standardizeBorderStyle(stateStyles),
-            });
-        }
-
-        return output;
-    };
 
     if (debug) {
         console.log("1. defaultBorder: ", defaultBorder);

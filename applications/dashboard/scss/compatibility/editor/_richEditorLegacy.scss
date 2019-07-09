@@ -157,6 +157,19 @@ body.hasRichEditor {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
     }
+    .richEditor {
+        .buttonClose {
+            appearance: none;
+            border: 0;
+        }
+
+        .spoiler {
+            .iconButton {
+                justify-content: center;
+                display: flex;
+            }
+
+        }
 }
 
 // Handle gutter for paragraph menu

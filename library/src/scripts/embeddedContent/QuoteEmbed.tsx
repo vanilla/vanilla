@@ -11,7 +11,7 @@ import classnames from "classnames";
 import { makeProfileUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import DateTime from "@library/content/DateTime";
-import { chevronUp, bottomChevron } from "@library/icons/common";
+import { bottomChevron, topChevron } from "@library/icons/common";
 import CollapsableUserContent from "@library/content/CollapsableContent";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 
@@ -71,9 +71,7 @@ export function QuoteEmbed(props: IProps) {
                             onClick={toggleCollapseState}
                             aria-pressed={isCollapsed}
                         >
-                            {isCollapsed
-                                ? bottomChevron("embedQuote-chevronDown")
-                                : chevronUp("embedquote-chevronDown")}
+                            {isCollapsed ? bottomChevron("embedQuote-chevronDown") : topChevron("embedQuote-chevronUp")}
                         </button>
                     )}
                 </div>

@@ -162,7 +162,7 @@ describe("getMentionRange", () => {
         });
     });
 
-    it("Returns null when quill is not focused.", () => {
+    it("Returns even when quill is not focused.", () => {
         // Sanity check that this would otherwise be a valid mention.
         quill.setContents([{ insert: "@Somebody" }]);
         const selection = { index: 3, length: 0 };
@@ -171,7 +171,7 @@ describe("getMentionRange", () => {
 
         // Actual check.
         button.focus();
-        expect(getMentionRange(quill, selection)).to.eq(null);
+        expect(getMentionRange(quill, selection)).not.to.eq(null);
     });
 
     it("Returns null when the selection length is greater than 0", () => {

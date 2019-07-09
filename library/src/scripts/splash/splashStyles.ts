@@ -160,10 +160,8 @@ export const splashVariables = useThemeCache(() => {
             bg: colors.bg,
         },
         borders: {
-            all: {
-                color: globalVars.elementaryColors.transparent,
-                width: 0,
-            },
+            color: globalVars.elementaryColors.transparent,
+            width: 0,
             left: {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
@@ -223,7 +221,7 @@ export const splashVariables = useThemeCache(() => {
                 color: colors.contrast,
             },
         },
-    }) as IButtonType;
+    });
 
     return {
         outerBackground,

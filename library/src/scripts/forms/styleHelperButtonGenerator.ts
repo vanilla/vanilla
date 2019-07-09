@@ -17,20 +17,20 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 import { debuglog } from "util";
 
-const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
-    let output = {};
-    if (defaultBorderStyle) {
-        output = defaultBorderStyle;
-    }
-
-    if (stateStyles) {
-        merge(output, {
-            borders: standardizeBorderStyle(stateStyles),
-        });
-    }
-
-    return output;
-};
+// const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
+//     let output = {};
+//     if (defaultBorderStyle) {
+//         output = defaultBorderStyle;
+//     }
+//
+//     if (stateStyles) {
+//         merge(output, {
+//             borders: standardizeBorderStyle(stateStyles),
+//         });
+//     }
+//
+//     return output;
+// };
 
 const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -60,31 +60,30 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         buttonTypeVars,
     );
     // Remove debug and fallback
-    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, globalVariables().border, debug);
+    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, globalVariables().border);
 
-    debug && console.log("DATA                : ", buttonTypeVars.borders);
-    debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
-    debug && console.log("THROUGH BORDER      : ", borders(defaultBorder));
+    if (debug) {
+        console.log("default border: ", defaultBorder);
+        //     debug && console.log("DATA                : ", buttonTypeVars.borders);
+        //     debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
+        //     debug && console.log("THROUGH BORDER      : ", borders(defaultBorder, globalVariables().border, true));
+    }
 
     const hoverBorder = borders(
-        buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.hover.borders)
-            : undefined,
+        buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, buttonTypeVars.hover.borders) : {},
     );
     const activeBorder = borders(
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.active.borders)
-            : undefined,
+            ? merge(defaultBorder, buttonTypeVars.active.borders)
+            : {},
     );
     const focusBorder = borders(
-        buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.focus.borders)
-            : undefined,
+        buttonTypeVars.focus && buttonTypeVars.focus.borders ? merge(defaultBorder, buttonTypeVars.focus.borders) : {},
     );
     const focusAccessibleBorder = borders(
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.focusAccessible.borders)
-            : undefined,
+            ? merge(defaultBorder, buttonTypeVars.focusAccessible.borders)
+            : {},
     );
 
     return style(
@@ -97,7 +96,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             color: colorOut(
                 buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
             ),
-            // background: colorOut(buttonTypeVars.colors ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg),
             backgroundColor: colorOut(
                 buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
             ),

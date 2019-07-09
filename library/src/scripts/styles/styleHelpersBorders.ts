@@ -54,7 +54,7 @@ export interface IBorderStylesBySideLeft extends ISimpleBorderStyle {
     radius?: ILeftBorderRadii;
 }
 
-export interface IBorderStyles extends ISimpleBorderStyle, IBorderRadiiDeclaration {
+export interface IBorderStyles extends ISimpleBorderStyle {
     all?: IBorderStylesAll;
     topBottom?: ISimpleBorderStyle;
     leftRight?: ISimpleBorderStyle;
@@ -63,6 +63,10 @@ export interface IBorderStyles extends ISimpleBorderStyle, IBorderRadiiDeclarati
     left?: IBorderStylesBySideRight;
     right?: IBorderStylesBySideLeft;
     radius?: radiusValue;
+    topBorderRadius?: ITopBorderRadii;
+    rightBorderRadius?: IRightBorderRadii;
+    bottomBorderRadius?: IBottomBorderRadii;
+    leftBorderRadius?: ILeftBorderRadii;
 }
 
 export type borderType = IBordersWithRadius | IBorderStyles;
@@ -622,6 +626,7 @@ export const singleBorderStyle = (
 export const borders = (
     detailedStyles?: IBorderFinalStyles | ISimpleBorderStyle | undefined,
     fallbackVariables: IGlobalBorderStyles = globalVariables().border,
+    debug = false,
 ): NestedCSSProperties => {
     let output: NestedCSSProperties = {};
 
@@ -688,6 +693,11 @@ export const borders = (
             }
         }
     }
+
+    if (debug) {
+        console.log("output: ", output);
+    }
+
     return output;
 };
 

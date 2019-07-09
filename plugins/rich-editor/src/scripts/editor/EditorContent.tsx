@@ -81,7 +81,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
                 window.quill = null;
             };
         }
-    }, [mountRef.current, extraOptions]);
+        // Causes an infinite loops if we specify mountRef.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [extraOptions, setQuillInstance]);
     return ref.current;
 }
 
@@ -133,7 +135,7 @@ function useLoadStatus() {
                 quill.enable();
             }
         }
-    }, [isLoading, quill]);
+    }, [isLoading, quill, prevLoading]);
 }
 
 /**
@@ -150,7 +152,7 @@ function useInitialValue() {
                 quill.setContents(initialValue);
             }
         }
-    }, [quill, initialValue, reinitialize]);
+    }, [quill, initialValue, reinitialize, prevInitialValue, prevReinitialize]);
 }
 
 /**
@@ -258,9 +260,9 @@ function useQuoteButtonHandler() {
 function useGlobalSelectionHandler() {
     const updateHandler = useUpdateHandler();
 
-    const handleGlobalSelectionUpdate = () => {
+    const handleGlobalSelectionUpdate = useCallback(() => {
         updateHandler(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-    };
+    }, [updateHandler]);
 
     useEffect(() => {
         document.addEventListener(SELECTION_UPDATE, handleGlobalSelectionUpdate);
@@ -297,7 +299,7 @@ function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement
         return () => {
             textArea.addEventListener("paste", pasteHandler);
         };
-    }, [legacyMode, quill]);
+    }, [legacyMode, quill, textArea]);
 }
 
 /**

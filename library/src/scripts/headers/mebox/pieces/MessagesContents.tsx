@@ -111,7 +111,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
  * @param state Current Redux store state.
  */
 function mapStateToProps(state: IConversationsStoreState) {
-    let countUnread: number = 0;
+    let countUnread = 0;
     const data: IMeBoxMessageItem[] = [];
     const { conversationsByID } = state.conversations;
 

@@ -58,10 +58,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
             return (
                 <div id={this.id} className="authenticateUserCol">
                     {pageTitle}
-                    <Paragraph
-                        children={t("A message has been sent to your email address with password reset instructions.")}
-                        className="authenticateUser-paragraph"
-                    />
+                    <Paragraph className="authenticateUser-paragraph">
+                        {t("A message has been sent to your email address with password reset instructions.")}
+                    </Paragraph>
                     <RememberPasswordLink onClick={this.props.onNavigateAway} />
                 </div>
             );
@@ -69,16 +68,13 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
             return (
                 <div className="authenticateUserCol">
                     {pageTitle}
-                    <Paragraph
-                        children={t("RecoverPasswordLabelCode", "Enter your email to continue.")}
-                        className="authenticateUser-paragraph"
-                    />
+                    <Paragraph className="authenticateUser-paragraph">
+                        {t("RecoverPasswordLabelCode", "Enter your email to continue.")}
+                    </Paragraph>
                     <form id={this.id} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
-                        <Paragraph
-                            className="authenticateUser-paragraph"
-                            children={getGlobalErrorMessage(this.props.requestPasswordState.error, ["email"])}
-                            isError={true}
-                        />
+                        <Paragraph className="authenticateUser-paragraph" isError={true}>
+                            {getGlobalErrorMessage(this.props.requestPasswordState.error, ["email"])}
+                        </Paragraph>
                         <InputTextBlock
                             label={t("Email")}
                             inputProps={{

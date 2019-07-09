@@ -44,7 +44,7 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                 case NotificationsActions.GET_NOTIFICATIONS_REQUEST:
                     nextState.notificationsByID.status = LoadStatus.LOADING;
                     break;
-                case NotificationsActions.GET_NOTIFICATIONS_RESPONSE:
+                case NotificationsActions.GET_NOTIFICATIONS_RESPONSE: {
                     nextState.notificationsByID.status = LoadStatus.SUCCESS;
                     nextState.notificationsByID.data = {};
                     const notifications = action.payload.data as INotification[];
@@ -52,11 +52,12 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                         nextState.notificationsByID.data![notification.notificationID] = notification;
                     });
                     break;
+                }
                 case NotificationsActions.GET_NOTIFICATIONS_ERROR:
                     nextState.notificationsByID.status = LoadStatus.ERROR;
                     nextState.notificationsByID.error = action.payload;
                     break;
-                case NotificationsActions.MARK_ALL_READ_RESPONSE:
+                case NotificationsActions.MARK_ALL_READ_RESPONSE: {
                     const { data } = nextState.notificationsByID;
                     if (data) {
                         for (const id of Object.keys(data)) {
@@ -64,6 +65,7 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                         }
                     }
                     break;
+                }
             }
         });
     };

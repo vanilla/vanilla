@@ -10,11 +10,6 @@
         "module": "esnext",
         "isolatedModules": false,
         "skipLibCheck": true,
-        "sourceMap": true,
-        "plugins": [
-            {
-                "name": "typescript-tslint-plugin"
-            }
-        ]
+        "sourceMap": true
     }
 }

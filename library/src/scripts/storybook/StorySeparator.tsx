@@ -8,10 +8,14 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 
+interface IProps {
+    width: number;
+}
+
 /**
  * Separator, for react storybook.
  */
-export function StorySeparator(props) {
+export function StorySeparator(props: IProps) {
     const globalVars = globalVariables();
     return (
         <hr

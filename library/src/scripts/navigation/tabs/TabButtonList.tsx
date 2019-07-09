@@ -93,34 +93,38 @@ export default class TabButtonList extends React.Component<IProps, IState> {
             () => {
                 const tabHandler = new TabHandler(this.tabButtons.current!);
                 switch (event.key) {
-                    case "ArrowRight":
+                    case "ArrowRight": {
                         event.stopPropagation();
                         const nextElement = tabHandler.getNext(currentEl, false, true);
                         if (nextElement) {
                             nextElement.focus();
                         }
                         break;
-                    case "ArrowLeft":
+                    }
+                    case "ArrowLeft": {
                         event.stopPropagation();
                         const prevElement = tabHandler.getNext(currentEl, true, true);
                         if (prevElement) {
                             prevElement.focus();
                         }
                         break;
-                    case "Home":
+                    }
+                    case "Home": {
                         event.stopPropagation();
                         const firstElement = tabHandler.getInitial();
                         if (firstElement) {
                             firstElement.focus();
                         }
                         break;
-                    case "End":
+                    }
+                    case "End": {
                         event.stopPropagation();
                         const lastElement = tabHandler.getLast();
                         if (lastElement) {
                             lastElement.focus();
                         }
                         break;
+                    }
                 }
                 this.setState({
                     setAllTabIndexes: false,

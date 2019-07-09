@@ -41,9 +41,6 @@ export function mimeTypeToAttachmentType(mimeType?: string | null): AttachmentTy
         case "application/vnd.ms-powerpoint":
         case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
             return AttachmentType.PPT;
-        case "application/vnd.ms-excel":
-        case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            return AttachmentType.EXCEL;
         case "application/zip":
         case "application/x-7z-compressed":
         case "application/x-bzip":

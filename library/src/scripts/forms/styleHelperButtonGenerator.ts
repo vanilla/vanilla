@@ -14,6 +14,8 @@ import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { debuglog } from "util";
 
 const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
     let output = {};
@@ -39,7 +41,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
 
     // TEMP
     const debug = buttonTypeVars.name === "splashSearchButton";
-    //
+
     if (debug) {
         debug && console.log("");
         debug && console.log("Generate Button class, raw data: ", buttonTypeVars);
@@ -57,12 +59,12 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         } as IButtonType,
         buttonTypeVars,
     );
+    // Remove debug and fallback
+    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, globalVariables().border, debug);
 
-    if (debug) {
-        debug && console.log("buttonTypeVars.borders: ", buttonTypeVars.borders);
-    }
-
-    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, debug);
+    debug && console.log("DATA                : ", buttonTypeVars.borders);
+    debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
+    debug && console.log("THROUGH BORDER      : ", borders(defaultBorder));
 
     const hoverBorder = borders(
         buttonTypeVars.hover && buttonTypeVars.hover.borders

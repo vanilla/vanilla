@@ -9,6 +9,9 @@ import {
     IBackground,
     emphasizeLightness,
     ColorValues,
+    IBorderRadiiDeclaration,
+    radiusValue,
+    IBorderRadiusOutput,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
@@ -343,10 +346,11 @@ export const globalVariables = useThemeCache(() => {
     };
 });
 
-export interface IGlobalBorderStyles {
+export interface IGlobalBorderStyles extends IBorderRadiusOutput {
     color: ColorValues;
     width: BorderWidthProperty<TLength> | number;
     style: BorderStyleProperty;
+    radius?: radiusValue;
 }
 
 export enum IIconSizes {

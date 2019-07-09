@@ -316,11 +316,15 @@ const isStringOrNumber = variable => {
     return !!type ? type === "string" || type === "number" : false;
 };
 
-export const getValueIfItExists = (haystack: object, needle: string) => {
+export const getValueIfItExists = (haystack: object | undefined, needle: string, fallback: any = null) => {
     if (!!haystack && checkIfKeyExistsAndIsDefined(haystack, needle)) {
         return haystack[needle];
     } else {
-        return undefined;
+        if (typeof fallback !== null) {
+            return fallback;
+        } else {
+            return undefined;
+        }
     }
 };
 

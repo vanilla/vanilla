@@ -279,6 +279,7 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         position: "relative",
         height: unit(vars.sizing.height),
+        width: percent(100),
     });
 
     // special selector

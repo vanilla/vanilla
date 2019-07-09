@@ -290,16 +290,16 @@ export const splashClasses = useThemeCache(() => {
         color: colorOut(vars.colors.contrast),
     });
 
-    const searchButton = generateButtonClass(vars.searchButton, true);
+    const searchButton = generateButtonClass(vars.searchButton);
 
     const valueContainer = style("valueContainer", {
         $nest: {
-            [`&, &.${searchBarClasses().valueContainer}`]: {
-                ...borders({
-                    color: vars.colors.contrast,
-                    radius: vars.searchBar.border.radius,
-                } as any),
-            },
+            // [`&, &.${searchBarClasses().valueContainer}`]: {
+            //     ...borders({
+            //         color: vars.colors.contrast,
+            //         radius: vars.searchBar.border.radius,
+            //     } as any),
+            // },
         },
     } as NestedCSSProperties);
 

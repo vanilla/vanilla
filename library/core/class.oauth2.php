@@ -333,7 +333,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
             'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
+            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.'],
+            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']]
         ];
         return $formFields;
     }
@@ -401,9 +402,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
-            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'],
-            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']],
-            'Response Type' => ['LabelCode' => 'Code Token', 'Description' => 'The response type send in the authorize uri (note: certain values can change the work flow ie. id_token)'],
+            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -456,7 +455,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $uri = val('AuthorizeUrl', $provider);
 
         $redirect_uri = '/entry/'.$this->getProviderKey();
-        $reponse_type = array_key_exists('Response Type', $provider) ? $provider['Response Type'] : 'code';
+        $reponse_type = c('OAuth2.ResponseType', 'code');
 
         $defaultParams = [
             'response_type' => $reponse_type,
@@ -471,7 +470,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $get['state'] = $this->encodeState($state);
 
         if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
-            $get['Prompt'] = $provider['Prompt'];
+            $get['prompt'] = $provider['Prompt'];
         }
 
         return $uri.'?'.http_build_query($get);

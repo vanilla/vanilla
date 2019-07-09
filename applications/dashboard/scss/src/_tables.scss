@@ -165,11 +165,30 @@
   tbody + tbody {
     border-top: ($table-border-width) solid $table-border-color;
   }
+
+  .column-checkbox {
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+// Add to a table that has content in one or more cells.
+.table-data-content {
+  tbody {
+    td {
+      vertical-align: top;
+    }
+  }
+
+  .media + .userContent {
+    margin-top: $table-padding-y;
+  }
 }
 
 .table-data-cell {
   overflow: hidden;
-  padding: $table-cell-padding $padding-row;
+  padding: $table-padding-y $table-padding-x;
   line-height: $line-height;
   vertical-align: middle;
   border-bottom: $table-border-width solid $table-border-color;
@@ -209,6 +228,10 @@
       border-right: 0;
     }
 
+    &.column-full {
+      width: 100%;
+    }
+
     &.column-xl {
       width: to-rem(300);
     }
@@ -230,10 +253,7 @@
     }
 
     &.column-checkbox {
-      width: to-rem(54);
-      max-width: to-rem(54);
-      padding-left: $spacer;
-      padding-right: $spacer;
+      width: from-rem($spacer) + 2 * $table-padding-x;
     }
   }
 }

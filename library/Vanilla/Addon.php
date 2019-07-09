@@ -744,7 +744,7 @@ class Addon implements Contracts\AddonInterface {
             && in_array($this->getType(), [static::TYPE_LOCALE, static::TYPE_THEME])
         ) {
 
-            $issues['key-subdir-mismatch'] = "The addon key must match it's subdirectory name ($rawKey vs. $subdir).";
+            $issues['key-subdir-mismatch'] = "The addon key must match its subdirectory name ($rawKey vs. $subdir).";
         }
 
         if ($this->getType() === static::TYPE_ADDON) {
@@ -756,7 +756,7 @@ class Addon implements Contracts\AddonInterface {
             }
 
             if (strcasecmp($key, basename($this->getSubdir())) !== 0) {
-                $issues['key-subdir-mismatch-case'] = "The addon key must match it's subdirectory name ($key vs. $subdir).";
+                $issues['key-subdir-mismatch-case'] = "The addon key must match its subdirectory name ($key vs. $subdir).";
             }
         }
 

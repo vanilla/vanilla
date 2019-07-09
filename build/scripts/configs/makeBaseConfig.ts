@@ -43,7 +43,9 @@ ${chalk.green(aliases)}`;
         hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
     }
 
-    const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    // Leaving this out until we get the docs actually generating. Huge slowdown.
+    // const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    const storybookLoaders: never[] = [];
 
     const config: any = {
         context: VANILLA_ROOT,

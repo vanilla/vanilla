@@ -285,9 +285,7 @@ const MIN_MENTION_LENGTH = 1;
  * @returns A range if a mention was matched, or null if one was not.
  */
 export function getMentionRange(quill: Quill, currentSelection: RangeStatic | null): RangeStatic | null {
-    if (!quill.hasFocus()) {
-        return null;
-    }
+    // We can't check for focus here. Clicking an item in the mention list causes quill to "lose" focus.
 
     if (!currentSelection) {
         return null;

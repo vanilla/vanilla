@@ -1510,6 +1510,9 @@ class SettingsController extends DashboardController {
         // Get the currently selected Expiration Length
         $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
 
+        // Get target
+        $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+
         // Registration methods.
         $this->RegistrationMethods = [
             // 'Closed' => "Registration is closed.",
@@ -1548,6 +1551,7 @@ class SettingsController extends DashboardController {
         $registrationOptions = [
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.InviteExpiration',
+            'Garden.Registration.InviteTarget',
             'Garden.Registration.ConfirmEmail'
         ];
         $configurationModel->setField($registrationOptions);
@@ -1588,6 +1592,10 @@ class SettingsController extends DashboardController {
 
             // Save!
             if ($this->Form->save() !== false) {
+
+                // Get the updated InviteTarget
+                $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+
                 // Get the updated Expiration Length
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));

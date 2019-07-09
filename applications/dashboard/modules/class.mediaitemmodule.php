@@ -32,6 +32,11 @@ class MediaItemModule extends Gdn_Module {
     private $meta = [];
 
     /**
+     * @var array
+     */
+    private $titleMeta = [];
+
+    /**
      * Have some extra info to pass to the view and don't know where to put it? Add it here!
      *
      * @var array An array of options to add to a view.
@@ -228,7 +233,7 @@ class MediaItemModule extends Gdn_Module {
      * THIS ADDS AN ITEM TO THE META ARRAY
      *
      * @param string $meta An HTML-formatted string.
-     * @return MediaItemModule $this
+     * @return $this
      */
     public function addMeta($meta) {
         $this->meta[] = $meta;
@@ -242,13 +247,49 @@ class MediaItemModule extends Gdn_Module {
      * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
      * or a permission string or array of permission strings (full match) to check.
      * @param string $meta An HTML-formatted string.
-     * @return MediaItemModule $this
+     * @return $this
      */
     public function addMetaIf($isAllowed, $meta) {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
         return $this->addMeta($meta);
+    }
+
+    /**
+     * Add a meta item that displays beside the title.
+     *
+     * @param string $meta An HTML-formatted string.
+     * @return $this
+     */
+    public function addTitleMeta(string $meta) {
+        $this->titleMeta[] = $meta;
+        return $this;
+    }
+
+    /**
+     * Adds a HTML-formatted string to the title meta array if it satisfies the $isAllowed condition.
+     * It's up to the view to concatenate the contents of this array, using something like implode(' | ', $meta)
+     *
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
+     * @param string $meta An HTML-formatted string.
+     * @return MediaItemModule $this
+     */
+    public function addTitleMetaIf($isAllowed, string $meta) {
+        if (!$this->allowed($isAllowed)) {
+            return $this;
+        }
+        return $this->addTitleMeta($meta);
+    }
+
+    /**
+     * Get the title meta items.
+     *
+     * @return array Returns the title meta array.
+     */
+    public function getTitleMeta(): array {
+        return $this->titleMeta;
     }
 
     /**

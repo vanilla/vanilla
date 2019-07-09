@@ -394,7 +394,7 @@ class UpdateModel extends Gdn_Model {
                     ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK'];
                 $error = val($zipOpened, $errors, 'Unknown Error');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($path $error)", 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($error)", 400);
             }
             return [];
         }

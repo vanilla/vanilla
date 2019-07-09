@@ -15,6 +15,8 @@ interface IProps extends IBaseEmbedProps {
     name?: string;
 }
 
+const MIN_HEIGHT = 350;
+
 /**
  * A class for rendering CodePen embeds.
  */
@@ -23,7 +25,7 @@ export function CodePenEmbed(props: IProps): JSX.Element {
 
     return (
         <EmbedContent type={props.embedType} inEditor={props.inEditor}>
-            <iframe src={src} height={props.height || 400} width="100%" scrolling="no" />
+            <iframe src={src} height={Math.max(props.height || MIN_HEIGHT, MIN_HEIGHT)} width="100%" scrolling="no" />
         </EmbedContent>
     );
 }

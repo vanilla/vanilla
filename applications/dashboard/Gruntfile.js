@@ -27,7 +27,7 @@ module.exports = function(grunt) {
                 files: ["Gruntfile.js"],
             },
             sass: {
-                files: ["scss/**/*.scss"],
+                files: ["scss/**/*.scss", "../../**/scss/**/*.scss"],
                 tasks: ["sass_globbing", "sass", "autoprefixer"],
             },
             livereload: {

@@ -80,7 +80,7 @@ interface IState {
 /**
  * Implemented paragraph menu bar. Note that conceptually, it's a bar of menus, but visually it behaves like tabs.
  */
-export default class ParagraphMenuBar extends React.Component<IProps, IState> {
+export default class ParagraphMenuBar extends React.PureComponent<IProps, IState> {
     public state = {
         headingMenuOpen: false,
         listMenuOpen: false,

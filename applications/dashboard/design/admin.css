@@ -11312,10 +11312,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
   color: #555a62;
 }
-.userContent > *:not(.emoji):not(:last-child):not(br, .embedResponsive) {
+.userContent > *:not(.emoji):not(:last-child):not(br):not(.embedResponsive) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br, .embedResponsive) {
+.userContent > *:not(.emoji):first-child:not(br):not(.embedResponsive) {
   margin-top: -0.25em !important;
 }
 .userContent,
@@ -11402,6 +11402,20 @@ body.hasRichEditor .richEditor ~ .TextBoxWrapper,
 body.hasRichEditor .CommentForm .PreviewButton,
 body.hasRichEditor #Form_Preview {
   display: none !important;
+}
+body.hasRichEditor .richEditor .buttonClose {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+}
+body.hasRichEditor .richEditor .spoiler .iconButton {
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 @media (min-width: 700px) {
@@ -12324,23 +12338,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .embedImgur iframe {
   max-width: 100%;
-}
-
-/*!
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedTwitter .embedExternal-content {
-  border-radius: 4px;
-  width: auto;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
-
-.twitter-tweet {
-  margin: 0 auto !important;
-  min-width: 100% !important;
 }
 
 /*!

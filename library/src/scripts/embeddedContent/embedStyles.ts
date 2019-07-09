@@ -41,7 +41,7 @@ export const embedContainerVariables = useThemeCache(() => {
 export const embedContainerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = embedContainerVariables();
-    const style = styleFactory("attachment");
+    const style = styleFactory("embed");
 
     const hoverFocusStates = {
         "&:hover": {

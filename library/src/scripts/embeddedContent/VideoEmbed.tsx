@@ -10,6 +10,8 @@ import { t } from "@library/utility/appUtils";
 import { simplifyFraction } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
+import { style } from "typestyle";
+import { percent } from "csx";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -41,42 +43,36 @@ export function VideoEmbed(props: IProps) {
             ratioClass = "is1by1";
             break;
         case "16:9":
-        default:
             ratioClass = "is16by9";
+        default:
+            ratioClass = style({
+                $debugName: "isCustomRatio",
+                paddingTop: percent(((height || 3) / (width || 4)) * 100),
+            });
     }
 
-    const style: React.CSSProperties = ratioClass
-        ? {}
-        : {
-              paddingTop: ((height || 3) / (width || 4)) * 100 + "%",
-          };
-
-    const thumbnail = (
-        <div style={style}>
-            <button
-                type="button"
-                aria-label={name || undefined}
-                className="embedVideo-playButton"
-                onClick={togglePlaying}
-            >
-                <img src={photoUrl || undefined} role="presentation" className="embedVideo-thumbnail" />
-                <span className="embedVideo-scrim" />
-                <PlayIcon />
-            </button>
-        </div>
-    );
-
-    const content = isPlaying ? <VideoIframe url={frameSrc} /> : thumbnail;
     return (
         <EmbedContainer className="embedVideo" inEditor={props.inEditor}>
-            <EmbedContent
-                type={embedType}
-                inEditor={props.inEditor}
-                className={classNames("embedVideo-ratio", ratioClass)}
-            >
-                {content}
+            <EmbedContent type={embedType} inEditor={props.inEditor}>
+                {isPlaying ? (
+                    <VideoIframe url={frameSrc} />
+                ) : (
+                    <div className={classNames("embedVideo-ratio", ratioClass)}>
+                        <VideoThumbnail name={name} onClick={togglePlaying} photoUrl={photoUrl} />
+                    </div>
+                )}
             </EmbedContent>
         </EmbedContainer>
+    );
+}
+
+function VideoThumbnail(props: { name?: string; onClick: React.MouseEventHandler; photoUrl: string }) {
+    return (
+        <button type="button" aria-label={props.name} className="embedVideo-playButton" onClick={props.onClick}>
+            <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" />
+            <span className="embedVideo-scrim" />
+            <PlayIcon />
+        </button>
     );
 }
 
@@ -93,19 +89,19 @@ function VideoIframe(props: { url: string }) {
 }
 
 function PlayIcon() {
-    const style: React.CSSProperties = { fill: "currentColor", strokeWidth: 0.3 };
+    const cssStyle: React.CSSProperties = { fill: "currentColor", strokeWidth: 0.3 };
 
     return (
         <svg className="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
             <title>{t("Play Video")}</title>
             <path
                 className="embedVideo-playIconPath embedVideo-playIconPath-circle"
-                style={style}
+                style={cssStyle}
                 d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"
             />
             <polygon
                 className="embedVideo-playIconPath embedVideo-playIconPath-triangle"
-                style={style}
+                style={cssStyle}
                 points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"
             />
         </svg>

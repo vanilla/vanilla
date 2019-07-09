@@ -13,10 +13,13 @@ import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
-import { TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
+import { TwitterEmbed, convertTwitterEmbeds } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
+import { onContent } from "@library/utility/appUtils";
+
+export const FOCUS_CLASS = "embed-focusableElement";
 
 // Methods
 export interface IBaseEmbedProps {
@@ -26,7 +29,6 @@ export interface IBaseEmbedProps {
     name?: string;
     // Frontend only
     inEditor?: boolean;
-    // onRenderComplete: () => void;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps>;
@@ -84,3 +86,7 @@ registerEmbed("twitter", TwitterEmbed);
 registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);
 registerEmbed("youtube", VideoEmbed);
+
+// This is specifically required because of some legacy formats that don't render
+// The embed json format. Twitter was converted out of global JS and merged here.
+onContent(convertTwitterEmbeds);

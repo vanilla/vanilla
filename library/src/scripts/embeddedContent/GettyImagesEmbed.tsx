@@ -28,24 +28,18 @@ export function GettyImagesEmbed(props: IProps): JSX.Element {
     });
 
     return (
-        <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
-                <div className="embedExternal embedGetty">
-                    <div className="embedExternal-content">
-                        <a
-                            children={props.url}
-                            className="embedExternal-content gie-single js-gettyEmbed"
-                            href={`https://www.gettyimages.com/detail/${props.photoID}`}
-                            id={props.foreignID}
-                            data-height={props.height}
-                            data-width={props.width}
-                            data-sig={props.embedSignature}
-                            data-items={props.photoID}
-                        />
-                    </div>
-                </div>
-            </EmbedContent>
-        </EmbedContainer>
+        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+            <a
+                children={props.url}
+                className="embedExternal-content gie-single js-gettyEmbed"
+                href={`https://www.gettyimages.com/detail/${props.photoID}`}
+                id={props.foreignID}
+                data-height={props.height}
+                data-width={props.width}
+                data-sig={props.embedSignature}
+                data-items={props.photoID}
+            />
+        </EmbedContent>
     );
 }
 

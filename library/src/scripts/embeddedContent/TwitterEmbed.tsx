@@ -4,11 +4,12 @@
  */
 
 import { ensureScript } from "@library/dom/domUtils";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import React from "react";
+import React, { useEffect } from "react";
 import { onContent } from "@library/utility/appUtils";
+import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
+import classNames from "classnames";
 
 interface IProps extends IBaseEmbedProps {
     statusID: string;
@@ -18,26 +19,26 @@ interface IProps extends IBaseEmbedProps {
  * A class for rendering Twitter embeds.
  */
 export function TwitterEmbed(props: IProps): JSX.Element {
+    const classes = twitterEmbedClasses();
+
+    useEffect(() => {
+        void convertTwitterEmbeds();
+    }, []);
+
     return (
-        <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
-                <div className="embedExternal embedTwitter">
-                    <div
-                        className="embedExternal-content js-twitterCard"
-                        data-tweeturl={props.url}
-                        data-tweetid={props.statusID}
-                    >
-                        <a href={props.url} className="tweet-url" rel="nofollow">
-                            {props.url}
-                        </a>
-                    </div>
-                </div>
-            </EmbedContent>
-        </EmbedContainer>
+        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+            <div
+                className={classNames("js-twitterCard", classes.card)}
+                data-tweeturl={props.url}
+                data-tweetid={props.statusID}
+            >
+                <a href={props.url} className="tweet-url" rel="nofollow">
+                    {props.url}
+                </a>
+            </div>
+        </EmbedContent>
     );
 }
-
-onContent(convertTwitterEmbeds);
 
 /**
  * Render a single twitter embed.
@@ -81,7 +82,7 @@ async function renderTweet(contentElement: HTMLElement) {
  *
  * @see library/Vanilla/Embeds/EmbedManager.php
  */
-async function convertTwitterEmbeds() {
+export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript("//platform.twitter.com/widgets.js");

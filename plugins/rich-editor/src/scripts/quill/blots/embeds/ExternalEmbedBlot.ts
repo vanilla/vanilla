@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS, IEmbedData } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { escapeHTML, getData, setData } from "@library/dom/domUtils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
@@ -26,12 +26,12 @@ interface ILoaderData {
 
 interface IEmbedUnloadedValue {
     loaderData: ILoaderData;
-    dataPromise: Promise<IEmbedData>;
+    dataPromise: Promise<IBaseEmbedProps>;
 }
 
 interface IEmbedLoadedValue {
     loaderData: ILoaderData;
-    data: IEmbedData;
+    data: IBaseEmbedProps;
 }
 
 const WARNING_HTML = title => `
@@ -107,7 +107,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Create a successful embed element.
      */
-    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
+    public static createEmbedFromData(data: IBaseEmbedProps, loaderElement: Element | null): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
 
         jsEmbed.classList.add("js-embed");
@@ -207,7 +207,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Normalize data and dataPromise into Promise<data>
      */
-    private resolveDataFromValue(value: IEmbedValue): Promise<IEmbedData> {
+    private resolveDataFromValue(value: IEmbedValue): Promise<IBaseEmbedProps> {
         if ("data" in value) {
             return Promise.resolve(value.data);
         } else {

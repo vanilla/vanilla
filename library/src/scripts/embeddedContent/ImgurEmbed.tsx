@@ -25,11 +25,9 @@ export function ImgurEmbed(props: IProps): JSX.Element {
     });
 
     return (
-        <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
-                <blockquote className="imgur-embed-pub" data-id={props.imgurID} />
-            </EmbedContent>
-        </EmbedContainer>
+        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+            <blockquote className="imgur-embed-pub" data-id={props.imgurID} />
+        </EmbedContent>
     );
 }
 

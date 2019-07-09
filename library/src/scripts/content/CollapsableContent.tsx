@@ -6,6 +6,7 @@
 import React from "react";
 import debounce from "lodash/debounce";
 import { getElementHeight } from "@library/dom/domUtils";
+import { forceRenderStyles } from "typestyle";
 
 interface IProps {
     id: string;
@@ -50,6 +51,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
      * Do the initial height calculation and recalcuate if the window dimensions change.
      */
     public componentDidMount() {
+        forceRenderStyles();
         this.calcMaxHeight();
         window.addEventListener("resize", this.windowResizerHandler);
     }
@@ -116,13 +118,14 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
 
             const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
             if (finalMaxHeight > 0 && height > this.props.preferredMaxHeight) {
+                finalMaxHeight -= lastBottomMargin;
+
                 return {
                     height: finalMaxHeight,
                     needsCollapser: true,
                 };
             }
             lastBottomMargin = bottomMargin;
-
             finalMaxHeight += height;
         }
 

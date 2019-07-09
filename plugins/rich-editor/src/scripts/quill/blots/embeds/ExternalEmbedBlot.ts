@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS, IEmbedData } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS, IEmbedData } from "@library/embeddedContent/embedUtils";
 import { escapeHTML, getData, setData } from "@library/dom/domUtils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";

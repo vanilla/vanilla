@@ -6,7 +6,7 @@
 
 import React from "react";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";

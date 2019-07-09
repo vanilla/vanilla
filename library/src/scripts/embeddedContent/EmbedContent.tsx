@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@library/utility/appUtils";

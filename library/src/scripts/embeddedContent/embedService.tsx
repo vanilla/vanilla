@@ -18,6 +18,8 @@ import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
 
+export const FOCUS_CLASS = "embed-focusableElement";
+
 // Methods
 export interface IBaseEmbedProps {
     // Stored data.

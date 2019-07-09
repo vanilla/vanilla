@@ -30,7 +30,6 @@ export function EmbedContainer(props: IProps) {
             {...htmlProps}
             className={classNames(
                 "embedExternal",
-                // "js-embed",
                 classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!props.inEditor, !!withPadding),
                 props.className,
             )}

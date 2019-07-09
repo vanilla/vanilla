@@ -18,45 +18,45 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { unit, ifExistsWithFallback } from "@library/styles/styleHelpers";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 import merge from "lodash/merge";
-import { ColorHelper } from "csx";
+import { border, ColorHelper } from "csx";
 import { getValueIfItExists, setAllBorderRadii } from "@library/forms/borderStylesCalculator";
 
-export interface ISingleBorderStyle {
+export interface ISimpleBorderStyle {
     color?: ColorValues | ColorHelper;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
 }
 
-export interface IBordersWithRadius extends ISingleBorderStyle {
+export interface IBordersWithRadius extends ISimpleBorderStyle {
     radius?: radiusValue;
 }
 
 export type radiusValue = BorderRadiusProperty<TLength> | string;
 
-export interface IBorderStylesAll extends ISingleBorderStyle {
+export interface IBorderStylesAll extends ISimpleBorderStyle {
     radius?: radiusValue;
 }
 
-export interface IBorderStylesBySideTop extends ISingleBorderStyle {
+export interface IBorderStylesBySideTop extends ISimpleBorderStyle {
     radius?: ITopBorderRadii;
 }
 
-export interface IBorderStylesBySideBottom extends ISingleBorderStyle {
+export interface IBorderStylesBySideBottom extends ISimpleBorderStyle {
     radius?: IBottomBorderRadii;
 }
 
-export interface IBorderStylesBySideRight extends ISingleBorderStyle {
+export interface IBorderStylesBySideRight extends ISimpleBorderStyle {
     radius?: IRightBorderRadii;
 }
 
-export interface IBorderStylesBySideLeft extends ISingleBorderStyle {
+export interface IBorderStylesBySideLeft extends ISimpleBorderStyle {
     radius?: ILeftBorderRadii;
 }
 
-export interface IBorderStyles extends ISingleBorderStyle {
+export interface IBorderStyles extends ISimpleBorderStyle {
     all?: IBorderStylesAll;
-    topBottom?: ISingleBorderStyle;
-    leftRight?: ISingleBorderStyle;
+    topBottom?: ISimpleBorderStyle;
+    leftRight?: ISimpleBorderStyle;
     top?: IBorderStylesBySideTop;
     bottom?: IBorderStylesBySideBottom;
     left?: IBorderStylesBySideRight;
@@ -164,10 +164,10 @@ export interface IBorderStylesWIP {
 
 // This is the final outputted format before we generate the actual styles.
 export interface IBorderFinalStyles {
-    top?: ISingleBorderStyle;
-    right?: ISingleBorderStyle;
-    bottom?: ISingleBorderStyle;
-    left?: ISingleBorderStyle;
+    top?: ISimpleBorderStyle;
+    right?: ISimpleBorderStyle;
+    bottom?: ISimpleBorderStyle;
+    left?: ISimpleBorderStyle;
     radius?: IBorderRadiusOutput | number;
 }
 
@@ -217,7 +217,7 @@ const typeIsStringOrNumber = variable => {
 };
 
 const getSingleBorderStyle = (color, width, style) => {
-    const result: ISingleBorderStyle = {};
+    const result: ISimpleBorderStyle = {};
     if (color) {
         result.color = color;
     }
@@ -230,10 +230,30 @@ const getSingleBorderStyle = (color, width, style) => {
     return result;
 };
 
+const setAllBorderSides = (key: string, value: any) => {
+    return {
+        top: {
+            [key]: value,
+        },
+        right: {
+            [key]: value,
+        },
+        bottom: {
+            [key]: value,
+        },
+        left: {
+            [key]: value,
+        },
+    };
+};
+
 /*
     Exports a standardized border style format from a flexible format (IBorderStyles)
  */
-export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: boolean = false) => {
+export const standardizeBorderStyle = (
+    borderStyles: IBorderStyles | ISimpleBorderStyle | undefined | {} = {},
+    debug: boolean = false,
+) => {
     let output: IBorderFinalStyles = {};
 
     if (debug) {
@@ -244,74 +264,6 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
         let outputCount = 0;
 
         // 0
-        debug && console.log(outputCount++ + " - output: ", output);
-
-        // Start of global values
-        // Color
-        const globalColor = getValueIfItExists(borderStyles, "color") as ColorValues;
-
-        if (globalColor) {
-            merge(output, {
-                top: {
-                    color: globalColor,
-                },
-                right: {
-                    color: globalColor,
-                },
-                bottom: {
-                    color: globalColor,
-                },
-                left: {
-                    color: globalColor,
-                },
-            });
-        }
-
-        // 1
-        debug && console.log(outputCount++ + " - output: ", output);
-
-        //Width
-        const globalWidth = getValueIfItExists(borderStyles, "width") as ColorValues;
-        if (globalWidth) {
-            merge(output, {
-                top: {
-                    width: globalWidth,
-                },
-                right: {
-                    width: globalWidth,
-                },
-                bottom: {
-                    width: globalWidth,
-                },
-                left: {
-                    width: globalWidth,
-                },
-            });
-        }
-
-        // 2
-        debug && console.log(outputCount++ + " - output: ", output);
-        //Width
-        const globalBorderStyle = getValueIfItExists(borderStyles, "style") as ColorValues;
-        if (globalBorderStyle) {
-            merge(output, {
-                top: {
-                    style: globalBorderStyle,
-                },
-                right: {
-                    style: globalBorderStyle,
-                },
-                bottom: {
-                    style: globalBorderStyle,
-                },
-                left: {
-                    style: globalBorderStyle,
-                },
-            });
-        }
-        // End of global values
-
-        // 3
         debug && console.log(outputCount++ + " - output: ", output);
 
         // All (global styles, includes border radius
@@ -344,7 +296,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             }
         }
 
-        // 4
+        // 2
         debug && console.log(outputCount++ + " - output: ", output);
 
         // Top Bottom border styles (does not include border radius,
@@ -363,7 +315,7 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
             }
         }
 
-        // 5
+        // 3
         debug && console.log(outputCount++ + " - output: ", output);
 
         // Left Right border styles (does not include border radius,
@@ -548,25 +500,18 @@ export const standardizeBorderStyle = (borderStyles: IBorderStyles = {}, debug: 
     }
 
     debug && console.log("FINAL: ", output);
-
-    if (Object.keys(output).length > 0) {
-        return {
-            border: output,
-        };
-    } else {
-        return {};
-    }
+    return output;
 };
 
 export const singleBorderStyle = (
-    borderStyles: ISingleBorderStyle,
+    borderStyles: ISimpleBorderStyle,
     fallbackVariables: IGlobalBorderStyles = globalVariables().border,
 ) => {
     if (!borderStyles) {
         return;
     }
     const { color, width, style } = borderStyles;
-    const output: ISingleBorderStyle = {};
+    const output: ISimpleBorderStyle = {};
     output.color = colorOut(borderStyles.color ? borderStyles.color : color) as ColorValues;
     output.width = unit(borderStyles.width ? borderStyles.width : width) as BorderWidthProperty<TLength>;
     output.style = borderStyles.style ? borderStyles.style : (style as BorderStyleProperty);
@@ -579,85 +524,86 @@ export const singleBorderStyle = (
 };
 
 export const borders = (
-    borderStyles?: IBordersWithRadius | IBorderFinalStyles | undefined,
+    detailedStyles?: IBorderFinalStyles | ISimpleBorderStyle | undefined,
     fallbackVariables: IGlobalBorderStyles = globalVariables().border,
 ): NestedCSSProperties => {
     let output: NestedCSSProperties = {};
-    const globalStyles = borderStyles as ISingleBorderStyle;
-    const detailedStyles = borderStyles as IBorderFinalStyles;
 
-    const formatedGlobalStyles = singleBorder(globalStyles);
-    if (formatedGlobalStyles) {
-        output = {
-            borderTop: formatedGlobalStyles,
-            borderRight: formatedGlobalStyles,
-            borderBottom: formatedGlobalStyles,
-            borderLeft: formatedGlobalStyles,
-        };
+    // If we have simple border styles, get them standardized first.
+    if (detailedStyles) {
+        const style = getValueIfItExists(detailedStyles, "style");
+        const color = getValueIfItExists(detailedStyles, "color");
+        const width = getValueIfItExists(detailedStyles, "width");
+        if (style || color || width) {
+            merge(
+                output,
+                standardizeBorderStyle({
+                    style,
+                    color,
+                    width,
+                }),
+            );
+        }
     }
+    // Now we are sure to not have simple styles anymore.
+    detailedStyles = detailedStyles as IBorderFinalStyles;
+    if (detailedStyles) {
+        if (detailedStyles && Object.keys(detailedStyles).length > 0) {
+            if (detailedStyles.top) {
+                const topStyles = singleBorderStyle(detailedStyles.top, fallbackVariables);
+                if (topStyles) {
+                    output.borderTopWidth = topStyles.width;
+                    output.borderTopStyle = topStyles.style as any;
+                    output.borderTopColor = topStyles.color as any;
+                }
+            }
 
-    if (detailedStyles && Object.keys(detailedStyles).length > 0) {
-        if (detailedStyles.top) {
-            const topStyles = singleBorderStyle(detailedStyles.top, fallbackVariables);
-            if (topStyles) {
-                output.borderTopWidth = topStyles.width;
-                output.borderTopStyle = topStyles.style as any;
-                output.borderTopColor = topStyles.color as any;
+            if (detailedStyles.right) {
+                const rightStyles = singleBorderStyle(detailedStyles.right, fallbackVariables);
+                if (rightStyles) {
+                    output.borderRightWidth = rightStyles.width;
+                    output.borderRightStyle = rightStyles.style as any;
+                    output.borderRightColor = rightStyles.color as any;
+                }
             }
-        }
+            if (detailedStyles.bottom) {
+                const bottomStyles = singleBorderStyle(detailedStyles.bottom, fallbackVariables);
+                if (bottomStyles) {
+                    output.borderBottomWidth = bottomStyles.width;
+                    output.borderBottomStyle = bottomStyles.style as any;
+                    output.borderBottomColor = bottomStyles.color as any;
+                }
+            }
+            if (detailedStyles.left) {
+                const leftStyles = singleBorderStyle(detailedStyles.left, fallbackVariables);
+                if (leftStyles) {
+                    output.borderLeftWidth = leftStyles.width;
+                    output.borderLeftStyle = leftStyles.style as any;
+                    output.borderLeftColor = leftStyles.color as any;
+                }
+            }
 
-        if (detailedStyles.right) {
-            const rightStyles = singleBorderStyle(detailedStyles.right, fallbackVariables);
-            if (rightStyles) {
-                output.borderRightWidth = rightStyles.width;
-                output.borderRightStyle = rightStyles.style as any;
-                output.borderRightColor = rightStyles.color as any;
-            }
-        }
-        if (detailedStyles.bottom) {
-            const bottomStyles = singleBorderStyle(detailedStyles.bottom, fallbackVariables);
-            if (bottomStyles) {
-                output.borderBottomWidth = bottomStyles.width;
-                output.borderBottomStyle = bottomStyles.style as any;
-                output.borderBottomColor = bottomStyles.color as any;
-            }
-        }
-        if (detailedStyles.left) {
-            const leftStyles = singleBorderStyle(detailedStyles.left, fallbackVariables);
-            if (leftStyles) {
-                output.borderLeftWidth = leftStyles.width;
-                output.borderLeftStyle = leftStyles.style as any;
-                output.borderLeftColor = leftStyles.color as any;
-            }
-        }
-        const globalRadius = getValueIfItExists(globalStyles, "radius");
-        if (globalRadius) {
-            output.borderTopRightRadius = unit(globalRadius);
-            output.borderBottomRightRadius = unit(globalRadius);
-            output.borderTopRightRadius = unit(globalRadius);
-            output.borderTopRightRadius = unit(globalRadius);
-        }
-
-        const detailedRadius = getValueIfItExists(detailedStyles, "radius");
-        if (detailedRadius) {
-            if (detailedRadius.topRight) {
-                output.borderTopRightRadius = unit(detailedRadius.topRight);
-            }
-            if (detailedRadius.bottomRight) {
-                output.borderBottomRightRadius = unit(detailedRadius.bottomRight);
-            }
-            if (detailedRadius.bottomRight) {
-                output.borderTopRightRadius = unit(detailedRadius.bottomRight);
-            }
-            if (detailedRadius.topLeft) {
-                output.borderTopRightRadius = unit(detailedRadius.topLeft);
+            const detailedRadius = getValueIfItExists(detailedStyles, "radius");
+            if (detailedRadius) {
+                if (detailedRadius.topRight) {
+                    output.borderTopRightRadius = unit(detailedRadius.topRight);
+                }
+                if (detailedRadius.bottomRight) {
+                    output.borderBottomRightRadius = unit(detailedRadius.bottomRight);
+                }
+                if (detailedRadius.bottomRight) {
+                    output.borderTopRightRadius = unit(detailedRadius.bottomRight);
+                }
+                if (detailedRadius.topLeft) {
+                    output.borderTopRightRadius = unit(detailedRadius.topLeft);
+                }
             }
         }
     }
     return output;
 };
 
-export const singleBorder = (styles?: ISingleBorderStyle) => {
+export const singleBorder = (styles?: ISimpleBorderStyle) => {
     const vars = globalVariables();
     const borderStyles = styles !== undefined ? styles : {};
     return `${borderStyles.style ? borderStyles.style : vars.border.style} ${

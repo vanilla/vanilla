@@ -7,7 +7,7 @@
 import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
+import { borders, IBorderFinalStyles, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
@@ -64,9 +64,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
 
     const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, debug);
 
-    debug && debug && console.log("defaultBorder: ", defaultBorder);
-    debug && debug && console.log("1. defaultBorder: ", defaultBorder);
-
     const hoverBorder = borders(
         buttonTypeVars.hover && buttonTypeVars.hover.borders
             ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.hover.borders)
@@ -87,17 +84,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             ? mergeDefaultBorderWithStateBorder(defaultBorder, buttonTypeVars.focusAccessible.borders)
             : undefined,
     );
-
-    debug &&
-        console.log(
-            "     color : ",
-            buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
-        );
-    debug &&
-        console.log(
-            "background : ",
-            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
-        );
 
     return style(
         DEBUG_STYLES as any,
@@ -142,7 +128,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             cursor: "pointer",
             minWidth: buttonGlobals.sizing.minWidth,
             minHeight: buttonGlobals.sizing.minHeight,
-            ...defaultBorder,
             $nest: {
                 "&:not([disabled])": {
                     $nest: {

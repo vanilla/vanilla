@@ -166,7 +166,10 @@ export const splashVariables = useThemeCache(() => {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
             },
-            radius: searchBar.border.radius,
+            radius: {
+                left: 0,
+                right: searchBar.border.radius,
+            },
         },
         fonts: {
             color: colors.fg,

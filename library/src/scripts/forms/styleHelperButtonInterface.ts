@@ -11,6 +11,7 @@ import { TLength } from "typestyle/lib/types";
 
 export interface IButtonType {
     name: string;
+    spinnerColor?: ColorValues;
     colors?: {
         bg?: ColorValues;
         fg?: ColorValues;

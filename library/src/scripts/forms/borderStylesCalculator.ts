@@ -5,7 +5,7 @@
  */
 
 import {
-    BorderRadiusValue,
+    IBorderRadiusValue,
     IBorderRadiiDeclaration,
     IBorderRadiusOutput,
     radiusValue,
@@ -302,7 +302,7 @@ export const calculateBorders = (borderStyles: IBorderStyles | undefined | null,
 
  */
 
-export const setAllBorderRadii = (radius: BorderRadiusValue) => {
+export const setAllBorderRadii = (radius: IBorderRadiusValue) => {
     return {
         topRight: radius,
         bottomRight: radius,
@@ -355,7 +355,7 @@ export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclarat
     if (borderRadiusStyles !== undefined) {
         if (isStringOrNumber(typeof borderRadiusStyles)) {
             //string or number -> same as "all"
-            merge(output, setAllBorderRadii(borderRadiusStyles as BorderRadiusValue));
+            merge(output, setAllBorderRadii(borderRadiusStyles as IBorderRadiusValue));
         } else {
             //all -> if has radius set all
             const allValue = getValueIfItExists(borderRadiusStyles as IBorderRadiusOutput, "all");
@@ -365,25 +365,25 @@ export const borderRadiusCalculation = (borderRadiusStyles: IBorderRadiiDeclarat
 
             // top -> if has radius -> set topLeft and topRight radii
             if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "top")) {
-                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
-                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as IBorderRadiusValue;
+                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as IBorderRadiusValue;
             }
 
             // bottom -> if has radius -> set bottomLeft and bottomRight radii
             if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "top")) {
-                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
-                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as BorderRadiusValue;
+                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as IBorderRadiusValue;
+                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).top as IBorderRadiusValue;
             }
             // left-> if has radius -> set topLeft and bottomLeft radii
             if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "left")) {
-                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as BorderRadiusValue;
-                output.bottomLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as BorderRadiusValue;
+                output.topLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as IBorderRadiusValue;
+                output.bottomLeftRadius = (borderRadiusStyles as IBorderRadiiDeclaration).left as IBorderRadiusValue;
             }
 
             // right -> if has radius -> set topRight and bottomRight radii
             if (checkIfKeyExistsAndIsDefined(borderRadiusStyles as IBorderRadiiDeclaration, "right")) {
-                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as BorderRadiusValue;
-                output.bottomRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as BorderRadiusValue;
+                output.topRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as IBorderRadiusValue;
+                output.bottomRightRadius = (borderRadiusStyles as IBorderRadiiDeclaration).right as IBorderRadiusValue;
             }
 
             // Explicitly set corners

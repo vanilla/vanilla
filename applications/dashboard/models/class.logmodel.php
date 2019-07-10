@@ -229,7 +229,7 @@ class LogModel extends Gdn_Pluggable {
                     break;
                 case 'Discussion':
                     $result =
-                        '<b>'.$this->formatKey('Name', $data).'</b><br />'.
+                        '<b>'.htmlspecialchars(val('Name', $data)).'</b><br />'.
                         $this->formatKey('Body', $data);
                     break;
                 case 'ActivityComment':

@@ -19,7 +19,7 @@ import classNames from "classnames";
 import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useMemo } from "react";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -92,21 +92,20 @@ function useQuillAttributeSync(placeholder?: string) {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
-    const quillRootClasses = classNames(
-        quill && quill.root.classList.value,
-        "richEditor-text",
-        "userContent",
-        classesRichEditor.text,
-        {
-            // These classes shouln't be applied until the forum is converted to the new styles.
-            [classesUserContent.root]: !legacyMode,
-        },
+    const quillRootClasses = useMemo(
+        () =>
+            classNames("richEditor-text", "userContent", classesRichEditor.text, {
+                // These classes shouln't be applied until the forum is converted to the new styles.
+                [classesUserContent.root]: !legacyMode,
+            }),
+        [],
     );
 
     useEffect(() => {
-        if (quill && !quill.root.classList.contains(classesRichEditor.text)) {
-            // Initialize some CSS classes onto the quill root.
-            quill.root.classList.value = quillRootClasses;
+        if (quill) {
+            // Initialize some CSS classes onto the quill root.quillRootClasses
+            // quill && quill.root.classList.value,
+            quill.root.classList.value += " " + quillRootClasses;
         }
     }, [quill, quillRootClasses]);
 

@@ -325,6 +325,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
+        $promptOptions =  [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login'];
         $formFields = [
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
@@ -334,7 +335,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
             'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
             'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.'],
-            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']]
+            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => $promptOptions]
         ];
         return $formFields;
     }

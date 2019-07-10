@@ -34,7 +34,7 @@ export function ImgurEmbed(props: IProps): JSX.Element {
 async function convertImgurEmbeds() {
     const images = Array.from(document.querySelectorAll(".imgur-embed-pub"));
     if (images.length > 0) {
-        await ensureScript("//s.imgur.com/min/embed.js");
+        await ensureScript("https://s.imgur.com/min/embed.js");
 
         if (!window.imgurEmbed) {
             throw new Error("The Imgur post failed to load");

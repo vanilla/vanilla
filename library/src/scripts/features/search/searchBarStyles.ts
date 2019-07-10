@@ -98,8 +98,6 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    // borderTopLeftRadius: important(0),
-                    // borderBottomLeftRadius: important(0),
                     marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),

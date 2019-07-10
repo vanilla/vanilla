@@ -15,32 +15,32 @@ import { expect } from "chai";
 
 describe("styleHelperBorders", () => {
     it("will pass through final output untouched.");
-    describe.only("can transform shorthand into into the final form", () => {
+    describe("can transform shorthand into into the final form", () => {
         it("short hand declaration", () => {
             const input: IBorderRadiusValue = 24;
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "24px",
-                bottomRightRadius: "24px",
-                topLeftRadius: "24px",
-                topRightRadius: "24px",
+                borderBottomLeftRadius: "24px",
+                borderBottomRightRadius: "24px",
+                borderTopLeftRadius: "24px",
+                borderTopRightRadius: "24px",
             };
 
-            expect(standardizeBorderRadius(input)).deep.eq(expected);
+            expect(standardizeBorderRadius(input, true)).deep.eq(expected);
         });
 
         it("Data already correct, just display:", () => {
             const input: IBorderRadiusOutput = {
-                bottomLeftRadius: "24px",
-                bottomRightRadius: "24px",
-                topLeftRadius: "24px",
-                topRightRadius: "24px",
+                borderBottomLeftRadius: "24px",
+                borderBottomRightRadius: "24px",
+                borderTopLeftRadius: "24px",
+                borderTopRightRadius: "24px",
             };
 
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "24px",
-                bottomRightRadius: "24px",
-                topLeftRadius: "24px",
-                topRightRadius: "24px",
+                borderBottomLeftRadius: "24px",
+                borderBottomRightRadius: "24px",
+                borderTopLeftRadius: "24px",
+                borderTopRightRadius: "24px",
             };
 
             expect(standardizeBorderRadius(input)).deep.eq(expected);
@@ -49,10 +49,10 @@ describe("styleHelperBorders", () => {
         it("spreads the 'all' property over all of the radii", () => {
             const input: IRadiusShorthand = { all: 24 };
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "24px",
-                bottomRightRadius: "24px",
-                topLeftRadius: "24px",
-                topRightRadius: "24px",
+                borderBottomLeftRadius: "24px",
+                borderBottomRightRadius: "24px",
+                borderTopLeftRadius: "24px",
+                borderTopRightRadius: "24px",
             };
 
             expect(standardizeBorderRadius(input)).deep.eq(expected);
@@ -64,10 +64,10 @@ describe("styleHelperBorders", () => {
                 left: 50,
             };
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "50px",
-                bottomRightRadius: "24px",
-                topLeftRadius: "50px",
-                topRightRadius: "24px",
+                borderBottomLeftRadius: "50px",
+                borderBottomRightRadius: "24px",
+                borderTopLeftRadius: "50px",
+                borderTopRightRadius: "24px",
             };
 
             expect(standardizeBorderRadius(input)).deep.eq(expected);
@@ -76,28 +76,28 @@ describe("styleHelperBorders", () => {
         it("real example", () => {
             const input: IRadiusShorthand = {
                 left: 0,
-                right: 49,
+                right: 29,
             };
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "0px",
-                bottomRightRadius: "29px",
-                topLeftRadius: "0px",
-                topRightRadius: "29px",
+                borderBottomLeftRadius: "0px",
+                borderBottomRightRadius: "29px",
+                borderTopLeftRadius: "0px",
+                borderTopRightRadius: "29px",
             };
 
             expect(standardizeBorderRadius(input)).deep.eq(expected);
         });
 
-        it("real example", () => {
+        it("Test top bottom", () => {
             const input: IRadiusShorthand = {
                 top: 0,
                 bottom: 12,
             };
             const expected: IBorderRadiusOutput = {
-                bottomLeftRadius: "12px",
-                bottomRightRadius: "12px",
-                topLeftRadius: "0px",
-                topRightRadius: "0px",
+                borderBottomLeftRadius: "12px",
+                borderBottomRightRadius: "12px",
+                borderTopLeftRadius: "0px",
+                borderTopRightRadius: "0px",
             };
 
             expect(standardizeBorderRadius(input)).deep.eq(expected);

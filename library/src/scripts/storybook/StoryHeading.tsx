@@ -20,7 +20,7 @@ export function StoryHeading(props: IStoryHeadingProps) {
     const Tag = `h${depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     return (
         <>
-            {Tag !== "h1" && <StorySeparator />}
+            {Tag !== "h1" && <StorySeparator width={500} />}
             <Tag
                 style={
                     {
@@ -35,7 +35,7 @@ export function StoryHeading(props: IStoryHeadingProps) {
             >
                 {props.children}
             </Tag>
-            {Tag === "h2" && <StorySeparator width="500px" />}
+            {Tag === "h2" && <StorySeparator width={500} />}
         </>
     );
 }

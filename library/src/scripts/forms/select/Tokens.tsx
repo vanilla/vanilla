@@ -52,7 +52,7 @@ export default class Tokens extends React.Component<IProps, IState> {
             <div className={classNames("tokens", "inputBlock", this.props.className, classes.root)}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
                     <span className="inputBlock-labelText">{this.props.label}</span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
+                    <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>
                 </label>
 
                 <div className={classNames("inputBlock-inputWrap", classes.inputWrap, { hasFocus: this.state.focus })}>

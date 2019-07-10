@@ -8,172 +8,139 @@ import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { embed } from "@library/icons/editorIcons";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { isAllowedUrl, t } from "@library/utility/appUtils";
-import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
-import { IWithEditorProps } from "@rich-editor/editor/context";
-import { withEditor } from "@rich-editor/editor/withEditor";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
-import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
-import React from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
-import Flyout from "@rich-editor/flyouts/pieces/Flyout";
 
-interface IProps extends IWithEditorProps, IDeviceProps {
+interface IProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode: boolean;
 }
 
-interface IState extends IRequiredComponentID {
-    id: string;
-    url: string;
-    isInputValid: boolean;
-}
+export default function EmbedFlyout(props: IProps) {
+    const { quill, legacyMode } = useEditor();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const embedModule = useMemo(() => quill && quill.getModule("embed/insertion"), [quill]);
+    const id = useMemo(() => uniqueIDFromPrefix("embedPopover"), []);
+    const titleID = id + "-title";
+    const descriptionID = id + "-description";
 
-export class EmbedFlyout extends React.PureComponent<IProps, IState> {
-    private embedModule: EmbedInsertionModule;
-    private inputRef = React.createRef<HTMLInputElement>();
+    const [isInputValid, setInputValid] = useState(false);
+    const [url, setUrl] = useState("");
 
-    public constructor(props) {
-        super(props);
-        this.embedModule = props.quill.getModule("embed/insertion");
-        this.state = {
-            id: getRequiredID(props, "embedPopover"),
-            url: "",
-            isInputValid: false,
-        };
-    }
-
-    get titleID(): string {
-        return this.state.id + "-title";
-    }
-
-    get descriptionID(): string {
-        return this.state.id + "-description";
-    }
-
-    public render() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const classesInsertMedia = insertMediaClasses();
-        const placeholderText = `https://`;
-        return (
-            <>
-                <DropDown
-                    id={this.state.id}
-                    name={t("Insert Media")}
-                    buttonClassName={classNames(
-                        "richEditor-button",
-                        "richEditor-embedButton",
-                        classesRichEditor.button,
-                    )}
-                    title={t("Insert Media")}
-                    paddedList={true}
-                    onClose={this.clearInput}
-                    onVisibilityChange={forceSelectionUpdate}
-                    disabled={this.props.disabled}
-                    buttonContents={<IconForButtonWrap icon={embed()} />}
-                    buttonBaseClass={ButtonTypes.CUSTOM}
-                    renderAbove={!!this.props.renderAbove}
-                    renderLeft={!!this.props.renderLeft}
-                    selfPadded={true}
-                    initialFocusElement={this.inputRef.current}
-                    flyoutSize={FlyoutSizes.MEDIUM}
-                    contentsClassName={!this.props.legacyMode ? classesRichEditor.flyoutOffset : ""}
-                >
-                    <Frame
-                        body={
-                            <FrameBody>
-                                <p className={style({ marginTop: 6, marginBottom: 6 })}>
-                                    {t("Paste the URL of the media you want.")}
-                                </p>
-                                <input
-                                    className={classNames("InputBox", classesInsertMedia.insert, {
-                                        inputText: !this.props.legacyMode,
-                                    })}
-                                    placeholder={placeholderText}
-                                    value={this.state.url}
-                                    onChange={this.inputChangeHandler}
-                                    onKeyDown={this.buttonKeyDownHandler}
-                                    aria-labelledby={this.titleID}
-                                    aria-describedby={this.descriptionID}
-                                    ref={this.inputRef}
-                                />
-                            </FrameBody>
-                        }
-                        footer={
-                            <FrameFooter>
-                                <Button
-                                    className={classNames("insertMedia-insert", classesInsertMedia.button)}
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    disabled={!this.state.isInputValid}
-                                    onClick={this.buttonClickHandler}
-                                >
-                                    {t("Insert")}
-                                </Button>
-                            </FrameFooter>
-                        }
-                    />
-                </DropDown>
-            </>
-        );
-    }
-
-    private clearInput = () => {
-        this.setState({
-            url: "",
-        });
+    const clearInput = () => {
+        setUrl("");
     };
 
-    private submitUrl() {
-        this.clearInput();
-        this.embedModule.scrapeMedia(this.normalizeUrl(this.state.url));
-    }
+    /**
+     * Normalize the URL with a prepended http if there isn't one.
+     */
+    const normalizeUrl = (urlToNormalize: string) => {
+        const result = urlToNormalize.match(/^https?:\/\//) ? urlToNormalize : "http://" + urlToNormalize;
+        return result;
+    };
+
+    const submitUrl = () => {
+        clearInput();
+        embedModule.scrapeMedia(normalizeUrl(url));
+    };
 
     /**
      * Handle key-presses for the link toolbar.
      */
-    private buttonKeyDownHandler = (event: React.KeyboardEvent<any>) => {
+    const buttonKeyDownHandler = (event: React.KeyboardEvent<any>) => {
         if (KeyboardModule.match(event.nativeEvent, "enter")) {
             event.preventDefault();
             event.stopPropagation();
-            this.state.isInputValid && this.submitUrl();
+            isInputValid && submitUrl();
         }
     };
 
     /**
      * Handle a submit button click..
      */
-    private buttonClickHandler = (event: React.MouseEvent<any>) => {
+    const buttonClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
-        this.submitUrl();
+        submitUrl();
     };
 
     /**
      * Control the inputs value.
      */
-    private inputChangeHandler = (event: React.ChangeEvent<any>) => {
-        const url = event.target.value;
-        const isInputValid = isAllowedUrl(this.normalizeUrl(url));
-        this.setState({ url, isInputValid });
+    const inputChangeHandler = (event: React.ChangeEvent<any>) => {
+        setUrl(event.target.value);
+        setInputValid(isAllowedUrl(normalizeUrl(url)));
     };
 
-    /**
-     * Normalize the URL with a prepended http if there isn't one.
-     */
-    private normalizeUrl(url: string) {
-        const result = url.match(/^https?:\/\//) ? url : "http://" + url;
-        return result;
-    }
+    const classesRichEditor = richEditorClasses(legacyMode);
+    const classesInsertMedia = insertMediaClasses();
+    const placeholderText = `https://`;
+    return (
+        <>
+            <DropDown
+                id={id}
+                name={t("Insert Media")}
+                buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
+                title={t("Insert Media")}
+                paddedList={true}
+                onClose={clearInput}
+                onVisibilityChange={forceSelectionUpdate}
+                disabled={props.disabled}
+                buttonContents={<IconForButtonWrap icon={embed()} />}
+                buttonBaseClass={ButtonTypes.CUSTOM}
+                renderAbove={!!props.renderAbove}
+                renderLeft={!!props.renderLeft}
+                selfPadded={true}
+                initialFocusElement={inputRef.current}
+                flyoutSize={FlyoutSizes.MEDIUM}
+                contentsClassName={!legacyMode ? classesRichEditor.flyoutOffset : ""}
+            >
+                <Frame
+                    body={
+                        <FrameBody>
+                            <p className={style({ marginTop: 6, marginBottom: 6 })}>
+                                {t("Paste the URL of the media you want.")}
+                            </p>
+                            <input
+                                className={classNames("InputBox", classesInsertMedia.insert, {
+                                    inputText: !legacyMode,
+                                })}
+                                placeholder={placeholderText}
+                                value={url}
+                                onChange={inputChangeHandler}
+                                onKeyDown={buttonKeyDownHandler}
+                                aria-labelledby={titleID}
+                                aria-describedby={descriptionID}
+                                ref={inputRef}
+                            />
+                        </FrameBody>
+                    }
+                    footer={
+                        <FrameFooter>
+                            <Button
+                                className={classNames("insertMedia-insert", classesInsertMedia.button)}
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                disabled={!isInputValid}
+                                onClick={buttonClickHandler}
+                            >
+                                {t("Insert")}
+                            </Button>
+                        </FrameFooter>
+                    }
+                />
+            </DropDown>
+        </>
+    );
 }
-
-export default withDevice(withEditor<IProps>(EmbedFlyout));

@@ -104,7 +104,7 @@ function useQuillAttributeSync(placeholder?: string) {
     );
 
     useEffect(() => {
-        if (quill) {
+        if (quill && !quill.root.classList.contains(classesRichEditor.text)) {
             // Initialize some CSS classes onto the quill root.
             quill.root.classList.value = quillRootClasses;
         }

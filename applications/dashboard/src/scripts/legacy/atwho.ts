@@ -86,7 +86,7 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
  * @returns Matching string if successful.  Null on failure to match.
  */
 export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
-    flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    flag = flag.replace(/[-[]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     if (shouldStartWithSpace) {
         flag = "(?:^|\\s)" + flag;
     }

@@ -83,13 +83,7 @@ export const embedContainerClasses = useThemeCache(() => {
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],
             ...borders(vars.border),
-            ...shadowOrBorderBasedOnLightness(
-                globalVars.body.backgroundImage.color,
-                borders({
-                    color: vars.border.color,
-                }),
-                shadowHelper().embed(),
-            ),
+            ...shadowOrBorderBasedOnLightness(globalVars.body.backgroundImage.color, borders(), shadowHelper().embed()),
             $nest: {
                 // These 2 can't be joined together or their pseudselectors don't get created properly.
                 "&.isLoading": {

@@ -71,12 +71,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function getUserFragmentSchema() {
         if ($this->userFragmentSchema === null) {
-            $this->userFragmentSchema = $this->schema([
-                'userID:i' => 'The ID of the user.',
-                'name:s' => 'The username of the user.',
-                'photoUrl:s' => 'The URL of the user\'s avatar picture.',
-                'dateLastActive:dt|n' => 'Time the user was last active.',
-            ], 'UserFragment');
+            $this->userFragmentSchema = $this->schema(new \Vanilla\Models\UserFragmentSchema(), 'UserFragment');
         }
         return $this->userFragmentSchema;
     }

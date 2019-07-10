@@ -75,17 +75,38 @@ export function leftChevronCompact(className?: string) {
     );
 }
 
+export function topChevron(className?: string) {
+    const title = `↑`;
+    return (
+        <svg
+            className={classNames("icon-chevronUp", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M5.467,14.858l.668.618a.442.442,0,0,0,.614,0L12,10.614l5.252,4.862a.442.442,0,0,0,.614,0l.668-.618a.369.369,0,0,0,0-.569L12.308,8.524a.443.443,0,0,0-.615,0L5.467,14.289a.376.376,0,0,0-.134.284A.381.381,0,0,0,5.467,14.858Z"
+            />
+        </svg>
+    );
+}
+
 export function bottomChevron(className?: string) {
     const title = `↓`;
     return (
         <svg
-            className={classNames("icon-chevronLeftCompact", className)}
+            className={classNames("icon-chevronDown", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 6.606 11.2"
+            viewBox="0 0 24 24"
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path d={leftChevronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
+            <path
+                fill="currentColor"
+                d="M18.534,9.142l-.668-.618a.442.442,0,0,0-.614,0L12,13.386,6.749,8.524a.442.442,0,0,0-.614,0l-.668.618a.369.369,0,0,0,0,.569l6.226,5.765a.443.443,0,0,0,.615,0l6.226-5.765a.376.376,0,0,0,.134-.284A.381.381,0,0,0,18.534,9.142Z"
+            />
         </svg>
     );
 }
@@ -322,7 +343,7 @@ export function signIn(className?: string) {
 }
 
 export function chevronUp(className?: string) {
-    const title = t("Close");
+    const title = t("Chevron Up");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

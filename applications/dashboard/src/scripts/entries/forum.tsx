@@ -28,7 +28,7 @@ registerReducer("notifications", new NotificationsModel().reducer);
 // Routing
 addComponent("App", Router);
 addRoutes([
-    <Route exact path="/authenticate/signin" component={SignInPage} />,
-    <Route exact path="/authenticate/password" component={PasswordPage} />,
-    <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
+    <Route exact path="/authenticate/signin" component={SignInPage} key="signin" />,
+    <Route exact path="/authenticate/password" component={PasswordPage} key="password" />,
+    <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} key="recover" />,
 ]);

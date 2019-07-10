@@ -91,6 +91,7 @@ export default class UserSuggestionActions extends ReduxActions {
                                 ),
                             );
                         }
+                        break;
                     case LoadStatus.LOADING:
                         // Already handled
                         return;
@@ -120,10 +121,13 @@ export default class UserSuggestionActions extends ReduxActions {
                                 ),
                             );
                         }
+                        break;
                     }
                     case LoadStatus.ERROR:
+                        break;
                     // Previously failed. We still want to proceed to a real lookup so do nothing.
                     case LoadStatus.PENDING:
+                        break;
                     // We still want to proceed to a real lookup so do nothing.
                 }
             }

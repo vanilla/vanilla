@@ -118,6 +118,11 @@ class DiscussionModel extends Gdn_Model {
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+
+        $this->addFilterField([
+            'Sink',
+            'Score',
+        ]);
     }
 
     /**

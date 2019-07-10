@@ -186,6 +186,8 @@ class MessagesController extends ConversationsController {
                 ['viewingUserID' => Gdn::session()->UserID]
             );
 
+            $this->Form->removeFormValue('MessageID');
+
             $this->EventArguments['Conversation'] = $conversation;
             $this->EventArguments['ConversationID'] = $conversationID;
             $this->fireEvent('BeforeAddMessage');

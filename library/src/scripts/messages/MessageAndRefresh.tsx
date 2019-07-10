@@ -19,7 +19,8 @@ interface IProps {
 export default function MessageAndRefresh(props: IProps) {
     const contents = t("The application has been updated. Refresh to get the latest version.");
     const refresh = () => {
-        window.location.href = window.location.href;
+        const currentUrl = window.location.href;
+        window.location.href = currentUrl;
     };
     return (
         <Message

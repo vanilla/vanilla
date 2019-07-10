@@ -61,15 +61,15 @@ export function lineHeightAdjustment(
             };
         }
     };
-    const result = !!nestedStyles ? nestedStyles : {};
+    const result = nestedStyles ? nestedStyles : {};
 
     const before = calculateOffset(Position.BEFORE);
-    if (!!before) {
+    if (before) {
         result["&::before"] = before;
     }
 
     const after = calculateOffset(Position.AFTER);
-    if (!!after) {
+    if (after) {
         result["&::after"] = after;
     }
 

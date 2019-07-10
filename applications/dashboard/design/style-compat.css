@@ -1469,6 +1469,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   cursor: pointer;
   overflow: hidden;
+  border: none;
 }
 
 .embedVideo-playIcon {

@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla;
 use Exception;
 use Garden\Http\HttpRequest;
 use VanillaTests\SharedBootstrapTestCase;
-use VanillaTests\Fixtures\PageScraper;
+use VanillaTests\Fixtures\LocalFilePageScraper;
 use Vanilla\Metadata\Parser\OpenGraphParser;
 use Vanilla\Metadata\Parser\JsonLDParser;
 
@@ -21,11 +21,11 @@ class PageScraperTest extends SharedBootstrapTestCase {
     /**
      * Grab a new testable instance of PageScraper.
      *
-     * @return PageScraper
+     * @return LocalFilePageScraper
      */
     private function pageScraper() {
         // Create the test instance. Register the metadata handlers.
-        $pageScraper = new PageScraper(new HttpRequest());
+        $pageScraper = new LocalFilePageScraper(new HttpRequest());
         $pageScraper->setHtmlDir(self::HTML_DIR);
         $pageScraper->registerMetadataParser(new OpenGraphParser());
         $pageScraper->registerMetadataParser(new JsonLDParser());

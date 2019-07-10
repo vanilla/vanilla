@@ -17,7 +17,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 const stubEmbedData: IEmbedValue = {
     data: {
-        type: "stub",
+        embedType: "stub",
         url: "",
         attributes: [],
     },

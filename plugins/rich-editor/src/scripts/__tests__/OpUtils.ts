@@ -76,12 +76,13 @@ export default class OpUtils {
     }
 
     public static image(url: string, alt: string | null = null) {
+        alt = alt || "";
         const imageData: IEmbedValue = {
             loaderData: {
                 type: "image",
             },
             data: {
-                type: "image",
+                embedType: "image",
                 url,
                 name: alt,
                 attributes: {},

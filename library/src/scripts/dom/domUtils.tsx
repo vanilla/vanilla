@@ -483,7 +483,7 @@ export function mountReact(
     component: React.ReactElement,
     target: HTMLElement,
     callback?: () => void,
-    options?: { overwrite: true },
+    options?: { overwrite: boolean },
 ) {
     let mountPoint = target;
     let cleanupContainer: HTMLElement | undefined;

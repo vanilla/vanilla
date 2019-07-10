@@ -4,19 +4,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import path from "path";
-import * as del from "del";
-import webpack, { Stats, Configuration } from "webpack";
-import { makeProdConfig } from "./configs/makeProdConfig";
-import { makeDevConfig } from "./configs/makeDevConfig";
-import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
-import { installLerna } from "./utility/moduleUtils";
-import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { print, fail } from "./utility/utils";
-import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
-import EntryModel from "./utility/EntryModel";
+import * as del from "del";
+import path from "path";
+import webpack, { Configuration, Stats } from "webpack";
 import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import { makeDevConfig } from "./configs/makeDevConfig";
+import { makePolyfillConfig } from "./configs/makePolyfillConfig";
+import { makeProdConfig } from "./configs/makeProdConfig";
+import { DIST_DIRECTORY } from "./env";
+import { BuildMode, getOptions, IBuildOptions } from "./options";
+import EntryModel from "./utility/EntryModel";
+import { installLerna } from "./utility/moduleUtils";
+import { fail, print } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -129,7 +129,7 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             host: this.options.devIp,
             port: 3030,
             hot: true,
-            open: true,
+            open: false,
             https: false,
             disableHostCheck: true,
             headers: {

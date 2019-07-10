@@ -58,11 +58,11 @@ $richEditor_innerPadding                          : 12px !default;
     }
 
     > *:not(.emoji) {
-        &:not(:last-child):not(br) {
+        &:not(:last-child):not(br,.embedResponsive) {
             margin-bottom: $global-block_margin;
         }
 
-        &:first-child:not(br) {
+        &:first-child:not(br,.embedResponsive) {
             margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }
@@ -156,6 +156,19 @@ body.hasRichEditor {
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
+    }
+    .richEditor {
+        .buttonClose {
+            appearance: none;
+            border: 0;
+        }
+
+        .spoiler {
+            .iconButton {
+                justify-content: center;
+                display: flex;
+            }
+        }
     }
 }
 

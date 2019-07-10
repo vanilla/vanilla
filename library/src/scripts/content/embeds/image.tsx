@@ -20,7 +20,7 @@ export class ImageEmbed extends BaseEmbed {
 
         // Yes we actually want a target blank here (even if we don't want it on normal links).
         return (
-            <a className="embedImage-link" href={sanitizedUrl || ""} rel="nofollow noopener" target="_blank">
+            <a className="embedImage-link" href={sanitizedUrl || ""} rel="nofollow noopener noreferrer" target="_blank">
                 <img className="embedImage-img" src={url || ""} alt={name || ""} />
             </a>
         );

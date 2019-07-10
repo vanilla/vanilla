@@ -161,7 +161,7 @@ export class SiteNav extends React.Component<IProps> {
                     }
                 }
                 break;
-            case "Home":
+            case "Home": {
                 /*
                     If a cell is focused, moves focus to the previous interactive widget in the current row.
                     If a row is focused, moves focus out of the treegrid.
@@ -173,7 +173,8 @@ export class SiteNav extends React.Component<IProps> {
                     firstLink.focus();
                 }
                 break;
-            case "End":
+            }
+            case "End": {
                 /*
                     If a row is focused, moves to the first row.
                     If a cell is focused, moves focus to the first cell in the row containing focus.
@@ -185,6 +186,7 @@ export class SiteNav extends React.Component<IProps> {
                     lastLink.focus();
                 }
                 break;
+            }
         }
     };
 }

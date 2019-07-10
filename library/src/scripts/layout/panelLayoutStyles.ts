@@ -170,6 +170,7 @@ export const layoutVariables = useThemeCache(() => {
         contentSizes,
         mediaQueries,
         panelLayoutSpacing,
+        panelLayoutBreakPoints,
     };
 });
 

@@ -15,8 +15,6 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
  * Dispatcher middleware for handling content-security headers.
  */
 class ContentSecurityPolicyMiddleware {
-    const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
-
     /**
      * @var ContentSecurityPolicyModel
      */
@@ -41,28 +39,10 @@ class ContentSecurityPolicyMiddleware {
         $response = Data::box($next($request));
 
         $response->setHeader(
-            self::CONTENT_SECURITY_POLICY,
-            $this->getHeaderString()
+            ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY,
+            $this->contentSecurityPolicyModel->getHeaderString()
         );
 
         return $response;
-    }
-
-    /**
-     * Compose content security header string from policies list
-     *
-     * @return string
-     */
-    private function getHeaderString(): string {
-        $directives = [];
-        $policies = $this->contentSecurityPolicyModel->getPolicies();
-        foreach ($policies as $policy) {
-            if (array_key_exists($policy->getDirective(), $directives)) {
-                $directives[$policy->getDirective()] .= ' ' . $policy->getArgument();
-            } else {
-                $directives[$policy->getDirective()] = $policy->getDirective() . ' ' . $policy->getArgument();
-            }
-        }
-        return implode('; ', $directives);
     }
 }

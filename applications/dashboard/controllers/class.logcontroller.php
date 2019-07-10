@@ -161,6 +161,7 @@ class LogController extends DashboardController {
         $this->permission('Garden.Moderation.Manage');
         list($offset, $limit) = offsetLimit($page, 10);
         $this->setData('Title', t('Change Log'));
+        $this->setData('_flaggedByTitle', t('Updated By'));
 
         $operations = ['Edit', 'Delete', 'Ban'];
         if ($op && in_array(ucfirst($op), $operations)) {

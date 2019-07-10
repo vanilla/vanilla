@@ -9,7 +9,19 @@
     <?php } ?>
     <div class="media-body">
         <div class="media-title">
-            <?php echo $this->getTitleUrl() != '' ? anchor(htmlspecialchars($this->getTitle()), $this->getTitleUrl(), 'reverse-link') : htmlspecialchars($this->getTitle()); ?>
+            <?php
+                echo $this->getTitleUrl() != '' ? anchor(htmlspecialchars($this->getTitle()), $this->getTitleUrl(), 'reverse-link') : htmlspecialchars($this->getTitle());
+
+                if (!empty($this->getTitleMeta())) {
+                    echo ' <span class="info info-inline">';
+
+                    foreach ($this->getTitleMeta() as $meta) {
+                        echo '<span class="info-item">'.$meta.'</span> ';
+                    }
+
+                    echo '</span> ';
+                }
+            ?>
         </div>
         <?php if ($this->getDescription()) { ?>
             <div class="media-description">
@@ -18,7 +30,11 @@
         <?php } ?>
         <?php if ($this->getMeta()) { ?>
             <div class="info">
-                <?php echo implode('<span class="spacer">|</span>', $this->getMeta()); ?>
+                <?php
+                foreach ($this->getMeta() as $meta) {
+                    echo '<span class="info-item">'.$meta.'</span> ';
+                }
+                ?>
             </div>
         <?php } ?>
         <?php foreach ($this->getButtons() as $button) { ?>

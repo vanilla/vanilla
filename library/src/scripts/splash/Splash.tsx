@@ -11,7 +11,7 @@ import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { splashStyles, splashVariables } from "@library/splash/splashStyles";
+import { splashClasses, splashVariables } from "@library/splash/splashStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -28,7 +28,7 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const classes = splashStyles();
+        const classes = splashClasses();
         const vars = splashVariables();
         const { action, className } = this.props;
         const title = this.props.title;

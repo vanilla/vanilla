@@ -71,11 +71,11 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                     <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
                         {this.props.label}
                     </span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
+                    <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>
                 </span>
 
                 <span className="inputBlock-inputWrap">{children}</span>
-                <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
+                <Paragraph className="inputBlock-labelNote">{this.props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );

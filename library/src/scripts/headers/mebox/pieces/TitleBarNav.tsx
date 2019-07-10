@@ -27,7 +27,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
     public render() {
         const classes = titleBarNavClasses();
         const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
-        const content = !!this.props.data
+        const content = this.props.data
             ? this.props.data.map((item, key) => {
                   return (
                       <TitleBarNavItem
@@ -50,7 +50,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
         return (
             <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
                 <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
-                    {!!this.props.children ? this.props.children : content}
+                    {this.props.children ? this.props.children : content}
                 </ul>
             </nav>
         );

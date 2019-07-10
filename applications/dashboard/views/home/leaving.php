@@ -6,6 +6,6 @@
     <?php echo sprintf(
         t('You are now leaving %1$s. Click the link to continue to %2$s.'),
         c('Garden.Title', ''),
-        anchor(htmlspecialchars($this->data('Target')), $this->data('Target'), '', ['rel' => 'nofollow'])
+        $this->data('Target')
     ); ?>
 </p>

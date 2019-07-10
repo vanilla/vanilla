@@ -44,6 +44,7 @@ export function VideoEmbed(props: IProps) {
             break;
         case "16:9":
             ratioClass = "is16by9";
+            break;
         default:
             ratioClass = style({
                 $debugName: "isCustomRatio",

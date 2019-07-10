@@ -23,14 +23,6 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
-    // TEMP
-    const debug = buttonTypeVars.name === "splashSearchButton";
-
-    if (debug) {
-        debug && console.log("");
-        debug && console.log("Generate Button class, raw data: ", buttonTypeVars);
-    }
-
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
@@ -44,15 +36,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         buttonTypeVars,
     );
     // Remove debug and fallback
-    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border, debug);
-
-    if (debug) {
-        console.log("default border: ", defaultBorder);
-        debug && console.log("DATA                : ", buttonTypeVars.borders);
-        debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
-        // debug && console.log("THROUGH BORDER      : ", borders(n, globalVariables().border, true));
-        debug && console.log("THROUGH BORDER      : ", defaultBorder);
-    }
+    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
     const hoverBorder = borders(
         buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, buttonTypeVars.hover.borders) : {},

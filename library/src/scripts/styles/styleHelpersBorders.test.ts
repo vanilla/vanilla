@@ -8,7 +8,6 @@ import {
     IBorderRadiusOutput,
     IBorderRadiusValue,
     IRadiusShorthand,
-    IRadiusValue,
     standardizeBorderRadius,
 } from "@library/styles/styleHelpersBorders";
 import { expect } from "chai";

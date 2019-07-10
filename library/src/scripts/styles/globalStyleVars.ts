@@ -4,18 +4,17 @@
  */
 
 import {
-    modifyColorBasedOnLightness,
     colorOut,
-    IBackground,
-    emphasizeLightness,
     ColorValues,
-    radiusValue,
+    emphasizeLightness,
+    IBackground,
     IBorderRadiusOutput,
+    modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, ColorHelper, percent, viewHeight } from "csx";
+import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty } from "csstype";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -103,7 +102,7 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const border = makeThemeVars("border", {
+    const border: IGlobalBorderStyles = makeThemeVars("border", {
         color: mixBgAndFg(0.15),
         width: 1,
         style: "solid",

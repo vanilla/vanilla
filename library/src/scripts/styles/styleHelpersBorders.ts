@@ -251,10 +251,10 @@ const setAllBorders = (
     radius?: IBorderRadiusOutput,
 ) => {
     return {
-        borderTopColor: color,
-        borderRightColor: color,
-        borderBottomColor: color,
-        borderLeftColor: color,
+        borderTopColor: colorOut(color),
+        borderRightColor: colorOut(color),
+        borderBottomColor: colorOut(color),
+        borderLeftColor: colorOut(color),
         borderTopWidth: unit(width),
         borderRightWidth: unit(width),
         borderBottomWidth: unit(width),

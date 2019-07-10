@@ -7,13 +7,12 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, standardizeBorderStyle, unit } from "@library/styles/styleHelpers";
+import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -37,8 +36,8 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const border = themeVars("border", {
-        radius: globalVars.border.radius,
         width: globalVars.border.width,
+        radius: globalVars.border.radius,
     });
 
     const input = themeVars("input", {
@@ -125,7 +124,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    ...borders(standardizeBorderStyle(buttonVariables().standard.borders)),
+                                    ...borders(buttonVariables().standard.borders),
                                 },
                             },
                         },

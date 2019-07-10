@@ -7,7 +7,7 @@
 import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders, IBorderFinalStyles, standardizeBorderStyle } from "@library/styles/styleHelpersBorders";
+import { borders } from "@library/styles/styleHelpersBorders";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
@@ -60,13 +60,13 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         buttonTypeVars,
     );
     // Remove debug and fallback
-    const defaultBorder = standardizeBorderStyle(buttonTypeVars.borders, globalVariables().border);
+    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border, debug);
 
     if (debug) {
         console.log("default border: ", defaultBorder);
-        //     debug && console.log("DATA                : ", buttonTypeVars.borders);
-        //     debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
-        //     debug && console.log("THROUGH BORDER      : ", borders(defaultBorder, globalVariables().border, true));
+        debug && console.log("DATA                : ", buttonTypeVars.borders);
+        debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
+        debug && console.log("THROUGH BORDER      : ", borders(defaultBorder, globalVariables().border, true));
     }
 
     const hoverBorder = borders(
@@ -103,7 +103,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 ...buttonGlobals.font,
                 ...buttonTypeVars.fonts,
             }),
-            ...borders(defaultBorder),
+            ...defaultBorder,
             ...buttonSizing(
                 buttonDimensions && buttonDimensions.minHeight
                     ? buttonDimensions.minHeight

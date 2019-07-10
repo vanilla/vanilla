@@ -55,13 +55,13 @@ export function VideoEmbed(props: IProps) {
     return (
         <EmbedContainer className="embedVideo" inEditor={props.inEditor}>
             <EmbedContent type={embedType} inEditor={props.inEditor}>
-                {isPlaying ? (
-                    <VideoIframe url={frameSrc} />
-                ) : (
-                    <div className={classNames("embedVideo-ratio", ratioClass)}>
+                <div className={classNames("embedVideo-ratio", ratioClass)}>
+                    {isPlaying ? (
+                        <VideoIframe url={frameSrc} />
+                    ) : (
                         <VideoThumbnail name={name} onClick={togglePlaying} photoUrl={photoUrl} />
-                    </div>
-                )}
+                    )}
+                </div>
             </EmbedContent>
         </EmbedContainer>
     );

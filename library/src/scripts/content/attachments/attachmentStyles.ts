@@ -4,45 +4,31 @@
  * @license GPL-2.0-only
  */
 
-import {
-    absolutePosition,
-    allLinkStates,
-    borders,
-    IBordersSameAllSidesStyles,
-    margins,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { absolutePosition, allLinkStates, borders, margins, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { transparentColor } from "@library/forms/buttonStyles";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("attachment");
+    const makeThemeVars = variableFactory("attachment");
 
-    const padding = {
+    const padding = makeThemeVars("padding", {
         default: 12,
-        ...themeVars.subComponentStyles("padding"),
-    };
+    });
 
-    const text = {
+    const text = makeThemeVars("text", {
         fontSize: globalVars.fonts.size.medium,
-        ...themeVars.subComponentStyles("text"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         color: globalVars.mixBgAndFg(0.9),
-        ...themeVars.subComponentStyles("title"),
-    };
+    });
 
-    const loading = {
+    const loading = makeThemeVars("loading", {
         opacity: 0.5,
-    };
+    });
 
     return { padding, text, title, loading };
 });
@@ -71,7 +57,7 @@ export const attachmentClasses = useThemeCache(() => {
         justifyContent: "space-between",
         width: percent(100),
         ...borders({
-            color: transparentColor,
+            color: globalVars.elementaryColors.transparent,
             width: 2,
             radius: 0,
         }),

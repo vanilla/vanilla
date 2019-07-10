@@ -3,13 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory, componentThemeVariables, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { px, percent } from "csx";
-import { userSelect, borders, IBordersSameAllSidesStyles, unit, colorOut } from "@library/styles/styleHelpers";
-import { shadowOrBorderBasedOnLightness, shadowHelper } from "@library/styles/shadowHelpers";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 import { EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
+import { borders, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const embedContainerVariables = useThemeCache(() => {
@@ -20,7 +19,7 @@ export const embedContainerVariables = useThemeCache(() => {
         bg: globalVars.mainColors.bg,
     });
 
-    const border: IBordersSameAllSidesStyles = makeThemeVars("border", {
+    const border = makeThemeVars("border", {
         style: "none",
         width: 0,
         radius: px(4),
@@ -84,13 +83,7 @@ export const embedContainerClasses = useThemeCache(() => {
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],
             ...borders(vars.border),
-            ...shadowOrBorderBasedOnLightness(
-                globalVars.body.backgroundImage.color,
-                borders({
-                    color: vars.border.color,
-                }),
-                shadowHelper().embed(),
-            ),
+            ...shadowOrBorderBasedOnLightness(globalVars.body.backgroundImage.color, borders(), shadowHelper().embed()),
             $nest: {
                 // These 2 can't be joined together or their pseudselectors don't get created properly.
                 "&.isLoading": {

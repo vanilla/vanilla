@@ -36,8 +36,8 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const border = themeVars("border", {
-        radius: globalVars.border.radius,
         width: globalVars.border.width,
+        radius: globalVars.border.radius,
     });
 
     const input = themeVars("input", {
@@ -98,8 +98,6 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    borderTopLeftRadius: important(0),
-                    borderBottomLeftRadius: important(0),
                     marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
@@ -195,7 +193,7 @@ export const searchBarClasses = useThemeCache(() => {
         left: 0,
         overflow: "hidden",
         ...borders({
-            radius: unit(vars.results.borderRadius),
+            radius: vars.results.borderRadius,
         }),
         ...shadow.dropDown(),
         zIndex: 1,
@@ -278,6 +276,7 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         position: "relative",
         height: unit(vars.sizing.height),
+        width: percent(100),
     });
 
     // special selector

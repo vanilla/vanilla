@@ -853,6 +853,34 @@ $(document).on('contentLoad', function(e) {
     }
 
     /**
+     * Add a CSS class to the navbar based on it scroll position.
+     *
+     * @param element - The scope of the function.
+     */
+    function navbarHeightInit(element) {
+        var $navbar = $('.js-navbar', element);
+
+        $navbar.addClass('navbar-short');
+        var navShortHeight = $navbar.outerHeight(true);
+        $navbar.removeClass('navbar-short');
+        var navHeight = $navbar.outerHeight(true);
+        var navOffset = navHeight - navShortHeight;
+
+        // If we load in the middle of the page, we should have a short navbar.
+        if ($(window).scrollTop() > navOffset) {
+            $navbar.addClass('navbar-short');
+        }
+
+        $(window).on('scroll', function() {
+            if ($(window).scrollTop() > navOffset) {
+                $navbar.addClass('navbar-short');
+            } else {
+                $navbar.removeClass('navbar-short');
+            }
+        });
+    }
+
+    /**
      * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
@@ -1133,6 +1161,7 @@ $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
+        navbarHeightInit(e.target); // navbar height settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -1397,31 +1426,6 @@ $(document).on('contentLoad', function(e) {
             data: ajaxData,
             dataType: 'json'
         });
-    });
-
-    /**
-     * Turn a toolbar with the .js-toolbar-sticky class into a sticky toolbar.
-     *
-     * This is an opt-in class because it may not work or be appropriate on all pages.
-     */
-    $(window).scroll(function () {
-        var $toolbar = $('.js-toolbar-sticky');
-        var cssClass = 'is-stuck';
-
-        if ($(this).scrollTop() > $('header.navbar').height()) {
-            $toolbar
-                .addClass(cssClass)
-                .outerWidth($('.main').outerWidth() - 2)
-                .next('*')
-                .css('margin-top', $toolbar.outerHeight());
-        } else {
-            $toolbar.removeClass(cssClass).outerWidth('').next('*').css('margin-top', '');
-        }
-    });
-    $(window).resize(function () {
-        var $toolbar = $('.js-toolbar-sticky.is-stuck');
-
-        $toolbar.outerWidth($('.main').outerWidth() - 2);
     });
 })(jQuery);
 

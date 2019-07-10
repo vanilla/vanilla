@@ -137,10 +137,9 @@ export const splashVariables = useThemeCache(() => {
             leftColor: colors.borderColor,
             width: globalVars.border.width,
             radius: {
-                right: 49,
+                right: globalVars.border.radius,
                 left: 0,
             },
-            // right: globalVars.border.radius, // change back
         },
     });
 

@@ -7,195 +7,352 @@
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { unit, ifExistsWithFallback } from "@library/styles/styleHelpers";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
+import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import merge from "lodash/merge";
+import { ColorHelper } from "csx";
+import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
 
-interface ISingleBorderStyle {
-    color?: ColorValues;
+export interface ISimpleBorderStyle {
+    color?: ColorValues | ColorHelper;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
 }
 
-export interface IBordersSameAllSidesStyles extends ISingleBorderStyle {
-    radius?: BorderRadiusProperty<TLength>;
+export interface IBordersWithRadius extends ISimpleBorderStyle {
+    radius?: radiusValue;
 }
 
-type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
+type radiusValue = BorderRadiusProperty<TLength> | string;
 
-interface IBorderStyles extends ISingleBorderStyle {
-    all?: ISingleBorderStyle;
-    topBottom?: ISingleBorderStyle;
-    leftRight?: ISingleBorderStyle;
-    top?: ISingleBorderStyle;
-    bottom?: ISingleBorderStyle;
-    left?: ISingleBorderStyle;
-    right?: ISingleBorderStyle;
-    radius?: radiusType;
+export type IRadiusValue = IBorderRadiusValue | IRadiusShorthand | IBorderRadiusOutput;
+
+interface IRadiusFlex {
+    radius?: IRadiusValue;
 }
 
-interface IBorderRadii {
-    all?: BorderRadiusProperty<TLength> | number;
-    top?: BorderRadiusProperty<TLength> | number;
-    bottom?: BorderRadiusProperty<TLength> | number;
-    left?: BorderRadiusProperty<TLength> | number;
-    right?: BorderRadiusProperty<TLength> | number;
-    topRight?: BorderRadiusProperty<TLength> | number;
-    topLeft?: BorderRadiusProperty<TLength> | number;
-    bottomLeft?: BorderRadiusProperty<TLength> | number;
-    bottomRight?: BorderRadiusProperty<TLength> | number;
+export interface IRadiusShorthand {
+    all?: IBorderRadiusValue;
+    top?: IBorderRadiusValue;
+    bottom?: IBorderRadiusValue;
+    left?: IBorderRadiusValue;
+    right?: IBorderRadiusValue;
 }
 
-export const borderRadii = (props: IBorderRadii) => {
-    return {
-        borderTopLeftRadius: unit(ifExistsWithFallback([props.all, props.top, props.left, props.topLeft, undefined])),
-        borderTopRightRadius: unit(
-            ifExistsWithFallback([props.all, props.top, props.right, props.topRight, undefined]),
-        ),
-        borderBottomLeftRadius: unit(
-            ifExistsWithFallback([props.all, props.bottom, props.left, props.bottomLeft, undefined]),
-        ),
-        borderBottomRightRadius: unit(
-            ifExistsWithFallback([props.all, props.bottom, props.right, props.bottomRight, undefined]),
-        ),
-    };
-};
+export interface IBorderRadiusOutput {
+    borderTopRightRadius?: IBorderRadiusValue;
+    borderTopLeftRadius?: IBorderRadiusValue;
+    borderBottomRightRadius?: IBorderRadiusValue;
+    borderBottomLeftRadius?: IBorderRadiusValue;
+}
 
-const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?: (value: any) => string) => {
-    let output = ultimateFallback;
-    const convert = unitFunction ? unitFunction : value => value.toString();
-    try {
-        const BreakException = {};
-        fallbacks.forEach((style, key) => {
-            if (style) {
-                output = style;
-                throw BreakException;
-            }
-        });
-    } catch (e) {
-        // break out of loop
+type IRadiusInput = IRadiusShorthand | IBorderRadiusOutput | IRadiusValue;
+
+export type IBorderRadiusValue = BorderRadiusProperty<TLength> | number | string | undefined;
+
+export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
+    all?: ISimpleBorderStyle;
+    topBottom?: ISimpleBorderStyle;
+    leftRight?: ISimpleBorderStyle;
+    top?: ISimpleBorderStyle;
+    bottom?: ISimpleBorderStyle;
+    left?: ISimpleBorderStyle;
+    right?: ISimpleBorderStyle;
+}
+
+const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
+    if (variable != null) {
+        const type = typeof variable;
+        return type === "string" || type === "number";
+    } else {
+        return false;
     }
-    return convert(output);
 };
 
-export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
-    const globalVars = globalVariables();
-
-    const output: NestedCSSProperties = {
-        borderLeft: undefined,
-        borderRight: undefined,
-        borderTop: undefined,
-        borderBottom: undefined,
+const setAllRadii = (radius: BorderRadiusProperty<TLength>) => {
+    return {
+        borderTopRightRadius: radius,
+        borderBottomRightRadius: radius,
+        borderBottomLeftRadius: radius,
+        borderTopLeftRadius: radius,
     };
+};
 
-    // Set border radii
-    let globalRadiusFound = false;
-    let specificRadiusFound = false;
-    if (props.radius !== undefined) {
-        if (typeof props.radius === "string" || typeof props.radius === "number") {
-            output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-            globalRadiusFound = true;
+/**
+ * Main utility function for generation proper border radiuses. Supports numerous shorthand properties.
+ *
+ * @param radii
+ * @param debug
+ */
+export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRadiusValue => {
+    if (radii == null) {
+        return;
+    }
+
+    const output: IBorderRadiusOutput = {};
+
+    if (typeIsStringOrNumber(radii)) {
+        const value = unit(radii as number | string);
+        return {
+            borderTopRightRadius: value,
+            borderBottomRightRadius: value,
+            borderBottomLeftRadius: value,
+            borderTopLeftRadius: value,
+        };
+    }
+
+    // Otherwise we need to check all of the values.
+    const all = getValueIfItExists(radii, "all");
+    const top = getValueIfItExists(radii, "top");
+    const bottom = getValueIfItExists(radii, "bottom");
+    const left = getValueIfItExists(radii, "left");
+    const right = getValueIfItExists(radii, "right");
+
+    if (typeIsStringOrNumber(all)) {
+        merge(output, {
+            borderTopRightRadius: unit(all),
+            borderBottomRightRadius: unit(all),
+            borderBottomLeftRadius: unit(all),
+            borderTopLeftRadius: unit(all),
+        });
+    }
+
+    if (top !== undefined) {
+        const isShorthand = typeIsStringOrNumber(top);
+
+        if (isShorthand) {
+            const value = isShorthand ? unit(top) : top;
+            merge(output, {
+                borderTopRightRadius: value,
+                borderTopLeftRadius: value,
+            });
         } else {
-            if (props.radius.all) {
-                globalRadiusFound = true;
-                output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-            } else {
-                if (props.radius.top) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.top);
-                    output.borderTopLeftRadius = unit(props.radius.top);
-                }
-                if (props.radius.bottom) {
-                    specificRadiusFound = true;
-                    output.borderBottomRightRadius = unit(props.radius.bottom);
-                    output.borderBottomLeftRadius = unit(props.radius.bottom);
-                }
-                if (props.radius.right) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.right);
-                    output.borderBottomRightRadius = unit(props.radius.right);
-                }
-                if (props.radius.left) {
-                    specificRadiusFound = true;
-                    output.borderTopLeftRadius = unit(props.radius.left);
-                    output.borderBottomLeftRadius = unit(props.radius.left);
-                }
-                if (props.radius.topRight) {
-                    specificRadiusFound = true;
-                    output.borderTopRightRadius = unit(props.radius.topRight);
-                }
-                if (props.radius.topLeft) {
-                    specificRadiusFound = true;
-                    output.borderTopLeftRadius = unit(props.radius.topLeft);
-                }
-                if (props.radius.bottomRight) {
-                    specificRadiusFound = true;
-                    output.borderBottomLeftRadius = unit(props.radius.bottomRight);
-                }
-                if (props.radius.topLeft) {
-                    specificRadiusFound = true;
-                    output.borderBottomRightRadius = unit(props.radius.bottomLeft);
-                }
-            }
+            merge(
+                output,
+                right !== undefined ? { borderTopRightRadius: unit(right) } : {},
+                left !== undefined ? { borderTopLeftRadius: unit(left) } : {},
+            );
         }
     }
-    // Set fallback border radius if none found
-    if (!globalRadiusFound && !specificRadiusFound) {
-        output.borderRadius = unit(globalVars.border.radius);
+
+    if (bottom !== undefined) {
+        const isShorthand = typeIsStringOrNumber(bottom);
+
+        if (isShorthand) {
+            const value = isShorthand ? unit(bottom) : bottom;
+            merge(output, {
+                borderBottomRightRadius: value,
+                borderBottomLeftRadius: value,
+            });
+        } else {
+            merge(
+                output,
+                right !== undefined ? { borderBottomRightRadius: unit(right) } : {},
+                left !== undefined ? { borderBottomLeftRadius: unit(left) } : {},
+            );
+        }
     }
 
-    // Set border styles
-    let borderSet = false;
-    if (props.all) {
-        output.borderTop = singleBorder(props.all);
-        output.borderRight = singleBorder(props.all);
-        output.borderBottom = singleBorder(props.all);
-        output.borderLeft = singleBorder(props.all);
-        borderSet = true;
+    if (left !== undefined) {
+        const isShorthand = typeIsStringOrNumber(left);
+
+        if (isShorthand) {
+            const value = isShorthand ? unit(left) : left;
+            merge(output, {
+                borderTopLeftRadius: value,
+                borderBottomLeftRadius: value,
+            });
+        } else {
+            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
+            const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
+            merge(
+                output,
+                !typeIsStringOrNumber(topStyles) ? topStyles : {},
+                !typeIsStringOrNumber(bottomStyles) ? bottomStyles : {},
+            );
+        }
+    }
+    if (right !== undefined) {
+        const isShorthand = typeIsStringOrNumber(right);
+
+        if (isShorthand) {
+            const value = isShorthand ? unit(right) : right;
+            merge(output, {
+                borderTopRightRadius: value,
+                borderBottomRightRadius: value,
+            });
+        } else {
+            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
+            const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
+            merge(
+                output,
+                !typeIsStringOrNumber(topStyles) ? topStyles : {},
+                !typeIsStringOrNumber(bottomStyles) ? bottomStyles : {},
+            );
+        }
     }
 
-    if (props.topBottom) {
-        output.borderTop = singleBorder(props.topBottom);
-        output.borderBottom = singleBorder(props.topBottom);
-        borderSet = true;
+    const borderTopRightRadius = getValueIfItExists(radii, "borderTopRightRadius");
+    if (borderTopRightRadius !== undefined) {
+        merge(output, {
+            borderTopRightRadius: unit(borderTopRightRadius),
+        });
+    }
+    const borderTopLeftRadius = getValueIfItExists(radii, "borderTopLeftRadius");
+    if (borderTopLeftRadius !== undefined) {
+        merge(output, {
+            borderTopLeftRadius: unit(borderTopLeftRadius),
+        });
+    }
+    const borderBottomRightRadius = getValueIfItExists(radii, "borderBottomRightRadius");
+    if (borderBottomRightRadius !== undefined) {
+        merge(output, {
+            borderBottomRightRadius: unit(borderBottomRightRadius),
+        });
+    }
+    const borderBottomLeftRadius = getValueIfItExists(radii, "borderBottomLeftRadius");
+    if (borderBottomLeftRadius !== undefined) {
+        merge(output, {
+            borderBottomLeftRadius: unit(borderBottomLeftRadius),
+        });
+    }
+    return output;
+};
+
+export const borderRadii = (radii: IRadiusValue, fallbackRadii = globalVariables().border.radius) => {
+    const output: IBorderRadiusOutput = {};
+
+    if (typeIsStringOrNumber(fallbackRadii)) {
+        merge(output, setAllRadii(unit(fallbackRadii as any) as any));
+    } else {
+        merge(output, typeIsStringOrNumber(fallbackRadii) ? fallbackRadii : fallbackRadii);
     }
 
-    if (props.leftRight) {
-        output.borderLeft = singleBorder(props.leftRight);
-        output.borderRight = singleBorder(props.leftRight);
-        borderSet = true;
+    const hasRadiusShorthand = typeIsStringOrNumber(radii);
+    const hasRadiusShorthandFallback = typeIsStringOrNumber(fallbackRadii);
+
+    // Make sure we have a value before overwriting.
+    if (hasRadiusShorthand) {
+        merge(output, setAllRadii(unit(radii as any) as any));
+    } else if (hasRadiusShorthandFallback) {
+        merge(output, setAllRadii(unit(fallbackRadii as any) as any));
+    } else {
+        // our fallback must be an object.
+        merge(output, standardizeBorderRadius(fallbackRadii as any));
+    }
+    merge(output, standardizeBorderRadius(radii as any));
+    return output as NestedCSSProperties;
+};
+
+const setAllBorders = (
+    color: ColorValues,
+    width: BorderWidthProperty<TLength>,
+    style: BorderStyleProperty,
+    radius?: IBorderRadiusOutput,
+) => {
+    return {
+        borderTopColor: color,
+        borderRightColor: color,
+        borderBottomColor: color,
+        borderLeftColor: color,
+        borderTopWidth: unit(width),
+        borderRightWidth: unit(width),
+        borderBottomWidth: unit(width),
+        borderLeftWidth: unit(width),
+        borderTopStyle: style,
+        borderRightStyle: style,
+        borderBottomStyle: style,
+        borderLeftStyle: style,
+        ...radius,
+    };
+};
+
+const singleBorderStyle = (
+    borderStyles: ISimpleBorderStyle,
+    fallbackVariables: IGlobalBorderStyles = globalVariables().border,
+) => {
+    if (!borderStyles) {
+        return;
+    }
+    const { color, width, style } = borderStyles;
+    const output: ISimpleBorderStyle = {};
+    output.color = colorOut(borderStyles.color ? borderStyles.color : color) as ColorValues;
+    output.width = unit(borderStyles.width ? borderStyles.width : width) as BorderWidthProperty<TLength>;
+    output.style = borderStyles.style ? borderStyles.style : (style as BorderStyleProperty);
+
+    if (Object.keys(output).length > 0) {
+        return output;
+    } else {
+        return;
+    }
+};
+
+export const borders = (
+    detailedStyles?: IBorderStyles | ISimpleBorderStyle | undefined,
+    fallbackVariables: IGlobalBorderStyles = globalVariables().border,
+): NestedCSSProperties => {
+    const output: NestedCSSProperties = {};
+    const style = getValueIfItExists(detailedStyles, "style", fallbackVariables.style);
+    const color = getValueIfItExists(detailedStyles, "color", fallbackVariables.color);
+    const width = getValueIfItExists(detailedStyles, "width", fallbackVariables.width);
+    const radius = getValueIfItExists(detailedStyles, "radius", fallbackVariables.radius);
+
+    if (style !== undefined || color !== undefined || width !== undefined || radius !== undefined) {
+        merge(output, setAllBorders(color, width, style, radius));
     }
 
-    if (props.top) {
-        output.borderTop = singleBorder(props.top);
-        borderSet = true;
-    }
+    // Now we are sure to not have simple styles anymore.
+    detailedStyles = detailedStyles as IBorderStyles;
+    if (detailedStyles) {
+        const top = getValueIfItExists(detailedStyles, "top");
+        if (top !== undefined) {
+            const topStyles = singleBorderStyle(top, fallbackVariables);
+            if (topStyles !== undefined) {
+                output.borderTopWidth = getValueIfItExists(topStyles, "width", fallbackVariables.width);
+                output.borderTopStyle = getValueIfItExists(topStyles, "style", fallbackVariables.style);
+                output.borderTopColor = getValueIfItExists(topStyles, "color", fallbackVariables.color);
+            }
+        }
 
-    if (props.bottom) {
-        output.borderBottom = singleBorder(props.bottom);
-        borderSet = true;
-    }
+        const right = getValueIfItExists(detailedStyles, "right");
+        if (right !== undefined) {
+            const rightStyles = singleBorderStyle(right, fallbackVariables);
+            if (rightStyles !== undefined) {
+                output.borderRightWidth = getValueIfItExists(rightStyles, "width", fallbackVariables.width);
+                output.borderRightStyle = getValueIfItExists(rightStyles, "style", fallbackVariables.style);
+                output.borderRightColor = getValueIfItExists(rightStyles, "color", fallbackVariables.color);
+            }
+        }
 
-    if (props.right) {
-        output.borderRight = singleBorder(props.right);
-        borderSet = true;
-    }
+        const bottom = getValueIfItExists(detailedStyles, "bottom");
+        if (bottom !== undefined) {
+            const bottomStyles = singleBorderStyle(bottom, fallbackVariables);
+            if (bottomStyles !== undefined) {
+                output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", fallbackVariables.width);
+                output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", fallbackVariables.style);
+                output.borderBottomColor = getValueIfItExists(bottomStyles, "color", fallbackVariables.color);
+            }
+        }
 
-    if (props.left) {
-        output.borderLeft = singleBorder(props.left);
-        borderSet = true;
-    }
+        const left = getValueIfItExists(detailedStyles, "left");
+        if (left !== undefined) {
+            const leftStyles = singleBorderStyle(left, fallbackVariables);
+            if (leftStyles !== undefined) {
+                output.borderLeftWidth = getValueIfItExists(leftStyles, "width", fallbackVariables.width);
+                output.borderLeftStyle = getValueIfItExists(leftStyles, "style", fallbackVariables.style);
+                output.borderLeftColor = getValueIfItExists(leftStyles, "color", fallbackVariables.color);
+            }
+        }
 
-    // If nothing was found, look for globals and fallback to global styles.
-    if (!borderSet) {
-        output.borderStyle = props.style ? props.style : globalVars.border.style;
-        output.borderColor = props.color ? colorOut(props.color) : colorOut(globalVars.border.color);
-        output.borderWidth = props.width ? unit(props.width) : unit(globalVars.border.width);
+        const detailedRadius = getValueIfItExists(detailedStyles, "radius");
+
+        merge(output, standardizeBorderRadius(detailedRadius));
     }
 
     return output;
 };
 
-export const singleBorder = (styles?: ISingleBorderStyle) => {
+export const singleBorder = (styles?: ISimpleBorderStyle) => {
     const vars = globalVariables();
     const borderStyles = styles !== undefined ? styles : {};
     return `${borderStyles.style ? borderStyles.style : vars.border.style} ${

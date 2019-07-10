@@ -23,7 +23,7 @@ export interface IBordersWithRadius extends ISimpleBorderStyle {
     radius?: radiusValue;
 }
 
-type radiusValue = BorderRadiusProperty<TLength> | string;
+export type radiusValue = BorderRadiusProperty<TLength> | string;
 
 export type IRadiusValue = IBorderRadiusValue | IRadiusShorthand | IBorderRadiusOutput;
 

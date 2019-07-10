@@ -38,6 +38,7 @@ export const meBoxClasses = useThemeCache(() => {
         maxWidth: unit(formVars.sizing.height),
         flexBasis: unit(formVars.sizing.height),
         height: unit(titleBarVars.meBox.sizing.buttonContents),
+        borderRadius: unit(globalVars.border.radius),
     });
 
     const rootFlexClass = (count: number) => {

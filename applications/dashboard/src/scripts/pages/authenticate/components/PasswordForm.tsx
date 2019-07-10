@@ -65,12 +65,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 onSubmit={this.handleSubmit}
                 noValidate
             >
-                <Paragraph
-                    id={this.formDescriptionID}
-                    className="authenticateUser-paragraph"
-                    children={globalErrorMessage}
-                    isError={true}
-                />
+                <Paragraph id={this.formDescriptionID} className="authenticateUser-paragraph" isError={true}>
+                    globalErrorMessage
+                </Paragraph>
                 <InputTextBlock
                     label={t("Email/Username")}
                     errors={getFieldErrors(this.props.passwordState.error, "username")}

@@ -49,7 +49,7 @@ export default class Heading extends React.Component<IHeadingProps> {
                     this.props.className,
                 )}
             >
-                {!!children ? children : title}
+                {children ? children : title}
             </Tag>
         );
     }

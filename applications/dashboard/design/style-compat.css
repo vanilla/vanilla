@@ -274,15 +274,12 @@ button.Close {
   border: 0;
   cursor: pointer;
   background: none;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -429,14 +426,12 @@ button.Close {
 }
 
 .rememberMeAndForgot {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -448,7 +443,6 @@ button.Close {
 }
 
 .rememberMeAndForgot-rememberMe {
-  -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
@@ -473,15 +467,12 @@ button.Close {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -512,15 +503,12 @@ button.Close {
 }
 
 .button-ssoContents {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -572,15 +560,12 @@ button.Close {
 .PageControls .selectBox {
   margin-right: 15px;
   float: left;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
@@ -597,15 +582,12 @@ button.Close {
 }
 
 .selectBox-main {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -702,11 +684,9 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .ButtonGroup.discussion-sort-filter-module {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -717,11 +697,9 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 24px;
 }
 .inputBlock .checkbox {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -828,12 +806,10 @@ label.checkbox input.checkbox-input {
 }
 
 .pageHeading {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   width: 100%;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -851,14 +827,12 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   max-width: 100%;
-  -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
 }
 
 .pageHeading-actions {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -949,10 +923,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
   color: #555a62;
 }
-.userContent > *:not(.emoji):not(:last-child):not(br) {
+.userContent > *:not(.emoji):not(:last-child):not(br, .embedResponsive) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br) {
+.userContent > *:not(.emoji):first-child:not(br, .embedResponsive) {
   margin-top: -0.25em !important;
 }
 .userContent,
@@ -986,7 +960,6 @@ label.checkbox input.checkbox-input {
   display: block;
   line-height: 1.5;
   color: #6f737a;
-  width: -webkit-calc(100% + 12px);
   width: calc(100% + 12px);
   overflow: hidden;
   text-align: left;
@@ -994,18 +967,15 @@ label.checkbox input.checkbox-input {
   margin-right: 6px;
 }
 .userContent .metas.isFlexed {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
-  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1041,6 +1011,20 @@ body.hasRichEditor .richEditor ~ .TextBoxWrapper,
 body.hasRichEditor .CommentForm .PreviewButton,
 body.hasRichEditor #Form_Preview {
   display: none !important;
+}
+body.hasRichEditor .richEditor .buttonClose {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+}
+body.hasRichEditor .richEditor .spoiler .iconButton {
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 @media (min-width: 700px) {
@@ -1169,7 +1153,6 @@ body.isMobile .richEditor {
 }
 body.isMobile .richEditor-menu.richEditorFlyout {
   left: 0;
-  width: -webkit-calc(100% + 4px);
   width: calc(100% + 4px);
 }
 body.isMobile .richEditor-embedBarMobileBorder {
@@ -1202,7 +1185,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
   .richEditor-menu.richEditorFlyout {
     left: 0;
-    width: -webkit-calc(100% + 4px);
     width: calc(100% + 4px);
   }
 
@@ -1261,11 +1243,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-width: 100%;
   width: 640px;
   position: relative;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1317,12 +1297,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLinkLoader-loader {
-  -webkit-transition-property: opacity;
-          transition-property: opacity;
-  -webkit-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-  -webkit-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
+  transition-property: opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
   display: block;
   width: 1em;
   height: 1em;
@@ -1373,8 +1350,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   height: 100%;
   width: 100%;
   content: "";
-  -webkit-transition: 0.2s ease box-shadow;
-          transition: 0.2s ease box-shadow;
+  transition: 0.2s ease box-shadow;
 }
 .richEditor .embedExternal-content:hover:after,
 .richEditor .embedLinkLoader-link:hover:after {
@@ -1458,7 +1434,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   left: 0;
   height: 100%;
   width: 100%;
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
@@ -1568,18 +1543,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText-header {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
@@ -1635,7 +1607,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .embedLink-image + .embedText-main {
   margin-left: auto;
-  width: -webkit-calc(100% - 225px);
   width: calc(100% - 225px);
   border-left-style: solid;
   border-left-width: 1px;
@@ -1694,11 +1665,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-userLink {
-  display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1727,15 +1696,12 @@ body.isMobile .Popup.hasRichEditor .Border {
   position: absolute;
   top: 0;
   right: 8px;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -1764,7 +1730,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-title {
-  max-width: -webkit-calc(100% - 36px);
   max-width: calc(100% - 36px);
 }
 
@@ -1783,15 +1748,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-header {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
@@ -1807,7 +1769,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-metaLink {
-  display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -1832,15 +1793,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-box {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -1853,12 +1811,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-loader {
-  -webkit-transition-property: opacity;
-          transition-property: opacity;
-  -webkit-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-  -webkit-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
+  transition-property: opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
   display: block;
   width: 42px;
   height: 42px;
@@ -1880,12 +1835,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedLoader-error {
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   overflow: hidden;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1893,8 +1846,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 0;
   padding: 15px;
   background: #ffebeb;
-  -webkit-transition: 0.2s ease box-shadow;
-          transition: 0.2s ease box-shadow;
+  transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 .embedLoader-error:hover {
@@ -1949,7 +1901,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .userContent .embedLoader-errorMessage {
-  max-width: -webkit-calc(100% - 72px);
   max-width: calc(100% - 72px);
   width: 100%;
   padding-left: 24px;
@@ -2020,7 +1971,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedTwitter .embedExternal-content {
   border-radius: 4px;
   width: auto;
-  display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -2075,8 +2025,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
 }
 .collapsableContent {
-  -webkit-transition: max-height 0.2s ease;
-          transition: max-height 0.2s ease;
+  transition: max-height 0.2s ease;
 }
 .collapsableContent *:last-child {
   margin-bottom: 0;
@@ -2135,11 +2084,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .atMentionList-user,
 .atMentionList-noResults {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -2164,14 +2111,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .atMentionList-userName {
   display: block;
-  -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: -webkit-calc(100% - 40px);
   max-width: calc(100% - 40px);
 }
 
@@ -2351,12 +2296,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .spoiler-warningMain {
   position: relative;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   box-sizing: border-box;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -2383,11 +2326,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: auto 0;
   width: 24px;
   height: 24px;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -2429,7 +2370,6 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @license GPL-2.0-only
  */
 .safeEmoji {
-  display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;

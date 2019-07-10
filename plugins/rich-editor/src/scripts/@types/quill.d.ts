@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-/* tslint:disable */
+/* eslint-disable */
 
 declare module "quill/core" {
     import HistoryModule from "@rich-editor/quill/HistoryModule";

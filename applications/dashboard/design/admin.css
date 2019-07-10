@@ -11403,6 +11403,20 @@ body.hasRichEditor .CommentForm .PreviewButton,
 body.hasRichEditor #Form_Preview {
   display: none !important;
 }
+body.hasRichEditor .richEditor .buttonClose {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+}
+body.hasRichEditor .richEditor .spoiler .iconButton {
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
 
 @media (min-width: 700px) {
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {

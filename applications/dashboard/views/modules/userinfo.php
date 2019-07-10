@@ -21,7 +21,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             <?php endif; ?>
 
             <?php
-            if ($this->User->Email && ($this->User->ShowEmail || $Session->checkPermission('Garden.PersonalInfo.View'))) {
+            if ($this->User->Email && ($this->User->ShowEmail || $this->data('_canViewPersonalInfo'))) {
                 echo '<dt class="Email">'.t('Email').'</dt>
          <dd class="Email" itemprop="email">'.Gdn_Format::email($this->User->Email).'</dd>';
             }

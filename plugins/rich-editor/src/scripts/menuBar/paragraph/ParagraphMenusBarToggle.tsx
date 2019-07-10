@@ -133,7 +133,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 style={this.pilcrowStyles}
                 className={classNames(
                     { isMenuInset: !this.props.legacyMode },
-                    !!this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
+                    this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
                 )}
                 onKeyDown={this.handleMenuBarKeyDown}
                 ref={this.selfRef}

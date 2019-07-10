@@ -59,7 +59,7 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
                 type="button"
                 onClick={onClick}
                 disabled={!!this.props.disabled}
-                tabIndex={!!this.props.disabled ? -1 : 0}
+                tabIndex={this.props.disabled ? -1 : 0}
                 data-firstletter={text.toLowerCase().substr(0, 1)}
             >
                 <span className={classes.icon}>{icon}</span>

@@ -333,7 +333,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
             'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
+            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.'],
+            'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login']]
         ];
         return $formFields;
     }
@@ -380,6 +381,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
             $sender->Form->validateRule('ProfileUrl', 'isUrl', 'You must provide a complete URL in the Profile Url field.');
+
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
@@ -453,9 +455,10 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $uri = val('AuthorizeUrl', $provider);
 
         $redirect_uri = '/entry/'.$this->getProviderKey();
+        $reponse_type = c('OAuth2.ResponseType', 'code');
 
         $defaultParams = [
-            'response_type' => 'code',
+            'response_type' => $reponse_type,
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)
@@ -465,6 +468,10 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         $state['token'] = $this->ssoUtils->getStateToken();
         $get['state'] = $this->encodeState($state);
+
+        if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
+            $get['prompt'] = $provider['Prompt'];
+        }
 
         return $uri.'?'.http_build_query($get);
     }

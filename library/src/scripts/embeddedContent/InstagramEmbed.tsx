@@ -50,7 +50,7 @@ export function InstagramEmbed(props: IProps): JSX.Element {
 async function convertInstagramEmbeds() {
     const instagramEmbeds = document.querySelectorAll(".instagram-media");
     if (instagramEmbeds.length > 0) {
-        await ensureScript("//platform.instagram.com/en_US/embeds.js");
+        await ensureScript("https://platform.instagram.com/en_US/embeds.js");
 
         if (!window.instgrm) {
             throw new Error("The Instagram post failed to load");

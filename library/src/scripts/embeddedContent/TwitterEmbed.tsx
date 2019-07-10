@@ -85,7 +85,7 @@ async function renderTweet(contentElement: HTMLElement) {
 export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
-        await ensureScript("//platform.twitter.com/widgets.js");
+        await ensureScript("https://platform.twitter.com/widgets.js");
         if (window.twttr) {
             const promises = tweets.map(contentElement => {
                 return renderTweet(contentElement as HTMLElement);

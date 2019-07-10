@@ -14,23 +14,7 @@ import { DEBUG_STYLES, styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
-import { debuglog } from "util";
-
-// const mergeDefaultBorderWithStateBorder = (defaultBorderStyle, stateStyles) => {
-//     let output = {};
-//     if (defaultBorderStyle) {
-//         output = defaultBorderStyle;
-//     }
-//
-//     if (stateStyles) {
-//         merge(output, {
-//             borders: standardizeBorderStyle(stateStyles),
-//         });
-//     }
-//
-//     return output;
-// };
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -66,7 +50,8 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         console.log("default border: ", defaultBorder);
         debug && console.log("DATA                : ", buttonTypeVars.borders);
         debug && console.log("STANDARDIZED BORDER : ", defaultBorder);
-        debug && console.log("THROUGH BORDER      : ", borders(defaultBorder, globalVariables().border, true));
+        // debug && console.log("THROUGH BORDER      : ", borders(n, globalVariables().border, true));
+        debug && console.log("THROUGH BORDER      : ", defaultBorder);
     }
 
     const hoverBorder = borders(

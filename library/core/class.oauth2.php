@@ -325,7 +325,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
-        $promptOptions =  [ 'none' => 'none', 'consent' => 'consent', 'login' => 'login', 'consent and login' =>  'consent and login'];
+        $promptOptions =  ['login' => 'login', 'none' => 'none', 'consent' => 'consent', 'consent and login' =>  'consent and login'];
         $formFields = [
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
@@ -471,7 +471,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $get['state'] = $this->encodeState($state);
 
         if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
-            $get['prompt'] = $provider['Prompt'];
+            $get['prompt'] = $provider['Prompt'] ;
         }
 
         return $uri.'?'.http_build_query($get);

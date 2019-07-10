@@ -103,7 +103,7 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const border: IGlobalBorderStyles = makeThemeVars("border", {
+    const border = makeThemeVars("border", {
         color: mixBgAndFg(0.15),
         width: 1,
         style: "solid",

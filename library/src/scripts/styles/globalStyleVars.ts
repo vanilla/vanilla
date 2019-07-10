@@ -9,7 +9,6 @@ import {
     IBackground,
     emphasizeLightness,
     ColorValues,
-    IBorderRadiiDeclaration,
     radiusValue,
     IBorderRadiusOutput,
 } from "@library/styles/styleHelpers";

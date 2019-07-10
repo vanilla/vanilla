@@ -137,10 +137,10 @@ export const splashVariables = useThemeCache(() => {
             leftColor: colors.borderColor,
             width: globalVars.border.width,
             radius: {
-                // right: globalVars.border.radius, // change back
                 right: 49,
                 left: 0,
             },
+            // right: globalVars.border.radius, // change back
         },
     });
 
@@ -152,7 +152,7 @@ export const splashVariables = useThemeCache(() => {
 
     // clean up and get rid of buttonTypeSplash / searchButton
 
-    const searchButton: IButtonType = makeThemeVars("splashSearchButton", {
+    const searchButton: any = makeThemeVars("splashSearchButton", {
         name: "splashSearchButton",
         spinnerColor: colors.contrast,
         colors: {
@@ -168,7 +168,7 @@ export const splashVariables = useThemeCache(() => {
             },
             radius: {
                 left: 0,
-                right: searchBar.border.radius,
+                ...searchBar.border.radius,
             },
         },
         fonts: {

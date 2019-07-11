@@ -65,7 +65,7 @@ class FiltererTest extends SharedBootstrapTestCase {
                     'embed-external' => [
                         'data' => [
                             'format' => 'Rich',
-                            'body' => '<div><script>alert("XSS!!!!")</script></div>',
+                            'body' => '<div><script>alert("This should be replaced!")</script></div>',
                             'bodyRaw' => [
                                 [
                                     'insert' => [

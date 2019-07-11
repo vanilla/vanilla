@@ -92,7 +92,7 @@ class Filterer {
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            // We also need to ensure we've safely rendered the body to prevent XSS.
+            // We also need to ensure we've safely rendered the body to prevent innacurate content.
             $embedData['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
         }
 

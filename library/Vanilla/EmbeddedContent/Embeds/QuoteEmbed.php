@@ -62,8 +62,9 @@ class QuoteEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'body:s',
-            'bodyRaw:s|a',
+            'body:s', // The body is need currnetly during edit mode,
+            // to prevent needing extra server roundtrips to render them.
+            'bodyRaw:s|a', // Raw body is the source of truth for the embed.
             'format:s',
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),

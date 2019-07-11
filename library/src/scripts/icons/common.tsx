@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
+import { iconStyles } from "@library/icons/iconStyles";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -184,10 +185,11 @@ export function dropDownMenu(className?: string) {
 }
 
 export function newFolder(className?: string, title: string = t("New Folder")) {
+    const classes = iconStyles();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-dropDownMenu", className)}
+            className={classNames(classes.newFolder, className)}
             viewBox="0 0 22 19"
             aria-hidden="true"
         >

@@ -46,7 +46,7 @@ storiesOf("CoreComponents/UserContent", module)
            }
        }
        </pre><p><br></p><h2>H2 Here. Spoiler next</h2><div class="spoiler"><div contenteditable="false" class="spoiler-buttonContainer">
-       <button class="iconButton button-spoiler js-toggleSpoiler">
+       <button title="Toggle Spoiler" class="iconButton button-spoiler js-toggleSpoiler">
            <span class="spoiler-warning">
                <span class="spoiler-warningMain">
                    <svg class="icon spoiler-icon" viewBox="0 0 24 24">

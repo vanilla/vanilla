@@ -50,8 +50,9 @@ class QuoteEmbed extends AbstractEmbed {
         ]);
 
         // Format the body.
-        $data['body'] = \Gdn_Format::quoteEmbed($data['bodyRaw'], $data['format']);
-        unset($data['bodyRaw']);
+        if (!isset($data['body']) && isset($data['bodyRaw'])) {
+            $data['body'] = \Gdn_Format::quoteEmbed($data['bodyRaw'], $data['format']);
+        }
 
         return $data;
     }
@@ -62,6 +63,7 @@ class QuoteEmbed extends AbstractEmbed {
     protected function schema(): Schema {
         return Schema::parse([
             'body:s',
+            'bodyRaw:s|a',
             'format:s',
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),

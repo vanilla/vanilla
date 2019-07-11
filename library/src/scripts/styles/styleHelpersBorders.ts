@@ -303,51 +303,53 @@ export const borders = (
 
     // Now we are sure to not have simple styles anymore.
     detailedStyles = detailedStyles as IBorderStyles;
-    if (detailedStyles) {
-        const top = getValueIfItExists(detailedStyles, "top");
-        if (top !== undefined) {
-            const topStyles = singleBorderStyle(top, fallbackBorderVariables);
-            if (topStyles !== undefined) {
-                output.borderTopWidth = getValueIfItExists(topStyles, "width", fallbackBorderVariables.width);
-                output.borderTopStyle = getValueIfItExists(topStyles, "style", fallbackBorderVariables.style);
-                output.borderTopColor = getValueIfItExists(topStyles, "color", fallbackBorderVariables.color);
-            }
-        }
-
-        const right = getValueIfItExists(detailedStyles, "right");
-        if (right !== undefined) {
-            const rightStyles = singleBorderStyle(right, fallbackBorderVariables);
-            if (rightStyles !== undefined) {
-                output.borderRightWidth = getValueIfItExists(rightStyles, "width", fallbackBorderVariables.width);
-                output.borderRightStyle = getValueIfItExists(rightStyles, "style", fallbackBorderVariables.style);
-                output.borderRightColor = getValueIfItExists(rightStyles, "color", fallbackBorderVariables.color);
-            }
-        }
-
-        const bottom = getValueIfItExists(detailedStyles, "bottom");
-        if (bottom !== undefined) {
-            const bottomStyles = singleBorderStyle(bottom, fallbackBorderVariables);
-            if (bottomStyles !== undefined) {
-                output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", fallbackBorderVariables.width);
-                output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", fallbackBorderVariables.style);
-                output.borderBottomColor = getValueIfItExists(bottomStyles, "color", fallbackBorderVariables.color);
-            }
-        }
-
-        const left = getValueIfItExists(detailedStyles, "left");
-        if (left !== undefined) {
-            const leftStyles = singleBorderStyle(left, fallbackBorderVariables);
-            if (leftStyles !== undefined) {
-                output.borderLeftWidth = getValueIfItExists(leftStyles, "width", fallbackBorderVariables.width);
-                output.borderLeftStyle = getValueIfItExists(leftStyles, "style", fallbackBorderVariables.style);
-                output.borderLeftColor = getValueIfItExists(leftStyles, "color", fallbackBorderVariables.color);
-            }
-        }
-
-        const detailedRadius = getValueIfItExists(detailedStyles, "radius", fallbackBorderVariables.radius);
-
-        merge(output, standardizeBorderRadius(detailedRadius));
+    if (!detailedStyles) {
+        detailedStyles = fallbackBorderVariables;
     }
+
+    const top = getValueIfItExists(detailedStyles, "top");
+    if (top !== undefined) {
+        const topStyles = singleBorderStyle(top, fallbackBorderVariables);
+        if (topStyles !== undefined) {
+            output.borderTopWidth = getValueIfItExists(topStyles, "width", fallbackBorderVariables.width);
+            output.borderTopStyle = getValueIfItExists(topStyles, "style", fallbackBorderVariables.style);
+            output.borderTopColor = getValueIfItExists(topStyles, "color", fallbackBorderVariables.color);
+        }
+    }
+
+    const right = getValueIfItExists(detailedStyles, "right");
+    if (right !== undefined) {
+        const rightStyles = singleBorderStyle(right, fallbackBorderVariables);
+        if (rightStyles !== undefined) {
+            output.borderRightWidth = getValueIfItExists(rightStyles, "width", fallbackBorderVariables.width);
+            output.borderRightStyle = getValueIfItExists(rightStyles, "style", fallbackBorderVariables.style);
+            output.borderRightColor = getValueIfItExists(rightStyles, "color", fallbackBorderVariables.color);
+        }
+    }
+
+    const bottom = getValueIfItExists(detailedStyles, "bottom");
+    if (bottom !== undefined) {
+        const bottomStyles = singleBorderStyle(bottom, fallbackBorderVariables);
+        if (bottomStyles !== undefined) {
+            output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", fallbackBorderVariables.width);
+            output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", fallbackBorderVariables.style);
+            output.borderBottomColor = getValueIfItExists(bottomStyles, "color", fallbackBorderVariables.color);
+        }
+    }
+
+    const left = getValueIfItExists(detailedStyles, "left");
+    if (left !== undefined) {
+        const leftStyles = singleBorderStyle(left, fallbackBorderVariables);
+        if (leftStyles !== undefined) {
+            output.borderLeftWidth = getValueIfItExists(leftStyles, "width", fallbackBorderVariables.width);
+            output.borderLeftStyle = getValueIfItExists(leftStyles, "style", fallbackBorderVariables.style);
+            output.borderLeftColor = getValueIfItExists(leftStyles, "color", fallbackBorderVariables.color);
+        }
+    }
+
+    const detailedRadius = getValueIfItExists(detailedStyles, "radius", fallbackBorderVariables.radius);
+
+    merge(output, standardizeBorderRadius(detailedRadius));
 
     return output;
 };

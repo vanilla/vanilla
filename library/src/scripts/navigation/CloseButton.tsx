@@ -24,7 +24,7 @@ interface IProps {
  */
 export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
-        baseClass: ButtonTypes.CUSTOM,
+        baseClass: ButtonTypes.ICON,
         compact: false,
     };
 

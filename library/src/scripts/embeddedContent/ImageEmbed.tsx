@@ -22,12 +22,12 @@ interface IProps extends IBaseEmbedProps {
  */
 export function ImageEmbed(props: IProps) {
     return (
-        <EmbedContainer>
-            <EmbedContent type="Image" inEditor={props.inEditor}>
-                <div className="embedImage-link">
-                    <img className="embedImage-img" src={props.url} alt={props.name} />
-                </div>
-            </EmbedContent>
-        </EmbedContainer>
+        // <EmbedContainer>
+        <EmbedContent type="Image" inEditor={props.inEditor}>
+            <div className="embedImage-link">
+                <img className="embedImage-img" src={props.url} alt={props.name} />
+            </div>
+        </EmbedContent>
+        // </EmbedContainer>
     );
 }

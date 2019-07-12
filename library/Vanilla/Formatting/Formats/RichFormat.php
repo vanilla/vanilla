@@ -106,7 +106,6 @@ class RichFormat extends BaseFormat {
             $this->logBadInput($e);
             return $this->renderErrorMessage();
         }
-
     }
 
     /**

@@ -46,24 +46,23 @@ class Filterer {
      */
     private function cleanupEmbeds(array &$operations): array {
         foreach ($operations as $key => &$op) {
-            $insert = &$op['insert'];
-            if (!is_array($insert)) {
-                // Only array type inserts can be embeds.
+            if (!is_array($op['insert']['embed-external'] ?? null)) {
                 continue;
             }
+            $embed = &$op['insert']['embed-external'];
 
             // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
             // We want to strip these embeds that haven't finished properly loading.
-            $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
+            $dataPromise = $embed['dataPromise'] ?? null;
             if ($dataPromise !== null) {
                 unset($operations[$key]);
             }
 
-            $embedData = &$op['insert']['embed-external']['data'] ?? null;
-            if ($embedData === null) {
+            if (!is_array($embed['data'] ?? null)) {
                 // We only care about embeds operations.
                 continue;
             }
+            $embedData = &$embed['data'];
 
 
             if (!$embedData) {

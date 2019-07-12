@@ -82,7 +82,7 @@ export default class EmbedInsertionModule extends Module {
 
     public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then(data => {
-            data.type = "image";
+            data.embedType = "image";
             return data;
         });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });

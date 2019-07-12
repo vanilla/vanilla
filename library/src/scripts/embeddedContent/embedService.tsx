@@ -18,6 +18,7 @@ import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
 import { onContent } from "@library/utility/appUtils";
+import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
@@ -91,6 +92,7 @@ registerEmbed("twitter", TwitterEmbed);
 registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);
 registerEmbed("youtube", VideoEmbed);
+registerEmbed("image", ImageEmbed);
 
 // This is specifically required because of some legacy formats that don't render
 // The embed json format. Twitter was converted out of global JS and merged here.

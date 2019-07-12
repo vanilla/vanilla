@@ -27,7 +27,6 @@ interface IProps extends IOptionalComponentID, LinkProps {
  */
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
-        baseClass: ButtonTypes.STANDARD,
         tabIndex: 0,
     };
 

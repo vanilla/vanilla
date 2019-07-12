@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
 use VanillaTests\SharedBootstrapTestCase;
@@ -53,6 +54,7 @@ class FiltererTest extends SharedBootstrapTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
+                            'type' => QuoteEmbed::TYPE,
                             'body' => "Fake body contents, should be replaced.",
                             'bodyRaw' => 'Rendered Body',
                             'format' => 'Markdown',
@@ -64,7 +66,8 @@ class FiltererTest extends SharedBootstrapTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
-                            'format' => 'Rich',
+                            'type' => QuoteEmbed::TYPE,
+                            'format' => RichFormat::FORMAT_KEY,
                             'body' => '<div><script>alert("This should be replaced!")</script></div>',
                             'bodyRaw' => [
                                 [
@@ -101,6 +104,7 @@ class FiltererTest extends SharedBootstrapTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
+                            'type' => QuoteEmbed::TYPE,
                             'body' => "<p>Rendered Body</p>\n",
                             'bodyRaw' => 'Rendered Body',
                             'format' => 'Markdown',
@@ -112,6 +116,7 @@ class FiltererTest extends SharedBootstrapTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
+                            'type' => QuoteEmbed::TYPE,
                             'format' => 'Rich',
                             'body' => \Gdn_Format::quoteEmbed($expectedEmbedBodyRaw, RichFormat::FORMAT_KEY),
                             'bodyRaw' => $expectedEmbedBodyRaw,

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Exception\FormattingException;
 
 /**
@@ -64,6 +65,7 @@ class Filterer {
                 continue;
             }
 
+
             if (!$embedData) {
                 // Clean up that messed up operation.
                 $operations[$key];
@@ -73,6 +75,12 @@ class Filterer {
             // Remove the rendered bodies. The raw bodies are the source of truth.
             $format = &$embedData['format'] ?? null;
             $bodyRaw = &$embedData['bodyRaw'] ?? null;
+            $type = &$embedData['type'] ?? null;
+
+            if ($type !== QuoteEmbed::TYPE) {
+                // We only care about quote embeds specifically.
+                continue;
+            }
 
             // Remove nested external embed data. We don't want it rendered and this will prevent it from being
             // searched.

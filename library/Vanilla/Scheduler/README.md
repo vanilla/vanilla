@@ -59,7 +59,7 @@ Let's see some code... by default Vanilla Scheduler would configure the containe
  *
  * This is one of the most important points into Scheduler design as it allows a great level of flexibility in terms of which actual job implementation will run.
  */
- $trackingSlip = $dummyScheduler->addJob(\MyNameSpace\MyJob::class, [ /* message */ ]);
+ $trackingSlip = $scheduler->addJob(\MyNameSpace\MyJob::class, [ /* message */ ]);
 ```
 
 Ok, so one question should be raised very fast. How the Scheduler knows which Driver should handle the job. Interface is the name of the game.

@@ -49,6 +49,11 @@ export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEdi
         logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
         return;
     }
+    const exception: string | null = "exception" in data ? data["exception"] : null;
+    if (exception !== null) {
+        logWarning(`Found embed with data`, data, `and and exception`, exception, ` on element`, mountPoint);
+        return;
+    }
     const EmbedClass = getEmbedForType(type);
     if (EmbedClass === null) {
         logWarning(

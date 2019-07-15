@@ -12,7 +12,6 @@ import classNames from "classnames";
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
     className?: string;
-    type?: string;
     disabled?: boolean;
     prefix?: string;
     legacyMode?: boolean;
@@ -38,8 +37,8 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
         switch (type) {
-            case ButtonTypes.TEXT:
-                return classes.text;
+            case ButtonTypes.STANDARD:
+                return classes.standard;
             case ButtonTypes.TEXT_PRIMARY:
                 return classes.textPrimary;
             case ButtonTypes.ICON:
@@ -61,7 +60,7 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
             case ButtonTypes.CUSTOM:
                 return classes.custom;
             default:
-                return classes.standard;
+                return "";
         }
     } else {
         return "";
@@ -75,7 +74,6 @@ export default class Button extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         id: undefined,
         disabled: false,
-        type: "button",
         prefix: "button",
         legacyMode: false,
         baseClass: ButtonTypes.STANDARD,
@@ -99,7 +97,7 @@ export default class Button extends React.Component<IProps, IState> {
             <button
                 id={this.state.id}
                 disabled={this.props.disabled}
-                type={this.props.type}
+                type="button" /* this is for buttons in forms, not to be confused with ButtonTypes */
                 className={componentClasses}
                 onClick={this.props.onClick}
                 title={this.props.title}

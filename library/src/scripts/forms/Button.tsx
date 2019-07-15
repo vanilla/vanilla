@@ -18,6 +18,7 @@ interface IProps extends IOptionalComponentID {
     onClick?: (e) => void;
     onKeyDown?: (e) => void;
     title?: string;
+    submit?: boolean;
     ariaLabel?: string;
     baseClass?: ButtonTypes;
     ariaHidden?: boolean;
@@ -97,7 +98,7 @@ export default class Button extends React.Component<IProps, IState> {
             <button
                 id={this.state.id}
                 disabled={this.props.disabled}
-                type="button" /* this is for buttons in forms, not to be confused with ButtonTypes */
+                type={this.props.submit ? "submit" : "button"}
                 className={componentClasses}
                 onClick={this.props.onClick}
                 title={this.props.title}

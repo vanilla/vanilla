@@ -19,6 +19,7 @@ import { logWarning } from "@vanilla/utils";
 import React from "react";
 import { onContent } from "@library/utility/appUtils";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
+import { forceRenderStyles } from "typestyle";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
@@ -66,6 +67,7 @@ export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEdi
     }
 
     mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, callback);
+    forceRenderStyles();
 }
 
 export function mountAllEmbeds(root: HTMLElement = document.body) {

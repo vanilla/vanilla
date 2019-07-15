@@ -117,25 +117,23 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         // Append these nodes.
         loaderElement && jsEmbed.appendChild(loaderElement);
 
-        setImmediate(() => {
-            // Do something with loader content if we have it?
-            // loaderElement && loaderElement.remove();
-            try {
-                mountEmbed(jsEmbed, data, true, () => {
-                    // Remove the focus class. It should be handled by the mounted embed at this point.
-                    jsEmbed.classList.remove(FOCUS_CLASS);
-                    forceSelectionUpdate();
-                });
-            } catch (e) {
-                const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-                // Cleanup existing HTML.
-                jsEmbed.innerHTML = "";
-
-                // Add the warning.
-                jsEmbed.appendChild(warning);
+        try {
+            mountEmbed(jsEmbed, data, true).then(() => {
+                // Remove the focus class. It should be handled by the mounted embed at this point.
+                loaderElement && loaderElement.remove();
+                jsEmbed.classList.remove(FOCUS_CLASS);
+                jsEmbed.removeAttribute("tabindex");
                 forceSelectionUpdate();
-            }
-        });
+            });
+        } catch (e) {
+            const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
+            // Cleanup existing HTML.
+            jsEmbed.innerHTML = "";
+
+            // Add the warning.
+            jsEmbed.appendChild(warning);
+            forceSelectionUpdate();
+        }
 
         return jsEmbed;
     }

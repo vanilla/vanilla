@@ -296,7 +296,7 @@ const rejectionCache: Map<string, Error> = new Map();
 /**
  * Dynamically load a javascript file.
  */
-export function ensureScript(scriptUrl: string) {
+export function ensureScript(scriptUrl: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const existingScript: HTMLScriptElement | null = document.querySelector(`script[src='${scriptUrl}']`);
         if (rejectionCache.has(scriptUrl)) {

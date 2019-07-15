@@ -10,10 +10,10 @@ import { initEmojiSupport } from "@library/content/emoji";
 import { initSpoilers } from "@library/content/spoilers";
 import { mountAllEmbeds } from "@library/embeddedContent/embedService";
 
-export function initAllUserContent() {
+export async function initAllUserContent() {
     initEmojiSupport();
     initSpoilers();
-    mountAllEmbeds();
+    await mountAllEmbeds();
     initCodeHighlighting();
 }
 

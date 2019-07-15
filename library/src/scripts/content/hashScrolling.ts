@@ -5,16 +5,17 @@
 import { forceRenderStyles } from "typestyle";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { useCallback, useEffect } from "react";
+import { initAllUserContent } from "@library/content/index";
 
 export function useHashScrolling() {
     const offset = useScrollOffset();
     const calcedOffset = offset.getCalcedHashOffset();
-    const callback = useCallback(() => {
-        return initHashScrolling(calcedOffset, () => offset.temporarilyDisabledWatching(500));
-    }, [calcedOffset]);
+    const callback = useCallback(() => {}, [calcedOffset]);
 
     useEffect(() => {
-        callback();
+        void initAllUserContent().then(() => {
+            initHashScrolling(calcedOffset, () => offset.temporarilyDisabledWatching(500));
+        });
     }, [callback]);
 }
 
@@ -31,10 +32,10 @@ export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () =
         if (element) {
             forceRenderStyles();
             beforeScrollHandler && beforeScrollHandler();
-            // setTimeout(() => {
-            const top = window.pageYOffset + element.getBoundingClientRect().top - offset;
-            window.scrollTo({ top, behavior: "smooth" });
-            // },)
+            setTimeout(() => {
+                const top = window.pageYOffset + element.getBoundingClientRect().top - offset;
+                window.scrollTo({ top, behavior: "smooth" });
+            }, 10);
         }
     };
 

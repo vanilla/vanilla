@@ -31,9 +31,12 @@ export interface IBaseEmbedProps {
     name?: string;
     // Frontend only
     inEditor?: boolean;
+    onRenderComplete?: () => void;
 }
 
-type EmbedComponentType = React.ComponentType<IBaseEmbedProps>;
+type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
+    async?: boolean;
+};
 
 const registeredEmbeds = new Map<string, EmbedComponentType>();
 
@@ -45,36 +48,46 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
-export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean, callback?: () => void) {
-    const type = data.embedType || null;
-    if (type === null) {
-        logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
-        return;
-    }
-    const exception: string | null = "exception" in data ? data["exception"] : null;
-    if (exception !== null) {
-        logWarning(`Found embed with data`, data, `and and exception`, exception, ` on element`, mountPoint);
-        return;
-    }
-    const EmbedClass = getEmbedForType(type);
-    if (EmbedClass === null) {
-        logWarning(
-            `Attempted to mount embed type ${type} on element`,
-            mountPoint,
-            `but could not find registered embed.`,
-        );
-        return;
-    }
+export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
+    return new Promise((resolve, reject) => {
+        const type = data.embedType || null;
+        if (type === null) {
+            logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
+            return;
+        }
+        const exception: string | null = "exception" in data ? data["exception"] : null;
+        if (exception !== null) {
+            logWarning(`Found embed with data`, data, `and and exception`, exception, ` on element`, mountPoint);
+            return;
+        }
+        const EmbedClass = getEmbedForType(type);
+        if (EmbedClass === null) {
+            logWarning(
+                `Attempted to mount embed type ${type} on element`,
+                mountPoint,
+                `but could not find registered embed.`,
+            );
+            return;
+        }
 
-    mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, callback);
+        const isAsync = EmbedClass.async;
+        const onMountComplete = () => resolve();
+        // If the component is flagged as async, then it will confirm when the render is complete.
+        mountReact(
+            <EmbedClass {...data} inEditor={inEditor} onRenderComplete={isAsync ? onMountComplete : undefined} />,
+            mountPoint,
+            !isAsync ? onMountComplete : undefined,
+        );
+    });
 }
 
-export function mountAllEmbeds(root: HTMLElement = document.body) {
+export async function mountAllEmbeds(root: HTMLElement = document.body) {
     const mountPoints = root.querySelectorAll("[data-embedjson]");
-    for (const mountPoint of mountPoints) {
+    const promises = Array.from(mountPoints).map(mountPoint => {
         const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        mountEmbed(mountPoint as HTMLElement, parsedData, false);
-    }
+        return mountEmbed(mountPoint as HTMLElement, parsedData, false);
+    });
+    await Promise.all(promises);
 }
 
 // Default embed registration

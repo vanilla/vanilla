@@ -9,13 +9,30 @@ namespace Vanilla\EmbeddedContent\Embeds;
 use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
+use Vanilla\Web\Asset\AssetPreloader;
+use Vanilla\Web\Asset\ExternalAsset;
 
 /**
  * Embed data object for Instagram.
  */
 class InstagramEmbed extends AbstractEmbed {
 
+    const JS_SCRIPT = "https://platform.instagram.com/en_US/embeds.js";
     const TYPE = "instagram";
+
+    /**
+     * Override to set a value in the PreloadAssetModel.
+     * @inheritdoc
+     */
+    public function __construct(array $data) {
+        parent::__construct($data);
+
+        EmbedUtils::getPreloadModel()->addScript(
+            new ExternalAsset(self::JS_SCRIPT),
+            AssetPreloader::REL_PRELOAD,
+            'instagram-embed-script-asset'
+        );
+    }
 
     /**
      * @inheritdoc

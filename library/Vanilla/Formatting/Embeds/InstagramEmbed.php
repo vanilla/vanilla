@@ -43,7 +43,7 @@ class InstagramEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $instagramPermalink = $data['attributes']['permaLink'] ?? '';
+        $instagramPermalink = \Gdn_Format::sanitizeUrl($data["attributes"]["permaLink"] ?? "");
         $instgramVersion = $data['attributes']['versionNumber'] ?? '';
         $url = \Gdn_Format::sanitizeUrl($data["url"] ?? "");
 

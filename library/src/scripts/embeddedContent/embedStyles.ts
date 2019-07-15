@@ -119,3 +119,13 @@ export const embedContainerClasses = useThemeCache(() => {
 
     return { makeRootClass, title };
 });
+
+export const embedContentClasses = useThemeCache(() => {
+    const style = styleFactory("embedContent");
+
+    const small = style("small", {
+        display: "inline-flex",
+        width: "auto",
+    });
+    return { small };
+});

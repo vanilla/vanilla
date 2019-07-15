@@ -27,7 +27,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
     }, []);
 
     return (
-        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+        <EmbedContent type={props.embedType} inEditor={props.inEditor} isSmall>
             <div
                 className={classNames("js-twitterCard", classes.card)}
                 data-tweeturl={props.url}

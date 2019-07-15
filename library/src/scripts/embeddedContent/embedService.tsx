@@ -67,7 +67,6 @@ export function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEdi
     }
 
     mountReact(<EmbedClass {...data} inEditor={inEditor} />, mountPoint, callback);
-    forceRenderStyles();
 }
 
 export function mountAllEmbeds(root: HTMLElement = document.body) {

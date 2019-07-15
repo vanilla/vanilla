@@ -502,7 +502,7 @@ export function mountReact(
                 target.remove();
             }
         }
+        forceRenderStyles();
         callback && callback();
     });
-    forceRenderStyles();
 }

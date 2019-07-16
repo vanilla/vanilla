@@ -77,7 +77,6 @@ const userContentVariables = useThemeCache(() => {
         base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
     });
 
-
     return {
         fonts,
         list,

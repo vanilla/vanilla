@@ -37,7 +37,6 @@ export default class CloseButton extends React.PureComponent<IProps> {
         return (
             <Button
                 disabled={this.props.disabled}
-                type="button"
                 className={componentClasses}
                 title={closeLabel}
                 onClick={this.props.onClick}

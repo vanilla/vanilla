@@ -219,27 +219,54 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public insertAt(index, value: string, def) {
         const isInListContent = this.getListContent() && index < this.getListContent()!.length();
 
+        // validate new line insertion position
         if (value.includes("\n") && isInListContent) {
             const after = this.split(index, false);
             const targetNext = after === this ? this.next : after;
 
             const inserts = value === "\n" ? [""] : value.split("\n");
-            if (inserts[0] && inserts[0] !== "") {
+            const nextListItem = this.next;
+
+            // condition to filter for the position of the cursor in the string.
+            // eg end of line 
+            // offset 
+            if (inserts[0] && inserts[0] !== "" && index === this.length()) {
                 this.getListContent()!.insertAt(index, inserts.shift()!);
             }
+            inserts[0] && inserts[0] !== "" ? this.getListContent()!.insertAt(index, inserts.shift()!) : null;
 
             const listItems = inserts.map((insert, inc) => {
                 const item = Parchment.create(ListItem.blotName, this.getValue()) as ListItem;
-                if (insert !== "") {
-                    item.insertAt(0, insert, undefined);
-                }
+                // if (insert !== "") {
+                //     item.insertAt(0, insert, undefined);
+                // }
+                insert !== "" ? item.insertAt(0, insert, undefined) : item;
                 return item;
             });
 
+            /*
+
+                note: get the position in the bulleted list line,
+                eg: 
+                    -12\/34   // position not last
+                   
+                eg: 
+                    -1234 \/  // position is the last of the line 
+                
+
+
+            
+            
+            */
+
+            // includes conditions for the new line inserts blot
+            // if the last element of the <ul> and the last charectrer in the string
             listItems.forEach(item => {
-                const clone = this.clone() as ListItemWrapper;
-                clone.appendChild(item);
-                this.parent.insertBefore(clone, targetNext);
+                if (item.parent !== undefined) {
+                    const clone = this.clone() as ListItemWrapper;
+                    clone.appendChild(item);
+                    this.parent.insertBefore(clone, targetNext);
+                }
             });
         } else {
             super.insertAt(index, value, def);

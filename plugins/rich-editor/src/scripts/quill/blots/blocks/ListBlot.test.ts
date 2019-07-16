@@ -416,10 +416,81 @@ describe("ListBlot", () => {
         });
     });
 
+
+    /* 
+        Press enter once; position in the line: not last;
+    */
     describe("insertion", () => {
-        it("can insert newlines", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
-            quill.updateContents([{ retain: 1 }, OpUtils.op("test\ntest")]);
+        it.only("can insert newlines", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+            quill.insertText(2, "\n");
+            /* 
+                - 1234
+
+                After:
+                - 12
+                - 34
+            
+            */
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("12"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("34"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
         });
     });
+
+    /* 
+        Press enter once; position in the line: last;
+    */
+
+    // describe("insertion", () => {
+    //     it.only("can insert newlines", () => {
+    //         insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+    //         quill.insertText(4, "\n");
+    //         /* 
+    //             - 1234
+
+    //             After:
+    //             - 1234
+    //             - 
+            
+    //         */
+    //         expect(quill.getContents().ops).deep.eq([
+    //             OpUtils.op("12"),
+    //             OpUtils.list(ListType.BULLETED),
+    //             OpUtils.op("34"),
+    //             OpUtils.list(ListType.BULLETED),
+    //         ]);
+    //     });
+    // });
+
+
+    /* 
+        Press enter twice, position in the line: last;
+    */
+
+//    describe("insertion", () => {
+//     it.only("can insert newlines", () => {
+//         insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+//         quill.insertText(2, "\n");
+//         /* 
+//             - 12345
+
+//             After:
+//             - 1234
+//             - 
+        
+//         */
+//         expect(quill.getContents().ops).deep.eq([
+//             OpUtils.op("12"),
+//             OpUtils.list(ListType.BULLETED),
+//             OpUtils.op("34"),
+//             OpUtils.list(ListType.BULLETED),
+//         ]);
+//         });
+//     });
+
+
 });

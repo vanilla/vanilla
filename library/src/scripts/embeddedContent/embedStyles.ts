@@ -92,6 +92,8 @@ export const embedContainerClasses = useThemeCache(() => {
                 },
                 "&.hasError": {
                     cursor: "pointer",
+                    background: colorOut(globalVars.messageColors.warning.bg),
+                    color: colorOut(globalVars.messageColors.warning.fg),
                     $nest: hoverFocusStates,
                 },
             },

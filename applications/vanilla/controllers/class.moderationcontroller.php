@@ -389,7 +389,7 @@ class ModerationController extends VanillaController {
             $Category = CategoryModel::categories($CategoryID);
             $this->Form->validateRule('CategoryID', 'function:ValidateRequired', 'Category is required');
             $this->Form->setValidationResults($CategoryModel->validationResults());
-            if ($this->Form->errorCount() == 0) {
+            if ($this->Form->errorCount() === 0) {
                 $RedirectLink = $this->Form->getFormValue('RedirectLink');
 
                 // User must have add permission on the target category

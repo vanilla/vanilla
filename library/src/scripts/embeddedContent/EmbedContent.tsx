@@ -2,7 +2,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import React from "react";
+import React, { RefObject } from "react";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -14,6 +14,7 @@ interface IProps {
     description?: string;
     children?: React.ReactNode;
     inEditor?: boolean;
+    ref?: RefObject<HTMLDivElement>;
 }
 
 export function EmbedContent(props: IProps) {
@@ -26,6 +27,7 @@ export function EmbedContent(props: IProps) {
             aria-label={"External embed content - " + props.type}
             className={classNames("embedExternal-content", props.className, { [FOCUS_CLASS]: props.inEditor })}
             tabIndex={props.inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
+            ref={props.ref}
         >
             <span className="sr-only">{props.description || defaultDesc}</span>
             {props.children}

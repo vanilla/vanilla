@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, setAllLinkColors } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -73,7 +73,21 @@ const userContentVariables = useThemeCache(() => {
         },
     });
 
-    return { fonts, list, blocks, code, codeInline, codeBlock, embeds };
+    const spacing = makeThemeVars("spacing", {
+        base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
+    });
+
+
+    return {
+        fonts,
+        list,
+        blocks,
+        code,
+        codeInline,
+        codeBlock,
+        embeds,
+        spacing,
+    };
 });
 
 /**
@@ -103,7 +117,7 @@ export const userContentClasses = useThemeCache(() => {
 
     const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): NestedCSSProperties => {
         return {
-            marginTop: globalVars.spacer.size,
+            marginTop: unit(vars.spacing.base),
             fontSize,
             $nest: lineHeightAdjustment(),
         };

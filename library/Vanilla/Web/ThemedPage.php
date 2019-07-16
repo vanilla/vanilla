@@ -37,7 +37,6 @@ abstract class ThemedPage extends Page {
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
         \ThemesApiController $themesApi = null // Default required to conform to interface
-
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel);
         $this->themesApi = $themesApi;

@@ -8,18 +8,17 @@ import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
+import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
-import { TwitterEmbed, convertTwitterEmbeds } from "@library/embeddedContent/TwitterEmbed";
+import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
+import { onContent } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
-import { onContent } from "@library/utility/appUtils";
-import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
-import { forceRenderStyles } from "typestyle";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 

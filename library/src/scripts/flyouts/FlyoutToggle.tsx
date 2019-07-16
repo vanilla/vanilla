@@ -144,8 +144,10 @@ export default function FlyoutToggle(props: IProps) {
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });
-    // Prevent flashing of content sometimes.
-    forceRenderStyles();
+    useEffect(() => {
+        // Prevent flashing on the first render
+        forceRenderStyles();
+    }, []);
 
     const childrenData = {
         id: contentID,

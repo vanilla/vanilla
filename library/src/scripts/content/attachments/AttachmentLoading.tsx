@@ -9,7 +9,7 @@ import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
 import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/styles/metasStyles";
@@ -17,6 +17,7 @@ import { attachmentIconClasses } from "@library/content/attachments/attachmentIc
 import classNames from "classnames";
 
 interface IProps extends IFileAttachment {
+    className?: string;
     type: AttachmentType;
     size: number; // bytes
     progressEventEmitter?: ProgressEventEmitter;
@@ -42,7 +43,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const classesMetas = metasClasses();
         return (
             <div
-                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
+                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
                 tabIndex={0}
                 aria-label={t("Uploading...")}
             >

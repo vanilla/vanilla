@@ -102,14 +102,14 @@ export default class ClipboardModule extends ClipboardBase {
      */
     public imageMatcher = (node: HTMLImageElement, delta: DeltaStatic) => {
         const src = node.getAttribute("src");
-        const alt = node.getAttribute("alt");
+        const alt = node.getAttribute("alt") || "";
         if (src) {
             const imageData: IEmbedValue = {
                 loaderData: {
                     type: "image",
                 },
                 data: {
-                    type: "image",
+                    embedType: "image",
                     url: src,
                     name: alt,
                     attributes: {},

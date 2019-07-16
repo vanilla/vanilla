@@ -8,6 +8,8 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Formats\Bold;
@@ -17,7 +19,7 @@ use Vanilla\Formatting\Quill\Formats\Link;
 /**
  * General testing of Filterer.
  */
-class FiltererTest extends TestCase {
+class FiltererTest extends SharedBootstrapTestCase {
 
     /**
      * Assert that the filterer is validating json properly.
@@ -36,6 +38,95 @@ class FiltererTest extends TestCase {
         $output = json_encode(json_decode($output));
         $filteredOutput = json_encode(json_decode($filteredOutput));
         $this->assertEquals($output, $filteredOutput);
+    }
+
+    /**
+     * Test that
+     * - unneeded embed data gets stripped off.
+     * - XSS in the body is prevent. We always have a fully rendered body.
+     */
+    public function testFilterEmbedData() {
+        $filterer = new Filterer();
+        $replacedUrl = 'http://test.com/replaced';
+
+        $input = [
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'type' => QuoteEmbed::TYPE,
+                            'body' => "Fake body contents, should be replaced.",
+                            'bodyRaw' => 'Rendered Body',
+                            'format' => 'Markdown',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'type' => QuoteEmbed::TYPE,
+                            'format' => RichFormat::FORMAT_KEY,
+                            'body' => '<div><script>alert("This should be replaced!")</script></div>',
+                            'bodyRaw' => [
+                                [
+                                    'insert' => [
+                                        'embed-external' => [
+                                            'data' => [
+                                                'url' => $replacedUrl,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                [ 'insert' => 'After Embed\n' ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        // Contents replaced with a link.
+        $expectedEmbedBodyRaw = [
+            [
+                'insert' => $replacedUrl,
+                'attributes' => [
+                    'link' => $replacedUrl,
+                ],
+            ],
+            [ 'insert' => "\n" ],
+            [ 'insert' => 'After Embed\n' ],
+        ];
+
+        $expected = [
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'type' => QuoteEmbed::TYPE,
+                            'body' => "<p>Rendered Body</p>\n",
+                            'bodyRaw' => 'Rendered Body',
+                            'format' => 'Markdown',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'type' => QuoteEmbed::TYPE,
+                            'format' => 'Rich',
+                            'body' => \Gdn_Format::quoteEmbed($expectedEmbedBodyRaw, RichFormat::FORMAT_KEY),
+                            'bodyRaw' => $expectedEmbedBodyRaw,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame(json_encode($expected), $filterer->filter(json_encode($input)));
     }
 
     /**

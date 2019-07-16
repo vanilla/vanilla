@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
+use Vanilla\Formatting\Quill\Filterer;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Renderer;
@@ -29,10 +30,13 @@ class RendererTest extends SharedBootstrapTestCase {
      * @throws \Garden\Container\NotFoundException
      */
     protected function render(array $ops): string {
+        $filterer = \Gdn::getContainer()->get(Filterer::class);
         $renderer = \Gdn::getContainer()->get(Renderer::class);
         $parser = \Gdn::getContainer()->get(Parser::class);
 
-        return $renderer->render($parser->parse($ops));
+        // We need to filter to test properly.
+        $filteredValue = json_decode($filterer->filter(json_encode($ops)), true);
+        return $renderer->render($parser->parse($filteredValue));
     }
 
     /**

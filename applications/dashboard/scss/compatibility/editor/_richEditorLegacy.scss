@@ -58,11 +58,11 @@ $richEditor_innerPadding                          : 12px !default;
     }
 
     > *:not(.emoji) {
-        &:not(:last-child):not(br,.embedResponsive) {
+        &:not(:last-child):not(br) {
             margin-bottom: $global-block_margin;
         }
 
-        &:first-child:not(br,.embedResponsive) {
+        &:first-child:not(br) {
             margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }

@@ -71,12 +71,14 @@ export const radioTabsVariables = useThemeCache(() => {
     const leftTab = makeVars("leftTab", {
         radii: {
             left: 3,
+            right: 0,
         },
     });
 
     const rightTab = makeVars("rightTab", {
         radii: {
             right: 3,
+            left: 0,
         },
     });
 

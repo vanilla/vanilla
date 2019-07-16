@@ -171,7 +171,6 @@ export default function FlyoutToggle(props: IProps) {
                 id={buttonID}
                 onClick={buttonClickHandler}
                 className={buttonClasses}
-                type="button"
                 title={title}
                 aria-label={"name" in props ? props.name : undefined}
                 aria-controls={contentID}

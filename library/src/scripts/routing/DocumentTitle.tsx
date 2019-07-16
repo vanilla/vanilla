@@ -44,11 +44,7 @@ export default function DocumentTitle(props: IProps) {
         document.title = headTitle;
     }, [headTitle]);
 
-    if (props.children) {
-        return props.children;
-    } else {
-        return <h1>{props.title}</h1>;
-    }
+    return <>{props.children ? props.children : <h1>{props.title}</h1>}</>;
 }
 
 interface IProps {

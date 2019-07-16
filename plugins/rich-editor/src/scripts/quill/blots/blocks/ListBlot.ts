@@ -223,50 +223,44 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         if (value.includes("\n") && isInListContent) {
             const after = this.split(index, false);
             const targetNext = after === this ? this.next : after;
+            const isEndOfLine = index === this.length() - 1;
 
-            const inserts = value === "\n" ? [""] : value.split("\n");
-            const nextListItem = this.next;
+            // Break the insert up on it's newlines.
+            const inserts = value === "\n" ? [""] : 
+            value.split("\n");
+
 
             // condition to filter for the position of the cursor in the string.
             // eg end of line 
-            // offset 
-            if (inserts[0] && inserts[0] !== "" && index === this.length()) {
+            // offset
+
+            // If we split the blot, we need to remove the first newline.
+            if (this.next && targetNext === this.next && inserts[0] === "") {
+                inserts.shift();
+            }
+
+            // If the first part of the insert is not a newline, insert it into the content and pop it off.
+            if (inserts[0] && inserts[0] !== "") {
                 this.getListContent()!.insertAt(index, inserts.shift()!);
             }
-            inserts[0] && inserts[0] !== "" ? this.getListContent()!.insertAt(index, inserts.shift()!) : null;
 
+            // Each of the rest of the inserts will get inserted on their own list
             const listItems = inserts.map((insert, inc) => {
                 const item = Parchment.create(ListItem.blotName, this.getValue()) as ListItem;
-                // if (insert !== "") {
-                //     item.insertAt(0, insert, undefined);
-                // }
-                insert !== "" ? item.insertAt(0, insert, undefined) : item;
+                if (insert !== "") {
+                    item.insertAt(0, insert, undefined);
+                }
                 return item;
             });
 
-            /*
-
-                note: get the position in the bulleted list line,
-                eg: 
-                    -12\/34   // position not last
-                   
-                eg: 
-                    -1234 \/  // position is the last of the line 
-                
-
-
-            
-            
-            */
+          
 
             // includes conditions for the new line inserts blot
             // if the last element of the <ul> and the last charectrer in the string
             listItems.forEach(item => {
-                if (item.parent !== undefined) {
-                    const clone = this.clone() as ListItemWrapper;
-                    clone.appendChild(item);
-                    this.parent.insertBefore(clone, targetNext);
-                }
+                const clone = this.clone() as ListItemWrapper; // Clone the <li/> tag.
+                clone.appendChild(item); // Insert the <p> tag in inside of the <li/>
+                this.parent.insertBefore(clone, targetNext); // Insert the <li> inside of the <ul> or <ol>
             });
         } else {
             super.insertAt(index, value, def);
@@ -511,11 +505,12 @@ export class ListItem extends LineBlot {
         return element;
     }
 
-    /**
+    /** 
      * Get the depth a list item based on the it's parent HTML elements.
      *
      * @param listElement The HTML element to check.
      */
+
     private static getListDepth(listElement: HTMLElement): number {
         let depth = 0;
         let parent = listElement.parentElement;

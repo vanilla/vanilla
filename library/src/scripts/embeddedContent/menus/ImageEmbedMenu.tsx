@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useRef, useState } from "react";
+import React, { RefObject, useCallback, useMemo, useRef, useState } from "react";
 import { t } from "@library/utility/appUtils";
 import DropDown from "@library/flyouts/DropDown";
 import classNames from "classnames";
@@ -15,7 +15,7 @@ import InputBlock from "@library/forms/InputBlock";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { getFieldErrors } from "@library/apiv2";
 import ButtonSubmit from "@library/forms/ButtonSubmit";
-import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { getRequiredID, uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { LoadStatus } from "@library/@types/api/core";
@@ -52,13 +52,13 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
     const [alt, setAlt] = useState("");
 
     const { saveImageMeta, initialAlt = "", elementToFocusOnClose } = props;
+    const id = useUniqueID("imageEmbedMenu");
+    let textInput = useRef();
 
-    const id = uniqueIDFromPrefix("describedBy");
-
-    const onVisibilityChange = e => {
+    const onVisibilityChange = useCallback(event => {
         if (!saved) {
-            e.preventDefault();
-            e.stopPropagation();
+            event.preventDefault();
+            event.stopPropagation();
             if (state.alt !== initialAlt && initialAlt !== "") {
                 // Don't care if they never set anything
                 setShowModal(true);
@@ -67,28 +67,36 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
                 debuglog("Submitting with alt text: " + alt);
             }
         }
-    };
+    }, []);
 
-    const onChange = e => {};
+    const onChange = useCallback(event => {}, []);
 
-    const onCancelClose = e => {
-        setShowModal(false);
-        setSaved(false);
-        setAlt(initialAlt);
-    };
-
-    const onSaveClose = e => {
-        // do save
-        setSaved(true);
-        setShowModal(false);
-        if (elementToFocusOnClose && elementToFocusOnClose.current) {
-            elementToFocusOnClose.current.focus();
+    const onCancelClose = useCallback(event => {
+        if (event) {
+            setShowModal(false);
+            setSaved(false);
+            setAlt(initialAlt);
         }
-    };
+    }, []);
 
-    const handleTextChange = e => {};
+    const onSaveClose = useCallback(event => {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+            setSaved(true);
+            setShowModal(false);
+            if (elementToFocusOnClose && elementToFocusOnClose.current) {
+                elementToFocusOnClose.current.focus();
+            }
+        }
+    }, []);
 
-    // let textInput = React.createRef();
+    const handleTextChange = useCallback(event => {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    }, []);
 
     return (
         <div className={classes.root}>
@@ -119,6 +127,7 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
                                 value: state.alt || "",
                                 onChange: handleTextChange,
                                 disabled: !disable,
+                                ref: textInput,
                             }}
                         />
                         <ButtonSubmit>{t("Insert")}</ButtonSubmit>

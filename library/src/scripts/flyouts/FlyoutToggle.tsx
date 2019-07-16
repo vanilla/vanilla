@@ -94,24 +94,26 @@ export default function FlyoutToggle(props: IProps) {
 
     const closeMenuHandler = useCallback(
         event => {
-            event.stopPropagation();
-            event.preventDefault();
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
 
-            props.onClose && props.onClose();
+                props.onClose && props.onClose();
 
-            const { activeElement } = document;
-            const parentElement = controllerRef.current;
+                const { activeElement } = document;
+                const parentElement = controllerRef.current;
 
-            setVisibility(false);
+                setVisibility(false);
 
-            if (parentElement && parentElement.contains(activeElement)) {
-                if (buttonRef.current) {
-                    buttonRef.current.focus();
-                    buttonRef.current.classList.add("focus-visible");
+                if (parentElement && parentElement.contains(activeElement)) {
+                    if (buttonRef.current) {
+                        buttonRef.current.focus();
+                        buttonRef.current.classList.add("focus-visible");
+                    }
                 }
-            }
-            if (props.onVisibilityChange) {
-                props.onVisibilityChange(false);
+                if (props.onVisibilityChange) {
+                    props.onVisibilityChange(false);
+                }
             }
         },
         [props.onClose, controllerRef.current, buttonRef.current, props.onVisibilityChange],
@@ -121,7 +123,9 @@ export default function FlyoutToggle(props: IProps) {
      * Stop click propagation outside the flyout
      */
     const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
-        e.stopPropagation();
+        if (e && e.stopPropagation) {
+            e.stopPropagation();
+        }
     }, []);
 
     const handleFocusChange = (hasFocus: boolean) => {

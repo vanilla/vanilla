@@ -25,7 +25,7 @@ interface IProps extends IBaseEmbedProps {
 export function ImageEmbed(props: IProps) {
     const imageEmbedRef: RefObject<HTMLDivElement> = React.createRef();
     return (
-        <EmbedContent type="Image" inEditor={props.inEditor} ref={imageEmbedRef}>
+        <EmbedContent type="Image" inEditor={props.inEditor} ref={imageEmbedRef ? imageEmbedRef : undefined}>
             <div className="embedImage-link">
                 {props.inEditor && (
                     <ImageEmbedMenu saveImageMeta={props.saveImageMeta} elementToFocusOnClose={imageEmbedRef} />

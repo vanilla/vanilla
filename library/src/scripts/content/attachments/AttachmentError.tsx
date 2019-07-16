@@ -42,7 +42,6 @@ export default class AttachmentError extends React.Component<IProps> {
             <EmbedContainer
                 className={classNames("hasError", FOCUS_CLASS)}
                 size={EmbedContainerSize.SMALL}
-                withPadding
                 tabIndex={0}
                 aria-describedby={this.descrID}
                 aria-label={t("Error")}

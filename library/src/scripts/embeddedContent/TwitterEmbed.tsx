@@ -67,7 +67,6 @@ export function TwitterEmbed(props: IProps): JSX.Element {
 }
 
 TwitterEmbed.async = true;
-TwitterEmbed.preloadScript = TWITTER_SCRIPT;
 
 /**
  * Render a single twitter embed.

@@ -55,6 +55,7 @@ export const attachmentClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "flex-start",
         justifyContent: "space-between",
+        padding: vars.padding.default,
         width: percent(100),
         ...borders({
             color: globalVars.elementaryColors.transparent,

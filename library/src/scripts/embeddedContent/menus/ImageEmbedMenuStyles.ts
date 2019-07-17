@@ -20,7 +20,8 @@ export const imageEmbedMenuClasses = () => {
 
     const root = style({
         ...absolutePosition.topLeft(),
-        transform: `translateX(-50)`,
+        transform: `translateX(-100%)`,
+        zIndex: 1,
     });
 
     return { root };

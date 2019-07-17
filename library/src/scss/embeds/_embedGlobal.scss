@@ -4,6 +4,7 @@
  */
 
 .embedResponsive {
+    position: relative;
     text-align: center;
 }
 
@@ -115,7 +116,7 @@
             }
         }
 
-        > * {
+        > *:not(.u-excludeFromPointerEvents) {
             pointer-events: none; // In edit mode, we never allow clicking into elements.
         }
     }

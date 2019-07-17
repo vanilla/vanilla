@@ -56,8 +56,8 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
     let textInput = useRef();
 
     const onVisibilityChange = useCallback(event => {
-        if (!saved) {
-            event.preventDefault();
+        if (!saved && event && event.preventDefault && event.stopPropagation) {
+            // event.preventDefault();
             event.stopPropagation();
             if (state.alt !== initialAlt && initialAlt !== "") {
                 // Don't care if they never set anything
@@ -99,7 +99,7 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
     }, []);
 
     return (
-        <div className={classes.root}>
+        <div className={classNames(classes.root)}>
             {showModal && (
                 <ModalConfirm
                     title={t("Are you sure you want to ")}

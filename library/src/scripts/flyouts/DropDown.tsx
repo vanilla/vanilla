@@ -162,6 +162,7 @@ class DropDown extends React.Component<IProps, IState> {
 
     private doNothing = e => {
         e.stopPropagation();
+        e.preventDefault();
     };
 }
 

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject } from "react";
+import React, { RefObject, useRef } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
@@ -23,14 +23,20 @@ interface IProps extends IBaseEmbedProps {
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
-    const imageEmbedRef: RefObject<HTMLDivElement> = React.createRef();
+    const extraProps: any = {};
+    if (props.inEditor) {
+        extraProps.imageEmbedRef = useRef();
+    }
     return (
-        <EmbedContent type="Image" inEditor={props.inEditor} ref={imageEmbedRef ? imageEmbedRef : undefined}>
-            <div className="embedImage-link">
-                {props.inEditor && (
-                    <ImageEmbedMenu saveImageMeta={props.saveImageMeta} elementToFocusOnClose={imageEmbedRef} />
-                )}
+        <EmbedContent type="Image" inEditor={props.inEditor} {...extraProps}>
+            <div className="embedImage-link u-excludeFromPointerEvents">
                 <img className="embedImage-img" src={props.url} alt={props.name} />
+                {props.inEditor && (
+                    <ImageEmbedMenu
+                        saveImageMeta={props.saveImageMeta}
+                        elementToFocusOnClose={extraProps.imageEmbedRef}
+                    />
+                )}
             </div>
         </EmbedContent>
     );

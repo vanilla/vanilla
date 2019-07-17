@@ -7,6 +7,7 @@ import React from "react";
 import debounce from "lodash/debounce";
 import { getElementHeight } from "@library/dom/domUtils";
 import { forceRenderStyles } from "typestyle";
+import { onContent, removeOnContent } from "@library/utility/appUtils";
 
 interface IProps {
     id: string;
@@ -21,8 +22,6 @@ interface IProps {
 interface IState {
     maxHeight: number | string;
 }
-
-interface IHeightInfo {}
 
 /**
  * A class for dynamic collapsable user content.
@@ -54,6 +53,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
         forceRenderStyles();
         this.calcMaxHeight();
         window.addEventListener("resize", this.windowResizerHandler);
+        onContent(this.calcMaxHeight);
     }
 
     /**
@@ -61,6 +61,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
      */
     public componentWillUnmount() {
         window.removeEventListener("resize", this.windowResizerHandler);
+        removeOnContent(this.calcMaxHeight);
     }
 
     /**
@@ -138,14 +139,16 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
     /**
      * Calculate the CSS max height that we want to apply to the container div.
      */
-    private calcMaxHeight() {
+    private calcMaxHeight = () => {
         const { height, needsCollapser } = this.getHeightInfo();
-        if (needsCollapser && this.props.isCollapsed) {
-            this.setState({ maxHeight: height! });
-        } else {
-            this.setState({ maxHeight: this.selfRef.current!.scrollHeight });
+
+        let newHeight = needsCollapser && this.props.isCollapsed ? height! : this.selfRef.current!.scrollHeight;
+        if (newHeight === 0) {
+            // This is probably a mistake. Since we are hidden we don't want to actually re-render.
+            return;
         }
 
+        this.setState({ maxHeight: newHeight });
         this.props.setNeedsCollapser && this.props.setNeedsCollapser(needsCollapser);
-    }
+    };
 }

@@ -18,9 +18,7 @@ interface IProps {
 }
 
 export function EmbedContent(props: IProps) {
-    const id = useUniqueID("richEditor-embed-description-");
-    const defaultDesc = t("richEditor.externalEmbed.description");
-
+    const id = useUniqueID("richEditor-embed-description");
     return (
         <div
             aria-describedby={id}
@@ -29,7 +27,7 @@ export function EmbedContent(props: IProps) {
             tabIndex={props.inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
             ref={props.ref}
         >
-            <span className="sr-only">{props.description || defaultDesc}</span>
+            <span className="sr-only">{props.description || t("richEditor.externalEmbed.description")}</span>
             {props.children}
         </div>
     );

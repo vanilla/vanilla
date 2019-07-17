@@ -2880,6 +2880,11 @@ class UserModel extends Gdn_Model {
             return false;
         }
 
+        if (!empty($invitation->AcceptedUserID)) {
+            $this->Validation->addValidationResult('InvitationCode', 'Invitation has been used.');
+            return false;
+        }
+
         // Get expiration date in timestamp. If nothing set, grab config default.
         $inviteExpiration = $invitation->DateExpires;
         if ($inviteExpiration != null) {

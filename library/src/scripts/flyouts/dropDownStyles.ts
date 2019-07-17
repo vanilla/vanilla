@@ -21,6 +21,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+export const notUserContent = "u-notUserContent";
+
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("dropDown");
@@ -186,12 +188,13 @@ export const dropDownClasses = useThemeCache(() => {
 
     // wrapping element
     const item = style("item", {
+        ...userSelect("none"),
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
         width: percent(100),
+        margin: 0,
         color: "inherit",
-        ...userSelect("none"),
         textAlign: "left",
         lineHeight: globalVars.lineHeights.condensed,
     });

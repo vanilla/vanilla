@@ -24,5 +24,13 @@ export const imageEmbedMenuClasses = () => {
         zIndex: 1,
     });
 
-    return { root };
+    const form = style("form", {
+        display: "block",
+        width: percent(100),
+    });
+
+    return {
+        root,
+        form,
+    };
 };

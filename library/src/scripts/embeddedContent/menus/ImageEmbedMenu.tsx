@@ -5,7 +5,7 @@
 
 import React, { RefObject, useCallback, useMemo, useRef, useState } from "react";
 import { t } from "@library/utility/appUtils";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
 import classNames from "classnames";
 import { accessibleImageMenu } from "@library/icons/common";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -21,6 +21,10 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { LoadStatus } from "@library/@types/api/core";
 import { debuglog } from "util";
 import { element } from "prop-types";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import { Devices } from "@library/layout/DeviceContext";
+import ModalSizes from "@library/modal/ModalSizes";
+import Modal from "@library/modal/Modal";
 
 interface IProps extends IImageMeta {
     saveImageMeta?: () => void;
@@ -110,9 +114,17 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
                     {t("This is a destructive action. You will not be able to restore your draft.")}
                 </ModalConfirm>
             )}
-            <DropDown title={t("Alt Text")} buttonContents={icon} onVisibilityChange={onVisibilityChange}>
-                <div className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}>
+            <DropDown
+                title={t("Alt Text")}
+                buttonContents={icon}
+                className
+                onVisibilityChange={onVisibilityChange}
+                size={FlyoutSizes.DEFAULT}
+                // openAsModal={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}
+            >
+                <DropDownItem className={classNames()}>
                     <form
+                        className={classes.form}
                         onSubmit={e => {
                             e.preventDefault();
                         }}
@@ -132,7 +144,7 @@ export function ImageEmbedMenu(props: IProps, state: IState): JSX.Element {
                         />
                         <ButtonSubmit>{t("Insert")}</ButtonSubmit>
                     </form>
-                </div>
+                </DropDownItem>
             </DropDown>
         </div>
     );

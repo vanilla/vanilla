@@ -21,8 +21,8 @@ export interface IRequiredComponentID {
 /**
  * React hook for useUniqueIDFromPrefix
  */
-export function useUniqueID(prefix?: string, trackedValues: any[] = []) {
-    return useMemo(() => uniqueIDFromPrefix(prefix), trackedValues);
+export function useUniqueID(prefix?: string) {
+    return useMemo(() => uniqueIDFromPrefix(prefix), [prefix]);
 }
 
 // Generates unique ID from suffix

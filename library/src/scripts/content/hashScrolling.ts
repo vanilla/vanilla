@@ -10,13 +10,12 @@ import { initAllUserContent } from "@library/content/index";
 export function useHashScrolling() {
     const offset = useScrollOffset();
     const calcedOffset = offset.getCalcedHashOffset();
-    const callback = useCallback(() => {}, [calcedOffset]);
 
     useEffect(() => {
         void initAllUserContent().then(() => {
             initHashScrolling(calcedOffset, () => offset.temporarilyDisabledWatching(500));
         });
-    }, [callback]);
+    }, [calcedOffset, offset]);
 }
 
 export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () => void) {

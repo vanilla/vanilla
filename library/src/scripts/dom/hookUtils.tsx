@@ -33,7 +33,7 @@ export function useMeasure(ref: RefObject<HTMLElement | null>) {
             window.cancelAnimationFrame(animationFrameId!);
             ro.disconnect();
         };
-    }, [ref.current]);
+    }, [ref]);
 
     return bounds;
 }

@@ -25,12 +25,13 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 function UserDropDown(props: IProps) {
     const ID = useMemo(() => uniqueIDFromPrefix("userDropDown"), []);
     const [isOpen, setOpen] = useState(false);
+    const { checkCountData } = props;
 
     useEffect(() => {
         if (isOpen) {
-            props.checkCountData();
+            checkCountData();
         }
-    }, [isOpen, props.checkCountData]);
+    }, [isOpen, checkCountData]);
 
     const { userInfo } = props;
     if (!userInfo) {

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { IEditorProps, EditorContext } from "@rich-editor/editor/context";
 import Quill from "quill/core";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
@@ -21,7 +21,7 @@ export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const ID = uniqueIDFromPrefix("editor");
+    const ID = useMemo(() => uniqueIDFromPrefix("editor"), []);
     const descriptionID = ID + "-description";
 
     return (

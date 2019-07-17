@@ -58,11 +58,12 @@ export default class ErrorBlot extends FocusableEmbedBlot {
         if (!data.error) {
             return;
         }
+        domNode.classList.remove(FOCUS_CLASS);
+        domNode.removeAttribute("tabindex");
 
         if (data.type === ErrorBlotType.FILE) {
             const now = new Date();
             const file = data.file!;
-            domNode.classList.remove(FOCUS_CLASS);
             ReactDOM.render(
                 <AttachmentError
                     message={data.error.message}

@@ -11713,6 +11713,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLinkLoader-link {
+  position: relative;
   display: inline-block;
   white-space: normal;
   padding: 2px 4px;

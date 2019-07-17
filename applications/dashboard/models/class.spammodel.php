@@ -17,7 +17,7 @@ class SpamModel extends Gdn_Pluggable {
     protected static $_Instance;
 
     /** @var bool */
-    public static $Disabled = true;
+    public static $Disabled = false;
 
     /**
      *

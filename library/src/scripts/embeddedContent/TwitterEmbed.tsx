@@ -23,6 +23,7 @@ const TWITTER_SCRIPT = "https://platform.twitter.com/widgets.js";
 export function TwitterEmbed(props: IProps): JSX.Element {
     const [twitterLoaded, setTwitterLoaded] = useState(false);
     const classes = twitterEmbedClasses();
+    const { onRenderComplete } = props;
 
     useEffect(() => {
         void convertTwitterEmbeds().then(() => {
@@ -30,12 +31,12 @@ export function TwitterEmbed(props: IProps): JSX.Element {
             // Otherwise we end up with a flash of the URL next to the rendered tweet.
             setTwitterLoaded(true);
         });
-    }, [setTwitterLoaded, props.onRenderComplete]);
+    }, [setTwitterLoaded]);
 
     useEffect(() => {
         // Don't count our tweet as rendered until the tweet is fully loaded.
-        props.onRenderComplete && props.onRenderComplete();
-    }, [twitterLoaded]);
+        onRenderComplete && onRenderComplete();
+    }, [twitterLoaded, onRenderComplete]);
 
     return (
         <>

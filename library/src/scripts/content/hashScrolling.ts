@@ -11,7 +11,7 @@ export function useHashScrolling() {
     const calcedOffset = offset.getCalcedHashOffset();
     const callback = useCallback(() => {
         return initHashScrolling(calcedOffset, () => offset.temporarilyDisabledWatching(500));
-    }, [calcedOffset]);
+    }, [offset, calcedOffset]);
 
     useEffect(() => {
         callback();

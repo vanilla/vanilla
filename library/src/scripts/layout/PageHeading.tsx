@@ -34,17 +34,10 @@ export function PageHeading(props: IPageHeading) {
     // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
     // public titleRef: React.RefObject<HTMLHeadingElement>;
     const ref = useRef<HTMLHeadingElement>(null);
-    const { setFontSize, fontSize } = useFontSizeCalculator();
+    const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
     const linkClasses = backLinkClasses();
-
-    useEffect(() => {
-        if (ref.current) {
-            const length = parseInt(getComputedStyle(ref.current)["font-size"], 10);
-            const before = !!length && setFontSize(length);
-        }
-    }, [ref.current, setFontSize]);
 
     return (
         <div className={classNames(classes.root, className)}>

@@ -14,12 +14,12 @@ export function useTabKeyboardHandler(
     excludedElements: Element[] = [],
     excludedRoots: Element[] = [],
 ): React.KeyboardEventHandler | undefined {
-    const makeTabHandler = () => {
+    const makeTabHandler = useCallback(() => {
         if (!root) {
             return;
         }
         return new TabHandler(root, excludedElements, excludedRoots);
-    };
+    }, [root, excludedElements, excludedRoots]);
 
     /**
      * Handle shift tab key presses.
@@ -29,19 +29,22 @@ export function useTabKeyboardHandler(
      *
      * @param event The react event.
      */
-    const handleShiftTab = useCallback((event: React.KeyboardEvent) => {
-        const tabHandler = makeTabHandler();
-        if (!tabHandler) {
-            return;
-        }
-        const nextElement = tabHandler.getNext(undefined, true);
-        if (nextElement) {
-            event.preventDefault();
+    const handleShiftTab = useCallback(
+        (event: React.KeyboardEvent) => {
+            const tabHandler = makeTabHandler();
+            if (!tabHandler) {
+                return;
+            }
+            const nextElement = tabHandler.getNext(undefined, true);
+            if (nextElement) {
+                event.preventDefault();
 
-            event.stopPropagation();
-            nextElement.focus();
-        }
-    }, []);
+                event.stopPropagation();
+                nextElement.focus();
+            }
+        },
+        [makeTabHandler],
+    );
 
     /**
      * Handle tab key presses.
@@ -51,18 +54,21 @@ export function useTabKeyboardHandler(
      *
      * @param event The react event.
      */
-    const handleTab = useCallback((event: React.KeyboardEvent) => {
-        const tabHandler = makeTabHandler();
-        if (!tabHandler) {
-            return;
-        }
-        const previousElement = tabHandler.getNext();
-        if (previousElement) {
-            event.preventDefault();
-            event.stopPropagation();
-            previousElement.focus();
-        }
-    }, []);
+    const handleTab = useCallback(
+        (event: React.KeyboardEvent) => {
+            const tabHandler = makeTabHandler();
+            if (!tabHandler) {
+                return;
+            }
+            const previousElement = tabHandler.getNext();
+            if (previousElement) {
+                event.preventDefault();
+                event.stopPropagation();
+                previousElement.focus();
+            }
+        },
+        [makeTabHandler],
+    );
 
     /**
      * Handle tab keyboard presses.

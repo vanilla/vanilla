@@ -15,12 +15,12 @@ import { withEditor } from "@rich-editor/editor/withEditor";
 import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
-import FocusWatcher from "@library/dom/FocusWatcher";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import ToolbarContainer from "@rich-editor/toolbars/pieces/ToolbarContainer";
 import InlineToolbarMenuItems from "@rich-editor/toolbars/pieces/InlineToolbarMenuItems";
 import InlineToolbarLinkInput from "@rich-editor/toolbars/pieces/InlineToolbarLinkInput";
+import { FocusWatcher } from "@vanilla/dom-utils";
 
 interface IProps extends IWithEditorProps {}
 

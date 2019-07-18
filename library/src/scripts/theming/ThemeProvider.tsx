@@ -8,7 +8,7 @@ import apiv2 from "@library/apiv2";
 import Backgrounds from "@library/layout/Backgrounds";
 import { inputClasses } from "@library/forms/inputStyles";
 import Loader from "@library/loaders/Loader";
-import { prepareShadowRoot } from "@library/dom/domUtils";
+import { prepareShadowRoot } from "@vanilla/dom-utils";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";

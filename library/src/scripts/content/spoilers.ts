@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { delegateEvent } from "@library/dom/domUtils";
+import { delegateEvent } from "@vanilla/dom-utils";
 
 export function initSpoilers() {
     // Setup

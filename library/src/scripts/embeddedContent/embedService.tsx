@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { mountReact } from "@library/dom/domUtils";
+import { mountReact } from "@vanilla/react-utils";
 import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";

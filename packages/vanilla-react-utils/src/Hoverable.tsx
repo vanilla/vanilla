@@ -32,7 +32,7 @@ interface IProvidedProps {
  *     }}
  * </Hoverable>
  */
-export default class Hoverable extends React.Component<IProps> {
+export class Hoverable extends React.Component<IProps> {
     public static defaultProps = {
         once: true,
     };

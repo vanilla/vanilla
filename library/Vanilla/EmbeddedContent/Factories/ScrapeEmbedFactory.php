@@ -114,7 +114,7 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      */
     private function getContentType(string $url): ?string {
         // Get information about the request with a HEAD request.
-        $response = $this->httpClient->head($url);
+        $response = $this->httpClient->options($url);
 
         // Let's do some super inconsistent validation of what file types are allowed.
         $contentType = $response->getHeaderLines('content-type');

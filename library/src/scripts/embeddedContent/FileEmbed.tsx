@@ -7,7 +7,6 @@ import React from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import Attachment from "@library/content/attachments/Attachment";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.

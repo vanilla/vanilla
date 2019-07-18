@@ -39,6 +39,7 @@ class FormatCompatibilityService {
      * Convert old style content to the new format.
      *
      * @param string $content
+     * @param string $format
      *
      * @return string
      */

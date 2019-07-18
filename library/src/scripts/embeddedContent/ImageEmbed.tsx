@@ -9,6 +9,7 @@ import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IImageMeta, ImageEmbedMenu } from "@library/embeddedContent/menus/ImageEmbedMenu";
 import { useFocusWatcher } from "@library/dom/FocusWatcher";
+import { debuglog } from "util";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -32,7 +33,7 @@ export function ImageEmbed(props: IProps) {
 
     useFocusWatcher(contentRef.current, newFocusState => {
         setIsFocused(newFocusState);
-        console.log("is focussed");
+        debuglog("is focussed");
     });
 
     return (
@@ -43,7 +44,6 @@ export function ImageEmbed(props: IProps) {
                     <ImageEmbedMenu
                         saveImageMeta={props.saveImageMeta}
                         elementToFocusOnClose={extraProps.imageEmbedRef}
-                        hasFocus={isFocused}
                     />
                 )}
             </div>

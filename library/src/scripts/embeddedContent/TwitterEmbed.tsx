@@ -7,13 +7,14 @@ import { ensureScript } from "@library/dom/domUtils";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useEffect } from "react";
-import { onContent } from "@library/utility/appUtils";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import classNames from "classnames";
 
 interface IProps extends IBaseEmbedProps {
     statusID: string;
 }
+
+const TWITTER_SCRIPT = "https://platform.twitter.com/widgets.js";
 
 /**
  * A class for rendering Twitter embeds.
@@ -22,7 +23,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
     const classes = twitterEmbedClasses();
 
     useEffect(() => {
-        void convertTwitterEmbeds();
+        void convertTwitterEmbeds().then(props.onRenderComplete);
     }, []);
 
     return (
@@ -39,6 +40,9 @@ export function TwitterEmbed(props: IProps): JSX.Element {
         </EmbedContent>
     );
 }
+
+TwitterEmbed.async = true;
+TwitterEmbed.preloadScript = TWITTER_SCRIPT;
 
 /**
  * Render a single twitter embed.
@@ -85,7 +89,7 @@ async function renderTweet(contentElement: HTMLElement) {
 export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
-        await ensureScript("https://platform.twitter.com/widgets.js");
+        await ensureScript(TWITTER_SCRIPT);
         if (window.twttr) {
             const promises = tweets.map(contentElement => {
                 return renderTweet(contentElement as HTMLElement);

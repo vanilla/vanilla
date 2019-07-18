@@ -77,6 +77,7 @@
 }
 
 .embedLinkLoader-link {
+    position: relative;
     display: inline-block;
     white-space: normal;
     padding: $embedded-select_borderWidth $embedded-select_borderWidth * 2;

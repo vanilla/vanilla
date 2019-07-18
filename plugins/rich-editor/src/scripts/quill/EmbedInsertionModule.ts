@@ -48,9 +48,10 @@ export default class EmbedInsertionModule extends Module {
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        insertBlockBlotAt(this.quill, this.quill.getLastGoodSelection().index, externalEmbed);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, externalEmbed);
         this.quill.update(Quill.sources.USER);
-        externalEmbed.focus();
+        this.quill.setSelection(externalEmbed.offset(this.quill.scroll) + externalEmbed.length(), 0);
     };
 
     private pasteHandler = (event: ClipboardEvent) => {

@@ -35,6 +35,8 @@
             <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
         {% endfor -%}
 
+        {{ preloadModel.renderHtml()|raw }}
+
         {%- if canonicalUrl -%}
             <link rel="canonical" href="{{ canonicalUrl }}"/>
         {%- endif -%}

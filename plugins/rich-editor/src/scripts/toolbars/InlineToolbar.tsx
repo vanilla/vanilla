@@ -262,9 +262,13 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         }
     };
 
+    /**
+     * Clear the link input, focus quill, and restore the selection.
+     */
     private clearLinkInput() {
-        this.quill.setSelection(this.props.lastGoodSelection);
         this.setState({ isLinkMenuOpen: false, inputValue: "" });
+        this.quill.focus();
+        this.quill.setSelection(this.props.lastGoodSelection);
     }
 
     /**

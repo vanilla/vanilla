@@ -22,7 +22,7 @@ export function delegateEvent(
     filterSelector: string,
     callback: (event: Event, triggeringElement: HTMLElement) => boolean | void,
     scopeSelector?: string | HTMLElement,
-): string | undefined {
+): string {
     let functionKey = eventName + filterSelector + callback.toString();
 
     let scope;

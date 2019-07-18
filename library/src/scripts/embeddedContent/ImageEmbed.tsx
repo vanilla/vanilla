@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useRef } from "react";
+import React, { RefObject, useEffect, useRef } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
@@ -17,16 +17,20 @@ interface IProps extends IBaseEmbedProps {
     width?: number;
     height?: number;
     saveImageMeta?: () => IImageMeta;
+    hasFocus: boolean;
 }
 
 /**
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
+    const { inEditor, type, size, dateInserted, name, width, height, saveImageMeta } = props;
     const extraProps: any = {};
-    if (props.inEditor) {
+
+    useEffect(() => {
         extraProps.imageEmbedRef = useRef();
-    }
+    }, [inEditor]);
+
     return (
         <EmbedContent type="Image" inEditor={props.inEditor} {...extraProps}>
             <div className="embedImage-link u-excludeFromPointerEvents">

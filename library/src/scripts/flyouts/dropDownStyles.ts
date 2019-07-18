@@ -86,7 +86,8 @@ export const dropDownVariables = useThemeCache(() => {
             color: globalVars.border.color,
         },
         padding: {
-            vertical: 9,
+            vertical: 16,
+            horizontal: 16,
         },
     });
 
@@ -305,6 +306,10 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
+    const noVerticalPadding = style("noVerticalPadding", {
+        ...paddings({ vertical: 0 }),
+    });
+
     const title = style("title", {
         ...fonts({
             weight: globalVars.fonts.weights.semiBold as 400,
@@ -318,6 +323,10 @@ export const dropDownClasses = useThemeCache(() => {
         }),
         flexGrow: 1,
         color: colorOut(vars.title.color),
+    });
+
+    const paddedFrame = style("paddedFrame", {
+        ...paddings(vars.contents.padding),
     });
 
     return {
@@ -339,5 +348,7 @@ export const dropDownClasses = useThemeCache(() => {
         count,
         verticalPadding,
         title,
+        noVerticalPadding,
+        paddedFrame,
     };
 });

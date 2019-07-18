@@ -160,8 +160,10 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**
      * Test that the edit endpoints apply format compatibility where possible.
+     *
+     * @param string $editSuffix Set this to change the GET request suffix.
      */
-    public function testEditFormatCompat() {
+    public function testEditFormatCompat(string $editSuffix = "/edit") {
         $record = $this->record();
 
         // Only check anything if we've got a format and body field.
@@ -185,7 +187,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
         // Get the actual record and assert our value was set.
         $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}/edit"
+            "{$this->baseUrl}/{$row[$this->pk]}$editSuffix"
         );
 
         $actualBody = $r['body'];

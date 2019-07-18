@@ -13,6 +13,9 @@
     margin: 0 0 $global-block_margin;
     border-radius: $global_borderRadius;
     padding: $component-base_padding;
+    a {
+        text-decoration: underline;
+    }
 }
 
 a.Dismiss.Dismiss {
@@ -24,15 +27,27 @@ a.Dismiss.Dismiss {
 .WarningMessage {
     background-color: mix($global-color_bg, $global-color_warning, 80%);
     border-color: $global-color_warning;
+
+    a {
+        color: darken($global-color_warning, 15%);
+    }
 }
 
 .CasualMessage,
 .InfoMessage {
     background-color: mix($global-color_bg, $global-color_primary, 80%);
     border-color: $global-color_primary;
+
+    a {
+        color: darken($global-color_primary, 15%);
+    }
 }
 
 .AlertMessage {
     background-color: mix($global-color_bg, $global-error_fg, 80%);
     border-color: $global-error_fg;
+
+    a {
+        color: darken($global-error_fg, 15%);
+    }
 }

@@ -94,7 +94,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         return (
                             <MentionSuggestion
                                 mentionData={mentionProp.mentionData}
-                                key={mentionProp.mentionData.name}
+                                key={mentionProp.mentionData.domID}
                                 onMouseEnter={mentionProp.onMouseEnter}
                                 onClick={onItemClick}
                                 isActive={isActive}

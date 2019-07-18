@@ -5,8 +5,7 @@
  */
 
 import { userContentClasses } from "@library/content/userContentStyles";
-import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
-import { useLastValue } from "@library/dom/hookUtils";
+import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
@@ -20,6 +19,7 @@ import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
+import { useLastValue } from "@vanilla/react-utils";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 

@@ -6,7 +6,7 @@
 
 import React from "react";
 import gdn from "@library/gdn";
-import { escapeHTML } from "@library/dom/domUtils";
+import { escapeHTML } from "@vanilla/dom-utils";
 import Translate from "@library/content/Translate";
 import { render } from "enzyme";
 import { expect } from "chai";

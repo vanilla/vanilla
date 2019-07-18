@@ -6,7 +6,7 @@
 import React from "react";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import Quill, { DeltaOperation } from "quill/core";
-import { mountReact } from "@library/dom/domUtils";
+import { mountReact } from "@vanilla/react-utils";
 import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
 

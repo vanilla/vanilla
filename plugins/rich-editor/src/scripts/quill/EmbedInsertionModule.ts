@@ -8,7 +8,7 @@ import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
-import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
+import { getPastedFile, getDraggedFile } from "@vanilla/dom-utils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";

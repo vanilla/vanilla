@@ -7,7 +7,7 @@ import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useEffect } from "react";
-import { ensureScript } from "@library/dom/domUtils";
+import { ensureScript } from "@vanilla/dom-utils";
 
 interface IProps extends IBaseEmbedProps {
     version: number;

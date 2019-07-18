@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 import TabButton from "@library/navigation/tabs/TabButton";
-import TabHandler from "@library/dom/TabHandler";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;

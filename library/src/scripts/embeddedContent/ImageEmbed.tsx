@@ -3,11 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useEffect, useRef } from "react";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IImageMeta, ImageEmbedMenu } from "@library/embeddedContent/menus/ImageEmbedMenu";
+import { useFocusWatcher } from "@library/dom/FocusWatcher";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -17,7 +18,6 @@ interface IProps extends IBaseEmbedProps {
     width?: number;
     height?: number;
     saveImageMeta?: () => IImageMeta;
-    hasFocus: boolean;
 }
 
 /**
@@ -27,18 +27,23 @@ export function ImageEmbed(props: IProps) {
     const { inEditor, type, size, dateInserted, name, width, height, saveImageMeta } = props;
     const extraProps: any = {};
 
-    useEffect(() => {
-        extraProps.imageEmbedRef = useRef();
-    }, [inEditor]);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const [isFocused, setIsFocused] = useState(false);
+
+    useFocusWatcher(contentRef.current, newFocusState => {
+        setIsFocused(newFocusState);
+        console.log("is focussed");
+    });
 
     return (
-        <EmbedContent type="Image" inEditor={props.inEditor} {...extraProps}>
+        <EmbedContent type="Image" inEditor={props.inEditor} contentRef={contentRef}>
             <div className="embedImage-link u-excludeFromPointerEvents">
                 <img className="embedImage-img" src={props.url} alt={props.name} />
-                {props.inEditor && (
+                {props.inEditor && isFocused && (
                     <ImageEmbedMenu
                         saveImageMeta={props.saveImageMeta}
                         elementToFocusOnClose={extraProps.imageEmbedRef}
+                        hasFocus={isFocused}
                     />
                 )}
             </div>

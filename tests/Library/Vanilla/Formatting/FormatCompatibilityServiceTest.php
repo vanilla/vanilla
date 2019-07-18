@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\FormatCompatibilityService;
 use Vanilla\Formatting\Formats\RichFormat;
 use VanillaTests\Fixtures\EmbeddedContent\LegacyEmbedFixtures;
@@ -41,10 +42,17 @@ class FormatCompatibilityServiceTest extends SharedBootstrapTestCase {
             $normalInsert,
         ];
 
+        // Register the quote embed.
+        /** @var EmbedService $embedService */
+        $embedService = \Gdn::getContainer()->get(EmbedService::class);
+        $embedService->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE);
+
+        // Convert our value.
         /** @var FormatCompatibilityService $service */
         $service = \Gdn::getContainer()->get(FormatCompatibilityService::class);
+        $actual = $service->convert(json_encode($initialValue), RichFormat::FORMAT_KEY);
 
-        $this->assertEquals(json_encode($expected), $service->convert(json_encode($initialValue), RichFormat::FORMAT_KEY));
+        $this->assertEquals(json_encode($expected), $actual);
     }
 
     /**

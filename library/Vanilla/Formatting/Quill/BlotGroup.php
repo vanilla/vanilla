@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
@@ -278,7 +279,7 @@ class BlotGroup {
     }
 
     /**
-     * Get all of the mention blots in the group.
+     * Get all of the usernames that are mentioned in the blot group.
      *
      * Mentions that are inside of Blockquote's are excluded. We don't want to be sending notifications when big quote
      * replies build up.
@@ -294,8 +295,16 @@ class BlotGroup {
         foreach ($this->blots as $blot) {
             if ($blot instanceof Blots\Embeds\MentionBlot) {
                 $names[] = $blot->getUsername();
+            } elseif ($blot instanceof ExternalBlot) {
+                $embed = $blot->getEmbed();
+                if ($embed instanceof QuoteEmbed) {
+                    $names[] = $embed->getUsername();
+                }
             }
         }
+
+        // De-duplicate the usernames.
+        $names = array_unique($names);
 
         return $names;
     }

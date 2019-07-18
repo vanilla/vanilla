@@ -14,7 +14,7 @@ interface IProps {
     description?: string;
     children?: React.ReactNode;
     inEditor?: boolean;
-    contentRef?: RefObject<HTMLDivElement | null>;
+    setContentRef?: (element: HTMLElement | null) => void;
 }
 
 export function EmbedContent(props: IProps) {
@@ -25,7 +25,7 @@ export function EmbedContent(props: IProps) {
             aria-label={"External embed content - " + props.type}
             className={classNames("embedExternal-content", props.className, { [FOCUS_CLASS]: props.inEditor })}
             tabIndex={props.inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
-            ref={props.contentRef}
+            ref={props.setContentRef}
         >
             <span className="sr-only">{props.description || t("richEditor.externalEmbed.description")}</span>
             {props.children}

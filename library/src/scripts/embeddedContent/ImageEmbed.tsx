@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
@@ -28,16 +28,16 @@ export function ImageEmbed(props: IProps) {
     const { inEditor, type, size, dateInserted, name, width, height, saveImageMeta } = props;
     const extraProps: any = {};
 
-    const contentRef = useRef<HTMLDivElement | null>(null);
+    const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
     const [isFocused, setIsFocused] = useState(false);
 
-    useFocusWatcher(contentRef.current, newFocusState => {
+    useFocusWatcher(contentRef, newFocusState => {
         setIsFocused(newFocusState);
-        debuglog("is focussed");
+        console.log("new focus value", newFocusState);
     });
 
     return (
-        <EmbedContent type="Image" inEditor={props.inEditor} contentRef={contentRef}>
+        <EmbedContent type="Image" inEditor={props.inEditor} setContentRef={setContentRef}>
             <div className="embedImage-link u-excludeFromPointerEvents">
                 <img className="embedImage-img" src={props.url} alt={props.name} />
                 {props.inEditor && isFocused && (

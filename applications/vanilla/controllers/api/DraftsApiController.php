@@ -14,6 +14,8 @@ use Vanilla\ApiUtils;
  */
 class DraftsApiController extends AbstractApiController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var DraftModel */
     private $draftModel;
 
@@ -153,6 +155,7 @@ class DraftsApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 

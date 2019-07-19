@@ -97,10 +97,11 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
     };
 
     baseConfig.plugins!.push(new SourceMapDevToolPlugin({
-        append: '\n//# sourceMappingURL='.concat('[url]'),
-        filename: 'sourcemaps/'.concat('[file].map'),
-        publicPath: '/sm/'.concat(section, '/'),
+        namespace: `vanilla`,
+        filename: `sm-`.concat(Math.random().toString(36).slice(-5), '/', '[chunkhash]'),
+        publicPath: `/sm/${section}/`,
     } as any));
+
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {
         baseConfig.plugins!.push(new BundleAnalyzerPlugin({

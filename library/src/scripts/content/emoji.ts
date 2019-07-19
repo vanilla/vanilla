@@ -4,7 +4,7 @@
  */
 
 import { onReady, onContent } from "@library/utility/appUtils";
-import { convertToSafeEmojiCharacters } from "@library/dom/domUtils";
+import { convertToSafeEmojiCharacters } from "@vanilla/dom-utils";
 
 export function initEmojiSupport() {
     // Emoji

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ensureScript } from "@library/dom/domUtils";
+import { ensureScript } from "@vanilla/dom-utils";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";

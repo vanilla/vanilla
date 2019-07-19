@@ -1,0 +1,18 @@
+{
+    "name": "@vanilla/dom-utils",
+    "main": "./src/index.ts",
+    "module": "./src/index.ts",
+    "version": "3.0.0",
+    "dependencies": {
+        "@vanilla/utils": "*",
+        "focus-visible": "4.1.5",
+        "smoothscroll-polyfill": "0.4.4",
+        "twemoji": "2.5.1"
+    },
+    "devDependencies": {
+        "@vanilla/tsconfig": "*"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

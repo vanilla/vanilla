@@ -7,7 +7,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { t } from "@library/utility/appUtils";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
-import { escapeHTML, setData, getData } from "@library/dom/domUtils";
+import { escapeHTML, setData, getData } from "@vanilla/dom-utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";

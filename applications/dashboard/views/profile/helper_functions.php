@@ -7,9 +7,11 @@ if (!function_exists('UserVerified')):
      * @return string
      */
     function userVerified($user) {
-        $userID = val('UserID', $user);
+        $userID = $user->UserID;
+        $userVerified = $user->Verified;
+        $isRequestUserID = isset($_REQUEST['userid']);
 
-        if (val('Verified', $user)) {
+        if (($userVerified === 1 && !$isRequestUserID) || ($userVerified === 0 && $isRequestUserID)) {
             $label = t('Verified');
             $title = t('Verified Description', 'Verified users bypass spam and pre-moderation filters.');
             $url = "/user/verify.json?userid=$userID&verified=0";

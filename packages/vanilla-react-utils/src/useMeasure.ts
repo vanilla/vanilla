@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { useState, RefObject, useLayoutEffect, useRef } from "react";
+import { RefObject, useState, useLayoutEffect } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 
 /**
@@ -36,16 +36,4 @@ export function useMeasure(ref: RefObject<HTMLElement | null>) {
     }, [ref]);
 
     return bounds;
-}
-
-/**
- * Keep a reference to the previous value of something. (during the previous render).
- *
- * @param value
- */
-export function useLastValue<T>(value: T): T {
-    const ref = useRef<T>();
-    const toReturn = ref.current!;
-    ref.current = value;
-    return toReturn;
 }

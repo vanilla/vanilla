@@ -2,27 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { useEffect } from "react";
-
-/**
- * React hook for creating and destroying a FocusWatcher. See FocusWatcher documentation.
- */
-export function useFocusWatcher(
-    rootNode: Element | null,
-    changeHandler: (hasFocus: boolean) => void,
-    bypass?: boolean,
-) {
-    useEffect(() => {
-        if (bypass) {
-            return;
-        }
-        if (rootNode !== null) {
-            const focusWatcher = new FocusWatcher(rootNode, changeHandler);
-            focusWatcher.start();
-            return focusWatcher.stop;
-        }
-    }, [rootNode, changeHandler, bypass]);
-}
 
 /**
  * Register a callback for focusin and focusin out events. The main improvement here over registering
@@ -32,7 +11,7 @@ export function useFocusWatcher(
  * This is particularly useful when you want to track focus leaving or enterring a component
  * without caring about the individual contents inside.
  */
-export default class FocusWatcher {
+export class FocusWatcher {
     /**
      * @param rootNode - The root dom node to watch on.
      * @param callback - A callback for when the tree focuses and blurs.

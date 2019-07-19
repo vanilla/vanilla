@@ -4,17 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import ReactDOM from "react-dom";
-import React, { ReactElement } from "react";
-import classNames from "classnames";
 import ModalSizes from "@library/modal/ModalSizes";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { modalClasses } from "@library/modal/modalStyles";
-import TabHandler from "@library/dom/TabHandler";
-import { logWarning } from "@vanilla/utils";
-import { forceRenderStyles } from "typestyle";
-import ScrollLock from "react-scrolllock";
 import { ModalView } from "@library/modal/ModalView";
+import { logWarning } from "@vanilla/utils";
+import React, { ReactElement } from "react";
+import ReactDOM from "react-dom";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IHeadingDescription {
     titleID: string;

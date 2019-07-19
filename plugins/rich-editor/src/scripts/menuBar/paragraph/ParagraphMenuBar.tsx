@@ -29,9 +29,9 @@ import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/Paragr
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import TabHandler from "@library/dom/TabHandler";
 import { IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import Formatter from "@rich-editor/quill/Formatter";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IProps {
     className?: string;

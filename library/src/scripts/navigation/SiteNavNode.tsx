@@ -11,11 +11,11 @@ import { downTriangle, rightTriangle } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import Hoverable from "@library/dom/Hoverable";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SiteNavContext } from "@library/navigation/SiteNavContext";
-import TabHandler from "@library/dom/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api/core";
+import { Hoverable } from "@vanilla/react-utils";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;

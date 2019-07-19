@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import FocusWatcher from "@library/dom/FocusWatcher";
-import TabHandler from "@library/dom/TabHandler";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import {
     blockquote,
@@ -35,6 +33,7 @@ import { style } from "typestyle";
 import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",

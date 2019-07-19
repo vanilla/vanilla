@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { ensureHtmlElement, mountReact } from "@library/dom/domUtils";
+import { ensureHtmlElement } from "@vanilla/dom-utils";
 import { ForumEditor } from "@rich-editor/editor/ForumEditor";
 import React from "react";
+import { mountReact } from "@vanilla/react-utils";
 
 /**
  * Mount the editor into a DOM Node.

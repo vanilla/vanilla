@@ -5,7 +5,7 @@
  */
 
 import { expect } from "chai";
-import TabHandler from "@library/dom/TabHandler";
+import { TabHandler } from "./TabHandler";
 
 describe("TabHandler", () => {
     it("can find a tabbable element", () => {

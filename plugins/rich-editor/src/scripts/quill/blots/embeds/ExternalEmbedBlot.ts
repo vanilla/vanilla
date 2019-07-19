@@ -5,7 +5,7 @@
  */
 
 import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { escapeHTML, getData, setData } from "@library/dom/domUtils";
+import { escapeHTML, getData, setData } from "@vanilla/dom-utils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";

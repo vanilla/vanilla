@@ -5,7 +5,7 @@
 
 import React from "react";
 import debounce from "lodash/debounce";
-import { getElementHeight } from "@library/dom/domUtils";
+import { getElementHeight } from "@vanilla/dom-utils";
 import { forceRenderStyles } from "typestyle";
 
 interface IProps {

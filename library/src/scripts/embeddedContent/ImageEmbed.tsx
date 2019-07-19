@@ -8,10 +8,11 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IImageMeta, ImageEmbedMenu } from "@library/embeddedContent/menus/ImageEmbedMenu";
-import { useFocusWatcher } from "@library/dom/FocusWatcher";
 import { debuglog } from "util";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import { useFocusWatcher } from "@vanilla/react-utils";
 
-interface IProps extends IBaseEmbedProps {
+interface IProps extends IBaseEmbedProps, IDeviceProps {
     type: string; // Mime type.
     size: number;
     dateInserted: string;
@@ -33,7 +34,7 @@ export function ImageEmbed(props: IProps) {
 
     useFocusWatcher(contentRef, newFocusState => {
         setIsFocused(newFocusState);
-        console.log("new focus value", newFocusState);
+        window.console.log("new focus value", newFocusState);
     });
 
     return (
@@ -44,9 +45,13 @@ export function ImageEmbed(props: IProps) {
                     <ImageEmbedMenu
                         saveImageMeta={props.saveImageMeta}
                         elementToFocusOnClose={extraProps.imageEmbedRef}
+                        isFocused={isFocused}
+                        device={props.device}
                     />
                 )}
             </div>
         </EmbedContent>
     );
 }
+
+export default withDevice(ImageEmbed);

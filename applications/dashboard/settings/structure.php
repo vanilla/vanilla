@@ -287,7 +287,7 @@ $Construct
     ->column('DateInserted', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
     ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
-    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
+    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 

@@ -384,6 +384,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         marginTop: unit((vars.menuButton.size - vars.iconWrap.width) / -2 + 1),
     });
 
+    const embedMetaDataMenu = style("embedMetaDataMenu", {
+        $nest: {
+            "&:empty": {
+                display: "none",
+            },
+        },
+    });
+
     return {
         root,
         menuBar,
@@ -409,5 +417,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         iconWrap,
         flyoutOffset,
         emojiGroup,
+        embedMetaDataMenu,
     };
 });

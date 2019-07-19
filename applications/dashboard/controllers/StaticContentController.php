@@ -30,7 +30,7 @@ class StaticContentController extends Gdn_Controller {
             Gdn::config()->get('Garden.Debug')
         );
         $this->MasterView = 'none';
-        $this->setHeader("Content-Type",  'application/json');
+        $this->setHeader("Content-Type", 'application/json');
 
         if ($sourceMapsEnabled) {
             $path = substr(Gdn::request()->path(), strlen('staticcontent/sourcemap/'));

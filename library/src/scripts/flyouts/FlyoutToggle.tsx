@@ -119,7 +119,7 @@ export default function FlyoutToggle(props: IProps) {
     /**
      * Stop click propagation outside the flyout
      */
-    const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
+    const handleBlockEventPropagation = useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
     }, []);
 
@@ -164,7 +164,7 @@ export default function FlyoutToggle(props: IProps) {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
-            onClick={handleBlockEventPropogation}
+            onClick={handleBlockEventPropagation}
         >
             <Button
                 id={buttonID}

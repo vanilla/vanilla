@@ -30,11 +30,15 @@ export const embedContainerVariables = useThemeCache(() => {
         weight: globalVars.fonts.weights.bold,
     });
 
+    const dimensions = makeThemeVars("dimensions", {
+        maxEmbedWidth: 640,
+    });
+
     const spacing = makeThemeVars("padding", {
         padding: 12,
     });
 
-    return { border, spacing, colors, title };
+    return { border, spacing, colors, title, dimensions };
 });
 
 export const embedContainerClasses = useThemeCache(() => {

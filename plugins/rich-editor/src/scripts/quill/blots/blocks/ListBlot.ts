@@ -226,12 +226,10 @@ export class ListItemWrapper extends withWrapper(Container as any) {
             const isEndOfLine = index === this.length() - 1;
 
             // Break the insert up on it's newlines.
-            const inserts = value === "\n" ? [""] : 
-            value.split("\n");
-
+            const inserts = value === "\n" ? [""] : value.split("\n");
 
             // condition to filter for the position of the cursor in the string.
-            // eg end of line 
+            // eg end of line
             // offset
 
             // If we split the blot, we need to remove the first newline.
@@ -252,8 +250,6 @@ export class ListItemWrapper extends withWrapper(Container as any) {
                 }
                 return item;
             });
-
-          
 
             // includes conditions for the new line inserts blot
             // if the last element of the <ul> and the last charectrer in the string
@@ -505,7 +501,7 @@ export class ListItem extends LineBlot {
         return element;
     }
 
-    /** 
+    /**
      * Get the depth a list item based on the it's parent HTML elements.
      *
      * @param listElement The HTML element to check.

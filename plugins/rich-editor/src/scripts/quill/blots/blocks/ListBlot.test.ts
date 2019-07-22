@@ -416,7 +416,6 @@ describe("ListBlot", () => {
         });
     });
 
-
     /* 
         Press enter once; position in the line: last;
     */
@@ -452,11 +451,7 @@ describe("ListBlot", () => {
                 - 
             */
 
-            expect(quill.getContents().ops).deep.eq([
-                OpUtils.op("1234"),
-                OpUtils.list(ListType.BULLETED, 0, "\n\n"),
-            ]);
+            expect(quill.getContents().ops).deep.eq([OpUtils.op("1234"), OpUtils.list(ListType.BULLETED, 0, "\n\n")]);
         });
     });
-
 });

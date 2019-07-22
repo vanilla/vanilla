@@ -8,16 +8,31 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Handles /user endpoint.
  */
 class UserController extends DashboardController {
+
+    /** @var ConfigurationInterface */
+    private $config;
 
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Database', 'Form'];
 
     /** @var Gdn_Form */
     public $Form;
+
+    /**
+     * Configure the controller.
+     *
+     * @param ConfigurationInterface $config
+     */
+    public function __construct(ConfigurationInterface $config) {
+        $this->config = $config;
+        parent::__construct();
+    }
 
     /**
      * Highlight menu path. Automatically run on every use.
@@ -220,6 +235,25 @@ class UserController extends DashboardController {
 
         $this->setData('UserRoles', $userRoleData);
         $this->render('edit', 'user');
+    }
+
+    /**
+     * Should guest users be allowed to search existing users by name and email?
+     *
+     * @param bool $throw Throw an exception if the action is not allowed?
+     * @return boolean
+     */
+    private function allowGuestUserSearch(bool $throw): bool {
+        $isPrivateCommunity = (bool)$this->config->get("Garden.PrivateCommunity", false);
+
+        $registrationMethod = $this->config->get("Garden.Registration.Method", "");
+        $isBasicRegistration = is_string($registrationMethod) ? strtolower($registrationMethod) === "basic" : false;
+
+        $result = !$isPrivateCommunity || $isBasicRegistration;
+        if (!$result && $throw) {
+            throw new Gdn_UserException("This action is not allowed for private communities.");
+        }
+        return $result;
     }
 
     /**
@@ -779,6 +813,8 @@ class UserController extends DashboardController {
      * @param string $email Email address to be checked.
      */
     public function emailAvailable($email = '') {
+        $this->allowGuestUserSearch(true);
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $available = true;
 
@@ -1150,6 +1186,8 @@ class UserController extends DashboardController {
      * @param string $name Username to be checked.
      */
     public function usernameAvailable($name = '') {
+        $this->allowGuestUserSearch(true);
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $available = true;
         if (c('Garden.Registration.NameUnique', true) && $name != '') {

@@ -16,21 +16,17 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { debuglog } from "util";
 import DropDownPaddedFrame from "@library/flyouts/items/DropDownPaddedFrame";
-import { Devices, IDeviceProps } from "@library/layout/DeviceContext";
+import { Devices, IDeviceProps, useDevice } from "@library/layout/DeviceContext";
 import ReactDOM from "react-dom";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { getIDForQuill } from "@rich-editor/quill/utility";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
-import {IEmbedStyles} from "@library/embeddedContent/EmbedMenu";
 
-interface IProps extends IImageMeta, IDeviceProps {
+interface IProps extends IImageMeta {
     saveImageMeta?: () => void;
     initialAlt?: string;
     elementToFocusOnClose: RefObject<HTMLDivElement> | HTMLDivElement | null;
-    isOpen: boolean;
-    setIsOpen: (open: boolean) => void;
-    positionData: IEmbedStyles;
 }
 
 export interface IImageMeta {
@@ -57,9 +53,10 @@ export function ImageEmbedMenu(props: IProps) {
     let textInput = useRef();
     const divRef = useRef<HTMLDivElement>(null);
 
+    const device = useDevice();
+
     const onVisibilityChange = useCallback(isVisible => {
         setAlt(initialAlt);
-        props.setIsOpen(isVisible);
     }, []);
 
     const onChange = useCallback(event => {}, []);
@@ -94,9 +91,10 @@ export function ImageEmbedMenu(props: IProps) {
         }
     }, []);
 
-    return ReactDOM.createPortal(
+    return (
         <div
-            className={classNames(classes.root)}
+            className={classNames(classes.root, "u-excludeFromPointerEvents")}
+            style={{ position: "absolute", top: 0, left: 0, transform: "translateX(-100%)", zIndex: 1 }}
         >
             {/*{showModal && (*/}
             {/*    <ModalConfirm*/}
@@ -111,10 +109,10 @@ export function ImageEmbedMenu(props: IProps) {
             <DropDown
                 title={t("Alt Text")}
                 buttonContents={icon}
-                className={classesDropDown.noVerticalPadding}
+                className={classNames("u-excludeFromPointerEvents")}
                 onVisibilityChange={onVisibilityChange}
                 size={FlyoutSizes.MEDIUM}
-                openAsModal={props.device === Devices.MOBILE || props.device === Devices.XS}
+                openAsModal={device === Devices.MOBILE || device === Devices.XS}
             >
                 <DropDownPaddedFrame>
                     <form
@@ -140,7 +138,6 @@ export function ImageEmbedMenu(props: IProps) {
                     </form>
                 </DropDownPaddedFrame>
             </DropDown>
-        </div>,
-        document.getElementById("embedMetaDataMenu")!,
+        </div>
     );
 }

@@ -1755,6 +1755,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: block;
   margin: 0;
 }
+.embedQuote-body::before, .embedQuote-body::after {
+  content: initial;
+}
 
 .embedQuote-metaLink {
   display: -webkit-inline-flex;

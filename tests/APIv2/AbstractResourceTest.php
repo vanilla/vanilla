@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Formatting\FormatCompatibilityService;
+
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**
@@ -154,6 +156,50 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
+    }
+
+    /**
+     * Test that the edit endpoints apply format compatibility where possible.
+     *
+     * @param string $editSuffix Set this to change the GET request suffix.
+     */
+    public function testEditFormatCompat(string $editSuffix = "/edit") {
+        $record = $this->record();
+
+        // Only check anything if we've got a format and body field.
+        if (!isset($record['body']) || !isset($record['format'])) {
+            $this->assertTrue(true);
+            return;
+        }
+
+        $row = $this->testPost($record);
+
+        $expectedBody = 'Converted!!';
+
+        // Create a stub for the compatService class.
+        $actualCompatService = static::container()->get(FormatCompatibilityService::class);
+        $mockCompatService = $this->createMock(FormatCompatibilityService::class);
+        $mockCompatService->method('convert')
+            ->willReturn($expectedBody);
+        static::container()
+            ->setInstance(FormatCompatibilityService::class, $mockCompatService);
+
+
+        // Get the actual record and assert our value was set.
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}$editSuffix"
+        );
+
+        $actualBody = $r['body'];
+        $this->assertEquals(
+            $expectedBody,
+            $actualBody,
+            "FormatCompatibilityServer::convert() should be run on edit endpoints."
+        );
+
+        // Restore back the actual format compat service.
+        static::container()
+            ->setInstance(FormatCompatibilityService::class, $actualCompatService);
     }
 
     /**

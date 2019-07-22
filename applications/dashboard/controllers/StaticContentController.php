@@ -24,7 +24,7 @@ class StaticContentController extends Gdn_Controller {
     /**
      * Output source maps of static js resources if allowed (Garden.Security.SourceMaps.Enabled)
      */
-    public function sourcemap() {
+    public function sourcemaps() {
         $sourceMapsEnabled = Gdn::config()->get(
             'Garden.Security.SourceMaps.Enabled',
             Gdn::config()->get('Garden.Debug')
@@ -33,7 +33,7 @@ class StaticContentController extends Gdn_Controller {
         $this->setHeader("Content-Type", 'application/json');
 
         if ($sourceMapsEnabled) {
-            $path = substr(Gdn::request()->path(), strlen('staticcontent/sourcemap/'));
+            $path = ltrim(substr(Gdn::request()->path(), strlen('staticcontent/sourcemap/')), DS);
             $fullPath = PATH_ROOT.DS.'dist'.DS.$path;
             if (is_file($fullPath)) {
                 $content = file_get_contents($fullPath);
@@ -44,7 +44,6 @@ class StaticContentController extends Gdn_Controller {
         } else {
             $this->statusCode(403);
         }
-
         $this->render();
     }
 }

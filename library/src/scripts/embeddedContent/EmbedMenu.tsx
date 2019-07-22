@@ -13,10 +13,29 @@ import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
+import {MaxWidthProperty, TopProperty, WidthProperty} from "csstype";
+import {TLength} from "typestyle/lib/types";
 
-interface IProps {}
+export interface IEmbedStyles {
+    top: TopProperty<TLength>,
+    width: WidthProperty<TLength>,
+    maxWidth: MaxWidthProperty<TLength>,
+}
+
+interface IProps {
+    positionStyles: IEmbedStyles | null;
+    setPositionStyles: (styles: IEmbedStyles | null) => void;
+    isVisible: boolean;
+    setVisibility: (visible: boolean) => void;
+}
 
 export function EmbedMenu(props: IProps) {
     const classes = editorFormClasses();
-    return <div id={"embedMetaDataMenu"} className={classNames("js-embedMetaDataMenu", classes.embedMetaDataMenu)} />;
+    const embedClass = classes.embedMetaDataMenuPosition(props.positionStyles);
+    return (
+        <div
+            id={"embedMetaDataMenu"}
+            className={classNames("js-embedMetaDataMenu", classes.embedMetaDataMenu)}
+        />
+    );
 }

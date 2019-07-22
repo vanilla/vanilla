@@ -22,6 +22,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { getIDForQuill } from "@rich-editor/quill/utility";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
+import {IEmbedStyles} from "@library/embeddedContent/EmbedMenu";
 
 interface IProps extends IImageMeta, IDeviceProps {
     saveImageMeta?: () => void;
@@ -29,6 +30,7 @@ interface IProps extends IImageMeta, IDeviceProps {
     elementToFocusOnClose: RefObject<HTMLDivElement> | HTMLDivElement | null;
     isOpen: boolean;
     setIsOpen: (open: boolean) => void;
+    positionData: IEmbedStyles;
 }
 
 export interface IImageMeta {
@@ -94,10 +96,6 @@ export function ImageEmbedMenu(props: IProps) {
 
     return ReactDOM.createPortal(
         <div
-            onClick={e => {
-                e.stopPropagation();
-                e.preventDefault();
-            }}
             className={classNames(classes.root)}
         >
             {/*{showModal && (*/}

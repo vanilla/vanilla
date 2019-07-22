@@ -14,6 +14,8 @@ import { useFocusWatcher } from "@vanilla/react-utils";
 import { EmbedMenu } from "@library/embeddedContent/EmbedMenu";
 import classNames from "classnames";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
+import {unit} from "@library/styles/styleHelpers";
+import {embedContainerVariables} from "@library/embeddedContent/embedStyles";
 
 interface IProps extends IBaseEmbedProps, IDeviceProps {
     type: string; // Mime type.
@@ -36,6 +38,7 @@ export function ImageEmbed(props: IProps) {
     const [isFocused, setIsFocused] = useState(false);
     const [pastFocus, setPastFocus] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [positionData, setPositionData] = useState();
 
     const divRef = useRef<HTMLDivElement>(null);
 
@@ -57,19 +60,30 @@ export function ImageEmbed(props: IProps) {
                     embedMenuClasses().imageContainer,
                 )}
             >
-                <EmbedMenu />
-                <img className="embedImage-img" src={props.url} alt={props.name} />
-                {props.inEditor && (isFocused || isOpen) && (
-                    <ImageEmbedMenu
-                        saveImageMeta={props.saveImageMeta}
-                        elementToFocusOnClose={extraProps.imageEmbedRef}
-                        isFocused={isFocused}
-                        device={props.device}
-                        setIsOpen={setIsOpen}
-                        isOpen={isOpen}
-                    />
-                )}
+                <img onLoad={() => {
+                    if (!positionData) {
+                        const image = divRef.current && divRef.current.querySelector("img");
+                        if (image) {
+                            setPositionData({
+                                top: unit(10), // TODO
+                                width: unit(image.width),
+                                maxWidth: unit(embedContainerVariables().dimensions.maxEmbedWidth),
+                            });
+                        }
+                    }
+                }} className="embedImage-img" src={props.url} alt={props.name} />
             </div>
+            {props.inEditor && (isFocused || isOpen) && (
+                <ImageEmbedMenu
+                    saveImageMeta={props.saveImageMeta}
+                    elementToFocusOnClose={extraProps.imageEmbedRef}
+                    isFocused={isFocused}
+                    device={props.device}
+                    setIsOpen={setIsOpen}
+                    isOpen={isOpen}
+                    positionData={positionData}
+                />
+            )}
         </EmbedContent>
     );
 }

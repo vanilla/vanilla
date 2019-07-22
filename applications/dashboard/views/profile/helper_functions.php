@@ -8,7 +8,7 @@ if (!function_exists('UserVerified')):
      */
     function userVerified($user) {
         $userID = val('UserID', $user);
-        $userVerified = $user->Verified;
+        $userVerified = val('Verified', $user);
         $isRequestUserID = isset($_REQUEST['userid']);
 
         if (($userVerified === 1 && !$isRequestUserID) || ($userVerified === 0 && $isRequestUserID)) {

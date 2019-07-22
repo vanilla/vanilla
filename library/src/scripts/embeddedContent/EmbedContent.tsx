@@ -24,7 +24,11 @@ export function EmbedContent(props: IProps) {
         <div
             aria-describedby={id}
             aria-label={"External embed content - " + props.type}
-            className={classNames(props.className, { [FOCUS_CLASS]: props.inEditor}, !props.noBaseClass && "embedExternal-content")}
+            className={classNames(
+                props.className,
+                { [FOCUS_CLASS]: props.inEditor },
+                !props.noBaseClass && "embedExternal-content",
+            )}
             tabIndex={props.inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
             ref={props.setContentRef}
         >

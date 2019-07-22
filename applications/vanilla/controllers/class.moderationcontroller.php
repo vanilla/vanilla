@@ -387,104 +387,107 @@ class ModerationController extends VanillaController {
             // Retrieve the category id
             $CategoryID = $this->Form->getFormValue('CategoryID');
             $Category = CategoryModel::categories($CategoryID);
-            $RedirectLink = $this->Form->getFormValue('RedirectLink');
+            $this->Form->validateRule('CategoryID', 'function:ValidateRequired', 'Category is required');
+            $this->Form->setValidationResults($CategoryModel->validationResults());
+            if ($this->Form->errorCount() === 0) {
+                $RedirectLink = $this->Form->getFormValue('RedirectLink');
 
-            // User must have add permission on the target category
-            if (!$Category['PermsDiscussionsAdd']) {
-                throw forbiddenException('@'.t('You do not have permission to add discussions to this category.'));
-            }
+                // User must have add permission on the target category
+                if (!$Category['PermsDiscussionsAdd']) {
+                    throw forbiddenException('@' . t('You do not have permission to add discussions to this category.'));
+                }
 
-            $AffectedCategories = [];
+                $AffectedCategories = [];
 
-            // Iterate and move.
-            foreach ($AllowedDiscussions as $DiscussionID) {
-                $Discussion = val($DiscussionID, $DiscussionData);
+                // Iterate and move.
+                foreach ($AllowedDiscussions as $DiscussionID) {
+                    $Discussion = val($DiscussionID, $DiscussionData);
 
-                // Create the shadow redirect.
-                if ($RedirectLink) {
-                    $DiscussionModel->defineSchema();
-                    $MaxNameLength = val('Length', $DiscussionModel->Schema->getField('Name'));
+                    // Create the shadow redirect.
+                    if ($RedirectLink) {
+                        $DiscussionModel->defineSchema();
+                        $MaxNameLength = val('Length', $DiscussionModel->Schema->getField('Name'));
 
-                    $RedirectDiscussion = [
-                        'Name' => sliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
-                        'DateInserted' => $Discussion['DateLastComment'],
-                        'Type' => 'redirect',
-                        'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => discussionUrl($Discussion)]),
-                        'Format' => 'Html',
-                        'Closed' => true
-                    ];
+                        $RedirectDiscussion = [
+                            'Name' => sliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
+                            'DateInserted' => $Discussion['DateLastComment'],
+                            'Type' => 'redirect',
+                            'CategoryID' => $Discussion['CategoryID'],
+                            'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => discussionUrl($Discussion)]),
+                            'Format' => 'Html',
+                            'Closed' => true
+                        ];
 
-                    // Pass a forced input formatter around this exception.
-                    if (c('Garden.ForceInputFormatter')) {
-                        $InputFormat = c('Garden.InputFormatter');
-                        saveToConfig('Garden.InputFormatter', 'Html', false);
+                        // Pass a forced input formatter around this exception.
+                        if (c('Garden.ForceInputFormatter')) {
+                            $InputFormat = c('Garden.InputFormatter');
+                            saveToConfig('Garden.InputFormatter', 'Html', false);
+                        }
+
+                        $RedirectID = $DiscussionModel->save($RedirectDiscussion);
+
+                        // Reset the input formatter
+                        if (c('Garden.ForceInputFormatter')) {
+                            saveToConfig('Garden.InputFormatter', $InputFormat, false);
+                        }
+
+                        if (!$RedirectID) {
+                            $this->Form->setValidationResults($DiscussionModel->validationResults());
+                            break;
+                        }
                     }
 
-                    $RedirectID = $DiscussionModel->save($RedirectDiscussion);
+                    $DiscussionModel->setField($DiscussionID, 'CategoryID', $CategoryID);
 
-                    // Reset the input formatter
-                    if (c('Garden.ForceInputFormatter')) {
-                        saveToConfig('Garden.InputFormatter', $InputFormat, false);
+                    if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
+                        $AffectedCategories[$Discussion['CategoryID']] = [-1, -$Discussion['CountComments']];
+                    } else {
+                        $AffectedCategories[$Discussion['CategoryID']][0] -= 1;
+                        $AffectedCategories[$Discussion['CategoryID']][1] -= $Discussion['CountComments'];
+                    }
+                    if (!isset($AffectedCategories[$CategoryID])) {
+                        $AffectedCategories[$CategoryID] = [1, $Discussion['CountComments']];
+                    } else {
+                        $AffectedCategories[$CategoryID][0] += 1;
+                        $AffectedCategories[$CategoryID][1] += $Discussion['CountComments'];
+                    }
+                }
+
+                // Update recent posts and counts on all affected categories.
+                CategoryModel::clearCache();
+                foreach ($AffectedCategories as $categoryID => $counts) {
+                    $CategoryModel->refreshAggregateRecentPost($categoryID, true);
+
+                    // Prepare to adjust post counts for this category and its ancestors.
+                    list($discussionOffset, $commentOffset) = $counts;
+
+                    // Offset the discussion count for this category and its parents.
+                    if ($discussionOffset < 0) {
+                        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
+                    } else {
+                        CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
                     }
 
-                    if (!$RedirectID) {
-                        $this->Form->setValidationResults($DiscussionModel->validationResults());
-                        break;
+                    // Offset the comment count for this category and its parents.
+                    if ($commentOffset < 0) {
+                        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
+                    } else {
+                        CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
                     }
                 }
+                CategoryModel::clearCache();
 
-                $DiscussionModel->setField($DiscussionID, 'CategoryID', $CategoryID);
-
-                if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
-                    $AffectedCategories[$Discussion['CategoryID']] = [-1, -$Discussion['CountComments']];
-                } else {
-                    $AffectedCategories[$Discussion['CategoryID']][0] -= 1;
-                    $AffectedCategories[$Discussion['CategoryID']][1] -= $Discussion['CountComments'];
-                }
-                if (!isset($AffectedCategories[$CategoryID])) {
-                    $AffectedCategories[$CategoryID] = [1, $Discussion['CountComments']];
-                } else {
-                    $AffectedCategories[$CategoryID][0] += 1;
-                    $AffectedCategories[$CategoryID][1] += $Discussion['CountComments'];
-                }
-            }
-
-            // Update recent posts and counts on all affected categories.
-            CategoryModel::clearCache();
-            foreach ($AffectedCategories as $categoryID => $counts) {
-                $CategoryModel->refreshAggregateRecentPost($categoryID, true);
-
-                // Prepare to adjust post counts for this category and its ancestors.
-                list($discussionOffset, $commentOffset) = $counts;
-
-                // Offset the discussion count for this category and its parents.
-                if ($discussionOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
-                } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
+                // Clear selections.
+                if ($ClearSelection) {
+                    Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
+                    ModerationController::informCheckedDiscussions($this);
                 }
 
-                // Offset the comment count for this category and its parents.
-                if ($commentOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
-                } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
+                if ($this->Form->errorCount() == 0) {
+                    $this->jsonTarget('', '', 'Refresh');
                 }
-            }
-            CategoryModel::clearCache();
-
-            // Clear selections.
-            if ($ClearSelection) {
-                Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
-                ModerationController::informCheckedDiscussions($this);
-            }
-
-            if ($this->Form->errorCount() == 0) {
-                $this->jsonTarget('', '', 'Refresh');
             }
         }
-
         $this->render();
     }
 }

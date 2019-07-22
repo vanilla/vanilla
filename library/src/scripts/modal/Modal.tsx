@@ -266,7 +266,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      */
     private handleModalClick = (event: React.MouseEvent) => {
         event.stopPropagation();
-        event.preventDefault();
     };
 
     /**

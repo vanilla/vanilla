@@ -229,27 +229,27 @@
     }
 
     &.column-full {
-      width: 100%;
+      width: auto;
     }
 
     &.column-xl {
-      width: to-rem(300);
+      width: auto;
     }
 
     &.column-lg {
-      width: to-rem(210);
+      width: auto;
     }
 
     &.column-md {
-      width: to-rem(132);
+      width: auto;
     }
 
     &.column-sm {
-      width: to-rem(90);
+      width: auto;
     }
 
     &.column-xs {
-      width: to-rem(54);
+      width: auto;
     }
 
     &.column-checkbox {

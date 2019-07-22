@@ -8980,32 +8980,32 @@ button.close {
 .table-data-head th.column-full, .table-data thead th.column-full,
 .table-data-head td.column-full,
 .table-data thead td.column-full {
-  width: 100%;
+  width: auto;
 }
 .table-data-head th.column-xl, .table-data thead th.column-xl,
 .table-data-head td.column-xl,
 .table-data thead td.column-xl {
-  width: 18.75rem;
+  width: auto;
 }
 .table-data-head th.column-lg, .table-data thead th.column-lg,
 .table-data-head td.column-lg,
 .table-data thead td.column-lg {
-  width: 13.125rem;
+  width: auto;
 }
 .table-data-head th.column-md, .table-data thead th.column-md,
 .table-data-head td.column-md,
 .table-data thead td.column-md {
-  width: 8.25rem;
+  width: auto;
 }
 .table-data-head th.column-sm, .table-data thead th.column-sm,
 .table-data-head td.column-sm,
 .table-data thead td.column-sm {
-  width: 5.625rem;
+  width: auto;
 }
 .table-data-head th.column-xs, .table-data thead th.column-xs,
 .table-data-head td.column-xs,
 .table-data thead td.column-xs {
-  width: 3.375rem;
+  width: auto;
 }
 .table-data-head th.column-checkbox, .table-data thead th.column-checkbox,
 .table-data-head td.column-checkbox,

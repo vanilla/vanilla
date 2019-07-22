@@ -3810,6 +3810,11 @@ class UserModel extends Gdn_Model {
             return -1;
         }
 
+        if (Gdn::config('Garden.Registration.Method') !== 'Invitation') {
+            // If registration method has been changed
+            return 0;
+        }
+
         // Get the Registration.InviteRoles settings:
         $inviteRoles = Gdn::config('Garden.Registration.InviteRoles', []);
         if (!is_array($inviteRoles) || count($inviteRoles) == 0) {

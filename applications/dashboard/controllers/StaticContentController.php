@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Web\Data;
-
 /**
  * Class StaticContentController
  */

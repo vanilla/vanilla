@@ -3,9 +3,19 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut, IBackground, emphasizeLightness } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    ColorValues,
+    emphasizeLightness,
+    IBackground,
+    IBorderRadiusOutput,
+    modifyColorBasedOnLightness,
+    radiusValue,
+} from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, ColorHelper, percent, viewHeight } from "csx";
+import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { color, ColorHelper, percent } from "csx";
+import { TLength } from "typestyle/lib/types";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -20,7 +30,7 @@ export const globalVariables = useThemeCache(() => {
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: `transparent`,
+        transparent: "transparent" as ColorValues,
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
@@ -33,7 +43,7 @@ export const globalVariables = useThemeCache(() => {
     colorPrimary = initialMainColors.primary;
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.15),
+        secondary: emphasizeLightness(colorPrimary, 0.065),
     });
 
     const mainColors = {
@@ -53,7 +63,7 @@ export const globalVariables = useThemeCache(() => {
         return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const feedbackColors = makeThemeVars("feedbackColors", {
+    const messageColors = makeThemeVars("messageColors", {
         warning: {
             fg: color("#4b5057"),
             bg: color("#fff1ce"),
@@ -70,14 +80,15 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const defaultLinkColor = emphasizeLightness(colorPrimary, 0.065);
+    const linkColorDefault = mainColors.secondary;
+    const linkColorState = emphasizeLightness(colorPrimary, 0.09);
     const links = makeThemeVars("links", {
         colors: {
-            default: defaultLinkColor,
-            hover: mainColors.secondary,
-            focus: mainColors.secondary,
-            accessibleFocus: mainColors.secondary,
-            active: mainColors.secondary,
+            default: linkColorDefault,
+            hover: linkColorState,
+            focus: linkColorState,
+            accessibleFocus: linkColorState,
+            active: linkColorState,
             visited: undefined,
         },
     });
@@ -185,7 +196,7 @@ export const globalVariables = useThemeCache(() => {
 
     const embed = makeThemeVars("embed", {
         error: {
-            bg: feedbackColors.error,
+            bg: messageColors.error,
         },
         focus: {
             color: mainColors.primary,
@@ -308,7 +319,7 @@ export const globalVariables = useThemeCache(() => {
         utility,
         elementaryColors,
         mainColors,
-        feedbackColors,
+        messageColors,
         body,
         border,
         meta,
@@ -333,6 +344,13 @@ export const globalVariables = useThemeCache(() => {
         userContentHyphenation,
     };
 });
+
+export interface IGlobalBorderStyles extends IBorderRadiusOutput {
+    color: ColorValues;
+    width: BorderWidthProperty<TLength> | number;
+    style: BorderStyleProperty;
+    radius?: radiusValue;
+}
 
 export enum IIconSizes {
     SMALL = "small",

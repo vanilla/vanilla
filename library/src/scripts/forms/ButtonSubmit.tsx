@@ -42,7 +42,7 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
             <Button
                 id={this.props.id}
                 disabled={this.props.disabled}
-                type="submit"
+                submit={true}
                 className={componentClasses}
                 prefix="submitButton"
                 legacyMode={this.props.legacyMode}

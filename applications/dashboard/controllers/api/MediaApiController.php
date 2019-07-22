@@ -8,10 +8,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Formatting\Embeds\EmbedManager;
+use \Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
+use \Vanilla\EmbeddedContent\AbstractEmbed;
 
 /**
  * API Controller for `/media`.
@@ -26,8 +27,8 @@ class MediaApiController extends AbstractApiController {
     /** @var MediaModel */
     private $mediaModel;
 
-    /** @var EmbedManager */
-    private $embedManager;
+    /** @var EmbedService */
+    private $embedService;
 
     /** @var ImageResizer */
     private $imageResizer;
@@ -39,11 +40,11 @@ class MediaApiController extends AbstractApiController {
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
-     * @param EmbedManager $embedManager
+     * @param EmbedService $embedService
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, ImageResizer $imageResizer, Gdn_Configuration $config) {
+    public function __construct(MediaModel $mediaModel, EmbedService $embedService, ImageResizer $imageResizer, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
-        $this->embedManager = $embedManager;
+        $this->embedService = $embedService;
         $this->imageResizer = $imageResizer;
         $this->config =  $config;
     }
@@ -164,20 +165,7 @@ class MediaApiController extends AbstractApiController {
      * @return Schema
      */
     protected function fullSchema() {
-        $schema = Schema::parse([
-            'mediaID:i' => 'The ID of the record.',
-            'url:s' => 'The URL of the file.',
-            'name:s' => 'The original filename of the upload.',
-            'type:s' => 'MIME type',
-            'size:i' =>'File size in bytes',
-            'width:i|n?' => 'Image width',
-            'height:i|n?' => 'Image height',
-            'dateInserted:dt' => 'When the media item was created.',
-            'insertUserID:i' => 'The user that created the media item.',
-            'foreignType:s|n' => 'Table the media is linked to.',
-            'foreignID:i|n' => 'The ID of the table.'
-        ]);
-        return $schema;
+        return new \Vanilla\Models\VanillaMediaSchema(true);
     }
 
     /**
@@ -438,23 +426,14 @@ class MediaApiController extends AbstractApiController {
                 'description' => 'Force the scrape even if the result is cached.'
             ]
         ], 'in')->setDescription('Scrape information from a URL.');
-        $out = $this->schema([
-            'url:s'	=> 'The URL that was scraped.',
-            'type:s' => [
-                'description' => 'The type of site. This determines how the embed is rendered.',
-                'enum' => $this->embedManager->getTypes()
-            ],
-            'name:s|n' => 'The title of the page/item/etc. if any.',
-            'body:s|n' => 'A paragraph summarizing the content, if any. This is not what is what gets rendered to the page.',
-            'photoUrl:s|n' => 'A photo that goes with the content.',
-            'height:i|n' => 'The height of the image/video/etc. if applicable. This may be the photoUrl, but might exist even when there is no photoUrl in the case of a video without preview image.',
-            'width:i|n' => 'The width of the image/video/etc. if applicable.',
-            'attributes:o|n' => 'Any additional attributes required by the the specific embed.',
-        ], 'out');
+        $out = $this->schema(
+            new \Vanilla\Utility\InstanceValidatorSchema(AbstractEmbed::class),
+            'out'
+        );
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->embedManager->matchUrl($body['url'], $body['force']);
+        $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
 
         $result = $out->validate($pageInfo);
         return $result;

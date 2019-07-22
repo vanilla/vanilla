@@ -28,7 +28,7 @@ export const metasVariables = useThemeCache(() => {
         active: {
             fg: globalVars.links.colors.active,
         },
-        deleted: globalVars.feedbackColors.deleted,
+        deleted: globalVars.messageColors.deleted,
     });
 
     const text = makeThemeVars("text", {

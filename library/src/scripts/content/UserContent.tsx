@@ -25,9 +25,6 @@ interface IProps {
 export default function UserContent(props: IProps) {
     const classes = userContentClasses();
 
-    useEffect(() => {
-        initAllUserContent();
-    });
     useHashScrolling();
 
     return (

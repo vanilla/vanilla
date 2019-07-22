@@ -8,7 +8,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import uniqueId from "lodash/uniqueId";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 
@@ -58,11 +58,12 @@ export default class ErrorBlot extends FocusableEmbedBlot {
         if (!data.error) {
             return;
         }
+        domNode.classList.remove(FOCUS_CLASS);
+        domNode.removeAttribute("tabindex");
 
         if (data.type === ErrorBlotType.FILE) {
             const now = new Date();
             const file = data.file!;
-            domNode.classList.remove(FOCUS_CLASS);
             ReactDOM.render(
                 <AttachmentError
                     message={data.error.message}

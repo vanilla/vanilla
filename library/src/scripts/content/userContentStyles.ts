@@ -220,14 +220,18 @@ export const userContentClasses = useThemeCache(() => {
     // They should be fully converted in the future but at the moment
     // Only the bare minimum is convverted in order to make the colors work.
     const spoilersAndQuotes: NestedCSSSelectors = {
-        [`& .spoiler,
-          & .button-spoiler,
-          & .spoiler-icon`]: {
+        "& .spoiler": {
+            background: colorOut(vars.blocks.bg),
+            color: colorOut(vars.blocks.fg),
+        },
+        "& .button-spoiler": {
             background: colorOut(vars.blocks.bg),
             color: colorOut(vars.blocks.fg),
         },
         "& .spoiler-icon": {
             margin: 0,
+            background: colorOut(vars.blocks.bg),
+            color: colorOut(vars.blocks.fg),
         },
         "& .embedExternal-content": {
             borderRadius: vars.embeds.borderRadius,

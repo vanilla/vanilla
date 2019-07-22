@@ -4,16 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { setData, getData, escapeHTML } from "@library/dom/domUtils";
-import uniqueId from "lodash/uniqueId";
-import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { escapeHTML, getData, setData } from "@vanilla/dom-utils";
+import { mountEmbed } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
-import { logError, capitalizeFirstLetter } from "@vanilla/utils";
+import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
-import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import ErrorBlot, { ErrorBlotType, IErrorData } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
+import { logError } from "@vanilla/utils";
 
 const DATA_KEY = "__embed-data__";
 
@@ -26,12 +26,12 @@ interface ILoaderData {
 
 interface IEmbedUnloadedValue {
     loaderData: ILoaderData;
-    dataPromise: Promise<IEmbedData>;
+    dataPromise: Promise<IBaseEmbedProps>;
 }
 
 interface IEmbedLoadedValue {
     loaderData: ILoaderData;
-    data: IEmbedData;
+    data: IBaseEmbedProps;
 }
 
 const WARNING_HTML = title => `
@@ -107,50 +107,33 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Create a successful embed element.
      */
-    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
+    public static createEmbedFromData(data: IBaseEmbedProps, loaderElement: Element | null): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
+
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
-        jsEmbed.classList.remove(FOCUS_CLASS);
-
-        const descriptionNode = document.createElement("span");
-        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
-        descriptionNode.classList.add("sr-only");
-        descriptionNode.id = uniqueId("richEditor-embed-description-");
-
-        const embedExternal = document.createElement("div");
-        embedExternal.classList.add("embedExternal");
-        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
-
-        const embedExternalContent = document.createElement("div");
-        embedExternalContent.classList.add(FOCUS_CLASS);
-        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
-        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
-        embedExternalContent.classList.add("embedExternal-content");
-        embedExternalContent.tabIndex = -1;
+        jsEmbed.tabIndex = -1;
 
         // Append these nodes.
         loaderElement && jsEmbed.appendChild(loaderElement);
-        jsEmbed.appendChild(embedExternal);
-        jsEmbed.appendChild(descriptionNode);
-        embedExternal.appendChild(embedExternalContent);
 
-        setImmediate(() => {
-            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
-                .then(() => {
-                    forceSelectionUpdate();
-                    loaderElement && loaderElement.remove();
-                })
-                .catch(e => {
-                    forceSelectionUpdate();
-                    logError(e);
-                    const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-                    embedExternal.remove();
-                    descriptionNode.remove();
-                    loaderElement && loaderElement.remove();
-                    jsEmbed.appendChild(warning);
-                });
-        });
+        try {
+            mountEmbed(jsEmbed, data, true).then(() => {
+                // Remove the focus class. It should be handled by the mounted embed at this point.
+                loaderElement && loaderElement.remove();
+                jsEmbed.classList.remove(FOCUS_CLASS);
+                jsEmbed.removeAttribute("tabindex");
+                forceSelectionUpdate();
+            });
+        } catch (e) {
+            const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
+            // Cleanup existing HTML.
+            jsEmbed.innerHTML = "";
+
+            // Add the warning.
+            jsEmbed.appendChild(warning);
+            forceSelectionUpdate();
+        }
 
         return jsEmbed;
     }
@@ -222,7 +205,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Normalize data and dataPromise into Promise<data>
      */
-    private resolveDataFromValue(value: IEmbedValue): Promise<IEmbedData> {
+    private resolveDataFromValue(value: IEmbedValue): Promise<IBaseEmbedProps> {
         if ("data" in value) {
             return Promise.resolve(value.data);
         } else {

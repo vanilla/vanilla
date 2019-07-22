@@ -6,6 +6,7 @@
  */
 
 import uniqueId from "lodash/uniqueId";
+import { useMemo } from "react";
 
 // Optional ID
 export interface IOptionalComponentID {
@@ -17,8 +18,15 @@ export interface IRequiredComponentID {
     id: string;
 }
 
+/**
+ * React hook for useUniqueIDFromPrefix
+ */
+export function useUniqueID(prefix?: string) {
+    return useMemo(() => uniqueIDFromPrefix(prefix), [prefix]);
+}
+
 // Generates unique ID from suffix
-export function uniqueIDFromPrefix(prefix: string) {
+export function uniqueIDFromPrefix(prefix?: string) {
     return (prefix + uniqueId()) as string;
 }
 

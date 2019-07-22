@@ -4,61 +4,33 @@
  * @license GPL-2.0-only
  */
 
-import {
-    absolutePosition,
-    allLinkStates,
-    borders,
-    IBordersSameAllSidesStyles,
-    margins,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { absolutePosition, allLinkStates, borders, margins, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { transparentColor } from "@library/forms/buttonStyles";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("attachment");
+    const makeThemeVars = variableFactory("attachment");
 
-    const border: IBordersSameAllSidesStyles = {
-        color: globalVars.mixBgAndFg(0.2),
-        style: "solid",
-        width: formElementVars.border.width,
-        radius: px(2),
-        ...themeVars.subComponentStyles("border"),
-    };
-
-    const sizing = {
-        width: globalVars.embed.sizing.width,
-        maxWidth: percent(100),
-        ...themeVars.subComponentStyles("sizing"),
-    };
-
-    const padding = {
+    const padding = makeThemeVars("padding", {
         default: 12,
-        ...themeVars.subComponentStyles("padding"),
-    };
+    });
 
-    const text = {
+    const text = makeThemeVars("text", {
         fontSize: globalVars.fonts.size.medium,
-        ...themeVars.subComponentStyles("text"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         color: globalVars.mixBgAndFg(0.9),
-        ...themeVars.subComponentStyles("title"),
-    };
+    });
 
-    const loading = {
+    const loading = makeThemeVars("loading", {
         opacity: 0.5,
-    };
+    });
 
-    return { border, padding, text, title, loading, sizing };
+    return { padding, text, title, loading };
 });
 
 export const attachmentClasses = useThemeCache(() => {
@@ -67,51 +39,9 @@ export const attachmentClasses = useThemeCache(() => {
     const vars = attachmentVariables();
     const style = styleFactory("attachment");
 
-    const hoverFocusStates = {
-        "&:hover": {
-            boxShadow: `0 0 0 ${px(globalVars.embed.select.borderWidth)} ${globalVars.embed.focus.color.fade(
-                0.5,
-            )} inset`,
-        },
-        "&:focus": {
-            boxShadow: `0 0 0 ${px(
-                globalVars.embed.select.borderWidth,
-            )} ${globalVars.embed.focus.color.toString()} inset`,
-        },
-    };
-
-    const root = style({
-        display: "block",
-        position: "relative",
-        textDecoration: "none",
-        color: "inherit",
-        width: px(globalVars.embed.sizing.width),
-        maxWidth: percent(100),
-        margin: "auto",
-        overflow: "hidden",
-        ...userSelect(),
-        ...borders(vars.border),
-        ...shadowOrBorderBasedOnLightness(
-            globalVars.body.backgroundImage.color,
-            borders({
-                color: vars.border.color,
-            }),
-            shadowHelper().embed(),
-        ),
-        $nest: {
-            // These 2 can't be joined together or their pseudselectors don't get created properly.
-            "&.isLoading": {
-                cursor: "pointer",
-                $nest: hoverFocusStates,
-            },
-            "&.hasError": {
-                cursor: "pointer",
-                $nest: hoverFocusStates,
-            },
-        },
-    });
-
     const link = style("link", {
+        display: "block",
+        width: "100%",
         ...allLinkStates({
             allStates: {
                 textDecoration: "none",
@@ -125,10 +55,9 @@ export const attachmentClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        padding: px(vars.padding.default),
         width: percent(100),
         ...borders({
-            color: transparentColor,
+            color: globalVars.elementaryColors.transparent,
             width: 2,
             radius: 0,
         }),
@@ -181,14 +110,14 @@ export const attachmentClasses = useThemeCache(() => {
 
     const loadingContent = style("loadingContent", {
         $nest: {
-            ".attachment-format": {
+            [`.${format}`]: {
                 opacity: vars.loading.opacity,
             },
-            ".attachment-main": {
+            [`.${main}`]: {
                 opacity: vars.loading.opacity,
             },
         },
     });
 
-    return { root, link, box, format, main, title, metas, close, loadingProgress, loadingContent };
+    return { link, box, format, main, title, metas, close, loadingProgress, loadingContent };
 });

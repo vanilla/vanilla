@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { userWarning } from "@library/icons/header";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
@@ -27,6 +27,7 @@ export default class StandardEmbedError extends React.Component<IProps> {
                 aria-label={t("Error")}
                 role="alert"
                 aria-live="assertive"
+                tabIndex={-1}
             >
                 {userWarning("embedLoader-icon embedLoader-warningIcon")}
                 <span id={descriptionId} className="embedLoader-errorMessage">

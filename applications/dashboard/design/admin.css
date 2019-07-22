@@ -11312,10 +11312,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
   color: #555a62;
 }
-.userContent > *:not(.emoji):not(:last-child):not(br, .embedResponsive) {
+.userContent > *:not(.emoji):not(:last-child):not(br) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br, .embedResponsive) {
+.userContent > *:not(.emoji):first-child:not(br) {
   margin-top: -0.25em !important;
 }
 .userContent,
@@ -11713,6 +11713,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLinkLoader-link {
+  position: relative;
   display: inline-block;
   white-space: normal;
   padding: 2px 4px;
@@ -11860,6 +11861,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   cursor: pointer;
   overflow: hidden;
+  border: none;
 }
 
 .embedVideo-playIcon {
@@ -11900,26 +11902,13 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
+  width: 100%;
 }
 
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.embedText {
-  font-size: 14px;
-}
-
-.embedText-content {
-  display: block;
-  background: #ffffff;
-  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-}
-.embedText-content, .embedText-content:hover, .embedText-content:focus {
-  color: inherit;
-  text-decoration: none !important;
-}
-
 .embedText-body {
   display: block;
   position: relative;
@@ -12065,7 +12054,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-userName {
-  margin: 0 0 0 4px;
   padding: 0;
   color: #6f737a;
   font-weight: 700;
@@ -12353,23 +12341,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .embedImgur iframe {
   max-width: 100%;
-}
-
-/*!
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedTwitter .embedExternal-content {
-  border-radius: 4px;
-  width: auto;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
-
-.twitter-tweet {
-  margin: 0 auto !important;
-  min-width: 100% !important;
 }
 
 /*!

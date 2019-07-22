@@ -43,7 +43,7 @@ class VimeoEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain): string {
-        return "`^(/[a-z,[0-9]+){1,2}$`";
+        return "`^/\d+(/[a-z0-9]+)?$`";
     }
 
     /**

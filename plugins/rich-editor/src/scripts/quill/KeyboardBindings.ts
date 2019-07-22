@@ -40,7 +40,7 @@ export default class KeyboardBindings {
         [key: string]: BindingObject;
     } = {};
 
-     constructor(private quill: Quill) {
+    constructor(private quill: Quill) {
         // Keyboard behaviours
         this.resetDefaultBindings();
         this.addBlockNewLineHandlers();

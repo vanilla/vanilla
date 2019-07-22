@@ -50,8 +50,6 @@ describe("NewLineClickInsertionModule", () => {
         // Quill automatically puts a newline at the end. Trim it off.
         quill.deleteText(quill.scroll.length() - 1, 1);
 
-        const setOps = quill.getContents();
-
         const event = ({
             y: 10000,
             target: document.createElement("div"),

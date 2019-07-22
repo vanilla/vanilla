@@ -375,5 +375,5 @@ function useSynchronization() {
         return () => {
             quill.off(Quill.events.EDITOR_CHANGE, updateHandler);
         };
-    });
+    }, [quill, updateHandler]);
 }

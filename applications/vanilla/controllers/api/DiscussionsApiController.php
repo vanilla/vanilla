@@ -17,6 +17,8 @@ use Vanilla\ApiUtils;
  */
 class DiscussionsApiController extends AbstractApiController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var CategoryModel */
     private $categoryModel;
 
@@ -417,6 +419,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($row);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 

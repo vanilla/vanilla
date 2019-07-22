@@ -75,6 +75,8 @@ class EntryController extends Gdn_Controller {
         } else {
             $this->setData('RecoverPasswordLabelCode', 'Enter your email to continue.');
         }
+
+        $this->addDefinition("userSearchAvailable", $this->UserModel->allowGuestUserSearch());
     }
 
     /**

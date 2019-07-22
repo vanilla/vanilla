@@ -124,6 +124,14 @@ class MessagesTest extends AbstractResourceTest {
     }
 
     /**
+     * {@inheritdoc}
+     * @requires function MessagesApiController::patch
+     */
+    public function testEditFormatCompat(string $editSuffix = "/edit") {
+        $this->fail(__METHOD__.' needs to be implemented');
+    }
+
+    /**
      * Test GET /messages.
      *
      * @expectedException \Exception

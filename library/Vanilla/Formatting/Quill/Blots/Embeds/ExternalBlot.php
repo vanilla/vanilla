@@ -16,6 +16,8 @@ use Vanilla\Formatting\Quill\Parser;
  */
 class ExternalBlot extends AbstractBlot {
 
+    const DATA_KEY = "insert.embed-external.data";
+
     /** @var EmbedService */
     private $embedService;
 
@@ -46,12 +48,23 @@ class ExternalBlot extends AbstractBlot {
     }
 
     /**
+     * Get the embed data from an operation.
+     *
+     * @param mixed $operation This is intentionally mixed because it could be garbage and we don't want to crash.
+     *
+     * @return array
+     */
+    public static function getEmbedDataFromOperation($operation): array {
+        return valr(self::DATA_KEY, $operation, []);
+    }
+
+    /**
      * Get the embed data.
      *
      * @return array
      */
     public function getEmbedData(): array {
-        return $this->currentOperation["insert"]["embed-external"]["data"] ?? [];
+        return self::getEmbedDataFromOperation($this->currentOperation);
     }
 
     /**

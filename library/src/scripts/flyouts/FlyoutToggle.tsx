@@ -119,7 +119,7 @@ export default function FlyoutToggle(props: IProps) {
     /**
      * Stop click propagation outside the flyout
      */
-    const handleBlockEventPropagation = useCallback((e: React.SyntheticEvent) => {
+    const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
     }, []);
 
@@ -144,9 +144,8 @@ export default function FlyoutToggle(props: IProps) {
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });
-
-    // Prevent flashing of content sometimes.
     useEffect(() => {
+        // Prevent flashing on the first render
         forceRenderStyles();
     }, []);
 
@@ -167,7 +166,7 @@ export default function FlyoutToggle(props: IProps) {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
-            onClick={handleBlockEventPropagation}
+            onClick={handleBlockEventPropogation}
         >
             <Button
                 id={buttonID}

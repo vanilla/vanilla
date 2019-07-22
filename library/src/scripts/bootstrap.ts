@@ -33,7 +33,7 @@ _executeReady()
         logDebug("Bootstrapping complete.");
         // Mount all data-react components.
         onContent(e => {
-            _mountComponents(e.target);
+            _mountComponents(e.target as HTMLElement);
             mountInputs();
         });
 

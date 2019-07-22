@@ -15,30 +15,43 @@ interface IProps {
     description?: string;
     children?: React.ReactNode;
     inEditor?: boolean;
+<<<<<<< HEAD
     noBaseClass?: boolean;
-    isSmall?: boolean;
     setContentRef?: (element: HTMLElement | null) => void;
 }
 
 export function EmbedContent(props: IProps) {
     const id = useUniqueID("richEditor-embed-description");
+=======
+    isSmall?: boolean;
+}
+
+export function EmbedContent(props: IProps) {
+    const id = useUniqueID("richEditor-embed-description-");
     const defaultDesc = t("richEditor.externalEmbed.description");
     const classes = embedContentClasses();
 
+>>>>>>> master
     return (
         <div
             aria-describedby={id}
             aria-label={"External embed content - " + props.type}
+<<<<<<< HEAD
             className={classNames(
                 props.className,
                 { [FOCUS_CLASS]: props.inEditor },
-                !props.noBaseClass && "embedExternal-content",                [FOCUS_CLASS]: props.inEditor,
-                [classes.small]: props.isSmall,
+                !props.noBaseClass && "embedExternal-content",
             )}
+=======
+            className={classNames("embedExternal-content", props.className, {
+                [FOCUS_CLASS]: props.inEditor,
+                [classes.small]: props.isSmall,
+            })}
+>>>>>>> master
             tabIndex={props.inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
             ref={props.setContentRef}
         >
-            <span className="sr-only">{props.description || defaultDesc}</span>
+            <span className="sr-only">{props.description || t("richEditor.externalEmbed.description")}</span>
             {props.children}
         </div>
     );

@@ -7,7 +7,7 @@ if (!function_exists('UserVerified')):
      * @return string
      */
     function userVerified($user) {
-        $userID = $user->UserID;
+        $userID = val('UserID', $user);
         $userVerified = $user->Verified;
         $isRequestUserID = isset($_REQUEST['userid']);
 

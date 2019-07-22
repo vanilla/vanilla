@@ -92,10 +92,7 @@ export function ImageEmbedMenu(props: IProps) {
     }, []);
 
     return (
-        <div
-            className={classNames(classes.root, "u-excludeFromPointerEvents")}
-            style={{ position: "absolute", top: 0, left: 0, transform: "translateX(-100%)", zIndex: 1 }}
-        >
+        <div className={classNames(classes.root, "u-excludeFromPointerEvents", classesEditorForm.embedMetaDataMenu)}>
             {/*{showModal && (*/}
             {/*    <ModalConfirm*/}
             {/*        title={t("Are you sure you want to ")}*/}

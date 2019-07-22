@@ -20,7 +20,6 @@ export const embedMenuClasses = () => {
 
     const mediaQueries = () => {
         const noRoomForMenuOnLeft = styles => {
-            // Todo: figure out when to break on the menu position...
             return media(
                 {
                     maxWidth: unit(

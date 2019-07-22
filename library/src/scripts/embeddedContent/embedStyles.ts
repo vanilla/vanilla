@@ -133,5 +133,9 @@ export const embedContentClasses = useThemeCache(() => {
         display: "inline-flex",
         width: "auto",
     });
-    return { small };
+
+    const root = style("root", {
+        position: "relative",
+    });
+    return { small, root };
 });

@@ -3798,6 +3798,11 @@ class UserModel extends Gdn_Model {
      * @return int
      */
     public function getInvitationCount($userID) {
+        if (Gdn::config('Garden.Registration.Method') !== 'Invitation') {
+            // If registration method has been changed
+            return 0;
+        }
+
         // If this user is master admin, they should have unlimited invites.
         if ($this->SQL
                 ->select('UserID')
@@ -3808,11 +3813,6 @@ class UserModel extends Gdn_Model {
                 ->numRows() > 0
         ) {
             return -1;
-        }
-
-        if (Gdn::config('Garden.Registration.Method') !== 'Invitation') {
-            // If registration method has been changed
-            return 0;
         }
 
         // Get the Registration.InviteRoles settings:

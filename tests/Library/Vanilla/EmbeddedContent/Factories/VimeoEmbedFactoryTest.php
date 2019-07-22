@@ -47,7 +47,8 @@ class VimeoEmbedFactoryTest extends ContainerTestCase {
      */
     public function supportedDomainsProvider(): array {
         return [
-            [ "https://vimeo.com/207028770" ]
+            [ "https://vimeo.com/207028770" ],
+            [ "https://vimeo.com/344997253/ab1b6f2867" ], // Alternate video syntax
         ];
     }
 

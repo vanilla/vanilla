@@ -100,6 +100,11 @@ $component-title_color:                  $global-color_secondary !default;
 $component-title-hover_color:            darken($global-color_secondary, 8%) !default;
 $component-meta-link-hover_color:        darken($global-color_secondary, 8%) !default;
 
+$component-casual-message_bg:            #f3f3f3;
+$component-casual-message_borderColor:   #c3c3c3;
+$component-casual-message_link-color:    #676767;
+
+
 /* -------------------------------------------------------------- *\
     Mebox
 \* -------------------------------------------------------------- */

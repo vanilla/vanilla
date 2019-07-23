@@ -30,7 +30,7 @@ class Filterer {
         $operations = Parser::jsonToOperations($content);
         // Re-encode the value to escape unicode values.
         $operations = $this->cleanupEmbeds($operations);
-        $operations = json_encode($operations);
+        $operations = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $operations;
     }
 

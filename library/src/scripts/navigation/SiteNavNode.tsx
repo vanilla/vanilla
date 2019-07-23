@@ -10,7 +10,7 @@ import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
 import { downTriangle, rightTriangle } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@library/@types/api/core";

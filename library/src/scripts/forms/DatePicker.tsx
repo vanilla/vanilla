@@ -11,7 +11,7 @@ import moment from "moment";
 import { t } from "@library/utility/appUtils";
 import { Moment } from "moment";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { guessOperatingSystem, OS } from "@vanilla/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";

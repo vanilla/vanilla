@@ -6,7 +6,7 @@
 
 import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
-import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonTypes";
 import classNames from "classnames";
 
 interface IProps extends IOptionalComponentID {

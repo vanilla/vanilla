@@ -15,7 +15,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonTypes";
 import ButtonSubmit from "@library/forms/ButtonSubmit";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import Frame from "@library/layout/frame/Frame";

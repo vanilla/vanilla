@@ -9,7 +9,7 @@ import apiv2 from "@library/apiv2";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import { INotificationsStoreState } from "@library/features/notifications/NotificationsModel";
 import Button from "@library/forms/Button";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonTypes";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { settings } from "@library/icons/header";

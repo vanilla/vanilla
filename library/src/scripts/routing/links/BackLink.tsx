@@ -11,7 +11,7 @@ import { formatUrl, t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router";
 import { leftChevronCompact } from "@library/icons/common";
 import { Link } from "react-router-dom";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/buttonTypes";
 
 interface IProps extends RouteComponentProps<{}> {
     fallbackUrl?: string;

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonTypes";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { borders } from "@library/styles/styleHelpersBorders";

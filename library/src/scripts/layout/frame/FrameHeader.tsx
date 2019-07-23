@@ -9,7 +9,7 @@ import Heading, { ICommonHeadingProps } from "@library/layout/Heading";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { leftChevron } from "@library/icons/common";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";

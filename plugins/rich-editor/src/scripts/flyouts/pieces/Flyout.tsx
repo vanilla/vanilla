@@ -12,7 +12,7 @@ import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorFlyoutClasses } from "@rich-editor/flyouts/pieces/flyoutClasses";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IState {
     id: string;

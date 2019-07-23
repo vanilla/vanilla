@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { buttonLoaderClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonLoaderClasses, ButtonTypes } from "@library/forms/buttonTypes";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {

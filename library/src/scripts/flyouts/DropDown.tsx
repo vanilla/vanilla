@@ -8,7 +8,7 @@ import React from "react";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents from "@library/flyouts/DropDownContents";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { getRequiredID } from "@library/utility/idUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";

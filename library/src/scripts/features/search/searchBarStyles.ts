@@ -10,7 +10,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonVariables } from "@library/forms/buttonTypes";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 

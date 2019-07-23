@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import Quill, { RangeStatic, Blot } from "quill/core";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";

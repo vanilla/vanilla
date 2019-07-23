@@ -5,7 +5,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";

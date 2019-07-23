@@ -7,7 +7,7 @@
 import React from "react";
 import { drawerClasses } from "@library/layout/drawer/drawerStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 

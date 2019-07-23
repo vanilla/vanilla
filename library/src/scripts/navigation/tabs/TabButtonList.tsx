@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 import TabButton from "@library/navigation/tabs/TabButton";
 import { TabHandler } from "@vanilla/dom-utils";

@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";

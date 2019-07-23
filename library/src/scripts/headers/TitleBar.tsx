@@ -31,7 +31,7 @@ import { connect } from "react-redux";
 import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { signIn } from "@library/icons/common";
 import SmartLink from "@library/routing/links/SmartLink";
 

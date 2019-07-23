@@ -8,7 +8,7 @@ import React from "react";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { MenuListComponentProps, MenuProps } from "react-select/lib/components/Menu";

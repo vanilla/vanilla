@@ -7,7 +7,7 @@
 import React from "react";
 import { downTriangle, checkCompact } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";

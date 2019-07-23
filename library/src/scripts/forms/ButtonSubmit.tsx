@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";

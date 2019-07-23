@@ -15,7 +15,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { search } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes, buttonVariables } from "@library/forms/buttonTypes";
+import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { InputActionMeta, ActionMeta } from "react-select/lib/types";

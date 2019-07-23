@@ -5,7 +5,7 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonTypes";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";

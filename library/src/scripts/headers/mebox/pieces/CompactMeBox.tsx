@@ -15,7 +15,7 @@ import { t } from "@library/utility/appUtils";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
 import { IInjectableUserState } from "@library/features/users/userModel";

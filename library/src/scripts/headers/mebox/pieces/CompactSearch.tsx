@@ -15,7 +15,7 @@ import SearchOption from "@library/features/search/SearchOption";
 import { search } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";

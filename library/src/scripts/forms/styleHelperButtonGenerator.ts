@@ -16,7 +16,7 @@ import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
-const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false, debug = false) => {
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
     const style = styleFactory(`button-${buttonTypeVars.name}`);
@@ -32,30 +32,30 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             active: {},
             borders: {},
             focusAccessible: {},
-        } as IButtonType,
+        },
         buttonTypeVars,
     );
     // Remove debug and fallback
     const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
-    const hoverBorder = borders(
-        buttonTypeVars.hover && buttonTypeVars.hover.borders ? merge(defaultBorder, buttonTypeVars.hover.borders) : {},
-    );
-    const activeBorder = borders(
-        buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(defaultBorder, buttonTypeVars.active.borders)
-            : {},
-    );
-    const focusBorder = borders(
-        buttonTypeVars.focus && buttonTypeVars.focus.borders ? merge(defaultBorder, buttonTypeVars.focus.borders) : {},
-    );
-    const focusAccessibleBorder = borders(
-        buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(defaultBorder, buttonTypeVars.focusAccessible.borders)
-            : {},
-    );
+    const hoverBorder = {
+        ...defaultBorder,
+        ...borders(buttonTypeVars.hover && buttonTypeVars.hover.borders),
+    };
 
-    return style({
+    const activeBorder = {
+        ...defaultBorder,
+        ...borders(buttonTypeVars.active && buttonTypeVars.active.borders),
+    };
+    const focusBorder = {
+        ...defaultBorder,
+        ...borders(buttonTypeVars.focus && buttonTypeVars.focus.borders),
+    };
+    const focusAccessibleBorder = {
+        ...defaultBorder,
+        ...borders(buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders),
+    };
+    const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
@@ -172,7 +172,9 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
                 opacity: formElVars.disabled.opacity,
             },
         },
-    } as NestedCSSProperties);
+    };
+    debug && console.log(result);
+    return style(result);
 };
 
 export default generateButtonClass;

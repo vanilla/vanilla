@@ -434,7 +434,7 @@ export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary),
-        standard: generateButtonClass(vars.standard),
+        standard: generateButtonClass(vars.standard, false, true),
         transparent: generateButtonClass(vars.transparent),
         compact: generateButtonClass(vars.compact),
         compactPrimary: generateButtonClass(vars.compactPrimary),

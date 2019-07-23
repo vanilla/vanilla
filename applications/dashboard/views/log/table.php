@@ -6,8 +6,8 @@ include $this->fetchViewLocation('helper_functions');
             <thead>
             <tr>
                 <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
-                <th class="content-cell column-full" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
-                <th class="UsernameCell column-lg"><?php echo $this->data('_flaggedByTitle', t('Flagged By', 'Flagged By')); ?></th>
+                <th class="content-cell column-full content-cell-responsive" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
+                <th class="UsernameCell column-lg username-cell-responsive"><?php echo $this->data('_flaggedByTitle', t('Flagged By', 'Flagged By')); ?></th>
                 <th class="options column-checkbox"></th>
             </tr>
             </thead>

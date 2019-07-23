@@ -416,21 +416,39 @@ describe("ListBlot", () => {
         });
     });
 
-    /* 
+    /*
         Press enter once; position in the line: last;
     */
 
     describe("newline insertion", () => {
+        it("can insert newlines at the start of a line", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+            quill.insertText(0, "\n");
+            /*
+                - 1234
+
+                After:
+                -
+                - 1234
+
+            */
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1234"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
+        });
+
         it("can insert newlines midline", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
             quill.insertText(2, "\n");
-            /* 
+            /*
                 - 1234
 
                 After:
                 - 12
                 - 34
-            
+
             */
             expect(quill.getContents().ops).deep.eq([
                 OpUtils.op("12"),
@@ -443,12 +461,12 @@ describe("ListBlot", () => {
         it("can insert newlines, end of the line", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
             quill.insertText(4, "\n");
-            /* 
+            /*
                 - 1234
-    
+
                 After:
                 - 1234
-                - 
+                -
             */
 
             expect(quill.getContents().ops).deep.eq([OpUtils.op("1234"), OpUtils.list(ListType.BULLETED, 0, "\n\n")]);

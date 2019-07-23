@@ -190,7 +190,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * @override
      */
     public split(index: number, force?: boolean) {
-        if ((!force && index === this.length() - 1) || index === 0) {
+        if (!force && (index === this.length() - 1 || index === 0)) {
             return this;
         }
         const ownItem = this.getListContent();
@@ -221,7 +221,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
 
         // validate new line insertion position
         if (value.includes("\n") && isInListContent) {
-            const after = this.split(index, false);
+            const after = this.split(index, true);
             const targetNext = after === this ? this.next : after;
             const isEndOfLine = index === this.length() - 1;
 

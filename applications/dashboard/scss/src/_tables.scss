@@ -126,136 +126,136 @@
 // Styleguide 7.1.
 
 .table-wrap {
-  display: block;
-  margin-top: 0;
-  margin-right: (-$padding-row);
-  margin-bottom: 0;
-  margin-left: (-$padding-row);
+    display: block;
+    margin-top: 0;
+    margin-right: (-$padding-row);
+    margin-bottom: 0;
+    margin-left: (-$padding-row);
 }
 
 .table-data {
-  margin-bottom: 0;
-  @include fixed-table;
-  @include has-top-border;
+    margin-bottom: 0;
+    @include fixed-table;
+    @include has-top-border;
 
-  thead {
-    @extend .table-data-head;
-  }
-
-  tbody {
-    @extend .table-data-body;
-  }
-
-  th,
-  td {
-    @extend .table-data-cell;
-  }
-
-  td.options {
-    .btn-group {
-      justify-content: flex-end;
+    thead {
+        @extend .table-data-head;
     }
-  }
 
-  .toggle-wrap {
-    margin-left: to-rem(12);
-    @extend .toggle-wrap-sm;
-  }
+    tbody {
+        @extend .table-data-body;
+    }
 
-  tbody + tbody {
-    border-top: ($table-border-width) solid $table-border-color;
-  }
+    th,
+    td {
+        @extend .table-data-cell;
+    }
 
-  .column-checkbox {
-    text-align: center;
-    padding-left: 0;
-    padding-right: 0;
-  }
+    td.options {
+        .btn-group {
+            justify-content: flex-end;
+        }
+    }
+
+    .toggle-wrap {
+        margin-left: to-rem(12);
+        @extend .toggle-wrap-sm;
+    }
+
+    tbody + tbody {
+        border-top: ($table-border-width) solid $table-border-color;
+    }
+
+    .column-checkbox {
+        text-align: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 // Add to a table that has content in one or more cells.
 .table-data-content {
-  tbody {
-    td {
-      vertical-align: top;
+    tbody {
+        td {
+            vertical-align: top;
+        }
     }
-  }
 
-  .media + .userContent {
-    margin-top: $table-padding-y;
-  }
+    .media + .userContent {
+        margin-top: $table-padding-y;
+    }
 }
 
 .table-data-cell {
-  overflow: hidden;
-  padding: $table-padding-y $table-padding-x;
-  line-height: $line-height;
-  vertical-align: middle;
-  border-bottom: $table-border-width solid $table-border-color;
+    overflow: hidden;
+    padding: $table-padding-y $table-padding-x;
+    line-height: $line-height;
+    vertical-align: middle;
+    border-bottom: $table-border-width solid $table-border-color;
 }
 
 .table-data-body {
-  font-size: $font-size-tables;
+    font-size: $font-size-tables;
 
-  tr {
-    &:hover {
-      background-color: #f9fdfe;
+    tr {
+        &:hover {
+            background-color: #f9fdfe;
+        }
     }
-  }
 }
 
 .table-data-head {
-  // thead
-  tr {
-    background-color: $grey-light;
-  }
-
-  th,
-  td {
-    width: to-rem(100);
-    padding: ($spacer / 2) ($spacer * .75);
-
-    border-right: $table-border-width solid #eee;
-    border-top: $table-border-width solid #ddd;
-    border-bottom: $table-border-width solid $table-border-color;
-
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: $font-size-sm;
-    line-height: $line-height-lg;
-
-    &:last-child {
-      border-right: 0;
+    // thead
+    tr {
+        background-color: $grey-light;
     }
 
-    &.column-full {
-      width: 100%;
-    }
+    th,
+    td {
+        width: to-rem(100);
+        padding: ($spacer / 2) ($spacer * .75);
 
-    &.column-xl {
-      width: to-rem(300);
-    }
+        border-right: $table-border-width solid #eee;
+        border-top: $table-border-width solid #ddd;
+        border-bottom: $table-border-width solid $table-border-color;
 
-    &.column-lg {
-      width: to-rem(210);
-    }
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: $font-size-sm;
+        line-height: $line-height-lg;
 
-    &.column-md {
-      width: to-rem(132);
-    }
+        &:last-child {
+            border-right: 0;
+        }
 
-    &.column-sm {
-      width: to-rem(90);
-    }
+        &.column-full {
+            width: 100%;
+        }
 
-    &.column-xs {
-      width: to-rem(54);
-    }
+        &.column-xl {
+            width: 300px;
+        }
 
-    &.column-checkbox {
-      width: from-rem($spacer) + 2 * $table-padding-x;
+        &.column-lg {
+            width: 210px;
+        }
+
+        &.column-md {
+            width: 132px;
+        }
+
+        &.column-sm {
+            width: 90px;
+        }
+
+        &.column-xs {
+            width: 54px;
+        }
+
+        &.column-checkbox {
+            width: from-rem($spacer) + 2 * $table-padding-x;
+        }
     }
-  }
 }
 
 // Table Jenga Meta
@@ -278,35 +278,35 @@
 
 .tj-meta,
 .table-meta {
-  margin-top: ($spacer / 2);
+    margin-top: ($spacer / 2);
 
-  & + & {
-    margin-top: 0;
-  }
-
-  .table-meta-item {
-    font-size: $font-size-sm;
-  }
-
-  .table-meta-item-label {
-    font-weight: 600;
-
-    // "Disable" any links in labels.
-    a {
-      color: $grey-dark;
-      pointer-events: none;
-      cursor: default;
+    & + & {
+        margin-top: 0;
     }
-  }
 
-  .media-sm {
-    display: inline-block;
-
-    .media-left,
-    .info {
-      display: none;
+    .table-meta-item {
+        font-size: $font-size-sm;
     }
-  }
+
+    .table-meta-item-label {
+        font-weight: 600;
+
+        // "Disable" any links in labels.
+        a {
+            color: $grey-dark;
+            pointer-events: none;
+            cursor: default;
+        }
+    }
+
+    .media-sm {
+        display: inline-block;
+
+        .media-left,
+        .info {
+            display: none;
+        }
+    }
 }
 
 // Checkbox Grid
@@ -356,97 +356,97 @@
 // Styleguide 7.2.
 
 .table-checkbox-grid {
-  table-layout: auto;
+    table-layout: auto;
 
-  .checkbox {
-    margin-bottom: 0;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  th {
-    font-weight: $headings-font-weight;
-  }
-
-  a {
-    color: $grey-dark;
-
-    &:hover {
-      color: $brand-primary;
-    }
-  }
-
-  thead {
-    // Permission column headings
-    td {
-      text-align: center;
-      padding: $spacer / 2;
-      border: 1px solid #eee;
-      border-top: 1px solid #ddd;
-      text-transform: uppercase;
-      font-weight: 600;
-      font-size: $font-size-sm;
-      line-height: $line-height-lg;
-      vertical-align: middle;
-      width: 10%;
-
-      &:last-child {
-        border-right: 0;
-      }
+    .checkbox {
+        margin-bottom: 0;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    // Title cell
     th {
-      font-weight: 700;
-      max-width: to-rem(120);
-      min-width: to-rem(120);
-      @extend .truncate;
-    }
-  }
-
-  tbody {
-    td {
-      padding: ($spacer / 2) ($spacer * .75);
-      text-align: center;
-    }
-  }
-
-  @media screen and (max-width: 575px) {
-    table-layout: fixed;
-
-    thead,
-    tbody {
-      td,
-      th {
-        font-size: to-rem(12);
-        padding: to-rem(6);
-      }
+        font-weight: $headings-font-weight;
     }
 
-    tbody th {
-      font-size: to-rem(13);
+    a {
+        color: $grey-dark;
+
+        &:hover {
+            color: $brand-primary;
+        }
     }
 
     thead {
-      th {
-        width: 100%;
-      }
+        // Permission column headings
+        td {
+            text-align: center;
+            padding: $spacer / 2;
+            border: 1px solid #eee;
+            border-top: 1px solid #ddd;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: $font-size-sm;
+            line-height: $line-height-lg;
+            vertical-align: middle;
+            width: 10%;
 
-      // We gotta fit the column headings in somehow, so rotate them.
-      td {
-        position: relative;
-        width: to-rem(36);
-        height: to-rem(90);
-
-        a {
-          position: relative;
-          display: block;
-          transform: rotate(90deg);
-          top: - to-rem(24);
+            &:last-child {
+                border-right: 0;
+            }
         }
-      }
+
+        // Title cell
+        th {
+            font-weight: 700;
+            max-width: to-rem(120);
+            min-width: to-rem(120);
+            @extend .truncate;
+        }
     }
-  }
+
+    tbody {
+        td {
+            padding: ($spacer / 2) ($spacer * .75);
+            text-align: center;
+        }
+    }
+
+    @media screen and (max-width: 575px) {
+        table-layout: fixed;
+
+        thead,
+        tbody {
+            td,
+            th {
+                font-size: to-rem(12);
+                padding: to-rem(6);
+            }
+        }
+
+        tbody th {
+            font-size: to-rem(13);
+        }
+
+        thead {
+            th {
+                width: 100%;
+            }
+
+            // We gotta fit the column headings in somehow, so rotate them.
+            td {
+                position: relative;
+                width: to-rem(36);
+                height: to-rem(90);
+
+                a {
+                    position: relative;
+                    display: block;
+                    transform: rotate(90deg);
+                    top: - to-rem(24);
+                }
+            }
+        }
+    }
 }
 
 // Summary Table
@@ -555,61 +555,83 @@
 // Styleguide 7.3.
 
 .summaries {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
-  > * {
-    flex-grow: 1;
-    max-width: 50%;
-    padding: $spacer;
+    > * {
+        flex-grow: 1;
+        max-width: 50%;
+        padding: $spacer;
 
-    @include media-breakpoint-down(md) {
-      max-width: inherit;
-      width: 100%;
-      padding: $spacer 0;
+        @include media-breakpoint-down(md) {
+            max-width: inherit;
+            width: 100%;
+            padding: $spacer 0;
+        }
     }
-  }
 }
 
 .table-summary {
-  @include fixed-table;
+    @include fixed-table;
 
-  th,
-  td {
-    @extend .table-data-cell;
-    text-align: center;
-    padding: $table-cell-padding to-rem(12);
-
-    &:first-child {
-      text-align: left;
-    }
-  }
-
-  tbody {
-    @extend .table-data-body;
-  }
-
-  thead {
     th,
     td {
-      width: 60%;
-      padding: ($spacer / 2) to-rem(12);
-      text-transform: uppercase;
-      font-weight: 600;
-      font-size: $font-size-sm;
-      line-height: $line-height-lg;
-      border-bottom: $table-border-width solid #ddd;
+        @extend .table-data-cell;
+        text-align: center;
+        padding: $table-cell-padding to-rem(12);
 
-      .table-summary-cell-main {
-        width: 100%;
-        min-width: to-rem(120);
-      }
+        &:first-child {
+            text-align: left;
+        }
     }
-  }
+
+    tbody {
+        @extend .table-data-body;
+    }
+
+    thead {
+        th,
+        td {
+            width: 60%;
+            padding: ($spacer / 2) to-rem(12);
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: $font-size-sm;
+            line-height: $line-height-lg;
+            border-bottom: $table-border-width solid #ddd;
+
+            .table-summary-cell-main {
+                width: 100%;
+                min-width: to-rem(120);
+            }
+        }
+    }
 }
 
 .table-summary-title {
-  font-size: 1rem;
-  font-weight: 600;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+// This is for the moderation queue page to make the content responsive on mobile.
+@media screen and (max-width: 600px) {
+    .table-data .column-lg.username-cell-responsive {
+        width: 150px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .media-sm .media-image-wrap {
+        display: none;
+    }
+    .table-data thead th.column-full {
+        width: 40%;
+    }
+    .table-data .column-lg.username-cell-responsive {
+        width: 40%;
+    }
+    .table-data thead th.column-checkbox {
+        width: 20%;
+    }
 }

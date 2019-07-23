@@ -11,6 +11,7 @@ import {
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
+    unit,
 } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { cssRule } from "typestyle";
@@ -53,6 +54,7 @@ export const inputClasses = useThemeCache(() => {
     const vars = inputVariables();
     const style = styleFactory("input");
     const formElementVars = formElementsVariables();
+    const globalVars = globalVariables();
 
     const textStyles = {
         ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
@@ -76,5 +78,14 @@ export const inputClasses = useThemeCache(() => {
     // Use as a global selector. This should be refactored in the future.
     const applyInputCSSRules = () => cssRule(".inputText", textStyles as NestedCSSProperties);
 
-    return { text, applyInputCSSRules };
+    const inputText = style("inputText", {
+        marginBottom: 0,
+        $nest: {
+            "&&": {
+                marginTop: unit(globalVars.gutter.quarter),
+            },
+        },
+    });
+
+    return { text, inputText, applyInputCSSRules };
 });

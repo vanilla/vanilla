@@ -27,6 +27,7 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         valid?: boolean;
         required?: boolean;
         disabled?: boolean;
+        inputRef?: React.Ref<HTMLInputElement>;
     };
 }
 
@@ -51,10 +52,16 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const classesInput = inputClasses();
 
         const { inputProps, ...blockProps } = this.props;
-        const classes = classNames("inputBlock-inputText", "inputText", inputProps.inputClassNames, {
-            InputBox: this.props.legacyMode,
-            [classesInput.text]: !this.props.legacyMode,
-        });
+        const classes = classNames(
+            "inputBlock-inputText",
+            "inputText",
+            inputClasses().inputText,
+            inputProps.inputClassNames,
+            {
+                InputBox: this.props.legacyMode,
+                [classesInput.text]: !this.props.legacyMode,
+            },
+        );
 
         return (
             <InputBlock {...blockProps}>

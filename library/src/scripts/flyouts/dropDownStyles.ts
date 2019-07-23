@@ -29,8 +29,8 @@ export const dropDownVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         widths: {
-            default: 250,
-            medium: 350,
+            default: 350,
+            medium: 450,
         },
         minHeight: 600,
     });

@@ -27,7 +27,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     label: ReactNode;
     children: JSX.Element | CallbackChildren;
     className?: string;
-    labelClassName?: string;
+    labelClass?: string;
     noteAfterInput?: string;
     labelNote?: string;
     labelID?: string;
@@ -68,7 +68,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
         return (
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
-                    <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
+                    <span className={classNames("inputBlock-labelText", this.props.labelClass)}>
                         {this.props.label}
                     </span>
                     <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>

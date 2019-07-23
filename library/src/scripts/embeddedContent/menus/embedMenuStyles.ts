@@ -60,8 +60,8 @@ export const embedMenuClasses = () => {
     // Extra specific and defensive here because it's within userContent styles.
     const paragraph = style("paragraph", {
         ...paddings({
-            horizontal: 0,
-            vertical: importantUnit(globalVars.gutter.quarter),
+            all: 0,
+            top: importantUnit(globalVars.gutter.quarter),
         }),
         ...fonts({
             weight: globalVars.fonts.weights.normal,
@@ -72,11 +72,18 @@ export const embedMenuClasses = () => {
         }),
     });
 
+    const verticalPadding = style("verticalPadding", {
+        ...paddings({
+            vertical: unit(globalVars.gutter.half),
+        }),
+    });
+
     return {
         root,
         form,
         imageContainer,
         mediaQueries,
         paragraph,
+        verticalPadding,
     };
 };

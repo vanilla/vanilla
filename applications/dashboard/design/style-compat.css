@@ -1229,6 +1229,7 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @license GPL-2.0-only
  */
 .embedResponsive {
+  position: relative;
   text-align: center;
 }
 
@@ -1361,8 +1362,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedLinkLoader-link:focus:after {
   box-shadow: 0 0 0 2px #0291db inset;
 }
-.richEditor .embedExternal-content > *,
-.richEditor .embedLinkLoader-link > * {
+.richEditor .embedExternal-content > *:not(.u-excludeFromPointerEvents),
+.richEditor .embedLinkLoader-link > *:not(.u-excludeFromPointerEvents) {
   pointer-events: none;
 }
 

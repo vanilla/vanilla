@@ -21,6 +21,7 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import Paragraph from "@library/layout/Paragraph";
+import InputTextBlock from "@library/forms/InputTextBlock";
 
 interface IProps extends IImageMeta {
     saveImageMeta?: () => void;
@@ -43,28 +44,25 @@ export function ImageEmbedMenu(props: IProps) {
     const classesEditorForm = editorFormClasses();
     const icon = accessibleImageMenu();
 
-    const [disable, setDisable] = useState(false);
+    const [disabled, setDisabled] = useState(false);
     const [saved, setSaved] = useState(false);
     const [alt, setAlt] = useState("");
     const [portalLocation, setPortalLocation] = useState();
 
     const { saveImageMeta, initialAlt = "", elementToFocusOnClose, setIsOpen } = props;
-    const id = useUniqueID("imageEmbedMenu");
-    let textInput = useRef();
-    const divRef = useRef<HTMLDivElement>(null);
+    // const id = useUniqueID("imageEmbedMenu");
+    // const divRef = useRef<HTMLDivElement>(null);
 
     const device = useDevice();
 
     const onVisibilityChange = useCallback(isVisible => {
         if (isVisible) {
             setIsOpen(true);
-            window.console.log("it IS visible");
         } else {
             setIsOpen(false);
             if (elementToFocusOnClose && elementToFocusOnClose.current) {
                 elementToFocusOnClose.current.focus();
             }
-            window.console.log("is NOT visible");
         }
     }, []);
 
@@ -92,13 +90,13 @@ export function ImageEmbedMenu(props: IProps) {
     //     }
     // }, []);
 
-    // const handleTextChange = useCallback(event => {
-    //     if (event) {
-    //         event.stopPropagation();
-    //         event.preventDefault();
-    //         setAlt(event.target.value || "");
-    //     }
-    // }, []);
+    const handleTextChange = useCallback(event => {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+            setAlt(event.target.value || "");
+        }
+    }, []);
 
     return (
         <div
@@ -114,10 +112,9 @@ export function ImageEmbedMenu(props: IProps) {
                 buttonContents={icon}
                 className={classNames("u-excludeFromPointerEvents")}
                 onVisibilityChange={onVisibilityChange}
-                size={FlyoutSizes.MEDIUM}
                 openAsModal={device === Devices.MOBILE || device === Devices.XS}
                 selfPadded={true}
-                isNotList={false}
+                isNotList={true}
             >
                 <form
                     className={classes.form}
@@ -125,20 +122,21 @@ export function ImageEmbedMenu(props: IProps) {
                         e.preventDefault();
                     }}
                 >
-                    <FrameBody>
-                        <Paragraph className={classes.paragraph}>
-                            {t("Alternative text helps users with accessibility concerns and improves SEO.")}
-                        </Paragraph>
-                        {/*<InputTextBlock*/}
-                        {/*    label={t("Alternative text helps users with accessibility concerns and improves SEO.")}*/}
-                        {/*    inputProps={{*/}
-                        {/*        required: true,*/}
-                        {/*        value: alt || "",*/}
-                        {/*        onChange: handleTextChange,*/}
-                        {/*        disabled: !disable,*/}
-                        {/*        ref: textInput,*/}
-                        {/*    }}*/}
-                        {/*/>*/}
+                    <FrameBody className={classes.verticalPadding}>
+                        {/*<Paragraph className={classes.paragraph}>*/}
+                        {/*    {t("Alternative text helps users with accessibility concerns and improves SEO.")}*/}
+                        {/*</Paragraph>*/}
+                        <InputTextBlock
+                            label={t("Alternative text helps users with accessibility concerns and improves SEO.")}
+                            labelClass={classes.paragraph}
+                            inputProps={{
+                                required: true,
+                                value: alt || initialAlt,
+                                onChange: handleTextChange,
+                                disabled: true,
+                                placeholder: t("(Image description)"),
+                            }}
+                        />
                     </FrameBody>
                     <FrameFooter justifyRight={true}>
                         <ButtonSubmit baseClass={ButtonTypes.TEXT_PRIMARY}>{t("Insert")}</ButtonSubmit>

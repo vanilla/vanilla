@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Handles /entry endpoint.
  */
@@ -547,6 +549,9 @@ class EntryController extends Gdn_Controller {
                     unset($data['Photo']);
                 }
 
+                // Saving an existing user data.
+                $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                 // Synchronize the user's data.
                 $userModel->save($data, [
                     'NoConfirmEmail' => true,
@@ -623,7 +628,9 @@ class EntryController extends Gdn_Controller {
                             $userID = $row['UserID'];
                             $this->Form->setFormValue('UserID', $userID);
                             $data = $this->Form->formValues();
-
+                            // Connecting an existing user.
+                            $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                            $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                             // User synchronization.
                             if (c('Garden.Registration.ConnectSynchronize', true)) {
                                 // Don't overwrite a photo if the user has already uploaded one.
@@ -764,6 +771,10 @@ class EntryController extends Gdn_Controller {
                     unset($user['UserID']);
                     $user['DiscoveryText'] = sprintft(t('SSO connection (%s)'), $method);
                     $userModel->Validation->reset();
+                    
+                    // Registering a new user.
+                    $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                     $userID = $userModel->register($user, $registerOptions);
 
                     if ($userID === UserModel::REDIRECT_APPROVE) {
@@ -779,6 +790,9 @@ class EntryController extends Gdn_Controller {
 
                 // Save the association to the new user.
                 if ($userID) {
+                    // Save Authentication of a user.
+                    $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                     $userModel->saveAuthentication([
                         'UserID' => $userID,
                         'Provider' => $this->Form->getFormValue('Provider'),
@@ -873,6 +887,9 @@ class EntryController extends Gdn_Controller {
                     }
                 }
             } elseif ($this->Form->errorCount() == 0) {
+                // Register a new user.
+                $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                 // The user doesn't exist so we need to add another user.
                 $user = $this->Form->formValues();
                 $user['Name'] = $user['ConnectName'];
@@ -901,6 +918,9 @@ class EntryController extends Gdn_Controller {
             // Save the user authentication association.
             if ($this->Form->errorCount() == 0) {
                 if (isset($user) && val('UserID', $user)) {
+                    // Connecting an existing user.
+                    $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
+                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
                     $userModel->saveAuthentication([
                         'UserID' => $user['UserID'],
                         'Provider' => $this->Form->getFormValue('Provider'),

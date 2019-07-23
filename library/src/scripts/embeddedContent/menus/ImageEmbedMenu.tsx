@@ -5,22 +5,16 @@
 
 import React, { RefObject, useCallback, useRef, useState } from "react";
 import { t } from "@library/utility/appUtils";
-import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
+import DropDown from "@library/flyouts/DropDown";
 import classNames from "classnames";
 import { accessibleImageMenu } from "@library/icons/common";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { useUniqueID } from "@library/utility/idUtils";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
-import Button from "@library/forms/Button";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonSubmit from "@library/forms/ButtonSubmit";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
-import Paragraph from "@library/layout/Paragraph";
 import InputTextBlock from "@library/forms/InputTextBlock";
 
 interface IProps extends IImageMeta {
@@ -39,20 +33,11 @@ export interface IImageMeta {
  * A class for rendering Giphy embeds.
  */
 export function ImageEmbedMenu(props: IProps) {
-    const classesDropDown = dropDownClasses();
     const classes = embedMenuClasses();
     const classesEditorForm = editorFormClasses();
     const icon = accessibleImageMenu();
-
-    const [disabled, setDisabled] = useState(false);
-    const [saved, setSaved] = useState(false);
     const [alt, setAlt] = useState("");
-    const [portalLocation, setPortalLocation] = useState();
-
-    const { saveImageMeta, initialAlt = "", elementToFocusOnClose, setIsOpen } = props;
-    // const id = useUniqueID("imageEmbedMenu");
-    // const divRef = useRef<HTMLDivElement>(null);
-
+    const { initialAlt = "", elementToFocusOnClose, setIsOpen } = props;
     const device = useDevice();
 
     const onVisibilityChange = useCallback(isVisible => {

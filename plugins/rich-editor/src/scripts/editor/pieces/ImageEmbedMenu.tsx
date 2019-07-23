@@ -19,7 +19,6 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 interface IProps extends IImageMeta {
     saveImageMeta?: () => void;
     initialAlt?: string;
-    elementToFocusOnClose: RefObject<HTMLDivElement>;
     setIsOpen: (isOpen: boolean) => void;
     className?: string;
 }
@@ -35,18 +34,11 @@ export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
     const icon = accessibleImageMenu();
     const [alt, setAlt] = useState("");
-    const { initialAlt = "", elementToFocusOnClose, setIsOpen } = props;
+    const { initialAlt = "", setIsOpen } = props;
     const device = useDevice();
 
     const onVisibilityChange = useCallback(isVisible => {
-        if (isVisible) {
-            setIsOpen(true);
-        } else {
-            setIsOpen(false);
-            if (elementToFocusOnClose && elementToFocusOnClose.current) {
-                elementToFocusOnClose.current.focus();
-            }
-        }
+        setIsOpen(isVisible);
     }, []);
 
     const handleTextChange = useCallback(event => {

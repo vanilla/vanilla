@@ -18,31 +18,31 @@ import {
     paddings,
     unit,
 } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
-import { layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
+import { imageEmbedMenuVariables } from "@rich-editor/editor/pieces/richEditorEmedOptionsStyles";
+
+export const embedMenuMediaQueries = useThemeCache(() => {
+    const vars = embedContainerVariables();
+    const globalVars = globalVariables();
+    const noRoomForMenuOnLeft = styles => {
+        return media(
+            {
+                maxWidth: unit(vars.dimensions.maxEmbedWidth + 2 * globalVars.buttonIcon.size + globalVars.gutter.half),
+            },
+            styles,
+        );
+    };
+
+    return {
+        noRoomForMenuOnLeft,
+    };
+});
 
 export const embedMenuClasses = () => {
     const style = styleFactory("imageEmbedMenu");
     const embedVars = embedContainerVariables();
     const globalVars = globalVariables();
-
-    const mediaQueries = () => {
-        const noRoomForMenuOnLeft = styles => {
-            return media(
-                {
-                    maxWidth: unit(
-                        embedVars.dimensions.maxEmbedWidth + 2 * globalVars.buttonIcon.size + globalVars.gutter.half,
-                    ),
-                },
-                styles,
-            );
-        };
-
-        return {
-            noRoomForMenuOnLeft,
-        };
-    };
 
     const root = style({
         marginRight: "auto",
@@ -101,7 +101,6 @@ export const embedMenuClasses = () => {
         root,
         form,
         imageContainer,
-        mediaQueries,
         paragraph,
         verticalPadding,
         embedMetaDataMenu,

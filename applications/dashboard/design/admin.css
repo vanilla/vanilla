@@ -8985,27 +8985,27 @@ button.close {
 .table-data-head th.column-xl, .table-data thead th.column-xl,
 .table-data-head td.column-xl,
 .table-data thead td.column-xl {
-  width: 18.75rem;
+  width: 300px;
 }
 .table-data-head th.column-lg, .table-data thead th.column-lg,
 .table-data-head td.column-lg,
 .table-data thead td.column-lg {
-  width: 13.125rem;
+  width: 210px;
 }
 .table-data-head th.column-md, .table-data thead th.column-md,
 .table-data-head td.column-md,
 .table-data thead td.column-md {
-  width: 8.25rem;
+  width: 132px;
 }
 .table-data-head th.column-sm, .table-data thead th.column-sm,
 .table-data-head td.column-sm,
 .table-data thead td.column-sm {
-  width: 5.625rem;
+  width: 90px;
 }
 .table-data-head th.column-xs, .table-data thead th.column-xs,
 .table-data-head td.column-xs,
 .table-data thead td.column-xs {
-  width: 3.375rem;
+  width: 54px;
 }
 .table-data-head th.column-checkbox, .table-data thead th.column-checkbox,
 .table-data-head td.column-checkbox,
@@ -9190,6 +9190,28 @@ button.close {
   font-weight: 600;
 }
 
+@media screen and (max-width: 600px) {
+  .table-data .column-lg.username-cell-responsive {
+    width: 150px;
+  }
+}
+@media screen and (max-width: 350px) {
+  .media-sm .media-image-wrap {
+    display: none;
+  }
+
+  .table-data thead th.column-full {
+    width: 40%;
+  }
+
+  .table-data .column-lg.username-cell-responsive {
+    width: 40%;
+  }
+
+  .table-data thead th.column-checkbox {
+    width: 20%;
+  }
+}
 .toaster, .InformMessages .InformMessage {
   position: relative;
   display: block;

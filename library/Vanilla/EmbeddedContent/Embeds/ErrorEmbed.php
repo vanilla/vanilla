@@ -30,12 +30,12 @@ class ErrorEmbed extends AbstractEmbed {
         $this->exception = $exception;
 
         // Try to ensure we have some URL and some Data.
-        if (($url = $data['url'] ?? null) === null) {
+        if (($data['url'] ?? null) === null) {
             $data['url'] = t('');
         }
 
-        if (($type = $data['type'] ?? null) === null) {
-            $data['type'] = self::TYPE;
+        if (($data['embedType'] ?? null) === null) {
+            $data['embedType'] = self::TYPE;
         }
 
         if (debug()) {

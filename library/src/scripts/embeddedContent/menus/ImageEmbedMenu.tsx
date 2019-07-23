@@ -66,30 +66,6 @@ export function ImageEmbedMenu(props: IProps) {
         }
     }, []);
 
-    // const onChange = useCallback(event => {}, []);
-    //
-    // const onCancelClose = useCallback(event => {
-    //     if (event) {
-    //         setSaved(false);
-    //         setAlt(initialAlt);
-    //     }
-    // }, []);
-    //
-    // const onSaveClose = useCallback(event => {
-    //     if (event) {
-    //         event.stopPropagation();
-    //         event.preventDefault();
-    //         setSaved(true);
-    //         if (elementToFocusOnClose) {
-    //             if ("current" in elementToFocusOnClose) {
-    //                 elementToFocusOnClose.current!.focus();
-    //             } else {
-    //                 elementToFocusOnClose.focus();
-    //             }
-    //         }
-    //     }
-    // }, []);
-
     const handleTextChange = useCallback(event => {
         if (event) {
             event.stopPropagation();
@@ -123,9 +99,6 @@ export function ImageEmbedMenu(props: IProps) {
                     }}
                 >
                     <FrameBody className={classes.verticalPadding}>
-                        {/*<Paragraph className={classes.paragraph}>*/}
-                        {/*    {t("Alternative text helps users with accessibility concerns and improves SEO.")}*/}
-                        {/*</Paragraph>*/}
                         <InputTextBlock
                             label={t("Alternative text helps users with accessibility concerns and improves SEO.")}
                             labelClass={classes.paragraph}

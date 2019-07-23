@@ -229,27 +229,27 @@
     }
 
     &.column-full {
-      width: auto;
+      width: 100%;
     }
 
     &.column-xl {
-      width: auto;
+      width: 300px;
     }
 
     &.column-lg {
-      width: auto;
+      width: 210px;
     }
 
     &.column-md {
-      width: auto;
+      width: 132px;
     }
 
     &.column-sm {
-      width: auto;
+      width: 90px;
     }
 
     &.column-xs {
-      width: auto;
+      width: 54px;
     }
 
     &.column-checkbox {
@@ -612,4 +612,26 @@
 .table-summary-title {
   font-size: 1rem;
   font-weight: 600;
+}
+
+// This is for the moderation queue page to make the content responsive on mobile.
+@media screen and (max-width: 600px) {
+    .table-data .column-lg.username-cell-responsive {
+        width: 150px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .media-sm .media-image-wrap {
+        display: none;
+    }
+    .table-data thead th.column-full {
+        width: 40%;
+    }
+    .table-data .column-lg.username-cell-responsive {
+        width: 40%;
+    }
+    .table-data thead th.column-checkbox {
+       width: 20%;
+    }
 }

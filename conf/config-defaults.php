@@ -87,7 +87,6 @@ $Configuration['Garden']['Security']['Hsts']['IncludeSubDomains'] = false;
 $Configuration['Garden']['Security']['Hsts']['Preload'] = false;
 $Configuration['Garden']['Security']['Hsts']['MaxAge'] = 604800;
 
-
 // Outgoing email.
 $Configuration['Garden']['Email']['UseSmtp'] = false;
 $Configuration['Garden']['Email']['SmtpHost'] = '';

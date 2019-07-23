@@ -73,7 +73,7 @@ export class NotificationsContents extends React.Component<IProps> {
                         </LinkAsButton>
                         <Button
                             onClick={this.markAllRead}
-                            baseClass={ButtonTypes.TEXT}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
                             className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
                         >
                             {t("Mark All Read")}

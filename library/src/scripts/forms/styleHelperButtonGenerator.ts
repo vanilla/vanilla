@@ -16,7 +16,7 @@ import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
-const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false, debug = false) => {
+const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
     const style = styleFactory(`button-${buttonTypeVars.name}`);
@@ -173,7 +173,7 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
             },
         },
     };
-    debug && console.log(result);
+
     return style(result);
 };
 

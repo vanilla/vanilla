@@ -9,7 +9,6 @@ import DropDown from "@library/flyouts/DropDown";
 import classNames from "classnames";
 import { accessibleImageMenu } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonSubmit from "@library/forms/ButtonSubmit";
@@ -34,7 +33,6 @@ export interface IImageMeta {
  */
 export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
-    const classesEditorForm = editorFormClasses();
     const icon = accessibleImageMenu();
     const [alt, setAlt] = useState("");
     const { initialAlt = "", elementToFocusOnClose, setIsOpen } = props;
@@ -64,7 +62,7 @@ export function ImageEmbedMenu(props: IProps) {
             className={classNames(
                 classes.root,
                 "u-excludeFromPointerEvents",
-                classesEditorForm.embedMetaDataMenu,
+                classes.embedMetaDataMenu,
                 props.className,
             )}
         >

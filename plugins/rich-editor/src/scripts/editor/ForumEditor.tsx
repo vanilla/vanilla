@@ -16,7 +16,7 @@ import classNames from "classnames";
 import { Provider } from "react-redux";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { useUniqueID } from "@library/utility/idUtils";
-import { RichEditorEmbedOptions } from "@library/embeddedContent/menus/richEditorEmbedOptions";
+import { RichEditorEmbedOptions } from "@rich-editor/editor/pieces/RichEditorEmbedOptions";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;

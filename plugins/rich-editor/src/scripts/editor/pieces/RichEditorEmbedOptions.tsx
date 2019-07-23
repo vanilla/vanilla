@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { richEditorEmbedOptionsClasses } from "@library/embeddedContent/menus/richEditorEmedOptionsStyles";
+import { richEditorEmbedOptionsClasses } from "@rich-editor/editor/pieces/richEditorEmedOptionsStyles";
 
 interface IProps {
     id: string;

@@ -5,7 +5,7 @@
 
 module.exports = {
     parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "react", "jsx-a11y"],
+    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y"],
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
@@ -66,5 +66,9 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/await-thenable": "off",
         "@typescript-eslint/promise-function-async": "off",
+
+        // React hooks
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
     },
 };

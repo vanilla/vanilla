@@ -10,6 +10,8 @@ import UserSuggestionModel from "@library/features/users/suggestion/UserSuggesti
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import { expect } from "chai";
 import sinon from "sinon";
+import { Moment } from "moment";
+import moment from "moment";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {
@@ -17,13 +19,13 @@ interface ISortTestData {
     search: string;
     expected: IMentionSuggestionData[];
 }
-function makeMentionSuggestion(username: string): IMentionSuggestionData {
+function makeMentionSuggestion(username: string, dateLastActive: Moment | null = null): IMentionSuggestionData {
     return {
         name: username,
         domID: "",
         userID: 0,
         photoUrl: "",
-        dateLastActive: "",
+        dateLastActive: dateLastActive ? dateLastActive.toISOString() : null,
     };
 }
 
@@ -31,9 +33,9 @@ function createSortTestData(basicData: SortProviderTuple[]): ISortTestData[] {
     return basicData.map(data => {
         const [input, search, expected] = data;
         return {
-            input: input.map(makeMentionSuggestion),
+            input: input.map(name => makeMentionSuggestion(name)),
             search,
-            expected: expected.map(makeMentionSuggestion),
+            expected: expected.map(name => makeMentionSuggestion(name)),
         };
     });
 }
@@ -60,7 +62,7 @@ describe("UserSuggestionModel", () => {
 
             it("invalidates the previous successful username", () => {
                 const users = {
-                    data: ["test", "test2"].map(makeMentionSuggestion),
+                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(
@@ -78,7 +80,7 @@ describe("UserSuggestionModel", () => {
 
             it("does not invalidate the previous successful username if the new one is a superset of that name", () => {
                 const users = {
-                    data: ["test", "test2"].map(makeMentionSuggestion),
+                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(
@@ -168,24 +170,37 @@ describe("UserSuggestionModel", () => {
         const sortProvider: SortProviderTuple[] = [
             [["c", "b", "a", "z"], "f", ["a", "b", "c", "z"]],
             [["c", "b", "a", "z"], "z", ["z", "a", "b", "c"]], // Exact results come first
-            [["Stephane", "Stéphane", "z"], "Ste", ["Stephane", "Stéphane", "z"]], // Exact results come first
-            [["Stephane", "Stéphane", "z"], "Sté", ["Stéphane", "Stephane", "z"]], // Exact results come first
-            [
-                ["testg", "testé", "testë", "testa", "teste", "testg"],
-                "te",
-                ["testa", "teste", "testé", "testë", "testg"],
-            ],
-            [
-                ["testg", "testé", "testë", "testa", "teste", "testg"],
-                "test",
-                ["testa", "teste", "testé", "testë", "testg"],
-            ],
+            [["stephane", "Stéphane", "z"], "ste", ["stephane", "Stéphane", "z"]], // Exact results come first
+            [["Stephane", "stéphane", "z"], "sté", ["stéphane", "Stephane", "z"]], // Exact results come first
+            [["testg", "testé", "testë", "testa", "teste"], "te", ["testa", "teste", "testé", "testë", "testg"]],
+            [["testg", "testé", "testë", "testa", "teste"], "test", ["testa", "teste", "testé", "testë", "testg"]],
         ];
 
         createSortTestData(sortProvider).forEach(({ input, search, expected }, index) => {
             it(`Case ${index}`, () => {
-                expect(UserSuggestionModel.sortSuggestions(input, search));
+                expect(UserSuggestionModel.sortSuggestions(input, search)).deep.eq(expected);
             });
+        });
+
+        it("sorts users active in the last 90 days to the top with exact matches first", () => {
+            const currentTime = moment();
+            const data = [
+                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
+            ];
+
+            const expected = [
+                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
+                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
+            ];
+
+            expect(UserSuggestionModel.sortSuggestions(data, "start")).deep.eq(expected);
         });
     });
 });

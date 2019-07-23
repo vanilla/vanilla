@@ -1,30 +1,11 @@
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import {
-    escapeHTML,
-    unescapeHTML,
-    removeAllDelegatedEvents,
-    delegateEvent,
-    removeDelegatedEvent,
-    getFormData,
-} from "@library/dom/domUtils";
 import { expect } from "chai";
 import sinon from "sinon";
-
-const input = `<script>alert("Got you!")</script>`;
-const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;
-
-it("escapes html", () => {
-    expect(escapeHTML(input)).to.deep.equal(output);
-});
-
-it("unescapes html", () => {
-    expect(unescapeHTML(output)).to.deep.equal(input);
-});
+import { delegateEvent, removeAllDelegatedEvents, removeDelegatedEvent } from "./index";
 
 describe("delegateEvent()", () => {
     beforeEach(() => {
@@ -146,20 +127,5 @@ describe("removeDelegatedEvent() && removeAllDelegatedEvents()", () => {
 
         sinon.assert.notCalled(callback1);
         sinon.assert.notCalled(callback2);
-    });
-});
-
-describe("getFormData()", () => {
-    beforeEach(() => {
-        document.body.innerHTML = `
-            <form>
-                <input type="text" name="foo" value="foo">
-            </form>
-        `;
-    });
-
-    it("can get data out of a form", () => {
-        const form = document.querySelector("form");
-        expect(getFormData(form)).deep.equals({ foo: "foo" });
     });
 });

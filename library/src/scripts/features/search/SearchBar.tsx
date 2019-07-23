@@ -293,7 +293,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         </div>
                         <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
                             <Button
-                                type="submit"
+                                submit={true}
                                 id={this.searchButtonID}
                                 baseClass={this.props.buttonBaseClass}
                                 className={classNames(

@@ -24,7 +24,6 @@ export function ClearButton(props: IProps) {
         <Button
             baseClass={ButtonTypes.ICON}
             className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
-            type="button"
             onClick={props.onClick}
             title={t("Clear")}
             aria-label={t("Clear")}

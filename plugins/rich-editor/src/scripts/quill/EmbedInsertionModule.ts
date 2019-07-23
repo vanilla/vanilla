@@ -8,7 +8,7 @@ import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
-import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
+import { getPastedFile, getDraggedFile } from "@vanilla/dom-utils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";
@@ -48,9 +48,10 @@ export default class EmbedInsertionModule extends Module {
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        insertBlockBlotAt(this.quill, this.quill.getLastGoodSelection().index, externalEmbed);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, externalEmbed);
         this.quill.update(Quill.sources.USER);
-        externalEmbed.focus();
+        this.quill.setSelection(externalEmbed.offset(this.quill.scroll) + externalEmbed.length(), 0);
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
@@ -82,7 +83,7 @@ export default class EmbedInsertionModule extends Module {
 
     public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then(data => {
-            data.type = "image";
+            data.embedType = "image";
             return data;
         });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
@@ -92,11 +93,8 @@ export default class EmbedInsertionModule extends Module {
         const progressEventEmitter = new ProgressEventEmitter();
 
         const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
-            return {
-                url: data.url,
-                embedType: "file",
-                attributes: data,
-            };
+            data.embedType = "file";
+            return data;
         });
         this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
     }

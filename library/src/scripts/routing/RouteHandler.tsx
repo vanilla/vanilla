@@ -6,10 +6,10 @@
 
 import React from "react";
 import { NavLink, NavLinkProps, Route } from "react-router-dom";
-import Hoverable from "@library/dom/Hoverable";
 import { Omit } from "@library/@types/utils";
 import Loadable, { LoadableComponent } from "react-loadable";
 import Loader from "@library/loaders/Loader";
+import { Hoverable } from "@vanilla/react-utils";
 
 type LoadFunction = () => Promise<any>;
 

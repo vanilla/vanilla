@@ -48,7 +48,7 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
         $isImage = $contentType && substr($contentType, 0, 6) === 'image/';
 
         if ($isImage) {
-            return $this->scrapeImage($url);
+            return $this->scrapeImage($url, $contentType);
         } else {
             return $this->scrapeHtml($url);
         }
@@ -58,11 +58,12 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      * Scrape an image URL.
      *
      * @param string $url
+     * @param string $contentType
      * @return ImageEmbed
      *
      * @throws \Garden\Schema\ValidationException If there's not enough / incorrect data to make an embed.
      */
-    private function scrapeImage(string $url): ImageEmbed {
+    private function scrapeImage(string $url, string $contentType): ImageEmbed {
         // Dimensions
         $result = getimagesize($url);
         $height = null;
@@ -72,6 +73,7 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
         }
         $data = [
             'url' => $url,
+            'type' => $contentType,
             'embedType' => ImageEmbed::TYPE,
             'name' => t('Untitled Image'),
             'height' => $height,
@@ -112,7 +114,7 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      */
     private function getContentType(string $url): ?string {
         // Get information about the request with a HEAD request.
-        $response = $this->httpClient->head($url);
+        $response = $this->httpClient->options($url);
 
         // Let's do some super inconsistent validation of what file types are allowed.
         $contentType = $response->getHeaderLines('content-type');

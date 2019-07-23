@@ -923,10 +923,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
   color: #555a62;
 }
-.userContent > *:not(.emoji):not(:last-child):not(br):not(.embedResponsive) {
+.userContent > *:not(.emoji):not(:last-child):not(br) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br):not(.embedResponsive) {
+.userContent > *:not(.emoji):first-child:not(br) {
   margin-top: -0.25em !important;
 }
 .userContent,
@@ -1322,6 +1322,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLinkLoader-link {
+  position: relative;
   display: inline-block;
   white-space: normal;
   padding: 2px 4px;
@@ -1510,6 +1511,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
+  width: 100%;
 }
 
 /*!
@@ -1752,6 +1754,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-body {
   display: block;
   margin: 0;
+}
+.embedQuote-body::before, .embedQuote-body::after {
+  content: initial;
 }
 
 .embedQuote-metaLink {

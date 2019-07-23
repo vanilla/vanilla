@@ -11,7 +11,7 @@ export default class SpoilerButton extends React.Component<{}> {
     public render() {
         return (
             <div contentEditable={false} className="spoiler-buttonContainer">
-                <button disabled className="iconButton button-spoiler" type="button">
+                <button title={t("Toggle Spoiler")} disabled className="iconButton button-spoiler" type="button">
                     <span className="spoiler-warning">
                         <span className="spoiler-warningMain">
                             {spoiler("spoiler-icon")}

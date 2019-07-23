@@ -16,6 +16,8 @@ use Vanilla\ApiUtils;
  */
 class CommentsApiController extends AbstractApiController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var CommentModel */
     private $commentModel;
 
@@ -260,6 +262,7 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($comment);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 

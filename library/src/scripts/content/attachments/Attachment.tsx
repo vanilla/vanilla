@@ -16,6 +16,8 @@ import { attachmentIconClasses } from "@library/content/attachments/attachmentIc
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -29,6 +31,7 @@ interface IProps extends IFileAttachment {
     type: AttachmentType;
     size: number; // bytes
     url: string;
+    inEditor?: boolean;
 }
 
 export default class Attachment extends React.Component<IProps> {
@@ -40,27 +43,35 @@ export default class Attachment extends React.Component<IProps> {
         const classesMetas = metasClasses();
 
         return (
-            <EmbedContainer size={EmbedContainerSize.SMALL} withPadding>
-                <div className={classes.box}>
-                    {type && (
-                        <div className={classNames(classes.format)}>{getAttachmentIcon(type, iconClasses.root)}</div>
-                    )}
-                    <div className={classNames(classes.main)}>
-                        <SmartLink to={url} className={classes.link} type={mimeType} download={name} tabIndex={1}>
+            <EmbedContainer size={EmbedContainerSize.SMALL}>
+                <EmbedContent inEditor={this.props.inEditor} type={this.props.type}>
+                    <SmartLink
+                        to={url}
+                        className={classNames(classes.link, classes.box)}
+                        type={mimeType}
+                        download={name}
+                        tabIndex={1}
+                    >
+                        {type && (
+                            <div className={classNames(classes.format)}>
+                                {getAttachmentIcon(type, iconClasses.root)}
+                            </div>
+                        )}
+                        <div className={classNames(classes.main)}>
                             <div className={classNames(classes.title)}>{label}</div>
-                        </SmartLink>
-                        <div className={classNames(classes.metas, classesMetas.root)}>
-                            {dateUploaded && (
+                            <div className={classNames(classes.metas, classesMetas.root)}>
+                                {dateUploaded && (
+                                    <span className={classesMetas.meta}>
+                                        <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
+                                    </span>
+                                )}
                                 <span className={classesMetas.meta}>
-                                    <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
+                                    <HumanFileSize numBytes={size} />
                                 </span>
-                            )}
-                            <span className={classesMetas.meta}>
-                                <HumanFileSize numBytes={size} />
-                            </span>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </SmartLink>
+                </EmbedContent>
             </EmbedContainer>
         );
     }

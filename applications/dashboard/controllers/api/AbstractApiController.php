@@ -7,7 +7,10 @@
 
 use Garden\Schema\Schema;
 
-abstract class AbstractApiController extends \Vanilla\Web\Controller {
+/**
+ * Base API controller for APIv2.
+ */
+abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface {
 
     /** @var Schema */
     private $categoryFragmentSchema;

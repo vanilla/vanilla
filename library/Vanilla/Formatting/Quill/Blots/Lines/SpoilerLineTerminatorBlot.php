@@ -81,7 +81,7 @@ HTML;
         }
         return <<<HTML
 <div contenteditable="false" class="spoiler-buttonContainer">
-<button class="$buttonClasses" $buttonDisabled>
+<button title="{$t('Toggle Spoiler')}" class="$buttonClasses" $buttonDisabled>
     <span class="spoiler-warning">
         <span class="spoiler-warningMain">
             <svg class="icon spoiler-icon" viewBox="0 0 24 24">

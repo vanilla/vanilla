@@ -10,7 +10,7 @@ import classNames from "classnames";
 import { accessibleImageMenu } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
-import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
+import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonSubmit from "@library/forms/ButtonSubmit";
 import FrameFooter from "@library/layout/frame/FrameFooter";

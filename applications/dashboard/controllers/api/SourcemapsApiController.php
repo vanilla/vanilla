@@ -11,6 +11,12 @@ use Garden\Web\Data;
  */
 class SourcemapsApiController extends AbstractApiController {
 
+    /**
+     * Get source map.
+     *
+     * @param string $path Relative path to source map file
+     * @return Data
+     */
     public function get(string $path): Data {
         $sourceMapsEnabled = Gdn::config()->get(
             'Garden.Security.SourceMaps.Enabled',

@@ -40,6 +40,7 @@ export interface IProps extends IDeviceProps {
     title?: string;
     selfPadded?: boolean;
     flyoutSize?: FlyoutSizes;
+    isNotList: boolean;
 }
 
 export enum FlyoutSizes {
@@ -79,6 +80,7 @@ class DropDown extends React.Component<IProps, IState> {
         const classesDropDown = dropDownClasses();
         const classesFrameHeader = frameHeaderClasses();
         const classes = dropDownClasses();
+        const ContentTag = this.props.isNotList ? "div" : "ul";
 
         const openAsModal =
             this.props.openAsModal || this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
@@ -152,7 +154,9 @@ class DropDown extends React.Component<IProps, IState> {
                                     />
                                 </header>
                             ) : null}
-                            <ul className={classNames("dropDownItems", classes.items)}>{this.props.children}</ul>
+                            <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                {this.props.children}
+                            </ContentTag>
                         </DropDownContents>
                     );
                 }}

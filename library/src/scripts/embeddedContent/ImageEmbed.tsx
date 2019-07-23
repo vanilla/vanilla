@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useEffect, useRef, useState, useLayoutEffect } from "react";
+import React, { RefObject, useEffect, useRef, useState, useLayoutEffect, useCallback } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
@@ -35,11 +35,12 @@ export function ImageEmbed(props: IProps) {
 
     const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
     const [isFocused, setIsFocused] = useState(false);
+    const [isOpen, setIsOpen] = useState(false); // For focus inside the modal/popup. It closes.
 
     const divRef = useRef<HTMLDivElement>(null);
 
     useFocusWatcher(contentRef, newFocusState => {
-        setIsFocused(newFocusState);
+        setIsFocused(newFocusState || isOpen);
     });
 
     return (
@@ -56,13 +57,13 @@ export function ImageEmbed(props: IProps) {
                     <img className="embedImage-img" src={props.url} alt={props.name} />
                 </div>
             </EmbedContent>
-            {/*{props.inEditor && isFocused && (*/}
-            <ImageEmbedMenu
-                saveImageMeta={props.saveImageMeta}
-                elementToFocusOnClose={extraProps.imageEmbedRef}
-                isFocused={isFocused}
-            />
-            {/*)}*/}
+            {props.inEditor && (isFocused || isOpen) && (
+                <ImageEmbedMenu
+                    saveImageMeta={props.saveImageMeta}
+                    elementToFocusOnClose={extraProps.imageEmbedRef}
+                    setIsOpen={setIsOpen}
+                />
+            )}
         </div>
     );
 }

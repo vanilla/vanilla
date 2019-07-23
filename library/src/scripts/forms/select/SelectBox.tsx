@@ -144,7 +144,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 <div className="selectBox-content">
                     <DropDown
                         id={this.state.id}
-                        className="selectBox-dropDown"
+                        className={classNames(
+                            "selectBox-dropDown",
+                            "dropDownItem-verticalPadding",
+                            classesDropDown.verticalPadding,
+                        )}
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
@@ -155,9 +159,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         openAsModal={this.props.openAsModal}
                         selfPadded={true}
                     >
-                        <div className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}>
-                            {selectItems}
-                        </div>
+                        {selectItems}
                     </DropDown>
                 </div>
             </div>

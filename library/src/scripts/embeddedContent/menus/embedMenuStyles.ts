@@ -5,10 +5,19 @@
  */
 
 import { keyframes, media } from "typestyle";
-import { ColorHelper, deg, percent, px, quote } from "csx";
+import { ColorHelper, deg, important, percent, px, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ContentProperty, DisplayProperty, PositionProperty } from "csstype";
-import { absolutePosition, debugHelper, defaultTransition, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    debugHelper,
+    defaultTransition,
+    fonts,
+    importantUnit,
+    margins,
+    paddings,
+    unit,
+} from "@library/styles/styleHelpers";
 import { styleFactory } from "@library/styles/styleUtils";
 import { layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
@@ -48,10 +57,26 @@ export const embedMenuClasses = () => {
         position: "relative",
     });
 
+    // Extra specific and defensive here because it's within userContent styles.
+    const paragraph = style("paragraph", {
+        ...paddings({
+            horizontal: 0,
+            vertical: importantUnit(globalVars.gutter.quarter),
+        }),
+        ...fonts({
+            weight: globalVars.fonts.weights.normal,
+            lineHeight: globalVars.lineHeights.base,
+            color: globalVars.meta.colors.fg,
+            size: globalVars.fonts.size.medium,
+            align: "left",
+        }),
+    });
+
     return {
         root,
         form,
         imageContainer,
         mediaQueries,
+        paragraph,
     };
 };

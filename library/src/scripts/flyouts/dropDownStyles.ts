@@ -312,15 +312,17 @@ export const dropDownClasses = useThemeCache(() => {
 
     const title = style("title", {
         ...fonts({
-            weight: globalVars.fonts.weights.semiBold as 400,
+            weight: globalVars.fonts.weights.semiBold,
             size: globalVars.fonts.size.medium,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         ...paddings({
-            top: 0,
-            right: 0,
-            bottom: 0,
+            all: 0,
         }),
+        ...margins({
+            all: 0,
+        }),
+        textAlign: "left",
         flexGrow: 1,
         color: colorOut(vars.title.color),
     });

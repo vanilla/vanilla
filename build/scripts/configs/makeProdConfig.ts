@@ -99,7 +99,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
     baseConfig.plugins!.push(new SourceMapDevToolPlugin({
         namespace: `vanilla-${section}`,
         filename: `sourcemaps/`.concat(Math.random().toString(36).slice(-5), '/', '[chunkhash]'),
-        publicPath: `/sourcemaps/${section}/`, // PHP-FPM will serve these files with some permission checks in StaticContentController.
+        publicPath: `/api/v2/sourcemaps/${section}/`,
     } as any));
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.

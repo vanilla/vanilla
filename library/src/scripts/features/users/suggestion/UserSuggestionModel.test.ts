@@ -182,22 +182,22 @@ describe("UserSuggestionModel", () => {
             });
         });
 
-        it("sorts users active in the last 90 days to the top with exact matches first", () => {
+        it.only("sorts users active in the last 90 days to the top with exact matches first", () => {
             const currentTime = moment();
             const data = [
-                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
+                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")),
             ];
 
             const expected = [
-                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
-                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")), // Capitalization doesn't matter. It's "exact".
+                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")), // Even though the accents are different these users are newer.
+                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
             ];
 
             expect(UserSuggestionModel.sortSuggestions(data, "start")).deep.eq(expected);

@@ -196,20 +196,42 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @param string $filename
      */
     private function getFileAsset(Addon $theme, string $filename): string {
-        $filename = basename($filename);
-        $fullFilename = $theme->path("/assets/{$filename}");
-        if (!file_exists($fullFilename)) {
-            throw new ServerException("Theme asset file does not exist: {$fullFilename}");
-        }
-        if (!is_readable($fullFilename)) {
-            throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-        }
-        $assetContent = file_get_contents($fullFilename);
-        if ($filename === 'variables.json') {
-            $assetContent = $this->addAddonVariables($assetContent);
+        $variablesAsset = ThemeModel::ASSET_LIST["variables"] ?? null;
+        if (is_array($variablesAsset) && $filename === ($variablesAsset["file"] ?? null)) {
+            $assetContent = $this->getVariablesFileAsset($theme);
+        } else {
+            $filename = basename($filename);
+            $fullFilename = $theme->path("/assets/{$filename}");
+            if (!file_exists($fullFilename)) {
+                throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+            }
+            if (!is_readable($fullFilename)) {
+                throw new ServerException("Unable to read theme asset file: {$fullFilename}");
+            }
+            $assetContent = file_get_contents($fullFilename);
         }
 
         return $assetContent;
+    }
+
+    private function getVariablesFileAsset(Addon $theme): string {
+        $variablesAsset = ThemeModel::ASSET_LIST["variables"] ?? null;
+        if (!array($variablesAsset) || !array_key_exists("file", $variablesAsset) || !is_string($variablesAsset["file"])) {
+            return "";
+        }
+
+        $filename = basename($variablesAsset["file"]);
+        $fullFilename = $theme->path("/assets/{$filename}");
+        $themeVariables = [];
+        if (file_exists($fullFilename) && is_readable($fullFilename)) {
+            $fileContent = json_decode(file_get_contents($fullFilename), true);
+            if (is_array($fileContent)) {
+                $themeVariables = $fileContent;
+            }
+        }
+
+        $result = $this->addAddonVariables(json_encode($themeVariables));
+        return $result;
     }
 
     /**
@@ -224,7 +246,9 @@ class FsThemeProvider implements ThemeProviderInterface {
         $theme = $this->getThemeByName($themeKey);
         $assets = $this->getAssets($themeKey);
 
-        if (array_key_exists($assetKey, $assets)) {
+        if ($assetKey === "variables") {
+            return $this->getFileAsset($theme, ThemeModel::ASSET_LIST["variables"]["file"]);
+        } elseif (array_key_exists($assetKey, $assets)) {
             return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]['file']);
         } else {
             throw new NotFoundException("Asset");
@@ -241,6 +265,12 @@ class FsThemeProvider implements ThemeProviderInterface {
     private function getAssets(string $id): array {
         $theme = $this->getThemeByName($id);
         $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, []);
+
+        // Addons can potentially add variables, so always include this asset.
+        if (array_key_exists("variables", ThemeModel::ASSET_LIST)) {
+            $assets["variables"] = ThemeModel::ASSET_LIST["variables"];
+        }
+
         return $assets;
     }
 }

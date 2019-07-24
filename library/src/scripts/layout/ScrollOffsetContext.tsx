@@ -179,7 +179,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         this.setState({ scrollOffset: offset });
     };
 
-    private getCalcedHashOffset(): number {
+    private getCalcedHashOffset = (): number => {
         const offsetElement = this.hashOffsetRef.current;
         if (!offsetElement) {
             return 0;
@@ -187,7 +187,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
 
         const rect = offsetElement.getBoundingClientRect();
         return rect.bottom;
-    }
+    };
 }
 
 export function useScrollOffset() {

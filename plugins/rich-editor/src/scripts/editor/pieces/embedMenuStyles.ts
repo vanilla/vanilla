@@ -39,7 +39,7 @@ export const embedMenuMediaQueries = useThemeCache(() => {
     };
 });
 
-export const embedMenuClasses = () => {
+export const embedMenuClasses = useThemeCache(() => {
     const style = styleFactory("imageEmbedMenu");
     const embedVars = embedContainerVariables();
     const globalVars = globalVariables();
@@ -78,7 +78,7 @@ export const embedMenuClasses = () => {
         }),
     });
 
-    const mediaQueriesEmbed = embedMenuClasses().mediaQueries();
+    const mediaQueriesEmbed = embedMenuMediaQueries();
 
     const menuTransformWithGutter = unit(globalVars.buttonIcon.size);
     const menuTransformWithoutGutter = unit((globalVars.buttonIcon.size - globalVars.icon.sizes.default) / 2);
@@ -105,4 +105,4 @@ export const embedMenuClasses = () => {
         verticalPadding,
         embedMetaDataMenu,
     };
-};
+});

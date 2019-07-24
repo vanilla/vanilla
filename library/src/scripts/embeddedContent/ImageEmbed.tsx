@@ -10,6 +10,7 @@ import { IImageMeta, ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbe
 import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -39,22 +40,24 @@ export function ImageEmbed(props: IProps) {
     });
 
     return (
-        <div className="embedExternal-content" style={{ position: "relative" }} ref={setContentRef}>
-            <EmbedContent type="Image" noBaseClass inEditor={props.inEditor}>
-                <div
-                    ref={divRef}
-                    className={classNames(
-                        "embedImage-link",
-                        "u-excludeFromPointerEvents",
-                        embedMenuClasses().imageContainer,
-                    )}
-                >
-                    <img className="embedImage-img" src={props.url} alt={props.name} />
-                </div>
-            </EmbedContent>
-            {props.inEditor && (isFocused || isOpen) && (
-                <ImageEmbedMenu saveImageMeta={props.saveImageMeta} setIsOpen={setIsOpen} />
-            )}
-        </div>
+        <DeviceProvider>
+            <div className="embedExternal-content" style={{ position: "relative" }} ref={setContentRef}>
+                <EmbedContent type="Image" noBaseClass inEditor={props.inEditor}>
+                    <div
+                        ref={divRef}
+                        className={classNames(
+                            "embedImage-link",
+                            "u-excludeFromPointerEvents",
+                            embedMenuClasses().imageContainer,
+                        )}
+                    >
+                        <img className="embedImage-img" src={props.url} alt={props.name} />
+                    </div>
+                </EmbedContent>
+                {props.inEditor && (isFocused || isOpen) && (
+                    <ImageEmbedMenu saveImageMeta={props.saveImageMeta} setIsOpen={setIsOpen} />
+                )}
+            </div>
+        </DeviceProvider>
     );
 }

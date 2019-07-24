@@ -214,10 +214,16 @@ class FsThemeProvider implements ThemeProviderInterface {
         return $assetContent;
     }
 
+    /**
+     * Special handling for the variables asset. Retrieve the file contents, if available. Merge in any addon variables.
+     *
+     * @param Addon $theme
+     * @return string
+     */
     private function getVariablesFileAsset(Addon $theme): string {
         $variablesAsset = ThemeModel::ASSET_LIST["variables"] ?? null;
         if (!array($variablesAsset) || !array_key_exists("file", $variablesAsset) || !is_string($variablesAsset["file"])) {
-            return "";
+            return json_encode([]);
         }
 
         $filename = basename($variablesAsset["file"]);

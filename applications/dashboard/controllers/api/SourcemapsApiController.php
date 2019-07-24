@@ -5,11 +5,24 @@
  */
 
 use Garden\Web\Data;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * API Controller to deliver source map files for compiled static resources: js, css.
  */
 class SourcemapsApiController extends AbstractApiController {
+    /**
+     * @var ConfigurationInterface
+     */
+    private $config;
+
+    /**
+     * SourcemapsApiController constructor.
+     * @param ConfigurationInterface $config
+     */
+    public function __construct(ConfigurationInterface $config) {
+        $this->config = $config;
+    }
 
     /**
      * Get source map.
@@ -18,15 +31,17 @@ class SourcemapsApiController extends AbstractApiController {
      * @return Data
      */
     public function get(string $path): Data {
-        $sourceMapsEnabled = Gdn::config()->get(
+        $this->permission();
+        $sourceMapsEnabled = $this->config->get(
             'Garden.Security.SourceMaps.Enabled',
-            Gdn::config()->get('Debug')
+            $this->config->get('Debug')
         );
 
         $result = new Data('');
         if ($sourceMapsEnabled) {
-            $fullPath = PATH_ROOT.DS.'dist'.DS.$path;
-            if (is_file($fullPath)) {
+            $fullPath = PATH_ROOT.DS.'dist'.DS.ltrim($path, '/');
+            $realPath  = realpath($fullPath);
+            if ($fullPath === $realPath) {
                 $result->setData(file_get_contents($fullPath));
             } else {
                 $result->setData(t('File not found.').' '.$path);

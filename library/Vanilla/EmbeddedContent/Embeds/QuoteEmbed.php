@@ -29,9 +29,19 @@ class QuoteEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     public function normalizeData(array $data): array {
+        $data = EmbedUtils::remapProperties($data, [
+            'name' => 'attributes.name',
+            'bodyRaw' => 'attributes.bodyRaw',
+            'format' => 'attributes.format',
+            'dateInserted' => 'attributes.dateInserted',
+            'insertUser' => 'attributes.insertUser',
+            'discussionID' => 'attributes.discussionID',
+            'commentID' => 'attributes.commentID',
+        ]);
+
         // Handle the IDs
-        $discussionID = $data['attributes']['discussionID'] ?? null;
-        $commentID = $data['attributes']['commentID'] ?? null;
+        $discussionID = $data['discussionID'] ?? null;
+        $commentID = $data['commentID'] ?? null;
 
         if ($discussionID !== null) {
             $data['recordID'] = $discussionID;
@@ -40,14 +50,6 @@ class QuoteEmbed extends AbstractEmbed {
             $data['recordID'] = $commentID;
             $data['recordType'] = 'comment';
         }
-
-        $data = EmbedUtils::remapProperties($data, [
-            'name' => 'attributes.name',
-            'bodyRaw' => 'attributes.bodyRaw',
-            'format' => 'attributes.format',
-            'dateInserted' => 'attributes.dateInserted',
-            'insertUser' => 'attributes.insertUser',
-        ]);
 
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {

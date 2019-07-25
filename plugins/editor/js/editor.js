@@ -32,7 +32,7 @@
         var stylesheetsInclude = [assets + '/design/editor.css?v=' + editorVersion];
 
          // If you want to include a custom stylesheet inside the iFram of the wysiwyg
-        stylesheetsInclude.push(assets + '/design/editorStyles.css?v=' + editorVersion);
+        stylesheetsInclude.push(assets + '/design/editorWysiwyg.css?v=' + editorVersion);
 
 
         // Some communities may want to modify just the styling of the Wysiwyg

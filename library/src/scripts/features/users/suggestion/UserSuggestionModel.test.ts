@@ -182,7 +182,7 @@ describe("UserSuggestionModel", () => {
             });
         });
 
-        it.only("sorts users active in the last 90 days to the top with exact matches first", () => {
+        it("sorts users active in the last 90 days to the top with exact matches first", () => {
             const currentTime = moment();
             const data = [
                 makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),

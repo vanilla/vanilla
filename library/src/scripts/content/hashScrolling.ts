@@ -8,14 +8,14 @@ import { useCallback, useEffect } from "react";
 import { initAllUserContent } from "@library/content/index";
 
 export function useHashScrolling() {
-    const offset = useScrollOffset();
-    const calcedOffset = offset.getCalcedHashOffset();
+    const { temporarilyDisabledWatching, getCalcedHashOffset } = useScrollOffset();
+    const calcedOffset = getCalcedHashOffset();
 
     useEffect(() => {
         void initAllUserContent().then(() => {
-            initHashScrolling(calcedOffset, () => offset.temporarilyDisabledWatching(500));
+            initHashScrolling(calcedOffset, () => temporarilyDisabledWatching(500));
         });
-    }, [calcedOffset, offset]);
+    }, [calcedOffset, temporarilyDisabledWatching]);
 }
 
 export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () => void) {

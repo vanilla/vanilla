@@ -393,16 +393,32 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
+        $fileName = $body['file']->getClientFilename();
+        $fileSize = $body['file']->getSize();
+        $fileTmp = $body['file']->getfile();
         $imageExtensions = array_keys(ImageResizer::getExtType());
-        /** @var UploadedFile $file */
-        $file = $body['file'];
-        $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION) ?? '';
+        $extension = pathinfo(strtolower($fileName), PATHINFO_EXTENSION) ?? '';
         $type = in_array($extension, $imageExtensions) ? self::TYPE_IMAGE : self::TYPE_FILE;
+        $destination = $this->generateUploadPath($extension, true);
+        if ($type && $type === 'image') {
+            $row = Gdn_UploadImage::saveImageAs($fileTmp, $destination);
+        }
 
-        $row = $this->doUpload($body['file'], $type);
-
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
+        $media = [
+            'Name' => $fileName,
+            'Type' => $type,
+            'Size' => $fileSize,
+            'ImageWidth' => $row ? $row['Width'] : '',
+            'ImageHeight' => $row ? $row['Height'] : '',
+            'Path' => $destination,
+            'ForeignID' => $this->getSession()->UserID,
+            'ForeignTable' => 'embed'
+        ];
+        $mediaID = $this->mediaModel->save($media);
+        $this->validateModel($this->mediaModel);
+        $mediaArray = $this->mediaByID($mediaID);
+        $result = $this->normalizeOutput($mediaArray);
+        $result = $out->validate($result);
         return $result;
     }
 

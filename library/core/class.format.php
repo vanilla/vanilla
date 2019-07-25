@@ -1279,22 +1279,6 @@ class Gdn_Format {
     }
 
     /**
-     * Get the event manager.
-     *
-     * The event manager should only be used by the formatter itself so leave this private.
-     *
-     * @return EventManager Returns the eventManager.
-     */
-    private static function getEventManager() {
-        if (self::$eventManager === null) {
-            global $dic;
-            static::$eventManager = $dic->get(EventManager::class);
-        }
-
-        return self::$eventManager;
-    }
-
-    /**
      * Formats BBCode list items.
      *
      * @param array $matches

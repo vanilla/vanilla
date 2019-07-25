@@ -10,6 +10,8 @@
  * @since 2.2
  */
 
+use \Vanilla\Formatting\FormatUtil;
+
 /**
  * Interpreting Emoji emoticons.
  */
@@ -590,7 +592,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::replaceButProtectCodeBlocks(
+                $text = FormatUtil::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text
@@ -603,7 +605,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = FormatUtil::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {

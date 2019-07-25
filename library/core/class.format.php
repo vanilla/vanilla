@@ -13,6 +13,9 @@
 
 use Garden\EventManager;
 use \Vanilla\Formatting;
+use \Vanilla\Formatting\Formats;
+use \Vanilla\Formatting\FormatUtil;
+use \Vanilla\Formatting\Html;
 
 /**
  * Output formatter.
@@ -1231,7 +1234,7 @@ class Gdn_Format {
             $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
-        $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+        $mixed = FormatUtil::replaceButProtectCodeBlocks(
             $regex,
             $linksCallback,
             $mixed,
@@ -1751,7 +1754,7 @@ EOT;
 
             // Handle #hashtag searches
             if (c('Garden.Format.Hashtags')) {
-                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+                $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
                     $mixed
@@ -1760,7 +1763,7 @@ EOT;
 
             // Handle "/me does x" action statements
             if (c('Garden.Format.MeActions')) {
-                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+                $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
                     $mixed

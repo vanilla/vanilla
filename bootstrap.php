@@ -315,10 +315,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule(Vanilla\Formatting\FormatService::class)
-    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, new Reference(Formats\RichFormat::class)])
-    ->addCall('registerFormat', [Formats\HtmlFormat::FORMAT_KEY, new Reference(Formats\HtmlFormat::class)])
-    ->addCall('registerFormat', [Formats\BBCodeFormat::FORMAT_KEY, new Reference(Formats\BBCodeFormat::class)])
-    ->addCall('registerFormat', [Formats\MarkdownFormat::FORMAT_KEY, new Reference(Formats\MarkdownFormat::class)])
+    ->addCall('registerBuiltInFormats')
     ->setShared(true)
 
     ->rule(\Vanilla\Analytics\Client::class)

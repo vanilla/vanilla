@@ -35,14 +35,29 @@ class FormatService {
     }
 
     /**
+     * Register vanilla's built-in formats.
+     *
+     * @param Container $dic
+     */
+    public function registerBuiltInFormats(Container $dic) {
+        $this->registerFormat(Formats\RichFormat::FORMAT_KEY, $dic->get(Formats\RichFormat::class))
+            ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, $dic->get(Formats\HtmlFormat::class))
+            ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, $dic->get(Formats\BBCodeFormat::class))
+            ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, $dic->get(Formats\MarkdownFormat::class));
+    }
+
+    /**
      * Register a format type and the class name handles it.
      *
      * @param string $formatKey
      * @param FormatInterface $format
+     *
+     * @return $this For method chaining.
      */
-    public function registerFormat(string $formatKey, FormatInterface $format) {
+    public function registerFormat(string $formatKey, FormatInterface $format): FormatService {
         $formatKey = strtolower($formatKey);
         $this->formats[$formatKey] = $format;
+        return $this;
     }
 
     /**

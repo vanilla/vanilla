@@ -19,7 +19,7 @@ class NotFoundFormat implements FormatInterface {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
-    const ERROR_VIEW_LOCATION = 'resources/userContentError';
+    const ERROR_VIEW_LOCATION = 'resources/views/userContentError.twig';
 
     /** @var string */
     private $searchedFormat;
@@ -67,7 +67,7 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function filter(string $content) {
+    public function filter(string $content): string {
         throw new FormatterNotFoundException($this->getErrorMessage());
     }
 

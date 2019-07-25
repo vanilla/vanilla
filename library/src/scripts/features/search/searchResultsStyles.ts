@@ -243,6 +243,7 @@ export const searchResultClasses = useThemeCache(() => {
     const excerpt = style("excerpt", {
         marginTop: unit(12),
         color: colorOut(vars.excerpt.fg),
+        lineHeight:  globalVars.lineHeights.excerpt
     });
 
     return {

@@ -39,7 +39,7 @@ class LegacyEmbedReplacer {
      * @return string The embed code for the given url.
      */
     public function replaceUrl(string $url) {
-        if ($this->embedConfig->areEmbedsEnabled()) {
+        if (!$this->embedConfig->areEmbedsEnabled()) {
             return '';
         }
 

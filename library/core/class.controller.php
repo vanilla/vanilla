@@ -12,6 +12,7 @@
  * @abstract
  */
 
+use Vanilla\Utility\ContainerUtils as ContainerUtilsAlias;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
@@ -288,9 +289,10 @@ class Gdn_Controller extends Gdn_Pluggable {
         parent::__construct();
         $this->ControllerName = strtolower($this->ClassName);
 
-        // Add current theme path to GDN object
-        $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
-        $this->addDefinition('currentThemePath', $themeInfo["Dir"]);
+        /** Addon $currentTheme */
+        $currentTheme = Gdn::getContainer()->get('ThemeManager')->getThemeInfo($this->Theme);
+        $this->addDefinition('currentThemePath', $currentTheme["Dir"]);
+
     }
 
     /**

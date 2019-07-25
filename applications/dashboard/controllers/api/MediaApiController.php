@@ -400,7 +400,7 @@ class MediaApiController extends AbstractApiController {
         $extension = pathinfo(strtolower($fileName), PATHINFO_EXTENSION) ?? '';
         $type = in_array($extension, $imageExtensions) ? self::TYPE_IMAGE : self::TYPE_FILE;
         $destination = $this->generateUploadPath($extension, true);
-        if ($type && $type === 'image') {
+        if ($type === 'image') {
             $row = Gdn_UploadImage::saveImageAs($fileTmp, $destination);
         }
 

@@ -25,7 +25,7 @@ class QuoteEmbedTest extends ContainerTestCase {
         parent::setUp();
         $container = \Gdn::getContainer();
         $container->rule(FormatService::class)
-            ->addCall('registerFormat', [RichFormat::FORMAT_KEY, RichFormat::class]);
+            ->addCall('registerFormat', [RichFormat::FORMAT_KEY, $container->get(RichFormat::class)]);
     }
 
     /**

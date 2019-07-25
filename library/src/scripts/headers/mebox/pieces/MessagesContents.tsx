@@ -19,13 +19,13 @@ import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownIt
 import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
-import { compose } from "redux";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
+import { compose } from "@library/icons/header";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -56,7 +56,7 @@ export class MessagesContents extends React.Component<IProps> {
                         <LinkAsButton
                             className={classNames(buttonUtils.pushLeft)}
                             to={"/messages/inbox"}
-                            baseClass={ButtonTypes.TEXT}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
                         >
                             {t("All Messages")}
                         </LinkAsButton>

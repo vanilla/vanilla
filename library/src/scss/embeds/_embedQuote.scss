@@ -104,6 +104,12 @@ $embedQuote-toggleButton_padding  : 12px !default;
 .embedQuote-body {
     display: block;
     margin: 0;
+
+    // Cleanup blockquote element styling in firefox.
+    &::before,
+    &::after {
+        content: initial;
+    }
 }
 
 .embedQuote-metaLink {

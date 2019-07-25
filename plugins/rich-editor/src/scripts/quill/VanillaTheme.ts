@@ -10,6 +10,7 @@ import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
+import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */
@@ -48,6 +49,9 @@ export default class VanillaTheme extends ThemeBase {
         // Attaches the markdown keyboard listener.
         const markdownModule = new MarkdownModule(this.quill);
         markdownModule.registerHandler();
+
+        // Create the newline insertion module.
+        void new NewLineClickInsertionModule(this.quill);
     }
 
     /**

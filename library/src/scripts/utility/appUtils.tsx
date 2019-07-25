@@ -298,10 +298,17 @@ export function _executeReady(): Promise<any[]> {
  * This is similar to onReady() but also includes content that is added dynamically (ex. AJAX).
  * Note that this function is meant to bridge the non-react parts of the application with react.
  *
- * @param {function} callback - The callback to execute.
+ * @param callback - The callback to execute.
  */
-export function onContent(callback) {
+export function onContent(callback: (event: CustomEvent) => void) {
     document.addEventListener("X-DOMContentReady", callback);
+}
+
+/**
+ * Remove a listener registered with `onContent`.
+ */
+export function removeOnContent(callback: (event: CustomEvent) => void) {
+    document.removeEventListener("X-DOMContentReady", callback);
 }
 
 /**

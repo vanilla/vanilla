@@ -168,6 +168,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         position: "relative",
         whiteSpace: important("pre-wrap"),
         outline: 0,
+        paddingBottom: 24, // So the user has room to click.
         $nest: {
             // When the editor is empty we should be displaying a placeholder.
             "&.ql-blank::before": {

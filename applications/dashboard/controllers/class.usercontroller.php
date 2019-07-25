@@ -1224,7 +1224,9 @@ class UserController extends DashboardController {
 
         // First, set the field value.
         Gdn::userModel()->setField($UserID, 'Verified', $Verified);
-
+        // Send the current $verified value to userVerified.
+        $User = (object)$User;
+        $User->Verified = $Verified;
         // Send back the verified button.
         require_once $this->fetchViewLocation('helper_functions', 'Profile', 'Dashboard');
         $this->jsonTarget('.User-Verified', userVerified($User), 'ReplaceWith');

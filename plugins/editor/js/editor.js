@@ -31,9 +31,6 @@
 
         var stylesheetsInclude = [assets + '/design/editor.css?v=' + editorVersion];
 
-         // If you want to include a custom stylesheet inside the iFram of the wysiwyg
-        stylesheetsInclude.push(assets + '/design/editorWysiwyg.css?v=' + editorVersion);
-
 
         // Some communities may want to modify just the styling of the Wysiwyg
         // while editing, so this file will let them.
@@ -41,6 +38,9 @@
         if (editorWysiwygCSS != '') {
             stylesheetsInclude.push(editorWysiwygCSS + '?v=' + editorVersion);
         }
+
+        // If you want to include a custom stylesheet inside the iFram of the wysiwyg
+        stylesheetsInclude.push(gdn.meta.currentThemePath + '/design/editorWysiwyg.css?v=' + editorVersion);
 
         /**
          * Fullpage actions--available to all editor views on page load.

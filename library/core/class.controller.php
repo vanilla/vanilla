@@ -287,6 +287,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         parent::__construct();
         $this->ControllerName = strtolower($this->ClassName);
+
+        // Add current theme path to GDN object
+        $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
+        $this->addDefinition('currentThemePath', $themeInfo["Dir"]);
     }
 
     /**

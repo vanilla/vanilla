@@ -15,11 +15,11 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { resetQuillContent, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import classNames from "classnames";
-import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
+import { IAutoHighlightResult } from "highlight.js";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -49,6 +49,29 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
+let hljs: any;
+
+/**
+ * Use a dynamically imported highlight.js to highlight text synchronously.
+ *
+ * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
+ * but until then we need this hack.60FPS
+ *
+ * - If hljs is loaded, run it.
+ * - Otherwise return the text back and start loading hljs.
+ */
+function highLightText(text: string): IAutoHighlightResult | string {
+    if (!hljs) {
+        void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
+            hljs = imported.default;
+            hljs.highlightAuto(text).value;
+        });
+        return text;
+    } else {
+        return hljs.highlightAuto(text).value;
+    }
+}
+
 /**
  * Manage and construct a quill instance ot some ref.
  *
@@ -64,7 +87,7 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
             theme: "vanilla",
             modules: {
                 syntax: {
-                    highlight: text => hljs.highlightAuto(text).value,
+                    highlight: highLightText,
                 },
             },
         };

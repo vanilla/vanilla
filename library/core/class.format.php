@@ -1308,11 +1308,11 @@ class Gdn_Format {
     /**
      * Returns embedded video width and height, based on configuration.
      *
-     * @deprecated 3.2 \Vanilla\EmbeddedContent\Embedconfig::getLegacyEmbedSize()
+     * @deprecated 3.2 \Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()
      * @return array array(Width, Height)
      */
     public static function getEmbedSize() {
-        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\Embedconfig::getLegacyEmbedSize()');
+        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()');
         return self::getEmbedConfig()->getLegacyEmbedSize();
     }
 

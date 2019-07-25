@@ -43,7 +43,7 @@ class LegacyEmbedReplacer {
             return '';
         }
 
-        list($width, $height) = Gdn_Format::getEmbedSize();
+        list($width, $height) = $this->embedConfig->getLegacyEmbedSize();
 
         $urlParts = parse_url($url);
         parse_str($urlParts['query'] ?? '', $query);
@@ -85,15 +85,14 @@ class LegacyEmbedReplacer {
                 // https://www.youtube.com/watch?v=sjm_gBpJ63k&list=PL4CFF79651DB8159B&index=1
                 // http://youtu.be/sjm_gBpJ63k
                 // https://www.youtube.com/watch?v=sjm_gBpJ63k
-                // http://YOUTU.BE/sjm_gBpJ63k?list=PL4CFF79651DB8159B
                 // http://youtu.be/GUbyhoU81sQ?t=1m8s
                 // https://m.youtube.com/watch?v=iAEKPcz9www
                 // https://youtube.com/watch?v=iAEKPcz9www
                 // https://www.youtube.com/watch?v=p5kcBxL7-qI
                 // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
 
-                $videoId = $matches['videoId'];
-                $listId = $matches['listId'];
+                $videoId = $matches['videoId'] ?? false;
+                $listId = $matches['listId'] ?? false;
 
                 if (!empty($listId)) {
                     // Playlist.
@@ -267,7 +266,7 @@ EOT;
                 break;
 
             case 'Wistia':
-                if (!$matches['videoID']) {
+                if (!($matches['videoID'] ?? false)) {
                     break;
                 }
                 $wistiaClass = "wistia_embed wistia_async_{$matches['videoID']} videoFoam=true allowThirdParty=false";

@@ -1268,6 +1268,15 @@ class Gdn_Format {
         }
     }
 
+
+    /**
+     * @return \Vanilla\EmbeddedContent\EmbedConfig
+     */
+    private static function getEmbedConfig(): \Vanilla\EmbeddedContent\EmbedConfig {
+        $embedReplacer = Gdn::getContainer()->get(\Vanilla\EmbeddedContent\EmbedConfig::class);
+        return $embedReplacer;
+    }
+
     /**
      * Get an instance of the legacy embed replacer.
      *
@@ -1299,36 +1308,12 @@ class Gdn_Format {
     /**
      * Returns embedded video width and height, based on configuration.
      *
+     * @deprecated 3.2 \Vanilla\EmbeddedContent\Embedconfig::getLegacyEmbedSize()
      * @return array array(Width, Height)
      */
     public static function getEmbedSize() {
-        $sizes = [
-            'tiny' => [400, 225],
-            'small' => [560, 340],
-            'normal' => [640, 385],
-            'big' => [853, 505],
-            'huge' => [1280, 745]];
-        $size = Gdn::config('Garden.Format.EmbedSize', 'normal');
-
-        // We allow custom sizes <Width>x<Height>
-        if (!isset($sizes[$size])) {
-            if (strpos($size, 'x')) {
-                list($width, $height) = explode('x', $size);
-                $width = intval($width);
-                $height = intval($height);
-
-                // Dimensions are too small, or 0
-                if ($width < 30 or $height < 30) {
-                    $size = 'normal';
-                }
-            } else {
-                $size = 'normal';
-            }
-        }
-        if (isset($sizes[$size])) {
-            list($width, $height) = $sizes[$size];
-        }
-        return [$width, $height];
+        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\Embedconfig::getLegacyEmbedSize()');
+        return self::getEmbedConfig()->getLegacyEmbedSize();
     }
 
     /**

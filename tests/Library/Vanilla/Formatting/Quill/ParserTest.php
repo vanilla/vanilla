@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineTerminatorBlot;
@@ -15,6 +17,7 @@ use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\NullBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
+use VanillaTests\Fixtures\EmbeddedContent\EmbedFixtures;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Parser;
 
@@ -309,7 +312,7 @@ class ParserTest extends SharedBootstrapTestCase {
         $result = [[["class" => HeadingTerminatorBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
 
-        $ops = [["attributes" => ["header" => 5], "content" => "\n"]];
+        $ops = [["attributes" => ["header" => 10], "content" => "\n"]];
         $result = [[["class" => NullBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
     }
@@ -348,13 +351,30 @@ class ParserTest extends SharedBootstrapTestCase {
             ["insert" => "\n"],
             $this->makeMention("@mentionInABlockquote"),
             ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+            ["insert" => "\n"],
+
+            // Comment and discussion quotes send a notification.
+            EmbedFixtures::embedInsert(EmbedFixtures::discussion("discussionUser")),
+            EmbedFixtures::embedInsert(EmbedFixtures::comment("commentUser")),
+
+            // No duplication should happen.
+            $this->makeMention("duplicate"),
+            $this->makeMention("duplicate"),
         ];
 
         $expectedUsernames = [
             "realMention",
             "Some Other meénetioön 🙃",
             "realMention$$.asdf Number 2",
+            "discussionUser",
+            "commentUser",
+            "duplicate"
         ];
+
+        // Make sure the quote embed is registered.
+        /** @var EmbedService $embedService */
+        $embedService = \Gdn::getContainer()->get(EmbedService::class);
+        $embedService->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE);
 
         /** @var Parser $parser */
         $parser = \Gdn::getContainer()->get(Parser::class);
@@ -362,6 +382,12 @@ class ParserTest extends SharedBootstrapTestCase {
         $this->assertSame($expectedUsernames, $actualUsernames);
     }
 
+    /**
+     * Make a mention of a user.
+     *
+     * @param string $name
+     * @return array
+     */
     private function makeMention(string $name) {
         return ["insert" => [
             "mention" => [

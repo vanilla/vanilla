@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Addon;
 
 /**
  * A class for gathering particular data about the site.
@@ -40,14 +41,24 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $localeKey;
 
+    /** @var Addon */
+    private $activeTheme;
+
+    /** @var string */
+    private $favIcon;
+
+    /** @var string */
+    private $mobileAddressBarColor;
+
     /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param \Gdn_Locale $locale
+     * @param Addon $activeTheme
      */
-    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config, \Gdn_Locale $locale) {
+    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config, \Gdn_Locale $locale, Addon $activeTheme) {
         $this->host = $request->getHost();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -68,6 +79,15 @@ class SiteMeta implements \JsonSerializable {
 
         // localization
         $this->localeKey = $locale->current();
+
+        // Theming
+        $this->activeTheme = $activeTheme;
+
+        if ($favIcon = $config->get("Garden.FavIcon")) {
+            $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
 
     /**
@@ -91,6 +111,9 @@ class SiteMeta implements \JsonSerializable {
             'ui' => [
                 'siteName' => $this->siteTitle,
                 'localeKey' => $this->localeKey,
+                'themeKey' => $this->activeTheme->getKey(),
+                'favIcon' => $this->favIcon,
+                'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,
@@ -153,5 +176,30 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getLocaleKey(): string {
         return $this->localeKey;
+    }
+
+    /**
+     * @return Addon
+     */
+    public function getActiveTheme(): Addon {
+        return $this->activeTheme;
+    }
+
+    /**
+     * Get the configured "favorite icon" for the site.
+     *
+     * @return string|null
+     */
+    public function getFavIcon(): ?string {
+        return $this->favIcon;
+    }
+
+    /**
+     * Get the configured "theme color" for the site.
+     *
+     * @return string|null
+     */
+    public function getMobileAddressBarColor(): ?string {
+        return $this->mobileAddressBarColor;
     }
 }

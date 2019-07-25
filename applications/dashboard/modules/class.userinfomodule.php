@@ -42,6 +42,7 @@ class UserInfoModule extends Gdn_Module {
         if (!checkPermission('Garden.PersonalInfo.View')) {
             $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
         }
+        $this->setData('_canViewPersonalInfo', Gdn::session()->UserID === $this->User->UserID || gdn::session()->checkPermission('Garden.PersonalInfo.View'));
     }
 
     public function toString() {

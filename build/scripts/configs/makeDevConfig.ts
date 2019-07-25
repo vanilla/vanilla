@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { Configuration } from "webpack";
+import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
 import { getOptions } from "../options";
@@ -21,15 +21,18 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = sectionEntries;
-    baseConfig.devtool = "cheap-module-eval-source-map";
+    baseConfig.devtool = "eval-source-map";
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `http://${options.devIp}:3030/`,
     };
     baseConfig.optimization = {
+        namedModules: true,
+        namedChunks: true,
         splitChunks: false,
     };
+    baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
 
     return baseConfig;
 }

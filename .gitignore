@@ -3,6 +3,7 @@
 !/applications/dashboard/
 !/applications/vanilla/
 /build/*
+!/build/.storybook
 !/build/entries
 !/build/scripts
 !/build/tsconfig.json
@@ -28,7 +29,7 @@
 !/plugins/ButtonBar/
 !/plugins/Debugger/
 !/plugins/editor/
-!/plugins/EmojiExtender/
+!/plugins/emojiextender/
 !/plugins/Facebook/
 !/plugins/Flagging/
 !/plugins/GettingStarted/
@@ -63,6 +64,7 @@
 !/themes/mobile/
 !/themes/theme-boilerplate/
 !/themes/keystone/
+!/themes/theme-api-test/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*
@@ -91,5 +93,6 @@ npm-debug.log
 /cgi-bin/
 phpunit.xml
 yarn-error.log
+lerna-debug.log
 git-diff.txt
 phpcs-diff.json

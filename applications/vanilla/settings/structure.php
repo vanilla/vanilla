@@ -212,7 +212,7 @@ $Construct
     ->column('InsertIPAddress', 'ipaddress', true)
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('Flag', 'tinyint', 0)
-    ->column('Score', 'float', null)
+    ->column('Score', 'float', null, ['index'])
     ->column('Attributes', 'text', true)
     //->column('Source', 'varchar(20)', true)
     ->set($Explicit, $Drop);

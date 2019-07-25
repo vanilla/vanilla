@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import React from "react";
 import { Link } from "react-router-dom";
 

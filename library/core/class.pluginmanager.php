@@ -20,6 +20,8 @@ use Vanilla\AddonManager;
  *
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
+ *
+ * @deprecated 3.0 - Use Vanilla\AddonManager.
  */
 class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
@@ -329,11 +331,12 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             }
 
             if ($screenshot = $addon->getIcon(Addon::PATH_ADDON)) {
-                if (basename($screenshot) === 'mobile.png') {
-                    $info['MobileScreenshotUrl'] = $screenshot;
-                } else {
-                    $info['ScreenshotUrl'] = $screenshot;
-                }
+                $info['ScreenshotUrl'] = $screenshot;
+            }
+
+            $mobileIcon = 'mobile.png';
+            if (file_exists($addon->path('mobile.png'))) {
+                $info['MobileScreenshotUrl'] = $addon->path($mobileIcon, Addon::PATH_ADDON);
             }
         }
 

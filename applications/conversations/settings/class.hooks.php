@@ -8,10 +8,23 @@
  * @since 2.0
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+
 /**
  * Handles hooks into Dashboard and Vanilla.
  */
 class ConversationsHooks implements Gdn_IPlugin {
+    /**
+     * Handle the container init event to register things with the container.
+     *
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        $dic->rule(\Vanilla\Menu\CounterModel::class)
+            ->addCall('addProvider', [new Reference(ConversationCounterProvider::class)])
+        ;
+    }
 
     /**
      *

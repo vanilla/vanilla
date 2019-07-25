@@ -3,9 +3,12 @@
  * @license GPL-2.0-only
  */
 
+$richEditor_horizontalPadding                     : 36px !default;
+$richEditor_verticalPadding                       : 12px !default;
+$richEditor_innerPadding                          : 12px !default;
+
 .richEditor {
     color: $global-color_fg;
-    padding-left: $richEditor_horizontalPadding;
 
     blockquote {
         display: block;
@@ -14,6 +17,26 @@
 
     .richEditorParagraphMenu {
         left: 0;
+    }
+
+    &.isDisabled { // Before React has replaced initial HTML
+        &,
+        .richEditor-button {
+            cursor: progress !important;
+        }
+    }
+
+    .ReactVirtualized__Grid {
+        min-width: 252px;
+    }
+
+    .richEditor-menuItems {
+        border-bottom: 0;
+    }
+
+    .richEditor-frame {
+        height: initial;
+        min-height: 275px;
     }
 }
 
@@ -84,12 +107,12 @@
         width: calc(100% + #{$meta_spacing * 2});
         overflow: hidden;
         text-align: left;
-    
+
         margin: {
             left: -#{$meta_spacing};
             right: $meta_spacing;
         }
-    
+
         &.isFlexed {
             display: flex;
             flex-wrap: wrap;
@@ -103,11 +126,11 @@
         margin: 0 $meta_spacing;
         font-size: $metaText_fontSize;
         color: $metas_color;
-    
+
         .meta {
             margin: 0;
         }
-    }    
+    }
 }
 
 .richEditor-menu {
@@ -133,6 +156,19 @@ body.hasRichEditor {
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
+    }
+    .richEditor {
+        .buttonClose {
+            appearance: none;
+            border: 0;
+        }
+
+        .spoiler {
+            .iconButton {
+                justify-content: center;
+                display: flex;
+            }
+        }
     }
 }
 
@@ -272,6 +308,7 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
+    min-height: 200px;
     padding: {
         top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
@@ -281,10 +318,16 @@ body.hasRichEditor {
     border-radius: $formElement_borderRadius;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    &:focus {
-        // Use a box shadow so border-radiuses work
-        box-shadow: 0 0 0 $formElement-borderWidth $richEditor-outline_color;
-    }
+}
+
+.ql-clipboard {
+    @include sr-only();
+    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+    position: fixed;
+}
+
+.richEditor-upload {
+    @include sr-only;
 }
 
 // Mobile
@@ -296,6 +339,12 @@ body.isMobile {
     @include legacyMobileStyles();
 }
 
-.richEditorFlyout {
+.richEditor-menu.richEditorFlyout {
     bottom: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.richEditor-textWrap {
+    min-height: 236px;
 }

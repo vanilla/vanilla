@@ -45,7 +45,6 @@ class EntryController extends Gdn_Controller {
         if (Gdn::request()->get('display') === 'popup') {
             $this->MasterView = 'popup';
         }
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
     }
 
     /**
@@ -76,6 +75,8 @@ class EntryController extends Gdn_Controller {
         } else {
             $this->setData('RecoverPasswordLabelCode', 'Enter your email to continue.');
         }
+
+        $this->addDefinition("userSearchAvailable", $this->UserModel->allowGuestUserSearch());
     }
 
     /**
@@ -104,8 +105,6 @@ class EntryController extends Gdn_Controller {
      * @param string $authenticationSchemeAlias Type of authentication we're attempting.
      */
     public function auth($authenticationSchemeAlias = 'default') {
-        Gdn::session()->ensureTransientKey();
-
         $this->EventArguments['AuthenticationSchemeAlias'] = $authenticationSchemeAlias;
         $this->fireEvent('BeforeAuth');
 
@@ -120,7 +119,7 @@ class EntryController extends Gdn_Controller {
         }
 
         // Set up controller
-        $this->View = 'auth/'.$authenticator->getAuthenticationSchemeAlias();
+        $this->View = 'auth/' . $authenticator->getAuthenticationSchemeAlias();
         $this->Form->setModel($this->UserModel);
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
@@ -181,7 +180,7 @@ class EntryController extends Gdn_Controller {
                         $userInfo = [];
                         $userEventData = array_merge([
                             'UserID' => Gdn::session()->UserID,
-                            'Payload' => val('HandshakeResponse', $authenticator, false)
+                            'Payload' => val('HandshakeResponse', $authenticator, false),
                         ], $userInfo);
 
                         Gdn::authenticator()->trigger($authenticationResponse, $userEventData);
@@ -233,7 +232,7 @@ class EntryController extends Gdn_Controller {
                                 }
 
                                 safeHeader("X-Vanilla-Authenticated: yes");
-                                safeHeader("X-Vanilla-TransientKey: ".Gdn::session()->transientKey());
+                                safeHeader("X-Vanilla-TransientKey: " . Gdn::session()->transientKey());
                                 $reaction = $authenticator->successResponse();
                         }
                     }
@@ -314,20 +313,20 @@ class EntryController extends Gdn_Controller {
         $this->EventArguments['TransientKey'] = $transientKey;
         $this->fireEvent("Override{$type}");
 
-        $url = $provider[$type.'Url'];
+        $url = $provider[$type . 'Url'];
         if ($url) {
             switch ($type) {
                 case 'Register':
                 case 'SignIn':
                     // When the other page comes back it needs to go through /sso to force a sso check.
-                    $target = '/sso?target='.urlencode($target);
+                    $target = '/sso?target=' . urlencode($target);
                     break;
                 case 'SignOut':
                     $cookie = c('Garden.Cookie.Name');
                     if (strpos($url, '?') === false) {
-                        $url .= '?vfcookie='.urlencode($cookie);
+                        $url .= '?vfcookie=' . urlencode($cookie);
                     } else {
-                        $url .= '&vfcookie='.urlencode($cookie);
+                        $url .= '&vfcookie=' . urlencode($cookie);
                     }
 
                     // Check to sign out here.
@@ -421,7 +420,7 @@ class EntryController extends Gdn_Controller {
                 'Name' => '',
                 'Email' => '',
                 'Photo' => '',
-                'Target' => $this->target()
+                'Target' => $this->target(),
             ];
             $this->Form->setData($data);
             $this->Form->addHidden('Target', $this->Request->get('Target', '/'));
@@ -435,7 +434,7 @@ class EntryController extends Gdn_Controller {
         $currentData = $this->Form->formValues();
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
         $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
-        unset($filteredData['Roles'], $filteredData['RoleID']);
+        unset($filteredData['Roles'], $filteredData['RoleID'], $filteredData['RankID']);
         $this->Form->formValues($filteredData);
 
         // Fire ConnectData event & error handling.
@@ -447,6 +446,7 @@ class EntryController extends Gdn_Controller {
         } catch (Gdn_UserException $ex) {
             // Your SSO magic said no.
             $this->Form->addError($ex);
+
             return $this->render('ConnectError');
         } catch (Exception $ex) {
             // Your SSO magic blew up.
@@ -455,6 +455,7 @@ class EntryController extends Gdn_Controller {
             } else {
                 $this->Form->addError('There was an error fetching the connection data.');
             }
+
             return $this->render('ConnectError');
         }
 
@@ -496,6 +497,7 @@ class EntryController extends Gdn_Controller {
         // If we've accrued errors, stop here and show them.
         if ($this->Form->errorCount() > 0) {
             $this->render();
+
             return;
         }
 
@@ -552,7 +554,7 @@ class EntryController extends Gdn_Controller {
                     'NoConfirmEmail' => true,
                     'FixUnique' => true,
                     'SaveRoles' => $saveRoles,
-                    'ValidateName' => !$isTrustedProvider
+                    'ValidateName' => !$isTrustedProvider,
                 ]);
                 $this->EventArguments['UserID'] = $userID;
                 $this->fireEvent('AfterConnectSave');
@@ -570,7 +572,7 @@ class EntryController extends Gdn_Controller {
             // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
 
-        // If a name of email has been provided
+            // If a name of email has been provided
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
             $nameUnique = c('Garden.Registration.NameUnique', true);
@@ -637,7 +639,7 @@ class EntryController extends Gdn_Controller {
                                     'NoConfirmEmail' => true,
                                     'FixUnique' => true,
                                     'SaveRoles' => $saveRoles,
-                                    'ValidateName' => !$isTrustedProvider
+                                    'ValidateName' => !$isTrustedProvider,
                                 ]);
                                 $this->EventArguments['UserID'] = $userID;
                                 $this->fireEvent('AfterConnectSave');
@@ -652,7 +654,7 @@ class EntryController extends Gdn_Controller {
                             $userModel->saveAuthentication([
                                 'UserID' => $userID,
                                 'Provider' => $this->Form->getFormValue('Provider'),
-                                'UniqueID' => $this->Form->getFormValue('UniqueID')
+                                'UniqueID' => $this->Form->getFormValue('UniqueID'),
                             ]);
 
                             // Sign the user in.
@@ -660,6 +662,7 @@ class EntryController extends Gdn_Controller {
                             Gdn::userModel()->fireEvent('AfterSignIn');
                             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                             $this->render();
+
                             return;
                         }
                     }
@@ -739,7 +742,7 @@ class EntryController extends Gdn_Controller {
                     'ValidateEmail' => false,
                     'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     'SaveRoles' => $saveRolesRegister,
-                    'ValidateName' => !$isTrustedProvider
+                    'ValidateName' => !$isTrustedProvider,
                 ];
                 $user = $this->Form->formValues();
                 $user['Password'] = randomString(16); // Required field.
@@ -768,6 +771,7 @@ class EntryController extends Gdn_Controller {
                     if ($userID === UserModel::REDIRECT_APPROVE) {
                         $this->Form->setFormValue('Target', '/entry/registerthanks');
                         $this->_setRedirect();
+
                         return;
                     }
 
@@ -780,7 +784,7 @@ class EntryController extends Gdn_Controller {
                     $userModel->saveAuthentication([
                         'UserID' => $userID,
                         'Provider' => $this->Form->getFormValue('Provider'),
-                        'UniqueID' => $this->Form->getFormValue('UniqueID')
+                        'UniqueID' => $this->Form->getFormValue('UniqueID'),
                     ]);
 
                     $this->Form->setFormValue('UserID', $userID);
@@ -813,7 +817,7 @@ class EntryController extends Gdn_Controller {
             if (!$userSelect || $userSelect == 'other') {
                 // The user entered a username. Validate it.
                 $connectNameEntered = true;
-                if ($this->Form->validateRule('ConnectName', 'ValidateRequired')) {
+                if (!empty($this->Form->getFormValue('ConnectName'))) {
                     $connectName = $this->Form->getFormValue('ConnectName');
                     $user = false;
 
@@ -846,9 +850,7 @@ class EntryController extends Gdn_Controller {
                 if ($allowConnect) {
                     // If the user is connecting to their current account, make sure it was intentional.
                     if (intval($user['UserID']) === intval(Gdn::session()->UserID)) {
-                        if (!Gdn::session()->validateTransientKey($this->Form->getFormValue('TransientKey'))) {
-                            throw permissionException();
-                        }
+                        $this->Request->isAuthenticatedPostBack(true);
                     } else {
                         $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
                         if ($hasPassword) {
@@ -856,7 +858,10 @@ class EntryController extends Gdn_Controller {
                             try {
                                 $password = $this->Form->getFormValue('ConnectPassword');
                                 $name = $this->Form->getFormValue('ConnectName');
-                                if (!$passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name)) {
+
+                                $passwordChecked = $passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name);
+                                Gdn::userModel()->rateLimit((object)$user, $passwordChecked);
+                                if (!$passwordChecked) {
                                     if ($connectNameEntered) {
                                         $this->addCredentialErrorToForm('The username you entered has already been taken.');
                                     } else {
@@ -879,7 +884,7 @@ class EntryController extends Gdn_Controller {
                     'CheckCaptcha' => false,
                     'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     'SaveRoles' => $saveRolesRegister,
-                    'ValidateName' => !$isTrustedProvider
+                    'ValidateName' => !$isTrustedProvider,
                 ]);
                 $user['UserID'] = $userID;
 
@@ -901,7 +906,7 @@ class EntryController extends Gdn_Controller {
                     $userModel->saveAuthentication([
                         'UserID' => $user['UserID'],
                         'Provider' => $this->Form->getFormValue('Provider'),
-                        'UniqueID' => $this->Form->getFormValue('UniqueID')
+                        'UniqueID' => $this->Form->getFormValue('UniqueID'),
                     ]);
                     $this->Form->setFormValue('UserID', $user['UserID']);
                 }
@@ -1035,8 +1040,6 @@ class EntryController extends Gdn_Controller {
             $this->checkOverride('SignIn', $this->target());
         }
 
-        Gdn::session()->ensureTransientKey();
-
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));
         $this->Form->addHidden('Target', $this->target());
@@ -1056,6 +1059,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
                 $this->Form->addError('Please try again.');
+                Gdn::session()->ensureTransientKey();
             }
 
             // Check the user.
@@ -1067,12 +1071,12 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if (!$user) {
-                    $this->addCredentialErrorToForm('@'.sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))));
+                    $this->addCredentialErrorToForm('@' . sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', ['signin' => $email]);
                     $this->fireEvent('BadSignIn', [
                         'Email' => $email,
                         'Password' => $this->Form->getFormValue('Password'),
-                        'Reason' => 'NotFound'
+                        'Reason' => 'NotFound',
                     ]);
                 } else {
                     // Check the password.
@@ -1082,7 +1086,7 @@ class EntryController extends Gdn_Controller {
                         $passwordChecked = $passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user));
 
                         // Rate limiting
-                        Gdn::userModel()->rateLimit($user, $passwordChecked);
+                        Gdn::userModel()->rateLimit($user);
 
                         if ($passwordChecked) {
                             // Update weak passwords
@@ -1123,9 +1127,12 @@ class EntryController extends Gdn_Controller {
                                 'Email' => $email,
                                 'Password' => $password,
                                 'User' => $user,
-                                'Reason' => 'Password'
+                                'Reason' => 'Password',
                             ]);
                         }
+                    } catch (Gdn_SanitizedUserException $ex) {
+                        $errorMessage = $ex->getMessage();
+                        $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
                     }
@@ -1166,10 +1173,12 @@ class EntryController extends Gdn_Controller {
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
                 Gdn::request()->withURI('dashboard/entry/auth/password');
+
                 return Gdn::dispatcher()->dispatch();
             }
         } catch (Exception $e) {
             Gdn::request()->withURI('/entry/signin');
+
             return Gdn::dispatcher()->dispatch();
         }
 
@@ -1178,7 +1187,7 @@ class EntryController extends Gdn_Controller {
             'ConsumerKey' => $authenticator->getProviderKeyFromHandshake($payload),
             'TokenKey' => $authenticator->getTokenKeyFromHandshake($payload),
             'UserName' => $authenticator->getUserNameFromHandshake($payload),
-            'UserEmail' => $authenticator->getUserEmailFromHandshake($payload)
+            'UserEmail' => $authenticator->getUserEmailFromHandshake($payload),
         ];
 
         if (method_exists($authenticator, 'GetRolesFromHandshake')) {
@@ -1203,7 +1212,7 @@ class EntryController extends Gdn_Controller {
                 $userID = $this->UserModel->synchronize($userInfo['UserKey'], [
                     'Name' => $userInfo['UserName'],
                     'Email' => $userInfo['UserEmail'],
-                    'Roles' => val('Roles', $userInfo)
+                    'Roles' => val('Roles', $userInfo),
                 ]);
 
                 if ($userID > 0) {
@@ -1214,7 +1223,7 @@ class EntryController extends Gdn_Controller {
 
                     $userEventData = array_merge([
                         'UserID' => $userID,
-                        'Payload' => $payload
+                        'Payload' => $payload,
                     ], $userInfo);
                     Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_CREATED, $userEventData);
 
@@ -1235,7 +1244,7 @@ class EntryController extends Gdn_Controller {
                     } else {
                         // Set the memory cookie to allow signinloopback to shortcircuit remote query.
                         $cookiePayload = [
-                            'Sync' => 'Failed'
+                            'Sync' => 'Failed',
                         ];
                         $encodedCookiePayload = dbencode($cookiePayload);
                         $authenticator->remember($userInfo['ConsumerKey'], $encodedCookiePayload);
@@ -1275,7 +1284,7 @@ class EntryController extends Gdn_Controller {
         $this->Form->addHidden('Target', $this->target());
 
         $preservedKeys = [
-            'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
+            'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset',
         ];
         $userID = 0;
         $target = $this->target();
@@ -1287,12 +1296,13 @@ class EntryController extends Gdn_Controller {
 
                 $userEventData = array_merge([
                     'UserID' => $userID,
-                    'Payload' => $payload
+                    'Payload' => $payload,
                 ], $userInfo);
                 Gdn::authenticator()->trigger($authResponse, $userEventData);
 
                 $authenticator->deleteCookie();
                 Gdn::request()->withRoute('DefaultController');
+
                 return Gdn::dispatcher()->dispatch();
 
             } elseif (val('NewAccount', $formValues)) {
@@ -1342,7 +1352,7 @@ class EntryController extends Gdn_Controller {
 
                 $userEventData = array_merge([
                     'UserID' => $userID,
-                    'Payload' => $payload
+                    'Payload' => $payload,
                 ], $userInfo);
                 Gdn::authenticator()->trigger($authResponse, $userEventData);
 
@@ -1414,7 +1424,7 @@ class EntryController extends Gdn_Controller {
         $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
-            'f' => t('Female')
+            'f' => t('Female'),
         ];
 
         // Make sure that the hour offset for new users gets defined when their account is created
@@ -1506,7 +1516,7 @@ class EntryController extends Gdn_Controller {
 
                     // Notification text
                     $label = t('NewApplicantEmail', 'New applicant:');
-                    $story = anchor(Gdn_Format::text($label.' '.$values['Name']), externalUrl('dashboard/user/applicants'));
+                    $story = anchor(Gdn_Format::text($label . ' ' . $values['Name']), externalUrl('dashboard/user/applicants'));
 
                     $this->EventArguments['AuthUserID'] = $authUserID;
                     $this->EventArguments['Story'] = &$story;
@@ -1569,6 +1579,7 @@ class EntryController extends Gdn_Controller {
                 if ($authUserID == UserModel::REDIRECT_APPROVE) {
                     $this->Form->setFormValue('Target', '/entry/registerthanks');
                     $this->_setRedirect();
+
                     return;
                 } elseif (!$authUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
@@ -1656,7 +1667,7 @@ class EntryController extends Gdn_Controller {
         $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
-            'f' => t('Female')
+            'f' => t('Female'),
         ];
 
         if (!$this->Form->isPostBack()) {
@@ -1668,7 +1679,8 @@ class EntryController extends Gdn_Controller {
         // Look for the invitation.
         $invitation = $invitationModel
             ->getWhere(['Code' => $this->Form->getValue('InvitationCode')])
-            ->firstRow(DATASET_TYPE_ARRAY);
+            ->firstRow(DATASET_TYPE_ARRAY)
+        ;
 
         if (!$invitation) {
             $this->Form->addError('Invitation not found.', 'Code');
@@ -1761,7 +1773,7 @@ class EntryController extends Gdn_Controller {
      */
     public function passwordRequest() {
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
-            Gdn::locale()->setTranslation('Email', t('Usermame'));
+            Gdn::locale()->setTranslation('Email', t('Username'));
         }
 
         if ($this->Form->isPostBack() === true) {
@@ -1780,7 +1792,7 @@ class EntryController extends Gdn_Controller {
                     $this->Form->addError('Success!');
                     $this->View = 'passwordrequestsent';
                     $this->fireEvent('PasswordRequest', [
-                        'Email' => $email
+                        'Email' => $email,
                     ]);
                 }
             } else {
@@ -1818,7 +1830,7 @@ class EntryController extends Gdn_Controller {
 
         if (!is_numeric($userID)
             || $passwordResetKey == ''
-            || $this->UserModel->getAttribute($userID, 'PasswordResetKey', '') != $passwordResetKey
+            || hash_equals($this->UserModel->getAttribute($userID, 'PasswordResetKey', ''), $passwordResetKey) === false
         ) {
             $this->Form->addError('Failed to authenticate your password reset request. Try using the reset request form again.');
             Logger::event(
@@ -1827,20 +1839,20 @@ class EntryController extends Gdn_Controller {
                 '{username} failed to authenticate password reset request.'
             );
             $this->fireEvent('PasswordResetFailed', [
-                'UserID' => $userID
+                'UserID' => $userID,
             ]);
         }
 
         $expires = $this->UserModel->getAttribute($userID, 'PasswordResetExpires');
         if ($this->Form->errorCount() === 0 && $expires < time()) {
-            $this->Form->addError('@'.t('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+            $this->Form->addError('@' . t('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
             Logger::event(
                 'password_reset_failure',
                 Logger::NOTICE,
                 '{username} has an expired reset token.'
             );
             $this->fireEvent('PasswordResetFailed', [
-                'UserID' => $userID
+                'UserID' => $userID,
             ]);
         }
 
@@ -1889,7 +1901,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($user->UserID, true);
-                    redirectTo('/');
+                    $this->setRedirectTo('/', false);
                 }
             }
 
@@ -1919,6 +1931,13 @@ class EntryController extends Gdn_Controller {
 
         $emailConfirmed = $this->UserModel->confirmEmail($user, $emailKey);
         $this->Form->setValidationResults($this->UserModel->validationResults());
+
+        $userMatch = ($userID === Gdn::session()->UserID) ? true : false;
+
+        if (!$userMatch) {
+            Gdn::session()->end();
+            redirectTo('/entry/signin');
+        }
 
         if ($emailConfirmed) {
             $userID = val('UserID', $user);
@@ -1995,7 +2014,7 @@ class EntryController extends Gdn_Controller {
             $this->View = 'leave';
             $reaction = $logoutResponse;
         } else {
-            $this->View = 'auth/'.$authenticator->getAuthenticationSchemeAlias();
+            $this->View = 'auth/' . $authenticator->getAuthenticationSchemeAlias();
             $reaction = $loginResponse;
         }
 
@@ -2048,6 +2067,7 @@ class EntryController extends Gdn_Controller {
      */
     public function redirectTo() {
         deprecated(__FUNCTION__, 'target');
+
         return $this->getTargetRoute();
     }
 
@@ -2061,6 +2081,7 @@ class EntryController extends Gdn_Controller {
      */
     protected function getTargetRoute() {
         $target = $this->target();
+
         return $target == '' ? Gdn::router()->getDestination('DefaultController') : $target;
     }
 
@@ -2083,7 +2104,7 @@ class EntryController extends Gdn_Controller {
 
         // Make sure that the target is a valid url.
         if (!preg_match('`(^https?://)`', $target)) {
-            $target = '/'.ltrim($target, '/');
+            $target = '/' . ltrim($target, '/');
 
             // Never redirect back to signin.
             if (preg_match('`^/entry/signin`i', $target)) {

@@ -100,7 +100,6 @@ $global-title_mobile_fontSize                        : 26px !default;
 $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
-
 $userContent-fontSizeH1                              : 2em !default;
 $userContent-fontSizeH2                              : 1.5em !default;
 $userContent-fontSizeH3                              : 1.25em !default;
@@ -209,36 +208,6 @@ $component-titleBar_minHeight                        : 60px;
 $component-titleBar_countBg                          : mix($global-color_bg, $global-color_fg, 88%) !default;
 $component-titleBar_viewMoreColor                    : mix($global-color_bg, $global-color_fg, 60%) !default;
 
-/* -------------------------------------------------------------- *\
-    Widgets
-\* -------------------------------------------------------------- */
-
-// Global
-$global-widgetInnerVertical_padding                  : $global-gutter_halfSize !default; // sections of widget
-$global-widgetInnerHorizontal_padding                : $global-gutter_quarterSize !default; // sections of widget
-$global-widgetSection-gap                            : 0 !default; // Between widget sections
-$global-widget_gap                                   : $global-gutter_halfSize !default; // Between widgets
-$global-widget_bg                                    : transparent !default;
-$global-widget_fg                                    : $global-color_fg !default;
-
-$global-widgetBorder_color                           : $global-border_color !default;
-$global-widgetBorder_width                           : $global-border-width !default;
-$global-widgetBorder_radius                          : $global_borderRadius !default;
-
-$global-widgetTitle_size                             : $global-subTitle_fontSize !default;
-$global-widgetSubTitle_size                          : $global-large_fontSize !default;
-$global-widgetText_size                              : $global-medium_fontSize !default;
-
-
-// Outer Widget Wrap
-$widget_borderColor                                  : $global-widgetBorder_color !default;
-$widget_borderWidth                                  : 0 !default;
-$widget_borderRadius                                 : $global-widgetBorder_radius !default;
-
-// Widget Contents - no padding on this guy, comes from wrapper or sub sections
-$widget-contents_bg                                  : $global-widget_bg !default;
-
-
 
 /* -------------------------------------------------------------- *\
     Form Elements
@@ -302,12 +271,11 @@ $buttonToIconMargin                                  : ($formElement_height - $i
     }
 }
 
-$overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
+$overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .4)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
 $overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
-
 $overlay-fullPageHeading_spacer                         : 32px;
 
 /* -------------------------------------------------------------- *\

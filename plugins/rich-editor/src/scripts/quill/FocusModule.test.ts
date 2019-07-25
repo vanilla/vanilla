@@ -12,10 +12,12 @@ import KeyboardModule from "quill/modules/keyboard";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import classNames from "classnames";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 const stubEmbedData: IEmbedValue = {
     data: {
-        type: "stub",
+        embedType: "stub",
         url: "",
         attributes: [],
     },
@@ -34,12 +36,13 @@ describe("FocusModule", () => {
     });
 
     beforeEach(() => {
+        const classesRichEditor = richEditorClasses(false);
         document.body.innerHTML = `<div>
             <div class="FormWrapper"><div id="quillNoEditor"></div></div>
-            <div class="richEditor"><div id="quillNoForm"></div></div>
+            <div class=${classNames("richEditor", classesRichEditor.root)}><div id="quillNoForm"></div></div>
             <div class="FormWrapper">
                 <button id="buttonBefore"></button>
-                <div class="richEditor">
+                <div class=${classNames("richEditor", classesRichEditor.root)}>
                     <div id="quill"></div>
                     <button id="button1"></button>
                 </div>

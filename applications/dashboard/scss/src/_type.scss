@@ -471,6 +471,15 @@ strong,
   color: $grey;
 }
 
+.info-inline {
+  display: inline-block;
+  margin-left: $meta-margin;
+}
+
+.info-item + .info-item {
+  margin-left: $meta-margin;
+}
+
 // List Reset
 //
 // .list-reset - Removes list styling.

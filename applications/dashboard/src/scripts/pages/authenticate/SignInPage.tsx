@@ -5,10 +5,10 @@
 
 import * as React from "react";
 import { connect } from "react-redux";
-import { t } from "@library/application";
-import { LoadStatus } from "@library/@types/api";
-import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
-import DocumentTitle from "@library/components/DocumentTitle";
+import { t } from "@library/utility/appUtils";
+import { LoadStatus } from "@library/@types/api/core";
+import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import Or from "@dashboard/components/forms/Or";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
 import { getUserAuthenticators } from "@dashboard/pages/authenticate/authenticatorsActions";

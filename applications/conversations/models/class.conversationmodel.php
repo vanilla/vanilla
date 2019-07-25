@@ -520,6 +520,10 @@ class ConversationModel extends ConversationsModel {
         if (!is_array($options)) {
             $options = [];
         }
+        // Remove any conversationID that might have been added to the form.
+        if (array_key_exists('ConversationID', $formPostValues)) {
+            unset($formPostValues['ConversationID']);
+        }
         $deprecated = $settings instanceof ConversationMessageModel;
         $createMessage =  $deprecated || empty($settings['ConversationOnly']);
 
@@ -546,6 +550,7 @@ class ConversationModel extends ConversationsModel {
             $recipientUserIDs = $this->SQL
                 ->select('UserID')
                 ->from('User')
+                ->where('Name <>', '')
                 ->whereIn('Name', $to)
                 ->get()->resultArray();
             $recipientUserIDs = array_column($recipientUserIDs, 'UserID');

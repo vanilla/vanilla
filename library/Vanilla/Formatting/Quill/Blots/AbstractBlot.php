@@ -136,6 +136,15 @@ abstract class AbstractBlot {
     }
 
     /**
+     * Get the nesting depth of the blot.
+     *
+     * @return int
+     */
+    public function getNestingDepth(): int {
+        return 0;
+    }
+
+    /**
      * Create a blot.
      *
      * @param array $currentOperation The current operation.

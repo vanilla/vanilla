@@ -76,9 +76,15 @@
 }
 
 .embedLinkLoader-link {
+    position: relative;
     display: inline-block;
     white-space: normal;
     padding: $embedded-select_borderWidth $embedded-select_borderWidth * 2;
+}
+
+.embed-focusableElement.focus-visible {
+    // We have specifically handled focus styles for these.
+    outline: none !important;
 }
 
 // Edit mode only
@@ -100,13 +106,13 @@
 
         &:hover {
             &:after {
-                box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
+                box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5) inset;
             }
         }
 
         &:focus {
             &:after {
-                box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
+                box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color inset;
             }
         }
 

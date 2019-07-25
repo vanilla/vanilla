@@ -22,11 +22,14 @@
 
 .main-container {
   width: 100%;
-  overflow-x: hidden; // For the drawer functionality
+  height: 100%;
 }
 
 .navbar {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: $navbar-height;
   z-index: 1010;
@@ -36,6 +39,7 @@
   display: flex;
   justify-content: center;
   margin-top: $navbar-height;
+  height: 100%;
 
   @include media-breakpoint-down(md) {
     display: block;
@@ -83,10 +87,20 @@
 .panel-content,
 .panel-content-wrapper {
   width: 204px;
+  height: 100%;
 }
 
 .panel-left {
   padding-left: $spacer;
+  position: sticky;
+  top: 0;
+  height: 100%;
+  padding-bottom: 0;
+
+  .panel-content {
+    max-height: calc(100vh - #{$navbar-height * 2});
+    overflow: auto;
+  }
 }
 
 .panel-right {
@@ -94,6 +108,8 @@
   order: 3;
 
   .panel-content {
+    max-height: 100%;
+    overflow: auto;
     padding-left: $spacer;
   }
 }
@@ -160,10 +176,14 @@
   }
 
   .drawer-show .panel-left {
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     display: block;
     width: $drawer-width;
     height: 100%;
     padding-top: $spacer * 4 + $navbar-height;
+    overflow: auto;
   }
 }

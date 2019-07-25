@@ -63,7 +63,16 @@ class GdnFormatLinksTest extends TestCase {
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
     }
-
+    
+    /**
+     * Testing a link with Right-To-Left character override.
+     */
+    public function testRightLeftOverrideLink() {
+        $input = 'https://‮test.com';
+        $expected = "<a href='https://test.com' rel='nofollow'>https://test.com</a>";
+        $output = Gdn_Format::links($input);
+        $this->assertHtmlStringEqualsHtmlString($expected, $output);
+    }
     /**
      * Test that autolinking ignore various puncation marks at the end of them.
      *

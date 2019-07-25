@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ locale }}">
     <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ title }}</title>
         <meta name="description" content="{{ description }}">
 
@@ -8,14 +11,18 @@
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
+        {% if favIcon -%}
+            <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
+        {% endif %}
+
         {% for script in inlineScripts -%}
-            <script>
+            <script nonce="{{ nonce }}">
                 {{- script|raw -}}
             </script>
         {% endfor %}
 
         {% for script in scripts -%}
-            <script defer src="{{ script.getWebPath() }}"></script>
+            <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
         {% endfor %}
 
         {%- if breadcrumbsJson -%}
@@ -27,6 +34,8 @@
         {% for stylesheet in styles -%}
             <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
         {% endfor -%}
+
+        {{ preloadModel.renderHtml()|raw }}
 
         {%- if canonicalUrl -%}
             <link rel="canonical" href="{{ canonicalUrl }}"/>
@@ -41,7 +50,12 @@
     </head>
     <body class="{{ cssClasses|join(' ') }}">
         <div id="page" class="page">
-            <div id="vanillaHeader"></div>
+            {%- if header -%}
+                <noscript id="themeHeader">
+                    {{ header|raw }}
+                </noscript>
+            {%- endif -%}
+            <header id="titleBar"></header>
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
                 <noscript>
@@ -51,29 +65,19 @@
                             height: initial;
                         }
                     </style>
-                    <div class="noScriptContainer">
-                        <h1 class="heading heading-1 pageTitle">
-                            {{- title -}}
-                        </h1>
-                        {{- seoContent|raw }}
-                    </div>
+                    <h1 class="heading heading-1 pageTitle">
+                        {{- title -}}
+                    </h1>
+                    {{- seoContent|raw }}
                 </noscript>
             {%- endif -%}
 
                 <div class="fullPageLoader"></div>
             </div>
-            <div id="footerContainer">
-                {#{{ include('partials/footer.twig') }}#}
-            </div>
+            {%- if footer -%}
+                <noscript id="themeFooter">{{ footer|raw }}</noscript>
+            {%- endif -%}
         </div>
         <div id="modals"></div>
-        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-        <script>
-            WebFont.load({
-                google: {
-                    families: ['Open Sans:400,400italic,600,700'] // Will be dynamic at some point
-                }
-            });
-        </script>
     </body>
 </html>

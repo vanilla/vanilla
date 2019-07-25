@@ -5,8 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, getMeta } from "@library/application";
-import { log, matchAtMention as _matchAtMention } from "@library/utility";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
+import { logDebug, matchAtMention as _matchAtMention } from "@vanilla/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.
@@ -19,7 +19,7 @@ let rawMatch: string | undefined;
 // Set minimum characters to type for @mentions to fire
 const minCharacters = getMeta("mentionMinChars", 2);
 
-// Max suggestions to show in dropdown.
+// Max suggestions to show in flyouts.
 const maxSuggestions = getMeta("mentionSuggestionCount", 5);
 
 // Server response limit. This should match the limit set in
@@ -86,7 +86,7 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
  * @returns Matching string if successful.  Null on failure to match.
  */
 export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
-    flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    flag = flag.replace(/[-[]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     if (shouldStartWithSpace) {
         flag = "(?:^|\\s)" + flag;
     }
@@ -261,6 +261,9 @@ export function initializeAtComplete(editorElement, iframe?: any) {
         // be false most of the time; the exception is when
         // it's true.
         if (!atQuote) {
+            // Supressing this error because this is legacy that is complicated to refactor.
+            // In the case here `this` is the atwho library which we don't have types.
+            // @ts-ignore
             insert = this.at + insert;
         }
 
@@ -311,7 +314,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             insert_tpl: "${atwho-data-value}",
             callbacks: {
                 matcher: matchFakeEmoji,
-                tplEval: (tpl, map) => log(map),
+                tplEval: (tpl, map) => logDebug(map),
             },
             limit: maxSuggestions,
             data: emojiList,

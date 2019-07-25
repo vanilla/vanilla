@@ -75,7 +75,7 @@ $userContent-fontSizeH6:                .85em !default;
 $global-heading_topMargin:              1.5 * $global-medium_fontSize;
 $global-block_margin:                   $userContent_fontSize !default;
 
-$global-main_width:                     1224px !default;
+$global-main_width:                     1272px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
 $global-default_timing:                 0.35s !default;
 
@@ -93,7 +93,7 @@ $global_borderRadius:                   6px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
-$link-default_color:                    $global-color_fg !default;
+$link-default_color:                    $global-color_primary !default;
 $link-default-hover_color:              $global-color_primary !default;
 $link-default_visited_color:            $global-color_primary !default;
 
@@ -375,6 +375,6 @@ $theme-breakpoint_smallMobile:           350px !default;
 $theme-breakpoint_mobile:                410px !default;
 $theme-breakpoint_smallTable:            768px !default;
 $theme-breakpoint_tablet:                992px !default;
-$theme-breakpoint_desktop:               1224px !default;
+$theme-breakpoint_desktop:               1272px !default;
 
 $theme-breakpoint_base:                  $theme-breakpoint_smallTable !default;

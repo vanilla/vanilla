@@ -440,9 +440,8 @@
             });
 
             // Target all elements in the document that fire the dropdown close
-            // (some are written directly as class in view), then add the matches
             // from within the iframe, and attach the relevant callbacks to events.
-            $('.editor-dialog-fire-close').add($('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close'))
+            $('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close')
                 .off('mouseup.fireclose dragover.fireclose')
                 .on('mouseup.fireclose dragover.fireclose', function(e) {
                     $('.editor-dropdown').each(function(i, el) {

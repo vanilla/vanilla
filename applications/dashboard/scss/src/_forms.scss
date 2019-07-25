@@ -1082,6 +1082,10 @@ select + select {
   &.focus {
     @include checkbox-painted-focus;
   }
+
+  .column-checkbox & {
+    margin: 0;
+  }
 }
 
 .iradio {

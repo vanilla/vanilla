@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "lib": ["es2018", "dom", "dom.iterable"],
+        "noImplicitThis": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "target": "esnext",
+        "module": "esnext",
+        "isolatedModules": false,
+        "skipLibCheck": true,
+        "sourceMap": true
+    }
+}

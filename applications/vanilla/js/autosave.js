@@ -6,12 +6,19 @@ jQuery(document).ready(function($) {
         if (!options.button)
             return false;
 
-        var lastVal = null;
+        var lastVal = $(textarea).val();
 
         var save = function() {
             var currentVal = $(textarea).val();
-            if (currentVal != undefined && currentVal != '' && currentVal != lastVal) {
-                lastVal = currentVal
+            var defaultValues = [
+                undefined,
+                null,
+                '',
+                '[{"insert":"\n"}]',
+                lastVal
+            ];
+            if (!defaultValues.includes(currentVal)) {
+                lastVal = currentVal;
                 $(options.button).click();
             }
         };

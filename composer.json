@@ -23,11 +23,12 @@
     ],
     "config": {
         "platform": {
-            "php": "7.0.26"
+            "php": "7.1"
         }
     },
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
+        "ext-pdo": "*",
         "ext-json": "*",
         "ext-dom": "*",
         "container-interop/container-interop": "^1.1",
@@ -41,7 +42,7 @@
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
         "vanilla/garden-container": "^1.3.4",
-        "vanilla/garden-http": "~1.0",
+        "vanilla/garden-http": "~2.0",
         "vanilla/garden-schema": "~1.0",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
@@ -55,8 +56,10 @@
         "exussum12/coverage-checker": "~0.10",
         "phpunit/phpunit": "~6.0",
         "vanilla/standards": "~1.3",
-        "voku/html-min": "~3.0",
-        "mikey179/vfsStream": "~1.6"
+        "voku/html-min": "3.0.5",
+        "voku/simple_html_dom": "4.1.7",
+        "mikey179/vfsstream": "~1.6",
+        "phing/phing": "2.*"
     },
     "provide": {
         "ext-gd": "*"
@@ -74,8 +77,8 @@
             "library/core/functions.deprecated.php"
         ],
         "psr-4": {
-			"Vanilla\\": "library/Vanilla",
-			"Garden\\": "library/Garden"
+            "Vanilla\\": "library/Vanilla",
+            "Garden\\": "library/Garden"
         }
     },
     "scripts": {

@@ -4,22 +4,22 @@
  */
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
-import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/application";
-import DocumentTitle from "@library/components/DocumentTitle";
+import { LoadStatus } from "@library/@types/api/core";
+import { t } from "@library/utility/appUtils";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import React from "react";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import Paragraph from "@library/components/Paragraph";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
+import ButtonSubmit from "@library/forms/ButtonSubmit";
+import Paragraph from "@library/layout/Paragraph";
+import InputTextBlock from "@library/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
-import { IRequestPasswordOptions } from "@dashboard/@types/api";
 import { connect } from "react-redux";
 import {
     postRequestPassword,
     afterRequestPasswordSuccessNavigate,
 } from "@dashboard/pages/recoverPassword/recoverPasswordActions";
 import RememberPasswordLink from "@dashboard/pages/authenticate/components/RememberPasswordLink";
+import { IRequestPasswordOptions } from "@dashboard/@types/api/authenticate";
 
 interface IState {
     email: string;
@@ -58,10 +58,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
             return (
                 <div id={this.id} className="authenticateUserCol">
                     {pageTitle}
-                    <Paragraph
-                        children={t("A message has been sent to your email address with password reset instructions.")}
-                        className="authenticateUser-paragraph"
-                    />
+                    <Paragraph className="authenticateUser-paragraph">
+                        {t("A message has been sent to your email address with password reset instructions.")}
+                    </Paragraph>
                     <RememberPasswordLink onClick={this.props.onNavigateAway} />
                 </div>
             );
@@ -69,16 +68,13 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
             return (
                 <div className="authenticateUserCol">
                     {pageTitle}
-                    <Paragraph
-                        children={t("RecoverPasswordLabelCode", "Enter your email to continue.")}
-                        className="authenticateUser-paragraph"
-                    />
+                    <Paragraph className="authenticateUser-paragraph">
+                        {t("RecoverPasswordLabelCode", "Enter your email to continue.")}
+                    </Paragraph>
                     <form id={this.id} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
-                        <Paragraph
-                            className="authenticateUser-paragraph"
-                            children={getGlobalErrorMessage(this.props.requestPasswordState, ["email"])}
-                            isError={true}
-                        />
+                        <Paragraph className="authenticateUser-paragraph" isError={true}>
+                            {getGlobalErrorMessage(this.props.requestPasswordState.error, ["email"])}
+                        </Paragraph>
                         <InputTextBlock
                             label={t("Email")}
                             inputProps={{
@@ -87,7 +83,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                                 onChange: this.handleEmailChange,
                                 disabled: !this.allowEdit,
                             }}
-                            errors={getFieldErrors(this.props.requestPasswordState, "email")}
+                            errors={getFieldErrors(this.props.requestPasswordState.error, "email")}
                             ref={this.emainInput}
                         />
                         <ButtonSubmit disabled={!this.allowEdit || this.state.email.length === 0} legacyMode={true}>

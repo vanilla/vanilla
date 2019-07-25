@@ -342,7 +342,7 @@ paths:
           minLength: 1
           type: string
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -360,12 +360,20 @@ paths:
           maximum: 200
           minimum: 1
       - description: |
-          Expand with the parent record.
+          Expand associated records using one or more valid field names (all, parent, breadcrumbs).
+          A value of "all" will expand all expandable fields.
         in: query
         name: expand
         schema:
-          default: false
-          type: boolean
+          oneOf:
+            - type: array
+            - type: boolean
+          items:
+            enum:
+            - breadcrumbs
+            - parent
+            - all
+            type: string
       responses:
         '200':
           content:
@@ -431,6 +439,22 @@ paths:
                       description: The URL code of the category.
                       minLength: 1
                       type: string
+                    breadcrumbs:
+                      items:
+                        properties:
+                          name:
+                            description: Breadcrumb element name.
+                            minLength: 1
+                            type: string
+                          url:
+                            description: Breadcrumb element url.
+                            minLength: 1
+                            type: string
+                        required:
+                        - name
+                        - url
+                        type: object
+                      type: array
                   required:
                   - categoryID
                   - name

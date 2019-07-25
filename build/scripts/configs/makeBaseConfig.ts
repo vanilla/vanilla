@@ -25,8 +25,8 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 
     const modulePaths = [
         "node_modules",
-        path.join(VANILLA_ROOT, "node_modules"),
         ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
+        path.join(VANILLA_ROOT, "node_modules"),
     ];
 
     const aliases = Object.keys(entryModel.aliases).join(", ");
@@ -35,11 +35,17 @@ ${chalk.green(aliases)}`;
     printVerbose(message);
 
     const babelPlugins: string[] = [];
+    const hotLoaders: any[] = [];
+    const hotAliases: any = {};
     if (options.mode === BuildMode.DEVELOPMENT) {
         babelPlugins.push(require.resolve("react-hot-loader/babel"));
+        hotLoaders.push(require.resolve("react-hot-loader/webpack"));
+        hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
     }
 
-    const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    // Leaving this out until we get the docs actually generating. Huge slowdown.
+    // const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    const storybookLoaders: never[] = [];
 
     const config: any = {
         context: VANILLA_ROOT,
@@ -48,14 +54,18 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
+                        const modulesRequiringTranspilation = ["quill", "p-debounce", "@vanilla/.*"];
+                        const exlusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
+
                         // We need to transpile quill's ES6 because we are building from source.
-                        return /node_modules/.test(modulePath) && !/node_modules\/quill\//.test(modulePath);
+                        return /node_modules/.test(modulePath) && !exlusionRegex.test(modulePath);
                     },
                     use: [
+                        ...hotLoaders,
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: [require.resolve("@vanillaforums/babel-preset")],
+                                presets: [require.resolve("@vanilla/babel-preset")],
                                 plugins: babelPlugins,
                                 cacheDirectory: true,
                             },
@@ -105,6 +115,7 @@ ${chalk.green(aliases)}`;
                             loader: "sass-loader",
                             options: {
                                 sourceMap: true,
+                                implementation: require("sass"), // Use dart sass
                             },
                         },
                     ],
@@ -120,6 +131,7 @@ ${chalk.green(aliases)}`;
         resolve: {
             modules: modulePaths,
             alias: {
+                ...hotAliases,
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
             },
@@ -154,13 +166,11 @@ ${chalk.green(aliases)}`;
     }
 
     // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
-    if (!options.lowMemory) {
-        config.plugins.push(
-            new WebpackBar({
-                name: section,
-            }),
-        );
-    }
+    config.plugins.push(
+        new WebpackBar({
+            name: section,
+        }),
+    );
 
     return config;
 }

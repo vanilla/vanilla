@@ -1,0 +1,12 @@
+.ImageUploadLimitsDimensions {
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.dimensionsDisabled {
+    opacity: 0;
+    height: 0;
+    pointer-events: none;
+    overflow: hidden;
+    padding: 0 !important;
+}

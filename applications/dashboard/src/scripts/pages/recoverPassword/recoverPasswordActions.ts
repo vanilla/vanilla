@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
-import { IRequestPasswordOptions } from "@dashboard/@types/api";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/redux/utility";
+import { IRequestPasswordOptions } from "@dashboard/@types/api/authenticate";
 
 // Authenticating user /authenticate/password
 export const POST_REQUEST_PASSWORD_REQUEST = "POST_REQUEST_PASSWORD_REQUEST";

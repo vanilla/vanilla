@@ -26,7 +26,6 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-userName {
-    margin: 0 0 0 $metaText_margin;
     padding: 0;
     color: $metaText_color;
     font-weight: $global-fontWeight_bold;
@@ -105,6 +104,12 @@ $embedQuote-toggleButton_padding  : 12px !default;
 .embedQuote-body {
     display: block;
     margin: 0;
+
+    // Cleanup blockquote element styling in firefox.
+    &::before,
+    &::after {
+        content: initial;
+    }
 }
 
 .embedQuote-metaLink {

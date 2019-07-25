@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+ use Vanilla\Message;
+
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
  */
@@ -25,6 +27,9 @@ class DiscussionController extends VanillaController {
     /** @var DiscussionModel */
     public $DiscussionModel;
 
+    /** @var Message[] */
+    private $messages = [];
+
     /**
      *
      *
@@ -39,7 +44,16 @@ class DiscussionController extends VanillaController {
                 return $this->data('Comments');
                 break;
         }
-        throw new Exception("DiscussionController->$name not found.", 400);
+        return null;
+    }
+
+    /**
+     * Add a message to be displayed on the discussion.
+     *
+     * @param Message $message
+     */
+    public function addMessage(Message $message) {
+        $this->messages[] = $message;
     }
 
     /**
@@ -154,8 +168,21 @@ class DiscussionController extends VanillaController {
         $this->setData('_LatestItem', $LatestItem);
 
         // Set the canonical url to have the proper page title.
-        $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
-
+        $canonicalUrl = ($this->Discussion->Attributes['CanonicalUrl'] ?? '');
+        if (empty($canonicalUrl)) {
+            $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
+        } else {
+            $canonicalMessage = new Message(
+                str_replace(
+                    ["<0>", "</0>"],
+                    ['<a href="' . htmlspecialchars(\Gdn::request()->url($canonicalUrl)) . '">', "</a>"],
+                    \Gdn::translate('This discussion has a more <0>recent version</0>.')
+                ),
+                Message::TYPE_WARNING
+            );
+            $this->addMessage($canonicalMessage);
+            $this->canonicalUrl($canonicalUrl);
+        }
         $this->checkPageRange($this->Offset, $ActualResponses);
 
         // Load the comments
@@ -281,6 +308,15 @@ class DiscussionController extends VanillaController {
             $this->DiscussionModel->structuredData((array)$this->Discussion)
         );
         $this->render();
+    }
+
+    /**
+     * Get current messages.
+     *
+     * @return Messages[]
+     */
+    public function getMessages(): array {
+        return $this->messages;
     }
 
     /**
@@ -885,7 +921,12 @@ body { background: transparent !important; }
             }
 
             // Set the canonical url to have the proper page title.
-            $this->canonicalUrl(discussionUrl($discussion, pageNumber($this->Offset, $limit)));
+            $canonicalUrl = ($discussion->Attributes['CanonicalUrl'] ?? '');
+            if (empty($canonicalUrl)) {
+                $this->canonicalUrl(discussionUrl($discussion, pageNumber($this->Offset, $limit)));
+            } else {
+                $this->canonicalUrl($canonicalUrl);
+            }
 
             // Load the comments.
             $currentOrderBy = $this->CommentModel->orderBy();

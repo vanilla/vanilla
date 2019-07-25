@@ -42,7 +42,7 @@ class ValidationTest extends SharedBootstrapTestCase {
     public function provideBodyFormatRows() {
         return [
             [
-                ['Body' => '{"insert":"This is a valid rich post."}', 'Format' => 'Rich'],
+                ['Body' => '[{"insert":"This is a valid rich post."}]', 'Format' => 'Rich'],
                 true
             ],
             [

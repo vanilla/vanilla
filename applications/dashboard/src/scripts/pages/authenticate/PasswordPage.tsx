@@ -4,9 +4,9 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import DocumentTitle from "@library/components/DocumentTitle";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import PasswordForm from "@dashboard/pages/authenticate/components/PasswordForm";
 
 export default class PasswordPage extends React.Component {

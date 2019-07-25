@@ -1,7 +1,7 @@
 {
     "name": "Twitter Social Connect",
     "description": "Users may sign into your site using their Twitter account.",
-    "version": "1.1.10",
+    "version": "1.2",
     "mobileFriendly": true,
     "settingsUrl": "/dashboard/social/twitter",
     "settingsPermission": "Garden.Settings.Manage",

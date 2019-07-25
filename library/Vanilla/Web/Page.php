@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
@@ -15,7 +16,9 @@ use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
@@ -29,6 +32,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var string */
     private $canonicalUrl;
+
+    /** @var string */
+    private $favIcon;
 
     /** @var string */
     private $seoTitle;
@@ -48,7 +54,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var AssetInterface[] */
     protected $scripts = [];
 
-    /** @var $styles [] */
+    /** @var AssetInterface[] */
     protected $styles = [];
 
     /** @var string[] */
@@ -88,6 +94,18 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var BreadcrumbModel */
     protected $breadcrumbModel;
 
+    /** @var string */
+    protected $headerHtml = '';
+
+    /** @var string */
+    protected $footerHtml = '';
+
+    /** @var ContentSecurityPolicyModel */
+    protected $cspModel;
+
+    /** @var AssetPreloadModel */
+    protected $preloadModel;
+
     /**
      * Dependendency Injection.
      *
@@ -96,19 +114,33 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param \Gdn_Session $session
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
+     * @param ContentSecurityPolicyModel $cspModel
+     * @param AssetPreloadModel $preloadModel
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        ContentSecurityPolicyModel $cspModel,
+        AssetPreloadModel $preloadModel
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->cspModel = $cspModel;
+        $this->preloadModel = $preloadModel;
+
+        if ($favIcon = $this->siteMeta->getFavIcon()) {
+            $this->setFavIcon($favIcon);
+        }
+
+        if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
+            $this->addMetaTag("theme-color", ["name" => "theme-color", "content" => $mobileAddressBarColor]);
+        }
     }
 
     /**
@@ -125,6 +157,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
+            'nonce' => $this->cspModel->getNonce(),
             'title' => $this->seoTitle,
             'description' => $this->seoDescription,
             'canonicalUrl' => $this->canonicalUrl,
@@ -136,10 +169,14 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'inlineStyles' => $this->inlineStyles,
             'seoContent' => $this->seoContent,
             'metaTags' => $this->metaTags,
+            'header' => $this->headerHtml,
+            'footer' => $this->footerHtml,
+            'preloadModel' => $this->preloadModel,
             'cssClasses' => ['isLoading'],
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
                 null,
+            'favIcon' => $this->favIcon,
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
@@ -189,6 +226,26 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     protected function addReduxAction(ReduxAction $action): self {
         $this->reduxActions[] = $action;
 
+        return $this;
+    }
+
+    /**
+     * Get the page's "favorite icon".
+     *
+     * @return string|null
+     */
+    protected function getFavIcon(): ?string {
+        return $this->favIcon;
+    }
+
+    /**
+     * Set the "favorite icon" for the page.
+     *
+     * @param string $favIcon
+     * @return self
+     */
+    protected function setFavIcon(string $favIcon): self {
+        $this->favIcon = $favIcon;
         return $this;
     }
 

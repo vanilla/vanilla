@@ -8,6 +8,7 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 
 /**
  * Handles /settings endpoint.
@@ -727,6 +728,9 @@ class SettingsController extends DashboardController {
         $configurationModel->setField([
             'Garden.TrustedDomains',
             'Garden.Format.WarnLeaving',
+            HstsModel::MAX_AGE_KEY,
+            HstsModel::INCLUDE_SUBDOMAINS_KEY,
+            HstsModel::PRELOAD_KEY,
         ]);
 
         // Set the model on the form.
@@ -752,6 +756,11 @@ class SettingsController extends DashboardController {
             $trustedDomains = implode("\n", $trustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
+
+            $this->Form->setFormValue(HstsModel::INCLUDE_SUBDOMAINS_KEY, $this->Form->getValue(HstsModel::INCLUDE_SUBDOMAINS_KEY) === '1');
+            $this->Form->setFormValue(HstsModel::PRELOAD_KEY, $this->Form->getValue(HstsModel::PRELOAD_KEY) === '1');
+
+            $this->Form->setFormValue(HstsModel::MAX_AGE_KEY, (int)$this->Form->getValue(HstsModel::MAX_AGE_KEY));
 
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
@@ -1244,7 +1253,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         $this->title(t('Locales'));
-        $this->setHighlightRoute('dashboard/settings/locales');
+        $this->setHighlightRoute('/settings/locales');
         $this->addJsFile('addons.js');
 
         $LocaleModel = new LocaleModel();
@@ -1501,6 +1510,9 @@ class SettingsController extends DashboardController {
         // Get the currently selected Expiration Length
         $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
 
+        // Get target
+        $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+
         // Registration methods.
         $this->RegistrationMethods = [
             // 'Closed' => "Registration is closed.",
@@ -1539,6 +1551,7 @@ class SettingsController extends DashboardController {
         $registrationOptions = [
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.InviteExpiration',
+            'Garden.Registration.InviteTarget',
             'Garden.Registration.ConfirmEmail'
         ];
         $configurationModel->setField($registrationOptions);
@@ -1579,6 +1592,10 @@ class SettingsController extends DashboardController {
 
             // Save!
             if ($this->Form->save() !== false) {
+
+                // Get the updated InviteTarget
+                $this->InviteTarget = Gdn::config('Garden.Registration.InviteTarget', '');
+
                 // Get the updated Expiration Length
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));
@@ -1998,13 +2015,17 @@ class SettingsController extends DashboardController {
 
         // Filter themes.
         foreach ($Themes as $ThemeKey => $ThemeData) {
+            $isMobile = $ThemeData['IsMobile'] ?? false;
+            $isArchived = $ThemeData['Archived'] ?? false;
+            $isResponsive = $ThemeData['IsResponsive'] ?? false;
+
             // Only show mobile themes.
-            if (empty($ThemeData['IsMobile'])) {
+            if (!$isMobile && !$isResponsive) {
                 unset($Themes[$ThemeKey]);
             }
 
             // Remove themes that are archived
-            if (!empty($ThemeData['Archived'])) {
+            if ($isArchived) {
                 unset($Themes[$ThemeKey]);
             }
         }

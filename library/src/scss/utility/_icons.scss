@@ -1,0 +1,98 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+ .icon {
+    display: inline-block;
+    width: $icon-default_size;
+    height: $icon-default_size;
+    vertical-align: middle;
+
+    &.isSmall {
+        width: $icon-small_size;
+        height: $icon-small_size;
+    }
+
+    &.isLarge {
+        width: $icon-large_size;
+        height: $icon-large_size;
+    }
+}
+
+// When refactored, update insertLinkClasses.ts to use variable instead of hard coded value.
+.icon-close {
+    display: block;
+    margin: auto;
+    width: 12px;
+    height: 12px;
+}
+
+
+.icon-triangleDown,
+.icon-triangleRight {
+    display: block;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+}
+
+.icon-help {
+    width: $icon-small_size;
+    height: $icon-small_size;
+}
+
+.icon-search {
+    width: 18px;
+    height: 24px;
+}
+
+.icon-notifications {
+    width: 18px;
+    height: 24px;
+}
+
+.icon-messages {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-fake {
+    font-family: arial, sans-serif;
+}
+
+.icon-compose {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-settings {
+    width: 18px;
+    height: 20px;
+}
+
+.icon-user {
+    width: 20px;
+}
+
+.icon-noUserPhoto {
+    width: 100%;
+    height: auto;
+}
+
+.icon-chevronUp {
+    width: 51px;
+    height: 17px;
+}
+
+
+.icon-folderOpen {
+    width: 18.612px;
+    height: 14px;
+}
+
+.icon-folderClosed {
+    width: 16px;
+    height: 14px;
+}

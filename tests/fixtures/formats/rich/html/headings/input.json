@@ -31,5 +31,23 @@
     },
     {
         "insert": "normal\n"
+    },
+    {
+        "insert": "h4"
+    },
+    {
+        "attributes": {
+            "header": 4
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "h5"
+    },
+    {
+        "attributes": {
+            "header": 5
+        },
+        "insert": "\n"
     }
 ]

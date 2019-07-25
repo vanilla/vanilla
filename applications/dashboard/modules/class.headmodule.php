@@ -51,6 +51,9 @@ if (!class_exists('HeadModule', false)) {
         /** @var array JSON Linking Data */
         private $jsonLD = [];
 
+        /** @var \Vanilla\Web\Asset\AssetPreloadModel */
+        private $assetPreloadModel;
+
         /**
          *
          *
@@ -63,6 +66,8 @@ if (!class_exists('HeadModule', false)) {
             $this->_Subtitle = '';
             $this->_TitleDivider = ' — ';
             parent::__construct($sender);
+            // Workaround beacuse we can't do parameter injection.
+            $this->assetPreloadModel = \Gdn::getContainer()->get(\Vanilla\Web\Asset\AssetPreloadModel::class);
         }
 
         /**
@@ -595,6 +600,10 @@ if (!class_exists('HeadModule', false)) {
                 $head .= $string;
                 $head .= "\n";
             }
+
+            // Add the HTML from the AssetPreloader
+            $head .= "\n";
+            $head .= $this->assetPreloadModel->renderHtml();
 
             return $head;
         }

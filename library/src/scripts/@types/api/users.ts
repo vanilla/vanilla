@@ -16,6 +16,13 @@ export interface IMe extends IUserFragment {
     isAdmin: boolean;
 }
 
+export interface ICount {
+    name: string;
+    count: number;
+}
+
+export type IMeCounts = ICount[];
+
 export interface IUser extends IUserFragment {
     email: string;
     emailConfirmed: boolean;

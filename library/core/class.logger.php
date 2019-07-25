@@ -95,7 +95,7 @@ class Logger {
      */
     public static function getLogger() {
         if (!self::$instance) {
-            self::$instance = new \Vanilla\Logger();
+            self::$instance = Gdn::getContainer()->get(\Vanilla\Logger::class);
         }
         return self::$instance;
     }

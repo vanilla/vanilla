@@ -1,7 +1,6 @@
 {
     "allowDisable": false,
     "description": "Vanilla is the sweetest discussion forum on the web.",
-    "version": "2.4.201",
     "setupController": "setup",
     "url": "https://open.vanillaforums.com",
     "license": "GPL v2",
@@ -17,5 +16,6 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ]
+    ],
+    "version": "3.0"
 }

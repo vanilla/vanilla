@@ -5,8 +5,8 @@
 
 import Quill from "quill/core";
 import { BlockEmbed } from "quill/blots/block";
-import { FOCUS_CLASS } from "@library/embeds";
-import { logWarning } from "@library/utility";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { logWarning } from "@vanilla/utils";
 import Parchment from "parchment";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
 

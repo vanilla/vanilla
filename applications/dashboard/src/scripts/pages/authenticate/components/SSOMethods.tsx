@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import React from "react";
-import Paragraph from "@library/components/Paragraph";
-import { IUserAuthenticator } from "@dashboard/@types/api";
+import Paragraph from "@library/layout/Paragraph";
+import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
 
 interface IProps {
     ssoMethods?: IUserAuthenticator[];
@@ -41,7 +41,7 @@ export default class SSOMethods extends React.Component<IProps> {
 
         return (
             <div className="ssoMethods">
-                <Paragraph children={t("Sign in with one of the following:")} />
+                <Paragraph>{t("Sign in with one of the following:")}</Paragraph>
                 {ssoMethods}
             </div>
         );

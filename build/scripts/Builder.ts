@@ -4,19 +4,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import path from "path";
-import del from "del";
-import webpack, { Stats, Configuration } from "webpack";
-import { makeProdConfig } from "./configs/makeProdConfig";
-import { makeDevConfig } from "./configs/makeDevConfig";
-import serve, { InitializedKoa, Options } from "webpack-serve";
-import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
-import { installNodeModulesInDir } from "./utility/moduleUtils";
+import * as del from "del";
+import path from "path";
+import webpack, { Configuration, Stats } from "webpack";
+import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { print, fail } from "./utility/utils";
-import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
+import { makeProdConfig } from "./configs/makeProdConfig";
+import { DIST_DIRECTORY } from "./env";
+import { BuildMode, getOptions, IBuildOptions } from "./options";
 import EntryModel from "./utility/EntryModel";
+import { installLerna } from "./utility/moduleUtils";
+import { fail, print } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -40,11 +40,19 @@ export default class Builder {
     }
 
     /**
+     * Run just the install step of the build.
+     */
+    public async installOnly() {
+        await this.entryModel.init();
+        await installLerna();
+    }
+
+    /**
      * Run the build based on the provided options.
      */
     public async build() {
         await this.entryModel.init();
-        await this.installNodeModules();
+        await installLerna();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -52,23 +60,6 @@ export default class Builder {
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
         }
-    }
-
-    /**
-     * Install node modules for all addons providing source files.
-     */
-    private async installNodeModules() {
-        // Make an exception for the old dashboard node_modules. We don't want to install these.
-        // Eventually they will be untangled but for now they trigger bower component installation.
-        // That does not work in CI.
-        const dashboardPath = path.resolve(VANILLA_APPS, "dashboard");
-        const installableAddons = this.entryModel.addonDirs.filter(addonDir => addonDir !== dashboardPath);
-
-        const originalDir = process.cwd();
-        // Install the node modules.
-        return await Promise.all(installableAddons.map(installNodeModulesInDir)).then(() => {
-            process.chdir(originalDir);
-        });
     }
 
     /**
@@ -134,31 +125,33 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 
-        const sections = await this.entryModel.getSections();
-        const config = await Promise.all(sections.map(section => makeDevConfig(this.entryModel, section)));
-        const compiler = webpack(config) as any;
-        const argv = {};
-        const enhancer = (app: InitializedKoa) => {
-            app.use(async (context, next) => {
-                context.set("Access-Control-Allow-Origin", "*");
-                context.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-                context.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-                await next();
-            });
-        };
-
-        const options: Options = {
-            compiler,
+        const devServerOptions: DevServerConfiguration = {
             host: this.options.devIp,
             port: 3030,
-            add: enhancer,
-            clipboard: false,
-            devMiddleware: {
-                publicPath: `http://${this.options.devIp}:3030/`,
-                stats: this.statOptions,
+            hot: true,
+            open: false,
+            https: false,
+            disableHostCheck: true,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+                "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
+            publicPath: `http://${this.options.devIp}:3030/`,
+            stats: this.statOptions,
         };
 
-        await serve(argv, options);
+        const sections = await this.entryModel.getSections();
+        const config = await Promise.all(
+            sections.map(async section => {
+                const sectionConfig = await makeDevConfig(this.entryModel, section);
+                WebpackDevServer.addDevServerEntrypoints(sectionConfig as any, devServerOptions);
+                return sectionConfig;
+            }),
+        );
+        const compiler = webpack(config) as any;
+
+        const server = new WebpackDevServer(compiler, devServerOptions);
+        server.listen(3030, devServerOptions.host || "127.0.0.1");
     }
 }

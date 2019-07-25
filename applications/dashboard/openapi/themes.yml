@@ -1,0 +1,380 @@
+openapi: 3.0.2
+info:
+paths:
+  /themes/{key}:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Get a theme.
+  /themes/{key}/assets/footer.html:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Success
+        404:
+          description: Footer could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get the footer HTML of a theme.
+  /themes/{key}/assets/fonts.json:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ThemeFont"
+                type: array
+          description: Success
+        404:
+          description: Fonts could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get custom fonts of a theme.
+  /themes/{key}/assets/header.html:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Success
+        404:
+          description: Header could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get the header HTML of a theme.
+  /themes/{key}/assets/javascript.js:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/javascript:
+              schema:
+                type: string
+          description: Success
+        404:
+          description: JavaScript could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get JavaScript to be used as part of a theme.
+  /themes/{key}/assets/scripts.json:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ThemeScript"
+                type: array
+          description: Success
+        404:
+          description: Additional scripts could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get additional script files of a theme.
+  /themes/{key}/assets/styles.css:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            text/css:
+              schema:
+                type: string
+          description: Success
+        404:
+          description: Stylesheet could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get theme styles.
+  /themes/{key}/assets/variables.json:
+    get:
+      parameters:
+        - description: Unique theme slug.
+          in: path
+          name: key
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Success
+        404:
+          description: Variables could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
+      tags:
+        - Themes
+      summary: Get theme variables.
+components:
+  schemas:
+    Theme:
+      properties:
+        assets:
+          $ref: "#/components/schemas/ThemeAssets"
+        type:
+          type: string
+          enum:
+            - themeFile
+        themeID:
+          type: integer
+        version:
+          type: string
+      required:
+        - assets
+        - type
+        - themeID
+        - version
+      type: object
+    ThemeAssets:
+      description: Assets to include in a page as part of the theme.
+      properties:
+        header:
+          $ref: "#/components/schemas/ThemeHeaderAsset"
+        footer:
+          $ref: "#/components/schemas/ThemeFooterAsset"
+        fonts:
+          $ref: "#/components/schemas/ThemeFontsAsset"
+        javascript:
+          description: An absolute URL to the theme's JavaScript file.
+          type: string
+        scripts:
+          $ref: "#/components/schemas/ThemeScriptsAsset"
+        styles:
+          description: An absolute URL to the theme's stylesheet.
+          type: string
+        variables:
+          $ref: "#/components/schemas/ThemeVariablesAsset"
+        logo:
+          $ref: "#/components/schemas/ThemeLogoAsset"
+        mobileLogo:
+          $ref: "#/components/schemas/ThemeMobileLogoAsset"
+      type: object
+    ThemeAssetNotFound:
+      properties:
+        description:
+          description: Verbose description of the error.
+          nullable: true
+          type: string
+        message:
+          description: Short description of the error.
+          type: string
+        status:
+          description: Status code of the error response.
+          type: integer
+      required:
+        - description
+        - message
+        - status
+      type: object
+    ThemeFont:
+      description: An external font resource.
+      properties:
+        fallbacks:
+          type: string
+          nullable: true
+        name:
+          type: string
+        type:
+          enum:
+            - url
+          type: string
+        url:
+          type: string
+      required:
+        - fallbacks
+        - name
+        - type
+        - url
+      type: object
+    ThemeFontsAsset:
+      description: A collection of external font resources.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ThemeFont"
+            type: object
+      required:
+        - data
+      type: object
+    ThemeFooterAsset:
+      description: Custom footer HTML.
+      properties:
+        data:
+          type: string
+        type:
+          type: string
+          enum:
+            - html
+      required:
+        - data
+        - type
+      type: object
+    ThemeHeaderAsset:
+      description: Custom header HTML.
+      properties:
+        data:
+          type: string
+        type:
+          type: string
+          enum:
+            - html
+      required:
+        - data
+        - type
+      type: object
+    ThemeScript:
+      properties:
+        url:
+          type: string
+      required:
+        - url
+      type: object
+    ThemeScriptsAsset:
+      description: External script files to be included.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ThemeScript"
+        type:
+          type: string
+          enum:
+            - data
+      required:
+        - data
+        - type
+      type: object
+    ThemeVariablesAsset:
+      description: A collection of variables intended to be used by theme.
+      properties:
+        data:
+          type: object
+        type:
+          type: string
+          enum:
+            - json
+      required:
+        - data
+        - type
+      type: object
+    ThemeLogoAsset:
+      description: Site logo to be displayed in the theme.
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+          enum:
+            - image
+      required:
+        - url
+        - type
+      type: object
+    ThemeMobileLogoAsset:
+      description: Site logo to be displayed in the theme when viewed on a mobile device.
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+          enum:
+            - image
+      required:
+        - url
+        - type
+      type: object

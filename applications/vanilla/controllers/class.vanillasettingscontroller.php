@@ -39,6 +39,7 @@ class VanillaSettingsController extends Gdn_Controller {
     public function posting() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
+        $this->addJsFile('admin.ts');
 
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
@@ -69,6 +70,10 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
             'Plugins.editor.ForceWysiwyg',
+            'ImageUpload.Limits.Enabled',
+            'ImageUpload.Limits.Width',
+            'ImageUpload.Limits.Height'
+
         ]);
 
         // Fire an filter event gather extra form HTML for specific format items.
@@ -105,6 +110,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $configurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
             $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
+            $configurationModel->Validation->applyRule('ImageUpload.Limits.Width', 'Integer');
+            $configurationModel->Validation->applyRule('ImageUpload.Limits.Height', 'Integer');
 
             // Save new settings
             $saved = $this->Form->save();

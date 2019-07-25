@@ -14,6 +14,7 @@ yargs
     .option("verbose", {
         alias: "v",
         default: false,
+        boolean: true,
     })
     .options("mode", {
         default: BuildMode.PRODUCTION,
@@ -24,13 +25,16 @@ yargs
     .options("fix", {
         alias: "f",
         default: false,
+        boolean: true,
     })
     .options("low-memory", {
         default: false,
+        boolean: true,
     })
     .options("install", {
         alias: "i",
         default: false,
+        boolean: true,
     });
 
 export interface IBuildOptions {
@@ -72,20 +76,20 @@ export async function getOptions(): Promise<IBuildOptions> {
     let enabledAddonKeys: string[] = [];
     let devIp = "localhost";
     if (yargs.argv.mode === BuildMode.DEVELOPMENT) {
-        config = await getVanillaConfig(yargs.argv.config);
+        config = await getVanillaConfig(yargs.argv.config as BuildMode);
         devIp = config.HotReload && config.HotReload.IP ? config.HotReload.IP : "localhost";
         enabledAddonKeys = parseEnabledAddons(config);
     }
 
     return {
-        mode: yargs.argv.mode,
-        verbose: yargs.argv.verbose,
+        mode: yargs.argv.mode as BuildMode,
+        verbose: yargs.argv.verbose as boolean,
         enabledAddonKeys,
-        lowMemory: yargs.argv["low-memory"],
-        configFile: yargs.argv.config,
-        fix: yargs.argv.fix,
-        phpConfig: config,
-        install: yargs.argv.install,
+        lowMemory: yargs.argv["low-memory"] as boolean,
+        configFile: yargs.argv.config as string,
+        fix: yargs.argv.fix as boolean,
+        phpConfig: config as string,
+        install: yargs.argv.install as boolean,
         devIp,
     };
 }

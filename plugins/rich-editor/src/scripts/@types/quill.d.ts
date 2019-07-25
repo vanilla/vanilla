@@ -4,9 +4,11 @@
  * @license GPL-2.0-only
  */
 
-/* tslint:disable */
+/* eslint-disable */
 
 declare module "quill/core" {
+    import HistoryModule from "@rich-editor/quill/HistoryModule";
+    import SelectionModule from "quill/modules/selection";
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from "parchment/dist/src/blot/abstract/container";
     import ClipboardModule from "quill/modules/clipboard";
@@ -163,9 +165,14 @@ declare module "quill/core" {
     class Quill extends EventEmitter {
         root: HTMLDivElement;
         clipboard: ClipboardModule;
+        selection: SelectionModule;
         scroll: Container;
         container: HTMLDivElement;
         options: AnyObject;
+        history: HistoryModule;
+
+        // Custom
+        getLastGoodSelection(): RangeStatic;
 
         constructor(container: string | Element, options?: QuillOptionsStatic);
         deleteText(index: number, length: number, source?: Sources): DeltaStatic;
@@ -175,6 +182,7 @@ declare module "quill/core" {
         getLength(): number;
         getText(index?: number, length?: number): string;
         insertEmbed(index: number, type: string, value: any, source?: Sources): DeltaStatic;
+        insertText(index: number, text: string, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, format: string, value: any, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, formats: StringMap, source?: Sources): DeltaStatic;
@@ -236,10 +244,13 @@ declare module "quill/core" {
 declare module "quill/blots/block" {
     import Block from "parchment/dist/src/blot/block";
     import Embed from "parchment/dist/src/blot/embed";
-    import { Blot } from "quill/core";
+    import { Blot, DeltaOperation } from "quill/core";
 
     export class BlockEmbed extends Embed {}
-    export default Block;
+    export default class BlockBlot extends Block {
+        protected cache: any = {};
+        public delta(): [];
+    }
 }
 
 declare module "quill/blots/inline" {
@@ -301,6 +312,7 @@ declare module "quill/modules/clipboard" {
         ): void;
         dangerouslyPasteHTML(html: string, source?: Sources): void;
         dangerouslyPasteHTML(index: number, html: string, source?: Sources): void;
+        convert(html?: string): DeltaStatic;
     }
 }
 declare module "quill/modules/formula";
@@ -320,6 +332,7 @@ declare module "quill/modules/history" {
         };
         protected lastRecorded: number;
         protected ignoreChange: boolean;
+        public clear(): void;
         public undo(): void;
         public redo(): void;
         public cutoff(): void;
@@ -358,7 +371,7 @@ declare module "quill/modules/keyboard" {
               [key: string]: string | boolean | number;
           };
 
-    interface Context {
+    interface ConfigurationContext {
         collapsed?: boolean;
         format?: Formats;
         offset?: number;
@@ -367,7 +380,22 @@ declare module "quill/modules/keyboard" {
         suffix?: RegExp;
     }
 
-    type KeyboardHandler = (selectedRange: RangeStatic) => boolean | null | undefined | void; // False to prevent default.
+    interface HandlerContext extends ConfigurationContext {
+        collapsed: boolean;
+        format: Formats;
+        offset: number;
+        empty: boolean;
+        prefix: string;
+        suffix: string;
+        event: KeyboardEvent;
+    }
+
+    interface IBindingObject extends ConfigurationContext, KeyBinding {
+        handler: KeyboardHandler;
+    }
+    export type BindingObject = IBindingObject | false | undefined;
+
+    type KeyboardHandler = (selectedRange: RangeStatic, context: HandlerContext) => boolean | null | undefined | void; // False to prevent default.
 
     export default class KeyboardModule extends Module {
         public static match(event: KeyboardEvent, binding: KeyBinding | string | number);

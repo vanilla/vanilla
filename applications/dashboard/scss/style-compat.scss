@@ -30,7 +30,6 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "../../../plugins/rich-editor/src/scss/richEditorVariables";
 @import "compatibility/editor/mixin.legacyMobileStyles";
 @import "compatibility/editor/mixin.legacyEditor";
 @import "compatibility/editor/richEditorLegacy";
@@ -47,5 +46,4 @@
 @import "../../../library/src/scss/userContent/spoiler";
 @import "../../../library/src/scss/userContent/emoji";
 @import "../../../library/src/scss/userContent/codeBlocks";
-@import "../../../library/src/scss/components/attachmentIcons";
-@import "../../../library/src/scss/components/attachment";
+

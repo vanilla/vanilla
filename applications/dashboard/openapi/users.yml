@@ -5,13 +5,13 @@ paths:
     get:
       parameters:
       - description: >
-          When the user was created.<br />
+          When the user was created.
 
-          This filter receive a string that can take two forms.<br />
+          This filter receive a string that can take two forms.
 
           A single date that matches '{Operator}{DateTime}' where {Operator}
           can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
+          =.
 
           A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
           where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
@@ -22,13 +22,13 @@ paths:
           format: date-filter
           type: string
       - description: >
-          When the user was updated.<br />
+          When the user was updated.
 
-          This filter receive a string that can take two forms.<br />
+          This filter receive a string that can take two forms.
 
           A single date that matches '{Operator}{DateTime}' where {Operator}
           can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
+          =.
 
           A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
           where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
@@ -49,14 +49,7 @@ paths:
         style: form
         x-filter:
           field: u.UserID
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -121,7 +114,7 @@ paths:
           minLength: 1
           type: string
       - description: >
-          Sort method for results.<br />
+          Sort method for results.
 
           Must be one of: "countComments", "dateLastActive", "name",
           "mention".
@@ -136,7 +129,7 @@ paths:
           - name
           - mention
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -176,6 +169,36 @@ paths:
       tags:
       - Users
       summary: Get information about the current user.
+  /users/me-counts:
+      get:
+        responses:
+          '200':
+            content:
+              'application/json':
+                schema:
+                  properties:
+                    counts:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            description: Menu counter name
+                            type: string
+                          count:
+                            description: Counter value
+                            type: integer
+                      example:
+                        - name: UnreadNotifications
+                          count: 2
+                        - name: Bookmarks
+                          count: 3
+                  required:
+                  - counts
+            description: Success
+        tags:
+        - Users
+        summary: Get information about menu counts for current user.
   /users/register:
     post:
       responses:
@@ -627,12 +650,26 @@ components:
   schemas:
     User:
       properties:
-        banned:
-          description: Is the user banned?
+        userID:
+          description: ID of the user.
           type: integer
-        bypassSpam:
-          description: Should submissions from this user bypass SPAM checks?
-          type: boolean
+        name:
+          description: Name of the user.
+          minLength: 1
+          type: string
+        photoUrl:
+          description: URL to the user photo.
+          minLength: 0
+          nullable: true
+          type: string
+        email:
+          description: Email address of the user.
+          minLength: 0
+          type: string
+        roles:
+          items:
+            $ref: 'schemas.yml#/components/schemas/RoleFragment'
+          type: array
         dateInserted:
           description: When the user was created.
           format: date-time
@@ -647,25 +684,22 @@ components:
           format: date-time
           nullable: true
           type: string
-        email:
-          description: Email address of the user.
-          minLength: 0
-          type: string
+        points:
+          description: The total number of points the user has accumulated.
+          type: integer
+          default: 0
         emailConfirmed:
-          description: Has the email address for this user been confirmed?
+          description: Has the email address for the user been confirmed?
           type: boolean
         hidden:
           description: Is this user hiding their online status?
           type: boolean
-        name:
-          description: Name of the user.
-          minLength: 1
-          type: string
-        photoUrl:
-          description: URL to the user photo.
-          minLength: 0
-          nullable: true
-          type: string
+        bypassSpam:
+          description: Should submissions from this user bypass SPAM checks?
+          type: boolean
+        banned:
+          description: Is the user banned?
+          type: integer
         rank:
           x-addon: ranks
           properties:
@@ -690,21 +724,15 @@ components:
           description: ID of the user rank.
           nullable: true
           type: integer
-        roles:
-          items:
-            $ref: 'schemas.yml#/components/schemas/RoleFragment'
-          type: array
         showEmail:
           description: Is the email address visible to other users?
           type: boolean
-        userID:
-          description: ID of the user.
-          type: integer
       required:
       - userID
       - name
       - email
       - photoUrl
+      - points
       - emailConfirmed
       - showEmail
       - bypassSpam

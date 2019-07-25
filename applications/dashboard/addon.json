@@ -1,6 +1,5 @@
 {
     "description": "Handles user, role, permission, plugin, theme, and application management.",
-    "version": "2.4.201",
     "allowDisable": false,
     "url": "https://open.vanillaforums.com",
     "license": "GPL-2.0-only",
@@ -16,5 +15,6 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ]
+    ],
+    "version": "3.0"
 }

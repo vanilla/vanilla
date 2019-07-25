@@ -1,0 +1,24 @@
+{
+    "name": "Google SignIn",
+    "description": "Users may sign into your site using their Google account.",
+    "version": "1.0.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/googlesignin",
+    "settingsPermission": "Garden.Settings.Manage",
+    "hidden": false,
+    "socialConnect": true,
+    "requiresRegistration": false,
+    "icon": "google_signin.png",
+    "key": "googlesignin",
+    "type": "addon",
+    "documentationUrl": "https://docs.vanillaforums.com/help/sso/social-connect/#google",
+    "authors": [
+        {
+            "name": "Support",
+            "email": "support@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.6"
+    }
+}

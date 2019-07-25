@@ -7,8 +7,8 @@
  * @license GPL-2.0-only
  */
 
-if (PHP_VERSION_ID < 70000) {
-    die('Vanilla requires PHP 7.0 or greater.');
+if (PHP_VERSION_ID < 70100) {
+    die('Vanilla requires PHP 7.1 or greater.');
 }
 
 // Define the constants we need to get going.
@@ -16,7 +16,9 @@ if (!defined('APPLICATION')) {
     define('APPLICATION', 'Vanilla');
 }
 if (!defined('APPLICATION_VERSION')) {
-    define('APPLICATION_VERSION', '2.8+2019.003');
+    // Rules for the versioning
+    // {OSS version}-{Cloud release version}-{? SNAPSHOT if it's a dev build}
+    define('APPLICATION_VERSION', '3.1-2019.009-SNAPSHOT');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

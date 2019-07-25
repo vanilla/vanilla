@@ -9,6 +9,7 @@ if (!function_exists('WriteComment'))
     include($this->fetchViewLocation('helper_functions', 'discussion'));
 
 ?>
+
 <div class="Embed">
     <?php
     echo '<span class="BeforeCommentHeading">';
@@ -38,6 +39,7 @@ if (!function_exists('WriteComment'))
         if ($this->Pager->lastPage()) {
             $LastCommentID = $this->addDefinition('LastCommentID');
             if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+                $this->Data['Discussion'] = (is_array($this->Data['Discussion'])) ? (object)$this->Data['Discussion'] : $this->Data['Discussion'];
                 $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
             $this->addDefinition('Vanilla_Comments_AutoRefresh', Gdn::config('Vanilla.Comments.AutoRefresh', 0));
         }

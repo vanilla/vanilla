@@ -205,6 +205,18 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test getting current menu counts /users/me-counts.
+     */
+    public function testMeCounts() {
+        $response = $this->api()->get("{$this->baseUrl}/me-counts");
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response = $response->getBody();
+
+        $this->assertArrayHasKey('counts', $response);
+    }
+
+    /**
      * Test getting current user info when the user is a valid member.
      */
     public function testMeMember() {

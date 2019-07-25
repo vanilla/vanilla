@@ -42,14 +42,20 @@ if (!$hasUserID) {
         || $usernameNotValid;
 }
 ?>
-<div class="Connect">
+<div class="Connect FormTitleWrapper AjaxForm">
     <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign In") : sprintf(t('%s Connect'), htmlentities($ConnectSource)); ?></h1>
 
-    <div>
+    <div class="FormWrapper">
         <?php
         echo $this->Form->open();
         echo $this->Form->errors();
-        if ($ConnectName || $ConnectPhoto) : ?>
+
+        /**
+         *  HideName can be passed by any plugin that hooks into
+         *  the EntryController that has rules that require this form to be
+         *  shown but not the Name Field.
+         */
+        if ($ConnectName || $ConnectPhoto && !$this->data('HideName')) : ?>
             <div class="MeBox">
                 <?php
                 if ($ConnectPhoto) {
@@ -99,7 +105,7 @@ if (!$hasUserID) {
 
                 <?php
                     $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
-                    if ($displayConnectName) : ?>
+                    if ($displayConnectName && !$this->data('HideName')) : ?>
                 <li>
                     <?php
 
@@ -131,13 +137,21 @@ if (!$hasUserID) {
                 <?php endif; ?>
 
                 <?php $this->fireEvent('RegisterBeforePassword'); ?>
-                <li id="ConnectPassword">
-                    <?php
+
+                <?php
+                /**
+                 *  HidePassword can be passed by any plugin that hooks into
+                 *  the EntryController that has rules that require this form to be
+                 *  shown but not the Password Field.
+                 */
+                if (!$this->data('HidePassword')) {
+                    echo '<li id="ConnectPassword">';
                     echo $this->Form->label('Password', 'ConnectPassword');
                     echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
                     echo $this->Form->input('ConnectPassword', 'password');
-                    ?>
-                </li>
+                    echo '</li>';
+                }
+                ?>
             </ul>
 
             <?php

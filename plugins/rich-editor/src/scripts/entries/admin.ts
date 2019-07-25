@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { onReady, onContent } from "@library/application";
+import { onReady, onContent } from "@library/utility/appUtils";
 
 onReady(handleRichEditorInputFormatterOptions);
 onContent(handleRichEditorInputFormatterOptions);

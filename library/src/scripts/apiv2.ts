@@ -5,16 +5,16 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, t, getMeta } from "@library/application";
-import { indexArrayByKey } from "@library/utility";
+import { formatUrl, t, getMeta } from "@library/utility/appUtils";
+import { indexArrayByKey } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
-import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
-import { humanFileSize } from "@library/utils/fileUtils";
+import { humanFileSize } from "@library/utility/fileUtils";
+import { IApiError, IFieldError } from "@library/@types/api/core";
 
 function fieldErrorTransformer(responseData) {
-    if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
+    if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
 
@@ -49,7 +49,8 @@ export function createTrackableRequest(
  * @param file - The file to upload.
  */
 export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}) {
-    const allowedAttachments = getMeta("upload.allowedExtensions", []) as string[];
+    let allowedExtensions = getMeta("upload.allowedExtensions", []) as string[];
+    allowedExtensions = allowedExtensions.map((ext: string) => ext.toLowerCase());
     const maxSize = getMeta("upload.maxSize", 0);
     const filePieces = file.name.split(".");
     const extension = filePieces[filePieces.length - 1] || "";
@@ -59,8 +60,8 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
         const stringTotal: string = humanSize.amount + humanSize.unitAbbr;
         const message = sprintf(t("The uploaded file was too big (max %s)."), stringTotal);
         throw new Error(message);
-    } else if (!allowedAttachments.includes(extension)) {
-        const attachmentsString = allowedAttachments.join(", ");
+    } else if (!allowedExtensions.includes(extension.toLowerCase())) {
+        const attachmentsString = allowedExtensions.join(", ");
         const message = sprintf(
             t(
                 "The uploaded file did not have an allowed extension. \nOnly the following extensions are allowed. \n%s.",
@@ -80,37 +81,44 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
 /**
  * Extract a field specific error from an ILoadable if applicable.
  *
- * @param loadable - The loadable to extract from.
+ * @param apiError - The error to extract from.
  * @param field - The field to extract.
  *
  * @returns an array of IFieldErrors if found or undefined.
  */
-export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldError[] | undefined {
-    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
-        if (loadable.error && loadable.error.errors && loadable.error.errors[field]) {
-            return loadable.error.errors[field];
-        }
+export function getFieldErrors(apiError: IApiError | undefined, field: string): IFieldError[] | undefined {
+    if (!apiError) {
+        return;
+    }
+
+    const serverError = apiError.response.data;
+    if (serverError && serverError.errors && serverError.errors[field]) {
+        return serverError.errors[field];
     }
 }
 
 /**
  * Extract a global error message out of an ILoadable if applicable.
  *
- * @param loadable - The loadable to extract from.
+ * @param apiError - The error to extract from.
  * @param validFields - Field to check for overriding fields errors from. A global error only shows if there are no valid field errors.
  *
  * @returns A global error message or an undefined.
  */
-export function getGlobalErrorMessage(loadable: ILoadable<any>, validFields: string[]): string | undefined {
-    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
-        for (const field of validFields) {
-            if (getFieldErrors(loadable, field)) {
-                return;
-            }
-        }
-
-        if (loadable.error) {
-            return loadable.error.message || t("An error has occurred, please try again.");
+export function getGlobalErrorMessage(apiError: IApiError | undefined, validFields: string[] = []): string | undefined {
+    if (!apiError) {
+        return;
+    }
+    for (const field of validFields) {
+        if (getFieldErrors(apiError, field)) {
+            return;
         }
     }
+
+    const serverError = apiError.response && apiError.response.data;
+    if (serverError && serverError.message) {
+        return serverError.message;
+    }
+
+    return t("Something went wrong while contacting the server.");
 }

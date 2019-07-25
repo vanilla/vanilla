@@ -3,10 +3,12 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
+use Firebase\JWT\JWT;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -89,6 +91,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ThemeManager')
 
+    // File base theme api provider
+    ->rule(\Vanilla\Models\ThemeModel::class)
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
+
     // Logger
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
@@ -154,9 +161,13 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias(Gdn::AliasDispatcher)
 
     ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+    ->setShared(true)
     ->setConstructorArgs([
         'deploymentTime' => ContainerUtils::config('Garden.Deployed')
     ])
+
+    ->rule(\Vanilla\Web\Asset\AssetPreloadModel::class)
+    ->setShared(true)
 
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
     ->addCall('setHotReloadEnabled', [
@@ -165,6 +176,15 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ])
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+
+    ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
+    ->addAlias('HstsModel')
+
+    ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
+    ->setShared(true)
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
     ->setConstructorArgs([ContainerUtils::cacheBuster()])
@@ -178,6 +198,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
@@ -279,6 +302,13 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
 
+    ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
+    ->addCall('addCoreEmbeds')
+    ->setShared(true)
+
+    ->rule(Vanilla\Models\SiteMeta::class)
+    ->setConstructorArgs(['activeTheme' => ContainerUtils::currentTheme()])
+
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
@@ -290,6 +320,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('registerFormat', [Formats\BBCodeFormat::FORMAT_KEY, new Reference(Formats\BBCodeFormat::class)])
     ->addCall('registerFormat', [Formats\MarkdownFormat::FORMAT_KEY, new Reference(Formats\MarkdownFormat::class)])
     ->setShared(true)
+
+    ->rule(\Vanilla\Analytics\Client::class)
+    ->setShared(true)
+    ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
 ;
 
 // Run through the bootstrap with dependencies.
@@ -423,6 +457,9 @@ register_shutdown_function(function () use ($dic) {
 $dic->get('Gdn_Locale');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+
+// Configure JWT library to allow for five seconds of leeway.
+JWT::$leeway = 5;
 
 // Start Authenticators
 $dic->get('Authenticator')->startAuthenticator();

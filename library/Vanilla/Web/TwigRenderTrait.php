@@ -51,6 +51,7 @@ trait TwigRenderTrait {
      */
     private function enhanceTwig(\Twig\Environment $twig) {
         $twig->addFunction(new \Twig_Function('t', [\Gdn::class, 'translate']));
+        $twig->addFunction(new \Twig_Function('sanitizeUrl', [\Gdn_Format::class, 'sanitizeUrl']));
         $twig->addFunction(new \Twig_Function('url', 'url'));
     }
 }

@@ -3,6 +3,9 @@
 helpAsset(t('Need More Help?'), anchor(t("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'));
 echo heading(t('Embedding'));
 ?>
+<div class="alert alert-warning">
+    <strong><?php echo sprintf(t('Add your site to trusted domains.', 'Make sure your site is added to %s when embedding is enabled.'), anchor(t('trusted domains'), '/settings/security')); ?></strong>
+</div>
 <div class="row form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Embed My Forum'); ?></div>

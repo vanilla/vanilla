@@ -8,29 +8,20 @@ import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
-import { getPastedFile, getDraggedFile } from "@library/dom";
+import { getPastedFile, getDraggedFile } from "@vanilla/dom-utils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import getStore from "@library/state/getStore";
-import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
-import { IStoreState } from "@rich-editor/@types/store";
-import { isFileImage } from "@library/utility";
-import ProgressEventEmitter from "@library/ProgressEventEmitter";
+import { insertBlockBlotAt } from "@rich-editor/quill/utility";
+import { isFileImage } from "@vanilla/utils";
+import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-    private store = getStore<IStoreState>();
-
-    constructor(public quill: Quill, options = {}, editorID) {
+    constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();
-    }
-
-    private get state() {
-        const id = getIDForQuill(this.quill);
-        return this.store.getState().editor.instances[id];
     }
 
     /**
@@ -57,10 +48,10 @@ export default class EmbedInsertionModule extends Module {
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        const selection = this.state.lastGoodSelection || { index: this.quill.scroll.length(), length: 0 };
-        insertBlockBlotAt(this.quill, selection.index, externalEmbed);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, externalEmbed);
         this.quill.update(Quill.sources.USER);
-        externalEmbed.focus();
+        this.quill.setSelection(externalEmbed.offset(this.quill.scroll) + externalEmbed.length(), 0);
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
@@ -92,7 +83,7 @@ export default class EmbedInsertionModule extends Module {
 
     public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then(data => {
-            data.type = "image";
+            data.embedType = "image";
             return data;
         });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
@@ -102,11 +93,8 @@ export default class EmbedInsertionModule extends Module {
         const progressEventEmitter = new ProgressEventEmitter();
 
         const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
-            return {
-                url: data.url,
-                type: "file",
-                attributes: data,
-            };
+            data.embedType = "file";
+            return data;
         });
         this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
     }

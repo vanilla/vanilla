@@ -5,7 +5,7 @@
 
 import * as actions from "@dashboard/pages/recoverPassword/recoverPasswordActions";
 import { IRequestPasswordState } from "@dashboard/@types/state";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 
 const initialState: IRequestPasswordState = {
     status: LoadStatus.PENDING,

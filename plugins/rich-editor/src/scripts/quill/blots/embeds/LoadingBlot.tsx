@@ -5,13 +5,13 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { t } from "@library/application";
-import { FOCUS_CLASS } from "@library/embeds";
-import { escapeHTML, setData, getData } from "@library/dom";
+import { t } from "@library/utility/appUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { escapeHTML, setData, getData } from "@vanilla/dom-utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import AttachmentLoading from "@library/components/attachments/AttachmentLoading";
-import { mimeTypeToAttachmentType } from "@library/components/attachments";
+import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
+import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
 
 const LOADER_DATA_KEY = "loadingDataKey";
 

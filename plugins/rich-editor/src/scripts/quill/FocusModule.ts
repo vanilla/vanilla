@@ -9,8 +9,7 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent } from "@library/dom";
-import TabHandler from "@library/TabHandler";
+import { delegateEvent, TabHandler } from "@vanilla/dom-utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import {
     insertNewLineAtEndOfScroll,
@@ -341,7 +340,7 @@ export default class EmbedFocusModule extends Module {
                 return currentBlot.next as Blot;
             case KeyboardModule.keys.UP:
                 return currentBlot.prev as Blot;
-            case KeyboardModule.keys.RIGHT:
+            case KeyboardModule.keys.RIGHT: {
                 // -1 needed for because end of blot is non-inclusive.
                 const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
                 if (this.lastSelection.index === endOfBlot) {
@@ -349,6 +348,7 @@ export default class EmbedFocusModule extends Module {
                     return currentBlot.next as Blot;
                 }
                 break;
+            }
             case KeyboardModule.keys.LEFT:
                 if (this.lastSelection.index === currentBlot.offset()) {
                     // If we're at the start of the line.

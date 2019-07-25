@@ -9,9 +9,19 @@ $enable-flex:                true;
 // Pixel value used to responsively scale all typography. Applied to the `<html>` element.
 $rem-base:                   16;
 
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+
+  @return $number;
+}
 
 @function to-rem($px) {
   @return ($px / $rem-base * 1rem);
+}
+@function from-rem($rem) {
+  @return (strip-unit($rem) * $rem-base * 1px);
 }
 
 // Colors
@@ -182,6 +192,9 @@ $toggle-height-sm: to-rem(24);
 $toggle-padding-sm: to-rem(1);
 
 // Padding
+$table-padding-x:                           12px;
+$table-padding-y:                           8px;
+$meta-margin:                               15px;
 $padding-row:                               $grid-gutter-width / 2;
 $border-color:                              #e7e8e9;
 

@@ -250,7 +250,6 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
                 }
             }
         }
-
         if (is_string($this->data) || $this->data === null) {
             echo $this->data;
         } else {

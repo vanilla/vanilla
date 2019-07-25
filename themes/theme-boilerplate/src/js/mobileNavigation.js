@@ -38,7 +38,7 @@ export function setupMobileNavigation() {
         toggleElement(navdrawer);
     });
 
-    mobileMeBoxBtn.addEventListener("click", () => {
+    mobileMeBoxBtn && mobileMeBoxBtn.addEventListener("click", () => {
         mobileMeBoxBtn.classList.toggle("isToggled");
         mainHeader.classList.remove("hasOpenNavigation");
         menuButton.classList.remove("isToggled");
@@ -46,7 +46,7 @@ export function setupMobileNavigation() {
         toggleElement(mobileMebox);
     });
 
-    mobileMeboxBtnClose.addEventListener("click", () => {
+    mobileMeboxBtnClose && mobileMeboxBtnClose.addEventListener("click", () => {
         collapseElement(mobileMebox);
     });
 

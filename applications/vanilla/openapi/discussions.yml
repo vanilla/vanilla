@@ -11,50 +11,8 @@ paths:
           type: integer
         x-filter:
           field: d.CategoryID
-      - description: >
-          When the discussion was created.<br />
-
-          This filter receive a string that can take two forms.<br />
-
-          A single date that matches '{Operator}{DateTime}' where {Operator}
-          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
-
-          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
-          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
-          '[]' are inclusive and '()' are exclusive.
-        in: query
-        name: dateInserted
-        schema:
-          format: date-range
-          type: string
-        x-filter:
-          field: d.DateInserted
-          processor:
-          - Vanilla\DateFilterSchema
-          - dateFilterField
-      - description: >
-          When the discussion was updated.<br />
-
-          This filter receive a string that can take two forms.<br />
-
-          A single date that matches '{Operator}{DateTime}' where {Operator}
-          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
-
-          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
-          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
-          '[]' are inclusive and '()' are exclusive.
-        in: query
-        name: dateUpdated
-        schema:
-          format: date-range
-          type: string
-        x-filter:
-          field: d.DateUpdated
-          processor:
-          - Vanilla\DateFilterSchema
-          - dateFilterField
+      - $ref: '#/components/parameters/DateInserted'
+      - $ref: '#/components/parameters/DateUpdated'
       - description: |
           Filter by discussion type.
         in: query
@@ -84,8 +42,7 @@ paths:
           If including pinned posts, in what order should they be
           integrated? When "first", discussions pinned to a specific category
           will only be affected if the discussion's category is passed as the
-          categoryID parameter. Cannot be used with the pinned parameter.<br
-          />
+          categoryID parameter. Cannot be used with the pinned parameter.
 
           Must be one of: "first", "mixed".
         in: query
@@ -96,15 +53,7 @@ paths:
           enum:
           - first
           - mixed
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -177,15 +126,7 @@ paths:
   /discussions/bookmarked:
     get:
       parameters:
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -284,15 +225,7 @@ paths:
         schema:
           minLength: 1
           type: string
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -636,15 +569,7 @@ paths:
           minLength: 1
           type: string
         allowEmptyValue: true
-      - description: >
-          Page number. See <a rel="nofollow" href="https://docs.vanillaforums.com/apiv2/#pagination">Pagination</a>.
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -797,6 +722,57 @@ paths:
       tags:
       - Discussions
       summary: Remove a user's reaction.
+  '/discussions/{id}/canonical-url':
+    put:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+        '404':
+          description: Not Found
+        '400':
+          description: Bad Request
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                canonicalUrl:
+                  description: Canonical url for discussion.
+                  type: string
+              required:
+              - canonicalUrl
+              type: object
+        required: true
+      summary: Set custom canonical url for a discussion.
+    delete:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '404':
+          description: Not Found
+      tags:
+      - Discussions
+      summary: Remove custom canonical url for a discussion.
 components:
   schemas:
     CategoryFragment:
@@ -822,7 +798,6 @@ components:
         attributes:
           properties:
             idea:
-              x-addon: ideation
               properties:
                 status:
                   properties:
@@ -933,7 +908,6 @@ components:
           description: Whether or not the discussion has been pinned.
           type: boolean
         reactions:
-          x-addon: reactions
           items:
             properties:
               class:

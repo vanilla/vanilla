@@ -118,6 +118,11 @@ class DiscussionModel extends Gdn_Model {
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+
+        $this->addFilterField([
+            'Sink',
+            'Score',
+        ]);
     }
 
     /**
@@ -1007,6 +1012,7 @@ class DiscussionModel extends Gdn_Model {
         $discussion->Name = htmlspecialchars($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
+        $discussion->CanonicalUrl = $discussion->Attributes['CanonicalUrl'] ?? $discussion->Url;
         $discussion->Tags = $this->formatTags($discussion->Tags);
 
         // Join in the category.
@@ -1107,7 +1113,6 @@ class DiscussionModel extends Gdn_Model {
         }
         $discussion->pinned = $pinned;
         $discussion->pinLocation = $pinLocation;
-
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
     }
@@ -1147,6 +1152,7 @@ class DiscussionModel extends Gdn_Model {
      * @return object SQL result.
      */
     public function getAnnouncements($wheres = '', $offset = 0, $limit = false) {
+
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
         if ($limit === false) {
@@ -1235,6 +1241,8 @@ class DiscussionModel extends Gdn_Model {
         foreach ($orderBy as $field => $direction) {
             $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
         }
+        $this->EventArguments['Wheres'] = &$wheres;
+        $this->fireEvent('beforeGetAnnouncements');
 
         $data = $this->SQL->get();
 
@@ -1960,9 +1968,7 @@ class DiscussionModel extends Gdn_Model {
         if ($categoryID !== false) {
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
-            if (!$category) {
-                $this->Validation->addValidationResult('CategoryID', "@Category {$categoryID} does not exist.");
-            } elseif ($checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
+            if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }
@@ -3275,5 +3281,62 @@ class DiscussionModel extends Gdn_Model {
             }
         }
         return $result;
+    }
+
+    /**
+     * Add discussion data to an array.
+     *
+     * @param array||Gdn_DataSet $dataSet Results we need to join discussion data to.
+     * @param string $discussionID Column name for provided $data to get discussionIDs.
+     * @param array $fields Optionally pass list of discussion fields to add to array.
+     *        NOTE: $fields is an associative array of 'field' => 'alias'
+     *              where 'field' - is discussion model column name (ex: Name, Body, Type)
+     *              and 'alias' - is the column name to add|replace to $data array (ex: DiscussionName, DiscussionBody)
+     */
+    public function joinDiscussionData(&$dataSet, string $discussionID, array $fields) {
+        if ($dataSet instanceof Gdn_DataSet) {
+            $data = $dataSet->result();
+            $arrayMode = $dataSet->datasetType() === DATASET_TYPE_ARRAY;
+        } else {
+            $data = &$dataSet;
+            $arrayMode = true;
+        }
+        if ($arrayMode) {
+            $discussionIDs = array_column($data, $discussionID);
+        } else {
+            $discussionIDs = [];
+            foreach ($data as $obj) {
+                $discussionIDs[] = $obj->$discussionID;
+            }
+        }
+
+        // Get the discussions.
+        $sql = $this->SQL->from('Discussion d');
+
+        if (empty($fields)) {
+            $sql->select('d.*');
+        } else {
+            $sql->select('d.DiscussionID');
+            foreach ($fields as $field => $alias) {
+                $sql->select($field, '', $alias);
+            }
+        }
+
+        $discussions = $sql->whereIn('d.DiscussionID', $discussionIDs)
+            ->get()
+            ->resultArray();
+
+        $discussions = array_combine(array_column($discussions, 'DiscussionID'), $discussions);
+
+        foreach ($data as &$row) {
+            $discussion = $arrayMode ? $discussions[$row[$discussionID]] : $discussions[$row->$discussionID];
+            foreach ($fields as $field => $alias) {
+                if ($arrayMode) {
+                    $row[$alias] = $discussion[$alias];
+                } else {
+                    $row->$alias = $discussion[$alias];
+                }
+            }
+        }
     }
 }

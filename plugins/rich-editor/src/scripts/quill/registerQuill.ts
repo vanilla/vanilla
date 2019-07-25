@@ -10,7 +10,6 @@ import Bold from "quill/formats/bold";
 import Italic from "quill/formats/italic";
 import Link from "quill/formats/link";
 import Strike from "quill/formats/strike";
-import List, { ListItem } from "quill/formats/list";
 import { IndentClass as Indent } from "quill/formats/indent";
 
 // Custom Inline Blots
@@ -41,8 +40,20 @@ import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import SyntaxModule from "@rich-editor/quill/SyntaxModule";
+import {
+    OrderedListGroup,
+    UnorderedListGroup,
+    ListItem,
+    ListItemWrapper,
+} from "@rich-editor/quill/blots/blocks/ListBlot";
+
+let wasRegistered = false;
 
 export default function registerQuill() {
+    if (wasRegistered) {
+        return;
+    }
+    wasRegistered = true;
     Quill.register(
         {
             // Block formats
@@ -54,8 +65,10 @@ export default function registerQuill() {
             "formats/spoiler/wrapper": SpoilerWrapperBlot,
             "formats/codeBlock": CodeBlockBlot,
             "formats/header": HeaderBlot,
-            "formats/list": List,
+            "formats/list/unordedGroup": UnorderedListGroup,
+            "formats/list/orderedGroup": OrderedListGroup,
             "formats/list/item": ListItem,
+            "formats/list/wrapper": ListItemWrapper,
             "formats/embed-error": EmbedErrorBlot,
             "formats/embed-loading": LoadingBlot,
             "formats/embed-external": ExternalEmbedBlot,

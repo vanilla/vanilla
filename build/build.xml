@@ -15,25 +15,7 @@
 
     <!-- Take steps to prepare for the build. -->
     <target name="prepare">
-        <loadfile property="vanilla.environment" file="${project.dir}/environment.php"/>
-
-        <!-- Grab the version number from Vanilla's index.php. -->
-        <propertyregex property="vanilla.version"
-            subject="${vanilla.environment}"
-            pattern="define\('APPLICATION_VERSION', '((\d\.?)+((a|b|p|rc)(\d+)?)?)'\)"
-            match="$1"
-            defaultValue="-1" />
-
-        <!-- If we have a valid version, use it.  If we don't, then skip appending it to our output filename. -->
-        <if>
-            <equals arg1="${vanilla.version}" arg2="-1" />
-            <then>
-                <property name="project.destfile" value="vanilla.zip" />
-            </then>
-            <else>
-                <property name="project.destfile" value="vanilla-${vanilla.version}.zip" />
-            </else>
-        </if>
+        <property name="project.destfile" value="vanilla.zip" />
     </target>
 
     <!-- Perform any steps to build the contents of the package. -->
@@ -77,9 +59,6 @@
         </copy>
 
         <!-- Archive everything in the package contents directory. -->
-        <zip
-            destfile="${project.destfile}"
-            basedir="${package.dir}">
-        </zip>
+        <exec command="zip -X -r vanilla.zip ./package" dir="." />
     </target>
 </project>

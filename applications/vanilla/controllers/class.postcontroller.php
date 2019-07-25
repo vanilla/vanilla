@@ -13,6 +13,8 @@
  */
 class PostController extends VanillaController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var DiscussionModel */
     public $DiscussionModel;
 
@@ -178,7 +180,13 @@ class PostController extends VanillaController {
         } else {
             // New discussion? Make sure a discussion ID didn't sneak in.
             $this->Form->removeFormValue('DiscussionID');
-
+            // Make sure a group discussion doesn't get announced outside the groups category.
+            $formAnnounce = $this->Form->_FormValues['Announce'];
+            if (isset($formAnnounce) && $formAnnounce === '1') {
+                if (isset($this->Data['Group'])) {
+                    $this->Form->setFormValue('Announce', '2');
+                }
+            }
             // Permission to add.
             if ($this->Category) {
                 $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');
@@ -233,11 +241,11 @@ class PostController extends VanillaController {
                 }
                 $this->populateForm($this->Form);
             }
-            
+
             // Decode HTML entities escaped by DiscussionModel::calculate() here.
             $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
-        } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
+        } elseif ($this->Form->authenticatedPostBack(true)) { // Form was submitted
             // Save as a draft?
             $formValues = $this->Form->formValues();
             $filters = ['Score'];
@@ -421,7 +429,7 @@ class PostController extends VanillaController {
      */
     public function editDiscussion($discussionID = '', $draftID = '') {
         if ($draftID != '') {
-            $this->Draft = $this->DraftModel->getID($draftID);
+            $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
 
             // Verify this is their draft
@@ -429,9 +437,13 @@ class PostController extends VanillaController {
                 throw permissionException();
             }
         } else {
-            $this->setData('Discussion', $this->DiscussionModel->getID($discussionID), true);
+            $record = $this->DiscussionModel->getID($discussionID);
+            $this->setData('Discussion', $record, true);
             $this->CategoryID = $this->Discussion->CategoryID;
         }
+
+        // Normalize the edit data.
+        $this->applyFormatCompatibility($record, 'Body', 'Format');
 
         // Verify we can add to the category content
         $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
@@ -694,7 +706,7 @@ class PostController extends VanillaController {
             if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
                 throw new Exception(t('You cannot comment in a closed discussion.'));
             }
-            
+
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }
@@ -959,6 +971,9 @@ class PostController extends VanillaController {
             $this->Form->setModel($this->DraftModel);
             $this->Comment = $this->DraftModel->getID($draftID);
         }
+
+        // Normalize the edit data.
+        $this->applyFormatCompatibility($this->Comment, 'Body', 'Format');
 
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');

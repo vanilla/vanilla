@@ -1,4 +1,4 @@
-/* tslint:disable */
+/* eslint-disable */
 
 interface Element {
     setAttribute(name: string, value: boolean): void;
@@ -33,7 +33,7 @@ declare namespace React {
 
 declare namespace JSX {
     interface ExtendIFrameAttributes extends React.IframeHTMLAttributes<HTMLIFrameElement> {
-        allow: string;
+        allow?: string;
     }
 
     interface IntrinsicElements {

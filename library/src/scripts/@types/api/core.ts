@@ -4,6 +4,7 @@
  */
 
 import { Omit } from "@library/@types/utils";
+import { AxiosError, AxiosResponse } from "axios";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -31,12 +32,16 @@ export interface IFieldError {
     status?: number; // HTTP status
 }
 
-export interface IApiError {
+export interface IServerError {
     message: string;
     status: number;
     errors?: {
         [key: string]: IFieldError[];
     };
+}
+
+export interface IApiError extends AxiosError {
+    response: AxiosResponse<IServerError | null>;
 }
 
 interface IMultiType<T> {
@@ -68,4 +73,10 @@ export interface ILinkGroup {
 export interface ILinkListData {
     groups: ILinkGroup[];
     ungroupedItems: INavigationItem[];
+}
+
+export enum PublishStatus {
+    DELETED = "deleted",
+    UNDELETED = "undeleted",
+    PUBLISHED = "published",
 }

@@ -16,14 +16,7 @@ paths:
         name: insertUserID
         schema:
           type: integer
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query

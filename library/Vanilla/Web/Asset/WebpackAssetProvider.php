@@ -62,6 +62,20 @@ class WebpackAssetProvider {
     }
 
     /**
+     * @return bool
+     */
+    public function isHotReloadEnabled(): bool {
+        return $this->hotReloadEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHotReloadSocketAddress(): string {
+        return 'http://'.$this->hotReloadIP.':3030';
+    }
+
+    /**
      * Set the key of the active locale.
      *
      * @param string $key

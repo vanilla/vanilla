@@ -64,7 +64,7 @@ class InternalClient extends HttpClient {
     /**
      * {@inheritdoc}
      */
-    public function createRequest($method, $uri, $body, array $headers = [], array $options = []) {
+    public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = []) {
         if (strpos($uri, '//') === false) {
             $uri = $this->baseUrl.'/'.ltrim($uri, '/');
         }

@@ -37,14 +37,14 @@ compiling css, etc.
 
 ### Grunt Tasks
 
-Grunt is our task manager. It provides us with a bunch of tools to accomplish a variety of tasks. In the future, 
+Grunt is our task manager. It provides us with a bunch of tools to accomplish a variety of tasks. In the future,
 we may wish to look into using npm as a build tool instead.
 
 Here are our Grunt tasks:
 
 * sass_globbing - Creates scss files with maps to a directory's scss files. This allows us to add or remove scss files
   without having to worry about including them or removing them from any stylesheet.
-* scsslint - Gives us hints about best practices in our Sass. It's run with the force flag, so the Sass will compile 
+* scsslint - Gives us hints about best practices in our Sass. It's run with the force flag, so the Sass will compile
   even if the linting fails. All the same, it's good to heed the linter where possible and eliminate notices.
 * sass - Compiles our Sass into CSS and creates a source map.
 * autoprefixer - Adds vendor prefixes to the CSS and updates the source map.
@@ -62,12 +62,12 @@ For any Grunt task, you can run `grunt *` to run the task. Simply running `grunt
   to applications/dashboard/styleguide.
 * wiredep - Copies vendor assets from the bower_components directory to its final resting place in Vanilla. You'll
   need to run this if you update the version of a dependency.
-  
+
 ### Dependency Managers
-  
+
 #### Bower
 
-Bower is the dependency manager for our frontend vendor code. The current dependencies and their versions are listed in 
+Bower is the dependency manager for our frontend vendor code. The current dependencies and their versions are listed in
 bower.json in the dashboard application's root.
 
 ##### Add a Bower Dependency
@@ -83,8 +83,8 @@ full list of dependencies can be found in the package.json file in the dashboard
 
 #### Do We Need Two Dependency Managers?
 
-Maybe not. We could probably accomplish everything with npm. However, it's nice to have the separation of frontend 
-code and process code that having the two dependency managers provides. It may be something we want to revisit in the 
+Maybe not. We could probably accomplish everything with npm. However, it's nice to have the separation of frontend
+code and process code that having the two dependency managers provides. It may be something we want to revisit in the
 future.
 
 ---
@@ -129,7 +129,7 @@ The specific javascript files we use are listed here.
 * iCheck - For our radio and checkbox styling.
 * Drop - For our user card dropdown.
 * Clipboard - For copying text. (Used in the embed section.)
-* CheckAll - For checking/unchecking a set of checkboxes at the same time. 
+* CheckAll - For checking/unchecking a set of checkboxes at the same time.
 
 ---
 
@@ -140,7 +140,6 @@ Other than the vendor js above, we also rely on the following js:
 in `/applications/dashboard/js`:
 
 * jquery.tablejenga.js - Table Jenga handles responsiveness by translating table columns into meta data.
-* jquery.fluidfixed.js - Fluid Fixed manages the fixed panel scrolling. It will scroll up when the user scrolls up 
   and scrolls down when the user scrolls down.
 * colorpicker.js - For color picker form inputs.
 * cropimage.js - For image cropping.

@@ -5,7 +5,7 @@
  */
 
 import Quill, { RangeStatic, Blot } from "quill/core";
-import KeyboardModule from "quill/modules/keyboard";
+import KeyboardModule, { BindingObject, HandlerContext } from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Emitter from "quill/core/emitter";
 import {
@@ -16,20 +16,29 @@ import {
     insertNewLineAtStartOfScroll,
     rangeContainsBlot,
 } from "@rich-editor/quill/utility";
-import { isAllowedUrl } from "@library/application";
+import { isAllowedUrl } from "@library/utility/appUtils";
 import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import Formatter from "@rich-editor/quill/Formatter";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 
 export default class KeyboardBindings {
-    private static MULTI_LINE_BLOTS = [SpoilerLineBlot.blotName, BlockquoteLineBlot.blotName, CodeBlockBlot.blotName];
-    public bindings: any = {};
+    private static MULTI_LINE_BLOTS = [
+        SpoilerLineBlot.blotName,
+        BlockquoteLineBlot.blotName,
+        CodeBlockBlot.blotName,
+        ListItem.blotName,
+    ];
+    public bindings: {
+        [key: string]: BindingObject;
+    } = {};
 
     constructor(private quill: Quill) {
         // Keyboard behaviours
@@ -264,6 +273,11 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
+        this.bindings.indent = false;
+        this.bindings.outdent = false;
+        this.bindings["outdent backspace"] = false;
+        this.bindings["list empty enter"] = false;
+        this.bindings["checklist enter"] = false;
     }
 
     private addLinkTransformKeyboardBindings() {
@@ -273,36 +287,6 @@ export default class KeyboardBindings {
             handler: this.transformLinkOnlyLineToEmbed,
         };
     }
-
-    /**
-     * Convert the last word of a line that is formatted like a link into an actual link.
-     */
-    private transformTextToLink = (range: RangeStatic) => {
-        const line: Blot = this.quill.getLine(range.index)[0];
-        const lineStart = line.offset();
-        const textUntilSpace = this.quill.getText(lineStart, range.index);
-        const results = textUntilSpace.match(/\s([^\s]+)$|^([^\s]+)$/);
-        if (!results) {
-            return true;
-        }
-
-        const lastWord = results[1] || results[2];
-        const lineIndex = results.index || 0;
-        let index = lineStart + lineIndex;
-        const length = lastWord.length;
-
-        if (results[1]) {
-            // Javascript has no lookbehinds so the space is part of the match. We need to adjust things to compensate.
-            index += 1;
-        }
-
-        const isAlreadyLink = this.quill.scroll.descendants(blot => blot instanceof LinkBlot, index, length).length > 0;
-
-        if (isAllowedUrl(lastWord) && !isAlreadyLink) {
-            this.quill.formatText(index, length, { link: lastWord }, Quill.sources.USER);
-        }
-        return true;
-    };
 
     /**
      * Add keyboard options.bindings that allow the user to
@@ -320,6 +304,32 @@ export default class KeyboardBindings {
             collapsed: true,
             format: [CodeBlockBlot.blotName],
             handler: this.handleCodeBlockEnter,
+        };
+
+        this.bindings["List Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: [ListItem.blotName],
+            handler: (range: RangeStatic) => {
+                const formatter = new Formatter(this.quill, range);
+                const listItems = formatter.getListItems();
+
+                let handled = false;
+                listItems.forEach(item => {
+                    if (item.domNode.textContent === "") {
+                        item.outdent();
+                        handled = true;
+                    }
+                });
+
+                if (handled) {
+                    this.quill.update(Quill.sources.USER);
+                    this.quill.setSelection(range, Quill.sources.API);
+                    return false;
+                } else {
+                    return true;
+                }
+            },
         };
     }
 
@@ -373,11 +383,11 @@ export default class KeyboardBindings {
      * Create a keyboard shortcut to enable/disable a format. These differ from Quill's built in
      * keyboard shortcuts because they do not work if the selection contains a codeBlock or inline-code.
      */
-    private makeFormatHandler(format) {
+    private makeFormatHandler(format): BindingObject {
         return {
             key: format[0].toUpperCase(),
             shortKey: true,
-            handler: (range, context) => {
+            handler: (range: RangeStatic, context: HandlerContext) => {
                 if (
                     rangeContainsBlot(this.quill, CodeBlockBlot, range) ||
                     rangeContainsBlot(this.quill, CodeBlot, range)
@@ -385,7 +395,7 @@ export default class KeyboardBindings {
                     return;
                 }
 
-                this.quill.format(format, !context.format[format], Quill.sources.USER);
+                this.quill.format(format, !context.format![format], Quill.sources.USER);
             },
         };
     }
@@ -394,6 +404,21 @@ export default class KeyboardBindings {
      * Add custom handlers for backspace inside of Blots.
      */
     private addBlockBackspaceHandlers() {
+        const handleListBackspace = (range: RangeStatic) => {
+            const formatter = new Formatter(this.quill, range);
+            const listItem = formatter.getListItems()[0];
+            listItem.replaceWith("block", "");
+            this.quill.setSelection(range, Quill.sources.SILENT);
+            return true;
+        };
+
+        this.bindings["List Backspace"] = {
+            key: KeyboardModule.keys.BACKSPACE,
+            offset: 0,
+            collapsed: true,
+            format: [ListItem.blotName],
+            handler: handleListBackspace,
+        };
         this.bindings["Block Backspace With Selection"] = {
             key: KeyboardModule.keys.BACKSPACE,
             collapsed: false,

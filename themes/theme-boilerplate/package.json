@@ -1,31 +1,31 @@
 {
-  "name": "@vanillaforums/theme-boilerplate",
-  "version": "1.1.6",
-  "description": "A boilerplate for Vanillaforums themes",
-  "bin": {
-    "boilerplate-install": "./setup/boilerplateInstall.js"
-  },
-  "scripts": {
-    "boilerplate-install": "./setup/boilerplateInstall.js"
-  },
-  "keywords": [
-    "vanilla",
-    "vanillaforums",
-    "theme",
-    "themes",
-    "boilerplate"
-  ],
-  "author": "Isis Graziatto <isis.g@vanillaforums.com> (https://vanilaforums.com)",
-  "license": "GPL-2.0-only",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/vanilla/themes.git"
-  },
-  "bugs": {
-    "url": "https://github.com/vanilla/themes/issues"
-  },
-  "homepage": "https://github.com/vanilla/themes/blob/feature/boilerplate-theme/vanilla-theme-boilerplate/guide.md",
-  "dependencies": {
-    "fs-extra": "^7.0.0"
-  }
+    "name": "@vanillaforums/theme-boilerplate",
+    "version": "1.2.4",
+    "description": "A boilerplate for Vanillaforums themes",
+    "bin": {
+        "boilerplate-install": "./setup/boilerplateInstall.js"
+    },
+    "scripts": {
+        "boilerplate-install": "./setup/boilerplateInstall.js"
+    },
+    "keywords": [
+        "vanilla",
+        "vanillaforums",
+        "theme",
+        "themes",
+        "boilerplate"
+    ],
+    "author": "Isis Graziatto <isis.g@vanillaforums.com> (https://vanilaforums.com)",
+    "license": "GPL-2.0-only",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/vanilla/themes.git"
+    },
+    "bugs": {
+        "url": "https://github.com/vanilla/themes/issues"
+    },
+    "homepage": "https://github.com/vanilla/themes/blob/feature/boilerplate-theme/vanilla-theme-boilerplate/guide.md",
+    "dependencies": {
+        "fs-extra": "^7.0.0"
+    }
 }

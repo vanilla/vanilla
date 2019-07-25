@@ -25,6 +25,10 @@ class VanillaHooks implements Gdn_IPlugin {
         $dic->rule(\Vanilla\Navigation\BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
         ;
+
+        $dic->rule(\Vanilla\Menu\CounterModel::class)
+            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
+        ;
     }
 
     /**
@@ -1108,6 +1112,23 @@ class VanillaHooks implements Gdn_IPlugin {
     public function pluginController_tagsearch_create() {
         $query = http_build_query(Gdn::request()->getQuery());
         redirectTo(url('/tags/search'.($query ? '?'.$query : null)), 301);
+    }
+
+    /**
+     * Hook in before a discussion is rendered and display any messages.
+     *
+     * @param mixed DiscussionController $sender
+     * @param array array $args
+     */
+    public function discussionController_beforeDiscussionDisplay_handler($sender, array $args) {
+        if (!($sender instanceof DiscussionController)) {
+            return;
+        }
+
+        $messages = $sender->getMessages();
+        foreach ($messages as $message) {
+            echo $message;
+        }
     }
 
     /**

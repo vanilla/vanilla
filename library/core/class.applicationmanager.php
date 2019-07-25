@@ -14,6 +14,8 @@ use Vanilla\AddonManager;
 
 /**
  * Manages available applications, enabling and disabling them.
+ *
+ * @deprecated 3.0 Use Vanilla\AddonManager.
  */
 class Gdn_ApplicationManager {
 
@@ -101,7 +103,7 @@ class Gdn_ApplicationManager {
      */
     private function calcOldInfoArray(Addon $addon) {
         $info = Gdn_pluginManager::calcOldInfoArray($addon);
-        $directories = explode(DS, $addon->getSubdir());
+        $directories = explode('/', $addon->getSubdir());
         $info['Folder'] = $directories[count($directories) - 1];
 
         return $info;

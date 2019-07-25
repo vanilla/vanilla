@@ -74,12 +74,55 @@
     padding: $utility-baseUnitHalf 0;
     display: flex;
     align-items: center;
+    flex-basis: 160px;
 
     img {
         max-height: $header_minHeight - 20px;
         width: auto;
         height: auto;
     }
+
+    @include maxWidth {
+        display: none;
+        flex-basis: initial;
+    }
+}
+
+.Header-desktopNav {
+    display: flex;
+    align-items: center;
+
+
+    @include maxWidth {
+        display: none;
+    }
+
+    .Navigation-linkContainer a {
+        color: $header-link_color;
+        border-radius: 3px;
+        margin: 0 6px;
+        padding: 0 6px;
+        height: 36px;
+        font-size: $global-medium_fontSize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: $header-link_color;
+            background: $global-color_primaryAlt;
+        }
+    }
+
+    .Navigation-linkContainer::after {
+        display: none;
+    }
+}
+
+.Header-flexSpacer {
+    flex: 1;
 
     @include maxWidth {
         display: none;

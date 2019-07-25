@@ -287,7 +287,7 @@ $Construct
     ->column('DateInserted', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
     ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
-    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
+    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 
@@ -868,11 +868,19 @@ $Construct
 $Construct
     ->table("reaction")
     ->primaryKey("reactionID")
-    ->column("ownerType", "varchar(64)", false, ["index", "index.record"])
-    ->column("reactionType", "varchar(64)", false, ["index", "index.record"])
-    ->column("recordType", "varchar(64)", false, ["index", "index.record"])
+    ->column("reactionOwnerID", "int", false, ["index", "index.record"])
     ->column("recordID", "int", false, "index.record")
     ->column("reactionValue", "int", false)
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->set($Explicit, $Drop);
+
+$Construct
+    ->table("reactionOwner")
+    ->primaryKey("reactionOwnerID")
+    ->column("ownerType", "varchar(64)", false, ["index", "unique.record"])
+    ->column("reactionType", "varchar(64)", false, ["index", "unique.record"])
+    ->column("recordType", "varchar(64)", false, ["index", "unique.record"])
     ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
     ->set($Explicit, $Drop);
@@ -992,3 +1000,12 @@ if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
 }
 
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
+Gdn::router()->setRoute("robots.txt", "/robots", "Internal");
+Gdn::router()->setRoute("utility/robots", "/robots", "Internal");
+Gdn::router()->setRoute("container.html", 'staticcontent/container', "Internal");
+
+// Migrate rules from Sitemaps addon.
+if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules")) {
+    Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
+    Gdn::config()->remove("Sitemap.Robots.Rules");
+}

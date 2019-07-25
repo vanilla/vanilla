@@ -1814,12 +1814,12 @@ A(a,!1,!0)}else B&&(/ut|nd/.test(d)?(h[_remove](v),e[_remove](w)):(h[_add](v),e[
 b[_type],e=/wn|up/.test(d)?t:v;if(!c[n]){if(d==_click)A(a,!1,!0);else{if(/wn|er|in/.test(d))h[_add](e);else h[_remove](e+" "+t);if(z.length&&B&&e==v)z[/ut|nd/.test(d)?_remove:_add](w)}if(_mobile)b.stopPropagation();else return!1}})})}})(window.jQuery||window.Zepto);
 
 /*!
- * clipboard.js v1.5.16
+ * clipboard.js v1.7.1
  * https://zenorocha.github.io/clipboard.js
  *
  * Licensed MIT © Zeno Rocha
  */
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var t;t="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this,t.Clipboard=e()}}(function(){var e,t,n;return function e(t,n,i){function o(a,c){if(!n[a]){if(!t[a]){var l="function"==typeof require&&require;if(!c&&l)return l(a,!0);if(r)return r(a,!0);var s=new Error("Cannot find module '"+a+"'");throw s.code="MODULE_NOT_FOUND",s}var u=n[a]={exports:{}};t[a][0].call(u.exports,function(e){var n=t[a][1][e];return o(n?n:e)},u,u.exports,e,t,n,i)}return n[a].exports}for(var r="function"==typeof require&&require,a=0;a<i.length;a++)o(i[a]);return o}({1:[function(e,t,n){function i(e,t){for(;e&&e.nodeType!==o;){if(e.matches(t))return e;e=e.parentNode}}var o=9;if(Element&&!Element.prototype.matches){var r=Element.prototype;r.matches=r.matchesSelector||r.mozMatchesSelector||r.msMatchesSelector||r.oMatchesSelector||r.webkitMatchesSelector}t.exports=i},{}],2:[function(e,t,n){function i(e,t,n,i,r){var a=o.apply(this,arguments);return e.addEventListener(n,a,r),{destroy:function(){e.removeEventListener(n,a,r)}}}function o(e,t,n,i){return function(n){n.delegateTarget=r(n.target,t),n.delegateTarget&&i.call(e,n)}}var r=e("./closest");t.exports=i},{"./closest":1}],3:[function(e,t,n){n.node=function(e){return void 0!==e&&e instanceof HTMLElement&&1===e.nodeType},n.nodeList=function(e){var t=Object.prototype.toString.call(e);return void 0!==e&&("[object NodeList]"===t||"[object HTMLCollection]"===t)&&"length"in e&&(0===e.length||n.node(e[0]))},n.string=function(e){return"string"==typeof e||e instanceof String},n.fn=function(e){var t=Object.prototype.toString.call(e);return"[object Function]"===t}},{}],4:[function(e,t,n){function i(e,t,n){if(!e&&!t&&!n)throw new Error("Missing required arguments");if(!c.string(t))throw new TypeError("Second argument must be a String");if(!c.fn(n))throw new TypeError("Third argument must be a Function");if(c.node(e))return o(e,t,n);if(c.nodeList(e))return r(e,t,n);if(c.string(e))return a(e,t,n);throw new TypeError("First argument must be a String, HTMLElement, HTMLCollection, or NodeList")}function o(e,t,n){return e.addEventListener(t,n),{destroy:function(){e.removeEventListener(t,n)}}}function r(e,t,n){return Array.prototype.forEach.call(e,function(e){e.addEventListener(t,n)}),{destroy:function(){Array.prototype.forEach.call(e,function(e){e.removeEventListener(t,n)})}}}function a(e,t,n){return l(document.body,e,t,n)}var c=e("./is"),l=e("delegate");t.exports=i},{"./is":3,delegate:2}],5:[function(e,t,n){function i(e){var t;if("SELECT"===e.nodeName)e.focus(),t=e.value;else if("INPUT"===e.nodeName||"TEXTAREA"===e.nodeName)e.focus(),e.setSelectionRange(0,e.value.length),t=e.value;else{e.hasAttribute("contenteditable")&&e.focus();var n=window.getSelection(),i=document.createRange();i.selectNodeContents(e),n.removeAllRanges(),n.addRange(i),t=n.toString()}return t}t.exports=i},{}],6:[function(e,t,n){function i(){}i.prototype={on:function(e,t,n){var i=this.e||(this.e={});return(i[e]||(i[e]=[])).push({fn:t,ctx:n}),this},once:function(e,t,n){function i(){o.off(e,i),t.apply(n,arguments)}var o=this;return i._=t,this.on(e,i,n)},emit:function(e){var t=[].slice.call(arguments,1),n=((this.e||(this.e={}))[e]||[]).slice(),i=0,o=n.length;for(i;i<o;i++)n[i].fn.apply(n[i].ctx,t);return this},off:function(e,t){var n=this.e||(this.e={}),i=n[e],o=[];if(i&&t)for(var r=0,a=i.length;r<a;r++)i[r].fn!==t&&i[r].fn._!==t&&o.push(i[r]);return o.length?n[e]=o:delete n[e],this}},t.exports=i},{}],7:[function(t,n,i){!function(o,r){if("function"==typeof e&&e.amd)e(["module","select"],r);else if("undefined"!=typeof i)r(n,t("select"));else{var a={exports:{}};r(a,o.select),o.clipboardAction=a.exports}}(this,function(e,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var o=n(t),r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},a=function(){function e(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,n,i){return n&&e(t.prototype,n),i&&e(t,i),t}}(),c=function(){function e(t){i(this,e),this.resolveOptions(t),this.initSelection()}return a(e,[{key:"resolveOptions",value:function e(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};this.action=t.action,this.emitter=t.emitter,this.target=t.target,this.text=t.text,this.trigger=t.trigger,this.selectedText=""}},{key:"initSelection",value:function e(){this.text?this.selectFake():this.target&&this.selectTarget()}},{key:"selectFake",value:function e(){var t=this,n="rtl"==document.documentElement.getAttribute("dir");this.removeFake(),this.fakeHandlerCallback=function(){return t.removeFake()},this.fakeHandler=document.body.addEventListener("click",this.fakeHandlerCallback)||!0,this.fakeElem=document.createElement("textarea"),this.fakeElem.style.fontSize="12pt",this.fakeElem.style.border="0",this.fakeElem.style.padding="0",this.fakeElem.style.margin="0",this.fakeElem.style.position="absolute",this.fakeElem.style[n?"right":"left"]="-9999px";var i=window.pageYOffset||document.documentElement.scrollTop;this.fakeElem.addEventListener("focus",window.scrollTo(0,i)),this.fakeElem.style.top=i+"px",this.fakeElem.setAttribute("readonly",""),this.fakeElem.value=this.text,document.body.appendChild(this.fakeElem),this.selectedText=(0,o.default)(this.fakeElem),this.copyText()}},{key:"removeFake",value:function e(){this.fakeHandler&&(document.body.removeEventListener("click",this.fakeHandlerCallback),this.fakeHandler=null,this.fakeHandlerCallback=null),this.fakeElem&&(document.body.removeChild(this.fakeElem),this.fakeElem=null)}},{key:"selectTarget",value:function e(){this.selectedText=(0,o.default)(this.target),this.copyText()}},{key:"copyText",value:function e(){var t=void 0;try{t=document.execCommand(this.action)}catch(e){t=!1}this.handleResult(t)}},{key:"handleResult",value:function e(t){this.emitter.emit(t?"success":"error",{action:this.action,text:this.selectedText,trigger:this.trigger,clearSelection:this.clearSelection.bind(this)})}},{key:"clearSelection",value:function e(){this.target&&this.target.blur(),window.getSelection().removeAllRanges()}},{key:"destroy",value:function e(){this.removeFake()}},{key:"action",set:function e(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"copy";if(this._action=t,"copy"!==this._action&&"cut"!==this._action)throw new Error('Invalid "action" value, use either "copy" or "cut"')},get:function e(){return this._action}},{key:"target",set:function e(t){if(void 0!==t){if(!t||"object"!==("undefined"==typeof t?"undefined":r(t))||1!==t.nodeType)throw new Error('Invalid "target" value, use a valid Element');if("copy"===this.action&&t.hasAttribute("disabled"))throw new Error('Invalid "target" attribute. Please use "readonly" instead of "disabled" attribute');if("cut"===this.action&&(t.hasAttribute("readonly")||t.hasAttribute("disabled")))throw new Error('Invalid "target" attribute. You can\'t cut text from elements with "readonly" or "disabled" attributes');this._target=t}},get:function e(){return this._target}}]),e}();e.exports=c})},{select:5}],8:[function(t,n,i){!function(o,r){if("function"==typeof e&&e.amd)e(["module","./clipboard-action","tiny-emitter","good-listener"],r);else if("undefined"!=typeof i)r(n,t("./clipboard-action"),t("tiny-emitter"),t("good-listener"));else{var a={exports:{}};r(a,o.clipboardAction,o.tinyEmitter,o.goodListener),o.clipboard=a.exports}}(this,function(e,t,n,i){"use strict";function o(e){return e&&e.__esModule?e:{default:e}}function r(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function a(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function c(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}function l(e,t){var n="data-clipboard-"+e;if(t.hasAttribute(n))return t.getAttribute(n)}var s=o(t),u=o(n),f=o(i),d=function(){function e(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,n,i){return n&&e(t.prototype,n),i&&e(t,i),t}}(),h=function(e){function t(e,n){r(this,t);var i=a(this,(t.__proto__||Object.getPrototypeOf(t)).call(this));return i.resolveOptions(n),i.listenClick(e),i}return c(t,e),d(t,[{key:"resolveOptions",value:function e(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};this.action="function"==typeof t.action?t.action:this.defaultAction,this.target="function"==typeof t.target?t.target:this.defaultTarget,this.text="function"==typeof t.text?t.text:this.defaultText}},{key:"listenClick",value:function e(t){var n=this;this.listener=(0,f.default)(t,"click",function(e){return n.onClick(e)})}},{key:"onClick",value:function e(t){var n=t.delegateTarget||t.currentTarget;this.clipboardAction&&(this.clipboardAction=null),this.clipboardAction=new s.default({action:this.action(n),target:this.target(n),text:this.text(n),trigger:n,emitter:this})}},{key:"defaultAction",value:function e(t){return l("action",t)}},{key:"defaultTarget",value:function e(t){var n=l("target",t);if(n)return document.querySelector(n)}},{key:"defaultText",value:function e(t){return l("text",t)}},{key:"destroy",value:function e(){this.listener.destroy(),this.clipboardAction&&(this.clipboardAction.destroy(),this.clipboardAction=null)}}]),t}(u.default);e.exports=h})},{"./clipboard-action":7,"good-listener":4,"tiny-emitter":6}]},{},[8])(8)});
+!function(t){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var e;e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this,e.Clipboard=t()}}(function(){var t,e,n;return function t(e,n,o){function i(a,c){if(!n[a]){if(!e[a]){var l="function"==typeof require&&require;if(!c&&l)return l(a,!0);if(r)return r(a,!0);var s=new Error("Cannot find module '"+a+"'");throw s.code="MODULE_NOT_FOUND",s}var u=n[a]={exports:{}};e[a][0].call(u.exports,function(t){var n=e[a][1][t];return i(n||t)},u,u.exports,t,e,n,o)}return n[a].exports}for(var r="function"==typeof require&&require,a=0;a<o.length;a++)i(o[a]);return i}({1:[function(t,e,n){function o(t,e){for(;t&&t.nodeType!==i;){if("function"==typeof t.matches&&t.matches(e))return t;t=t.parentNode}}var i=9;if("undefined"!=typeof Element&&!Element.prototype.matches){var r=Element.prototype;r.matches=r.matchesSelector||r.mozMatchesSelector||r.msMatchesSelector||r.oMatchesSelector||r.webkitMatchesSelector}e.exports=o},{}],2:[function(t,e,n){function o(t,e,n,o,r){var a=i.apply(this,arguments);return t.addEventListener(n,a,r),{destroy:function(){t.removeEventListener(n,a,r)}}}function i(t,e,n,o){return function(n){n.delegateTarget=r(n.target,e),n.delegateTarget&&o.call(t,n)}}var r=t("./closest");e.exports=o},{"./closest":1}],3:[function(t,e,n){n.node=function(t){return void 0!==t&&t instanceof HTMLElement&&1===t.nodeType},n.nodeList=function(t){var e=Object.prototype.toString.call(t);return void 0!==t&&("[object NodeList]"===e||"[object HTMLCollection]"===e)&&"length"in t&&(0===t.length||n.node(t[0]))},n.string=function(t){return"string"==typeof t||t instanceof String},n.fn=function(t){return"[object Function]"===Object.prototype.toString.call(t)}},{}],4:[function(t,e,n){function o(t,e,n){if(!t&&!e&&!n)throw new Error("Missing required arguments");if(!c.string(e))throw new TypeError("Second argument must be a String");if(!c.fn(n))throw new TypeError("Third argument must be a Function");if(c.node(t))return i(t,e,n);if(c.nodeList(t))return r(t,e,n);if(c.string(t))return a(t,e,n);throw new TypeError("First argument must be a String, HTMLElement, HTMLCollection, or NodeList")}function i(t,e,n){return t.addEventListener(e,n),{destroy:function(){t.removeEventListener(e,n)}}}function r(t,e,n){return Array.prototype.forEach.call(t,function(t){t.addEventListener(e,n)}),{destroy:function(){Array.prototype.forEach.call(t,function(t){t.removeEventListener(e,n)})}}}function a(t,e,n){return l(document.body,t,e,n)}var c=t("./is"),l=t("delegate");e.exports=o},{"./is":3,delegate:2}],5:[function(t,e,n){function o(t){var e;if("SELECT"===t.nodeName)t.focus(),e=t.value;else if("INPUT"===t.nodeName||"TEXTAREA"===t.nodeName){var n=t.hasAttribute("readonly");n||t.setAttribute("readonly",""),t.select(),t.setSelectionRange(0,t.value.length),n||t.removeAttribute("readonly"),e=t.value}else{t.hasAttribute("contenteditable")&&t.focus();var o=window.getSelection(),i=document.createRange();i.selectNodeContents(t),o.removeAllRanges(),o.addRange(i),e=o.toString()}return e}e.exports=o},{}],6:[function(t,e,n){function o(){}o.prototype={on:function(t,e,n){var o=this.e||(this.e={});return(o[t]||(o[t]=[])).push({fn:e,ctx:n}),this},once:function(t,e,n){function o(){i.off(t,o),e.apply(n,arguments)}var i=this;return o._=e,this.on(t,o,n)},emit:function(t){var e=[].slice.call(arguments,1),n=((this.e||(this.e={}))[t]||[]).slice(),o=0,i=n.length;for(o;o<i;o++)n[o].fn.apply(n[o].ctx,e);return this},off:function(t,e){var n=this.e||(this.e={}),o=n[t],i=[];if(o&&e)for(var r=0,a=o.length;r<a;r++)o[r].fn!==e&&o[r].fn._!==e&&i.push(o[r]);return i.length?n[t]=i:delete n[t],this}},e.exports=o},{}],7:[function(e,n,o){!function(i,r){if("function"==typeof t&&t.amd)t(["module","select"],r);else if(void 0!==o)r(n,e("select"));else{var a={exports:{}};r(a,i.select),i.clipboardAction=a.exports}}(this,function(t,e){"use strict";function n(t){return t&&t.__esModule?t:{default:t}}function o(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}var i=n(e),r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},a=function(){function t(t,e){for(var n=0;n<e.length;n++){var o=e[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}return function(e,n,o){return n&&t(e.prototype,n),o&&t(e,o),e}}(),c=function(){function t(e){o(this,t),this.resolveOptions(e),this.initSelection()}return a(t,[{key:"resolveOptions",value:function t(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};this.action=e.action,this.container=e.container,this.emitter=e.emitter,this.target=e.target,this.text=e.text,this.trigger=e.trigger,this.selectedText=""}},{key:"initSelection",value:function t(){this.text?this.selectFake():this.target&&this.selectTarget()}},{key:"selectFake",value:function t(){var e=this,n="rtl"==document.documentElement.getAttribute("dir");this.removeFake(),this.fakeHandlerCallback=function(){return e.removeFake()},this.fakeHandler=this.container.addEventListener("click",this.fakeHandlerCallback)||!0,this.fakeElem=document.createElement("textarea"),this.fakeElem.style.fontSize="12pt",this.fakeElem.style.border="0",this.fakeElem.style.padding="0",this.fakeElem.style.margin="0",this.fakeElem.style.position="absolute",this.fakeElem.style[n?"right":"left"]="-9999px";var o=window.pageYOffset||document.documentElement.scrollTop;this.fakeElem.style.top=o+"px",this.fakeElem.setAttribute("readonly",""),this.fakeElem.value=this.text,this.container.appendChild(this.fakeElem),this.selectedText=(0,i.default)(this.fakeElem),this.copyText()}},{key:"removeFake",value:function t(){this.fakeHandler&&(this.container.removeEventListener("click",this.fakeHandlerCallback),this.fakeHandler=null,this.fakeHandlerCallback=null),this.fakeElem&&(this.container.removeChild(this.fakeElem),this.fakeElem=null)}},{key:"selectTarget",value:function t(){this.selectedText=(0,i.default)(this.target),this.copyText()}},{key:"copyText",value:function t(){var e=void 0;try{e=document.execCommand(this.action)}catch(t){e=!1}this.handleResult(e)}},{key:"handleResult",value:function t(e){this.emitter.emit(e?"success":"error",{action:this.action,text:this.selectedText,trigger:this.trigger,clearSelection:this.clearSelection.bind(this)})}},{key:"clearSelection",value:function t(){this.trigger&&this.trigger.focus(),window.getSelection().removeAllRanges()}},{key:"destroy",value:function t(){this.removeFake()}},{key:"action",set:function t(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"copy";if(this._action=e,"copy"!==this._action&&"cut"!==this._action)throw new Error('Invalid "action" value, use either "copy" or "cut"')},get:function t(){return this._action}},{key:"target",set:function t(e){if(void 0!==e){if(!e||"object"!==(void 0===e?"undefined":r(e))||1!==e.nodeType)throw new Error('Invalid "target" value, use a valid Element');if("copy"===this.action&&e.hasAttribute("disabled"))throw new Error('Invalid "target" attribute. Please use "readonly" instead of "disabled" attribute');if("cut"===this.action&&(e.hasAttribute("readonly")||e.hasAttribute("disabled")))throw new Error('Invalid "target" attribute. You can\'t cut text from elements with "readonly" or "disabled" attributes');this._target=e}},get:function t(){return this._target}}]),t}();t.exports=c})},{select:5}],8:[function(e,n,o){!function(i,r){if("function"==typeof t&&t.amd)t(["module","./clipboard-action","tiny-emitter","good-listener"],r);else if(void 0!==o)r(n,e("./clipboard-action"),e("tiny-emitter"),e("good-listener"));else{var a={exports:{}};r(a,i.clipboardAction,i.tinyEmitter,i.goodListener),i.clipboard=a.exports}}(this,function(t,e,n,o){"use strict";function i(t){return t&&t.__esModule?t:{default:t}}function r(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function a(t,e){if(!t)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!e||"object"!=typeof e&&"function"!=typeof e?t:e}function c(t,e){if("function"!=typeof e&&null!==e)throw new TypeError("Super expression must either be null or a function, not "+typeof e);t.prototype=Object.create(e&&e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}}),e&&(Object.setPrototypeOf?Object.setPrototypeOf(t,e):t.__proto__=e)}function l(t,e){var n="data-clipboard-"+t;if(e.hasAttribute(n))return e.getAttribute(n)}var s=i(e),u=i(n),f=i(o),d="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},h=function(){function t(t,e){for(var n=0;n<e.length;n++){var o=e[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}return function(e,n,o){return n&&t(e.prototype,n),o&&t(e,o),e}}(),p=function(t){function e(t,n){r(this,e);var o=a(this,(e.__proto__||Object.getPrototypeOf(e)).call(this));return o.resolveOptions(n),o.listenClick(t),o}return c(e,t),h(e,[{key:"resolveOptions",value:function t(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};this.action="function"==typeof e.action?e.action:this.defaultAction,this.target="function"==typeof e.target?e.target:this.defaultTarget,this.text="function"==typeof e.text?e.text:this.defaultText,this.container="object"===d(e.container)?e.container:document.body}},{key:"listenClick",value:function t(e){var n=this;this.listener=(0,f.default)(e,"click",function(t){return n.onClick(t)})}},{key:"onClick",value:function t(e){var n=e.delegateTarget||e.currentTarget;this.clipboardAction&&(this.clipboardAction=null),this.clipboardAction=new s.default({action:this.action(n),target:this.target(n),text:this.text(n),container:this.container,trigger:n,emitter:this})}},{key:"defaultAction",value:function t(e){return l("action",e)}},{key:"defaultTarget",value:function t(e){var n=l("target",e);if(n)return document.querySelector(n)}},{key:"defaultText",value:function t(e){return l("text",e)}},{key:"destroy",value:function t(){this.listener.destroy(),this.clipboardAction&&(this.clipboardAction.destroy(),this.clipboardAction=null)}}],[{key:"isSupported",value:function t(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:["copy","cut"],n="string"==typeof e?[e]:e,o=!!document.queryCommandSupported;return n.forEach(function(t){o=o&&!!document.queryCommandSupported(t)}),o}}]),e}(u.default);t.exports=p})},{"./clipboard-action":7,"good-listener":4,"tiny-emitter":6}]},{},[8])(8)});
 !function(t,e){"function"==typeof define&&define.amd?define(["tether"],e):"object"==typeof exports?module.exports=e(require("tether")):t.Drop=e(t.Tether)}(this,function(t){"use strict";function e(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function n(t,e){if("function"!=typeof e&&null!==e)throw new TypeError("Super expression must either be null or a function, not "+typeof e);t.prototype=Object.create(e&&e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}}),e&&(Object.setPrototypeOf?Object.setPrototypeOf(t,e):t.__proto__=e)}function o(t){var e=t.split(" "),n=a(e,2),o=n[0],i=n[1];if(["left","right"].indexOf(o)>=0){var s=[i,o];o=s[0],i=s[1]}return[o,i].join(" ")}function i(t,e){for(var n=void 0,o=[];-1!==(n=t.indexOf(e));)o.push(t.splice(n,1));return o}function s(){var a=arguments.length<=0||void 0===arguments[0]?{}:arguments[0],h=function(){for(var t=arguments.length,e=Array(t),n=0;t>n;n++)e[n]=arguments[n];return new(r.apply(b,[null].concat(e)))};p(h,{createContext:s,drops:[],defaults:{}});var g={classPrefix:"drop",defaults:{position:"bottom left",openOn:"click",beforeClose:null,constrainToScrollParent:!0,constrainToWindow:!0,classes:"",remove:!1,openDelay:0,closeDelay:50,focusDelay:null,blurDelay:null,hoverOpenDelay:null,hoverCloseDelay:null,tetherOptions:{}}};p(h,g,a),p(h.defaults,g.defaults,a.defaults),"undefined"==typeof x[h.classPrefix]&&(x[h.classPrefix]=[]),h.updateBodyClasses=function(){for(var t=!1,e=x[h.classPrefix],n=e.length,o=0;n>o;++o)if(e[o].isOpened()){t=!0;break}t?d(document.body,h.classPrefix+"-open"):c(document.body,h.classPrefix+"-open")};var b=function(s){function r(t){if(e(this,r),u(Object.getPrototypeOf(r.prototype),"constructor",this).call(this),this.options=p({},h.defaults,t),this.target=this.options.target,"undefined"==typeof this.target)throw new Error("Drop Error: You must provide a target.");var n="data-"+h.classPrefix,o=this.target.getAttribute(n);o&&null==this.options.content&&(this.options.content=o);for(var i=["position","openOn"],s=0;s<i.length;++s){var a=this.target.getAttribute(n+"-"+i[s]);a&&null==this.options[i[s]]&&(this.options[i[s]]=a)}this.options.classes&&this.options.addTargetClasses!==!1&&d(this.target,this.options.classes),h.drops.push(this),x[h.classPrefix].push(this),this._boundEvents=[],this.bindMethods(),this.setupElements(),this.setupEvents(),this.setupTether()}return n(r,s),l(r,[{key:"_on",value:function(t,e,n){this._boundEvents.push({element:t,event:e,handler:n}),t.addEventListener(e,n)}},{key:"bindMethods",value:function(){this.transitionEndHandler=this._transitionEndHandler.bind(this)}},{key:"setupElements",value:function(){var t=this;if(this.drop=document.createElement("div"),d(this.drop,h.classPrefix),this.options.classes&&d(this.drop,this.options.classes),this.content=document.createElement("div"),d(this.content,h.classPrefix+"-content"),"function"==typeof this.options.content){var e=function(){var e=t.options.content.call(t,t);if("string"==typeof e)t.content.innerHTML=e;else{if("object"!=typeof e)throw new Error("Drop Error: Content function should return a string or HTMLElement.");t.content.innerHTML="",t.content.appendChild(e)}};e(),this.on("open",e.bind(this))}else"object"==typeof this.options.content?this.content.appendChild(this.options.content):this.content.innerHTML=this.options.content;this.drop.appendChild(this.content)}},{key:"setupTether",value:function(){var e=this.options.position.split(" ");e[0]=E[e[0]],e=e.join(" ");var n=[];this.options.constrainToScrollParent?n.push({to:"scrollParent",pin:"top, bottom",attachment:"together none"}):n.push({to:"scrollParent"}),this.options.constrainToWindow!==!1?n.push({to:"window",attachment:"together"}):n.push({to:"window"});var i={element:this.drop,target:this.target,attachment:o(e),targetAttachment:o(this.options.position),classPrefix:h.classPrefix,offset:"0 0",targetOffset:"0 0",enabled:!1,constraints:n,addTargetClasses:this.options.addTargetClasses};this.options.tetherOptions!==!1&&(this.tether=new t(p({},i,this.options.tetherOptions)))}},{key:"setupEvents",value:function(){var t=this;if(this.options.openOn){if("always"===this.options.openOn)return void setTimeout(this.open.bind(this));var e=this.options.openOn.split(" ");if(e.indexOf("click")>=0)for(var n=function(e){t.toggle(e),e.preventDefault()},o=function(e){t.isOpened()&&(e.target===t.drop||t.drop.contains(e.target)||e.target===t.target||t.target.contains(e.target)||t.close(e))},i=0;i<y.length;++i){var s=y[i];this._on(this.target,s,n),this._on(document,s,o)}var r=null,a=null,l=function(e){null!==a?clearTimeout(a):r=setTimeout(function(){t.open(e),r=null},("focus"===e.type?t.options.focusDelay:t.options.hoverOpenDelay)||t.options.openDelay)},u=function(e){null!==r?clearTimeout(r):a=setTimeout(function(){t.close(e),a=null},("blur"===e.type?t.options.blurDelay:t.options.hoverCloseDelay)||t.options.closeDelay)};e.indexOf("hover")>=0&&(this._on(this.target,"mouseover",l),this._on(this.drop,"mouseover",l),this._on(this.target,"mouseout",u),this._on(this.drop,"mouseout",u)),e.indexOf("focus")>=0&&(this._on(this.target,"focus",l),this._on(this.drop,"focus",l),this._on(this.target,"blur",u),this._on(this.drop,"blur",u))}}},{key:"isOpened",value:function(){return this.drop?f(this.drop,h.classPrefix+"-open"):void 0}},{key:"toggle",value:function(t){this.isOpened()?this.close(t):this.open(t)}},{key:"open",value:function(t){var e=this;this.isOpened()||(this.drop.parentNode||document.body.appendChild(this.drop),"undefined"!=typeof this.tether&&this.tether.enable(),d(this.drop,h.classPrefix+"-open"),d(this.drop,h.classPrefix+"-open-transitionend"),setTimeout(function(){e.drop&&d(e.drop,h.classPrefix+"-after-open")}),"undefined"!=typeof this.tether&&this.tether.position(),this.trigger("open"),h.updateBodyClasses())}},{key:"_transitionEndHandler",value:function(t){t.target===t.currentTarget&&(f(this.drop,h.classPrefix+"-open")||c(this.drop,h.classPrefix+"-open-transitionend"),this.drop.removeEventListener(m,this.transitionEndHandler))}},{key:"beforeCloseHandler",value:function(t){var e=!0;return this.isClosing||"function"!=typeof this.options.beforeClose||(this.isClosing=!0,e=this.options.beforeClose(t,this)!==!1),this.isClosing=!1,e}},{key:"close",value:function(t){this.isOpened()&&this.beforeCloseHandler(t)&&(c(this.drop,h.classPrefix+"-open"),c(this.drop,h.classPrefix+"-after-open"),this.drop.addEventListener(m,this.transitionEndHandler),this.trigger("close"),"undefined"!=typeof this.tether&&this.tether.disable(),h.updateBodyClasses(),this.options.remove&&this.remove(t))}},{key:"remove",value:function(t){this.close(t),this.drop.parentNode&&this.drop.parentNode.removeChild(this.drop)}},{key:"position",value:function(){this.isOpened()&&"undefined"!=typeof this.tether&&this.tether.position()}},{key:"destroy",value:function(){this.remove(),"undefined"!=typeof this.tether&&this.tether.destroy();for(var t=0;t<this._boundEvents.length;++t){var e=this._boundEvents[t],n=e.element,o=e.event,s=e.handler;n.removeEventListener(o,s)}this._boundEvents=[],this.tether=null,this.drop=null,this.content=null,this.target=null,i(x[h.classPrefix],this),i(h.drops,this)}}]),r}(v);return h}var r=Function.prototype.bind,a=function(){function t(t,e){var n=[],o=!0,i=!1,s=void 0;try{for(var r,a=t[Symbol.iterator]();!(o=(r=a.next()).done)&&(n.push(r.value),!e||n.length!==e);o=!0);}catch(l){i=!0,s=l}finally{try{!o&&a["return"]&&a["return"]()}finally{if(i)throw s}}return n}return function(e,n){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return t(e,n);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),l=function(){function t(t,e){for(var n=0;n<e.length;n++){var o=e[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}return function(e,n,o){return n&&t(e.prototype,n),o&&t(e,o),e}}(),u=function(t,e,n){for(var o=!0;o;){var i=t,s=e,r=n;o=!1,null===i&&(i=Function.prototype);var a=Object.getOwnPropertyDescriptor(i,s);if(void 0!==a){if("value"in a)return a.value;var l=a.get;if(void 0===l)return;return l.call(r)}var u=Object.getPrototypeOf(i);if(null===u)return;t=u,e=s,n=r,o=!0,a=u=void 0}},h=t.Utils,p=h.extend,d=h.addClass,c=h.removeClass,f=h.hasClass,v=h.Evented,y=["click"];"ontouchstart"in document.documentElement&&y.push("touchstart");var g={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"otransitionend",transition:"transitionend"},m="";for(var b in g)if({}.hasOwnProperty.call(g,b)){var O=document.createElement("p");"undefined"!=typeof O.style[b]&&(m=g[b])}var E={left:"right",right:"left",top:"bottom",bottom:"top",middle:"middle",center:"center"},x={},P=s();return document.addEventListener("DOMContentLoaded",function(){P.updateBodyClasses()}),P});
 'use strict';
 
@@ -6063,374 +6063,6 @@ var buttonGroup = function(element) {
 
 })(jQuery);
 
-/**
- * Makes a fluidfixed item that, if taller than the window height, will scroll up when the user scrolls up
- * and scroll down when the user scrolls down.
- */
-
-(function($) {
-    /**
-     * Start fluidfixed on an element. To do so, use $('js-fluidfixed').fluidfixed();
-     *
-     * As options, it accepts two properties:
-     * offsetTop: The offset from the top of the window that it will stop at when scrolling up.
-     * offsetBottom: The offset from the bottom of the window that it will stop at when scrolling down.
-     *
-     * If not passed, the offsetTop will default to the offset of the fluidfixed element to the top of the window.
-     * This is likely what you want, but you can customize it. However, you'll probably want to define your
-     * offsetBottom. It defaults to 30px.
-     *
-     * @param {{offsetTop: {(undefined|number)}, offsetBottom: {(undefined|number)}}} options
-     */
-    $.fn.fluidfixed = function(options) {
-
-        /**
-         *
-         * @type {Array}
-         */
-        var killThreadIds = [];
-
-        /**
-         * Resets the variables.
-         *
-         * @param {FluidFixedSettings} vars
-         */
-        var reset = function(vars) {
-            vars.windowHeight = undefined;
-            vars.containerHeight = undefined;
-            vars.documentHeight = undefined;
-            vars.minMargin = undefined;
-            vars.upstartMargin = 0;
-            vars.downstartMargin = 0;
-            vars.upstart = 0;
-            vars.downstart = 0;
-            vars.lastMarginTop = 0;
-        };
-
-        /**
-         * Prints out the variables.
-         *
-         * @param {FluidFixedSettings} vars
-         */
-        var debug = function(vars) {
-            console.log('windowHeight    : ' + vars.windowHeight);
-            console.log('documentHeight  : ' + vars.documentHeight);
-            console.log('containerHeight : ' + vars.containerHeight);
-            console.log('minMargin       : ' + vars.minMargin);
-            console.log('upstartMargin   : ' + vars.upstartMargin);
-            console.log('downstartMargin : ' + vars.downstartMargin);
-            console.log('upstart         : ' + vars.upstart);
-            console.log('downstart       : ' + vars.downstart);
-        };
-
-
-        /**
-         *
-         * @param element
-         * @param {FluidFixedSettings} vars
-         */
-        var start = function(element, vars) {
-
-            // First, calculate the offsets and heights.
-
-            if (vars.containerHeight == undefined) {
-                vars.containerHeight = $(element).outerHeight(true);
-            }
-
-            if (vars.documentHeight == undefined) {
-                vars.documentHeight = $(document).height();
-            }
-
-            if (vars.windowHeight == undefined) {
-                vars.windowHeight = $(window).height();
-            }
-
-            if (vars.minMargin == undefined) {
-                // The lowest negative margin on the container.
-                vars.minMargin = - (vars.containerHeight + vars.offsetTop + vars.offsetBottom - vars.windowHeight);
-            }
-
-            /**
-             * We have 3 cases to check here:
-             *
-             * 1. The fluidfixed element is higher than the page height, so we don't need to do anything.
-             * 2. The fluidfixed element height is shorter than the window height, so we can just set
-             *    the fluidfixed element's position to fixed.
-             * 3. The fluidfixed element height is higher than the window height, so we need to set the
-             *    fluidfixed element's position to fixed and calculate the position by adjusting the margin
-             *    when scrolling.
-             */
-
-            var containerOuterHeight = vars.containerHeight + vars.offsetTop + vars.offsetBottom;
-            var fixObject = containerOuterHeight < vars.documentHeight && containerOuterHeight < vars.windowHeight;
-
-            var handleScroll = fixObject
-                && containerOuterHeight > vars.windowHeight // Element height is higher than the window height
-                && vars.documentHeight > vars.windowHeight; // Page height is higher than window height
-
-            if (fixObject) {
-                $(element).css('position', 'fixed');
-
-                if ((vars.scrollTop + containerOuterHeight) > vars.documentHeight) {
-                    // We're loading the page near the bottom of the document, the fluidfixed element will be cut
-                    // off unless we set the margin-top to the minMargin.
-                    $(element).css('margin-top', vars.minMargin);
-                }
-
-                if (handleScroll) {
-                    // Case 3: The element needs to be fixed and we have to calculate its position on scroll.
-                    var $element = $(element); // Cache element before scroll.
-                    killThreadIds[vars.id] = false;
-                    scrollHandler($element, vars);
-                } else {
-                    // Case 2: The element only needs to be fixed, no position calculations necessary.
-                    $(element).css('margin-top', 0);
-                    killThreadIds[vars.id] = true;
-                    $(window).off("scroll." + vars.id); // IE
-                }
-
-            } else {
-                // Case 1: The element doesn't need to be fixed, reinstate its original position property.
-                $(element).css('position', vars.position);
-            }
-        };
-
-        /**
-         * Detect request animation frame.
-         *
-         * @param {jQuery} $element
-         * @param {FluidFixedSettings} vars
-         * @returns {*|Function}
-         */
-        var getRequestAnimationFrame = function($element, vars) {
-            return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            // IE Fallback
-            function() { $(window).on("scroll." + vars.id, $.proxy(onScroll, null, $element, vars)); };
-        };
-
-        /**
-         * Starts an infinite loop using the requestAnimationFrame which lets us execute code on the
-         * next available screen repaint, rather than trying to calculate the position when the browser's
-         * not ready for it.
-         *
-         * @param {jQuery} $element
-         * @param {FluidFixedSettings} vars
-         * @returns {boolean}
-         */
-        var scrollHandler = function($element, vars) {
-            if (killThreadIds[vars.id]) {
-                // We've been interrupted. Kill the loop.
-                return false;
-            }
-            if (vars.lastScrollTop == window.pageYOffset) {
-                // We're not scrolling.
-                getRequestAnimationFrame($element, vars)($.proxy(scrollHandler, null, $element, vars));
-                return false;
-            } else {
-                // We're scrolling, let's party.
-                onScroll($element, vars);
-                getRequestAnimationFrame($element, vars)($.proxy(scrollHandler, null, $element, vars));
-            }
-        };
-
-        /**
-         * Checks to see whether we're scrolling up or down by comparing the current scroll position with the last
-         * calculated scroll position, then handles the positioning.
-         *
-         * @param {jQuery} $element
-         * @param {FluidFixedSettings} vars
-         */
-        var onScroll = function($element, vars) {
-            vars.scrollTop = window.pageYOffset;
-            if (vars.scrollTop > vars.lastScrollTop) {
-                // downscroll
-                handleDownScroll($element, vars);
-            } else if (vars.scrollTop < vars.lastScrollTop) {
-                //upscroll
-                handleUpScroll($element, vars);
-            }
-            vars.lastScrollTop = vars.scrollTop;
-        };
-
-        /**
-         * Calculates our and applies our downscroll position. Works by incrementally adding a negative margin
-         * to the fluidfixed element.
-         *
-         * @param {jQuery} $element
-         * @param {FluidFixedSettings} vars
-         */
-        var handleDownScroll = function($element, vars) {
-            vars.upstart = 0;
-            vars.upstartMargin = 0;
-
-            if (vars.downstart != 0 && vars.lastMarginTop == vars.minMargin) {
-                // We're scrolling down and the margin is already at the min margin, we can't decrease the
-                // margin anymore, so checkout early.
-                return;
-            }
-
-            if (vars.downstart == 0) {
-                vars.downstart = vars.scrollTop;
-            }
-
-            if (vars.downstartMargin == 0) {
-                var px = $element.css('margin-top');
-                vars.downstartMargin = parseInt(px.substring(0, px.length - 2));
-            }
-
-            var margin = Math.max((vars.downstartMargin + vars.downstart - vars.scrollTop), vars.minMargin);
-
-            if (vars.scrollTop > vars.offsetTop) {
-                vars.lastMarginTop = margin;
-                $element.css('margin-top', margin + 'px');
-            } else {
-                vars.lastMarginTop = - (vars.scrollTop);
-                $element.css('margin-top', - (vars.scrollTop) + 'px');
-            }
-        };
-
-        /**
-         * Calculates our and applies our upscroll position. Works by incrementally removing the negative margin
-         * on the fluidfixed element.
-         *
-         * @param {jQuery} $element
-         * @param {FluidFixedSettings} vars
-         */
-        var handleUpScroll = function($element, vars) {
-            vars.downstart = 0;
-            vars.downstartMargin = 0;
-
-            if (vars.upstart != 0 && vars.lastMarginTop == 0) {
-                // We're scrolling up and the margin is already 0. We can't increase the margin any further,
-                // so check out early.
-                return;
-            }
-
-            if (vars.upstart == 0) {
-                vars.upstart = vars.scrollTop;
-            }
-
-            if (vars.upstartMargin == 0) {
-                var px = $element.css('margin-top');
-                vars.upstartMargin = parseInt(px.substring(0, px.length - 2));
-            }
-
-            var margin = Math.min((vars.upstartMargin - vars.scrollTop + vars.upstart), 0);
-            vars.lastMarginTop = margin;
-            $element.css('margin-top', margin + 'px');
-        };
-
-        /**
-         * Initializes the settings for each fluidfixed element and starts the whole operation.
-         */
-        this.each(function() {
-            var self = this;
-
-            // Extend Settings.
-            var settings = $.extend({}, $.fn.fluidfixed.defaults, options);
-
-            if (settings.offsetTop === undefined) {
-                settings.offsetTop = $(this).offset().top;
-            }
-
-            if (settings.offsetBottom === undefined) {
-                settings.offsetBottom = 30;
-            }
-
-            var position = 'static';
-
-            if ($(this).css('position') !== null) {
-                position = $(this).css('position');
-            }
-
-            /**
-             * The variables we pass around for each fluidfixed object.
-             *
-             * @typedef {Object} FluidFixedSettings
-             * @property {string} id - A unique ID generated for the fluidfixed element used to kill the scroll listener if necessary. This has nothing to do with the id property on an HTML element.
-             * @property {number} offsetTop - The offset between the top of the window and the top of the container when scrolling up (set to offset of container by default).
-             * @property {number} offsetBottom - The offset between the bottom of the window and the bottom of the container when scrolling down (set to 30 by default).
-             * @property {(number|undefined)} windowHeight - The window height.
-             * @property {(number|undefined)} containerHeight - The height of the fluidfixed element.
-             * @property {(number|undefined)} documentHeight - The height of the document/page.
-             * @property {(number|undefined)} minMargin - The lowest the negative margin can get when we're scrolling down.
-             * @property {number} upstartMargin - The margin on the container when we start scrolling up.
-             * @property {number} downstartMargin - The margin on the container when we start scrolling down.
-             * @property {number} upstart - The offset of the container when we start scrolling up.
-             * @property {number} downstart - The offset of the container when we start scrolling down.
-             * @property {number} lastMarginTop - The last calculated margin-top.
-             * @property {number} lastScrollTop - The last calcuated window offset, used to find whether we're scrolling up or down.
-             * @property {number} scrollTop - The current window offset.
-             * @property {string} position - The old CSS position property to revert to if fluidfixed is detached from the element, defaults to 'static'.
-             */
-
-            /**
-             * @type {FluidFixedSettings}
-             */
-            var vars = {
-                id: Math.random().toString(36).substr(2, 9),
-                offsetTop: settings.offsetTop,
-                offsetBottom: settings.offsetBottom,
-                windowHeight: undefined,
-                containerHeight: undefined,
-                documentHeight: undefined,
-                minMargin: undefined,
-                upstartMargin: 0,
-                downstartMargin: 0,
-                upstart: 0,
-                downstart: 0,
-                lastMarginTop: 0,
-                lastScrollTop: window.pageYOffset,
-                scrollTop: window.pageYOffset,
-                position: position
-            };
-
-            /**
-             * Kills the fluidfixed functionality of a fluidfixed element.
-             */
-            $(self).on('detach.FluidFixed', function() {
-                $(self).css('position', vars.position);
-                $(self).css('margin-top', 0);
-                killThreadIds[vars.id] = true;
-                $(window).off("scroll." + vars.id); // IE
-            });
-
-            /**
-             * Resets and recalculates the fluidfixed element position when the `reset.FluidFixed` event is triggered.
-             */
-            $(self).on('reset.FluidFixed', function() {
-                reset(vars);
-                start(self, vars);
-            });
-
-            /**
-             * Resets and recalculates the fluidfixed element position when the window is resized.
-             */
-            $(window).resize(function() {
-                reset(vars);
-                start(self, vars);
-            });
-
-            start(self, vars);
-        });
-    };
-
-    /**
-     * The properties that need to exist in the options being passed in initialization.
-     *
-     * @type {{offsetTop: {(undefined|number)}, offsetBottom: {(undefined|number)}}}
-     */
-    $.fn.fluidfixed.defaults = {
-        offsetTop: undefined,
-        offsetBottom: undefined
-    };
-
-})(jQuery);
-
 /* jshint -W003 */
 /*!
  * jQuery Expander Plugin - v1.7.0 - 2016-03-12
@@ -9230,18 +8862,6 @@ $(document).on('contentLoad', function(e) {
     }
 
     /**
-     * Start fluidfixed on the dashboard panel navigation.
-     *
-     * @param element - The scope of the function.
-     */
-    function fluidFixedInit(element) {
-        // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
-        $('.js-fluid-fixed', element).fluidfixed({
-            offsetBottom: 72 + 9
-        });
-    }
-
-    /**
      * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
@@ -9348,20 +8968,6 @@ $(document).on('contentLoad', function(e) {
 
         $(drawerToggle).on('click', function() {
             window.scrollTo(0, 0);
-        });
-
-        $(drawer, element).on('drawer.show', function() {
-            $('.panel-nav .js-fluid-fixed', element).trigger('detach.FluidFixed');
-            $(content, element).height($('.panel-nav .js-fluid-fixed', element).outerHeight(true) + 132);
-            $(content, element).css('overflow', 'hidden');
-
-        });
-
-        $(drawer, element).on('drawer.hide', function() {
-            // TODO: We should only reset if the panel is actually displayed.
-            $('.panel-nav .js-fluid-fixed', element).trigger('reset.FluidFixed');
-            $(content, element).height('auto');
-            $(content, element).css('overflow', 'inherit');
         });
 
         $(window).resize(function() {
@@ -9533,7 +9139,6 @@ $(document).on('contentLoad', function(e) {
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
-        fluidFixedInit(e.target); // panel and scroll settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -9618,8 +9223,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 
@@ -9629,8 +9232,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 

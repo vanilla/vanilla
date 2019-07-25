@@ -7,11 +7,12 @@
 import ClipboardBase from "quill/modules/clipboard";
 import Delta from "quill-delta";
 import Quill, { DeltaStatic } from "quill/core";
-import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
-import getStore from "@library/state/getStore";
-import { IStoreState } from "@rich-editor/@types/store";
+import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+
+export const EDITOR_SCROLL_CONTAINER_CLASS = "js-richEditorScrollContainer";
 
 export default class ClipboardModule extends ClipboardBase {
     /**
@@ -50,36 +51,44 @@ export default class ClipboardModule extends ClipboardBase {
     constructor(quill, options) {
         super(quill, options);
         this.addMatcher(Node.TEXT_NODE, this.linkMatcher);
+        this.addMatcher("img", this.imageMatcher);
+
+        // Skip screen reader only content.
+        this.addMatcher(".sr-only", () => new Delta());
     }
 
     /**
-     * Override the paste event to not jump around on paste in a cross-browser manor.
-     *
-     * Override https://github.com/quilljs/quill/blob/master/modules/clipboard.js#L108-L123
-     * Because of https://github.com/quilljs/quill/issues/1374
-     *
-     * Hopefully this will be fixed in Quill 2.0
+     * @override
+     * Override the paste handler to
+     * - Prevent jumping on paste.
+     * - Ensure current selection is deleted before a paste.
      */
     public onPaste(e: Event) {
         if (e.defaultPrevented || !(this.quill as any).isEnabled()) {
             return;
         }
         const range = this.quill.getSelection();
-        let delta = new Delta().retain(range.index);
-        const container = this.options.scrollingContainer;
+        const container = this.quill.root.closest(`.${EDITOR_SCROLL_CONTAINER_CLASS}`);
 
-        // THIS IS WHAT IS DIFFERENT
+        // Get our scroll positions
         const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;
         const containerTop = container ? container.scrollTop : 0;
         this.container.focus();
-        (this.quill as any).selection.update(Quill.sources.SILENT);
-        setImmediate(() => {
-            delta = delta.concat((this as any).convert()).delete(range.length);
-            this.quill.updateContents(delta, Quill.sources.USER);
-            // range.length contributes to delta.length()
-            this.quill.setSelection((delta.length() - range.length) as any, Quill.sources.SILENT);
+        this.quill.selection.update(Quill.sources.SILENT);
 
-            // THIS IS WHAT IS DIFFERENT
+        // Delete text if any is currently selected.
+        if (range.length) {
+            this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+        }
+
+        // Settimeout so that the paste goes into `this.container`.
+        setImmediate(() => {
+            // Insert the pasted content.
+            const delta = new Delta().retain(range.index).concat(this.convert());
+            this.quill.updateContents(delta, Quill.sources.USER);
+
+            // Fix our selection & scroll position.
+            this.quill.setSelection(delta.length(), 0, Quill.sources.SILENT);
             document.documentElement!.scrollTop = document.body.scrollTop = scrollTop;
             if (container) {
                 container.scrollTop = containerTop;
@@ -87,6 +96,31 @@ export default class ClipboardModule extends ClipboardBase {
             this.quill.focus();
         });
     }
+
+    /**
+     * A matcher for img tags. Converts `<img />` into an external embed (type image).
+     */
+    public imageMatcher = (node: HTMLImageElement, delta: DeltaStatic) => {
+        const src = node.getAttribute("src");
+        const alt = node.getAttribute("alt") || "";
+        if (src) {
+            const imageData: IEmbedValue = {
+                loaderData: {
+                    type: "image",
+                },
+                data: {
+                    embedType: "image",
+                    url: src,
+                    name: alt,
+                    attributes: {},
+                },
+            };
+            return new Delta().insert({
+                [ExternalEmbedBlot.blotName]: imageData,
+            });
+        }
+        return delta;
+    };
 
     /**
      * A matcher to turn a pasted links into real links.
@@ -109,13 +143,7 @@ export default class ClipboardModule extends ClipboardBase {
      * Determine if we are in a code formatted item or not.
      */
     private get inCodeFormat() {
-        const instance = getStore<IStoreState>().getState().editor.instances[getIDForQuill(this.quill)];
-        if (!instance || !instance.lastGoodSelection) {
-            return false;
-        }
-        return (
-            rangeContainsBlot(this.quill, CodeBlockBlot, instance.lastGoodSelection) ||
-            rangeContainsBlot(this.quill, CodeBlot, instance.lastGoodSelection)
-        );
+        const range = this.quill.getLastGoodSelection();
+        return rangeContainsBlot(this.quill, CodeBlockBlot, range) || rangeContainsBlot(this.quill, CodeBlot, range);
     }
 }

@@ -14,7 +14,7 @@ import EntryModel from "../utility/EntryModel";
 export async function makeTestConfig(entryModel: EntryModel) {
     const baseConfig: Configuration = await makeBaseConfig(entryModel, "unit-tests");
     baseConfig.mode = "development";
-    baseConfig.devtool = "inline-source-map";
+    baseConfig.devtool = "inline-cheap-module-source-map";
     baseConfig.optimization = {
         splitChunks: false,
         minimize: false,

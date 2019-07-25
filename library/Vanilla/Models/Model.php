@@ -115,12 +115,21 @@ class Model implements InjectableInterface {
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? false;
         $offset = $options["offset"] ?? 0;
+        $selects =  $options["select"] ?? [];
 
-        $result = $this->sql()
-            ->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
+        $sqlDriver = $this->sql();
+
+        if (!empty($selects)) {
+            $sqlDriver->select($selects);
+        }
+        $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
-        $schema = Schema::parse([":a" => $this->readSchema]);
+        if (empty($selects)) {
+            $schema = Schema::parse([":a" => $this->readSchema]);
+        } else {
+            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
+        }
         $result = $schema->validate($result);
 
         return $result;

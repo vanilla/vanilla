@@ -12,11 +12,35 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Contracts;
 
 /**
  * Event handlers for the Dashboard application.
  */
 class DashboardHooks extends Gdn_Plugin {
+
+    /** @var string */
+    private $mobileThemeKey;
+
+    /** @var string */
+    private $desktopThemeKey;
+
+    /** @var \Vanilla\AddonManager */
+    private $addonManager;
+
+    /**
+     * Constructor for DI.
+     *
+     * @param \Vanilla\AddonManager $addonManager
+     * @param Contracts\ConfigurationInterface $config
+     */
+    public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config) {
+        parent::__construct();
+        $this->addonManager = $addonManager;
+        $this->mobileThemeKey = $config->get('Garden.MobileTheme');
+        $this->desktopThemeKey = $config->get('Garden.Theme');
+    }
+
 
     /**
      * Install the formatter to the container.
@@ -34,7 +58,12 @@ class DashboardHooks extends Gdn_Plugin {
 
             ->rule('Gdn_Dispatcher')
             ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
-            ;
+
+            ->rule(\Vanilla\Menu\CounterModel::class)
+            ->addCall('addProvider', [new Reference(ActivityCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(LogCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(RoleCounterProvider::class)])
+        ;
     }
 
     /**
@@ -82,7 +111,6 @@ class DashboardHooks extends Gdn_Plugin {
             $sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
             $sender->addJsFile('vendors/icheck.min.js', 'dashboard');
             $sender->addJsFile('jquery.tablejenga.js', 'dashboard');
-            $sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
             $sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
             $sender->addJsFile('vendors/ace/ace.js', 'dashboard');
             $sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');
@@ -176,12 +204,6 @@ class DashboardHooks extends Gdn_Plugin {
         if ($embed = c('Garden.Embed.Allow')) {
             // Record the remote url where the forum is being embedded.
             $remoteUrl = c('Garden.Embed.RemoteUrl');
-            if (!$remoteUrl) {
-                $remoteUrl = getIncomingValue('remote');
-                if ($remoteUrl) {
-                    saveToConfig('Garden.Embed.RemoteUrl', $remoteUrl);
-                }
-            }
             if ($remoteUrl) {
                 $sender->addDefinition('RemoteUrl', $remoteUrl);
             }
@@ -278,8 +300,11 @@ class DashboardHooks extends Gdn_Plugin {
         $nav = $sender;
 
         $session = Gdn::session();
-        $hasThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledDesktopThemeKey());
-        $hasMobileThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledMobileThemeKey());
+        $desktopTheme = $this->addonManager->lookupTheme($this->desktopThemeKey);
+        $mobileTheme = $this->addonManager->lookupTheme($this->mobileThemeKey);
+        $isDistinctMobileTheme = $mobileTheme !== $desktopTheme;
+        $hasThemeOptions = count($desktopTheme->getInfoValue('options', [])) > 0;
+        $hasMobileThemeOptions = $isDistinctMobileTheme && count($mobileTheme->getInfoValue('options', [])) > 0;
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
@@ -320,7 +345,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
 
             ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
-            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'site-settings.locales', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/settings/locales', 'site-settings.locales', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
@@ -476,7 +501,8 @@ class DashboardHooks extends Gdn_Plugin {
                     $sQL = Gdn::sql();
                     $sQL->delete('TagDiscussion', ['TagID' => $tagID]);
                     $sQL->delete('Tag', ['TagID' => $tagID]);
-
+                    $tag['Name'] = htmlspecialchars($tag['Name']);
+                    $tag['FullName'] = htmlspecialchars($tag['FullName']);
                     $sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $tag));
                     $sender->jsonTarget("#Tag_{$tag['TagID']}", null, 'Remove');
                 }
@@ -587,6 +613,10 @@ class DashboardHooks extends Gdn_Plugin {
             throw notFoundException('Discussion');
         }
 
+        $hasPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        if (!$hasPermission && $discussion['InsertUserID'] !== GDN::session()->UserID) {
+            throw permissionException('Garden.Moderation.Manage');
+        }
         $sender->title('Add Tags');
 
         if ($sender->Form->authenticatedPostBack()) {
@@ -878,7 +908,8 @@ class DashboardHooks extends Gdn_Plugin {
         if ($parsed['Type'] !== 'static' || $parsed['Domain'] !== 'v') {
             return;
         }
-
+        // Sanitize $parsed['Name'] to prevent path traversal.
+        $parsed['Name'] = str_replace('..', '', $parsed['Name']);
         $remotePath = PATH_ROOT.'/'.$parsed['Name'];
 
         // Since this is just a temp file we don't want to nest it in a bunch of subfolders.

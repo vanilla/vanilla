@@ -23,17 +23,48 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritdoc
      */
     public static function matches(array $operation): bool {
-        return static::opAttrsContainKeyWithValue($operation, "list", static::LIST_TYPES);
+        $value = self::normalizeValue($operation ?? []);
+        return in_array($value['type'], self::LIST_TYPES, true);
     }
+
+
+    /**
+     * Get a normalized value from the blot.
+     *
+     * @param array $operation The operation to normalize.
+     *
+     * @return array
+     */
+    private static function normalizeValue(array $operation): array {
+        $blotValue = $operation["attributes"]["list"] ?? self::LIST_TYPE_UNRECOGNIZED;
+        if (is_array($blotValue) && array_key_exists("depth", $blotValue) && array_key_exists("type", $blotValue)) {
+            return $blotValue;
+        }
+
+        if (!is_string($blotValue)) {
+            return [
+                'type' => self::LIST_TYPE_UNRECOGNIZED,
+                'depth' => 0,
+            ];
+        }
+
+        return [
+            'type' => $blotValue,
+            'depth' => 0,
+        ];
+    }
+
 
     /**
      * @inheritdoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        $surroundingBlot = $group->getBlotForSurroundingTags();
+        $surroundingBlot = $group->getMainBlot();
         if ($surroundingBlot instanceof ListLineTerminatorBlot) {
             // If the list types are different we need to clear the block.
-            return $surroundingBlot->getListType() !== $this->getListType();
+            return
+                $surroundingBlot->getListType() !== $this->getListType()
+                || $surroundingBlot->getListDepth() !== $this->getListDepth();
         } else {
             return parent::shouldClearCurrentGroup($group);
         }
@@ -42,13 +73,7 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritdoc
      */
     public function renderLineStart(): string {
-        $classString = "";
-        $indentLevel = $this->currentOperation["attributes"]["indent"] ?? null;
-        if ($indentLevel && filter_var($indentLevel, FILTER_VALIDATE_INT) !== false) {
-            $classString = " class=\"ql-indent-$indentLevel\"";
-        }
-
-        return "<li$classString>";
+        return "<li>";
     }
 
     /**
@@ -87,12 +112,37 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
     }
 
     /**
+     * Get a normalized value from the blot.
+     *
+     * @return array
+     */
+    private function getNormalizedValue(): array {
+        return self::normalizeValue($this->currentOperation);
+    }
+
+    /**
      * Determine which type of list we are in.
      *
      * @return string
      */
-    private function getListType() {
-        $listType = $this->currentOperation["attributes"]["list"] ?? static::LIST_TYPE_UNRECOGNIZED;
+    private function getListType(): string {
+        $listType = $this->getNormalizedValue()['type'];
         return !in_array($listType, static::LIST_TYPES) ? static::LIST_TYPE_UNRECOGNIZED : $listType;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNestingDepth(): int {
+        return $this->getListDepth();
+    }
+
+    /**
+     * Determine which depth of nesting our list is.
+     *
+     * @return int
+     */
+    private function getListDepth(): int {
+        return $this->getNormalizedValue()['depth'];
     }
 }

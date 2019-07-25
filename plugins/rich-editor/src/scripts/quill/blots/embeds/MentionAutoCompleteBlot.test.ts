@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import Quill from "quill/core";
 import { expect } from "chai";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 
 describe("[MentionAutoCompleteBlot]", () => {
     it("can be finalized.", () => {
-        const quill = new Quill(document.body);
+        const quill = setupTestQuill();
 
         const data: IMentionSuggestionData = {
             userID: 1,

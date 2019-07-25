@@ -670,6 +670,8 @@ class EditorPlugin extends Gdn_Plugin {
             $sender->setValue('Format', $this->Format);
         }
 
+
+
         // If force Wysiwyg enabled in settings
         $needsConversion = (!in_array($this->Format, ['Wysiwyg']));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
@@ -827,6 +829,23 @@ class EditorPlugin extends Gdn_Plugin {
                 if ($uploadType === 'unknown') {
                     $uploadType = 'image';
                 }
+
+                // image dimensions are higher than limit, it needs resizing
+                if (c("ImageUpload.Limits.Enabled")) {
+                    if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
+                        $imageResizer = new \Vanilla\ImageResizer();
+                        $imageResizer->resize(
+                            $tmpFilePath,
+                            null,
+                            [
+                                "height" => c("ImageUpload.Limits.Height"),
+                                "width" => c("ImageUpload.Limits.Width"),
+                                "crop" => false
+                            ]
+                        );
+                    }
+                }
+
                 $filePathParsed = Gdn_UploadImage::saveImageAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -995,7 +1014,7 @@ class EditorPlugin extends Gdn_Plugin {
             $categoryID = $discussion->CategoryID;
             $category = CategoryModel::categories($categoryID);
 
-            if ($category && $category['AllowFileUploads'] !==1  && Gdn::request()->getValue('MediaIDs') !== false) {
+            if ($category && $category['AllowFileUploads'] != 1  && Gdn::request()->getValue('MediaIDs') !== false) {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }
@@ -1427,6 +1446,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add additional Image Upload specific form items to the dashboard posting page.
      * Add additional WYSIWYG specific form item to the dashboard posting page.
      *
      * @param string $additionalFormItemHTML
@@ -1440,6 +1460,7 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
+        //WYSIWYG form items
         $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
         $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
         $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
@@ -1448,7 +1469,8 @@ class EditorPlugin extends Gdn_Plugin {
         $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
-        $additionalFormItemHTML .= "<li class='form-group'>$formToggle</li>";
+        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
+
         return $additionalFormItemHTML;
     }
 

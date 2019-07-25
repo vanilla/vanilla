@@ -7,7 +7,8 @@
 namespace Vanilla\Formatting\Quill\Blots\Embeds;
 
 use Gdn;
-use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Parser;
 
@@ -16,8 +17,10 @@ use Vanilla\Formatting\Quill\Parser;
  */
 class ExternalBlot extends AbstractBlot {
 
-    /** @var EmbedManager */
-    private $embedManager;
+    const DATA_KEY = "insert.embed-external.data";
+
+    /** @var EmbedService */
+    private $embedService;
 
     /**
      * @inheritDoc
@@ -42,8 +45,18 @@ class ExternalBlot extends AbstractBlot {
         if ($this->content !== '') {
             $this->content .= "\n";
         }
-        /** @var EmbedManager embedManager */
-        $this->embedManager = Gdn::getContainer()->get(EmbedManager::class);
+        $this->embedService = Gdn::getContainer()->get(EmbedService::class);
+    }
+
+    /**
+     * Get the embed data from an operation.
+     *
+     * @param mixed $operation This is intentionally mixed because it could be garbage and we don't want to crash.
+     *
+     * @return array
+     */
+    public static function getEmbedDataFromOperation($operation): array {
+        return valr(self::DATA_KEY, $operation, []);
     }
 
     /**
@@ -52,12 +65,21 @@ class ExternalBlot extends AbstractBlot {
      * @return array
      */
     public function getEmbedData(): array {
-        return $this->currentOperation["insert"]["embed-external"]["data"] ?? [];
+        return self::getEmbedDataFromOperation($this->currentOperation);
     }
 
     /**
-     * Render out the content of the blot using the EmbedManager.
-     * @see EmbedManager
+     * Get an Embed class instance that backs the embed.
+     *
+     * @return AbstractEmbed
+     */
+    public function getEmbed(): AbstractEmbed {
+        $data = $this->getEmbedData();
+        return $this->embedService->createEmbedFromData($data);
+    }
+
+    /**
+     * Render out the content of the blot using the EmbedService.
      * @inheritDoc
      */
     public function render(): string {
@@ -65,24 +87,23 @@ class ExternalBlot extends AbstractBlot {
             return $this->renderQuote();
         }
 
-        $value = $this->currentOperation["insert"]["embed-external"] ?? [];
-        $data = $value['data'] ?? $value;
-        try {
-            return "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
-        } catch (\Exception $e) {
-            // TODO: Add better error handling here.
-            return '';
-        }
+        return $this->getEmbed()->renderHtml();
     }
 
+    /**
+     * Render the version of the embed if it is inside of a quote embed.
+     * Eg. A nested embed.
+     *
+     * @return string
+     */
     public function renderQuote(): string {
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
         $data = $value['data'] ?? $value;
 
         $url = $data['url'] ?? "";
         if ($url) {
-            $sanitizedUrl = \Gdn_Format::sanitizeUrl($url);
-            return "<div class=\"userContent\"><p><a href=\"$sanitizedUrl\">$url</a></p></div>";
+            $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
+            return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
         }
         return "";
     }

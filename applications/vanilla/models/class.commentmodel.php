@@ -232,7 +232,7 @@ class CommentModel extends Gdn_Model {
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $where = $this->stripWherePrefixes($where);
-        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true]);
+        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
 
         // Build up an inner select of comments to force late-loading.
         $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, 'c3');
@@ -250,6 +250,10 @@ class CommentModel extends Gdn_Model {
             Gdn::userModel()->joinUsers($result, ['InsertUserID', 'UpdateUserID']);
         }
 
+        if ($options['joinDiscussions']) {
+            $discussionModel = GDN::getContainer()->get(DiscussionModel::class);
+            $discussionModel->joinDiscussionData($result, 'DiscussionID', $options['joinDiscussions']);
+        }
         $this->setCalculatedFields($result);
 
         return $result;
@@ -712,7 +716,7 @@ class CommentModel extends Gdn_Model {
 
         } else {
             // Make sure the discussion isn't archived.
-            $archiveDate = c('Vanilla.Archive.Date', false);
+            $archiveDate = Gdn::config('Vanilla.Archive.Date', false);
             if (!$archiveDate || (Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($archiveDate))) {
                 $newComments = true;
 
@@ -737,7 +741,7 @@ class CommentModel extends Gdn_Model {
 
         // If this discussion is in a category that has been marked read,
         // check if reading this thread causes it to be completely read again.
-        $categoryID = val('CategoryID', $discussion);
+        $categoryID = $discussion->CategoryID;
         if (!$categoryID) {
             return;
         }
@@ -745,19 +749,17 @@ class CommentModel extends Gdn_Model {
         if (!$category) {
             return;
         }
-        $dateMarkedRead = val('DateMarkedRead', $category);
-        if (!$dateMarkedRead) {
-            return;
+        $wheres = ['CategoryID' => $categoryID];
+        $dateMarkedRead = $category->DateMarkedRead;
+        if ($dateMarkedRead) {
+            $wheres['DateLastComment>'] = $dateMarkedRead;
         }
         // Fuzzy way of looking back about 2 pages into the past.
-        $lookBackCount = c('Vanilla.Discussions.PerPage', 50) * 2;
+        $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
 
         // Find all discussions with content from after DateMarkedRead.
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(0, $lookBackCount + 1, [
-            'CategoryID' => $categoryID,
-            'DateLastComment>' => $dateMarkedRead
-        ]);
+        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
         unset($discussionModel);
 
         // Abort if we get back as many as we asked for, meaning a
@@ -1672,6 +1674,11 @@ class CommentModel extends Gdn_Model {
         $category = CategoryModel::categories(val('CategoryID', $discussion));
         if (CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
             return true;
+        }
+
+        // Check if user can view the category contents.
+        if (!CategoryModel::checkPermission($category, 'Vanilla.Comments.Add')) {
+            return false;
         }
 
         // Make sure only moderators can edit closed things.

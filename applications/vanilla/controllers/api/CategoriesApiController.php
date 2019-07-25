@@ -5,11 +5,13 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Navigation\Breadcrumb;
 
 /**
  * API Controller for the `/categories` resource.
@@ -33,7 +35,9 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param CategoryModel $categoryModel
      */
-    public function __construct(CategoryModel $categoryModel) {
+    public function __construct(
+        CategoryModel $categoryModel
+    ) {
         $this->categoryModel = $categoryModel;
     }
 
@@ -136,7 +140,8 @@ class CategoriesApiController extends AbstractApiController {
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
             'countAllComments:i' => 'Total of all comments in a category and its children.',
-            'followed:b?' => 'Is the category being followed by the current user?'
+            'followed:b?' => 'Is the category being followed by the current user?',
+            "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
         ]);
     }
 
@@ -205,10 +210,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 200
             ],
-            'expand:b?' => [
-                'default' => false,
-                'description' => 'Expand with the parent record.'
-            ]
+            'expand?' => ApiUtils::getExpandDefinition(['parent', 'breadcrumbs'])
         ])->setDescription('Search categories.');
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
 
@@ -217,13 +219,18 @@ class CategoriesApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
-            $query['expand'],
+            $this->isExpandField('parent', $query['expand']),
             $limit,
-            $offset
+            $offset,
+            $this->isExpandField('breadcrumbs', $query['expand']) ? ['breadcrumbs'] : []
         );
 
-        foreach ($rows as &$row) {
+        foreach ($rows as $key => &$row) {
             $row = $this->normalizeOutput($row);
+            $hasPermission = categoryModel::checkPermission($row['categoryID'], 'Vanilla.Discussions.View');
+            if (!$hasPermission) {
+                unset($rows[$key]);
+            }
         }
 
         $result = $out->validate($rows);

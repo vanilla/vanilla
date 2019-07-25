@@ -1,0 +1,11 @@
+<h1>{{ Title }} </h1>
+<div class="padded alert alert-warning">
+    {{ Instructions | raw }}
+</div>
+ {{ form.open() | raw }}
+ {{ form.errors() | raw }}
+ {{ form.simple(formData) | raw }}
+<div class="modal-footer js-modal-fixed">
+{{ form.button('Save') | raw }}
+</div>
+ {{ form.close() | raw }}

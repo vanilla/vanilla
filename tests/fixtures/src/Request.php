@@ -85,7 +85,7 @@ class Request implements RequestInterface {
      * @param string $method The HTTP method.
      * @return $this
      */
-    public function setMethod($method) {
+    public function setMethod(string $method) {
         $this->method = $method;
         return $this;
     }
@@ -204,7 +204,7 @@ class Request implements RequestInterface {
      * @param mixed $value The value of the header.
      * @return $this
      */
-    public function setHeader($header, $value) {
+    public function setHeader(string $header, $value) {
         $this->headers[$header] = $value;
         return $this;
     }
@@ -216,7 +216,7 @@ class Request implements RequestInterface {
      * @param mixed $default The default value if the header does not exist.
      * @return mixed Returns the header value or {@link $default}.
      */
-    public function getHeader($header, $default = null) {
+    public function getHeader(string $header, $default = null) {
         return isset($this->headers[$header]) ? $this->headers[$header] : $default;
     }
 
@@ -233,7 +233,7 @@ class Request implements RequestInterface {
      * @param string $header Case-insensitive header name.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($header) {
+    public function hasHeader(string $header): bool {
         return !empty($this->headers[$header]);
     }
 

@@ -1,0 +1,311 @@
+version: 2
+aliases:
+    - &db_env
+        MYSQL_USER: travis
+        MYSQL_PASSWORD: ''
+        MYSQL_DATABASE: vanilla_test
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    - &php71
+        - image: circleci/php:7.1.30-fpm-stretch-node
+        - image: mysql:5.7.26
+          environment: *db_env
+    - &php72
+        - image: circleci/php:7.2.19-fpm-stretch-node
+        - image: mysql:5.7.26
+          environment: *db_env
+    - &php73
+        - image: circleci/php:7.3.6-fpm-stretch-node
+        - image: mysql:5.7.26
+          environment: *db_env
+    - &install_nginx
+        run:
+            name: Installting NGINX
+            command: sudo apt-get update && sudo apt-get install nginx
+    - &node
+        - image: circleci/node:lts-browsers
+    - &run_yarn
+        run:
+            name: Install Yarn Packages
+            command: |
+                cd ~/workspace/frontend
+                yarn install --pure-lockfile
+                yarn install-all
+    - &set_hosts
+        run:
+            name: Configuring Hosts
+            command: |
+                # Localhost redirects
+                echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+                cat /etc/hosts
+    - &attach_workspace
+        attach_workspace:
+            at: ~/workspace
+    - &run_composer
+        run:
+            name: Install Composer Packages
+            command: |
+                cd ~/workspace/php
+                VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+    - &run_php_lint
+        run:
+            name: Linting PHP
+            command: |
+                cd ~/workspace/php
+                # Validate syntax in all the files
+                tests/travis/php-lint.sh ./applications
+                tests/travis/php-lint.sh ./conf
+                tests/travis/php-lint.sh ./library
+                tests/travis/php-lint.sh ./plugins
+                tests/travis/php-lint.sh ./themes
+
+                # Run code sniffer on the diffed files.
+                ./tests/travis/diff-standards.sh
+    - &prepare_mysql
+        run:
+            name: Prepare Database Dependencies
+            command: |
+                sudo apt-get update && sudo apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
+                sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+                sudo docker-php-ext-install pdo pdo_mysql gd
+                sudo apt-get install mysql-client
+                # Create the SQL "travis" user. Once we remove travis this should no longer be necessary.
+                mysql -h 127.0.0.1 -u root -e \
+                    "CREATE USER 'travis'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'travis'@'127.0.0.1' IDENTIFIED BY '';"
+    - &await_mysql
+        run:
+            name: Waiting for MySQL to be ready
+            command: |
+                for i in `seq 1 30`;
+                do
+                nc -z 127.0.0.1 3306 && echo Success && exit 0
+                echo -n .
+                sleep 1
+                done
+                echo Failed waiting for MySQL && exit 1
+jobs:
+    frontend_setup:
+        docker: *node
+        steps:
+            - run:
+                name: Versions
+                command: |
+                    node --version
+                    yarn --version
+            - checkout:
+                path: ~/workspace/frontend
+            - run:
+                # Makes workspace persisting much faster if not needed.
+                name: Cleaning up git directory
+                command: |
+                    cd ~/workspace/frontend
+                    rm -rf .git
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_yarn
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                    - frontend
+    frontend_build:
+        docker: *node
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/frontend
+                    yarn build
+    frontend_test:
+        docker: *node
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/frontend
+                    yarn test
+    frontend_lint:
+        docker: *node
+        steps:
+            - *attach_workspace
+            - run: |
+                cd ~/workspace/frontend
+                yarn lint
+                yarn prettier --check "**/src/scripts/**/*"
+    frontend_typechecker:
+        docker: *node
+        resource_class: large
+        steps:
+            - *attach_workspace
+            - run: |
+                cd ~/workspace/frontend
+                yarn check-types
+    php_setup:
+        docker: *php72
+        steps:
+            - run:
+                name: Versions
+                command: |
+                    php --version
+                    composer --version
+            - checkout:
+                path: ~/workspace/php # Repository will be named repo.
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_composer
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                    - php
+    php_72_lint:
+        docker: *php72
+        steps: &php_lint_steps
+            - checkout:
+                path: ~/workspace/php
+            - *set_hosts
+            - *run_php_lint
+    php_72_tests:
+        docker: *php72
+        steps: &php_unit_test_steps
+            - *attach_workspace
+            - *set_hosts
+            - run:
+                name: Test setup
+                command: |
+                    cd ~/workspace/php
+                    cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+            - *prepare_mysql
+            - *await_mysql
+            - run:
+                name: Library Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+            - run:
+                name: APIv2 Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+    php_72_integration:
+        docker: *php72
+        steps: &php_integration_test_steps
+            - *attach_workspace
+            - *set_hosts
+            - *install_nginx
+            - *prepare_mysql
+            - *await_mysql
+            - run:
+                name: Starrt PHP-FPM/Nginx
+                command: |
+                    cd  ~/workspace/php
+                    ls -l tests/travis
+                    php-fpm --daemonize
+                    sudo ./tests/travis/start-nginx.sh
+            - run:
+                name: APIv0 Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
+            - run:
+                name: Models Tests
+                command: |
+                    cd ~/workspace/php
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+    php_73_lint:
+        docker: *php73
+        steps: *php_lint_steps
+    php_73_tests:
+        docker: *php73
+        steps: *php_unit_test_steps
+    php_73_integration:
+        docker: *php73
+        steps: *php_integration_test_steps
+    php_71_lint:
+        docker: *php71
+        steps: *php_lint_steps
+    php_71_tests:
+        docker: *php71
+        steps: *php_unit_test_steps
+    php_71_integration:
+        docker: *php71
+        steps: *php_integration_test_steps
+    dependency_audit:
+        docker: *php72
+        steps:
+            - checkout
+            - run: yarn audit
+
+workflows:
+    version: 2
+    commit:
+        jobs:
+            # PHP 7.2 jobs are only nightly until we move upwards on infra.
+            - php_setup
+            - php_72_lint
+            - php_72_integration:
+                requires:
+                    - php_setup
+            - php_72_tests:
+                requires:
+                    - php_setup
+            # JS and browsers
+            - frontend_setup
+            - frontend_lint:
+                requires:
+                    - frontend_setup
+            - frontend_typechecker:
+                requires:
+                    - frontend_setup
+            - frontend_build:
+                requires:
+                    - frontend_setup
+            - frontend_test:
+                requires:
+                    - frontend_setup
+    nightly:
+        triggers:
+            - schedule:
+                cron: "0 0 * * *" # Once a day.
+                filters:
+                    branches:
+                        only:
+                            - master
+        jobs:
+            - dependency_audit
+            # PHP and serverside
+            - php_setup
+            - php_71_lint
+            - php_72_lint
+            - php_73_lint
+            - php_71_integration:
+                requires:
+                    - php_setup
+            - php_72_integration:
+                requires:
+                    - php_setup
+            - php_73_integration:
+                requires:
+                    - php_setup
+            - php_71_tests:
+                requires:
+                    - php_setup
+            - php_72_tests:
+                requires:
+                    - php_setup
+            - php_73_tests:
+                requires:
+                    - php_setup
+            ## JS & browsers
+            - frontend_setup
+            - frontend_lint:
+                requires:
+                    - frontend_setup
+            - frontend_typechecker:
+                requires:
+                    - frontend_setup
+            - frontend_build:
+                requires:
+                    - frontend_setup
+            - frontend_test:
+                requires:
+                    - frontend_setup

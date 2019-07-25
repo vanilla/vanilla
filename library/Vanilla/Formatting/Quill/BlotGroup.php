@@ -7,12 +7,12 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ListLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -82,6 +82,49 @@ class BlotGroup {
         return count($this->blots) === 0;
     }
 
+    /** @var BlotGroup[] */
+    private $nestedGroups = [];
+
+    /**
+     * Determine if one group can nest another one inside of it.
+     *
+     * @param BlotGroup $otherGroup
+     * @return bool
+     */
+    public function canNest(BlotGroup $otherGroup): bool {
+        $otherMainBlot = $otherGroup->getMainBlot();
+        $ownMainBlot = $this->getMainBlot();
+        if ($otherMainBlot instanceof ListLineTerminatorBlot
+            && $ownMainBlot instanceof ListLineTerminatorBlot
+            && $otherGroup->getNestingDepth() > $this->getNestingDepth()
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getNestingDepth(): int {
+        $ownMainBlot = $this->getMainBlot();
+        return $ownMainBlot->getNestingDepth();
+    }
+
+    /**
+     * Nest a blot group inside of this one.
+     *
+     * @param BlotGroup $blotGroup
+     */
+    public function nestGroup(BlotGroup $blotGroup) {
+        $lastNestedGroup = $this->nestedGroups[count($this->nestedGroups) - 1] ?? null;
+        if ($lastNestedGroup && $lastNestedGroup->canNest($blotGroup)) {
+            $lastNestedGroup->nestGroup($blotGroup);
+        } else {
+            $this->nestedGroups[] = $blotGroup;
+        }
+    }
 
     /**
      * Render the block.
@@ -102,11 +145,24 @@ class BlotGroup {
         }
 
         // Don't render empty groups.
-        $surroundTagBlot = $this->getBlotForSurroundingTags();
-        $result = $surroundTagBlot->getGroupOpeningTag();
+        $result = '';
+        $result .= $this->renderOpeningTag();
+        $result .= $this->renderContent();
+        $result .= $this->renderClosingTag();
+        return $result;
+    }
 
-        // Line blots have special rendering.
+    /**
+     * Render the content of a blot group.
+     *
+     * @return string
+     */
+    public function renderContent(): string {
+        $result = '';
+        $surroundTagBlot = $this->getMainBlot();
+
         if ($surroundTagBlot instanceof AbstractLineTerminatorBlot) {
+            // Line blots have special rendering.
             $result .= $this->renderLineGroup();
         } else {
             foreach ($this->blots as $blot) {
@@ -114,7 +170,46 @@ class BlotGroup {
             }
         }
 
-        $result .= $surroundTagBlot->getGroupClosingTag();
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function renderOpeningTag(): string {
+        $surroundTagBlot = $this->getMainBlot();
+        return $surroundTagBlot->getGroupOpeningTag();
+    }
+
+    /**
+     * @return string
+     */
+    public function renderClosingTag(): string {
+        $surroundTagBlot = $this->getMainBlot();
+        return $surroundTagBlot->getGroupClosingTag();
+    }
+
+    /**
+     * Render any nested groups inside of this one.
+     *
+     * If there are multiple nested groups they will share the start/end tag of the first nested group.
+     *
+     * @return string
+     */
+    private function renderNestedGroups(): string {
+        $firstNestedGroup = $this->nestedGroups[0] ?? null;
+        if (!$firstNestedGroup) {
+            return "";
+        }
+
+        $result = "";
+        $result .= $firstNestedGroup->renderOpeningTag();
+
+        foreach ($this->nestedGroups as $nestedGroup) {
+            // Only the first group will be used for the group tags.
+            $result .= $nestedGroup->renderContent();
+        }
+        $result .= $firstNestedGroup->renderClosingTag();
         return $result;
     }
 
@@ -139,9 +234,17 @@ class BlotGroup {
         $result .= $terminator->renderLineStart();
 
         foreach ($this->blots as $index => $blot) {
+            $isLast = $index === count($this->blots) - 1;
             if ($blot instanceof AbstractLineTerminatorBlot) {
                 // Render out the content of the line terminator (maybe nothing, maybe extra newlines).
                 $result .= $terminator->render();
+                if ($isLast) {
+                    // render the nested groups inside of the last line, before it's closing tag. Eg.
+                    // <li>Line 1 <ul>
+                    //     <li>Line 1.1</li>
+                    // </ul></li>
+                    $result .= $this->renderNestedGroups();
+                }
                 // End the line.
                 $result .= $terminator->renderLineEnd();
 
@@ -176,7 +279,7 @@ class BlotGroup {
     }
 
     /**
-     * Get all of the mention blots in the group.
+     * Get all of the usernames that are mentioned in the blot group.
      *
      * Mentions that are inside of Blockquote's are excluded. We don't want to be sending notifications when big quote
      * replies build up.
@@ -184,7 +287,7 @@ class BlotGroup {
      * @return string[]
      */
     public function getMentionUsernames() {
-        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
+        if ($this->getMainBlot() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
             return [];
         }
 
@@ -192,8 +295,16 @@ class BlotGroup {
         foreach ($this->blots as $blot) {
             if ($blot instanceof Blots\Embeds\MentionBlot) {
                 $names[] = $blot->getUsername();
+            } elseif ($blot instanceof ExternalBlot) {
+                $embed = $blot->getEmbed();
+                if ($embed instanceof QuoteEmbed) {
+                    $names[] = $embed->getUsername();
+                }
             }
         }
+
+        // De-duplicate the usernames.
+        $names = array_unique($names);
 
         return $names;
     }
@@ -234,12 +345,12 @@ class BlotGroup {
      *
      * @return AbstractBlot|null
      */
-    public function getBlotForSurroundingTags() {
+    public function getMainBlot(): ?AbstractBlot {
         if (count($this->blots) === 0) {
             return null;
         }
         $blot = $this->blots[0];
-        $overridingBlot = $this->getPrimaryBlot();
+        $overridingBlot = $this->getOverrideBlot();
 
         return $overridingBlot ?? $blot;
     }
@@ -249,7 +360,7 @@ class BlotGroup {
      *
      * @return null|AbstractBlot
      */
-    public function getPrimaryBlot() {
+    public function getOverrideBlot(): ?AbstractBlot {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {

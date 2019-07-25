@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import { Optionalize } from "@library/@types/utils";
-import { AxiosInstance } from "axios";
-import { ISearchOptionData } from "@library/components/search/SearchOption";
-import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import { ISearchOptionData } from "@library/features/search/SearchOption";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+
 const SearchContext = React.createContext<IWithSearchProps>({} as any);
 export default SearchContext;
 
@@ -34,7 +34,8 @@ export function withSearch<T extends IWithSearchProps = IWithSearchProps>(Wrappe
             return (
                 <SearchContext.Consumer>
                     {context => {
-                        return <WrappedComponent {...context} {...this.props} />;
+                        // https://github.com/Microsoft/TypeScript/issues/28938
+                        return <WrappedComponent {...context} {...this.props as T} />;
                     }}
                 </SearchContext.Consumer>
             );

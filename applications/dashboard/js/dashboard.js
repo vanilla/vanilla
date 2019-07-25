@@ -853,46 +853,6 @@ $(document).on('contentLoad', function(e) {
     }
 
     /**
-     * Add a CSS class to the navbar based on it scroll position.
-     *
-     * @param element - The scope of the function.
-     */
-    function navbarHeightInit(element) {
-        var $navbar = $('.js-navbar', element);
-
-        $navbar.addClass('navbar-short');
-        var navShortHeight = $navbar.outerHeight(true);
-        $navbar.removeClass('navbar-short');
-        var navHeight = $navbar.outerHeight(true);
-        var navOffset = navHeight - navShortHeight;
-
-        // If we load in the middle of the page, we should have a short navbar.
-        if ($(window).scrollTop() > navOffset) {
-            $navbar.addClass('navbar-short');
-        }
-
-        $(window).on('scroll', function() {
-            if ($(window).scrollTop() > navOffset) {
-                $navbar.addClass('navbar-short');
-            } else {
-                $navbar.removeClass('navbar-short');
-            }
-        });
-    }
-
-    /**
-     * Start fluidfixed on the dashboard panel navigation.
-     *
-     * @param element - The scope of the function.
-     */
-    function fluidFixedInit(element) {
-        // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
-        $('.js-fluid-fixed', element).fluidfixed({
-            offsetBottom: 72 + 9
-        });
-    }
-
-    /**
      * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
@@ -1001,20 +961,6 @@ $(document).on('contentLoad', function(e) {
             window.scrollTo(0, 0);
         });
 
-        $(drawer, element).on('drawer.show', function() {
-            $('.panel-nav .js-fluid-fixed', element).trigger('detach.FluidFixed');
-            $(content, element).height($('.panel-nav .js-fluid-fixed', element).outerHeight(true) + 132);
-            $(content, element).css('overflow', 'hidden');
-
-        });
-
-        $(drawer, element).on('drawer.hide', function() {
-            // TODO: We should only reset if the panel is actually displayed.
-            $('.panel-nav .js-fluid-fixed', element).trigger('reset.FluidFixed');
-            $(content, element).height('auto');
-            $(content, element).css('overflow', 'inherit');
-        });
-
         $(window).resize(function() {
             if ($(drawerToggle, element).css('display') !== 'none') {
                 $(container, element).addClass('drawer-hide');
@@ -1050,6 +996,10 @@ $(document).on('contentLoad', function(e) {
             aria: true
         }).on('ifChanged', function() {
             $(this).trigger('change');
+            // Re-firing event for forward-compatibility.
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            $(this)[0].dispatchEvent(evt);
         });
 
         $(selector, element).on('inputChecked', function() {
@@ -1183,8 +1133,6 @@ $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        navbarHeightInit(e.target); // navbar height settings
-        fluidFixedInit(e.target); // panel and scroll settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -1269,8 +1217,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 
@@ -1280,8 +1226,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 
@@ -1453,6 +1397,31 @@ $(document).on('contentLoad', function(e) {
             data: ajaxData,
             dataType: 'json'
         });
+    });
+
+    /**
+     * Turn a toolbar with the .js-toolbar-sticky class into a sticky toolbar.
+     *
+     * This is an opt-in class because it may not work or be appropriate on all pages.
+     */
+    $(window).scroll(function () {
+        var $toolbar = $('.js-toolbar-sticky');
+        var cssClass = 'is-stuck';
+
+        if ($(this).scrollTop() > $('header.navbar').height()) {
+            $toolbar
+                .addClass(cssClass)
+                .outerWidth($('.main').outerWidth() - 2)
+                .next('*')
+                .css('margin-top', $toolbar.outerHeight());
+        } else {
+            $toolbar.removeClass(cssClass).outerWidth('').next('*').css('margin-top', '');
+        }
+    });
+    $(window).resize(function () {
+        var $toolbar = $('.js-toolbar-sticky.is-stuck');
+
+        $toolbar.outerWidth($('.main').outerWidth() - 2);
     });
 })(jQuery);
 

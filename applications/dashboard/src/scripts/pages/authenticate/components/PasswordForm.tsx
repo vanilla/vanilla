@@ -4,19 +4,19 @@
  */
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import Checkbox from "@library/components/forms/Checkbox";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import Paragraph from "@library/components/Paragraph";
-import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import Checkbox from "@library/forms/Checkbox";
+import ButtonSubmit from "@library/forms/ButtonSubmit";
+import Paragraph from "@library/layout/Paragraph";
+import { IRequiredComponentID, getRequiredID } from "@library/utility/idUtils";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
-import { IAuthenticatePasswordParams } from "@dashboard/@types/api";
 import { connect } from "react-redux";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import { postAuthenticatePassword } from "@dashboard/pages/authenticate/passwordActions";
+import { IAuthenticatePasswordParams } from "@dashboard/@types/api/authenticate";
 
 interface IProps {
     passwordState: IPasswordState;
@@ -51,7 +51,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
 
     public render() {
         let formDescribedBy;
-        const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState, ["username", "password"]);
+        const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState.error, ["username", "password"]);
         if (globalErrorMessage) {
             formDescribedBy = this.formDescriptionID;
         }
@@ -65,15 +65,12 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 onSubmit={this.handleSubmit}
                 noValidate
             >
-                <Paragraph
-                    id={this.formDescriptionID}
-                    className="authenticateUser-paragraph"
-                    children={globalErrorMessage}
-                    isError={true}
-                />
+                <Paragraph id={this.formDescriptionID} className="authenticateUser-paragraph" isError={true}>
+                    globalErrorMessage
+                </Paragraph>
                 <InputTextBlock
                     label={t("Email/Username")}
-                    errors={getFieldErrors(this.props.passwordState, "username")}
+                    errors={getFieldErrors(this.props.passwordState.error, "username")}
                     ref={this.usernameInput}
                     inputProps={{
                         required: true,
@@ -86,7 +83,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 <InputTextBlock
                     label={t("Password")}
                     ref={this.passwordInput}
-                    errors={getFieldErrors(this.props.passwordState, "password")}
+                    errors={getFieldErrors(this.props.passwordState.error, "password")}
                     inputProps={{
                         required: true,
                         disabled: !this.allowEdit,
@@ -124,9 +121,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
             return;
         }
 
-        if (getFieldErrors(this.props.passwordState, "username")) {
+        if (getFieldErrors(this.props.passwordState.error, "username")) {
             this.usernameInput.current!.select();
-        } else if (getFieldErrors(this.props.passwordState, "password")) {
+        } else if (getFieldErrors(this.props.passwordState.error, "password")) {
             this.passwordInput.current!.select();
         } else {
             this.usernameInput.current!.select();

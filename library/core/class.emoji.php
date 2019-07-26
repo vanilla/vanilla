@@ -10,6 +10,7 @@
  * @since 2.2
  */
 
+use Garden\EventManager;
 use \Vanilla\Formatting\FormatUtil;
 
 /**
@@ -95,9 +96,9 @@ class Emoji {
     public $rdelim = ':';
 
     /**
-     *
+     * @param EventManager $eventManager
      */
-    public function __construct() {
+    public function __construct(EventManager $eventManager) {
         $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)
@@ -246,7 +247,7 @@ class Emoji {
             $this->enabled = false;
         }
 
-        Gdn::pluginManager()->callEventHandlers($this, 'Emoji', 'Init', 'Handler');
+        $eventManager->fire('Emoji_Init', $this);
 
         // Add emoji to definition list for whole site. This used to be in the
         // advanced editor plugin, but since moving atmentions to core, had to

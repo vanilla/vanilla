@@ -46,11 +46,6 @@ class Gdn_Format {
     ];
 
     /**
-     * @var EventManager
-     */
-    private static $eventManager;
-
-    /**
      * The ActivityType table has some special sprintf search/replace values in the
      * FullHeadline and ProfileHeadline fields.
      *
@@ -1126,12 +1121,12 @@ class Gdn_Format {
      * @return string
      */
     public static function links($mixed, bool $isHtml = false) {
-        if (!c('Garden.Format.Links', true)) {
-            return $mixed;
-        }
-
         if (!is_string($mixed)) {
             return self::to($mixed, 'Links');
+        }
+
+        if (!c('Garden.Format.Links', true)) {
+            return $mixed;
         }
 
         $linksCallback = function ($matches) use ($isHtml) {
@@ -1241,7 +1236,13 @@ class Gdn_Format {
             true
         );
 
-        Gdn::pluginManager()->fireAs('Format')->fireEvent('Links', ['Mixed' => &$mixed]);
+        Gdn::getContainer()
+            ->get(EventManager::class)
+            ->fireDeprecated(
+                'Format_Links',
+                null, // To comply with the only handler type expecting (mixed $sender, array $args)
+                ['Mixed' => &$mixed]
+            );
 
         return $mixed;
     }

@@ -74,7 +74,6 @@ export default function EmbedFlyout(props: IProps) {
     const buttonClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
         submitUrl();
-        window.console.log("buttonClickHandler (event.nativeEvent): ", event);
     };
 
     /**
@@ -150,9 +149,7 @@ export default function EmbedFlyout(props: IProps) {
     );
 
     function handleVisibilityChange() {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
+        inputRef.current && inputRef.current.focus();
         forceSelectionUpdate();
     }
 }

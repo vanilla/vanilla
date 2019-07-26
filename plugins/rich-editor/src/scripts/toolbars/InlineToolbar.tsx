@@ -177,10 +177,6 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
                 key: "k",
                 metaKey: true,
             },
-            {
-                key: "ctrolv",
-                metaKey: true,
-            },
             {},
             this.commandKHandler,
         );

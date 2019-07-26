@@ -12,7 +12,6 @@
  * @abstract
  */
 
-use Vanilla\Utility\ContainerUtils as ContainerUtilsAlias;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;

@@ -39,9 +39,6 @@
             stylesheetsInclude.push(editorWysiwygCSS + '?v=' + editorVersion);
         }
 
-        // If you want to include a custom stylesheet inside the iFrame of the wysiwyg
-        stylesheetsInclude.push(gdn.meta.currentThemePath + '/design/editorWysiwyg.css?v=' + editorVersion);
-
         /**
          * Fullpage actions--available to all editor views on page load.
          *

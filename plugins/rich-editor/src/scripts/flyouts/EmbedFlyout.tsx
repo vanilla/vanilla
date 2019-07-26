@@ -20,9 +20,8 @@ import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClass
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
-import { handleInputChange } from "react-select/lib/utils";
 
 interface IProps {
     disabled?: boolean;
@@ -67,7 +66,6 @@ export default function EmbedFlyout(props: IProps) {
             event.stopPropagation();
             isInputValid && submitUrl();
         }
-        window.console.log("buttonKeyDownHandler (event.nativeEvent): ", event.nativeEvent);
     };
 
     /**
@@ -83,11 +81,13 @@ export default function EmbedFlyout(props: IProps) {
      * Control the inputs value.
      */
     const inputChangeHandler = (event: React.ChangeEvent<any>) => {
-        setUrl(event.target.value);
-        setInputValid(isAllowedUrl(normalizeUrl(url)));
-
-        window.console.log("inputChangeHandler: ", event.target.value);
+        setUrl(normalizeUrl(event.target.value));
     };
+
+    // We need to check the value after we've set it with setUrl
+    useEffect(() => {
+        setInputValid(isAllowedUrl(url));
+    }, [url]);
 
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesInsertMedia = insertMediaClasses();
@@ -101,7 +101,7 @@ export default function EmbedFlyout(props: IProps) {
                 title={t("Insert Media")}
                 paddedList={true}
                 onClose={clearInput}
-                onVisibilityChange={forceSelectionUpdate}
+                onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
                 buttonContents={<IconForButtonWrap icon={embed()} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}
@@ -148,4 +148,11 @@ export default function EmbedFlyout(props: IProps) {
             </DropDown>
         </>
     );
+
+    function handleVisibilityChange() {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+        forceSelectionUpdate();
+    }
 }

@@ -19,6 +19,13 @@ class GdnFormatTest extends SharedBootstrapTestCase {
     use AssertsFixtureRenderingTrait;
 
     /**
+     * Overridden for compat with the fixtures.
+     */
+    protected static function getBootstrapFolderName() {
+        return 'minimal-container-test';
+    }
+
+    /**
      * Test the BBCode HTML rendering.
      *
      * @param string $fixtureDir The directory of the fixture to use for the testCase.
@@ -72,41 +79,6 @@ class GdnFormatTest extends SharedBootstrapTestCase {
     public function testHtml(string $fixtureDir) {
         $this->assertFixturePassesForFormat($fixtureDir, 'html');
     }
-
-
-    /**
-     * Test results of Gdn_Format::excerpt with rich-formatted content.
-     *
-     * @param string $fixtureDir The directory of the fixture to use for the testCase.
-     * @dataProvider provideRichExcerpts
-     */
-    public function testRichExcerpt(string $fixtureDir) {
-        list($body, $unused, $expected) = $this->getFixture($fixtureDir);
-        $actual = \Gdn_Format::excerpt($body, RichFormat::FORMAT_KEY);
-        $this->assertEquals(
-            $expected,
-            $actual,
-            "Expected excerpt outputs for fixture $fixtureDir did not match."
-        );
-    }
-
-
-    /**
-     * Test results of Gdn_Format::plainText with rich-formatted content.
-     *
-     * @param string $fixtureDir The directory of the fixture to use for the testCase.
-     * @dataProvider provideRichPlainText
-     */
-    public function testRichPlainText(string $fixtureDir) {
-        list($body, $unused, $expected) = $this->getFixture($fixtureDir);
-        $actual = \Gdn_Format::plainText($body, RichFormat::FORMAT_KEY);
-        $this->assertEquals(
-            $expected,
-            $actual,
-            "Expected excerpt outputs for fixture $fixtureDir did not match."
-        );
-    }
-
 
     /**
      * Test using a rich-format array of operations with the quoteEmbed method.
@@ -170,60 +142,42 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @return array
      */
     public function provideHtml(): array {
-        return $this->createFixtureDataProvider('/formats/html/html');
+        return $this->createFixtureDataProvider('/formats/html');
     }
 
     /**
      * @return array
      */
     public function provideBBCode(): array {
-        return $this->createFixtureDataProvider('/formats/bbcode/html');
+        return $this->createFixtureDataProvider('/formats/bbcode');
     }
 
     /**
      * @return array
      */
     public function provideMarkdown(): array {
-        return $this->createFixtureDataProvider('/formats/markdown/html');
+        return $this->createFixtureDataProvider('/formats/markdown');
     }
 
     /**
      * @return array
      */
     public function provideText(): array {
-        return $this->createFixtureDataProvider('/formats/text/html');
+        return $this->createFixtureDataProvider('/formats/text');
     }
 
     /**
      * @return array
      */
     public function provideTextEx(): array {
-        return $this->createFixtureDataProvider('/formats/textex/html');
-    }
-
-    /**
-     * Provide data for testing the excerpt method with the rich format.
-     *
-     * @return array
-     */
-    public function provideRichExcerpts(): array {
-        return $this->createFixtureDataProvider("/formats/rich/excerpt");
-    }
-
-    /**
-     * Provide data for testing the plainText method.
-     *
-     * @return array
-     */
-    public function provideRichPlainText(): array {
-        return $this->createFixtureDataProvider("/formats/rich/plain-text");
+        return $this->createFixtureDataProvider('/formats/textex');
     }
 
     /**
      * @return array
      */
     public function provideWysiwyg(): array {
-        return $this->createFixtureDataProvider('/formats/wysiwyg/html');
+        return $this->createFixtureDataProvider('/formats/wysiwyg');
     }
 
     /**

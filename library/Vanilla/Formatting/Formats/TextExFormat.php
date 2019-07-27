@@ -41,6 +41,15 @@ class TextExFormat extends TextFormat {
     /**
      * @inheritdoc
      */
+    public function renderQuote(string $content): string {
+        $result = parent::renderHTML($content);
+        $result = $this->htmlEnhancer->enhance($result, true, false);
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function parseHeadings(string $content): array {
         return [];
     }

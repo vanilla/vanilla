@@ -343,6 +343,7 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Clean');
         }
+        deprecated(__FUNCTION__, 'FormatUtil::transliterate()');
         return FormatUtil::transliterate($mixed);
     }
 

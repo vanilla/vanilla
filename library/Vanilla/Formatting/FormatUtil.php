@@ -111,13 +111,13 @@ class FormatUtil {
     /**
      * Convert certain unicode characters into their ascii equivalents.
      *
-     * @param mixed $mixed The text to clean.
+     * @param string $text The text to clean.
      * @return string
      */
-    public static function transliterate(string $mixed): string {
-        $mixed = strtr($mixed, self::CHAR_MAPPING);
-        $mixed = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($mixed));
-        $mixed = preg_replace('/ +/', '-', trim($mixed));
-        return strtolower($mixed);
+    public static function transliterate(string $text): string {
+        $text = strtr($text, self::CHAR_MAPPING);
+        $text = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($text));
+        $text = preg_replace('/ +/', '-', trim($text));
+        return strtolower($text);
     }
 }

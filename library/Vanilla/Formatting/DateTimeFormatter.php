@@ -30,17 +30,17 @@ class DateTimeFormatter {
         $this->dateConfig = $dateConfig;
     }
 
-
     /**
      * Format a MySQL DateTime string in the specified format.
      *
      * @link http://us.php.net/manual/en/function.strftime.php
      *
      * @param string|number $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
+     * @param bool $isHtml Whether or not to output this as an HTML string.
      * @param string $format The format string to use. Defaults to the application's default format.
      * @return string
      */
-    public function formatDate($timestamp = '', string $format = ''): string {
+    public function formatDate($timestamp = '', bool $isHtml = false, string $format = ''): string {
         // Was a mysqldatetime passed?
         if ($timestamp !== null && !is_numeric($timestamp)) {
             $timestamp = self::dateTimeToTimeStamp($timestamp);
@@ -56,12 +56,6 @@ class DateTimeFormatter {
         $gmTimestamp = $timestamp;
         $timestamp = $this->adjustTimeStampForUser($timestamp);
 
-        $html = false;
-        if (strcasecmp($format, 'html') == 0) {
-            $format = '';
-            $html = true;
-        }
-
         if ($format == '') {
             $format = $this->getDefaultFormatForTimestamp($timestamp);
         } elseif ($format === self::FORCE_FULL_FORMAT) {
@@ -71,7 +65,7 @@ class DateTimeFormatter {
 
         $result = strftime($format, $timestamp);
 
-        if ($html) {
+        if ($isHtml) {
             $fullFormat = $this->dateConfig->getDefaultDateTimeFormat();
             $fullFormat = $this->normalizeFormatForTimeStamp($fullFormat, $timestamp);
             $result = wrap(
@@ -105,7 +99,7 @@ class DateTimeFormatter {
             $hour = val(4, $matches, 0);
             $minute = val(5, $matches, 0);
             $second = val(6, $matches, 0);
-            return mktime($hour, $minuste, $second, $month, $day, $year);
+            return mktime($hour, $minute, $second, $month, $day, $year);
         } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateTime, $matches)) {
             $year = $matches[1];
             $month = $matches[2];
@@ -282,6 +276,40 @@ class DateTimeFormatter {
             return sprintf(plural($years, '%s year', '%s years'), $years);
         }
     }
+
+    /**
+     * Convert a timetstamp to time formatted as H::MM::SS (g:i:s).
+     *
+     * @param int $timestamp The timestamp to use.
+     *
+     * @return string The formatted value.
+     */
+    public function timestampToTime(int $timestamp): string {
+        return date('g:i:s', $timestamp);
+    }
+
+    /**
+     * Convert a timetstamp to date formatted as D-m-d
+     *
+     * @param int $timestamp The timestamp to use.
+     *
+     * @return string The formatted value.
+     */
+    public function timestampToDate(int $timestamp): string {
+        return date('D-m-d', $timestamp);
+    }
+
+    /**
+     * Convert a timetstamp to datetime formatted as Y-m-d H:i:s.
+     *
+     * @param int $timestamp The timestamp to use.
+     *
+     * @return string The formatted value.
+     */
+    public function timestampToDateTime(int $timestamp): string {
+        return date('Y-m-d H:i:s', $timestamp);
+    }
+
 
     /**
      * Adjust a timestamp for the sessioned user's time offset.

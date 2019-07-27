@@ -23,7 +23,6 @@ use \Vanilla\Formatting\Html;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
-    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -247,7 +246,7 @@ class Gdn_Format {
         return Gdn_Format::$formatter($mixed);
     }
 
-    /**
+    /**[
      * Format BBCode into HTML.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
@@ -361,7 +360,7 @@ class Gdn_Format {
      * @param string $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
      * @param string $format The format string to use. Defaults to the application's default format.
      * @return string
-     * @deprecated 3.2 DateTimeFormatter::formatDate()
+     * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp)
      */
     public static function date($timestamp = '', $format = '') {
         $formatter = self::getDateTimeFormatter();
@@ -382,7 +381,10 @@ class Gdn_Format {
             return formatDateCustom($timestamp, $format);
         }
 
-        return $formatter->formatDate($timestamp, $format);
+        $isHtml = strtolower($format) === 'html';
+        $format = $isHtml ? '' : $format;
+
+        return $formatter->formatDate($timestamp, $isHtml, $format);
     }
 
     /**
@@ -392,7 +394,7 @@ class Gdn_Format {
      * @param string $format
      * @return string
      * @since 2.1
-     * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp, DateTimeFormatt::FORCE_FULL_FORMAT)
+     * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp, true)
      */
     public static function dateFull($timestamp, $format = Formatting\DateTimeFormatter::FORCE_FULL_FORMAT) {
         return self::date($timestamp, $format);
@@ -1239,30 +1241,34 @@ class Gdn_Format {
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $timestamp
+     * @param int|string $timestamp
+     *
      * @return string The formatted date.
+     * @deprecated 3.2 DateTimeFormatter::timestampToDate()
      */
     public static function toDate($timestamp = '') {
+        $formatter = self::getDateTimeFormatter();
         if ($timestamp == '') {
             $timestamp = time();
         } elseif (!is_numeric($timestamp)) {
-            $timestamp = self::toTimestamp($timestamp);
+            $timestamp = $formatter->dateTimeToTimeStamp($timestamp);
         }
 
-        return date('Y-m-d', $timestamp);
+        return self::getDateTimeFormatter()->timestampToDate($timestamp);
     }
 
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $timestamp
+     * @param int|string $timestamp
      * @return string The formatted date and time.
+     * @deprecated DateTimeFormatter::timestampToDateTime()
      */
     public static function toDateTime($timestamp = '') {
         if ($timestamp == '') {
             $timestamp = time();
         }
-        return date('Y-m-d H:i:s', $timestamp);
+        return self::getDateTimeFormatter()->timestampToDateTime((int) $timestamp);
     }
 
     /**
@@ -1296,15 +1302,10 @@ class Gdn_Format {
      *
      * @param int $timespan
      * @return string
+     * @deprecated 3.2 DateTimeFormatter::timestampToTime()
      */
     public static function timespan($timespan) {
-        //$timespan -= 86400 * ($days = (int) floor($timespan / 86400));
-        $timespan -= 3600 * ($hours = (int)floor($timespan / 3600));
-        $timespan -= 60 * ($minutes = (int)floor($timespan / 60));
-        $seconds = $timespan;
-
-        $result = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-        return $result;
+        return self::getDateTimeFormatter()->timestampToTime((int) $timespan);
     }
 
     /** @var array  */
@@ -1462,7 +1463,6 @@ class Gdn_Format {
     }
 
     /**
-     * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
      * Get the usernames mention in a rich post.
      *
      * @param string $body The contents of a post body.
@@ -1483,10 +1483,11 @@ class Gdn_Format {
     ];
 
     /**
-     * Encode special CSS characters as hex.
+     * Sanitize a URL to ensure that it matches a whitelist of approved url schemes.
+     * If the url does not match one of these schemes, prepend `unsafe:` before it.
      *
      * Allowed protocols
-     * - "http:",
+     * - "http:",s
      * - "https:",
      * - "tel:",
      * - "mailto:",

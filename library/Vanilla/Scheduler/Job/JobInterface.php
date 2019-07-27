@@ -20,4 +20,20 @@ interface JobInterface {
      * @param array $message
      */
     public function setMessage(array $message);
+
+    /**
+     * Set job priority
+     *
+     * @param JobPriority $priority
+     * @return void
+     */
+    public function setPriority(JobPriority $priority);
+
+    /**
+     * Set job execution delay
+     *
+     * @param int $seconds
+     * @return void
+     */
+    public function setDelay(int $seconds);
 }

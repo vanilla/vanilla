@@ -7,6 +7,8 @@
 
 namespace Vanilla\Scheduler;
 
+use Vanilla\Scheduler\Job\JobPriority;
+
 /**
  * Scheduler Interface
  */
@@ -62,8 +64,10 @@ interface SchedulerInterface {
      *
      * @param string $jobType
      * @param array $message
+     * @param JobPriority|null $jobPriority
+     * @param int|null $delay
      *
      * @return TrackingSlipInterface
      */
-    public function addJob(string $jobType, $message = []): TrackingSlipInterface;
+    public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface;
 }

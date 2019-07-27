@@ -118,7 +118,7 @@ class FiltererTest extends SharedBootstrapTestCase {
                         'data' => [
                             'type' => QuoteEmbed::TYPE,
                             'format' => 'Rich',
-                            'body' => \Gdn_Format::quoteEmbed($expectedEmbedBodyRaw, RichFormat::FORMAT_KEY),
+                            'body' => \Gdn::formatService()->renderQuote($expectedEmbedBodyRaw, RichFormat::FORMAT_KEY),
                             'bodyRaw' => $expectedEmbedBodyRaw,
                         ],
                     ],

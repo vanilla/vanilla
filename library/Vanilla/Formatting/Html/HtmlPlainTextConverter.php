@@ -8,7 +8,6 @@
 namespace Vanilla\Formatting\Html;
 
 use Garden\StaticCacheTranslationTrait;
-use Vanilla\Formatting\FormatUtil;
 
 /**
  * Class for converting HTML into plain text.
@@ -62,11 +61,11 @@ class HtmlPlainTextConverter {
      *
      * @param string $html An HTML-formatted string.
      * @param array $classStringMapping A mapping of CSSClass => replacement string.
-     * @param array $classStringMapping A mapping of NodeName => replacement string.
+     * @param array $tagNameStringMapping A mapping of NodeName => replacement string.
      *
      * @return string Returns the html with spoilers removed.
      */
-    protected function replaceHtmlElementsWithStrings(string $html, array $classStringMapping, array $nodeStringMapping) {
+    protected function replaceHtmlElementsWithStrings(string $html, array $classStringMapping, array $tagNameStringMapping) {
         $contentID = 'contentID';
 
         // Use a big content prefix so we can force utf-8 parsing.
@@ -95,7 +94,7 @@ HTML;
             }
         }
 
-        foreach ($nodeStringMapping as $nodeName => $replacementString) {
+        foreach ($tagNameStringMapping as $nodeName => $replacementString) {
             $foundItems = $dom->getElementsByTagName($nodeName);
 
             /** @var \DOMNode $spoiler */

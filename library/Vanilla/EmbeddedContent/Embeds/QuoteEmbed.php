@@ -9,6 +9,7 @@ namespace Vanilla\EmbeddedContent\Embeds;
 use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Models\UserFragmentSchema;
 
 /**
@@ -53,7 +54,7 @@ class QuoteEmbed extends AbstractEmbed {
 
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {
-            $data['body'] = \Gdn_Format::quoteEmbed($data['bodyRaw'], $data['format']);
+            $data['body'] = \Gdn::formatService()->renderQuote($data['bodyRaw'], $data['format']);
         }
 
         return $data;

@@ -41,17 +41,18 @@ class HtmlEnhancer {
      *
      * @param string $sanitizedHtml An already HTML string.
      * @param bool $doMentions Whether or not to format mentions.
+     * @param bool $doEmbeds Whether or not links should be converted into legacy embeds.
      *
      * @return string The formatted HTML string.
      *
      * @internal This method is only public so it can be used for backwards compat in Gdn_Format.
      */
-    public function enhance(string $sanitizedHtml, bool $doMentions = true) {
+    public function enhance(string $sanitizedHtml, bool $doMentions = true, bool $doEmbeds = true) {
         // Do event first so it doesn't have to deal with the other formatters.
         $eventsHandledHtml = $this->eventManager->fireFilter('format_filterHtml', $sanitizedHtml);
 
         // Embed & auto-links.
-        $sanitizedHtml = \Gdn_Format::links($eventsHandledHtml, true);
+        $sanitizedHtml = \Gdn_Format::links($eventsHandledHtml, true, $doEmbeds);
 
         // Mentions.
         if ($doMentions) {

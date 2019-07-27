@@ -11,6 +11,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\FormatService;
+
 /**
  * Framework superobject.
  *
@@ -93,6 +95,15 @@ class Gdn {
      */
     public static function addonManager() {
         return self::factory(self::AliasAddonManager);
+    }
+
+    /**
+     * Get the format service.
+     *
+     * @return FormatService
+     */
+    public static function formatService(): FormatService {
+        return self::getContainer()->get(FormatService::class);
     }
 
     /**

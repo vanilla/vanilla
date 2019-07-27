@@ -258,7 +258,7 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'BBCode');
         } else {
-            return self::getFormatService()
+            return Gdn::formatService()
                 ->getFormatter(Formats\BBCodeFormat::FORMAT_KEY)
                 ->renderHtml($mixed);
         }
@@ -765,7 +765,7 @@ class Gdn_Format {
             return self::to($mixed, 'Html');
         }
 
-        return self::getFormatService()
+        return Gdn::formatService()
             ->getFormatter(Formats\HtmlFormat::FORMAT_KEY)
             ->renderHTML($mixed);
     }
@@ -784,7 +784,7 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'HtmlFilter');
         } else {
-            if (self::isHtml($mixed)) {
+            if (Html\HtmlSanitizer::containsHtmlTags($mixed)) {
                 // Purify HTML with our formatter.
                 $formatter = Gdn::factory('HtmlFormatter');
                 if (is_null($formatter)) {
@@ -841,16 +841,6 @@ class Gdn_Format {
     }
 
     /**
-     * Detect HTML for the purposes of doing advanced filtering.
-     *
-     * @param $text
-     * @return bool
-     */
-    protected static function isHtml($text) {
-        return strpos($text, '<') !== false || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $text);
-    }
-
-    /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper.
      *
      * Parsers for NBBC and Markdown should use this function to format thier spoilers.
@@ -872,11 +862,10 @@ class Gdn_Format {
      *
      * @return string Sanitized HTML.
      * @since 2.1
-     * @deprecated 3.2 FormatService::getFormatter($format)->renderPlainText()
+     * @deprecated 3.2 FormatService::renderPlainText
      */
     public static function plainText($body, $format = 'Html') {
-        $formatter = self::getFormatService()->getFormatter($format);
-        $plainText = $formatter->renderPlainText($body);
+        $plainText = Gdn::formatService()->renderPlainText((string) $body, (string) $format);
 
         // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
         // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
@@ -900,11 +889,10 @@ class Gdn_Format {
      *
      * @return string Sanitized HTML.
      * @since 2.1
-     * @deprecated 3.2 FormatService::getFormatter($format)->renderExcerpt()
+     * @deprecated 3.2 FormatService::renderExcerpt
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        $formatter = self::getFormatService()->getFormatter($format);
-        $plainText = $formatter->renderExcerpt($body);
+        $plainText = Gdn::formatService()->renderExcerpt((string) $body, (string) $format);
 
         // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
         // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
@@ -1005,9 +993,11 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param bool $isHtml Should $mixed be considered to be a valid HTML string?
+     * @param bool $doEmbeds Should we format links into embeds?
+     *
      * @return string
      */
-    public static function links($mixed, bool $isHtml = false) {
+    public static function links($mixed, bool $isHtml = false, bool $doEmbeds = true) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Links');
         }
@@ -1016,7 +1006,7 @@ class Gdn_Format {
             return $mixed;
         }
 
-        $linksCallback = function ($matches) use ($isHtml) {
+        $linksCallback = function ($matches) use ($isHtml, $doEmbeds) {
             static $inTag = 0;
             static $inAnchor = false;
 
@@ -1060,9 +1050,11 @@ class Gdn_Format {
 
             $url = $matches[4];
 
-            $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? '');
-            if ($embeddedResult !== '') {
-                return $embeddedResult;
+            if ($doEmbeds) {
+                $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? '');
+                if ($embeddedResult !== '') {
+                    return $embeddedResult;
+                }
             }
 
             // Unformatted links
@@ -1190,15 +1182,14 @@ class Gdn_Format {
      * Format a string using Markdown syntax.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
-     * @param boolean $flavored Optional. Parse with Vanilla-flavored settings? Default true.
      * @return string Sanitized HTML.
      * @deprecated 3.2 MarkdownFormat::renderHtml($mixed)
      */
-    public static function markdown($mixed, $flavored = true) {
+    public static function markdown($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            return self::getFormatService()
+            return Gdn::formatService()
                 ->getFormatter(Formats\MarkdownFormat::FORMAT_KEY)
                 ->renderHTML($mixed);
         }
@@ -1486,11 +1477,10 @@ class Gdn_Format {
             return self::to($mixed, 'Text');
         }
 
-        /** @var Formats\TextFormat $textFormat */
-        $textFormat = self::getFormatService()
-            ->getFormatter(Formats\TextFormat::FORMAT_KEY);
-
-        return $textFormat->renderHTML((string) $mixed, (bool) $addBreaks);
+        return Gdn::formatService()
+            ->getFormatter(Formats\TextFormat::FORMAT_KEY)
+            ->renderHTML((string) $mixed, (bool) $addBreaks)
+        ;
     }
 
     /**
@@ -1506,7 +1496,7 @@ class Gdn_Format {
             return self::to($str, 'TextEx');
         }
 
-        return self::getFormatService()
+        return Gdn::formatService()
             ->getFormatter(Formats\TextExFormat::FORMAT_KEY)
             ->renderHTML($str)
         ;
@@ -1518,7 +1508,7 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param string $formatMethod The method with which the variable should be formatted.
      * @return mixed
-     * @deprecated 3.2 FormatService::getFormatter($format)->renderHtml($content)
+     * @deprecated 3.2 FormatService::renderHtml
      */
     public static function to($mixed, $formatMethod) {
         // Process $Mixed based on its type.
@@ -1761,18 +1751,11 @@ class Gdn_Format {
             );
             return $customFormatter($mixed);
         } else {
-            return self::getFormatService()
+            return Gdn::formatService()
                 ->getFormatter(Formats\WysiwygFormat::FORMAT_KEY)
                 ->renderHTML($mixed)
             ;
         }
-    }
-
-    /**
-     * @return Formatting\FormatService
-     */
-    private static function getFormatService(): Formatting\FormatService {
-        return Gdn::getContainer()->get(Formatting\FormatService::class);
     }
 
     /**
@@ -1784,7 +1767,7 @@ class Gdn_Format {
      * @deprecated 3.2 RichFormat::renderHtml($content)
      */
     public static function rich(string $deltas): string {
-        return self::getFormatService()
+        return Gdn::formatService()
             ->getFormatter(Formats\RichFormat::FORMAT_KEY)
             ->renderHTML($deltas);
     }
@@ -1796,26 +1779,11 @@ class Gdn_Format {
      * @param string $format The initial format of the post.
      *
      * @return string
+     * @deprecated 3.2 FormatService::renderQuote($body, $format)
      */
     public static function quoteEmbed($body, string $format): string {
-        if (strcasecmp($format, Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            if (is_array($body)) {
-                $body = json_encode($body);
-            }
-            return self::getFormatService()
-                ->getFormatter(Formats\RichFormat::FORMAT_KEY)
-                ->renderQuote($body);
-        }
-
-        $previousLinksValue = c('Garden.Format.Links');
-        saveToConfig('Garden.Format.Links', false, ['Save' => false]);
-        $value = self::to($body, $format);
-
-        // These breaks make the collapsing behaviour much more difficult in a rich quote.
-        // Replace them with starting and closing p tags.
-        $value = str_replace("<br>", "</p><p>", $value);
-        saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
-        return $value;
+        deprecated(__FUNCTION__, 'FormatService::renderQuote($body, $format)');
+        return Gdn::formatService()->renderQuote($body, $format);
     }
 
     /**
@@ -1829,7 +1797,7 @@ class Gdn_Format {
      */
     public static function getRichMentionUsernames(string $body): array {
         deprecated(__FUNCTION__, 'RichFormat::parseMentions($body)');
-        return self::getFormatService()
+        return Gdn::formatService()
             ->getFormatter(Formats\RichFormat::FORMAT_KEY)
             ->parseMentions($body);
     }

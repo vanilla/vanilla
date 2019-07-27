@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Formats;
 
 use Garden\StaticCacheTranslationTrait;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlEnhancer;
@@ -19,7 +20,7 @@ use Vanilla\Formatting\Html\LegacySpoilerTrait;
 /**
  * Format definition for HTML based formats.
  */
-class HtmlFormat implements FormatInterface {
+class HtmlFormat extends BaseFormat {
 
     use StaticCacheTranslationTrait;
 
@@ -60,8 +61,8 @@ class HtmlFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $result = $this->htmlSanitizer->filter($value);
+    public function renderHtml(string $content, bool $enhance = true): string {
+        $result = $this->htmlSanitizer->filter($content);
 
         if ($this->shouldCleanupLineBreaks) {
             $result = self::cleanupLineBreaks($result);
@@ -73,12 +74,6 @@ class HtmlFormat implements FormatInterface {
             $result = $this->htmlEnhancer->enhance($result);
         }
         return $result;
-    }
-    /**
-     * @inheritdoc
-     */
-    public function renderExcerpt(string $content, string $query = null): string {
-        // TODO: Implement renderExcerpt() method.
     }
 
     /**
@@ -93,7 +88,17 @@ class HtmlFormat implements FormatInterface {
      * @inheritdoc
      */
     public function renderQuote(string $content): string {
-        // TODO: Implement renderQuote() method.
+        $result = $this->htmlSanitizer->filter($content);
+
+        if ($this->shouldCleanupLineBreaks) {
+            $result = self::cleanupLineBreaks($result);
+        }
+
+        $result = $this->legacySpoilers($result);
+
+        // No Embeds
+        $result = $this->htmlEnhancer->enhance($result, true, false);
+        return $result;
     }
 
     /**

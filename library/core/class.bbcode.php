@@ -1,8 +1,15 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use Garden\EventManager;
 use Nbbc\BBCode as Nbbc;
 
+/**
+ * A wrapper around Nbbc\BBCode with some custom configuration.
+ */
 class BBCode extends Gdn_Pluggable {
 
     /**
@@ -24,10 +31,6 @@ class BBCode extends Gdn_Pluggable {
     public function __construct(EventManager $eventManager = null) {
         // There are some old empty constructed usages.
         $this->eventManager = $eventManager ?? \Gdn::getContainer()->get(EventManager::class);
-    }
-
-    public function setPlainMode() {
-
     }
 
     /**

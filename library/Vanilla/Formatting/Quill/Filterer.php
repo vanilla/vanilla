@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class for filtering Rich content before it gets inserted into the database.
@@ -99,8 +100,7 @@ class Filterer {
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            // We also need to ensure we've safely rendered the body to prevent innacurate content.
-            $embedData['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
+            $embedData['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $format);
         }
 
         return array_values($operations);

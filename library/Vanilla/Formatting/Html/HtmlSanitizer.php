@@ -1,7 +1,15 @@
 <?php
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 namespace Vanilla\Formatting\Html;
 
+/**
+ * Class for sanitizing HTML.
+ */
 class HtmlSanitizer {
 
     /** @var \VanillaHtmlFormatter */
@@ -11,6 +19,7 @@ class HtmlSanitizer {
     private $shouldEncodeCodeBlocks = true;
 
     /**
+     * DI.
      *
      * @param \VanillaHtmlFormatter $htmlFilterer
      */
@@ -19,6 +28,11 @@ class HtmlSanitizer {
     }
 
     /**
+     * Filter some potentially dangerous user content.
+     *
+     * - If HMTL tags are found will filter using HtmLawed.
+     * - Otherwise HTML encodes the content.
+     *
      * @param string $content
      * @return string
      */
@@ -61,7 +75,7 @@ class HtmlSanitizer {
      * @return bool
      */
     public static function containsHtmlTags(string $toCheck): bool {
-        return strpos($toCheck, '<') >= 0;
+        return strpos($toCheck, '<') >= 0 || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $toCheck);
     }
 
     /**

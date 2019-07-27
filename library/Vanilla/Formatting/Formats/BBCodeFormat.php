@@ -49,4 +49,12 @@ class BBCodeFormat extends HtmlFormat {
         $renderedBBCode = $this->bbcodeParser->format($value);
         return parent::renderHtml($renderedBBCode, $enhance);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderQuote(string $value): string {
+        $renderedBBCode = $this->bbcodeParser->format($value);
+        return parent::renderQuote($renderedBBCode);
+    }
 }

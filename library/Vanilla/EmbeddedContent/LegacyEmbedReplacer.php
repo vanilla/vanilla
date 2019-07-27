@@ -134,7 +134,6 @@ EOT;
                             . $width . '" height="' . $height . '" border="0" /></a></span>';
                     $result .= '<span class="VideoPlayer"></span>';
                     $result .= '</span>';
-
                 }
                 $result .= '</span>';
 

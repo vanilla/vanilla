@@ -117,6 +117,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
     ->addAlias('Locale')
 
+    ->rule(Contracts\LocaleInterface::class)
+    ->setAliasOf(Gdn_Locale::class)
+    ->setShared(true)
+
     // Request
     ->rule('Gdn_Request')
     ->setShared(true)

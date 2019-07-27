@@ -45,7 +45,7 @@ class DateConfig {
         $this->defaultYearFormat = $locale->translate('Date.DefaultYearFormat', '%B %Y');
         $this->defaultFormat = $locale->translate('Date.DefaultFormat', '%B %e, %Y');
         $this->defaultDateTimeFormat = $locale->translate('Date.DefaultDateTimeFormat', '%c');
-        $this->hourOffset = $session->hourOffset();
+        $this->hourOffset = $session->hourOffset() ?? 0;
     }
 
     /**

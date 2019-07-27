@@ -16,6 +16,7 @@ use \Vanilla\Formatting;
 use \Vanilla\Formatting\Formats;
 use \Vanilla\Formatting\FormatUtil;
 use \Vanilla\Formatting\Html;
+use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Output formatter.
@@ -346,10 +347,10 @@ class Gdn_Format {
     }
 
     /**
-     * @return Formatting\DateTimeFormatter
+     * @return DateTimeFormatter
      */
-    private static function getDateTimeFormatter(): Formatting\DateTimeFormatter {
-        return Gdn::getContainer()->get(Formatting\DateTimeFormatter::class);
+    private static function getDateTimeFormatter(): DateTimeFormatter {
+        return Gdn::getContainer()->get(DateTimeFormatter::class);
     }
 
     /**
@@ -363,15 +364,14 @@ class Gdn_Format {
      * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp)
      */
     public static function date($timestamp = '', $format = '') {
-        $formatter = self::getDateTimeFormatter();
         if (function_exists('formatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
             deprecated(
                 'FormatDateCustom',
-                'Extend ' . Formatting\DateTimeFormatter::class . ' and replace it in Garden\Container'
+                'Extend ' . DateTimeFormatter::class . ' and replace it in Garden\Container'
             );
             // Was a mysqldatetime passed?
             if ($timestamp !== null && !is_numeric($timestamp)) {
-                $timestamp = $formatter->dateTimeToTimeStamp($timestamp);
+                $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp, false);
             }
 
             if (!$timestamp) {
@@ -384,7 +384,7 @@ class Gdn_Format {
         $isHtml = strtolower($format) === 'html';
         $format = $isHtml ? '' : $format;
 
-        return $formatter->formatDate($timestamp, $isHtml, $format);
+        return self::getDateTimeFormatter()->formatDate($timestamp, $isHtml, $format);
     }
 
     /**
@@ -396,7 +396,7 @@ class Gdn_Format {
      * @since 2.1
      * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp, true)
      */
-    public static function dateFull($timestamp, $format = Formatting\DateTimeFormatter::FORCE_FULL_FORMAT) {
+    public static function dateFull($timestamp, $format = DateTimeFormatter::FORCE_FULL_FORMAT) {
         return self::date($timestamp, $format);
     }
 
@@ -512,7 +512,10 @@ class Gdn_Format {
      * @deprecated 3.2 DateTimeFormatter::formatRelativeTime
      */
     public static function fuzzyTime($timestamp = null, $morePrecise = false): string {
-        return self::getDateTimeFormatter()->formatRelativeTime($timestamp, (bool) $morePrecise);
+        if ($morePrecise) {
+            deprecated(__FUNCTION__ . ' param $morePrecise');
+        }
+        return self::getDateTimeFormatter()->formatRelativeTime($timestamp);
     }
 
     /**
@@ -1146,7 +1149,7 @@ class Gdn_Format {
     public static function seconds($seconds): string {
         $formatter = self::getDateTimeFormatter();
         if (!is_numeric($seconds)) {
-            $seconds = $formatter->dateTimeToSeconds($seconds);
+            $seconds = $formatter::dateTimeToSecondsAgo($seconds);
         }
         return $formatter->formatSeconds($seconds);
     }
@@ -1244,17 +1247,16 @@ class Gdn_Format {
      * @param int|string $timestamp
      *
      * @return string The formatted date.
-     * @deprecated 3.2 DateTimeFormatter::timestampToDate()
+     * @deprecated 3.2 DateTimeFormatter::timeStampToDate()
      */
     public static function toDate($timestamp = '') {
-        $formatter = self::getDateTimeFormatter();
         if ($timestamp == '') {
             $timestamp = time();
         } elseif (!is_numeric($timestamp)) {
-            $timestamp = $formatter->dateTimeToTimeStamp($timestamp);
+            $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
         }
 
-        return self::getDateTimeFormatter()->timestampToDate($timestamp);
+        return DateTimeFormatter::timeStampToDate($timestamp);
     }
 
     /**
@@ -1262,13 +1264,13 @@ class Gdn_Format {
      *
      * @param int|string $timestamp
      * @return string The formatted date and time.
-     * @deprecated DateTimeFormatter::timestampToDateTime()
+     * @deprecated DateTimeFormatter::timeStampToDateTime()
      */
     public static function toDateTime($timestamp = '') {
         if ($timestamp == '') {
             $timestamp = time();
         }
-        return self::getDateTimeFormatter()->timestampToDateTime((int) $timestamp);
+        return DateTimeFormatter::timeStampToDateTime((int) $timestamp);
     }
 
     /**
@@ -1283,7 +1285,7 @@ class Gdn_Format {
         if (!is_string($dateTime)) {
             return false;
         }
-        return self::getDateTimeFormatter()->dateTimeToTimeStamp($dateTime);
+        return DateTimeFormatter::dateTimeToTimeStamp($dateTime, false);
     }
 
     /**
@@ -1302,10 +1304,10 @@ class Gdn_Format {
      *
      * @param int $timespan
      * @return string
-     * @deprecated 3.2 DateTimeFormatter::timestampToTime()
+     * @deprecated 3.2 DateTimeFormatter::timeStampToTime()
      */
     public static function timespan($timespan) {
-        return self::getDateTimeFormatter()->timestampToTime((int) $timespan);
+        return DateTimeFormatter::timeStampToTime((int) $timespan);
     }
 
     /** @var array  */

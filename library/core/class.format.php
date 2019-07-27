@@ -781,39 +781,15 @@ class Gdn_Format {
      * @param array $options An array of filter options. These will also be passed through to the formatter.
      *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 HtmlSanitizer
      */
     public static function htmlFilter($mixed, $options = []) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'HtmlFilter');
         } else {
-            if (Html\HtmlSanitizer::containsHtmlTags($mixed)) {
-                // Purify HTML with our formatter.
-                $formatter = Gdn::factory('HtmlFormatter');
-                if (is_null($formatter)) {
-                    // If there is no HtmlFormatter then make sure that script injections won't work.
-                    return self::display($mixed);
-                }
-
-                // Allow the code tag to keep all enclosed HTML encoded.
-                $codeBlockEntities = val('codeBlockEntities', $options, true);
-                if ($codeBlockEntities) {
-                    $mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
-                        $result = "<code{$matches[1]}>" .
-                            htmlspecialchars($matches[2]) .
-                            '</code>';
-                        return $result;
-                    }, $mixed);
-                }
-
-                // Do HTML filtering before our special changes.
-                $result = $formatter->format($mixed, $options);
-            } else {
-                // The text does not contain HTML and does not have to be purified.
-                // This is an optimization because purifying is very slow and memory intense.
-                $result = htmlspecialchars($mixed, ENT_NOQUOTES, 'UTF-8');
-            }
-
-            return $result;
+            /** @var Html\HtmlSanitizer $htmlSanitizer */
+            $htmlSanitizer = Gdn::getContainer()->get(Html\HtmlSanitizer::class);
+            return $htmlSanitizer->filter((string) $mixed);
         }
     }
 

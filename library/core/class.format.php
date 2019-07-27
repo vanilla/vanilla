@@ -1095,7 +1095,7 @@ class Gdn_Format {
 
         Gdn::getContainer()
             ->get(EventManager::class)
-            ->fireDeprecated(
+            ->fire(
                 'Format_Links',
                 null, // To comply with the only handler type expecting (mixed $sender, array $args)
                 ['Mixed' => &$mixed]

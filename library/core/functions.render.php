@@ -890,7 +890,7 @@ if (!function_exists('fixnl2br')) {
      * @return string
      * @since 2.1
      *
-     * @deprecated 2.8 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
+     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
      */
     function fixnl2br($text) {
         deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');

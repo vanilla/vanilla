@@ -58,12 +58,7 @@ class BodyFormatValidator {
      */
     public function __invoke($value, $field, $row = []) {
         $format = strtolower($row['Format'] ?? Formats\TextFormat::FORMAT_KEY);
-
-        if (isset($this->validators[$format])) {
-            $valid = $this->validate($value, $format);
-        } else {
-            $valid = $value;
-        }
+        $valid = $this->validate($value, $format);
 
         return $valid;
     }

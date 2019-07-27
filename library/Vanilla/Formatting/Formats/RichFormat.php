@@ -58,7 +58,7 @@ class RichFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content, bool $throw = false): string {s
+    public function renderHTML(string $content, bool $throw = false): string {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);

@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Vanilla\Formatting\BaseFormat;
+use Vanilla\Formatting\FormatConfig;
 
 /**
  * Class for rendering content of the markdown format.
@@ -15,6 +16,17 @@ use Vanilla\Formatting\BaseFormat;
 class TextFormat extends BaseFormat {
 
     const FORMAT_KEY = "Text";
+
+    /** @var FormatConfig */
+    private $formatConfig;
+
+    /**
+     * @param FormatConfig $formatConfig
+     */
+    public function __construct(FormatConfig $formatConfig) {
+        $this->formatConfig = $formatConfig;
+    }
+
 
     /**
      * @inheritdoc
@@ -24,7 +36,7 @@ class TextFormat extends BaseFormat {
         $result = preg_replace('`<br\s?/?>`', "\n", $result);
         $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
 
-        if (c('Garden.Format.ReplaceNewlines', true)) {
+        if ($this->formatConfig->shouldReplaceNewLines()) {
             $result = nl2br(trim($result));
         }
 

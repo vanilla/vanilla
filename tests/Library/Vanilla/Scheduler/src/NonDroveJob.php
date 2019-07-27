@@ -9,6 +9,7 @@ namespace Vanilla\Scheduler\Test;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Job\JobInterface;
+use Vanilla\Scheduler\Job\JobPriority;
 
 /**
  * Class NonDroveJob
@@ -42,10 +43,16 @@ class NonDroveJob implements JobInterface {
         $this->message = $message;
     }
 
-    /**
-     *
-     */
     public function run() {
         $this->logger->info(get_class($this)." :: ".var_export($this->message, true));
     }
+
+    public function setPriority(JobPriority $priority) {
+        // void method.
+    }
+
+    public function setDelay(int $seconds) {
+        // void method.
+    }
+
 }

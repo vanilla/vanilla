@@ -9,6 +9,7 @@ namespace Vanilla\Scheduler\Test;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
@@ -41,4 +42,13 @@ class EchoJob implements LocalJobInterface {
         $this->logger->info(get_class($this)." :: ".var_export($this->message, true));
         return JobExecutionStatus::complete();
     }
+
+    public function setPriority(JobPriority $priority) {
+        // void method. It doesn't make any sense set a priority for a LocalJob
+    }
+
+    public function setDelay(int $seconds) {
+        // void method. It doesn't make any sense set a delay for a LocalJob
+    }
+
 }

@@ -13,7 +13,10 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Driver\DriverInterface;
 use Vanilla\Scheduler\Job\JobInterface;
 use Garden\Container\Container;
+use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\JobTypeAwareInterface;
+use Exception;
+use Throwable;
 
 /**
  * DummyScheduler
@@ -81,15 +84,15 @@ class DummyScheduler implements SchedulerInterface {
      * @param string $driverType
      *
      * @return bool
-     * @throws \Exception The class `%s` cannot be found.
-     * @throws \Exception The class `%s` doesn't implement DriverInterface.
+     * @throws Exception The class `%s` cannot be found.
+     * @throws Exception The class `%s` doesn't implement DriverInterface.
      */
     public function addDriver(string $driverType): bool {
 
         if (!$this->container->has($driverType)) {
             $missingDriverMsg = "The class `$driverType` cannot be found.";
             $this->logger->error($missingDriverMsg);
-            throw new \Exception($missingDriverMsg);
+            throw new Exception($missingDriverMsg);
         }
 
         $driver = $this->container->get($driverType);
@@ -97,7 +100,7 @@ class DummyScheduler implements SchedulerInterface {
         if (!$driver instanceof DriverInterface) {
             $missingInterfaceMsg = "The class `$driverType` doesn't implement DriverInterface.";
             $this->logger->error($missingInterfaceMsg);
-            throw new \Exception($missingInterfaceMsg);
+            throw new Exception($missingInterfaceMsg);
         }
 
         $jobTypes = $driver->getSupportedInterfaces();
@@ -105,7 +108,7 @@ class DummyScheduler implements SchedulerInterface {
         if (count($jobTypes) === 0) {
             $driverDoesntSupportAnyTypeMsg = "The class `$driverType` doesn't support any Job implementation.";
             $this->logger->error($driverDoesntSupportAnyTypeMsg);
-            throw new \Exception($driverDoesntSupportAnyTypeMsg);
+            throw new Exception($driverDoesntSupportAnyTypeMsg);
         }
 
         foreach ($jobTypes as $jobType) {
@@ -158,6 +161,8 @@ class DummyScheduler implements SchedulerInterface {
             }
 
             $this->dispatchAll();
+
+            return true;
         });
 
         return true;
@@ -198,18 +203,20 @@ class DummyScheduler implements SchedulerInterface {
      *
      * @param string $jobType
      * @param array $message
+     * @param JobPriority|null $jobPriority
+     * @param int|null $delay
      * @return TrackingSlipInterface
      *
-     * @throws \Exception The class `%s` cannot be found.
-     * @throws \Exception The job class `%s` doesn't implement JobInterface.
-     * @throws \Exception DummyScheduler couldn't find an appropriate driver to handle the job class `%s`.
+     * @throws Exception The class `%s` cannot be found.
+     * @throws Exception The job class `%s` doesn't implement JobInterface.
+     * @throws Exception DummyScheduler couldn't find an appropriate driver to handle the job class `%s`.
      */
-    public function addJob(string $jobType, $message = []): TrackingSlipInterface {
+    public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface {
 
         if (!$this->container->has($jobType)) {
             $missingJobMsg = "The class `$jobType` cannot be found.";
             $this->logger->error($missingJobMsg);
-            throw new \Exception($missingJobMsg);
+            throw new Exception($missingJobMsg);
         }
 
         // Resolve the job and set the message
@@ -218,9 +225,12 @@ class DummyScheduler implements SchedulerInterface {
         if (!$job instanceof JobInterface) {
             $missingInterfaceMsg = "The job class `$jobType` doesn't implement JobInterface.";
             $this->logger->error($missingInterfaceMsg);
-            throw new \Exception($missingInterfaceMsg);
+            throw new Exception($missingInterfaceMsg);
         }
 
+        $job->setPriority($jobPriority ?? JobPriority::normal());
+        $job->setDelay($delay ?? 0);
+        // Priority & Delay are set before the message, so the message could overwrite those values if needed
         $job->setMessage($message);
 
         if ($job instanceof JobTypeAwareInterface) {
@@ -239,7 +249,7 @@ class DummyScheduler implements SchedulerInterface {
 
         $missingDriverMsg = "DummyScheduler couldn't find an appropriate driver to handle the job class `$jobType`.";
         $this->logger->error($missingDriverMsg);
-        throw new \Exception($missingDriverMsg);
+        throw new Exception($missingDriverMsg);
     }
 
     /**
@@ -254,7 +264,7 @@ class DummyScheduler implements SchedulerInterface {
                 $jobInterface = $trackingSlip->getJobInterface();
                 $driverSlip = $trackingSlip->getDriverSlip();
                 $this->drivers[$jobInterface]->execute($driverSlip);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 $msg = "Scheduler failed to execute Job";
                 $msg .= ". Message: ".$t->getMessage();
                 $msg .= ". File: ".$t->getFile();

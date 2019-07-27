@@ -14,7 +14,7 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the BBCodeFormat.
  */
-class BBCodeFormatTest extends AbstractFormatTestCase {
+class BBCodeFormatTest extends AbstractFormatTestCaseMinimal {
 
     /**
      * @inheritDoc

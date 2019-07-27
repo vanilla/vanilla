@@ -14,7 +14,7 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the MarkdownFormat.
  */
-class MarkdownFormatTest extends AbstractFormatTestCase {
+class MarkdownFormatTest extends AbstractFormatTestCaseMinimal {
 
     /**
      * @inheritDoc

@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the HtmlFormat.
  */
-class WysiwygFormatTest extends AbstractFormatTestCase {
+class WysiwygFormatTest extends AbstractFormatTestCaseMinimal {
 
     /**
      * @inheritDoc

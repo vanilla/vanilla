@@ -252,15 +252,13 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
-     * @deprecated 3.2 BBCodeFormat::renderHtml()
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\BBCodeFormat::FORMAT_KEY);
      */
     public static function bbCode($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'BBCode');
         } else {
-            return Gdn::formatService()
-                ->getFormatter(Formats\BBCodeFormat::FORMAT_KEY)
-                ->renderHtml($mixed);
+            return Gdn::formatService()->renderHtml($mixed, Formats\BBCodeFormat::FORMAT_KEY);
         }
     }
 
@@ -761,15 +759,14 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\HtmlFormat::FORMAT_KEY);
      */
     public static function html($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Html');
         }
 
-        return Gdn::formatService()
-            ->getFormatter(Formats\HtmlFormat::FORMAT_KEY)
-            ->renderHTML($mixed);
+        return Gdn::formatService()->renderHTML($mixed, Formats\HtmlFormat::FORMAT_KEY);
     }
 
     /**
@@ -1160,16 +1157,21 @@ class Gdn_Format {
      * Format a string using Markdown syntax.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
+     * @param null $flavor Deprecated param.
      * @return string Sanitized HTML.
-     * @deprecated 3.2 MarkdownFormat::renderHtml($mixed)
+     * @deprecated 3.2 FormatService::renderHtml($mixed, Formats\MarkdownFormat::FORMAT_KEY)
      */
-    public static function markdown($mixed) {
+    public static function markdown($mixed, $flavor = null) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            return Gdn::formatService()
-                ->getFormatter(Formats\MarkdownFormat::FORMAT_KEY)
-                ->renderHTML($mixed);
+            if ($flavor) {
+                deprecated(
+                    __FUNCTION__ . ' param $flavor',
+                    'config `Garden.Format.UseVanillaMarkdownFlavor`'
+                );
+            }
+            return Gdn::formatService()->renderHTML($mixed, Formats\MarkdownFormat::FORMAT_KEY);
         }
     }
 
@@ -1428,19 +1430,20 @@ class Gdn_Format {
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
-     * @param bool $addBreaks
+     * @param bool|null $addBreaks
      * @return string Sanitized HTML.
      * @deprecated Formats\TextFormat::renderHtml()
      */
-    public static function text($mixed, $addBreaks = true) {
+    public static function text($mixed, $addBreaks = null) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Text');
         }
 
-        return Gdn::formatService()
-            ->getFormatter(Formats\TextFormat::FORMAT_KEY)
-            ->renderHTML((string) $mixed, (bool) $addBreaks)
-        ;
+        if ($addBreaks) {
+            deprecated(__FUNCTION__ . ' param $addBreaks', 'config `Garden.Format.ReplaceNewlines`');
+        }
+
+        return Gdn::formatService()->renderHTML((string) $mixed, Formats\TextFormat::FORMAT_KEY);
     }
 
     /**
@@ -1449,17 +1452,14 @@ class Gdn_Format {
      * @param string $str
      * @return string Sanitized HTML.
      * @since 2.1
-     * @deprecated 3.2 TextExFormat::renderHtml($str)
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\TextExFormat::FORMAT_KEY)
      */
     public static function textEx($str) {
         if (!is_string($str)) {
             return self::to($str, 'TextEx');
         }
 
-        return Gdn::formatService()
-            ->getFormatter(Formats\TextExFormat::FORMAT_KEY)
-            ->renderHTML($str)
-        ;
+        return Gdn::formatService()->renderHTML($str, Formats\TextExFormat::FORMAT_KEY);
     }
 
     /**
@@ -1694,7 +1694,7 @@ class Gdn_Format {
      * @param $mixed
      * @return mixed|string
      *
-     * @deprecated 3.2 WywisygFormat::renderHtml($string)
+     * @deprecated 3.2 FormatService::renderHtml($string, Formats\WysiwygFormat::FORMAT_KEY)
      */
     public static function wysiwyg($mixed) {
         static $customFormatter;
@@ -1711,10 +1711,7 @@ class Gdn_Format {
             );
             return $customFormatter($mixed);
         } else {
-            return Gdn::formatService()
-                ->getFormatter(Formats\WysiwygFormat::FORMAT_KEY)
-                ->renderHTML($mixed)
-            ;
+            return Gdn::formatService()->renderHTML($mixed, Formats\WysiwygFormat::FORMAT_KEY);
         }
     }
 
@@ -1724,12 +1721,10 @@ class Gdn_Format {
      * @param string $deltas A JSON encoded array of Quill deltas.
      *
      * @return string - The rendered HTML output.
-     * @deprecated 3.2 RichFormat::renderHtml($content)
+     * @deprecated 3.2 FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)
      */
     public static function rich(string $deltas): string {
-        return Gdn::formatService()
-            ->getFormatter(Formats\RichFormat::FORMAT_KEY)
-            ->renderHTML($deltas);
+        return Gdn::formatService()->renderHTML($deltas, Formats\RichFormat::FORMAT_KEY);
     }
 
     /**
@@ -1753,13 +1748,11 @@ class Gdn_Format {
      * @param string $body The contents of a post body.
      *
      * @return string[]
-     * @deprecated 3.2 RichFormat::parseMentions($body)
+     * @deprecated 3.2 FormatService::parseMentions($body, Formats\RichFormat::FORMAT_KEY)
      */
     public static function getRichMentionUsernames(string $body): array {
         deprecated(__FUNCTION__, 'RichFormat::parseMentions($body)');
-        return Gdn::formatService()
-            ->getFormatter(Formats\RichFormat::FORMAT_KEY)
-            ->parseMentions($body);
+        return Gdn::formatService()->parseMentions($body, Formats\RichFormat::FORMAT_KEY);
     }
 
     const SAFE_PROTOCOLS = [

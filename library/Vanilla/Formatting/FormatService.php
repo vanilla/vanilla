@@ -9,6 +9,7 @@ namespace Vanilla\Formatting;
 use Garden\Container\Container;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;
 
 /**
@@ -32,6 +33,27 @@ class FormatService {
         $result = $formatter->renderHTML($content);
         return $result;
     }
+
+    /**
+     * Format a particular string.
+     *
+     * @param mixed $content The content to render.
+     * @param string $format The format of the content.
+     *
+     * @return string
+     *
+     * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
+     * @throws FormatterNotFoundException If the format doesn't have a match.
+     */
+    public function filter($content, string $format): string {
+        if (!is_string($content)) {
+            throw new FormattingException('Format body must be a string', true);
+        }
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->filter($content);
+        return $result;
+    }
+
 
     /**
      * Render a safe, sanitized, short version of some content.

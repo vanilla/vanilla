@@ -58,14 +58,18 @@ class RichFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content): string {
+    public function renderHTML(string $content, bool $throw = false): string {s
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
             return $this->renderer->render($blotGroups);
         } catch (\Throwable $e) {
             $this->logBadInput($e);
-            return $this->renderErrorMessage();
+            if ($throw) {
+                throw new FormattingException($e->getMessage(), $e->getCode(), $e);
+            } else {
+                return $this->renderErrorMessage();
+            }
         }
     }
 
@@ -113,7 +117,7 @@ class RichFormat extends BaseFormat {
      */
     public function filter(string $content): string {
         $filtered = $this->filterer->filter($content);
-        $this->renderHTML($filtered);
+        $this->renderHTML($filtered, true);
         return $filtered;
     }
 

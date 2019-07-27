@@ -23,9 +23,7 @@ Image
 [img]/uploads/editor/8u/uoq1cauk9k10.png[/img]
 
 [code]
-<script>
-    var thing = $('#HelloWorld');
-</script>
+<script>var thing = $('#HelloWorld');</script>
 [/code]
 
 [spoiler]Spoiler[/spoiler]

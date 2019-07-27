@@ -12,41 +12,37 @@ use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 
 /**
- * Class for rendering content with the source format BBCode.
+ * Class for rendering content of the markdown format.
  */
-class BBCodeFormat extends HtmlFormat {
+class WysiwygFormat extends HtmlFormat {
 
-    const FORMAT_KEY = "BBCode";
+    const FORMAT_KEY = "Wysiwyg";
 
-    /** @var \BBCode */
-    private $bbcodeParser;
 
     /**
-     * Constructor for Dependency Injection
+     * Constructor for dependency Injection.
      *
-     * @param \BBCode $bbcodeParser
      * @param HtmlSanitizer $htmlSanitizer
      * @param HtmlEnhancer $htmlEnhancer
      * @param HtmlPlainTextConverter $plainTextConverter
      */
     public function __construct(
-        \BBCode $bbcodeParser,
         HtmlSanitizer $htmlSanitizer,
         HtmlEnhancer $htmlEnhancer,
         HtmlPlainTextConverter $plainTextConverter
     ) {
-        // The BBCode parser already encodes code blocks.
-        $plainTextConverter->setAddNewLinesAfterDiv(true);
-        $htmlSanitizer->setShouldEncodeCodeBlocks(false);
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
-        $this->bbcodeParser = $bbcodeParser;
     }
 
     /**
-     * @inheritdoc
+     * Legacy Spoilers don't get applied to WYSIWYG.
+     * Stub out the method.
+     *
+     * @param string $html
+     *
+     * @return string
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $renderedBBCode = $this->bbcodeParser->format($value);
-        return parent::renderHtml($renderedBBCode, $enhance);
+    protected function legacySpoilers(string $html): string {
+        return $html;
     }
 }

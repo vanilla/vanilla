@@ -1,1 +1,3 @@
-bold italic strikeall inline https://autolink.com
+bold italic strike all inline :)  :(  :/
+https://autolink.com
+

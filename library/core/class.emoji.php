@@ -625,7 +625,7 @@ class Emoji {
      */
     public static function instance() {
         if (Emoji::$instance === null) {
-            Emoji::$instance = new Emoji();
+            Emoji::$instance = Gdn::getContainer()->get(Emoji::class);
         }
 
         return Emoji::$instance;

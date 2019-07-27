@@ -8,22 +8,15 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Formats\RichFormat;
+use VanillaTests\ContainerTestCase;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
-use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Unit tests for the Gdn_Format class.
  */
-class GdnFormatTest extends SharedBootstrapTestCase {
+class GdnFormatTest extends ContainerTestCase {
 
     use AssertsFixtureRenderingTrait;
-
-    /**
-     * Overridden for compat with the fixtures.
-     */
-    protected static function getBootstrapFolderName() {
-        return 'minimal-container-test';
-    }
 
     /**
      * Test the BBCode HTML rendering.
@@ -190,15 +183,18 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         list($input, $expectedHtml, $expectedText) = $this->getFixture($fixtureDir);
         $outputHtml = \Gdn_Format::to($input, $format);
         $this->assertHtmlStringEqualsHtmlString(
-            $expectedHtml, // Needed so code blocks are equivalently decoded
-            $outputHtml, // Gdn_Format does htmlspecialchars
+            $expectedHtml,
+            $outputHtml,
             "Expected $format -> html conversion for fixture $fixtureDir to match."
         );
 
         $outputText = \Gdn_Format::plainText($input, $format);
-        $this->assertHtmlStringEqualsHtmlString(
-            $expectedText,
-            $outputText,
+        $this->assertEquals(
+            trim($expectedText),
+            // Gdn_Format (deprecated) encodes special chars.
+            // Format interfaces don't.
+            // Undo this so we can work with the same fixtures.
+            htmlspecialchars_decode($outputText),
             "Expected $format -> text conversion for fixture $fixtureDir to match."
         );
     }

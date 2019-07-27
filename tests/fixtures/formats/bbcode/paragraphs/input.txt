@@ -6,6 +6,7 @@ Line 5
 
 
 Line 8
+
 [left]Left[/left]
 [center]Middle[/center]
 [right]Right[/right]

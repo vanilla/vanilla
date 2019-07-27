@@ -26,6 +26,9 @@ class BBCode extends Gdn_Pluggable {
         $this->eventManager = $eventManager ?? \Gdn::getContainer()->get(EventManager::class);
     }
 
+    public function setPlainMode() {
+
+    }
 
     /**
      * Perform formatting against a string for the attach tag.

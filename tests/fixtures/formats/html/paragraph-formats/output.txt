@@ -1,12 +1,11 @@
 h1
 
- h2
+h2
 
- quote
+(Quote)
 
-
-     alert("xss");
+    <script>alert("xss");</script>
 (Spoiler)
 
-
 (Spoiler)
+

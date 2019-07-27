@@ -12,7 +12,7 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 
 /**
- * Tests for the BBCodeFormat.
+ * Tests for the HtmlFormat.
  */
 class HtmlFormatTest extends AbstractFormatTestCase {
 

@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 
 /**
@@ -20,22 +21,24 @@ class MarkdownFormat extends HtmlFormat {
     /** @var \MarkdownVanilla */
     private $markdownParser;
 
-    
+
     /**
      * Constructor for dependency Injection.
      *
      * @param \MarkdownVanilla $markdownParser
      * @param HtmlSanitizer $htmlSanitizer
      * @param HtmlEnhancer $htmlEnhancer
+     * @param HtmlPlainTextConverter $plainTextConverter
      */
     public function __construct(
         \MarkdownVanilla $markdownParser,
         HtmlSanitizer $htmlSanitizer,
-        HtmlEnhancer $htmlEnhancer
+        HtmlEnhancer $htmlEnhancer,
+        HtmlPlainTextConverter $plainTextConverter
     ) {
         // The markdown parser already encodes code blocks.
         $htmlSanitizer->setShouldEncodeCodeBlocks(false);
-        parent::__construct($htmlSanitizer, $htmlEnhancer, false);
+        parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
         $this->markdownParser = $markdownParser;
         $this->markdownParser->addAllFlavor();
     }
@@ -43,8 +46,8 @@ class MarkdownFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value): string {
+    public function renderHtml(string $value, bool $enhance = true): string {
         $markdownParsed = $this->markdownParser->transform($value);
-        return parent::renderHtml($markdownParsed);
+        return parent::renderHtml($markdownParsed, $enhance);
     }
 }

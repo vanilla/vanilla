@@ -78,7 +78,7 @@ abstract class AbstractFormatTestCase extends ContainerTestCase {
      */
     public function testRenderExcerpt(string $input, string $expectedOutput, string $errorMessage) {
         $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString(
+        $this->assertEquals(
             $expectedOutput,
             $format->renderExcerpt($input),
             $errorMessage
@@ -105,8 +105,8 @@ abstract class AbstractFormatTestCase extends ContainerTestCase {
      */
     public function testRenderPlainText(string $input, string $expectedOutput, string $errorMessage) {
         $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString(
-            $expectedOutput,
+        $this->assertEquals(
+            trim($expectedOutput), // We can have extra trailing whitespace from our IDE.
             $format->renderPlainText($input),
             $errorMessage
         );
@@ -160,7 +160,7 @@ abstract class AbstractFormatTestCase extends ContainerTestCase {
         $format = $this->prepareFormatter();
         $this->assertSame(
             $expectedOutput,
-            $format->renderExcerpt($input)
+            $format->parseHeadings($input)
         );
     }
 
@@ -203,7 +203,7 @@ abstract class AbstractFormatTestCase extends ContainerTestCase {
         foreach ($fixtures as $fixture) {
             $expected = $fixture->{$methodToCall}();
             if ($expected !== null) {
-                $paramSets[] = [
+                $paramSets[$fixture->getName()] = [
                     $fixture->getInput(),
                     $expected,
                     "Failed asserting expected fixture output for $renderType fixture '{$fixture->getName()}'"

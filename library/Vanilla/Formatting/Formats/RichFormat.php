@@ -82,7 +82,7 @@ class RichFormat extends BaseFormat {
             foreach ($blotGroups as $blotGroup) {
                 $text .= $blotGroup->getUnsafeText();
             }
-            return $text;
+            return trim($text);
         } catch (\Throwable $e) {
             $this->logBadInput($e);
             return self::t(self::RENDER_ERROR_MESSAGE);

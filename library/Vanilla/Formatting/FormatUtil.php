@@ -57,4 +57,4 @@ class FormatUtil {
 
         return $subject;
     }
- }
+}

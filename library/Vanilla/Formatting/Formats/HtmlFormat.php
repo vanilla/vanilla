@@ -12,7 +12,9 @@ use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Formatting\Html\LegacySpoilerTrait;
 
 /**
  * Format definition for HTML based formats.
@@ -32,37 +34,46 @@ class HtmlFormat implements FormatInterface {
     /** @var bool */
     private $shouldCleanupLineBreaks;
 
+    /** @var HtmlPlainTextConverter */
+    private $plainTextConverter;
+
     /**
      * Constructor for dependency injection.
      *
      * @param HtmlSanitizer $htmlSanitizer
      * @param HtmlEnhancer $htmlEnhancer
+     * @param HtmlPlainTextConverter $plainTextConverter
      * @param bool $shouldCleanupLineBreaks
      */
     public function __construct(
         HtmlSanitizer $htmlSanitizer,
         HtmlEnhancer $htmlEnhancer,
+        HtmlPlainTextConverter $plainTextConverter,
         bool $shouldCleanupLineBreaks = true
     ) {
         $this->htmlSanitizer = $htmlSanitizer;
         $this->htmlEnhancer = $htmlEnhancer;
+        $this->plainTextConverter = $plainTextConverter;
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
     }
 
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value): string {
-        $sanitized = $this->htmlSanitizer->filter($value);
+    public function renderHtml(string $value, bool $enhance = true): string {
+        $result = $this->htmlSanitizer->filter($value);
 
         if ($this->shouldCleanupLineBreaks) {
-            $sanitized = self::cleanupLineBreaks($sanitized);
+            $result = self::cleanupLineBreaks($result);
         }
 
-        $enhanced = $this->htmlEnhancer->enhance($sanitized);
-        return $enhanced;
-    }
+        $result = $this->legacySpoilers($result);
 
+        if ($enhance) {
+            $result = $this->htmlEnhancer->enhance($result);
+        }
+        return $result;
+    }
     /**
      * @inheritdoc
      */
@@ -74,7 +85,8 @@ class HtmlFormat implements FormatInterface {
      * @inheritdoc
      */
     public function renderPlainText(string $content): string {
-        // TODO: Implement renderPlainText() method.
+        $html = $this->renderHtml($content, false);
+        return $this->plainTextConverter->convert($html);
     }
 
     /**
@@ -110,7 +122,7 @@ class HtmlFormat implements FormatInterface {
     public function parseHeadings(string $content): array {
         $rendered = $this->renderHtml($content);
         $dom = new \DOMDocument();
-        $dom->loadHTML($rendered);
+        @$dom->loadHTML($rendered);
 
         $xpath = new \DOMXPath($dom);
         $domHeadings = $xpath->query('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
@@ -120,7 +132,7 @@ class HtmlFormat implements FormatInterface {
 
         /** @var \DOMNode $domHeading */
         foreach ($domHeadings as $domHeading) {
-            $level = str_replace('h', 0, $domHeading->nodeValue);
+            $level = (int)str_replace('h', '', $domHeading->nodeValue);
             $level = filter_var($level, FILTER_VALIDATE_INT);
 
             if (!$level) {
@@ -130,7 +142,7 @@ class HtmlFormat implements FormatInterface {
             $headings[] = new Heading(
                 $domHeading->textContent,
                 $level,
-                'no_id_found'
+                slugify()
             );
         }
 
@@ -178,29 +190,26 @@ class HtmlFormat implements FormatInterface {
     }
 
     /**
-     * Check to see if a string has spoilers and replace them with an innocuous string.
+     * Spoilers with backwards compatibility.
      *
-     * Good for displaying excerpts from discussions and without showing the spoiler text.
+     * In the Spoilers plugin, we would render BBCode-style spoilers in any format post and allow a title.
      *
-     * @param string $html An HTML-formatted string.
-     * @param string $replaceWith The translation code to replace spoilers with.
-     *
-     * @return string Returns the html with spoilers removed.
-     * @internal Marked public for internal backwards compatibility only.
+     * @param string $html
+     * @return string
      */
-    public function replaceSpoilersWithPlaintext(string $html, string $replaceWith = "(Spoiler)") {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($html);
-        $xpath = new \DOMXPath($dom);
-        $spoilers = $xpath->query(".//*[contains(@class, 'Spoiler') or contains(@class, 'UserSpoiler')]");
-
-        /** @var \DOMNode $spoiler */
-        foreach ($spoilers as $spoiler) {
-            $replacement = new \DOMNode();
-            $replacement->textContent = self::t($replaceWith);
-            $spoiler->parentNode->replaceChild($replacement, $spoiler);
+    protected function legacySpoilers(string $html): string {
+        if (strpos($html, '[/spoiler]') !== false) {
+            $count = 0;
+            do {
+                $html = preg_replace(
+                    '`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\](.*?)\[\/spoiler\]`usi',
+                    '<div class="Spoiler">$1</div>',
+                    $html,
+                    -1,
+                    $count
+                );
+            } while ($count > 0);
         }
-
-        return $dom->saveHTML();
+        return $html;
     }
 }

@@ -7,4 +7,4 @@ Line 5
 
 Line 8
 
-[spoiler]Legacy Spoiler[/spoiler]
+[spoiler]Legacy Spoilers don't apply[/spoiler]

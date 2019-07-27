@@ -1,0 +1,7 @@
+h1
+
+h2
+
+(Quote)
+    <script>alert("xss");</script>(Spoiler)
+[spoiler]Legacy Spoiler's Don't Apply[/spoiler]

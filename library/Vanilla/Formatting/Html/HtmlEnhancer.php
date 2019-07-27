@@ -21,6 +21,7 @@ class HtmlEnhancer {
     private $emojiParser;
 
     /**
+     * DI.
      *
      * @param EventManager $eventManager
      * @param \Emoji $emojiParser
@@ -60,27 +61,6 @@ class HtmlEnhancer {
         // Emoji.
         $sanitizedHtml = $this->emojiParser->translateToHtml($sanitizedHtml);
 
-        // Old Spoiler plugin markup handling.
-        $sanitizedHtml = $this->legacySpoilers($sanitizedHtml);
-
         return $sanitizedHtml;
-    }
-
-    /**
-     * Spoilers with backwards compatibility.
-     *
-     * In the Spoilers plugin, we would render BBCode-style spoilers in any format post and allow a title.
-     *
-     * @param string $html
-     * @return string
-     */
-    protected function legacySpoilers($html) {
-        if (strpos($html, '[/spoiler]') !== false) {
-            $count = 0;
-            do {
-                $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\](.*?)\[\/spoiler\]`usi', '<div class="Spoiler">$1</div>', $html, -1, $count);
-            } while ($count > 0);
-        }
-        return $html;
     }
 }

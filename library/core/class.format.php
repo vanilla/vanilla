@@ -228,8 +228,6 @@ class Gdn_Format {
      */
     public static function arrayValueForPhp($string) {
         return str_replace('\\', '\\', html_entity_decode($string, ENT_QUOTES));
-        // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
-        // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
     }
 
     /**
@@ -237,8 +235,10 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
+     * @deprecated 3.2 The formatting method should be saved in the DB.
      */
     public static function auto($mixed) {
+        deprecated(__FUNCTION__, 'Any other formatting method.');
         $formatter = c('Garden.InputFormatter');
         if (!method_exists('Gdn_Format', $formatter)) {
             return $mixed;
@@ -252,6 +252,7 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 BBCodeFormat::renderHtml()
      */
     public static function bbCode($mixed) {
         if (!is_string($mixed)) {
@@ -850,52 +851,6 @@ class Gdn_Format {
     }
 
     /**
-     * Check to see if a string has spoilers and replace them with an innocuous string.
-     *
-     * Good for displaying excerpts from discussions and without showing the spoiler text.
-     *
-     * @param string $html An HTML-formatted string.
-     * @param string $replaceWith The translation code to replace spoilers with.
-     * @return string Returns the html with spoilers removed.
-     */
-    protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
-        if (preg_match('/class="(User)?Spoiler"/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
-
-            foreach($htmlDom->query('.Spoiler') as $spoilerBlock) {
-                $spoilerBlock->html(t($replaceWith));
-            }
-            $html = (string)$htmlDom;
-        }
-
-        return $html;
-    }
-
-    /**
-     * Check to see if a string has quotes and replace with them with a placeholder.
-     *
-     * Good for displaying excerpts from discussions without showing quotes.
-     *
-     * @param string $html An HTML-formatted string.
-     * @param string $replaceWith The translation code to replace quotes with.
-     *
-     * @return string Returns the html with quotes removed.
-     */
-    protected static function replaceQuotes($html, $replaceWith = '(Quote)') {
-        // This regex can't have an end quote because BBCode formats with both Quote and UserQuote classes.
-        if (preg_match('/class="(User)?Quote/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
-
-            foreach($htmlDom->query('.UserQuote, .Quote') as $quoteBlock) {
-                $quoteBlock->html(t($replaceWith));
-            }
-            $html = (string)$htmlDom;
-        }
-
-        return $html;
-    }
-
-    /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper.
      *
      * Parsers for NBBC and Markdown should use this function to format thier spoilers.
@@ -910,81 +865,24 @@ class Gdn_Format {
     }
 
     /**
-     * Replaces opening html list tags with an asterisk and closing list tags with new lines.
-     *
-     * Accepts both encoded and decoded html strings.
-     *
-     * @param  string $html An HTML-formatted string.
-     * @return string Returns the html with all list items removed.
-     */
-    protected static function replaceListItems($html) {
-        $html = str_replace(['<li>', '&lt;li&gt;'], '* ', $html);
-        $items = ['/(<\/?(?:li|ul|ol)([^>]+)?>)/', '/(&lt;\/?(?:li|ul|ol)([^&]+)?&gt;)/'];
-        $html = preg_replace($items, "\n", $html);
-        return $html;
-    }
-
-    /**
-     * Convert common tags in an HTML strings to plain text. You still need to sanitize your string!!!
-     *
-     * @param string $html An HTML-formatted string.
-     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
-     *
-     * @return string An HTML-formatted strings with common tags replaced with plainText
-     */
-    protected static function convertCommonHTMLTagsToPlainText($html, $collapse = false) {
-        // Remove returns and then replace html return tags with returns.
-        $result = str_replace(["\n", "\r"], ' ', $html);
-        $result = preg_replace('`<br\s*/?>`', "\n", $result);
-
-        // Fix lists.
-        $result = Gdn_Format::replaceListItems($result);
-
-        $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-        $pattern = "</{$allBlocks}>";
-        if ($collapse) {
-            $pattern = "((\s+)?{$pattern})+";
-        }
-        $result = preg_replace("`{$pattern}`", "\n\n", $result);
-
-        // TODO: Fix hard returns within pre blocks.
-
-        return strip_tags($result);
-    }
-
-    /**
      * Format a string as plain text.
      *
      * @param string $body The text to format.
      * @param string $format The current format of the text.
-     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
      *
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 FormatService::getFormatter($format)->renderPlainText()
      */
-    public static function plainText($body, $format = 'Html', $collapse = false) {
-        if (strcasecmp($format, Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getFormatService()
-                ->getFormatter(Formats\RichFormat::FORMAT_KEY)
-                ->renderPlainText($body);
-        }
+    public static function plainText($body, $format = 'Html') {
+        $formatter = self::getFormatService()->getFormatter($format);
+        $plainText = $formatter->renderPlainText($body);
 
-        if (strcasecmp($format, 'text') === 0) {
-            // for content that is initially content, we can skip a lot of processing.
-            // We still need to filter/sanitize afterwards though.
-            $result = $body;
-        } else {
-            $result = Gdn_Format::to($body, $format);
-            $result = Gdn_Format::replaceSpoilers($result);
-            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-            $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
-        }
-
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($result);
-
-        // No magic `processHTML()` for plain text.
-
+        // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
+        // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
+        // Some use cases RELY on this sanitization, so if you want to remove this, you'll have to go find those usages.
+        // Really just use `FormatInterface::renderPlainText()` instead.
+        $sanitized = htmlspecialchars($plainText);
         return $sanitized;
     }
 
@@ -1002,28 +900,17 @@ class Gdn_Format {
      *
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 FormatService::getFormatter($format)->renderExcerpt()
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        if (strcasecmp($format, Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return htmlspecialchars(
-                self::getFormatService()
-                    ->getFormatter(Formats\RichFormat::FORMAT_KEY)
-                    ->renderExcerpt($body)
-            );
-        }
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-        $result = Gdn_Format::replaceQuotes($result);
-        if (strtolower($format) !== 'text') {
-            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-        }
-        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
+        $formatter = self::getFormatService()->getFormatter($format);
+        $plainText = $formatter->renderExcerpt($body);
 
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($result);
-
-        // No magic `processHTML()` for plain text.
-
+        // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
+        // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
+        // Some use cases RELY on this sanitization, so if you want to remove this, you'll have to go find those usages.
+        // Really just use `FormatInterface::renderExcerpt()` instead.
+        $sanitized = htmlspecialchars($plainText);
         return $sanitized;
     }
 
@@ -1289,24 +1176,6 @@ class Gdn_Format {
     }
 
     /**
-     * Formats BBCode list items.
-     *
-     * @param array $matches
-     * @return string
-     */
-    protected static function listCallback($matches) {
-        $content = explode("[*]", $matches[1]);
-        $result = '';
-        foreach ($content as $item) {
-            if (trim($item) != '') {
-                $result .= '<li>'.$item.'</li>';
-            }
-        }
-        $result = '<ul>'.$result.'</ul>';
-        return $result;
-    }
-
-    /**
      * Returns embedded video width and height, based on configuration.
      *
      * @deprecated 3.2 \Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()
@@ -1323,6 +1192,7 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param boolean $flavored Optional. Parse with Vanilla-flavored settings? Default true.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 MarkdownFormat::renderHtml($mixed)
      */
     public static function markdown($mixed, $flavored = true) {
         if (!is_string($mixed)) {
@@ -1344,6 +1214,7 @@ class Gdn_Format {
      * @param string $html An unparsed HTML string.
      * @param bool $mentions Whether mentions are processed or not.
      * @return string The formatted HTML string.
+     *
      */
     protected static function processHTML($html, $mentions = true) {
         /** @var Html\HtmlEnhancer $htmlEnhancer */
@@ -1606,29 +1477,20 @@ class Gdn_Format {
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
+     * @param bool $addBreaks
      * @return string Sanitized HTML.
+     * @deprecated Formats\TextFormat::renderHtml()
      */
     public static function text($mixed, $addBreaks = true) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Text');
         }
 
-        $result = html_entity_decode($mixed, ENT_QUOTES, 'UTF-8');
-        $result = preg_replace('`<br\s?/?>`', "\n", $result);
-        /**
-         * We need special handling for invalid markup here, because if we don't compensate
-         * things like <3, they'll lead to invalid markup and strip_tags will truncate the
-         * text.
-         */
-        $result = preg_replace('/<(?![a-z\/])/i', '&lt;', $result);
-        $result = strip_tags($result);
-        $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
+        /** @var Formats\TextFormat $textFormat */
+        $textFormat = self::getFormatService()
+            ->getFormatter(Formats\TextFormat::FORMAT_KEY);
 
-        if ($addBreaks && c('Garden.Format.ReplaceNewlines', true)) {
-            $result = nl2br(trim($result));
-        }
-
-        return $result;
+        return $textFormat->renderHTML((string) $mixed, (bool) $addBreaks);
     }
 
     /**
@@ -1637,22 +1499,17 @@ class Gdn_Format {
      * @param string $str
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 TextExFormat::renderHtml($str)
      */
     public static function textEx($str) {
         if (!is_string($str)) {
             return self::to($str, 'TextEx');
         }
 
-        // Basic text parsing.
-        $str = self::text($str);
-
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($str);
-
-        // Vanilla magic parsing. (this is the "Ex"tra)
-        $sanitized = Gdn_Format::processHTML($sanitized);
-
-        return $sanitized;
+        return self::getFormatService()
+            ->getFormatter(Formats\TextExFormat::FORMAT_KEY)
+            ->renderHTML($str)
+        ;
     }
 
     /**
@@ -1661,6 +1518,7 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param string $formatMethod The method with which the variable should be formatted.
      * @return mixed
+     * @deprecated 3.2 FormatService::getFormatter($format)->renderHtml($content)
      */
     public static function to($mixed, $formatMethod) {
         // Process $Mixed based on its type.
@@ -1885,6 +1743,8 @@ class Gdn_Format {
      *
      * @param $mixed
      * @return mixed|string
+     *
+     * @deprecated 3.2 WywisygFormat::renderHtml($string)
      */
     public static function wysiwyg($mixed) {
         static $customFormatter;
@@ -1895,24 +1755,16 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Wysiwyg');
         } elseif (is_callable($customFormatter)) {
+            deprecated(
+                'Garden.Format.WysiwygFunction',
+                'Replace WysiwygFormat using Garden\Container'
+            );
             return $customFormatter($mixed);
         } else {
-            // The text contains html and must be purified.
-            $formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($formatter)) {
-                // If there is no HtmlFormatter then make sure that script injections won't work.
-                return self::display($mixed);
-            }
-
-            // Always filter after basic parsing.
-            // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
-            $filterOptions = ['codeBlockEntities' => false];
-            $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
-
-            // Vanilla magic formatting.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
+            return self::getFormatService()
+                ->getFormatter(Formats\WysiwygFormat::FORMAT_KEY)
+                ->renderHTML($mixed)
+            ;
         }
     }
 
@@ -1929,6 +1781,7 @@ class Gdn_Format {
      * @param string $deltas A JSON encoded array of Quill deltas.
      *
      * @return string - The rendered HTML output.
+     * @deprecated 3.2 RichFormat::renderHtml($content)
      */
     public static function rich(string $deltas): string {
         return self::getFormatService()
@@ -1972,8 +1825,10 @@ class Gdn_Format {
      * @param string $body The contents of a post body.
      *
      * @return string[]
+     * @deprecated 3.2 RichFormat::parseMentions($body)
      */
     public static function getRichMentionUsernames(string $body): array {
+        deprecated(__FUNCTION__, 'RichFormat::parseMentions($body)');
         return self::getFormatService()
             ->getFormatter(Formats\RichFormat::FORMAT_KEY)
             ->parseMentions($body);

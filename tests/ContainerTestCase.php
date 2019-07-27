@@ -16,6 +16,7 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
@@ -36,6 +37,9 @@ class ContainerTestCase extends TestCase {
     public static function setUpBeforeClass() {
         \Gdn::setContainer(new Container());
         self::container()
+            ->rule(FormatService::class)
+            ->addCall('registerBuiltInFormats', [self::container()])
+
             // Mocks of interfaces.
             // Addons
             ->rule(AddonProviderInterface::class)

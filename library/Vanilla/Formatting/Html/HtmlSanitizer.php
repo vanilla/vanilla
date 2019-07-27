@@ -18,9 +18,13 @@ class HtmlSanitizer {
         $this->htmlFilterer = $htmlFilterer;
     }
 
+    /**
+     * @param string $content
+     * @return string
+     */
     public function filter(string $content): string {
         if (!self::containsHtmlTags($content)) {
-            return $content;
+            return htmlspecialchars($content);
         }
 
         $encodedCodeBlocks = $this->encodeCodeBlocks($content);

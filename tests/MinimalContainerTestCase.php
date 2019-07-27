@@ -26,6 +26,17 @@ use VanillaTests\Fixtures\NullCache;
 
 /**
  * A very minimal PHPUnit test case using Garden\Container.
+ *
+ * Provides minimal default container configuration.
+ * Please try to avoid bloating this the size of BootstrapTrait.
+ *
+ * Highlights:
+ * - Little/No IO.
+ * - No DB.
+ * - No Config.
+ * - No localization.
+ * - No addon manager.
+ * - No cache.
  */
 class MinimalContainerTestCase extends TestCase {
 

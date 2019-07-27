@@ -182,7 +182,7 @@ class FormatService {
      * @return FormatInterface
      * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    public function getFormatter(string $formatKey, $throw = false): FormatInterface {
+    private function getFormatter(string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey);
         $format = $this->formats[$formatKey] ?? null;
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";

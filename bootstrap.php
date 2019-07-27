@@ -3,7 +3,10 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
@@ -316,6 +319,15 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerBuiltInFormats')
+    ->setShared(true)
+
+    ->rule(LegacyEmbedReplacer::class)
+    ->setShared(true)
+
+    ->rule(HtmlEnhancer::class)
+    ->setShared(true)
+
+    ->rule(HtmlSanitizer::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Analytics\Client::class)

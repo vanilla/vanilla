@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 
 /**
@@ -22,9 +23,11 @@ class TextExFormat extends TextFormat {
     /**
      * DI.
      *
+     * @param FormatConfig $formatConfig
      * @param HtmlEnhancer $htmlEnhancer
      */
-    public function __construct(HtmlEnhancer $htmlEnhancer) {
+    public function __construct(FormatConfig $formatConfig, HtmlEnhancer $htmlEnhancer) {
+        parent::__construct($formatConfig);
         $this->htmlEnhancer = $htmlEnhancer;
     }
 

@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\DateTimeFormatter;
+
 /**
  * Handles /utility endpoint.
  */
@@ -442,7 +444,7 @@ class UtilityController extends DashboardController {
         }
 
         $time = microtime(true) - $start;
-        $this->setData('time', Gdn_Format::timespan($time));
+        $this->setData('time', DateTimeFormatter::timeStampToTime($time));
         $this->setData('time_s', $time);
         $this->setData('valid', $valid);
         $this->title('Ping');

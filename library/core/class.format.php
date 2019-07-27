@@ -247,7 +247,7 @@ class Gdn_Format {
         return Gdn_Format::$formatter($mixed);
     }
 
-    /**[
+    /**
      * Format BBCode into HTML.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
@@ -266,6 +266,7 @@ class Gdn_Format {
      * Format a number by putting K/M/B suffix after it when appropriate.
      *
      * @param mixed $number The number to format. If a number isn't passed then it is returned as is.
+     * @param string $format
      * @return string The formatted number.
      * @todo Make this locale aware.
      */
@@ -1308,6 +1309,7 @@ class Gdn_Format {
      * @deprecated 3.2 DateTimeFormatter::timeStampToTime()
      */
     public static function timespan($timespan) {
+        deprecated(__FUNCTION__, 'DateTimeFormatter::timeStampToTime()');
         return DateTimeFormatter::timeStampToTime((int) $timespan);
     }
 
@@ -1490,7 +1492,7 @@ class Gdn_Format {
      * If the url does not match one of these schemes, prepend `unsafe:` before it.
      *
      * Allowed protocols
-     * - "http:",s
+     * - "http:",
      * - "https:",
      * - "tel:",
      * - "mailto:",

@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
+use VanillaTests\ContainerTestCase;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Formats\Bold;
 use Vanilla\Formatting\Quill\Formats\Italic;
@@ -19,7 +20,7 @@ use Vanilla\Formatting\Quill\Formats\Link;
 /**
  * General testing of Filterer.
  */
-class FiltererTest extends SharedBootstrapTestCase {
+class FiltererTest extends ContainerTestCase {
 
     /**
      * Assert that the filterer is validating json properly.

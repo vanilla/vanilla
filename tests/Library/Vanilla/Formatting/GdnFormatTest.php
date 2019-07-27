@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Vanilla\Formatting\Quill;
+namespace VanillaTests\Library\Vanilla\Formatting;
 
 use Vanilla\Formatting\Formats\RichFormat;
 use VanillaTests\ContainerTestCase;
@@ -71,20 +71,6 @@ class GdnFormatTest extends ContainerTestCase {
      */
     public function testHtml(string $fixtureDir) {
         $this->assertFixturePassesForFormat($fixtureDir, 'html');
-    }
-
-    /**
-     * Test using a rich-format array of operations with the quoteEmbed method.
-     */
-    public function testRichQuoteEmbedAsArray() {
-        $richEmbed = [
-            ["insert" => "Hello world."],
-        ];
-
-        $this->assertEquals(
-            "<p>Hello world.</p>",
-            \Gdn_Format::quoteEmbed($richEmbed, RichFormat::FORMAT_KEY)
-        );
     }
 
     /**

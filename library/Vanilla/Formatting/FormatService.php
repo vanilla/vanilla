@@ -20,15 +20,104 @@ class FormatService {
     private $formats = [];
 
     /**
+     * Render a safe, sanitized, HTML version of some content.
+     *
+     * @param string $content The content to render.
+     * @param string $format The format of the content.
+     *
+     * @return string
+     */
+    public function renderHTML(string $content, string $format): string {
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->renderHTML($content);
+        return $result;
+    }
+
+    /**
+     * Render a safe, sanitized, short version of some content.
+     *
+     * @param string $content The content to render.
+     * @param string $format The format of the content.
+     * @param string $query A string to try and ensure is in the outputted excerpt.
+     *
+     * @return string
+     */
+    public function renderExcerpt(string $content, string $format, string $query = null): string {
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->renderExcerpt($content, $query);
+        return $result;
+    }
+
+    /**
+     * Render a plain text version of some content.
+     *
+     * @param string $content The content to render.
+     * @param string $format The format of the content.
+     *
+     * @return string
+     */
+    public function renderPlainText(string $content, string $format): string {
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->renderPlainText($content);
+        return $result;
+    }
+
+    /**
+     * Render a version of the content suitable to be quoted in other content.
+     *
+     * @param string|array $content The raw content to render.
+     * @param string $format The format of the content.
+     *
+     * @return string
+     */
+    public function renderQuote($content, string $format): string {
+        // Sometimes quotes come in as an array (normally from nested JSON).
+        $stringContent = is_array($content) ? json_encode($content) : $content;
+
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->renderQuote($stringContent);
+        return $result;
+    }
+
+    /**
      * Parse attachment data from a message.
      *
-     * @param string $content
-     * @param string $format
+     * @param string $content The content the parse.
+     * @param string $format The format of the content.
+     *
      * @return Attachment[]
      */
     public function parseAttachments(string $content, string $format): array {
         $formatter = $this->getFormatter($format);
         $result = $formatter->parseAttachments($content);
+        return $result;
+    }
+
+    /**
+     * Parse out a list of headings from the post contents.
+     *
+     * @param string $content The raw content to parse.
+     * @param string $format The format of the content.
+     *
+     * @return Heading[]
+     */
+    public function parseHeadings(string $content, string $format): array {
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->parseHeadings($content);
+        return $result;
+    }
+
+    /**
+     * Parse out a list of usernames mentioned in the post contents.
+     *
+     * @param string $content The content the parse.
+     * @param string $format The format of the content.
+     *
+     * @return string[] A list of usernames.
+     */
+    public function parseMentions(string $content, string $format): array {
+        $formatter = $this->getFormatter($format);
+        $result = $formatter->parseMentions($content);
         return $result;
     }
 

@@ -16,7 +16,6 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 class GettyImagesEmbed extends AbstractEmbed {
 
     const LEGACY_TYPE = "getty";
-
     const TYPE = "gettyimages";
 
     /**

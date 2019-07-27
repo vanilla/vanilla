@@ -13,11 +13,11 @@ import {
     LineHeightProperty,
     MaxWidthProperty,
     OverflowXProperty,
-    TextAlignLastProperty,
     TextOverflowProperty,
     TextShadowProperty,
     TextTransformProperty,
     WhiteSpaceProperty,
+    TextAlignProperty,
 } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
@@ -83,12 +83,12 @@ export interface IFont {
     weight?: FontWeightProperty | number;
     lineHeight?: LineHeightProperty<TLength>;
     shadow?: TextShadowProperty;
-    align?: TextAlignLastProperty;
+    align?: TextAlignProperty;
     family?: FontFamilyProperty[];
     transform?: TextTransformProperty;
 }
 
-export const fonts = (props: IFont) => {
+export const fonts = (props: IFont): NestedCSSProperties => {
     if (props) {
         const fontSize = props.size !== undefined ? unit(props.size) : undefined;
         const fontWeight = props.weight !== undefined ? props.weight : undefined;
@@ -107,9 +107,9 @@ export const fonts = (props: IFont) => {
             textShadow,
             fontFamily,
             textTransform,
-        } as NestedCSSProperties;
+        };
     } else {
-        return {} as NestedCSSProperties;
+        return {};
     }
 };
 

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { IUserFragment } from "@library/@types/api/users";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -52,6 +52,11 @@ export function QuoteEmbed(props: IProps) {
     const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed });
     const userUrl = makeProfileUrl(insertUser.name);
 
+    const [readyToRenderContent, setReadyToRender] = useState(!props.inEditor);
+    useEffect(() => {
+        setReadyToRender(true);
+    }, [setReadyToRender]);
+
     return (
         <EmbedContainer className="embedText embedQuote">
             <EmbedContent type="Quote" inEditor={props.inEditor}>
@@ -84,13 +89,15 @@ export function QuoteEmbed(props: IProps) {
                     </div>
                     <div className="embedText-main embedQuote-main">
                         <div className="embedQuote-excerpt">
-                            <CollapsableUserContent
-                                setNeedsCollapser={setNeedsCollapseButton}
-                                isCollapsed={isCollapsed}
-                                id={id}
-                                preferredMaxHeight={100}
-                                dangerouslySetInnerHTML={{ __html: body }}
-                            />
+                            {readyToRenderContent && (
+                                <CollapsableUserContent
+                                    setNeedsCollapser={setNeedsCollapseButton}
+                                    isCollapsed={isCollapsed}
+                                    id={id}
+                                    preferredMaxHeight={100}
+                                    dangerouslySetInnerHTML={{ __html: body }}
+                                />
+                            )}
                         </div>
                     </div>
                 </blockquote>

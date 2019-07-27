@@ -7,10 +7,21 @@
 
 namespace Vanilla\EmbeddedContent;
 
+use Vanilla\Web\Asset\AssetPreloadModel;
+
 /**
  * Simple static embed utilities.
  */
 class EmbedUtils {
+
+    /**
+     * Quick access so embed instances can easily preload assets.
+     *
+     * @return AssetPreloadModel
+     */
+    public static function getPreloadModel(): AssetPreloadModel {
+        return \Gdn::getContainer()->get(AssetPreloadModel::class);
+    }
 
     /**
      * Attempt to extract some height/width values from an oembed repsonse.

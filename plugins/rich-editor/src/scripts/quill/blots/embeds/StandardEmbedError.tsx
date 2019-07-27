@@ -27,6 +27,7 @@ export default class StandardEmbedError extends React.Component<IProps> {
                 aria-label={t("Error")}
                 role="alert"
                 aria-live="assertive"
+                tabIndex={-1}
             >
                 {userWarning("embedLoader-icon embedLoader-warningIcon")}
                 <span id={descriptionId} className="embedLoader-errorMessage">

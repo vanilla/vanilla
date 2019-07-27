@@ -1322,6 +1322,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLinkLoader-link {
+  position: relative;
   display: inline-block;
   white-space: normal;
   padding: 2px 4px;
@@ -1753,6 +1754,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-body {
   display: block;
   margin: 0;
+}
+.embedQuote-body::before, .embedQuote-body::after {
+  content: initial;
 }
 
 .embedQuote-metaLink {

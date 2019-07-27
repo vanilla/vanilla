@@ -5,8 +5,7 @@
  */
 
 import { userContentClasses } from "@library/content/userContentStyles";
-import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
-import { useLastValue } from "@library/dom/hookUtils";
+import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
@@ -20,6 +19,7 @@ import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
+import { useLastValue } from "@vanilla/react-utils";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -81,7 +81,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
                 window.quill = null;
             };
         }
-    }, [mountRef.current, extraOptions]);
+        // Causes an infinite loops if we specify mountRef.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [extraOptions, setQuillInstance]);
     return ref.current;
 }
 
@@ -98,7 +100,7 @@ function useQuillAttributeSync(placeholder?: string) {
                 // These classes shouln't be applied until the forum is converted to the new styles.
                 [classesUserContent.root]: !legacyMode,
             }),
-        [],
+        [classesRichEditor.text, classesUserContent.root, legacyMode],
     );
 
     useEffect(() => {
@@ -132,7 +134,7 @@ function useLoadStatus() {
                 quill.enable();
             }
         }
-    }, [isLoading, quill]);
+    }, [isLoading, quill, prevLoading]);
 }
 
 /**
@@ -149,7 +151,7 @@ function useInitialValue() {
                 quill.setContents(initialValue);
             }
         }
-    }, [quill, initialValue, reinitialize]);
+    }, [quill, initialValue, reinitialize, prevInitialValue, prevReinitialize]);
 }
 
 /**
@@ -257,9 +259,9 @@ function useQuoteButtonHandler() {
 function useGlobalSelectionHandler() {
     const updateHandler = useUpdateHandler();
 
-    const handleGlobalSelectionUpdate = () => {
+    const handleGlobalSelectionUpdate = useCallback(() => {
         updateHandler(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-    };
+    }, [updateHandler]);
 
     useEffect(() => {
         document.addEventListener(SELECTION_UPDATE, handleGlobalSelectionUpdate);
@@ -296,7 +298,7 @@ function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement
         return () => {
             textArea.addEventListener("paste", pasteHandler);
         };
-    }, [legacyMode, quill]);
+    }, [legacyMode, quill, textArea]);
 }
 
 /**
@@ -373,5 +375,5 @@ function useSynchronization() {
         return () => {
             quill.off(Quill.events.EDITOR_CHANGE, updateHandler);
         };
-    });
+    }, [quill, updateHandler]);
 }

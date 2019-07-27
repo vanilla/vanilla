@@ -10,13 +10,30 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
+use Vanilla\Web\Asset\AssetPreloader;
+use Vanilla\Web\Asset\ExternalAsset;
 
 /**
  * Embed data object for imgur.
  */
 class ImgurEmbed extends AbstractEmbed {
 
+    const JS_SCRIPT = "https://s.imgur.com/min/embed.js";
     const TYPE = "imgur";
+
+    /**
+     * Override to set a value in the PreloadAssetModel.
+     * @inheritdoc
+     */
+    public function __construct(array $data) {
+        parent::__construct($data);
+
+        EmbedUtils::getPreloadModel()->addScript(
+            new ExternalAsset(self::JS_SCRIPT),
+            AssetPreloader::REL_PRELOAD,
+            'imgur-embed-script-asset'
+        );
+    }
 
     /**
      * @inheritdoc

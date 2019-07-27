@@ -190,7 +190,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * @override
      */
     public split(index: number, force?: boolean) {
-        if ((!force && index === this.length() - 1) || index === 0) {
+        if (!force && (index === this.length() - 1 || index === 0)) {
             return this;
         }
         const ownItem = this.getListContent();
@@ -219,15 +219,30 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public insertAt(index, value: string, def) {
         const isInListContent = this.getListContent() && index < this.getListContent()!.length();
 
+        // validate new line insertion position
         if (value.includes("\n") && isInListContent) {
-            const after = this.split(index, false);
+            const after = this.split(index, true);
             const targetNext = after === this ? this.next : after;
+            const isEndOfLine = index === this.length() - 1;
 
+            // Break the insert up on it's newlines.
             const inserts = value === "\n" ? [""] : value.split("\n");
+
+            // condition to filter for the position of the cursor in the string.
+            // eg end of line
+            // offset
+
+            // If we split the blot, we need to remove the first newline.
+            if (this.next && targetNext === this.next && inserts[0] === "") {
+                inserts.shift();
+            }
+
+            // If the first part of the insert is not a newline, insert it into the content and pop it off.
             if (inserts[0] && inserts[0] !== "") {
                 this.getListContent()!.insertAt(index, inserts.shift()!);
             }
 
+            // Each of the rest of the inserts will get inserted on their own list
             const listItems = inserts.map((insert, inc) => {
                 const item = Parchment.create(ListItem.blotName, this.getValue()) as ListItem;
                 if (insert !== "") {
@@ -236,10 +251,12 @@ export class ListItemWrapper extends withWrapper(Container as any) {
                 return item;
             });
 
+            // includes conditions for the new line inserts blot
+            // if the last element of the <ul> and the last charectrer in the string
             listItems.forEach(item => {
-                const clone = this.clone() as ListItemWrapper;
-                clone.appendChild(item);
-                this.parent.insertBefore(clone, targetNext);
+                const clone = this.clone() as ListItemWrapper; // Clone the <li/> tag.
+                clone.appendChild(item); // Insert the <p> tag in inside of the <li/>
+                this.parent.insertBefore(clone, targetNext); // Insert the <li> inside of the <ul> or <ol>
             });
         } else {
             super.insertAt(index, value, def);
@@ -489,6 +506,7 @@ export class ListItem extends LineBlot {
      *
      * @param listElement The HTML element to check.
      */
+
     private static getListDepth(listElement: HTMLElement): number {
         let depth = 0;
         let parent = listElement.parentElement;

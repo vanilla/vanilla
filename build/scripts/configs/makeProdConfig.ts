@@ -9,6 +9,7 @@ import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
+import { SourceMapDevToolPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import TerserWebpackPlugin from "terser-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
@@ -37,7 +38,6 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
-    baseConfig.devtool = "cheap-source-map";
     baseConfig.optimization = {
         noEmitOnErrors: true,
         namedModules: false,
@@ -95,6 +95,12 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
         ],
     };
+
+    baseConfig.plugins!.push(new SourceMapDevToolPlugin({
+        namespace: `vanilla-${section}`,
+        filename: `sourcemaps/`.concat(Math.random().toString(36).slice(-5), '/', '[chunkhash]'),
+        publicPath: `/api/v2/sourcemaps/${section}/`, // PHP-FPM will serve these files with some permission checks in SourcemapsApiController.
+    } as any));
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

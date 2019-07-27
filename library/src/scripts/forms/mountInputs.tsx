@@ -5,7 +5,7 @@
 
 import React from "react";
 import { TextInput, InputValidationFilter } from "@library/forms/TextInput";
-import { mountReact } from "@library/dom/domUtils";
+import { mountReact } from "@vanilla/react-utils";
 import { logDebug } from "@vanilla/utils";
 
 /**

@@ -247,9 +247,7 @@ class Bootstrap {
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Formatting\Embeds\EmbedManager::class)
-            ->addCall('addCoreEmbeds')
-            ->addCall('setNetworkEnabled', [false])
+            ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
             ->setShared(true)
 
             ->rule(\Vanilla\PageScraper::class)

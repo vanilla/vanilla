@@ -7,6 +7,7 @@
 namespace Vanilla\Formatting\Quill\Blots\Embeds;
 
 use Gdn;
+use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Parser;
@@ -15,6 +16,8 @@ use Vanilla\Formatting\Quill\Parser;
  * Blot for rendering embeds with the embed manager.
  */
 class ExternalBlot extends AbstractBlot {
+
+    const DATA_KEY = "insert.embed-external.data";
 
     /** @var EmbedService */
     private $embedService;
@@ -46,12 +49,33 @@ class ExternalBlot extends AbstractBlot {
     }
 
     /**
+     * Get the embed data from an operation.
+     *
+     * @param mixed $operation This is intentionally mixed because it could be garbage and we don't want to crash.
+     *
+     * @return array
+     */
+    public static function getEmbedDataFromOperation($operation): array {
+        return valr(self::DATA_KEY, $operation, []);
+    }
+
+    /**
      * Get the embed data.
      *
      * @return array
      */
     public function getEmbedData(): array {
-        return $this->currentOperation["insert"]["embed-external"]["data"] ?? [];
+        return self::getEmbedDataFromOperation($this->currentOperation);
+    }
+
+    /**
+     * Get an Embed class instance that backs the embed.
+     *
+     * @return AbstractEmbed
+     */
+    public function getEmbed(): AbstractEmbed {
+        $data = $this->getEmbedData();
+        return $this->embedService->createEmbedFromData($data);
     }
 
     /**
@@ -63,16 +87,15 @@ class ExternalBlot extends AbstractBlot {
             return $this->renderQuote();
         }
 
-        $value = $this->currentOperation["insert"]["embed-external"] ?? [];
-        $data = $value['data'] ?? $value;
-        try {
-            return $this->embedService->createEmbedFromData($data)->renderHtml();
-        } catch (\Exception $e) {
-            // TODO: Add better error handling here.
-            return '';
-        }
+        return $this->getEmbed()->renderHtml();
     }
 
+    /**
+     * Render the version of the embed if it is inside of a quote embed.
+     * Eg. A nested embed.
+     *
+     * @return string
+     */
     public function renderQuote(): string {
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
         $data = $value['data'] ?? $value;

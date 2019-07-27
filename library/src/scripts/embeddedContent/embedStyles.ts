@@ -92,6 +92,8 @@ export const embedContainerClasses = useThemeCache(() => {
                 },
                 "&.hasError": {
                     cursor: "pointer",
+                    background: colorOut(globalVars.messageColors.warning.bg),
+                    color: colorOut(globalVars.messageColors.warning.fg),
                     $nest: hoverFocusStates,
                 },
             },
@@ -118,4 +120,14 @@ export const embedContainerClasses = useThemeCache(() => {
     });
 
     return { makeRootClass, title };
+});
+
+export const embedContentClasses = useThemeCache(() => {
+    const style = styleFactory("embedContent");
+
+    const small = style("small", {
+        display: "inline-flex",
+        width: "auto",
+    });
+    return { small };
 });

@@ -15,6 +15,7 @@ import { attachmentClasses } from "@library/content/attachments/attachmentStyles
 import { metasClasses } from "@library/styles/metasStyles";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
+import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 
 interface IProps extends IFileAttachment {
     className?: string;
@@ -42,9 +43,9 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const iconClasses = attachmentIconClasses();
         const classesMetas = metasClasses();
         return (
-            <div
+            <EmbedContainer
+                size={EmbedContainerSize.SMALL}
                 className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
-                tabIndex={0}
                 aria-label={t("Uploading...")}
             >
                 <div
@@ -70,7 +71,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                     </div>
                 </div>
                 <div className={classes.loadingProgress} style={{ width: `${Math.min(this.state.progress, 100)}%` }} />
-            </div>
+            </EmbedContainer>
         );
     }
 

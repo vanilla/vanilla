@@ -11,6 +11,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -33,10 +34,11 @@ abstract class ThemedPage extends Page {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        \ThemesApiController $themesApi = null, // Default required to conform to interface
-        ContentSecurityPolicyModel $cspModel
+        ContentSecurityPolicyModel $cspModel,
+        AssetPreloadModel $preloadModel,
+        \ThemesApiController $themesApi = null // Default required to conform to interface
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel);
         $this->themesApi = $themesApi;
         $this->initAssets();
     }

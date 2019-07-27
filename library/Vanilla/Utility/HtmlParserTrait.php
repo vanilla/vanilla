@@ -24,7 +24,7 @@ trait HtmlParserTrait {
         $dom = new \DOMDocument();
         $dom->loadHTML($html);
         $tags = $dom->getElementsByTagName($tagName);
-        if ($tags->count() > 0) {
+        if (count($tags) > 0) {
             $attrs = [];
             $tag = $tags->item(0);
             foreach ($tag->attributes as $attribName => $attribNodeVal) {

@@ -166,6 +166,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
         'deploymentTime' => ContainerUtils::config('Garden.Deployed')
     ])
 
+    ->rule(\Vanilla\Web\Asset\AssetPreloadModel::class)
+    ->setShared(true)
+
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
     ->addCall('setHotReloadEnabled', [
         ContainerUtils::config('HotReload.Enabled'),

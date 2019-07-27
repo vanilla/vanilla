@@ -1,0 +1,13 @@
+<!-- Preload links, scripts, and stylesheets -->
+
+{% for script in model.getFullScripts() -%}
+    <script defer src="{{ script.getWebPath() }}"></script>
+{% endfor -%}
+
+{%- for stylesheet in model.getFullStylesheets() -%}
+    <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
+{% endfor -%}
+
+{%- for preload in model.getPreloads() -%}
+    <link href="{{ preload.getAsset().getWebPath() }}" as="{{ preload.getAs() }}" rel="{{ preload.getRel() }}" />
+{% endfor -%}

@@ -6,6 +6,8 @@
 
 namespace Vanilla\EmbeddedContent;
 
+use DateTime;
+use DateTimeInterface;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Web\TwigRenderTrait;
@@ -43,12 +45,33 @@ abstract class AbstractEmbed implements \JsonSerializable {
      * @return array|mixed
      */
     public function jsonSerialize() {
-        foreach ($this->data as $key => $value) {
-            if ($value instanceof \DateTimeInterface) {
-                $this->data[$key] = $value->format(\DateTime::RFC3339);
+        return $this->jsonFilter($this->data);
+    }
+
+    /**
+     * Prepare data for json_encode
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function jsonFilter($value) {
+        $fn = function (&$value, $key = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey);
+                });
+            } elseif ($value instanceof DateTimeInterface) {
+                $value = $value->format(DateTime::RFC3339);
             }
+        };
+
+        if (is_array($value)) {
+            array_walk($value, $fn);
+        } else {
+            $fn($value);
         }
-        return $this->data;
+
+        return $value;
     }
 
     /**

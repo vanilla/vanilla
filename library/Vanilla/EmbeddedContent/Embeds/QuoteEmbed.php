@@ -29,9 +29,19 @@ class QuoteEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     public function normalizeData(array $data): array {
+        $data = EmbedUtils::remapProperties($data, [
+            'name' => 'attributes.name',
+            'bodyRaw' => 'attributes.bodyRaw',
+            'format' => 'attributes.format',
+            'dateInserted' => 'attributes.dateInserted',
+            'insertUser' => 'attributes.insertUser',
+            'discussionID' => 'attributes.discussionID',
+            'commentID' => 'attributes.commentID',
+        ]);
+
         // Handle the IDs
-        $discussionID = $data['attributes']['discussionID'] ?? null;
-        $commentID = $data['attributes']['commentID'] ?? null;
+        $discussionID = $data['discussionID'] ?? null;
+        $commentID = $data['commentID'] ?? null;
 
         if ($discussionID !== null) {
             $data['recordID'] = $discussionID;
@@ -40,14 +50,6 @@ class QuoteEmbed extends AbstractEmbed {
             $data['recordID'] = $commentID;
             $data['recordType'] = 'comment';
         }
-
-        $data = EmbedUtils::remapProperties($data, [
-            'name' => 'attributes.name',
-            'bodyRaw' => 'attributes.bodyRaw',
-            'format' => 'attributes.format',
-            'dateInserted' => 'attributes.dateInserted',
-            'insertUser' => 'attributes.insertUser',
-        ]);
 
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {
@@ -58,10 +60,21 @@ class QuoteEmbed extends AbstractEmbed {
     }
 
     /**
+     * Get the name of the user being quoted.
+     *
+     * @return string
+     */
+    public function getUsername(): string {
+        return $this->data['insertUser']['name'];
+    }
+
+    /**
      * @inheritdoc
      */
     protected function schema(): Schema {
         return Schema::parse([
+            'recordID:i',
+            'recordType:s',
             'body:s', // The body is need currnetly during edit mode,
             // to prevent needing extra server roundtrips to render them.
             'bodyRaw:s|a', // Raw body is the source of truth for the embed.

@@ -4,12 +4,16 @@
     "private": true,
     "workspaces": {
         "nohoist": [
-            "**"
+            "quill",
+            "quill-delta",
+            "parchment"
         ]
     },
     "dependencies": {
         "quill": "https://github.com/vanilla/quill.git#1.3.7",
         "@vanilla/utils": "*",
-        "@vanilla/library": "*"
+        "@vanilla/library": "*",
+        "@vanilla/dom-utils": "*",
+        "@vanilla/react-utils": "*"
     }
 }

@@ -12,9 +12,9 @@ import Heading from "@library/layout/Heading";
 import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID } from "@library/utility/idUtils";
-import TabHandler from "@library/dom/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IProps {
     activeRecord: IActiveRecord;

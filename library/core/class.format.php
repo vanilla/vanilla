@@ -578,6 +578,7 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
+     * @deprecated 3.2 Use a specific formatting method.
      */
     public static function display($mixed) {
         if (!is_string($mixed)) {
@@ -585,9 +586,10 @@ class Gdn_Format {
         } else {
             $mixed = htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
             $mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $mixed);
-            $mixed = Gdn_Format::processHTML($mixed);
 
-
+            /** @var Html\HtmlEnhancer $htmlEnhancer */
+            $htmlEnhancer = Gdn::getContainer()->get(Html\HtmlEnhancer::class);
+            $mixed = $htmlEnhancer->enhance($mixed);
             return $mixed;
         }
     }
@@ -1193,24 +1195,6 @@ class Gdn_Format {
                 ->getFormatter(Formats\MarkdownFormat::FORMAT_KEY)
                 ->renderHTML($mixed);
         }
-    }
-
-    /**
-     * Do Vanilla's "magic" text processing.
-     *
-     * Runs an HTML string through our custom links, mentions, emoji and spoilers formatters.
-     * Any thing done here is AFTER security filtering and must be extremely careful.
-     * This should always be done LAST, after any other input formatters.
-     *
-     * @param string $html An unparsed HTML string.
-     * @param bool $mentions Whether mentions are processed or not.
-     * @return string The formatted HTML string.
-     *
-     */
-    protected static function processHTML($html, $mentions = true) {
-        /** @var Html\HtmlEnhancer $htmlEnhancer */
-        $htmlEnhancer = Gdn::getContainer()->get(Html\HtmlEnhancer::class);
-        return $htmlEnhancer->enhance((string) $html, (bool) $mentions);
     }
 
     /**

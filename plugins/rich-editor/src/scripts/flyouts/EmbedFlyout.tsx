@@ -91,6 +91,12 @@ export default function EmbedFlyout(props: IProps) {
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesInsertMedia = insertMediaClasses();
     const placeholderText = `https://`;
+
+    function handleVisibilityChange() {
+        inputRef.current && inputRef.current.focus();
+        forceSelectionUpdate();
+    }
+
     return (
         <>
             <DropDown
@@ -147,9 +153,4 @@ export default function EmbedFlyout(props: IProps) {
             </DropDown>
         </>
     );
-
-    function handleVisibilityChange() {
-        inputRef.current && inputRef.current.focus();
-        forceSelectionUpdate();
-    }
 }

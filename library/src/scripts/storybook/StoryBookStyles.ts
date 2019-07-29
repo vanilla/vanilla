@@ -3,14 +3,22 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { margins } from "@library/styles/styleHelpers";
+import {fonts, margins} from "@library/styles/styleHelpers";
 import { important } from "csx";
+import {globalVariables} from "@library/styles/globalStyleVars";
 
 export const storyBookClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const style = styleFactory("storyBookStyles");
 
     const heading = style("heading", {
-
+        display: "block",
+        ...fonts({
+            size: 24,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.bold,
+            lineHeight: 1.25,
+        }),
     });
 
 
@@ -24,7 +32,13 @@ export const storyBookClasses = useThemeCache(() => {
 
 
     const paragraph = style("paragraph", {
-
+        display: "block",
+        ...fonts({
+            size: 14,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.bold,
+            lineHeight: 1.43
+        }),
     });
 
     const unorderedList = style("unorderedList", {
@@ -40,8 +54,17 @@ export const storyBookClasses = useThemeCache(() => {
     const link = style("link", {
 
     });
-    const sectionHeading = style("link", {
+    const sectionHeading = style("sectionHeading", {
 
+    });
+    const containerOuter = style("contanerOuter", {
+        position: "relative",
+        display: "block",
+        maxWidth: "100%",
+    });
+    const containerInner = style("contanerInner", {
+        position: "relative",
+        display: "block",
     });
 
     return {
@@ -54,5 +77,7 @@ export const storyBookClasses = useThemeCache(() => {
         separator,
         link,
         sectionHeading,
+        containerOuter,
+        containerInner,
     };
 });

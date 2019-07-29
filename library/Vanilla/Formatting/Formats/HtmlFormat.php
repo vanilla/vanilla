@@ -135,19 +135,30 @@ class HtmlFormat extends BaseFormat {
         /** @var Heading[] $headings */
         $headings = [];
 
+        // Mapping of $key => $usageCount.
+        $slugKeyCache = [];
+
         /** @var \DOMNode $domHeading */
         foreach ($domHeadings as $domHeading) {
-            $level = (int)str_replace('h', '', $domHeading->nodeValue);
+            $level = (int)str_replace('h', '', $domHeading->tagName);
             $level = filter_var($level, FILTER_VALIDATE_INT);
 
             if (!$level) {
                 continue;
             }
 
+            $text = $domHeading->textContent;
+            $slug = slugify($text);
+            $count = $slugKeyCache[$slug] ?? 0;
+            $slugKeyCache[$slug] = $count + 1;
+            if ($count > 0) {
+                $slug .= '-' . $count;
+            }
+
             $headings[] = new Heading(
                 $domHeading->textContent,
                 $level,
-                slugify()
+                slugify($slug)
             );
         }
 

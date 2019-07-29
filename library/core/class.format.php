@@ -1053,13 +1053,13 @@ class Gdn_Format {
             }
 
             // Handle @mentions.
-            if (c('Garden.Format.Mentions')) {
+            if (c('Garden.Format.Mentions', true)) {
                 // Only format mentions that are not already in anchor tags or code tags.
                 $mixed = self::tagContent($mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
-            if (c('Garden.Format.Hashtags')) {
+            if (c('Garden.Format.Hashtags', false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
@@ -1068,7 +1068,7 @@ class Gdn_Format {
             }
 
             // Handle "/me does x" action statements
-            if (c('Garden.Format.MeActions')) {
+            if (c('Garden.Format.MeActions', false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),

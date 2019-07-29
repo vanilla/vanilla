@@ -14,7 +14,7 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the HtmlFormat.
  */
-class HtmlFormatTest extends AbstractFormatTestCaseMinimal {
+class HtmlFormatTest extends AbstractFormatTestCase {
 
     /**
      * @inheritDoc

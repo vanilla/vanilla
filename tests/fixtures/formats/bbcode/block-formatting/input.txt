@@ -9,6 +9,8 @@
 [*] Num List 3
 [/list]
 
+[h1]No heading support in bbcode[/h1]
+
 [quote]Quote Hello world
 
 

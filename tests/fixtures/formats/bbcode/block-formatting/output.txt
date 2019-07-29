@@ -5,6 +5,8 @@
 * 
 * Num List 3
 
+
+[h1]No heading support in bbcode[/h1]
 (Quote)
 
 Image

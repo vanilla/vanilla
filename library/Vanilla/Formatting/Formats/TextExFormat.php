@@ -49,18 +49,4 @@ class TextExFormat extends TextFormat {
         $result = $this->htmlEnhancer->enhance($result, true, false);
         return $result;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function parseHeadings(string $content): array {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function parseMentions(string $content): array {
-        return [];
-    }
 }

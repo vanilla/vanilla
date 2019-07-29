@@ -96,7 +96,7 @@ class FormatFixture {
      * @return array|null
      */
     public function getMentions(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-usernames.json');
+        $json = $this->getFixtureContentsWithFileName('output-mentions.json');
         if ($json) {
             return json_decode($json, true);
         }

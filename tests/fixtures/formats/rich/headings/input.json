@@ -21,7 +21,7 @@
         "insert": "\n"
     },
     {
-        "insert": "h3"
+        "insert": "h3 - no ref === excluded"
     },
     {
         "attributes": {
@@ -37,7 +37,7 @@
     },
     {
         "attributes": {
-            "header": 4
+            "header": "4"
         },
         "insert": "\n"
     },
@@ -47,6 +47,30 @@
     {
         "attributes": {
             "header": 5
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "duplicated refs stay duplicated. no post processing"
+    },
+    {
+        "attributes": {
+            "header": {
+                "level": 5,
+                "ref": "duplicated-refs"
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "duplicated refs stay duplicated. no post processing"
+    },
+    {
+        "attributes": {
+            "header": {
+                "level": 5,
+                "ref": "duplicated-refs"
+            }
         },
         "insert": "\n"
     }

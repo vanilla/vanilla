@@ -1,0 +1,31 @@
+Block operations H2 Title here. Code Block next.
+/**
+ *adds locale data to the view, and adds a respond button to the discussion page.
+ */
+class MyThemeNameThemeHooks extends Gdn_Plugin {
+
+    /**
+     * Fetches the current locale and sets the data for the theme view.
+     * Render the locale in a smarty template using {$locale}
+     *
+     * @param  Controller $sender The sending controller object.
+     */
+    public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {
+        // Bail out if we're in the dashboard
+        if (inSection('Dashboard')) {
+            return;
+        }
+
+        // Fetch the currently enabled locale (en by default)
+        $locale = Gdn::locale()->current();
+        $sender->setData('locale', $locale);
+    }
+}
+
+H3 Here. Spoiler next
+(Spoiler)
+
+A blockquote will be next.
+
+Some Block quote contentbold italic strike
+More blockquote content

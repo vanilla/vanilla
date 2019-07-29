@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the TextExFormat.
  */
-class TextExFormatTest extends AbstractFormatTestCaseMinimal {
+class TextExFormatTest extends AbstractFormatTestCase {
 
     /**
      * @inheritDoc

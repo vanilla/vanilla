@@ -8,25 +8,27 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
-use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\TextExFormat;
+use Vanilla\Formatting\Formats\TextFormat;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 
 /**
- * Tests for the MarkdownFormat.
+ * Tests for the TextExFormat.
  */
-class MarkdownFormatTest extends AbstractFormatTestCase {
+class TextFormatTest extends AbstractFormatTestCase {
 
     /**
      * @inheritDoc
      */
     protected function prepareFormatter(): FormatInterface {
-        return self::container()->get(MarkdownFormat::class);
+        return self::container()->get(TextFormat::class);
     }
 
     /**
      * @inheritDoc
      */
     protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('markdown'))->getAllFixtures();
+        return (new FormatFixtureFactory('text'))->getAllFixtures();
     }
 }

@@ -15,7 +15,7 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 /**
  * Base test case for a format. Provides test cases for all core methods on the interface.
  */
-abstract class AbstractFormatTestCaseMinimal extends MinimalContainerTestCase {
+abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
 
     use AssertsFixtureRenderingTrait;
 
@@ -79,7 +79,7 @@ abstract class AbstractFormatTestCaseMinimal extends MinimalContainerTestCase {
     public function testRenderExcerpt(string $input, string $expectedOutput, string $errorMessage) {
         $format = $this->prepareFormatter();
         $this->assertEquals(
-            $expectedOutput,
+            trim($expectedOutput),
             $format->renderExcerpt($input),
             $errorMessage
         );
@@ -158,9 +158,10 @@ abstract class AbstractFormatTestCaseMinimal extends MinimalContainerTestCase {
      */
     public function testParseHeadings(string $input, array $expectedOutput) {
         $format = $this->prepareFormatter();
-        $this->assertSame(
-            $expectedOutput,
-            $format->parseHeadings($input)
+        $headings = $format->parseHeadings($input);
+        $this->assertEquals(
+            json_encode($expectedOutput, JSON_PRETTY_PRINT),
+            json_encode($headings, JSON_PRETTY_PRINT)
         );
     }
 
@@ -185,7 +186,7 @@ abstract class AbstractFormatTestCaseMinimal extends MinimalContainerTestCase {
         $format = $this->prepareFormatter();
         $this->assertSame(
             $expectedOutput,
-            $format->renderExcerpt($input)
+            $format->parseMentions($input)
         );
     }
 

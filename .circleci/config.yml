@@ -19,13 +19,18 @@ aliases:
           environment: *db_env
     - &better_checkout
         run:
-            name: Merge Target Branch
+            name: Checkout
             command: |
-                #!/bin/bash
-                # https://gist.github.com/amacneil/f14db753919e0af2d7d2f5a8da7fce65
-                # if we are testing a PR, merge it with the latest target branch before testing
-                # this ensures that all tests pass with the latest upstream changes.
-
+                # !/bin/bash
+                # Script for checking out our git repo.
+                # Fixes a few shortcomings of the built in `checkout script`.
+                #
+                # - Merges the target branch into our branch if possible.
+                #   this ensures that all tests pass with the latest upstream changes.
+                #   https://ideas.circleci.com/ideas/CCI-I-431
+                # - Get's rid of the `git reset --hard` to preserve default branch history.
+                #   https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
+                #   https://discuss.circleci.com/t/the-checkout-step-mangles-branches-messes-the-history/24975
                 set -e
 
                 mkdir -p ~/.ssh

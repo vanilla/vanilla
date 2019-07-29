@@ -1,5 +1,7 @@
 <?php
 
+use Vanilla\Formatting\Formats\RichFormat;
+
 $inlineOperations = '[
     {
         "insert": "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind\'s eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there\'s little good evidence Orion\'s sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n"
@@ -744,15 +746,15 @@ $quoteEmbeds = '
 
 echo "<div class='Item-Body'><div class='Message userContent'>";
 echo "<h2>Inline operations</h2>";
-echo Gdn_Format::rich($inlineOperations);
+echo Gdn::formatService()->renderHTML($inlineOperations, RichFormat::FORMAT_KEY);
 echo "<hr>";
 echo "<h2>Block operations</h2>";
-echo Gdn_Format::rich($blockOperations);
+echo Gdn::formatService()->renderHTML($blockOperations, RichFormat::FORMAT_KEY);
 echo "<hr>";
 echo "<h2>Embed operations</h2>";
-echo Gdn_Format::rich($embedOperations);
+echo Gdn::formatService()->renderHTML($embedOperations, RichFormat::FORMAT_KEY);
 echo "<h2>Quotes</h2>";
-echo Gdn_Format::rich($quoteEmbeds);
+echo Gdn::formatService()->renderHTML($quoteEmbeds, RichFormat::FORMAT_KEY);
 echo "
 <h2>Spacer</h2>
 <p>

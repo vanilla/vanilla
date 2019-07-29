@@ -75,6 +75,8 @@ class TextFormat extends BaseFormat {
      * @inheritdoc
      */
     public function parseMentions(string $content): array {
-        return [];
+        // Legacy Mention Fetcher.
+        // This should get replaced in a future refactoring.
+        return getMentions($content);
     }
 }

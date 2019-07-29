@@ -12,6 +12,17 @@ export const storyBookClasses = useThemeCache(() => {
     const heading = style("heading", {
 
     });
+
+
+    const headingH1 = style("headingH1", {
+
+    });
+
+    const headingH2 = style("headingH2", {
+
+    });
+
+
     const paragraph = style("paragraph", {
 
     });
@@ -29,11 +40,19 @@ export const storyBookClasses = useThemeCache(() => {
     const link = style("link", {
 
     });
+    const sectionHeading = style("link", {
+
+    });
 
     return {
         heading,
+        headingH1,
+        headingH2,
         paragraph,
-        unorderedList, listItem, separator,
-        link
+        unorderedList,
+        listItem,
+        separator,
+        link,
+        sectionHeading,
     };
 });

@@ -15,6 +15,7 @@ import { StoryLink } from "@library/storybook/StoryLink";
 const reactionsStory = storiesOf("Quick Start", module);
 
 reactionsStory.add("Colors", () => {
+    // @ts-ignore
     return (
         <>
             <StoryHeading depth={1}>Colors</StoryHeading>
@@ -25,9 +26,9 @@ reactionsStory.add("Colors", () => {
                     <StoryListItem>
                         <StoryLink href="https://staff.vanillaforums.com/kb/articles/100-styling">Styling</StoryLink>
                     </StoryListItem>
-                    <li>
+                    <StoryListItem>
                         <StoryLink href="https://staff.vanillaforums.com/kb/articles/101-theming">Theming</StoryLink>
-                    </li>
+                    </StoryListItem>
                 </>
             </StoryUnorderedList>
         </>

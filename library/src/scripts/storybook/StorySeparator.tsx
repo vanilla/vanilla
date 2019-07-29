@@ -7,9 +7,7 @@
 import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
-interface IProps {
-    width: number;
-}
+interface IProps {}
 
 /**
  * Separator, for react storybook.

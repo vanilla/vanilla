@@ -7,10 +7,12 @@
 import React, { CSSProperties } from "react";
 import { StorySeparator } from "@library/storybook/StorySeparator";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import classNames from "classnames";
 
 export interface IStoryHeadingProps {
-    depth?: 1 | 2 | 3 | 4 | 5 | 6;
+    depth?: number;
     children: React.ReactNode;
+    separator?: boolean;
 }
 
 /**
@@ -22,9 +24,15 @@ export function StoryHeading(props: IStoryHeadingProps) {
     const Tag = `h${depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     return (
         <>
-            {Tag !== "h1" && <StorySeparator width={500} />}
-            <Tag className={classes.heading}>{props.children}</Tag>
-            {Tag === "h2" && <StorySeparator width={500} />}
+            <div
+                className={classNames(classes.sectionHeading, {
+                    [classes.headingH1]: depth === 1,
+                    [classes.headingH2]: depth === 2,
+                })}
+            >
+                <Tag className={classes.heading}>{props.children}</Tag>
+                {(props.separator || Tag !== "h1") && <StorySeparator />}
+            </div>
         </>
     );
 }

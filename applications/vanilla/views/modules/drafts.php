@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Formatting\Formats\TextFormat;
+
+if (!defined('APPLICATION')) exit(); ?>
 <div class="Box BoxDrafts">
     <?php echo panelHeading(t('My Drafts')); ?>
     <ul class="PanelInfo PanelDiscussions">
@@ -6,8 +8,15 @@
             $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;
             ?>
             <li>
-                <strong><?php echo anchor($Draft->Name, $EditUrl); ?></strong>
-                <?php echo anchor(sliceString(Gdn_Format::text($Draft->Body), 200), $EditUrl, 'DraftCommentLink'); ?>
+                <strong><?php echo anchor(htmlspecialchars($Draft->Name), $EditUrl); ?></strong>
+                <?php echo anchor(
+                        Gdn::formatService()->renderExcerpt(
+                                $Draft->Body ?? '',
+                                $Draft->Format ?? TextFormat::FORMAT_KEY
+                        ),
+                        $EditUrl,
+                        'DraftCommentLink'
+                ); ?>
             </li>
         <?php
         }

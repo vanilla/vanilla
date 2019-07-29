@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Formatting\Formats\TextFormat;
+
+if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
 <h1><?php echo t('Manage Applicants'); ?></h1>
@@ -48,7 +50,8 @@ if ($NumApplicants == 0) : ?>
                         }
                         // Only make a blockquote if we got a reason.
                         if ($User->DiscoveryText) {
-                            echo Gdn_Format::text($User->DiscoveryText);
+                            // Since there is no format set here, we default to text.
+                            echo Gdn::formatService()->renderHTML($User->DiscoveryText, TextFormat::FORMAT_KEY);
                         }
                         // Opportunity for plugins to do arbitrary appending.
                         $this->fireEvent("AppendApplicantInfo");

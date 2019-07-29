@@ -15,7 +15,7 @@ if (sizeof($this->data('Discussions'))) {
             <?php $this->fireEvent('BeforeItemContent'); ?>
             <div class="ItemContent">
                 <div class="Message"><?php
-                    echo '<h2>'.anchor(Gdn_Format::text($discussion->Name), $permalink).'</h2>';
+                    echo '<h2>'.anchor(htmlspecialchars($discussion->Name), $permalink).'</h2>';
                     echo sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), 250);
                     ?></div>
                 <div class="Meta">

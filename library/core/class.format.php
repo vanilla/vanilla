@@ -1481,7 +1481,8 @@ class Gdn_Format {
             } elseif ($formatter = Gdn::factory($formatMethod.'Formatter')) {
                 $mixed = $formatter->format($mixed);
             } else {
-                $mixed = Gdn_Format::text($mixed);
+                // Fall back to just sanitization. This is really the old renderHtml function.
+                $mixed = htmlspecialchars($mixed);
             }
         } elseif (is_array($mixed)) {
             foreach ($mixed as $key => $val) {

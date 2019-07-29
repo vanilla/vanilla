@@ -1468,7 +1468,7 @@ class CategoryModel extends Gdn_Model {
         if ($discussion) {
             // Discussion-related field values.
             $result['LastDiscussionUserID'] = val('InsertUserID', $discussion);
-            $result['LastTitle'] = Gdn_Format::text(val('Name', $discussion, t('No Title')));
+            $result['LastTitle'] = htmlspecialchars(val('Name', $discussion, t('No Title')));
             $result['LastUrl'] = discussionUrl($discussion, false, '//') . '#latest';
             $result['LastUserID'] = val('InsertUserID', $discussion);
 
@@ -1640,13 +1640,11 @@ class CategoryModel extends Gdn_Model {
             }
 
             $discussion = val($row['LastDiscussionID'], $discussions);
-            $nameUrl = 'x';
             if ($discussion) {
-                $row['LastTitle'] = Gdn_Format::text($discussion['Name']);
+                $row['LastTitle'] = htmlspecialchars($discussion['Name']);
                 $row['LastUserID'] = $discussion['InsertUserID'];
                 $row['LastDiscussionUserID'] = $discussion['InsertUserID'];
                 $row['LastDateInserted'] = $discussion['DateInserted'];
-                $nameUrl = Gdn_Format::text($discussion['Name'], true);
                 $row['LastUrl'] = discussionUrl($discussion, false, '/').'#latest';
             }
             if (!empty($comments) && ($comment = val($row['LastCommentID'], $comments))) {

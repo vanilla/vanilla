@@ -128,7 +128,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Use plaintext for building these
-            $value = Gdn_Format::text($value);
+            $value = htmlspecialchars($value);
 
             switch ($label) {
                 case 'Twitter':

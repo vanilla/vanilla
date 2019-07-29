@@ -1446,7 +1446,7 @@ if (!function_exists('_formatStringCallback')) {
                     $result = rawurlencode($value);
                     break;
                 case 'text':
-                    $result = Gdn_Format::text($value, false);
+                    $result = htmlspecialchars($value);
                     break;
                 case 'time':
                     $result = Gdn_Format::date($value, '%l:%M%p');

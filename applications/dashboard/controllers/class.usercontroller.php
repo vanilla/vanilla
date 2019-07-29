@@ -381,7 +381,7 @@ class UserController extends DashboardController {
         $userModel = new UserModel();
         $data = $userModel->getLike(['u.Name' => $q], 'u.Name', 'asc', 10, 0);
         foreach ($data->result() as $user) {
-            echo htmlspecialchars($user->Name).'|'.Gdn_Format::text($user->UserID)."\n";
+            echo htmlspecialchars($user->Name).'|'.htmlspecialchars($user->UserID)."\n";
         }
         $this->render();
     }

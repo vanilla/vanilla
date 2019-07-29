@@ -1651,7 +1651,7 @@ EOT;
         if (strpos($this->CssClass, 'Profile') === false) {
             $this->CssClass .= ' Profile';
         }
-        $this->title(Gdn_Format::text($this->User->Name));
+        $this->title(htmlspecialchars($this->User->Name));
 
         if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
             // Javascript needed

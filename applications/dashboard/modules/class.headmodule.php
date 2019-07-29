@@ -104,7 +104,7 @@ if (!class_exists('HeadModule', false)) {
             $this->addTag('link', [
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
-                'title' => Gdn_Format::text($title),
+                'title' => htmlspecialchars($title),
                 'href' => asset($hRef)
             ]);
         }
@@ -450,7 +450,7 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', ['property' => 'og:site_name', 'content' => $siteName]);
             }
 
-            $title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
+            $title = $this->title('', true);
             if ($title != '') {
                 $this->addTag('meta', ['name' => 'twitter:title', 'property' => 'og:title', 'content' => $title]);
             }
@@ -522,7 +522,7 @@ if (!class_exists('HeadModule', false)) {
             $tags2 = $this->_Tags;
 
             // Start with the title.
-            $head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
+            $head = '<title>'.htmlspecialchars($this->title())."</title>\n";
 
             $tagStrings = [];
             // Loop through each tag.

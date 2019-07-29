@@ -17,7 +17,7 @@ if (!function_exists('extendedProfileFields')) {
 
             // Non-magic fields must be plain text, but we'll auto-link
             if (!in_array($name, $magicLabels)) {
-                $value = Gdn_Format::links(Gdn_Format::text($value));
+                $value = Gdn_Format::links(htmlspecialchars($value));
             }
 
             $class = 'Profile'.Gdn_Format::alphaNumeric($name);

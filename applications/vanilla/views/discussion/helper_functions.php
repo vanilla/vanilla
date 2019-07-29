@@ -625,7 +625,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                     echo wrap(
                         sprintf(
                             t('Commenting as %1$s (%2$s)', 'Commenting as %1$s <span class="SignOutWrap">(%2$s)</span>'),
-                            Gdn_Format::text($session->User->Name),
+                            htmlspecialchars($session->User->Name),
                             anchor(t('Sign Out'), $authenticationUrl, 'SignOut', $attributes)
                         ),
                         'div',

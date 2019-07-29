@@ -25,8 +25,7 @@ class SimpleConfig {
      * SimpleConfig constructor.
      */
     public function __construct() {
-        $this->pathRoot = realpath(__DIR__ . '/../');
-        echo $this->pathRoot;
+        $this->pathRoot = realpath(__DIR__ . '/..');
     }
 
     /**
@@ -255,6 +254,7 @@ try {
         $config->deleteConfig();
         $data = [];
     } else {
+        $saved = $config->saveToConfig($data);
         $saved = $config->saveToConfig($data);
         $data = $config->loadConfig();
 

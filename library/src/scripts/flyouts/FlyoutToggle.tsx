@@ -81,7 +81,7 @@ export default function FlyoutToggle(props: IProps) {
      * Toggle Menu menu
      */
     const buttonClickHandler = useCallback(
-        (e: React.MouseEvent) => {
+        (e: MouseEvent) => {
             e.stopPropagation();
             setVisibility(!isVisible);
             if (onVisibilityChange) {
@@ -90,6 +90,18 @@ export default function FlyoutToggle(props: IProps) {
         },
         [isVisible, setVisibility, onVisibilityChange],
     );
+
+    useEffect(() => {
+        const buttonElement = buttonRef.current;
+        if (!buttonElement) {
+            return;
+        }
+
+        buttonElement.addEventListener("click", buttonClickHandler);
+        return () => {
+            buttonElement.removeEventListener("click", buttonClickHandler);
+        };
+    }, [buttonRef, buttonClickHandler]);
 
     const closeMenuHandler = useCallback(
         event => {
@@ -170,7 +182,6 @@ export default function FlyoutToggle(props: IProps) {
         >
             <Button
                 id={buttonID}
-                onClick={buttonClickHandler}
                 className={buttonClasses}
                 title={title}
                 aria-label={"name" in props ? props.name : undefined}

@@ -36,6 +36,7 @@ export function ImageEmbed(props: IProps) {
     const divRef = useRef<HTMLDivElement>(null);
 
     useFocusWatcher(contentRef, newFocusState => {
+        console.log(newFocusState, document.activeElement);
         setIsFocused(newFocusState || isOpen);
     });
 

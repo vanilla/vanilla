@@ -6,6 +6,7 @@
 
 import React, { CSSProperties } from "react";
 import { StorySeparator } from "@library/storybook/StorySeparator";
+import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 export interface IStoryHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -16,25 +17,13 @@ export interface IStoryHeadingProps {
  * Heading component, for react storybook.
  */
 export function StoryHeading(props: IStoryHeadingProps) {
+    const classes = storyBookClasses();
     const depth = props.depth ? props.depth : 2;
     const Tag = `h${depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     return (
         <>
             {Tag !== "h1" && <StorySeparator width={500} />}
-            <Tag
-                style={
-                    {
-                        opacity: (7 - depth) * 0.15 + (depth - 1) * 0.1,
-                        fontSize: `${30 - (depth - 1) * 2}px`,
-                        textAlign: "center",
-                        display: "block",
-                        textTransform: depth !== 1 ? "uppercase" : undefined,
-                        fontStyle: depth !== 1 ? "italic" : undefined,
-                    } as CSSProperties
-                }
-            >
-                {props.children}
-            </Tag>
+            <Tag className={classes.heading}>{props.children}</Tag>
             {Tag === "h2" && <StorySeparator width={500} />}
         </>
     );

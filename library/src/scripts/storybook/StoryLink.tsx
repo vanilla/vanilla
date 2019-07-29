@@ -8,13 +8,19 @@ import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
-    width: number;
+    href: string;
+    children: JSX.Element;
+    newTab?: boolean;
 }
 
 /**
  * Separator, for react storybook.
  */
-export function StorySeparator(props: IProps) {
+export function StoryLink(props: IProps) {
     const classes = storyBookClasses();
-    return <hr className={classes.separator} />;
+    return (
+        <a href={props.href} target={props.newTab ? "_blank" : undefined} className={classes.link}>
+            {props.children}
+        </a>
+    );
 }

@@ -8,13 +8,13 @@ import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
-    width: number;
+    children: JSX.Element;
 }
 
 /**
  * Separator, for react storybook.
  */
-export function StorySeparator(props: IProps) {
+export function StoryUnorderedList(props: IProps) {
     const classes = storyBookClasses();
-    return <hr className={classes.separator} />;
+    return <ul className={classes.unorderedList}>{props.children}</ul>;
 }

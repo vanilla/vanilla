@@ -5,16 +5,18 @@
  */
 
 import React from "react";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
-    width: number;
+    children: JSX.Element;
 }
 
 /**
  * Separator, for react storybook.
  */
-export function StorySeparator(props: IProps) {
+export function StoryTile(props: IProps) {
     const classes = storyBookClasses();
-    return <hr className={classes.separator} />;
+    return <li className={classes.tile}>{props.children}</li>;
 }

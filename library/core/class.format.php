@@ -1450,6 +1450,7 @@ class Gdn_Format {
      * @deprecated 3.2 FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)
      */
     public static function rich(string $deltas): string {
+        deprecated(__FUNCTION__, 'FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)');
         return Gdn::formatService()->renderHTML($deltas, Formats\RichFormat::FORMAT_KEY);
     }
 

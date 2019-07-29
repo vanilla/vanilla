@@ -16,7 +16,7 @@ if (!function_exists('WriteModuleDiscussion')):
    </span>
 
             <div class="Title"><?php
-                echo anchor(Gdn_Format::text($discussion->Name, false), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
+                echo anchor(htmlspecialchars($discussion->Name), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
                 ?></div>
             <div class="Meta DiscussionsModuleMeta">
                 <?php
@@ -90,7 +90,7 @@ if (!function_exists('WritePromotedContent')):
                 ?>
             </div>
             <div
-                class="Title"><?php echo anchor(Gdn_Format::text(sliceString($content['Name'], $sender->TitleLimit), false), $contentURL, 'DiscussionLink'); ?></div>
+                class="Title"><?php echo anchor(htmlspecialchars(sliceString($content['Name'], $sender->TitleLimit), false), $contentURL, 'DiscussionLink'); ?></div>
             <div class="Body">
                 <?php
                 $linkContent = Gdn_Format::excerpt($content['Body'], $content['Format']);

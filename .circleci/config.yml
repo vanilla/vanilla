@@ -1,7 +1,7 @@
 version: 2
 aliases:
     - &db_env
-        MYSQL_USER: travis
+        MYSQL_USER: circleci
         MYSQL_PASSWORD: ''
         MYSQL_DATABASE: vanilla_test
         MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
@@ -17,9 +17,106 @@ aliases:
         - image: circleci/php:7.3.6-fpm-stretch-node
         - image: mysql:5.7.26
           environment: *db_env
+    - &better_checkout
+        run:
+            name: Merge Target Branch
+            command: |
+                #!/bin/bash
+                # https://gist.github.com/amacneil/f14db753919e0af2d7d2f5a8da7fce65
+                # if we are testing a PR, merge it with the latest target branch before testing
+                # this ensures that all tests pass with the latest upstream changes.
+
+                set -e
+
+                mkdir -p ~/.ssh
+
+                echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+                bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+                ' >> ~/.ssh/known_hosts
+
+                (umask 077; touch ~/.ssh/id_rsa)
+                chmod 0600 ~/.ssh/id_rsa
+                (cat <<EOF > ~/.ssh/id_rsa
+                $CHECKOUT_KEY
+                EOF
+                )
+
+                # use git+ssh instead of https
+                git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
+                git config --global gc.auto 0 || true
+
+                if [ -e $TARGET_DIR/.git ]
+                then
+                    cd $TARGET_DIR
+                    git remote set-url origin "$CIRCLE_REPOSITORY_URL" || true
+                else
+                    mkdir -p $TARGET_DIR
+                    cd $TARGET_DIR
+                    git clone "$CIRCLE_REPOSITORY_URL" .
+                    ls
+                fi
+
+                echo $PWD
+                ls ~/workspace
+
+                if [ -n "$CIRCLE_TAG" ]
+                then
+                    git fetch --force origin "refs/tags/${CIRCLE_TAG}"
+                else
+                    git fetch --force origin "${CIRCLE_BRANCH}:remotes/origin/${CIRCLE_BRANCH}"
+                fi
+
+                if [ -n "$CIRCLE_TAG" ]
+                then
+                    # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
+                    git checkout -q "$CIRCLE_TAG"
+                elif [ -n "$CIRCLE_BRANCH" ]
+                then
+                    # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
+                    git checkout -q "$CIRCLE_BRANCH"
+                fi
+                # Ensures the remote and local branch are in sync after the fetch (see above).
+                git reset --hard "$CIRCLE_SHA1"
+
+
+                # Merge target branch back into ourselves if we need to.
+                set -eu -o pipefail
+
+                PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
+                err=0
+
+                if [ -z "$PR_NUMBER" ]; then
+                    exit
+                fi
+
+                (set -x && git pull --ff-only origin "refs/pull/$PR_NUMBER/merge") || err=$?
+
+                if [ "$err" -ne "0" ]; then
+                    echo
+                    echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
+                    echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
+                    exit $err
+                fi
+    - &is_php
+        run:
+            name: Configuring as Frontend
+            command: |
+                mkdir $HOME/workspace
+                echo 'TARGET_DIR="$HOME/workspace/php"' >> $BASH_ENV
+    - &is_frontend
+        run:
+            name: Configuring as Frontend
+            command: |
+                mkdir $HOME/workspace
+                echo 'TARGET_DIR="$HOME/workspace/frontend"' >> $BASH_ENV
+    - &post_checkout_frontend
+        run:
+            name: Merge Target Branch
+            command: |
+                cd ~/workspace/frontend && ~/workspace/frontend/.circleci/scripts/merge-master.sh
     - &install_nginx
         run:
-            name: Installting NGINX
+            name: Installing NGINX
             command: sudo apt-get update && sudo apt-get install nginx
     - &node
         - image: circleci/node:lts-browsers
@@ -52,14 +149,14 @@ aliases:
             command: |
                 cd ~/workspace/php
                 # Validate syntax in all the files
-                tests/travis/php-lint.sh ./applications
-                tests/travis/php-lint.sh ./conf
-                tests/travis/php-lint.sh ./library
-                tests/travis/php-lint.sh ./plugins
-                tests/travis/php-lint.sh ./themes
+                .circleci/scripts/php-lint.sh ./applications
+                .circleci/scripts/php-lint.sh ./conf
+                .circleci/scripts/php-lint.sh ./library
+                .circleci/scripts/php-lint.sh ./plugins
+                .circleci/scripts/php-lint.sh ./themes
 
                 # Run code sniffer on the diffed files.
-                ./tests/travis/diff-standards.sh
+                ./.circleci/scripts/diff-standards.sh
     - &prepare_mysql
         run:
             name: Prepare Database Dependencies
@@ -68,9 +165,9 @@ aliases:
                 sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
                 sudo docker-php-ext-install pdo pdo_mysql gd
                 sudo apt-get install mysql-client
-                # Create the SQL "travis" user. Once we remove travis this should no longer be necessary.
+                # Create the SQL "circleci" user. Once we remove travis this should no longer be necessary.
                 mysql -h 127.0.0.1 -u root -e \
-                    "CREATE USER 'travis'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'travis'@'127.0.0.1' IDENTIFIED BY '';"
+                    "CREATE USER 'circleci'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'circleci'@'127.0.0.1' IDENTIFIED BY '';"
     - &await_mysql
         run:
             name: Waiting for MySQL to be ready
@@ -91,8 +188,8 @@ jobs:
                 command: |
                     node --version
                     yarn --version
-            - checkout:
-                path: ~/workspace/frontend
+            - *is_frontend
+            - *better_checkout
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -148,8 +245,8 @@ jobs:
                 command: |
                     php --version
                     composer --version
-            - checkout:
-                path: ~/workspace/php # Repository will be named repo.
+            - *is_php
+            - *better_checkout
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
@@ -160,9 +257,9 @@ jobs:
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps
-            - checkout:
-                path: ~/workspace/php
-            - *set_hosts
+            - *is_php
+            - *better_checkout
+            - *run_composer
             - *run_php_lint
     php_72_tests:
         docker: *php72
@@ -173,7 +270,7 @@ jobs:
                 name: Test setup
                 command: |
                     cd ~/workspace/php
-                    cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+                    cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
             - *prepare_mysql
             - *await_mysql
             - run:
@@ -198,9 +295,8 @@ jobs:
                 name: Starrt PHP-FPM/Nginx
                 command: |
                     cd  ~/workspace/php
-                    ls -l tests/travis
                     php-fpm --daemonize
-                    sudo ./tests/travis/start-nginx.sh
+                    sudo ./.circleci/scripts/start-nginx.sh
             - run:
                 name: APIv0 Tests
                 command: |
@@ -232,7 +328,9 @@ jobs:
     dependency_audit:
         docker: *php72
         steps:
-            - checkout
+            - *is_frontend
+            - *better_checkout
+            - *post_checkout_frontend
             - run: yarn audit
 
 workflows:

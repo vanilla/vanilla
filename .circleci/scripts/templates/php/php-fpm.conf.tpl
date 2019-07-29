@@ -1,6 +1,6 @@
 [global]
 
-[travis]
+[circleci]
 listen = {PORT}
 listen.mode = 0666
 pm = static

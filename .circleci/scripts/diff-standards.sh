@@ -21,15 +21,13 @@ cd $BUILD_DIR
 
 echo "Verify changed code against coding standards."
 
-# Without this, Travis only has a ref to the current branch in a shallow clone. Other branches cannot be compared.
+# Without this, Circleci only has a ref to the current branch in a shallow clone. Other branches cannot be compared.
 echo "Updating available refs..."
-[ $TRAVIS ] && echo "travis_fold:start:coding_standards_setup"
 git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 git fetch --all
 
 GIT_DIFF=$(git diff $DIFF_BRANCH '*.php')
 if [ -z "$GIT_DIFF" ]; then
-    [ $TRAVIS ] && echo "travis_fold:end:coding_standards_setup"
     echo "No PHP file changes detected."
     exit 0
 fi
@@ -40,8 +38,6 @@ echo -n "$GIT_DIFF" > $GIT_DIFF_FILENAME
 echo "Exporting full PHP_CodeSniffer scan of changed files to $PHPCS_DIFF_FILENAME..."
 rm -f $PHPCS_DIFF_FILENAME
 ./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --report=json $(git diff --diff-filter=ACM --name-only $DIFF_BRANCH -- '*.php') > $PHPCS_DIFF_FILENAME
-
-[ $TRAVIS ] && echo "travis_fold:end:coding_standards_setup"
 
 echo "Comparing results of PHP_CodeSniffer scan with changed lines from branch diff..."
 echo ""

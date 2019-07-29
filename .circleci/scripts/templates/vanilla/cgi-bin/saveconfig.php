@@ -25,7 +25,7 @@ class SimpleConfig {
      * SimpleConfig constructor.
      */
     public function __construct() {
-        $this->pathRoot = realpath(__DIR__.'/..');
+        $this->pathRoot = realpath(__DIR__ . '/vanilla');
     }
 
     /**

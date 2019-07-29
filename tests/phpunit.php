@@ -22,7 +22,7 @@ if (!file_exists($dir)) {
     mkdir($dir);
 }
 
-$files = glob(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
+$files = glob(realpath(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php"));
 foreach ($files as $file) {
     $dest = $dir.'/'.basename($file);
     $r = copy($file, $dest);

@@ -17,8 +17,7 @@
         "eslint-plugin-react-hooks": "^1.6.0"
     },
     "devDependencies": {
-        "eslint": "^6.1.0"
-        "eslint-plugin-react-hooks": "^1.6.0",
+        "eslint": "^6.1.0",
         "eslint-plugin-ban": "^1.2.0"
     }
 }

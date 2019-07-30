@@ -5,7 +5,7 @@
 
 module.exports = {
     parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y"],
+    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "ban"],
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
@@ -69,6 +69,12 @@ module.exports = {
 
         // React hooks
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn"
+        "react-hooks/exhaustive-deps": "warn",
+
+        // Ban certain functions from production
+        "ban/ban": [
+            2,
+            {"name": "findColorMatch", "message": "The function 'findColorMatch' is only for development, not for production."}
+        ]
     },
 };

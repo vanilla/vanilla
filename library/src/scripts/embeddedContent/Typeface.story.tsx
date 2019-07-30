@@ -8,13 +8,14 @@ import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/Emb
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
+import { StoryContent } from "@library/storybook/StoryContent";
 
 const reactionsStory = storiesOf("Typeface", module);
 
 reactionsStory.add("Typeface", () => {
     return (
-        <>
+        <StoryContent>
             <StoryHeading depth={1}>Typeface</StoryHeading>
-        </>
+        </StoryContent>
     );
 });

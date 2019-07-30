@@ -11,16 +11,31 @@ import Paragraph from "@library/layout/Paragraph";
 import { StoryUnorderedList } from "@library/storybook/StoryUnorderedList";
 import { StoryListItem } from "@library/storybook/StoryListItem";
 import { StoryLink } from "@library/storybook/StoryLink";
+import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
 const reactionsStory = storiesOf("Quick Start", module);
 
 reactionsStory.add("Colors", () => {
-    // @ts-ignore
     return (
-        <>
+        <StoryContent>
             <StoryHeading depth={1}>Colors</StoryHeading>
-
+            <StoryParagraph>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut labor
+                aliquip consequat adipiscing elit, sed do eiusmod tempor.
+            </StoryParagraph>
+            <StoryParagraph>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut labor
+                aliquip consequat adipiscing elit, sed do eiusmod tempor.
+            </StoryParagraph>
             <StoryHeading>More resources</StoryHeading>
+            <StoryParagraph>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut labor
+                aliquip consequat adipiscing elit, sed do eiusmod tempor.
+            </StoryParagraph>
             <StoryUnorderedList>
                 <>
                     <StoryListItem>
@@ -31,6 +46,6 @@ reactionsStory.add("Colors", () => {
                     </StoryListItem>
                 </>
             </StoryUnorderedList>
-        </>
+        </StoryContent>
     );
 });

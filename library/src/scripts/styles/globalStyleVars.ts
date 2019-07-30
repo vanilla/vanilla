@@ -16,6 +16,8 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
+import { debuglog } from "util";
+import { logWarning } from "@vanilla/utils";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -315,6 +317,35 @@ export const globalVariables = useThemeCache(() => {
         hyphenationZone: "6em",
     });
 
+    // This function should not be used in production, but is helpful for development.
+    // Helps to find the right "mix" of bg and fg for a target hex color
+
+    const findColorMatch = (hexCode: string) => {
+        const globalVars = globalVariables();
+        const colorToMatch = color(hexCode.replace("#", ""));
+        const max = 100;
+        const lightnessPrecision = 3;
+        const targetLightness = colorToMatch.lightness().toFixed(lightnessPrecision);
+        for (let i = 0; i <= max; i++) {
+            const mix = i / max;
+            const currentColor = globalVars.mixBgAndFg(mix);
+            if (currentColor.toHexString() === colorToMatch.toHexString()) {
+                debuglog("---exact match");
+                debuglog("real grey: " + colorToMatch.toHexString());
+                debuglog("target grey: " + currentColor.toHexString());
+                debuglog("mix: " + mix);
+                debuglog("---");
+                i = max;
+                return;
+            }
+            if (currentColor.lightness().toFixed(lightnessPrecision) === targetLightness) {
+                debuglog("---lightness match: " + mix);
+                i = max;
+                return;
+            }
+        }
+    };
+
     return {
         utility,
         elementaryColors,
@@ -342,6 +373,7 @@ export const globalVariables = useThemeCache(() => {
         mixPrimaryAndBg,
         separator,
         userContentHyphenation,
+        findColorMatch,
     };
 });
 

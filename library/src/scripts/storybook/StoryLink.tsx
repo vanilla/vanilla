@@ -9,7 +9,7 @@ import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
     href: string;
-    children: JSX.Element;
+    children: React.ReactNode;
     newTab?: boolean;
 }
 

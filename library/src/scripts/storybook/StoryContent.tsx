@@ -18,18 +18,7 @@ export interface IStoryHeadingProps {
 /**
  * Heading component, for react storybook.
  */
-export function StoryHeading(props: IStoryHeadingProps) {
+export function StoryContent(props: IStoryHeadingProps) {
     const classes = storyBookClasses();
-    const depth = props.depth ? props.depth : 2;
-    const Tag = `h${depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-    return (
-        <Tag
-            className={classNames(classes.heading, {
-                [classes.headingH1]: depth === 1,
-                [classes.headingH2]: depth === 2,
-            })}
-        >
-            {props.children}
-        </Tag>
-    );
+    return <div className={classes.content}>{props.children}</div>;
 }

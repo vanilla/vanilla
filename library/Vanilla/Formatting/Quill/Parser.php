@@ -111,18 +111,21 @@ class Parser {
     }
 
     /**
-     * Parse out the usernames of everyone mentioned in a post.
+     * Parse out the usernames of everyone mentioned or quoted in a post.
      *
      * @param array $operations
      * @return string[]
      */
     public function parseMentionUsernames(array $operations): array {
-        if (!in_array(Blots\Embeds\MentionBlot::class, $this->blotClasses)) {
+        if (!in_array(Blots\Embeds\MentionBlot::class, $this->blotClasses)
+            && !in_array(Blots\Embeds\ExternalBlot::class, $this->blotClasses)
+        ) {
             return [];
         }
 
         $blotGroups = $this->parse($operations);
         $mentionUsernames = [];
+        /** @var BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
             $mentionUsernames = array_merge($mentionUsernames, $blotGroup->getMentionUsernames());
         }

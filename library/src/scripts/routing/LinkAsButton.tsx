@@ -32,7 +32,7 @@ export default class LinkAsButton extends React.Component<IProps> {
 
     public render() {
         const { baseClass, className, title, ariaLabel, to, children, tabIndex, ...restProps } = this.props;
-        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass), className);
+        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass || ButtonTypes.STANDARD), className);
         return (
             <SmartLink
                 className={componentClasses}

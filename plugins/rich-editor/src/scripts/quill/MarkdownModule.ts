@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import Quill, { RangeStatic, Blot } from "quill/core";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
@@ -6,10 +11,16 @@ import Delta from "quill-delta";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
+enum TriggerKey {
+    ENTER = "Enter",
+    SPACE = " ",
+}
+
 interface IMarkdownMatch {
     name: string;
     pattern: RegExp;
     preventsDefault?: boolean;
+    triggerKey: TriggerKey;
     handler: (text: string, selection: RangeStatic, pattern: RegExp, lineStart: number) => void;
 }
 
@@ -64,7 +75,7 @@ export default class MarkdownModule {
      * Handle a keydown event and trigger markdown actions.
      */
     private keyDownHandler = (event: KeyboardEvent) => {
-        if (!["Enter", " "].includes(event.key)) {
+        if (!Object.values(TriggerKey).includes(event.key)) {
             return;
         }
         const selection = this.quill.getSelection();
@@ -80,44 +91,51 @@ export default class MarkdownModule {
 
         // Iterate through our matchers and execute the first one.
         for (const match of this.matchers) {
-            const matchedText = text.match(match.pattern);
-            if (matchedText) {
-                if (match.preventsDefault) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                // Cutoff the history before an after so this is it's own action to undo.
-                this.quill.history.cutoff();
-                match.handler(text, selection, match.pattern, lineStart);
-                this.quill.history.cutoff();
-                break;
+            if (match.triggerKey !== event.key) {
+                continue;
             }
+
+            const matchedText = text.match(match.pattern);
+            if (!matchedText) {
+                continue;
+            }
+
+            if (match.preventsDefault) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            // Cutoff the history before an after so this is it's own action to undo.
+            this.quill.history.cutoff();
+            match.handler(text, selection, match.pattern, lineStart);
+            this.quill.history.cutoff();
+            break;
         }
     };
 
     private matchers: IMarkdownMatch[] = [
         {
             name: "header",
+            triggerKey: TriggerKey.SPACE,
             preventsDefault: true,
-            pattern: /^(#){1,6}/g,
+            pattern: /^(#){2,5}$/g,
             handler: (text, selection, pattern) => {
                 const match = pattern.exec(text);
                 if (!match) {
                     return;
                 }
-                const size = Math.min(Math.max(2, match[0].length), 5);
+                const hashesLength = match[0].length;
 
-                const offset = text.length; // 1 for the space.
                 const delta = new Delta()
-                    .retain(selection.index - offset)
-                    .delete(offset)
-                    .retain(1, { [HeaderBlot.blotName]: size });
+                    .retain(selection.index - hashesLength)
+                    .delete(hashesLength)
+                    .retain(1, { [HeaderBlot.blotName]: hashesLength });
                 this.quill.updateContents(delta, Quill.sources.USER);
             },
         },
         {
             name: "blockquote",
+            triggerKey: TriggerKey.SPACE,
             pattern: /^(>)/g,
             handler: (text, selection) => {
                 const offset = text.length;
@@ -130,7 +148,7 @@ export default class MarkdownModule {
         },
         {
             name: "spoiler",
-
+            triggerKey: TriggerKey.SPACE,
             pattern: /^!>/g,
             handler: (text, selection) => {
                 const offset = text.length;
@@ -143,6 +161,7 @@ export default class MarkdownModule {
         },
         {
             name: "code-block",
+            triggerKey: TriggerKey.ENTER,
             preventsDefault: true,
             pattern: /^`{3}/g,
             handler: (text, selection) => {
@@ -156,6 +175,7 @@ export default class MarkdownModule {
         },
         {
             name: "bolditalic",
+            triggerKey: TriggerKey.SPACE,
             pattern: /(?:\*|_){3}(.+?)(?:\*|_){3}/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
@@ -177,6 +197,7 @@ export default class MarkdownModule {
         },
         {
             name: "bold",
+            triggerKey: TriggerKey.SPACE,
             pattern: /(?:\*|_){2}(.+?)(?:\*|_){2}/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
@@ -198,6 +219,7 @@ export default class MarkdownModule {
         },
         {
             name: "italic",
+            triggerKey: TriggerKey.SPACE,
             pattern: /(?:\*|_){1}(.+?)(?:\*|_){1}/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
@@ -219,6 +241,7 @@ export default class MarkdownModule {
         },
         {
             name: "strikethrough",
+            triggerKey: TriggerKey.SPACE,
             pattern: /(?:~~)(.+?)(?:~~)/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
@@ -240,6 +263,7 @@ export default class MarkdownModule {
         },
         {
             name: "code",
+            triggerKey: TriggerKey.SPACE,
             pattern: /(?:`)(.+?)(?:`)/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);

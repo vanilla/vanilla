@@ -20,7 +20,7 @@ import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClass
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
 
 interface IProps {
@@ -80,13 +80,23 @@ export default function EmbedFlyout(props: IProps) {
      * Control the inputs value.
      */
     const inputChangeHandler = (event: React.ChangeEvent<any>) => {
-        setUrl(event.target.value);
-        setInputValid(isAllowedUrl(normalizeUrl(url)));
+        setUrl(normalizeUrl(event.target.value));
     };
+
+    // We need to check the value after we've set it with setUrl
+    useEffect(() => {
+        setInputValid(isAllowedUrl(url));
+    }, [url]);
 
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesInsertMedia = insertMediaClasses();
     const placeholderText = `https://`;
+
+    function handleVisibilityChange() {
+        inputRef.current && inputRef.current.focus();
+        forceSelectionUpdate();
+    }
+
     return (
         <>
             <DropDown
@@ -96,7 +106,7 @@ export default function EmbedFlyout(props: IProps) {
                 title={t("Insert Media")}
                 paddedList={true}
                 onClose={clearInput}
-                onVisibilityChange={forceSelectionUpdate}
+                onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
                 buttonContents={<IconForButtonWrap icon={embed()} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}

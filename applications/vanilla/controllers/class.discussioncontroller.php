@@ -44,7 +44,7 @@ class DiscussionController extends VanillaController {
                 return $this->data('Comments');
                 break;
         }
-        throw new Exception("DiscussionController->$name not found.", 400);
+        return null;
     }
 
     /**

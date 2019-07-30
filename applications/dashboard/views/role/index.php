@@ -51,14 +51,14 @@ $this->fireEvent('AfterRolesInfo'); ?>
             ?>
             <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
                 <td>
-                    <?php echo $Role['Name']; ?>
+                    <?php echo htmlEsc($Role['Name']); ?>
                 </td>
                 <td>
-                    <?php echo $Role['Description']; ?>
+                    <?php echo htmlEsc($Role['Description']); ?>
                 </td>
                 <td>
                     <?php if (val('Type', $Role)) {
-                        echo t(val('Type', $Role));
+                        echo htmlEsc(t(val('Type', $Role)));
                     } ?>
                 </td>
                 <td><?php echo anchor($Role['CountUsers'] ?: 0, '/dashboard/user?Keywords='.urlencode($Role['Name'])); ?></td>

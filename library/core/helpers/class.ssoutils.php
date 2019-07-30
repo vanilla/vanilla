@@ -90,7 +90,7 @@ class SsoUtils {
      */
     public function verifyStateToken($context, $stateToken) {
         if (empty($stateToken)) {
-            throw new Gdn_UserException(t('Invalid state token supplied.'), 403);
+            throw new Gdn_UserException(t('State token not found.'), 403);
         }
 
         $storedStateTokenData = null;

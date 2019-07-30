@@ -133,6 +133,7 @@ export const storyBookClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "stretch",
         justifyContent: "flex-start",
+        flexWrap: "wrap",
         width: calc(`100% + ${unit(vars.gaps.tile * 2)}`),
         transform: translateX(`-${unit(vars.gaps.tile)}`),
     });

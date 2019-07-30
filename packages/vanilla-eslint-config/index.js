@@ -5,7 +5,7 @@
 
 module.exports = {
     parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "ban"],
+    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y"],
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
@@ -69,6 +69,6 @@ module.exports = {
 
         // React hooks
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn",
+        "react-hooks/exhaustive-deps": "warn"
     },
 };

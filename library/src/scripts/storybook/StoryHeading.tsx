@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { CSSProperties } from "react";
-import { StorySeparator } from "@library/storybook/StorySeparator";
+import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import classNames from "classnames";
 

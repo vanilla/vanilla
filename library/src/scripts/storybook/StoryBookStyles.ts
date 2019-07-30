@@ -4,7 +4,7 @@
  */
 import { useThemeCache, styleFactory, variableFactory, DEBUG_STYLES } from "@library/styles/styleUtils";
 import { borders, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { calc, color, em, important, percent, translateX } from "csx";
+import { border, calc, color, em, important, percent, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 
@@ -25,9 +25,14 @@ export const storyBookVariables = useThemeCache(() => {
         primary: globalVars.mixBgAndFg(0.2),
     });
 
+    const gaps = makeThemeVars("gaps", {
+        tile: 30,
+    });
+
     globalVars.findColorMatch("ffffff");
 
     return {
+        gaps,
         spacing,
         colors,
     };
@@ -116,21 +121,35 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
     });
 
-    const tiles = style("tiles", {
-        position: "relative",
-        display: "block",
-    });
-
-    const tile = style("tile", {
-        position: "relative",
-        display: "block",
-    });
-
     const content = style("content", {
         position: "relative",
         display: "block",
         maxWidth: percent(100),
         width: unit(672),
+    });
+
+    const tiles = style("tiles", {
+        position: "relative",
+        display: "flex",
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+        width: calc(`100% + ${unit(vars.gaps.tile * 2)}`),
+        transform: translateX(`-${unit(vars.gaps.tile)}`),
+    });
+
+    const tile = style("tile", {
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: unit(120),
+        minWidth: unit(120),
+        margin: unit(vars.gaps.tile),
+        ...borders({
+            width: 1,
+            color: vars.colors.border,
+            radius: 0,
+        }),
     });
 
     return {

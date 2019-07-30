@@ -70,11 +70,5 @@ module.exports = {
         // React hooks
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn",
-
-        // Ban certain functions from production
-        "ban/ban": [
-            2,
-            {"name": "findColorMatch", "message": "The function 'findColorMatch' is only for development, not for production."}
-        ]
     },
 };

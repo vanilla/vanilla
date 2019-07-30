@@ -10,7 +10,7 @@ import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
-    children: JSX.Element;
+    children: React.ReactNode;
 }
 
 /**

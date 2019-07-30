@@ -465,7 +465,6 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const iconMixin = (dimension: number): NestedCSSProperties => ({
         ...buttonResetMixin(),
         alignItems: "center",
-        display: "flex",
         height: unit(dimension),
         minWidth: unit(dimension),
         width: unit(dimension),

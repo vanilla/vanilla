@@ -49,7 +49,7 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
-let hljs: any;
+let hightLightJs: any;
 
 /**
  * Use a dynamically imported highlight.js to highlight text synchronously.
@@ -57,18 +57,18 @@ let hljs: any;
  * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
  * but until then we need this hack.60FPS
  *
- * - If hljs is loaded, run it.
- * - Otherwise return the text back and start loading hljs.
+ * - If hightLightJs is loaded, run it.
+ * - Otherwise return the text back and start loading hightLightJs.
  */
 function highLightText(text: string): IAutoHighlightResult | string {
-    if (!hljs) {
+    if (!hightLightJs) {
         void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
-            hljs = imported.default;
-            hljs.highlightAuto(text).value;
+            hightLightJs = imported.default;
+            hightLightJs.highlightAuto(text).value;
         });
         return text;
     } else {
-        return hljs.highlightAuto(text).value;
+        return hightLightJs.highlightAuto(text).value;
     }
 }
 

@@ -126,89 +126,6 @@ export const buttonVariables = useThemeCache(() => {
         },
     });
 
-    const compact: IButtonType = makeThemeVars("compact", {
-        name: ButtonTypes.COMPACT,
-        colors: {
-            bg: globalVars.mainColors.bg,
-        },
-        borders: {
-            color: globalVars.elementaryColors.transparent,
-            radius: globalVars.border.radius,
-        },
-        sizing: {
-            minHeight: 24,
-        },
-        hover: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        active: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        focus: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        focusAccessible: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-    });
-
-    const compactPrimary: IButtonType = makeThemeVars("compactPrimary", {
-        name: ButtonTypes.COMPACT_PRIMARY,
-        colors: {
-            bg: globalVars.mainColors.bg,
-        },
-        fonts: {
-            color: globalVars.mainColors.primary.fade(0.7),
-        },
-        sizing: {
-            minHeight: 24,
-        },
-        borders: {
-            color: globalVars.elementaryColors.transparent,
-            radius: globalVars.border.radius,
-        },
-        hover: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        active: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        focus: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-        focusAccessible: {
-            fonts: {
-                color: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
-        },
-    });
-
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
@@ -260,33 +177,33 @@ export const buttonVariables = useThemeCache(() => {
         name: ButtonTypes.TRANSPARENT,
         colors: {
             fg: globalVars.mainColors.bg,
-            bg: globalVars.mainColors.fg.fade(0.2),
+            bg: globalVars.mainColors.fg.fade(0.1),
         },
         fonts: {
-            color: globalVars.mainColors.fg,
+            color: globalVars.mainColors.bg,
         },
         border: {
-            color: modifyColorBasedOnLightness(globalVars.mainColors.fg, 1, true),
+            color: globalVars.mainColors.fg,
             radius: globalVars.border.radius,
         },
         hover: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         active: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         focus: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         focusAccessible: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
     });
@@ -294,6 +211,7 @@ export const buttonVariables = useThemeCache(() => {
     const translucid: IButtonType = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
         colors: {
+            fg: globalVars.mainColors.primary,
             bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.1),
         },
         fonts: {
@@ -377,8 +295,6 @@ export const buttonVariables = useThemeCache(() => {
         standard,
         primary,
         transparent,
-        compact,
-        compactPrimary,
         translucid,
         inverted,
     };
@@ -420,8 +336,6 @@ export enum ButtonTypes {
     STANDARD = "standard",
     PRIMARY = "primary",
     TRANSPARENT = "transparent",
-    COMPACT = "compact",
-    COMPACT_PRIMARY = "compactPrimary",
     TRANSLUCID = "translucid",
     INVERTED = "inverted",
     CUSTOM = "custom",
@@ -437,8 +351,6 @@ export const buttonClasses = useThemeCache(() => {
         primary: generateButtonClass(vars.primary),
         standard: generateButtonClass(vars.standard),
         transparent: generateButtonClass(vars.transparent),
-        compact: generateButtonClass(vars.compact),
-        compactPrimary: generateButtonClass(vars.compactPrimary),
         translucid: generateButtonClass(vars.translucid),
         inverted: generateButtonClass(vars.inverted),
         icon: buttonUtilityClasses().buttonIcon,

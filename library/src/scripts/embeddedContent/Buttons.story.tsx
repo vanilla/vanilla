@@ -11,26 +11,11 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import { closeCompact } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { checkCompact } from "@library/icons/common";
 
 const reactionsStory = storiesOf("Components", module);
-
-/*
-    STANDARD = "standard",
-    PRIMARY = "primary",
-    TRANSPARENT = "transparent",
-    COMPACT = "compact",
-    COMPACT_PRIMARY = "compactPrimary",
-    TRANSLUCID = "translucid",
-    INVERTED = "inverted",
-    CUSTOM = "custom",
-    TEXT = "text",
-    TEXT_PRIMARY = "textPrimary",
-    ICON = "icon",
-    ICON_COMPACT = "iconCompact",
- */
 
 reactionsStory.add("Buttons", () => {
     return (
@@ -62,42 +47,30 @@ reactionsStory.add("Buttons", () => {
                 <StoryTileAndTextCompact type="primary">
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
-
-                <StoryTileAndTextCompact mouseOverText={"Text Button"}>
+                <StoryTileAndTextCompact text={"Fake transparency of the text with colors"}>
+                    <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
+                    <Button baseClass={ButtonTypes.INVERTED}>Inverted</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
                     <Button baseClass={ButtonTypes.TEXT}>Text</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact>
-                    <Button>Primary Button</Button>
+                    <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact>
-                    <Button>Icon</Button>
+                    <Button baseClass={ButtonTypes.ICON}>Icon</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
-                    <Button>Icon_Compact</Button>
+                <StoryTileAndTextCompact title={"Icon Compact"}>
+                    <Button baseClass={ButtonTypes.ICON_COMPACT}>{checkCompact()}</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    title={"Compact"}
                     text={
-                        "Note that there are 'compact' versions of some icons to have less padding in them. This style is mainly for buttons with just an icon"
+                        "If you don't want to fight against existing styles and write your own custom button, use the custom class."
                     }
                 >
-                    <Button baseClass={ButtonTypes.ICON_COMPACT}>{closeCompact()}</Button>
-                </StoryTileAndTextCompact>
-
-                <StoryTileAndTextCompact
-                    text={"Note that there are 'compact' versions of some icons to have less padding in them"}
-                >
-                    <Button>Compact Primary</Button>
-                </StoryTileAndTextCompact>
-
-                <StoryTileAndTextCompact text={"Fake transparency of the text with colors"}>
-                    <Button>Translucid</Button>
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={"Inverted bg and fg"}>
-                    <Button>Inverted</Button>
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={"No special styling, for special case buttons"}>
-                    <Button>Custom</Button>
+                    <Button baseClass={ButtonTypes.CUSTOM}>Custom</Button>
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

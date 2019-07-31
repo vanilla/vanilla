@@ -121,7 +121,7 @@ export const globalVariables = useThemeCache(() => {
         base: 1.5,
         condensed: 1.25,
         code: 1.45,
-        excerpt: 1.45,
+        excerpt: 1.4,
         meta: 1.5,
     });
 

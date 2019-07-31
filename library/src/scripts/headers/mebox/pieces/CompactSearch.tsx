@@ -12,7 +12,7 @@ import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
-import { search } from "@library/icons/header";
+import { search } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";

@@ -6,7 +6,7 @@
 
 import { IUsersStoreState } from "@library/features/users/userModel";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { notifications } from "@library/icons/header";
+import { notifications } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import { connect } from "react-redux";

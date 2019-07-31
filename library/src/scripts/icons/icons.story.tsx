@@ -19,7 +19,7 @@ import * as commonIcons from "@library/icons/common";
 import * as editorIcons from "@library/icons/editorIcons";
 import * as emojiGroupIcons from "@library/icons/emojiGroups";
 import * as fileTypesIcons from "@library/icons/fileTypes";
-import * as headerIcons from "@library/icons/header";
+import * as headerIcons from "@library/icons/titleBar";
 import * as revisionIcons from "@library/icons/revision";
 
 const reactionsStory = storiesOf("Icons", module);
@@ -96,27 +96,30 @@ reactionsStory.add("Icons", () => {
                 <StoryTile title={"fileImage()"}>{fileTypesIcons.fileImage()}</StoryTile>
                 <StoryTile title={"filePowerPoint()"}>{fileTypesIcons.filePowerPoint()}</StoryTile>
                 <StoryTile title={"fileZip()"}>{fileTypesIcons.fileZip()}</StoryTile>
-                <StoryTile title={"fileUploadError()"}>{fileTypesIcons.fileUploadError()}</StoryTile>
+                <StoryTile title={"attachmentError()"}>{fileTypesIcons.attachmentError()}</StoryTile>
             </StoryTiles>
-            <StoryHeading>Header</StoryHeading>
+            <StoryHeading>Title Bar</StoryHeading>
             <StoryTiles>
                 <StoryTile title={"close()"}>{headerIcons.close()}</StoryTile>
                 <StoryTile title={"check()"}>{headerIcons.check()}</StoryTile>
                 <StoryTile title={"help()"}>{headerIcons.help()}</StoryTile>
                 <StoryTile title={"compose()"}>{headerIcons.compose()}</StoryTile>
                 <StoryTile title={"download()"}>{headerIcons.download()}</StoryTile>
-                <StoryTile title={"vanillaLogo()"}>{headerIcons.vanillaLogo()}</StoryTile>
                 <StoryTile title={"settings()"}>{headerIcons.settings()}</StoryTile>
                 <StoryTile title={"search()"}>{headerIcons.search()}</StoryTile>
                 <StoryTile title={"notifications()"}>{headerIcons.notifications()}</StoryTile>
                 <StoryTile title={"messages()"}>{headerIcons.messages()}</StoryTile>
                 <StoryTile title={"user()"}>{headerIcons.user()}</StoryTile>
-                <StoryTile title={"noUserPhoto()"}>{headerIcons.noUserPhoto()}</StoryTile>
                 <StoryTile title={"userWarning()"}>{headerIcons.userWarning()}</StoryTile>
+                <StoryTile title={"noUserPhoto()"}>
+                    <div className={"icon"}>{headerIcons.noUserPhoto("icon")}</div>
+                </StoryTile>
+                <StoryTile title={"vanillaLogo()"} scaleContents={0.5}>
+                    {headerIcons.vanillaLogo()}
+                </StoryTile>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>
             <StoryTiles>
-                <StoryTile title={"revisionStatus_revision()"}>{revisionIcons.revisionStatus_revision()}</StoryTile>
                 <StoryTile title={"revisionStatus_draft()"}>{revisionIcons.revisionStatus_draft()}</StoryTile>
                 <StoryTile title={"revisionStatus_pending()"}>{revisionIcons.revisionStatus_pending()}</StoryTile>
                 <StoryTile title={"revisionStatus_published()"}>{revisionIcons.revisionStatus_published()}</StoryTile>

@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache, styleFactory, variableFactory, DEBUG_STYLES } from "@library/styles/styleUtils";
-import { borders, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { border, calc, color, em, important, percent, translateX } from "csx";
+import { borders, colorOut, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { border, calc, color, em, important, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 
@@ -153,6 +153,16 @@ export const storyBookClasses = useThemeCache(() => {
         }),
     });
 
+    const tileDark = style("tileDark", {
+        backgroundColor: colorOut(vars.colors.fg),
+    });
+
+    const scaleContents = (multiplier: number) => {
+        return style("scale", {
+            transform: scale(multiplier),
+        });
+    };
+
     return {
         heading,
         headingH1,
@@ -166,6 +176,8 @@ export const storyBookClasses = useThemeCache(() => {
         containerInner,
         tiles,
         tile,
+        tileDark,
         content,
+        scaleContents,
     };
 });

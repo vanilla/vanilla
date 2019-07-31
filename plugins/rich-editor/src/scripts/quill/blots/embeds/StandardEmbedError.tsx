@@ -6,7 +6,7 @@
 import React from "react";
 import classNames from "classnames";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
-import { userWarning } from "@library/icons/header";
+import { userWarning } from "@library/icons/titleBar";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 

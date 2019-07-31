@@ -13,7 +13,7 @@ import { ClearButton } from "@library/forms/select/ClearButton";
 import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { search } from "@library/icons/header";
+import { search } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";

@@ -13,7 +13,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
-import { fileUploadError } from "@library/icons/fileTypes";
+import { attachmentError } from "@library/icons/fileTypes";
 import classNames from "classnames";
 import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 
@@ -50,7 +50,7 @@ export default class AttachmentError extends React.Component<IProps> {
             >
                 <div className={classNames("attachment-box", classes.box)}>
                     <div className={classNames("attachment-format", classes.format)}>
-                        {fileUploadError(iconClasses.error)}
+                        {attachmentError(iconClasses.error)}
                     </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div id={this.descrID} className={classNames("attachment-title", classes.title)}>

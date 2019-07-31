@@ -10,7 +10,7 @@ import { unit } from "@library/styles/styleHelpers";
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
 
-    const default = themeVars("defaultIcon", {
+    const standard = themeVars("defaultIcon", {
         width: 24,
         height: 24,
     });
@@ -25,7 +25,23 @@ export const iconVariables = useThemeCache(() => {
         height: 14.67,
     });
 
-    return { default, newFolder, fileType };
+    const attachmentError = themeVars("attachmentError", {
+        width: 20,
+        height: 18,
+    });
+
+    const vanillaLogo = themeVars("vanillaLogo", {
+        width: 296.866,
+        height: 119.993,
+    });
+
+    return {
+        standard,
+        newFolder,
+        fileType,
+        attachmentError,
+        vanillaLogo,
+    };
 });
 
 export const iconClasses = useThemeCache(() => {
@@ -33,8 +49,8 @@ export const iconClasses = useThemeCache(() => {
     const style = styleFactory("iconSizes");
 
     const standard = style("defaultIcon", {
-        width: unit(vars.default.width),
-        height: unit(vars.default.height),
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
     });
 
     const fileType = style("fileType", {
@@ -47,9 +63,21 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.newFolder.height),
     });
 
+    const attachmentError = style("attachmentError", {
+        width: unit(vars.attachmentError.width),
+        height: unit(vars.attachmentError.height),
+    });
+
+    const vanillaLogo = style("vanillaLogo", {
+        width: unit(vars.vanillaLogo.width),
+        height: unit(vars.vanillaLogo.height),
+    });
+
     return {
         standard,
         newFolder,
         fileType,
+        attachmentError,
+        vanillaLogo,
     };
 });

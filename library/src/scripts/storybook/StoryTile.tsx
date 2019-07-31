@@ -8,10 +8,14 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import classNames from "classnames";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     title?: string;
     children: JSX.Element;
+    dark?: boolean;
+    scaleContents?: number;
 }
 
 /**
@@ -20,8 +24,13 @@ interface IProps {
 export function StoryTile(props: IProps) {
     const classes = storyBookClasses();
     return (
-        <li title={props.title} className={classes.tile}>
-            {props.children}
+        <li title={props.title} className={classNames(classes.tile, { [classes.tileDark]: props.dark })}>
+            <ConditionalWrap
+                condition={props.scaleContents !== undefined}
+                className={classes.scaleContents(props.scaleContents!)}
+            >
+                {props.children}
+            </ConditionalWrap>
         </li>
     );
 }

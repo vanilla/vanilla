@@ -7,6 +7,7 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
+import { iconClasses } from "@library/icons/iconClasses";
 
 export function close(className?: string, noPadding: boolean = false) {
     const title = t("Close");
@@ -101,10 +102,11 @@ export function download(className?: string) {
 
 export function vanillaLogo(className?: string, fill: string = "currentColor") {
     const title = `Vanilla`;
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={className}
+            className={classNames(className, classes.vanillaLogo)}
             viewBox="0 0 296.866 119.883"
             role="img"
             aria-label={title}

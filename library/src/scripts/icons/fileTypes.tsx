@@ -186,14 +186,14 @@ export function fileZip(className?: string) {
     );
 }
 
-export function fileUploadError(className?: string) {
+export function attachmentError(className?: string) {
     const title = t("Error");
     const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 18"
-            className={classNames("attachmentIcon-error", className)}
+            className={classNames("attachmentIcon-error", classes.attachmentError, className)}
             role="img"
             aria-label={title}
         >

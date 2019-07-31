@@ -5,7 +5,7 @@
  */
 
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { messages } from "@library/icons/header";
+import { messages } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 

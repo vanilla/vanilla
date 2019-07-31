@@ -15,6 +15,7 @@ export const storyBookVariables = useThemeCache(() => {
     const spacing = makeThemeVars("spacing", {
         large: 24,
         default: 16,
+        verticalTitle: 22,
         tight: 8,
     });
 
@@ -27,14 +28,20 @@ export const storyBookVariables = useThemeCache(() => {
 
     const gaps = makeThemeVars("gaps", {
         tile: 30,
+        wideTile: 60,
     });
 
-    globalVars.findColorMatch("ffffff");
+    const tiles = makeThemeVars("tiles", {
+        height: 120,
+        width: 120,
+        wideWidth: 240,
+    });
 
     return {
         gaps,
         spacing,
         colors,
+        tiles,
     };
 });
 
@@ -100,6 +107,15 @@ export const storyBookClasses = useThemeCache(() => {
         },
     });
 
+    const headingH3 = style("headingH1", {
+        ...fonts({
+            size: 14,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.semiBold,
+        }),
+        marginBottom: unit(4),
+    });
+
     const unorderedList = style("unorderedList", {});
 
     const listItem = style("listItem", {});
@@ -143,19 +159,57 @@ export const storyBookClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: unit(120),
-        minWidth: unit(120),
+        minHeight: unit(vars.tiles.height),
+        minWidth: unit(vars.tiles.width),
         margin: unit(vars.gaps.tile),
         ...borders({
             width: 1,
             color: vars.colors.border,
             radius: 0,
         }),
+        padding: unit(16),
     });
 
-    const tileDark = style("tileDark", {
-        backgroundColor: colorOut(vars.colors.fg),
+    const tilesAndText = style("tilesAndText", {
+        display: "flex",
+        width: percent(100),
+        margin: unit(vars.gaps.tile),
+        $nest: {
+            [`.${tile}`]: {
+                margin: 0,
+                minWidth: unit(vars.tiles.wideWidth),
+            },
+        },
     });
+
+    const tileTitle = style("tileTitle", {
+        fontSize: unit(14),
+    });
+    const tileText = style("tileText", {
+        width: calc(`100% - ${unit(vars.tiles.width)}`),
+    });
+
+    const tileTextPaddingLeft = style("tileTextPaddingLeft", {
+        ...paddings({
+            vertical: 6,
+            left: 28,
+        }),
+    });
+
+    const setBackground = (type: string) => {
+        let background = vars.colors.bg;
+        switch (type) {
+            case "inverted":
+                background = vars.colors.fg;
+                break;
+            case "primary":
+                background = vars.colors.primary;
+                break;
+        }
+        return style("tileType", {
+            backgroundColor: colorOut(background),
+        });
+    };
 
     const scaleContents = (multiplier: number) => {
         return style("scale", {
@@ -163,10 +217,24 @@ export const storyBookClasses = useThemeCache(() => {
         });
     };
 
+    const compactTilesAndText = style("compactTilesAndText", {
+        flexDirection: "column",
+        width: unit(vars.tiles.wideWidth),
+        $nest: {
+            [`.${headingH3}`]: {
+                marginTop: unit(vars.spacing.verticalTitle),
+            },
+            [`.${tileText}`]: {
+                width: percent(100),
+            },
+        },
+    });
+
     return {
         heading,
         headingH1,
         headingH2,
+        headingH3,
         paragraph,
         unorderedList,
         listItem,
@@ -176,8 +244,13 @@ export const storyBookClasses = useThemeCache(() => {
         containerInner,
         tiles,
         tile,
-        tileDark,
         content,
         scaleContents,
+        setBackground,
+        tilesAndText,
+        tileTitle,
+        tileText,
+        tileTextPaddingLeft,
+        compactTilesAndText,
     };
 });

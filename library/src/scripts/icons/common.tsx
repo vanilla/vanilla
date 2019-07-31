@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { iconStyles } from "@library/icons/iconStyles";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -65,7 +65,7 @@ export function leftChevronCompact(className?: string) {
     const title = `<`;
     return (
         <svg
-            className={classNames("icon-chevronLeftCompact", className)}
+            className={classNames("icon icon-chevronLeftCompact", className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 12 21"
             aria-hidden="true"
@@ -80,7 +80,7 @@ export function topChevron(className?: string) {
     const title = `↑`;
     return (
         <svg
-            className={classNames("icon-chevronUp", className)}
+            className={classNames("icon", "icon-chevronUp", className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -98,7 +98,7 @@ export function bottomChevron(className?: string) {
     const title = `↓`;
     return (
         <svg
-            className={classNames("icon-chevronDown", className)}
+            className={classNames("icon icon-chevronDown", className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -131,7 +131,7 @@ export function close(className?: string) {
 }
 
 export function closeCompact(className?: string) {
-    return close(classNames(className, "icon-closeCompact"));
+    return close(classNames(className, "icon icon-closeCompact"));
 }
 
 export function clear(className?: string, noPadding: boolean = false) {
@@ -185,7 +185,7 @@ export function dropDownMenu(className?: string) {
 }
 
 export function newFolder(className?: string, title: string = t("New Folder")) {
-    const classes = iconStyles();
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -10,6 +10,7 @@ import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {
+    title?: string;
     children: JSX.Element;
 }
 
@@ -18,5 +19,9 @@ interface IProps {
  */
 export function StoryTile(props: IProps) {
     const classes = storyBookClasses();
-    return <li className={classes.tile}>{props.children}</li>;
+    return (
+        <li title={props.title} className={classes.tile}>
+            {props.children}
+        </li>
+    );
 }

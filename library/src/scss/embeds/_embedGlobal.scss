@@ -117,8 +117,12 @@
             }
         }
 
-        > *:not(.u-excludeFromPointerEvents) {
+        > * {
             pointer-events: none; // In edit mode, we never allow clicking into elements.
+        }
+
+        > .u-excludeFromPointerEvents {
+            pointer-events: initial;
         }
     }
 }

@@ -9,6 +9,8 @@ import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { FlyoutSizes } from "@library/flyouts/DropDown";
+import { ClickWall } from "@vanilla/react-utils";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export interface IProps {
     id: string;
@@ -18,7 +20,6 @@ export interface IProps {
     isVisible?: boolean;
     renderAbove: boolean;
     renderLeft: boolean;
-    onClick: (event: React.MouseEvent) => void;
     legacyMode?: boolean;
     openAsModal?: boolean;
     selfPadded?: boolean;
@@ -51,7 +52,8 @@ export default class DropDownContents extends React.Component<IProps> {
                         !this.props.selfPadded ? classes.verticalPadding : "",
                     )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
-                    onClick={this.props.onClick}
+                    onClick={this.doNothing}
+                    onMouseDown={this.forceTryFocus}
                 >
                     {this.props.children}
                 </div>
@@ -62,4 +64,29 @@ export default class DropDownContents extends React.Component<IProps> {
             ); // for accessibility
         }
     }
+
+    /**
+     * Our focus watcher has an exclusion for moving away focus when focus is moved to the body.
+     * This is standard behaviour on mousedown, if a non-focusable element is clicked.
+     *
+     * Unfortunately if this is rendered inside of a `content-editable`,
+     * the content editable will be focused instead of the body. This simple handler ensures that focus goes to the body
+     * if a non-focusable element is clicked inside a dropdown inside a content-editable.
+     */
+    private forceTryFocus = (e: React.MouseEvent) => {
+        if (e.target instanceof HTMLElement) {
+            if (!TabHandler.isTabbable(e.target)) {
+                e.preventDefault();
+                document.body.focus();
+            }
+        }
+    };
+
+    private doNothing = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        e.nativeEvent.stopImmediatePropagation();
+        e.nativeEvent.stopPropagation();
+        e.nativeEvent.preventDefault();
+    };
 }

@@ -105,10 +105,26 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
+     * Callback for syncing some values back into the blot data from a react rendered embed.
+     */
+    private syncMountedValues = (newValues: object) => {
+        const existingValue: IEmbedLoadedValue = ExternalEmbedBlot.value(this.domNode as Element);
+        const mergedValue = {
+            ...existingValue,
+            data: {
+                ...existingValue.data,
+                newValues,
+            },
+        };
+        setData(this.domNode as Element, DATA_KEY, mergedValue);
+    };
+
+    /**
      * Create a successful embed element.
      */
-    public static createEmbedFromData(data: IBaseEmbedProps, loaderElement: Element | null): Element {
+    public async createEmbedFromData(data: IBaseEmbedProps, loaderElement: Element | null, newValueToSet: any) {
         const jsEmbed = FocusableEmbedBlot.create(data);
+        setData(jsEmbed, DATA_KEY, newValueToSet);
 
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
@@ -118,13 +134,19 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         loaderElement && jsEmbed.appendChild(loaderElement);
 
         try {
-            mountEmbed(jsEmbed, data, true).then(() => {
-                // Remove the focus class. It should be handled by the mounted embed at this point.
-                loaderElement && loaderElement.remove();
-                jsEmbed.classList.remove(FOCUS_CLASS);
-                jsEmbed.removeAttribute("tabindex");
-                forceSelectionUpdate();
-            });
+            await mountEmbed(
+                jsEmbed,
+                {
+                    ...data,
+                    syncBackEmbedValue: this.syncMountedValues,
+                    quill: this.quill,
+                },
+                true,
+            );
+            // Remove the focus class. It should be handled by the mounted embed at this point.
+            loaderElement && loaderElement.remove();
+            jsEmbed.classList.remove(FOCUS_CLASS);
+            jsEmbed.removeAttribute("tabindex");
         } catch (e) {
             const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
             // Cleanup existing HTML.
@@ -132,10 +154,21 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
             // Add the warning.
             jsEmbed.appendChild(warning);
-            forceSelectionUpdate();
         }
 
-        return jsEmbed;
+        // Replace the old dom node.
+        this.domNode.parentNode!.insertBefore(jsEmbed, this.domNode);
+        this.domNode.parentNode!.removeChild(this.domNode);
+
+        // Move the blot reference from the old node to the new one.
+        delete this.domNode["__blot"];
+        jsEmbed["__blot"] = { blot: this };
+
+        // Assign the new domNode.
+        this.domNode = jsEmbed;
+
+        // Trigger an update.
+        forceSelectionUpdate();
     }
 
     /**
@@ -143,20 +176,17 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      *
      * @param domNode - The node to attach the blot to.
      * @param value - The value the embed is being created with.
-     * @param needsSetup - Whether or not replace with a final form. This should be false only for internal use.
      */
-    constructor(domNode, value: IEmbedValue, needsSetup = true) {
+    constructor(domNode, value: IEmbedValue) {
         super(domNode);
-        if (needsSetup) {
-            void this.replaceLoaderWithFinalForm(value);
-        }
+        void this.replaceLoaderWithFinalForm(value);
     }
 
     /**
      * Replace the embed's loader with it's final state. This could take the form of a registered embed,
      * or an error state.
      *
-     * @see @dashboard/embeds
+     * @see @library/embedService
      */
     public replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
@@ -182,10 +212,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
                 };
 
                 const loader = (this.domNode as Element).querySelector(".embedLinkLoader");
-                const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
-                setData(embedElement, DATA_KEY, newValue);
-                finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
-                this.replaceWith(finalBlot);
+                void this.createEmbedFromData(data, loader, newValue);
             })
             .catch(e => {
                 logError(e);

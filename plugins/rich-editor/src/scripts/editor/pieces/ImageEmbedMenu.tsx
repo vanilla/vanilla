@@ -3,28 +3,29 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject, useCallback, useRef, useState } from "react";
-import { t } from "@library/utility/appUtils";
 import DropDown from "@library/flyouts/DropDown";
-import classNames from "classnames";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import InputTextBlock from "@library/forms/InputTextBlock";
 import { accessibleImageMenu } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import ButtonSubmit from "@library/forms/ButtonSubmit";
-import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameBody from "@library/layout/frame/FrameBody";
-import InputTextBlock from "@library/forms/InputTextBlock";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { t } from "@library/utility/appUtils";
+import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
+import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
+import classNames from "classnames";
+import React, { useCallback, useState } from "react";
 
 interface IProps extends IImageMeta {
-    saveImageMeta?: () => void;
+    onSave: (meta: IImageMeta) => void;
     initialAlt?: string;
-    setIsOpen: (isOpen: boolean) => void;
+    onToggleOpen: (isOpen: boolean) => void;
     className?: string;
 }
 
 export interface IImageMeta {
-    alt?: string;
+    alt: string;
 }
 
 /**
@@ -34,12 +35,15 @@ export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
     const icon = accessibleImageMenu();
     const [alt, setAlt] = useState("");
-    const { initialAlt = "", setIsOpen } = props;
+    const { initialAlt = "", onToggleOpen } = props;
     const device = useDevice();
 
-    const onVisibilityChange = useCallback(isVisible => {
-        setIsOpen(isVisible);
-    }, []);
+    const onVisibilityChange = useCallback(
+        isVisible => {
+            onToggleOpen(isVisible);
+        },
+        [onToggleOpen],
+    );
 
     const handleTextChange = useCallback(event => {
         if (event) {
@@ -58,39 +62,50 @@ export function ImageEmbedMenu(props: IProps) {
                 props.className,
             )}
         >
-            <DropDown
-                title={t("Alt Text")}
-                buttonContents={icon}
-                className={classNames("u-excludeFromPointerEvents")}
-                onVisibilityChange={onVisibilityChange}
-                openAsModal={device === Devices.MOBILE || device === Devices.XS}
-                selfPadded={true}
-                isNotList={true}
-            >
-                <form
-                    className={classes.form}
-                    onSubmit={e => {
-                        e.preventDefault();
-                    }}
+            <EditorEventWall>
+                <DropDown
+                    title={t("Alt Text")}
+                    buttonContents={icon}
+                    className={classNames("u-excludeFromPointerEvents")}
+                    onVisibilityChange={onVisibilityChange}
+                    openAsModal={device === Devices.MOBILE || device === Devices.XS}
+                    selfPadded={true}
+                    isNotList={true}
                 >
-                    <FrameBody className={classes.verticalPadding}>
-                        <InputTextBlock
-                            label={t("Alternative text helps users with accessibility concerns and improves SEO.")}
-                            labelClass={classes.paragraph}
-                            inputProps={{
-                                required: true,
-                                value: alt || initialAlt,
-                                onChange: handleTextChange,
-                                disabled: true,
-                                placeholder: t("(Image description)"),
-                            }}
-                        />
-                    </FrameBody>
-                    <FrameFooter justifyRight={true}>
-                        <ButtonSubmit baseClass={ButtonTypes.TEXT_PRIMARY}>{t("Insert")}</ButtonSubmit>
-                    </FrameFooter>
-                </form>
-            </DropDown>
+                    {/* We can't use an actual form submit because we're in a nested form. */}
+                    <form className={classes.form}>
+                        <FrameBody className={classes.verticalPadding}>
+                            <InputTextBlock
+                                label={t("Alternative text helps users with accessibility concerns and improves SEO.")}
+                                labelClass={classes.paragraph}
+                                inputProps={{
+                                    required: true,
+                                    value: alt || initialAlt,
+                                    onChange: handleTextChange,
+                                    placeholder: t("(Image description)"),
+                                }}
+                            />
+                        </FrameBody>
+                        <FrameFooter justifyRight={true}>
+                            <Button
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                onClick={e => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    e.nativeEvent.stopPropagation();
+                                    e.nativeEvent.stopImmediatePropagation();
+                                    props.onSave({
+                                        alt,
+                                    });
+                                    props.onToggleOpen(false);
+                                }}
+                            >
+                                {t("Insert")}
+                            </Button>
+                        </FrameFooter>
+                    </form>
+                </DropDown>
+            </EditorEventWall>
         </div>
     );
 }

@@ -20,6 +20,7 @@ import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 

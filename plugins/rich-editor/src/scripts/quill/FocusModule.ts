@@ -19,6 +19,8 @@ import {
     forceSelectionUpdate,
 } from "@rich-editor/quill/utility";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
+import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -71,7 +73,6 @@ export default class EmbedFocusModule extends Module {
         });
 
         this.setupEmbedClickHandler();
-        this.setupMobileHandler();
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.formWrapper.addEventListener("keydown", this.tabListener);
@@ -366,17 +367,22 @@ export default class EmbedFocusModule extends Module {
             "click",
             "a",
             (event, clickedElement) => {
+                if (isEditorWalledEvent(event)) {
+                    return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
             },
             this.quill.container,
         );
-
         delegateEvent(
             "click",
-            ".js-embed",
+            "." + FOCUS_CLASS,
             (event, clickedElement) => {
-                const embed = Parchment.find(clickedElement);
+                if (isEditorWalledEvent(event)) {
+                    return;
+                }
+                const embed = Parchment.find(clickedElement.closest(".js-embed"));
                 if (embed instanceof FocusableEmbedBlot) {
                     embed.focus();
                 }
@@ -385,36 +391,14 @@ export default class EmbedFocusModule extends Module {
         );
     }
 
-    private setupMobileHandler() {
-        delegateEvent(
-            "click",
-            ".js-richText .richEditor-text",
-            (event, clickedElement) => {
-                this.editorRoot.classList.toggle("isFocused", true);
-            },
-            this.quill.container,
-        );
-
-        delegateEvent(
-            "click",
-            ".js-richEditor-next",
-            (event, clickedElement) => {
-                const tabHandler = new TabHandler(this.formWrapper);
-                const nextEl = tabHandler.getNext(clickedElement);
-
-                if (nextEl) {
-                    nextEl.focus();
-                    this.editorRoot.classList.toggle("isFocused", false);
-                }
-            },
-            this.editorRoot,
-        );
-    }
-
     /**
      * Keydown listener on the current quill instance.
      */
     private keyDownListener = (event: KeyboardEvent) => {
+        if (isEditorWalledEvent(event)) {
+            return;
+        }
+
         if (!this.editorRoot.contains(document.activeElement)) {
             return;
         }

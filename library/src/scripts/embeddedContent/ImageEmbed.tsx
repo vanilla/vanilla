@@ -11,6 +11,7 @@ import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
+import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -19,16 +20,12 @@ interface IProps extends IBaseEmbedProps {
     name: string;
     width?: number;
     height?: number;
-    saveImageMeta?: () => IImageMeta;
 }
 
 /**
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
-    const { inEditor, type, size, dateInserted, name, width, height, saveImageMeta } = props;
-    const extraProps: any = {};
-
     const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [isOpen, setIsOpen] = useState(false); // For focus inside the modal/popup. It closes.
@@ -36,9 +33,10 @@ export function ImageEmbed(props: IProps) {
     const divRef = useRef<HTMLDivElement>(null);
 
     useFocusWatcher(contentRef, newFocusState => {
-        console.log(newFocusState, document.activeElement);
         setIsFocused(newFocusState || isOpen);
     });
+
+    const showEmbedMenu = props.inEditor;
 
     return (
         <DeviceProvider>
@@ -55,8 +53,17 @@ export function ImageEmbed(props: IProps) {
                         <img className="embedImage-img" src={props.url} alt={props.name} />
                     </div>
                 </EmbedContent>
-                {props.inEditor && (isFocused || isOpen) && (
-                    <ImageEmbedMenu saveImageMeta={props.saveImageMeta} setIsOpen={setIsOpen} />
+                {showEmbedMenu && (
+                    <ImageEmbedMenu
+                        onSave={newValue => {
+                            props.syncBackEmbedValue &&
+                                props.syncBackEmbedValue({
+                                    name: newValue.alt,
+                                });
+                        }}
+                        onToggleOpen={setIsOpen}
+                        alt={props.name}
+                    />
                 )}
             </div>
         </DeviceProvider>

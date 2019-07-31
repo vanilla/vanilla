@@ -107,7 +107,6 @@ class DropDown extends React.Component<IProps, IState> {
                             id={this.id + "-handle"}
                             parentID={this.id}
                             className={classNames(this.props.contentsClassName)}
-                            onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={openAsModal}
@@ -163,11 +162,6 @@ class DropDown extends React.Component<IProps, IState> {
             </FlyoutToggle>
         );
     }
-
-    private doNothing = e => {
-        e.stopPropagation();
-        e.preventDefault();
-    };
 }
 
 export default withDevice(DropDown);

@@ -23,6 +23,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { iconClasses } from "@library/icons/iconClasses";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -620,14 +621,19 @@ export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
     const logoFrame = style("logoFrame", { display: "inline-flex" });
+    const logoHeight = px(vars.sizing.height - 18);
 
     const logo = style("logo", {
         display: "block",
-        height: px(vars.sizing.height - 18),
+        height: logoHeight,
         width: "auto",
         $nest: {
             "&.isCentred": {
                 margin: "auto",
+            },
+            [`.${iconClasses().vanillaLogo}`]: {
+                height: logoHeight,
+                width: "auto",
             },
         },
     });

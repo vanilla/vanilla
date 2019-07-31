@@ -4,60 +4,101 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
-import { StoryTile } from "@library/storybook/StoryTile";
-import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { StoryTileAndText } from "@library/storybook/StoryTileAndText";
 import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
+import { closeCompact } from "@library/icons/common";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
 const reactionsStory = storiesOf("Components", module);
+
+/*
+    STANDARD = "standard",
+    PRIMARY = "primary",
+    TRANSPARENT = "transparent",
+    COMPACT = "compact",
+    COMPACT_PRIMARY = "compactPrimary",
+    TRANSLUCID = "translucid",
+    INVERTED = "inverted",
+    CUSTOM = "custom",
+    TEXT = "text",
+    TEXT_PRIMARY = "textPrimary",
+    ICON = "icon",
+    ICON_COMPACT = "iconCompact",
+ */
 
 reactionsStory.add("Buttons", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Buttons</StoryHeading>
+            <StoryParagraph>
+                Buttons use a{" "}
+                <strong>
+                    <code>baseClass</code>
+                </strong>{" "}
+                to specify the type of button you want. The types are available through the enum{" "}
+                <strong>
+                    <code>ButtonTypes</code>
+                </strong>{" "}
+                and if you want to do something custom and not overwrite the base button styles, use
+                <strong>
+                    {" "}
+                    <code>ButtonTypes.CUSTOM</code>
+                </strong>
+                .
+            </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndText compact={true} mouseOverText={"Standard Button"}>
+                <StoryTileAndTextCompact mouseOverText={"Standard Button"}>
                     <Button>Standard</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} mouseOverText={"Text Button"}>
-                    <Button>Text</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"Uses the primary color as the background"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
+                    <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact type="primary">
+                    <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
+                </StoryTileAndTextCompact>
+
+                <StoryTileAndTextCompact mouseOverText={"Text Button"}>
+                    <Button baseClass={ButtonTypes.TEXT}>Text</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
                     <Button>Primary Button</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"blah"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
                     <Button>Icon</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"blah"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
                     <Button>Icon_Compact</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"blah"}>
-                    <Button>Compact</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"Uses primary color as BG"}>
-                    <Button>Primary</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"bUses primary color as BG, with less paddinglah"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact
+                    title={"Compact"}
+                    text={
+                        "Note that there are 'compact' versions of some icons to have less padding in them. This style is mainly for buttons with just an icon"
+                    }
+                >
+                    <Button baseClass={ButtonTypes.ICON_COMPACT}>{closeCompact()}</Button>
+                </StoryTileAndTextCompact>
+
+                <StoryTileAndTextCompact
+                    text={"Note that there are 'compact' versions of some icons to have less padding in them"}
+                >
                     <Button>Compact Primary</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"No background color"}>
-                    <Button>Transparent</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"Fake transparency of the text with colors"}>
+                </StoryTileAndTextCompact>
+
+                <StoryTileAndTextCompact text={"Fake transparency of the text with colors"}>
                     <Button>Translucid</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"Inverted bg and fg"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Inverted bg and fg"}>
                     <Button>Inverted</Button>
-                </StoryTileAndText>
-                <StoryTileAndText compact={true} text={"No special styling, for special case buttons"}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"No special styling, for special case buttons"}>
                     <Button>Custom</Button>
-                </StoryTileAndText>
+                </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>
     );

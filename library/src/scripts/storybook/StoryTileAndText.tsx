@@ -14,7 +14,7 @@ import { IStoryTileProps, StoryTile } from "@library/storybook/StoryTile";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-interface IProps extends IStoryTileProps {
+export interface IStoryTileAndTextProps extends IStoryTileProps {
     text?: string;
     title?: string;
     compact?: boolean;
@@ -23,7 +23,7 @@ interface IProps extends IStoryTileProps {
 /**
  * Separator, for react storybook.
  */
-export function StoryTileAndText(props: IProps) {
+export function StoryTileAndText(props: IStoryTileAndTextProps) {
     const classes = storyBookClasses();
     return (
         <li className={classNames(classes.tilesAndText, { [classes.compactTilesAndText]: props.compact })}>

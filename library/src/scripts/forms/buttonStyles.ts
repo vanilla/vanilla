@@ -259,7 +259,8 @@ export const buttonVariables = useThemeCache(() => {
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
         colors: {
-            bg: globalVars.elementaryColors.transparent,
+            fg: globalVars.mainColors.bg,
+            bg: globalVars.mainColors.fg.fade(0.2),
         },
         fonts: {
             color: globalVars.mainColors.fg,

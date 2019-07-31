@@ -197,17 +197,21 @@ export const storyBookClasses = useThemeCache(() => {
     });
 
     const setBackground = (type: string) => {
-        let background = vars.colors.bg;
+        let bg = globalVars.mainColors.bg;
+        let fg = globalVars.mainColors.fg;
         switch (type) {
             case "inverted":
-                background = vars.colors.fg;
+                bg = globalVars.mainColors.fg;
+                fg = globalVars.mainColors.bg;
                 break;
             case "primary":
-                background = vars.colors.primary;
+                bg = globalVars.mainColors.primary;
+                fg = globalVars.mainColors.bg;
                 break;
         }
         return style("tileType", {
-            backgroundColor: colorOut(background),
+            backgroundColor: colorOut(bg),
+            color: colorOut(fg),
         });
     };
 

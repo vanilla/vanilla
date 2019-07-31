@@ -124,7 +124,7 @@ ${chalk.green(aliases)}`;
         },
         performance: { hints: false },
         plugins: [
-            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|es|fr|pt|ch/),
+            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
             new webpack.DefinePlugin({
                 __BUILD__SECTION__: JSON.stringify(section),
             }),

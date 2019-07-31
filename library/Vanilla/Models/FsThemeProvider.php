@@ -18,6 +18,7 @@ use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Gdn_Request;
 use Gdn_Upload;
 
@@ -156,7 +157,8 @@ class FsThemeProvider implements ThemeProviderInterface {
         if ($filename === null) {
             throw new ServerException("File key missing for theme asset.");
         }
-        $data = $this->getFileAsset($theme, $filename);
+
+        $data = $this->getFileAsset($theme, $asset);
 
         switch ($type) {
             case "data":
@@ -193,18 +195,22 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Cast themeAssetModel data to out schema data by calculating and casting required fields.
      *
      * @param Addon $theme
-     * @param string $filename
+     * @param array $asset
      */
-    private function getFileAsset(Addon $theme, string $filename): string {
-        $filename = basename($filename);
-        $fullFilename = $theme->path("/assets/{$filename}");
-        if (!file_exists($fullFilename)) {
-            throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+    private function getFileAsset(Addon $theme, array $asset): string {
+        $filename = basename($asset['file']);
+        if (!isset($asset['placeholder'])) {
+            $fullFilename = $theme->path("/assets/{$filename}");
+            if (!file_exists($fullFilename)) {
+                throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+            }
+            if (!is_readable($fullFilename)) {
+                throw new ServerException("Unable to read theme asset file: {$fullFilename}");
+            }
+            $assetContent = file_get_contents($fullFilename);
+        } else {
+            $assetContent = $asset['placeholder'];
         }
-        if (!is_readable($fullFilename)) {
-            throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-        }
-        $assetContent = file_get_contents($fullFilename);
         if ($filename === 'variables.json') {
             $assetContent = $this->addAddonVariables($assetContent);
         }
@@ -225,7 +231,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $assets = $this->getAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
-            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]['file']);
+            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
         } else {
             throw new NotFoundException("Asset");
         }
@@ -240,7 +246,23 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     private function getAssets(string $id): array {
         $theme = $this->getThemeByName($id);
-        $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, []);
+        $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, $this->getDefaultAssets());
         return $assets;
+    }
+
+    /**
+     * In case theme does not have any asset defined yet
+     * we still need some of them to exist (ex: variables.json)
+     *
+     * @return array
+     */
+    private function getDefaultAssets(): array {
+        return [
+            "variables" => [
+                "type" => "json",
+                "file" => "variables.json",
+                "placeholder" => '{}',
+            ]
+        ];
     }
 }

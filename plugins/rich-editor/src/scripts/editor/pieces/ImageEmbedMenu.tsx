@@ -15,12 +15,10 @@ import { t } from "@library/utility/appUtils";
 import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import classNames from "classnames";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 
 interface IProps extends IImageMeta {
     onSave: (meta: IImageMeta) => void;
-    initialAlt?: string;
-    onToggleOpen: (isOpen: boolean) => void;
     className?: string;
 }
 
@@ -35,15 +33,10 @@ export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
     const icon = accessibleImageMenu();
     const [alt, setAlt] = useState("");
-    const { initialAlt = "", onToggleOpen } = props;
+    const initialAlt = props.alt || "";
     const device = useDevice();
-
-    const onVisibilityChange = useCallback(
-        isVisible => {
-            onToggleOpen(isVisible);
-        },
-        [onToggleOpen],
-    );
+    const [isVisible, setVisible] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const handleTextChange = useCallback(event => {
         if (event) {
@@ -67,7 +60,8 @@ export function ImageEmbedMenu(props: IProps) {
                     title={t("Alt Text")}
                     buttonContents={icon}
                     className={classNames("u-excludeFromPointerEvents")}
-                    onVisibilityChange={onVisibilityChange}
+                    onVisibilityChange={setVisible}
+                    isVisible={isVisible}
                     openAsModal={device === Devices.MOBILE || device === Devices.XS}
                     selfPadded={true}
                     isNotList={true}
@@ -82,6 +76,7 @@ export function ImageEmbedMenu(props: IProps) {
                                     required: true,
                                     value: alt || initialAlt,
                                     onChange: handleTextChange,
+                                    inputRef,
                                     placeholder: t("(Image description)"),
                                 }}
                             />
@@ -97,7 +92,7 @@ export function ImageEmbedMenu(props: IProps) {
                                     props.onSave({
                                         alt,
                                     });
-                                    props.onToggleOpen(false);
+                                    setVisible(false);
                                 }}
                             >
                                 {t("Insert")}

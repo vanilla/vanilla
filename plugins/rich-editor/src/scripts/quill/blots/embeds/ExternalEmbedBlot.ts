@@ -113,7 +113,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             ...existingValue,
             data: {
                 ...existingValue.data,
-                newValues,
+                ...newValues,
             },
         };
         setData(this.domNode as Element, DATA_KEY, mergedValue);

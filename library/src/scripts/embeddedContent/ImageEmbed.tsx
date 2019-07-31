@@ -3,15 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IImageMeta, ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
-import { useFocusWatcher } from "@vanilla/react-utils";
-import classNames from "classnames";
-import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
+import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
+import classNames from "classnames";
+import React, { useRef } from "react";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -26,21 +24,11 @@ interface IProps extends IBaseEmbedProps {
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
-    const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
-    const [isFocused, setIsFocused] = useState(false);
-    const [isOpen, setIsOpen] = useState(false); // For focus inside the modal/popup. It closes.
-
     const divRef = useRef<HTMLDivElement>(null);
-
-    useFocusWatcher(contentRef, newFocusState => {
-        setIsFocused(newFocusState || isOpen);
-    });
-
-    const showEmbedMenu = props.inEditor;
 
     return (
         <DeviceProvider>
-            <div className="embedExternal-content" style={{ position: "relative" }} ref={setContentRef}>
+            <div className="embedExternal-content" style={{ position: "relative" }}>
                 <EmbedContent type="Image" noBaseClass inEditor={props.inEditor}>
                     <div
                         ref={divRef}
@@ -53,7 +41,7 @@ export function ImageEmbed(props: IProps) {
                         <img className="embedImage-img" src={props.url} alt={props.name} />
                     </div>
                 </EmbedContent>
-                {showEmbedMenu && (
+                {props.inEditor && (
                     <ImageEmbedMenu
                         onSave={newValue => {
                             props.syncBackEmbedValue &&
@@ -61,7 +49,6 @@ export function ImageEmbed(props: IProps) {
                                     name: newValue.alt,
                                 });
                         }}
-                        onToggleOpen={setIsOpen}
                         alt={props.name}
                     />
                 )}

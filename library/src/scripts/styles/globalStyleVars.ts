@@ -16,8 +16,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { debuglog } from "util";
-import { logError, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -332,16 +331,16 @@ export const globalVariables = useThemeCache(() => {
                 const mix = i / max;
                 const currentColor = globalVars.mixBgAndFg(mix);
                 if (currentColor.toHexString() === colorToMatch.toHexString()) {
-                    debuglog("---exact match");
-                    debuglog("real grey: " + colorToMatch.toHexString());
-                    debuglog("target grey: " + currentColor.toHexString());
-                    debuglog("mix: " + mix);
-                    debuglog("---");
+                    logDebug("---exact match");
+                    logDebug("real grey: " + colorToMatch.toHexString());
+                    logDebug("target grey: " + currentColor.toHexString());
+                    logDebug("mix: " + mix);
+                    logDebug("---");
                     i = max;
                     return;
                 }
                 if (currentColor.lightness().toFixed(lightnessPrecision) === targetLightness) {
-                    debuglog("---lightness match: " + mix);
+                    logDebug("---lightness match: " + mix);
                     i = max;
                     return;
                 }

@@ -4,23 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { keyframes, media } from "typestyle";
-import { ColorHelper, deg, important, percent, px, quote } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { ContentProperty, DisplayProperty, PositionProperty } from "csstype";
-import {
-    absolutePosition,
-    debugHelper,
-    defaultTransition,
-    fonts,
-    importantUnit,
-    margins,
-    paddings,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
-import { imageEmbedMenuVariables } from "@rich-editor/editor/pieces/richEditorEmedOptionsStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { absolutePosition, fonts, importantUnit, paddings, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import { media } from "typestyle";
 
 export const embedMenuMediaQueries = useThemeCache(() => {
     const vars = embedContainerVariables();

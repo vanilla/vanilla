@@ -11,21 +11,22 @@ import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
 import { ensureScript } from "@vanilla/dom-utils";
 import "../scss/_base.scss";
+import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
 const Error = () => <p>{errorMessage}</p>;
 const styleDecorator = storyFn => {
-    const style = {
-        padding: 24,
-    };
+    const classes = storyBookClasses();
     return (
         <>
             <Provider store={getStore()}>
                 <ThemeProvider errorComponent={<Error />} themeKey="theme-variables-dark">
-                    <div style={style}>
-                        <Backgrounds />
-                        {storyFn()}
+                    <div className={classes.containerOuter}>
+                        <div className={classes.containerInner}>
+                            <Backgrounds />
+                            {storyFn()}
+                        </div>
                     </div>
                 </ThemeProvider>
             </Provider>

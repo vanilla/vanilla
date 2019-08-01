@@ -3055,6 +3055,7 @@ if (!function_exists('redirectTo')) {
             echo json_encode([
                 'FormSaved' => true,
                 'RedirectUrl' => $url,
+                'RedirectTo' => $url,
             ]);
         } else {
             safeHeader('Location: ' . $url, true, $statusCode);

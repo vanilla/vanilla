@@ -62,7 +62,9 @@ class ImageResizer {
                 $exif = exif_read_data($source);
                 if (!empty($exif['Orientation'])) {
                     switch ($exif['Orientation']) {
+                        case 5:
                         case 6:
+                        case 7:
                         case 8:
                             list($width, $height) = [$height, $width];
                             break;
@@ -79,11 +81,25 @@ class ImageResizer {
             $srcImage = $this->createImage($source, $srcType);
             if (!empty($exif['Orientation'])) {
                 switch ($exif['Orientation']) {
+                    case 2:
+                        imageflip($srcImage, IMG_FLIP_HORIZONTAL);
+                        break;
                     case 3:
                         $srcImage = imagerotate($srcImage, 180, 0);
                         break;
+                    case 4:
+                        imageflip($srcImage, IMG_FLIP_VERTICAL);
+                        break;
+                    case 5:
+                        $srcImage = imagerotate($srcImage, -90, 0);
+                        imageflip($srcImage, IMG_FLIP_HORIZONTAL);
+                        break;
                     case 6:
                         $srcImage = imagerotate($srcImage, -90, 0);
+                        break;
+                    case 7:
+                        $srcImage = imagerotate($srcImage, 90, 0);
+                        imageflip($srcImage, IMG_FLIP_HORIZONTAL);
                         break;
                     case 8:
                         $srcImage = imagerotate($srcImage, 90, 0);

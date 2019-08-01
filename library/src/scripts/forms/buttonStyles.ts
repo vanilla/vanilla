@@ -255,47 +255,11 @@ export const buttonVariables = useThemeCache(() => {
         },
     });
 
-    const inverted: IButtonType = makeThemeVars("inverted", {
-        name: ButtonTypes.INVERTED,
-        colors: {
-            bg: globalVars.mainColors.fg,
-        },
-        fonts: {
-            color: globalVars.mainColors.primary,
-        },
-        spinnerColor: globalVars.elementaryColors.white,
-        border: {
-            color: globalVars.mainColors.fg,
-            radius: globalVars.border.radius,
-        },
-        hover: {
-            colors: {
-                bg: globalVars.mainColors.fg.fade(0.9),
-            },
-        },
-        active: {
-            colors: {
-                bg: globalVars.mainColors.fg.fade(0.9),
-            },
-        },
-        focus: {
-            colors: {
-                bg: globalVars.mainColors.fg.fade(0.9),
-            },
-        },
-        focusAccessible: {
-            colors: {
-                bg: globalVars.mainColors.fg.fade(0.9),
-            },
-        },
-    });
-
     return {
         standard,
         primary,
         transparent,
         translucid,
-        inverted,
     };
 });
 
@@ -336,7 +300,6 @@ export enum ButtonTypes {
     PRIMARY = "primary",
     TRANSPARENT = "transparent",
     TRANSLUCID = "translucid",
-    INVERTED = "inverted",
     CUSTOM = "custom",
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
@@ -351,7 +314,6 @@ export const buttonClasses = useThemeCache(() => {
         standard: generateButtonClass(vars.standard),
         transparent: generateButtonClass(vars.transparent),
         translucid: generateButtonClass(vars.translucid),
-        inverted: generateButtonClass(vars.inverted),
         icon: buttonUtilityClasses().buttonIcon,
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,
@@ -442,6 +404,14 @@ export const buttonUtilityClasses = useThemeCache(() => {
         },
     });
 
+    const buttonIconRightMargin = style("buttonIconRightMargin", {
+        marginRight: unit(6),
+    });
+
+    const buttonIconLeftMargin = style("buttonIconLeftMargin", {
+        marginLeft: unit(6),
+    });
+
     return {
         pushLeft,
         buttonAsText,
@@ -449,6 +419,8 @@ export const buttonUtilityClasses = useThemeCache(() => {
         pushRight,
         buttonIconCompact,
         buttonIcon,
+        buttonIconRightMargin,
+        buttonIconLeftMargin,
     };
 });
 

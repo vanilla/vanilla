@@ -7,6 +7,7 @@ import { borders, colorOut, fonts, margins, paddings, singleBorder, unit } from 
 import { border, calc, color, em, important, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -199,6 +200,8 @@ export const storyBookClasses = useThemeCache(() => {
     const setBackground = (type: string) => {
         let bg = globalVars.mainColors.bg;
         let fg = globalVars.mainColors.fg;
+        const titleBarVars = titleBarVariables();
+
         switch (type) {
             case "inverted":
                 bg = globalVars.mainColors.fg;
@@ -207,6 +210,10 @@ export const storyBookClasses = useThemeCache(() => {
             case "primary":
                 bg = globalVars.mainColors.primary;
                 fg = globalVars.mainColors.bg;
+                break;
+            case "titleBar":
+                bg = titleBarVars.colors.bg;
+                fg = titleBarVars.colors.fg;
                 break;
         }
         return style("tileType", {

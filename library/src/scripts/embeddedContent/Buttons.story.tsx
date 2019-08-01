@@ -11,15 +11,17 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { checkCompact, plusCircle } from "@library/icons/common";
+import { checkCompact, closeCompact, compose, plusCircle } from "@library/icons/common";
 import { StoryTile } from "@library/storybook/StoryTile";
-import * as revisionIcons from "@library/icons/revision";
-
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
 const reactionsStory = storiesOf("Components", module);
 
 reactionsStory.add("Buttons", () => {
+    const globalVars = globalVariables();
+    const classesButtonUtility = buttonUtilityClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Buttons</StoryHeading>
@@ -40,20 +42,17 @@ reactionsStory.add("Buttons", () => {
                 .
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact mouseOverText={"Standard Button"}>
+                <StoryTileAndTextCompact title={"Most common button"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={"Call to action"}>
                     <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact type="primary">
+                <StoryTileAndTextCompact type="titleBar" title={"For Title Bar (Sign in Button)"}>
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact type="primary" text={"Fake transparency of the text with colors"}>
+                <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Register)"}>
                     <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
-                    <Button baseClass={ButtonTypes.INVERTED}>Inverted</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact>
                     <Button baseClass={ButtonTypes.TEXT}>Text</Button>
@@ -61,10 +60,18 @@ reactionsStory.add("Buttons", () => {
                 <StoryTileAndTextCompact>
                     <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
-                    <Button baseClass={ButtonTypes.ICON}>Icon</Button>
+                <StoryTileAndTextCompact
+                    title={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
+                >
+                    <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
+                        {closeCompact()}
+                    </Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={"Icon Compact"}>
+                <StoryTileAndTextCompact
+                    title={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
+                        globalVars.icon.sizes.default,
+                    )})`}
+                >
                     <Button baseClass={ButtonTypes.ICON_COMPACT}>{checkCompact()}</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
@@ -82,8 +89,12 @@ reactionsStory.add("Buttons", () => {
                     'a "compact" version of your icon that doesn\'t have as much padding that will look better.'}
             </StoryParagraph>
             <StoryTiles>
-                <StoryTile mouseOverText={"revisionStatus_draft()"}>{revisionIcons.revisionStatus_draft()}</StoryTile>
-                <StoryTile mouseOverText={"revisionStatus_pending()"}>{`plusCircle() ${"Icon and Text"}`}</StoryTile>
+                <StoryTileAndTextCompact>
+                    <Button baseClass={ButtonTypes.STANDARD}>
+                        {compose(classesButtonUtility.buttonIconRightMargin)}
+                        {"Icon and Text"}
+                    </Button>
+                </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>
     );

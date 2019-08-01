@@ -12,9 +12,5 @@ import React from "react";
 const reactionsStory = storiesOf("Pages", module);
 
 reactionsStory.add("Editor", () => {
-    return (
-        <>
-            <StoryHeading depth={1}>Editor</StoryHeading>
-        </>
-    );
+    return <StoryHeading depth={1}>Editor</StoryHeading>;
 });

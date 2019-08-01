@@ -15,7 +15,7 @@ import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     photoUrl?: string;
-    body: string;
+    body?: string;
 }
 
 export function LinkEmbed(props: IProps) {

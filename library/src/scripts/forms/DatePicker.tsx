@@ -15,8 +15,8 @@ import { guessOperatingSystem, OS } from "@vanilla/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
-import { leftChevron, rightChevron } from "@library/icons/common";
 import { formatDate, parseDate } from "react-day-picker/moment";
+import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -200,10 +200,10 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
                 <h3 className={classNames("datePicker-title", classes.title)}>{title}</h3>
                 <span className={classNames("datePicker-navigation", className, classes.navigation)}>
                     <Button baseClass={ButtonTypes.ICON} onClick={prev}>
-                        {leftChevron("", true)}
+                        <LeftChevronIcon centred={true} />
                     </Button>
                     <Button baseClass={ButtonTypes.ICON} onClick={next}>
-                        {rightChevron("", true)}
+                        <RightChevronIcon centred={true} />
                     </Button>
                 </span>
             </div>

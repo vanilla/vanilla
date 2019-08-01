@@ -15,12 +15,36 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTile } from "@library/storybook/StoryTile";
-import * as commonIcons from "@library/icons/common";
-import * as editorIcons from "@library/icons/editorIcons";
-import * as emojiGroupIcons from "@library/icons/emojiGroups";
-import * as fileTypesIcons from "@library/icons/fileTypes";
-import * as headerIcons from "@library/icons/titleBar";
-import * as revisionIcons from "@library/icons/revision";
+import * as EditorIcons from "@library/icons/editorIcons";
+import * as FileTypesIcons from "@library/icons/fileTypes";
+import * as TitleBarIcons from "@library/icons/titleBar";
+import * as RevisionIcons from "@library/icons/revision";
+import * as CommonIcons from "@library/icons/common";
+import {
+    EmojiGroupSmileysPeopleIcon,
+    EmojiGroupAnimalsNatureIcon,
+    EmojiGroupFoodDrinkIcon,
+    EmojiGroupTravelPlacesIcon,
+    EmojiGroupActivitiesIcon,
+    EmojiGroupObjectsIcon,
+    EmojiGroupSymbolsIcon,
+    EmojiGroupFlagsIcon,
+} from "./emojiGroups";
+import {
+    FileTypeGenericIcon,
+    FileTypeWordIcon,
+    FileTypeExcelIcon,
+    FileTypeImageIcon,
+    FileTypePowerPointIcon,
+    FileTypePDFIcon,
+    FileTypeZipIcon,
+    AttachmentErrorIcon,
+} from "@library/icons/fileTypes";
+import {
+    RevisionStatusPublishedIcon,
+    RevisionStatusPendingIcon,
+    RevisionStatusDraftIcon,
+} from "@library/icons/revision";
 
 const reactionsStory = storiesOf("Components/Icons", module);
 
@@ -36,109 +60,241 @@ reactionsStory.add("Icons", () => {
 
             <StoryHeading>Common</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"rightChevron()"}>{commonIcons.rightChevron()}</StoryTile>
-                <StoryTile mouseOverText={"leftChevron()"}>{commonIcons.leftChevron()}</StoryTile>
-                <StoryTile mouseOverText={"topChevron()"}>{commonIcons.topChevron()}</StoryTile>
-                <StoryTile mouseOverText={"bottomChevron()"}>{commonIcons.bottomChevron()}</StoryTile>
-                <StoryTile mouseOverText={"close()"}>{commonIcons.close()}</StoryTile>
-                <StoryTile mouseOverText={"clear()"}>{commonIcons.clear()}</StoryTile>
-                <StoryTile mouseOverText={"check()"}>{commonIcons.check()}</StoryTile>
-                <StoryTile mouseOverText={"dropDownMenu()"}>{commonIcons.dropDownMenu()}</StoryTile>
-                <StoryTile mouseOverText={"newFolder()"}>{commonIcons.newFolder()}</StoryTile>
-                <StoryTile mouseOverText={"categoryIcon()"}>{commonIcons.categoryIcon()}</StoryTile>
-                <StoryTile mouseOverText={"checkCompact()"}>{commonIcons.checkCompact()}</StoryTile>
-                <StoryTile mouseOverText={"downTriangle()"}>{commonIcons.downTriangle()}</StoryTile>
-                <StoryTile mouseOverText={"rightTriangle()"}>{commonIcons.rightTriangle()}</StoryTile>
-                <StoryTile mouseOverText={"help()"}>{commonIcons.help()}</StoryTile>
-                <StoryTile mouseOverText={"compose()"}>{commonIcons.compose()}</StoryTile>
-                <StoryTile mouseOverText={"plusCircle()"}>{commonIcons.plusCircle()}</StoryTile>
-                <StoryTile mouseOverText={"signIn()"}>{commonIcons.signIn()}</StoryTile>
-                <StoryTile mouseOverText={"chevronUp()"}>{commonIcons.chevronUp()}</StoryTile>
-                <StoryTile mouseOverText={"searchError()"}>{commonIcons.searchError()}</StoryTile>
+                <StoryTile mouseOverText={`&lt;RightChevronIconLogo/&gt;`}>
+                    <CommonIcons.RightChevronIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;leftChevron/&gt;`}>
+                    <CommonIcons.LeftChevronIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;TopChevronIcon/&gt;`}>
+                    <CommonIcons.TopChevronIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;BottomChevronIcon/&gt;`}>
+                    <CommonIcons.BottomChevronIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;CloseIcon/&gt;`}>
+                    <CommonIcons.CloseIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;clearIcon/&gt;`}>
+                    <CommonIcons.ClearIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;checkIcon/&gt;`}>
+                    <CommonIcons.CheckIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;dropDownMenuIcon/&gt;`}>
+                    <CommonIcons.DropDownMenuIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;newFolderIcon/&gt;`}>
+                    <CommonIcons.NewFolderIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;categoryIconLogo/&gt;`}>
+                    <CommonIcons.CategoryIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;checkCompactLogo/&gt;`}>
+                    <CommonIcons.CheckCompactIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;downTriangleLogo/&gt;`}>
+                    <CommonIcons.DownTriangleIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;rightTriangleLogo/&gt;`}>
+                    <CommonIcons.RightTriangleIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;helpLogo/&gt;`}>
+                    <CommonIcons.HelpIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;composeLogo/&gt;`}>
+                    <CommonIcons.ComposeIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;plusCircleLogo/&gt;`}>
+                    <CommonIcons.PlusCircleIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;signInLogo/&gt;`}>
+                    <CommonIcons.SignInIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;chevronUpLogo/&gt;`}>
+                    <CommonIcons.ChevronUpIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;searchErrorLogo/&gt;`}>
+                    <CommonIcons.SearchErrorIcon />
+                </StoryTile>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"bold()"}>{editorIcons.bold()}</StoryTile>
-                <StoryTile mouseOverText={"italic()"}>{editorIcons.italic()}</StoryTile>
-                <StoryTile mouseOverText={"strike()"}>{editorIcons.strike()}</StoryTile>
-                <StoryTile mouseOverText={"code()"}>{editorIcons.code()}</StoryTile>
-                <StoryTile mouseOverText={"link()"}>{editorIcons.link()}</StoryTile>
-                <StoryTile mouseOverText={"emoji()"}>{editorIcons.emoji()}</StoryTile>
-                <StoryTile mouseOverText={"embedError()"}>{editorIcons.embedError()}</StoryTile>
-                <StoryTile mouseOverText={"pilcrow()"}>{editorIcons.pilcrow()}</StoryTile>
-                <StoryTile mouseOverText={"heading2()"}>{editorIcons.heading2()}</StoryTile>
-                <StoryTile mouseOverText={"heading3()"}>{editorIcons.heading3()}</StoryTile>
-                <StoryTile mouseOverText={"heading4()"}>{editorIcons.heading4()}</StoryTile>
-                <StoryTile mouseOverText={"heading5()"}>{editorIcons.heading5()}</StoryTile>
-                <StoryTile mouseOverText={"blockquote()"}>{editorIcons.blockquote()}</StoryTile>
-                <StoryTile mouseOverText={"codeBlock()"}>{editorIcons.codeBlock()}</StoryTile>
-                <StoryTile mouseOverText={"spoiler()"}>{editorIcons.spoiler()}</StoryTile>
-                <StoryTile mouseOverText={"embed()"}>{editorIcons.embed()}</StoryTile>
-                <StoryTile mouseOverText={"image()"}>{editorIcons.image()}</StoryTile>
-                <StoryTile mouseOverText={"attachment()"}>{editorIcons.attachment()}</StoryTile>
-                <StoryTile mouseOverText={"listUnordered()"}>{editorIcons.listUnordered()}</StoryTile>
-                <StoryTile mouseOverText={"listOrdered()"}>{editorIcons.listOrdered()}</StoryTile>
-                <StoryTile mouseOverText={"indent()"}>{editorIcons.indent()}</StoryTile>
-                <StoryTile mouseOverText={"outdent()"}>{editorIcons.outdent()}</StoryTile>
+                <StoryTile mouseOverText={`&lt;boldLogo/&gt;`}>
+                    <EditorIcons.BoldIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;italicLogo/&gt;`}>
+                    <EditorIcons.ItalicIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;strikeLogo/&gt;`}>
+                    <EditorIcons.StrikeIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;codeLogo/&gt;`}>
+                    <EditorIcons.CodeIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;linkLogo/&gt;`}>
+                    <EditorIcons.LinkIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;emojiLogo/&gt;`}>
+                    <EditorIcons.EmojiIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;embedErrorLogo/&gt;`}>
+                    <EditorIcons.EmbedErrorIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;pilcrowLogo/&gt;`}>
+                    <EditorIcons.PilcrowIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;heading2Logo/&gt;`}>
+                    <EditorIcons.Heading2Icon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;heading3Logo/&gt;`}>
+                    <EditorIcons.Heading3Icon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;heading4Logo/&gt;`}>
+                    <EditorIcons.Heading4Icon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;heading5Logo/&gt;`}>
+                    <EditorIcons.Heading5Icon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;blockquoteLogo/&gt;`}>
+                    <EditorIcons.BlockquoteIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;codeBlockLogo/&gt;`}>
+                    <EditorIcons.CodeBlockIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;spoilerLogo/&gt;`}>
+                    <EditorIcons.SpoilerIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;embedLogo/&gt;`}>
+                    <EditorIcons.EmbedIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;ImageIcon/&gt;`}>
+                    <EditorIcons.ImageIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;AttachmentIcon/&gt;`}>
+                    <EditorIcons.AttachmentIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;ListUnorderedIcon/&gt;`}>
+                    <EditorIcons.ListUnorderedIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;ListOrderedIcon/&gt;`}>
+                    <EditorIcons.ListOrderedIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;IndentIcon/&gt;`}>
+                    <EditorIcons.IndentIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;OutdentIcon/&gt;`}>
+                    <EditorIcons.OutdentIcon />
+                </StoryTile>
             </StoryTiles>
             <StoryHeading>Emoji Groups</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"emojiGroup_smileysPeople()"}>
-                    {emojiGroupIcons.emojiGroup_smileysPeople()}
+                <StoryTile mouseOverText={`&lt;EmojiGroupSmileysPeopleIcon/&gt;`}>
+                    <EmojiGroupSmileysPeopleIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_animalsNature()"}>
-                    {emojiGroupIcons.emojiGroup_animalsNature()}
+                <StoryTile mouseOverText={`&lt;EmojiGroupAnimalsNatureIcon/&gt;`}>
+                    <EmojiGroupAnimalsNatureIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_foodDrink()"}>{emojiGroupIcons.emojiGroup_foodDrink()}</StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_travelPlaces()"}>
-                    {emojiGroupIcons.emojiGroup_travelPlaces()}
+                <StoryTile mouseOverText={`&lt;EmojiGroupFoodDrinkIcon/&gt;`}>
+                    <EmojiGroupFoodDrinkIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_activities()"}>
-                    {emojiGroupIcons.emojiGroup_activities()}
+                <StoryTile mouseOverText={`&lt;EmojiGroupTravelPlacesIcon/&gt;`}>
+                    <EmojiGroupTravelPlacesIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_objects()"}>{emojiGroupIcons.emojiGroup_objects()}</StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_symbols()"}>{emojiGroupIcons.emojiGroup_symbols()}</StoryTile>
-                <StoryTile mouseOverText={"emojiGroup_flags()"}>{emojiGroupIcons.emojiGroup_flags()}</StoryTile>
+                <StoryTile mouseOverText={`&lt;EmojiGroupActivitiesIcon/&gt;`}>
+                    <EmojiGroupActivitiesIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;EmojiGroupObjectsIcon/&gt;`}>
+                    <EmojiGroupObjectsIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;EmojiGroupSymbolsIcon/&gt;`}>
+                    <EmojiGroupSymbolsIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;EmojiGroupFlagsIcon/&gt;`}>
+                    <EmojiGroupFlagsIcon />
+                </StoryTile>
             </StoryTiles>
             <StoryHeading>File Types</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"fileGeneric()"}>{fileTypesIcons.fileGeneric()}</StoryTile>
-                <StoryTile mouseOverText={"fileWord()"}>{fileTypesIcons.fileWord()}</StoryTile>
-                <StoryTile mouseOverText={"fileExcel()"}>{fileTypesIcons.fileExcel()}</StoryTile>
-                <StoryTile mouseOverText={"filePDF()"}>{fileTypesIcons.filePDF()}</StoryTile>
-                <StoryTile mouseOverText={"fileImage()"}>{fileTypesIcons.fileImage()}</StoryTile>
-                <StoryTile mouseOverText={"filePowerPoint()"}>{fileTypesIcons.filePowerPoint()}</StoryTile>
-                <StoryTile mouseOverText={"fileZip()"}>{fileTypesIcons.fileZip()}</StoryTile>
-                <StoryTile mouseOverText={"attachmentError()"}>{fileTypesIcons.attachmentError()}</StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypeGenericIcon/&gt;`}>
+                    <FileTypeGenericIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypeWordIcon/&gt;`}>
+                    <FileTypeWordIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypeExcelIcon/&gt;`}>
+                    <FileTypeExcelIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypePDFIcon/&gt;`}>
+                    <FileTypePDFIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypeImageIcon/&gt;`}>
+                    <FileTypeImageIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypePowerPointIcon/&gt;`}>
+                    <FileTypePowerPointIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;FileTypeZipIcon/&gt;`}>
+                    <FileTypeZipIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;AttachmentErrorIcon/&gt;`}>
+                    <AttachmentErrorIcon />
+                </StoryTile>
             </StoryTiles>
             <StoryHeading>Title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"close()"}>{headerIcons.close()}</StoryTile>
-                <StoryTile mouseOverText={"check()"}>{headerIcons.check()}</StoryTile>
-                <StoryTile mouseOverText={"help()"}>{headerIcons.help()}</StoryTile>
-                <StoryTile mouseOverText={"compose()"}>{headerIcons.compose()}</StoryTile>
-                <StoryTile mouseOverText={"download()"}>{headerIcons.download()}</StoryTile>
-                <StoryTile mouseOverText={"settings()"}>{headerIcons.settings()}</StoryTile>
-                <StoryTile mouseOverText={"search()"}>{headerIcons.search()}</StoryTile>
-                <StoryTile mouseOverText={"notifications()"}>{headerIcons.notifications()}</StoryTile>
-                <StoryTile mouseOverText={"messages()"}>{headerIcons.messages()}</StoryTile>
-                <StoryTile mouseOverText={"user()"}>{headerIcons.user()}</StoryTile>
-                <StoryTile mouseOverText={"userWarning()"}>{headerIcons.userWarning()}</StoryTile>
-                <StoryTile mouseOverText={"noUserPhoto()"}>
-                    <div className={"icon"}>{headerIcons.noUserPhoto("icon")}</div>
+                <StoryTile mouseOverText={`&lt;CloseIcon/&gt;`}>
+                    <TitleBarIcons.CloseIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"vanillaLogo()"} scaleContents={0.5}>
-                    {headerIcons.vanillaLogo()}
+                <StoryTile mouseOverText={`&lt;CheckLogo/&gt;`}>
+                    <TitleBarIcons.CheckIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;HelpLogo/&gt;`}>
+                    <TitleBarIcons.HelpIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;ComposeLogo/&gt;`}>
+                    <TitleBarIcons.ComposeIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;DownloadLogo/&gt;`}>
+                    <TitleBarIcons.DownloadIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;SettingsLogo/&gt;`}>
+                    <TitleBarIcons.SettingsIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;SearchLogo/&gt;`}>
+                    <TitleBarIcons.SearchIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;NotificationsLogo/&gt;`}>
+                    <TitleBarIcons.NotificationsIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;MessagesLogo/&gt;`}>
+                    <TitleBarIcons.MessagesIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;UserLogo/&gt;`}>
+                    <TitleBarIcons.UserIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;UserWarningLogo/&gt;`}>
+                    <TitleBarIcons.UserWarningIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;NoUserPhotoLogo/&gt;`}>
+                    <div className={"icon"}>
+                        <TitleBarIcons.NoUserPhotoIcon />
+                    </div>
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;VanillaLogo/>`} scaleContents={0.5}>
+                    {<TitleBarIcons.VanillaLogo />}
                 </StoryTile>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={"revisionStatus_draft()"}>{revisionIcons.revisionStatus_draft()}</StoryTile>
-                <StoryTile mouseOverText={"revisionStatus_pending()"}>
-                    {revisionIcons.revisionStatus_pending()}
+                <StoryTile mouseOverText={`&lt;RevisionStatusDraftIcon/&gt;`}>
+                    <RevisionStatusDraftIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={"revisionStatus_published()"}>
-                    {revisionIcons.revisionStatus_published()}
+                <StoryTile mouseOverText={`&lt;RevisionStatusPendingIcon/&gt;`}>
+                    <RevisionStatusPendingIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;RevisionStatusPublishedIcon/&gt;`}>
+                    <RevisionStatusPublishedIcon />
                 </StoryTile>
             </StoryTiles>
         </StoryContent>

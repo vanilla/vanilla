@@ -7,9 +7,8 @@
 import React from "react";
 import { NullComponent } from "@library/forms/select/overwrites";
 import DayPickerInput from "react-day-picker/DayPickerInput";
-import moment from "moment";
 import { t } from "@library/utility/appUtils";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { guessOperatingSystem, OS } from "@vanilla/utils";

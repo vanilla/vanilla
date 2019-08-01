@@ -40,28 +40,40 @@ reactionsStory.add("Buttons", () => {
                         <Button>Compact</Button>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Primary</Button>
-                        <StoryParagraph>Uses primary color as BG</StoryParagraph>
+                        <>
+                            <Button>Primary</Button>
+                            <StoryParagraph>Uses primary color as BG</StoryParagraph>
+                        </>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Compact Primary</Button>
-                        <StoryParagraph>Uses primary color as BG, with less padding</StoryParagraph>
+                        <>
+                            <Button>Compact Primary</Button>
+                            <StoryParagraph>Uses primary color as BG, with less padding</StoryParagraph>
+                        </>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Transparent</Button>
-                        <StoryParagraph>No background color</StoryParagraph>
+                        <>
+                            <Button>Transparent</Button>
+                            <StoryParagraph>No background color</StoryParagraph>
+                        </>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Translucid</Button>
-                        <StoryParagraph>Fake transparency of the text with colors</StoryParagraph>
+                        <>
+                            <Button>Translucid</Button>
+                            <StoryParagraph>Fake transparency of the text with colors</StoryParagraph>
+                        </>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Inverted</Button>
-                        <StoryParagraph>Inverted colors</StoryParagraph>
+                        <>
+                            <Button>Inverted</Button>
+                            <StoryParagraph>Inverted colors</StoryParagraph>
+                        </>
                     </StoryTile>
                     <StoryTile>
-                        <Button>Cutstom</Button>
-                        <StoryParagraph>No special styling, for special case buttons.</StoryParagraph>
+                        <>
+                            <Button>Cutstom</Button>
+                            <StoryParagraph>No special styling, for special case buttons.</StoryParagraph>
+                        </>
                     </StoryTile>
                 </>
             </StoryTiles>

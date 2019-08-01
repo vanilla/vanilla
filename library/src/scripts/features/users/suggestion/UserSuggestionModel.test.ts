@@ -10,8 +10,7 @@ import UserSuggestionModel from "@library/features/users/suggestion/UserSuggesti
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import { expect } from "chai";
 import sinon from "sinon";
-import { Moment } from "moment";
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {

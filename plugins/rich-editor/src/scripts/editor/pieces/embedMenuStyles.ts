@@ -60,16 +60,13 @@ export const embedMenuClasses = useThemeCache(() => {
         {
             position: "relative",
             $nest: {
-                "&&": {
-                    cursor: "initial",
-                },
                 "&:hover::after": {
                     display: "none", // Hide the box shadow
                 },
             },
         },
         mediaQueriesEmbed.noRoomForMenuOnLeft({
-            paddingTop: globalVars.buttonIcon.size,
+            marginTop: unit(globalVars.buttonIcon.size),
         }),
     );
 
@@ -107,7 +104,7 @@ export const embedMenuClasses = useThemeCache(() => {
             zIndex: 1,
         },
         mediaQueriesEmbed.noRoomForMenuOnLeft({
-            transform: `translateX(-${menuTransformWithoutGutter}) translateY(0)`,
+            transform: `translateX(-${menuTransformWithoutGutter}) translateY(-${menuTransformWithGutter})`,
         }),
     );
 

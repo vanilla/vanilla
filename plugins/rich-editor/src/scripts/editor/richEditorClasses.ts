@@ -42,7 +42,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                     },
                 },
             },
-            "& .richEditor-text, & .richEditor-textWrap, & .richEditor-frame": {
+            "& .richEditor-textWrap, & .richEditor-frame": {
                 display: "flex",
                 flexDirection: "column",
                 flexGrow: 1,

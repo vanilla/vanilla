@@ -13,7 +13,9 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { checkCompact } from "@library/icons/common";
+import { checkCompact, plusCircle } from "@library/icons/common";
+import { StoryTile } from "@library/storybook/StoryTile";
+import * as revisionIcons from "@library/icons/revision";
 
 const reactionsStory = storiesOf("Components", module);
 
@@ -47,7 +49,7 @@ reactionsStory.add("Buttons", () => {
                 <StoryTileAndTextCompact type="primary">
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={"Fake transparency of the text with colors"}>
+                <StoryTileAndTextCompact type="primary" text={"Fake transparency of the text with colors"}>
                     <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact>
@@ -72,6 +74,16 @@ reactionsStory.add("Buttons", () => {
                 >
                     <Button baseClass={ButtonTypes.CUSTOM}>Custom</Button>
                 </StoryTileAndTextCompact>
+            </StoryTiles>
+
+            <StoryHeading>Button With Icon</StoryHeading>
+            <StoryParagraph>
+                {"You can just add an icon in with the text of your button. It's worth noting however, that there might be\n" +
+                    'a "compact" version of your icon that doesn\'t have as much padding that will look better.'}
+            </StoryParagraph>
+            <StoryTiles>
+                <StoryTile mouseOverText={"revisionStatus_draft()"}>{revisionIcons.revisionStatus_draft()}</StoryTile>
+                <StoryTile mouseOverText={"revisionStatus_pending()"}>{`plusCircle() ${"Icon and Text"}`}</StoryTile>
             </StoryTiles>
         </StoryContent>
     );

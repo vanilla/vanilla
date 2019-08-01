@@ -28,6 +28,10 @@ reactionsStory.add("Icons", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Global Icons</StoryHeading>
+            <StoryParagraph>
+                Use a function to call these icons. Note also that some of these functions have 'compact' versions,
+                which just means they have less padding for tighter spaces. Most icons render in a box 24px by 24px.
+            </StoryParagraph>
 
             <StoryHeading>Common</StoryHeading>
             <StoryTiles>

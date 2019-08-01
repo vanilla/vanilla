@@ -211,11 +211,10 @@ export const buttonVariables = useThemeCache(() => {
     const translucid: IButtonType = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
         colors: {
-            fg: globalVars.mainColors.primary,
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.1),
+            bg: globalVars.mainColors.bg,
         },
         fonts: {
-            color: globalVars.mainColors.bg,
+            color: globalVars.mainColors.primary,
         },
         spinnerColor: globalVars.mainColors.bg,
         border: {
@@ -224,7 +223,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         hover: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
             border: {
                 color: globalVars.mainColors.bg,
@@ -232,7 +231,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         active: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
             border: {
                 color: globalVars.mainColors.bg,
@@ -240,7 +239,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focus: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
             border: {
                 color: globalVars.mainColors.bg,
@@ -248,7 +247,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focusAccessible: {
             colors: {
-                bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
             border: {
                 color: globalVars.mainColors.bg,

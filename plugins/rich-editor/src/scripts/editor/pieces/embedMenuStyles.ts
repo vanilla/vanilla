@@ -53,9 +53,25 @@ export const embedMenuClasses = useThemeCache(() => {
         width: percent(100),
     });
 
-    const imageContainer = style("imageContainer", {
-        position: "relative",
-    });
+    const mediaQueriesEmbed = embedMenuMediaQueries();
+
+    const imageContainer = style(
+        "imageContainer",
+        {
+            position: "relative",
+            $nest: {
+                "&&": {
+                    cursor: "initial",
+                },
+                "&:hover::after": {
+                    display: "none", // Hide the box shadow
+                },
+            },
+        },
+        mediaQueriesEmbed.noRoomForMenuOnLeft({
+            paddingTop: globalVars.buttonIcon.size,
+        }),
+    );
 
     // Extra specific and defensive here because it's within userContent styles.
     const paragraph = style("paragraph", {
@@ -78,8 +94,6 @@ export const embedMenuClasses = useThemeCache(() => {
         }),
     });
 
-    const mediaQueriesEmbed = embedMenuMediaQueries();
-
     const menuTransformWithGutter = unit(globalVars.buttonIcon.size);
     const menuTransformWithoutGutter = unit((globalVars.buttonIcon.size - globalVars.icon.sizes.default) / 2);
 
@@ -93,7 +107,7 @@ export const embedMenuClasses = useThemeCache(() => {
             zIndex: 1,
         },
         mediaQueriesEmbed.noRoomForMenuOnLeft({
-            transform: `translateX(-${menuTransformWithoutGutter}) translateY(-${menuTransformWithGutter})`,
+            transform: `translateX(-${menuTransformWithoutGutter}) translateY(0)`,
         }),
     );
 

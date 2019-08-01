@@ -377,12 +377,12 @@ export default class EmbedFocusModule extends Module {
         );
         delegateEvent(
             "click",
-            "." + FOCUS_CLASS,
+            ".js-embed",
             (event, clickedElement) => {
                 if (isEditorWalledEvent(event)) {
                     return;
                 }
-                const embed = Parchment.find(clickedElement.closest(".js-embed"));
+                const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {
                     embed.focus();
                 }

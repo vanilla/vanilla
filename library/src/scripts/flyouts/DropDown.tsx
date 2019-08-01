@@ -7,7 +7,7 @@
 import React from "react";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
-import DropDownContents from "@library/flyouts/DropDownContents";
+import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
@@ -39,14 +39,13 @@ export interface IProps extends IDeviceProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
+    flyoutType: FlyoutType;
     selfPadded?: boolean;
-    flyoutSize?: FlyoutSizes;
-    isNotList: boolean;
 }
 
-export enum FlyoutSizes {
-    DEFAULT = "default",
-    MEDIUM = "medium",
+export enum FlyoutType {
+    LIST = "list",
+    FRAME = "frame",
 }
 
 export interface IState {
@@ -81,7 +80,7 @@ class DropDown extends React.Component<IProps, IState> {
         const classesDropDown = dropDownClasses();
         const classesFrameHeader = frameHeaderClasses();
         const classes = dropDownClasses();
-        const ContentTag = this.props.isNotList ? "div" : "ul";
+        const ContentTag = this.props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
 
         const openAsModal =
             this.props.openAsModal || this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
@@ -112,8 +111,16 @@ class DropDown extends React.Component<IProps, IState> {
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={openAsModal}
-                            selfPadded={this.props.selfPadded}
-                            flyoutSize={this.props.flyoutSize}
+                            selfPadded={
+                                this.props.selfPadded !== undefined
+                                    ? this.props.selfPadded
+                                    : this.props.flyoutType === FlyoutType.FRAME
+                            }
+                            size={
+                                this.props.flyoutType === FlyoutType.FRAME
+                                    ? DropDownContentSize.MEDIUM
+                                    : DropDownContentSize.MEDIUM
+                            }
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>

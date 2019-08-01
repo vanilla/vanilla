@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
@@ -16,6 +16,7 @@ import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import classNames from "classnames";
 import React, { useCallback, useState, useRef, useEffect } from "react";
+import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps extends IImageMeta {
     onSave: (meta: IImageMeta) => void;
@@ -32,8 +33,7 @@ export interface IImageMeta {
 export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
     const icon = accessibleImageMenu();
-    const [alt, setAlt] = useState("");
-    const initialAlt = props.alt || "";
+    const [alt, setAlt] = useState(props.alt);
     const device = useDevice();
     const [isVisible, setVisible] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -45,6 +45,13 @@ export function ImageEmbedMenu(props: IProps) {
             setAlt(event.target.value || "");
         }
     }, []);
+
+    const prevVisibility = useLastValue(isVisible);
+    useEffect(() => {
+        if (!prevVisibility && isVisible && inputRef.current) {
+            inputRef.current && inputRef.current.focus();
+        }
+    }, [prevVisibility, isVisible, inputRef]);
 
     return (
         <div
@@ -63,8 +70,7 @@ export function ImageEmbedMenu(props: IProps) {
                     onVisibilityChange={setVisible}
                     isVisible={isVisible}
                     openAsModal={device === Devices.MOBILE || device === Devices.XS}
-                    selfPadded={true}
-                    isNotList={true}
+                    flyoutType={FlyoutType.FRAME}
                 >
                     {/* We can't use an actual form submit because we're in a nested form. */}
                     <form className={classes.form}>
@@ -74,7 +80,7 @@ export function ImageEmbedMenu(props: IProps) {
                                 labelClass={classes.paragraph}
                                 inputProps={{
                                     required: true,
-                                    value: alt || initialAlt,
+                                    value: alt,
                                     onChange: handleTextChange,
                                     inputRef,
                                     placeholder: t("(Image description)"),

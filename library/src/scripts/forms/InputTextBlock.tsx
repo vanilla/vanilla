@@ -27,7 +27,7 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         valid?: boolean;
         required?: boolean;
         disabled?: boolean;
-        inputRef?: React.Ref<HTMLInputElement>;
+        inputRef?: React.RefObject<HTMLInputElement>;
     };
 }
 
@@ -41,7 +41,10 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
     };
 
     private id: string;
-    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
+    private ownInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+    private get inputRef() {
+        return this.props.inputProps.inputRef || this.ownInputRef;
+    }
 
     public constructor(props) {
         super(props);

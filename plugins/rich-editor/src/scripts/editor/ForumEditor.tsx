@@ -36,7 +36,6 @@ export function ForumEditor(props: IProps) {
     return (
         <Provider store={store}>
             <DeviceProvider>
-                <RichEditorEmbedOptions id={embedOptionsID} visible={true} />
                 <Editor
                     isPrimaryEditor={true}
                     legacyMode={true}

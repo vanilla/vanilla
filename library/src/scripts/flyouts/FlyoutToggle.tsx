@@ -68,7 +68,7 @@ export default function FlyoutToggle(props: IProps) {
 
     const controllerRef = useRef<HTMLDivElement>(null);
     const [ownIsVisible, ownSetVisibility] = useState(false);
-    const isVisible = "isVisible" in props ? props.isVisible : ownIsVisible;
+    const isVisible = props.isVisible !== undefined ? props.isVisible : ownIsVisible;
     const setVisibility = useCallback(
         (visibility: boolean) => {
             ownSetVisibility(visibility);

@@ -6,12 +6,14 @@
 
 // @ts-check
 
-import { configure, addDecorator, addParameters } from "@storybook/react";
-import {checkA11y, withA11Y} from "@storybook/addon-a11y";
-import { withKnobs } from "@storybook/addon-knobs";
+'use strict';
+
+import { configure, addDecorator, addParameters } from '@storybook/react';
+import {checkA11y, withA11y} from '@storybook/addon-a11y';
+import { withKnobs } from '@storybook/addon-knobs';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
-import { unit } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { unit } from '@library/styles/styleHelpers';
+import { layoutVariables } from '@library/layout/panelLayoutStyles';
 
 /**
  * Utility for importing everything from a wepback require.context
@@ -21,11 +23,11 @@ function importAll(r) {
     r.keys().forEach(r);
 }
 
-require("../../library/src/scripts/storybookConfig");
+require('../../library/src/scripts/storybookConfig');
 
 function loadStories() {
     const storyFiles = require.context(
-        "../..",
+        '../..',
         true,
         /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
     importAll(storyFiles);
@@ -34,20 +36,20 @@ function loadStories() {
 
 
 addDecorator(checkA11y);
-addDecorator(withA11Y);
+addDecorator(withA11y);
 addDecorator(withKnobs);
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 
 const customViewports = {
-    "panelLayout_withBleed": {
+    'panelLayout_withBleed': {
         name: 'Panel Layout - Full',
         styles: {
             width: unit(panelLayoutBreakPoints.noBleed + 100), // 100 is arbitrary. We just want more than being right up to the minimum margin
             height: '1000px',
         },
     },
-    "panelLayout_noBleed": {
+    'panelLayout_noBleed': {
         name: 'Panel Layout - Minimum Margin',
         styles: {
             width: unit(panelLayoutBreakPoints.noBleed),
@@ -55,21 +57,21 @@ const customViewports = {
         },
     },
 
-    "panelLayout_twoColumns": {
+    'panelLayout_twoColumns': {
         name: 'Panel Layout - Two Columns',
         styles: {
             width: unit(panelLayoutBreakPoints.twoColumn),
             height: '1000px',
         },
     },
-    "panelLayout_oneColumn": {
+    'panelLayout_oneColumn': {
         name: 'Panel Layout - One Columns',
         styles: {
             width: unit(panelLayoutBreakPoints.oneColumn),
             height: '1000px',
         },
     },
-    "panelLayout_xs": {
+    'panelLayout_xs': {
         name: 'Panel Layout - Extra Small',
         styles: {
             width: unit(panelLayoutBreakPoints.xs),

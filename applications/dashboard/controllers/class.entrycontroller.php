@@ -774,7 +774,7 @@ class EntryController extends Gdn_Controller {
                     
                     // Registering a new user.
                     $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
-                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
+                    $eventManager->fireFilter('entryController_beforeRegistering', $this, []);
                     $userID = $userModel->register($user, $registerOptions);
 
                     if ($userID === UserModel::REDIRECT_APPROVE) {
@@ -792,7 +792,7 @@ class EntryController extends Gdn_Controller {
                 if ($userID) {
                     // Save Authentication of a user.
                     $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
-                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
+                    $eventManager->fireFilter('entryController_beforeSavingUserAuthentication', $this, []);
                     $userModel->saveAuthentication([
                         'UserID' => $userID,
                         'Provider' => $this->Form->getFormValue('Provider'),
@@ -889,7 +889,7 @@ class EntryController extends Gdn_Controller {
             } elseif ($this->Form->errorCount() == 0) {
                 // Register a new user.
                 $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
-                $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
+                $eventManager->fireFilter('entryController_beforeRegistering', $this, []);
                 // The user doesn't exist so we need to add another user.
                 $user = $this->Form->formValues();
                 $user['Name'] = $user['ConnectName'];
@@ -920,7 +920,7 @@ class EntryController extends Gdn_Controller {
                 if (isset($user) && val('UserID', $user)) {
                     // Connecting an existing user.
                     $eventManager = Gdn::getContainer()->get(Garden\EventManager::class);
-                    $eventManager->fireFilter('entryController_beforeSavingUserOnConnection', $this, []);
+                    $eventManager->fireFilter('entryController_beforeSavingUserAuthentication', $this, []);
                     $userModel->saveAuthentication([
                         'UserID' => $user['UserID'],
                         'Provider' => $this->Form->getFormValue('Provider'),

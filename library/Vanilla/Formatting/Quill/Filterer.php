@@ -59,7 +59,8 @@ class Filterer {
             }
 
             if (!is_array($embed['data'] ?? null)) {
-                // We only care about embeds operations.
+                // Strip off any malformed embeds.
+                unset($operations[$key]);
                 continue;
             }
             $embedData = &$embed['data'];

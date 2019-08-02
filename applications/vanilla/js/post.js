@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
     }
 
     // Hijack comment form button clicks
-    $(document).on('submit', '#CommentForm :submit', function() {
+    $('#CommentForm :submit').click(function() {
         var btn = this;
         var frm = $(btn).parents('form').get(0);
 
@@ -93,7 +93,7 @@ jQuery(document).ready(function($) {
     //$('#DiscussionForm :submit').live('click', function() {
 
     // Jan28, 2014 jQuery upgrade to 1.10.2, as live() removed in 1.7.
-    $(document).on('submit', '#DiscussionForm :submit', function() {
+    $(document).on('click', '#DiscussionForm :submit', function() {
         var btn = this;
         var frm = $(btn).parents('form').get(0);
 

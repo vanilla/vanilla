@@ -36,7 +36,6 @@ export function FileTypeGenericIcon(props: { className?: string; fileType?: stri
 }
 
 export function FileTypeWordIcon(props: { className?: string }) {
-    const textFill = "#fff";
     const title = t("Word");
     const classes = iconClasses();
     return (
@@ -80,8 +79,6 @@ export function FileTypeExcelIcon(props: { className?: string }) {
 }
 
 export function FileTypePDFIcon(props: { className?: string }) {
-    const textFill = "#fff";
-    const title = t("PDF");
     const unabbreviatedType = t(AttachmentType.PDF);
     const classes = iconClasses();
     return (

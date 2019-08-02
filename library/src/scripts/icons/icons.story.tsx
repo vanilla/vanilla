@@ -7,18 +7,12 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import Paragraph from "@library/layout/Paragraph";
-import { StoryUnorderedList } from "@library/storybook/StoryUnorderedList";
-import { StoryListItem } from "@library/storybook/StoryListItem";
-import { StoryLink } from "@library/storybook/StoryLink";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTile } from "@library/storybook/StoryTile";
 import * as EditorIcons from "@library/icons/editorIcons";
-import * as FileTypesIcons from "@library/icons/fileTypes";
 import * as TitleBarIcons from "@library/icons/titleBar";
-import * as RevisionIcons from "@library/icons/revision";
 import * as CommonIcons from "@library/icons/common";
 import {
     EmojiGroupSmileysPeopleIcon,

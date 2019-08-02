@@ -3,18 +3,16 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import {
-    filePDF,
-    fileExcel,
-    fileWord,
-    filePowerPoint,
-    fileZip,
-    fileImage,
-    fileGeneric,
-} from "@library/icons/fileTypes";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
-
+import {
+    FileTypeGenericIcon,
+    FileTypeWordIcon,
+    FileTypeExcelIcon,
+    FileTypePDFIcon,
+    FileTypeImageIcon,
+    FileTypePowerPointIcon,
+    FileTypeZipIcon,
+} from "@library/icons/fileTypes";
 /**
  * Map a mimeType into an AttachmentType.
  *
@@ -52,21 +50,22 @@ export function mimeTypeToAttachmentType(mimeType?: string | null): AttachmentTy
     }
 }
 
-export function getAttachmentIcon(type: AttachmentType, className?: string) {
-    switch (type) {
+export function GetAttachmentIcon(props: { type: AttachmentType; className?: string }) {
+    switch (props.type) {
         case AttachmentType.PDF:
-            return filePDF(className);
+            return <FileTypePDFIcon className={props.className} />;
+            break;
         case AttachmentType.EXCEL:
-            return fileExcel(className);
+            return <FileTypeExcelIcon className={props.className} />;
         case AttachmentType.WORD:
-            return fileWord(className);
+            return <FileTypeWordIcon className={props.className} />;
         case AttachmentType.PPT:
-            return filePowerPoint(className);
+            return <FileTypePowerPointIcon className={props.className} />;
         case AttachmentType.ARCHIVE:
-            return fileZip(className);
+            return <FileTypeZipIcon className={props.className} />;
         case AttachmentType.IMAGE:
-            return fileImage(className);
+            return <FileTypeImageIcon className={props.className} />;
         default:
-            return fileGeneric(className);
+            return <FileTypeGenericIcon className={props.className} />;
     }
 }

@@ -9,7 +9,6 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
-import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/titleBar";
@@ -72,7 +71,7 @@ reactionsStory.add("Buttons", () => {
                     </StoryTileAndTextCompact>
 
                     <StoryHeading>Icon with text</StoryHeading>
-                    <Button type={ButtonTypes.PRIMARY}>
+                    <Button baseClass={ButtonTypes.PRIMARY}>
                         <>
                             <ComposeIcon />
                             <span className={classes.buttonIconLeftMargin}>Example with icon</span>

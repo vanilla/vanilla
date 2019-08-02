@@ -1742,7 +1742,7 @@ if (!function_exists('getAllMentions')) {
             }
 
             // Filter empty mentions
-            if ($mention !== "") {
+            if ($mention) {
                 $mentions[] = $mention;
             }
         }

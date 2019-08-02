@@ -398,7 +398,7 @@ class BlotGroup {
         $text = "";
         $mainBlot = $this->getMainBlot();
         if ($mainBlot instanceof SpoilerLineTerminatorBlot) {
-            return t("(Spoiler)\n");
+            return \Gdn::translate("(Spoiler)\n");
         }
 
         foreach ($this->blots as $blot) {

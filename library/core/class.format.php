@@ -1739,6 +1739,7 @@ class Gdn_Format {
      */
     public static function quoteEmbed($body, string $format): string {
         deprecated(__FUNCTION__, 'FormatService::renderQuote($body, $format)');
+        $body = is_array($body) ? json_encode($body) : $body;
         return Gdn::formatService()->renderQuote($body, $format);
     }
 

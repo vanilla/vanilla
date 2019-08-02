@@ -86,17 +86,14 @@ class FormatService {
     /**
      * Render a version of the content suitable to be quoted in other content.
      *
-     * @param string|array $content The raw content to render.
+     * @param string $content The raw content to render.
      * @param string $format The format of the content.
      *
      * @return string
      */
-    public function renderQuote($content, string $format): string {
-        // Sometimes quotes come in as an array (normally from nested JSON).
-        $stringContent = is_array($content) ? json_encode($content) : $content;
-
+    public function renderQuote(string $content, string $format): string {
         $formatter = $this->getFormatter($format);
-        $result = $formatter->renderQuote($stringContent);
+        $result = $formatter->renderQuote($content);
         return $result;
     }
 

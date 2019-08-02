@@ -54,7 +54,9 @@ class QuoteEmbed extends AbstractEmbed {
 
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {
-            $data['body'] = \Gdn::formatService()->renderQuote($data['bodyRaw'], $data['format']);
+            $bodyRaw = $data['bodyRaw'];
+            $bodyRaw = is_array($bodyRaw) ? json_encode($bodyRaw) : $bodyRaw;
+            $data['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $data['format']);
         }
 
         return $data;

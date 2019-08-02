@@ -15,7 +15,7 @@ use Vanilla\Formatting\FormatConfig;
  */
 class TextFormat extends BaseFormat {
 
-    const FORMAT_KEY = "Text";
+    const FORMAT_KEY = "text";
 
     /** @var FormatConfig */
     private $formatConfig;

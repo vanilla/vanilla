@@ -24,7 +24,7 @@ class HtmlFormat extends BaseFormat {
 
     use StaticCacheTranslationTrait;
 
-    const FORMAT_KEY = "Html";
+    const FORMAT_KEY = "html";
 
     /** @var HtmlSanitizer */
     private $htmlSanitizer;

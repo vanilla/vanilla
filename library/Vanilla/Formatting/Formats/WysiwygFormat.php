@@ -16,7 +16,7 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
  */
 class WysiwygFormat extends HtmlFormat {
 
-    const FORMAT_KEY = "Wysiwyg";
+    const FORMAT_KEY = "wysiwyg";
 
 
     /**

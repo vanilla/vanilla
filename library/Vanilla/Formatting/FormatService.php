@@ -168,7 +168,6 @@ class FormatService {
      * @return $this For method chaining.
      */
     public function registerFormat(string $formatKey, FormatInterface $format): FormatService {
-        $formatKey = strtolower($formatKey);
         $this->formats[$formatKey] = $format;
         return $this;
     }

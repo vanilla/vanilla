@@ -60,13 +60,12 @@ class FormatService {
      *
      * @param string $content The content to render.
      * @param string $format The format of the content.
-     * @param string $query A string to try and ensure is in the outputted excerpt.
      *
      * @return string
      */
-    public function renderExcerpt(string $content, string $format, string $query = null): string {
+    public function renderExcerpt(string $content, string $format): string {
         $formatter = $this->getFormatter($format);
-        $result = $formatter->renderExcerpt($content, $query);
+        $result = $formatter->renderExcerpt($content);
         return $result;
     }
 

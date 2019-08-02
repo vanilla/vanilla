@@ -3,6 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import React from "react";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import {
     FileTypeGenericIcon,
@@ -54,7 +55,6 @@ export function GetAttachmentIcon(props: { type: AttachmentType; className?: str
     switch (props.type) {
         case AttachmentType.PDF:
             return <FileTypePDFIcon className={props.className} />;
-            break;
         case AttachmentType.EXCEL:
             return <FileTypeExcelIcon className={props.className} />;
         case AttachmentType.WORD:

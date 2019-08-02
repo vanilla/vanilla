@@ -244,6 +244,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
             "&:active": {
                 color: colorOut(globalVars.mainColors.secondary),
             },
+            [`&:hover .${iconWrap}`]: {
+                color: colorOut(globalVars.mainColors.primary),
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
             [`&.isOpen .${iconWrap}`]: {
                 backgroundColor: colorOut(vars.buttonContents.state.bg),
             },

@@ -15,12 +15,12 @@ import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
-import { signIn } from "@library/icons/common";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
 import Container from "@library/layout/components/Container";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
+import { SignInIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -53,7 +53,7 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                             {isGuest ? (
                                 <TitleBarNav className={classNames(titleBarVars.nav, "titleBar-guest")}>
                                     <TitleBarNavItem to={`/entry/signin?target=${window.location.pathname}`}>
-                                        {signIn("titleBar-signInIcon")}
+                                        <SignInIcon className={"titleBar-signInIcon"} />
                                     </TitleBarNavItem>
                                 </TitleBarNav>
                             ) : (

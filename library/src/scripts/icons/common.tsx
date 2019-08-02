@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { iconStyles } from "@library/icons/iconStyles";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -16,17 +16,17 @@ const currentColorFill = {
 const leftChevronPath =
     "M3.621,10.5l7.94-7.939A1.5,1.5,0,0,0,9.439.439h0l-9,9a1.5,1.5,0,0,0,0,2.121h0l9,9a1.5,1.5,0,0,0,2.122-2.122Z";
 
-const horizontalChevronViewBox = (centred: boolean) => {
+const horizontalChevronViewBox = (centred?: boolean) => {
     return centred ? "-8 -4 30 30" : "0 0 24 24";
 };
 
-export function rightChevron(className?: string, centred: boolean = false) {
+export function RightChevronIcon(props: { className?: string; centred?: boolean }) {
     const title = `>`;
     return (
         <svg
-            className={classNames("icon", "icon-chevronRight", className)}
+            className={classNames("icon", "icon-chevronRight", props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox={horizontalChevronViewBox(centred)}
+            viewBox={horizontalChevronViewBox(props.centred)}
             aria-hidden="true"
             style={{ transform: "scaleX(-1)", transformOrigin: "50% 50%" }}
         >
@@ -41,13 +41,13 @@ export function rightChevron(className?: string, centred: boolean = false) {
     );
 }
 
-export function leftChevron(className?: string, centred: boolean = false) {
+export function LeftChevronIcon(props: { className?: string; centred?: boolean }) {
     const title = `<`;
     return (
         <svg
-            className={classNames("icon", "icon-chevronLeft", className)}
+            className={classNames("icon", "icon-chevronLeft", props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox={horizontalChevronViewBox(centred)}
+            viewBox={horizontalChevronViewBox(props.centred)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -61,11 +61,11 @@ export function leftChevron(className?: string, centred: boolean = false) {
     );
 }
 
-export function leftChevronCompact(className?: string) {
+export function LeftChevronCompactIcon(props: { className?: string }) {
     const title = `<`;
     return (
         <svg
-            className={classNames("icon-chevronLeftCompact", className)}
+            className={classNames("icon icon-chevronLeftCompact", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 12 21"
             aria-hidden="true"
@@ -76,11 +76,11 @@ export function leftChevronCompact(className?: string) {
     );
 }
 
-export function topChevron(className?: string) {
+export function TopChevronIcon(props: { className?: string }) {
     const title = `↑`;
     return (
         <svg
-            className={classNames("icon-chevronUp", className)}
+            className={classNames("icon", "icon-chevronUp", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -94,11 +94,11 @@ export function topChevron(className?: string) {
     );
 }
 
-export function bottomChevron(className?: string) {
+export function BottomChevronIcon(props: { className?: string }) {
     const title = `↓`;
     return (
         <svg
-            className={classNames("icon-chevronDown", className)}
+            className={classNames("icon icon-chevronDown", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -112,11 +112,11 @@ export function bottomChevron(className?: string) {
     );
 }
 
-export function close(className?: string) {
+export function CloseIcon(props: { className?: string }) {
     const title = t("Close");
     return (
         <svg
-            className={classNames("icon", "icon-close", className)}
+            className={classNames("icon", "icon-close", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 10 10"
             aria-hidden="true"
@@ -130,15 +130,15 @@ export function close(className?: string) {
     );
 }
 
-export function closeCompact(className?: string) {
-    return close(classNames(className, "icon-closeCompact"));
+export function CloseCompactIcon(props: { className?: string }) {
+    return <CloseIcon className={classNames("icon", "icon-closeCompact")} />;
 }
 
-export function clear(className?: string, noPadding: boolean = false) {
+export function ClearIcon(props: { className?: string }) {
     const title = t("Clear");
     return (
         <svg
-            className={classNames("icon", "icon-clear", className)}
+            className={classNames("icon", "icon-clear", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -152,11 +152,11 @@ export function clear(className?: string, noPadding: boolean = false) {
     );
 }
 
-export function check(className?: string) {
+export function CheckIcon(props: { className?: string }) {
     const title = `✓`;
     return (
         <svg
-            className={classNames("icon", "icon-check", className)}
+            className={classNames("icon", "icon-check", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -167,11 +167,11 @@ export function check(className?: string) {
     );
 }
 
-export function dropDownMenu(className?: string) {
+export function DropDownMenuIcon(props: { className?: string }) {
     const title = `…`;
     return (
         <svg
-            className={classNames("icon", "icon-dropDownMenu", className)}
+            className={classNames("icon", "icon-dropDownMenu", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -184,16 +184,16 @@ export function dropDownMenu(className?: string) {
     );
 }
 
-export function newFolder(className?: string, title: string = t("New Folder")) {
-    const classes = iconStyles();
+export function NewFolderIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(classes.newFolder, className)}
+            className={classNames(classes.newFolder, props.className)}
             viewBox="0 0 22 19"
             aria-hidden="true"
         >
-            <title>{title}</title>
+            <title>{props.title ? props.title : t("New Folder")}</title>
             <path
                 d="M1,15.066V3.77Q1,1,3.548,1H9.12L11.3,3.769h7.286q2.372-.083,2.372,2.6v8.7q0,3.205-2.372,3.206H3.548Q1,18.272,1,15.066Z"
                 style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
@@ -206,12 +206,12 @@ export function newFolder(className?: string, title: string = t("New Folder")) {
     );
 }
 
-export function categoryIcon(className?: string) {
+export function CategoryIcon(props: { className?: string }) {
     const title = t("Folder");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-categoryIcon", className)}
+            className={classNames("icon", "icon-categoryIcon", props.className)}
             viewBox="0 0 24 24"
             role="img"
             aria-label={title}
@@ -225,12 +225,12 @@ export function categoryIcon(className?: string) {
     );
 }
 
-export function checkCompact(className?: string) {
+export function CheckCompactIcon(props: { className?: string }) {
     const title = `✓`;
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-selectedCategory", className)}
+            className={classNames("icon", "icon-selectedCategory", props.className)}
             viewBox="0 0 16.8 13"
             role="img"
             aria-label={title}
@@ -244,36 +244,36 @@ export function checkCompact(className?: string) {
     );
 }
 
-export function downTriangle(className?: string, title: string = "▾", deg?: number) {
+export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
     let transform;
-    if (deg) {
-        transform = { transform: `rotate(${deg}deg` };
+    if (props.deg) {
+        transform = { transform: `rotate(${props.deg}deg` };
     }
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 8 8"
-            className={classNames("icon", "icon-triangleRight", className)}
+            className={classNames("icon", "icon-triangleRight", props.className)}
             aria-hidden="true"
             style={transform}
         >
-            <title>{title}</title>
+            <title>{props.title ? props.title : `▾`}</title>
             <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
         </svg>
     );
 }
 
-export function rightTriangle(className?: string, title: string = `▶`) {
-    return downTriangle(className, title, -90);
+export function RightTriangleIcon(props: { className?: string; title?: string }) {
+    return <DownTriangleIcon className={props.className} title={props.title ? props.title : `▶`} deg={-90} />;
 }
 
-export function help(className?: string) {
+export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-help", className)}
+            className={classNames("icon", "icon-help", props.className)}
             role="img"
             aria-label={title}
         >
@@ -287,12 +287,12 @@ export function help(className?: string) {
     );
 }
 
-export function compose(className?: string) {
+export function ComposeIcon(props: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "icon-compose", className)}
+            className={classNames("icon", "icon-compose", props.className)}
             aria-hidden="true"
         >
             <path
@@ -303,13 +303,13 @@ export function compose(className?: string) {
     );
 }
 
-export function plusCircle(className?: string) {
+export function PlusCircleIcon(props: { className?: string }) {
     const title = `+`;
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 14 14"
-            className={classNames("icon", "icon-plusCircle", className)}
+            className={classNames("icon", "icon-plusCircle", props.className)}
             role="img"
             aria-hidden="true"
         >
@@ -322,13 +322,13 @@ export function plusCircle(className?: string) {
     );
 }
 
-export function signIn(className?: string) {
+export function SignInIcon(props: { className?: string }) {
     const title = t("Sign In");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="-4 0 24 18"
-            className={classNames("icon", "icon-signIn", className)}
+            className={classNames("icon", "icon-signIn", props.className)}
             role="img"
         >
             <title>{title}</title>
@@ -344,13 +344,13 @@ export function signIn(className?: string) {
     );
 }
 
-export function chevronUp(className?: string) {
+export function ChevronUpIcon(props: { className?: string }) {
     const title = t("Chevron Up");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 51 17"
-            className={classNames("icon", "icon-chevronUp", className)}
+            className={classNames("icon", "icon-chevronUp", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -362,13 +362,13 @@ export function chevronUp(className?: string) {
     );
 }
 
-export function searchError(message?: string, className?: string) {
-    const title = message ? message : t("Page Not Found");
+export function SearchErrorIcon(props: { message?: string; className?: string }) {
+    const title = props.message ? props.message : t("Page Not Found");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "icon-notFound", className)}
+            className={classNames("icon", "icon-notFound", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>

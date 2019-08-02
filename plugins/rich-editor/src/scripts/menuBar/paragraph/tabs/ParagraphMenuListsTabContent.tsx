@@ -12,8 +12,8 @@ import ParagraphMenuBarRadioGroup, {
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSeparator from "@rich-editor/menuBar/paragraph/items/ParagraphMenuSeparator";
 import classNames from "classnames";
-import { indent, outdent } from "@library/icons/editorIcons";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { IndentIcon, OutdentIcon } from "@library/icons/editorIcons";
 
 interface IProps {
     closeMenu: () => void;
@@ -62,7 +62,7 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         tabIndex={indentDisabled ? -1 : 0}
                         data-firstletter={indentLabel.toLowerCase().substr(0, 1)}
                     >
-                        <span className={checkRadioClasses.icon}>{indent()}</span>
+                        <span className={checkRadioClasses.icon}>{<IndentIcon />}</span>
                         <span className={checkRadioClasses.checkRadioLabel}>{indentLabel}</span>
                     </button>
                     <button
@@ -73,7 +73,7 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         tabIndex={outdentDisabled ? -1 : 0}
                         data-firstletter={outdentLabel.toLowerCase().substr(0, 1)}
                     >
-                        <span className={checkRadioClasses.icon}>{outdent()}</span>
+                        <span className={checkRadioClasses.icon}>{<OutdentIcon />}</span>
                         <span className={checkRadioClasses.checkRadioLabel}>{outdentLabel}</span>
                     </button>
                 </div>

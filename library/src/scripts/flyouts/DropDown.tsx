@@ -16,8 +16,8 @@ import SmartAlign from "@library/layout/SmartAlign";
 import CloseButton from "@library/navigation/CloseButton";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
-import { dropDownMenu } from "@library/icons/common";
 import { IDeviceProps, withDevice, Devices } from "@library/layout/DeviceContext";
+import { DropDownMenuIcon } from "@library/icons/common";
 
 export interface IProps extends IDeviceProps {
     id?: string;
@@ -90,7 +90,7 @@ class DropDown extends React.Component<IProps, IState> {
                 className={classNames(this.props.className)}
                 buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.ICON}
                 name={this.props.name}
-                buttonContents={this.props.buttonContents || dropDownMenu()}
+                buttonContents={this.props.buttonContents || <DropDownMenuIcon />}
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
                 disabled={this.props.disabled}

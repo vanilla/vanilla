@@ -26,6 +26,7 @@ export function StoryHeading(props: IStoryHeadingProps) {
             className={classNames(classes.heading, {
                 [classes.headingH1]: depth === 1,
                 [classes.headingH2]: depth === 2,
+                [classes.headingH3]: depth === 3,
             })}
         >
             {props.children}

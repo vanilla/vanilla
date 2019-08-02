@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache, styleFactory, variableFactory, DEBUG_STYLES } from "@library/styles/styleUtils";
-import { borders, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { border, calc, color, em, important, percent, translateX } from "csx";
+import { borders, colorOut, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { border, calc, color, em, important, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -15,6 +16,7 @@ export const storyBookVariables = useThemeCache(() => {
     const spacing = makeThemeVars("spacing", {
         large: 24,
         default: 16,
+        verticalTitle: 22,
         tight: 8,
     });
 
@@ -27,14 +29,20 @@ export const storyBookVariables = useThemeCache(() => {
 
     const gaps = makeThemeVars("gaps", {
         tile: 30,
+        wideTile: 60,
     });
 
-    globalVars.findColorMatch("ffffff");
+    const tiles = makeThemeVars("tiles", {
+        height: 120,
+        width: 120,
+        wideWidth: 240,
+    });
 
     return {
         gaps,
         spacing,
         colors,
+        tiles,
     };
 });
 
@@ -100,6 +108,15 @@ export const storyBookClasses = useThemeCache(() => {
         },
     });
 
+    const headingH3 = style("headingH1", {
+        ...fonts({
+            size: 14,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.semiBold,
+        }),
+        marginBottom: unit(4),
+    });
+
     const unorderedList = style("unorderedList", {});
 
     const listItem = style("listItem", {});
@@ -143,20 +160,92 @@ export const storyBookClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: unit(120),
-        minWidth: unit(120),
+        minHeight: unit(vars.tiles.height),
+        minWidth: unit(vars.tiles.width),
         margin: unit(vars.gaps.tile),
         ...borders({
             width: 1,
             color: vars.colors.border,
             radius: 0,
         }),
+        padding: unit(16),
+    });
+
+    const tilesAndText = style("tilesAndText", {
+        display: "flex",
+        width: percent(100),
+        margin: unit(vars.gaps.tile),
+        $nest: {
+            [`.${tile}`]: {
+                margin: 0,
+                minWidth: unit(vars.tiles.wideWidth),
+            },
+        },
+    });
+
+    const tileTitle = style("tileTitle", {
+        fontSize: unit(14),
+    });
+    const tileText = style("tileText", {
+        width: calc(`100% - ${unit(vars.tiles.width)}`),
+    });
+
+    const tileTextPaddingLeft = style("tileTextPaddingLeft", {
+        ...paddings({
+            vertical: 6,
+            left: 28,
+        }),
+    });
+
+    const setBackground = (type: string) => {
+        let bg = globalVars.mainColors.bg;
+        let fg = globalVars.mainColors.fg;
+        const titleBarVars = titleBarVariables();
+
+        switch (type) {
+            case "inverted":
+                bg = globalVars.mainColors.fg;
+                fg = globalVars.mainColors.bg;
+                break;
+            case "primary":
+                bg = globalVars.mainColors.primary;
+                fg = globalVars.mainColors.bg;
+                break;
+            case "titleBar":
+                bg = titleBarVars.colors.bg;
+                fg = titleBarVars.colors.fg;
+                break;
+        }
+        return style("tileType", {
+            backgroundColor: colorOut(bg),
+            color: colorOut(fg),
+        });
+    };
+
+    const scaleContents = (multiplier: number) => {
+        return style("scale", {
+            transform: scale(multiplier),
+        });
+    };
+
+    const compactTilesAndText = style("compactTilesAndText", {
+        flexDirection: "column",
+        width: unit(vars.tiles.wideWidth),
+        $nest: {
+            [`.${headingH3}`]: {
+                marginTop: unit(vars.spacing.verticalTitle),
+            },
+            [`.${tileText}`]: {
+                width: percent(100),
+            },
+        },
     });
 
     return {
         heading,
         headingH1,
         headingH2,
+        headingH3,
         paragraph,
         unorderedList,
         listItem,
@@ -167,5 +256,12 @@ export const storyBookClasses = useThemeCache(() => {
         tiles,
         tile,
         content,
+        scaleContents,
+        setBackground,
+        tilesAndText,
+        tileTitle,
+        tileText,
+        tileTextPaddingLeft,
+        compactTilesAndText,
     };
 });

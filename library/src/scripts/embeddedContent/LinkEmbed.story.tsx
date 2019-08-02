@@ -4,13 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import { FileEmbed } from "@library/embeddedContent/FileEmbed";
-import DateTime from "@library/content/DateTime";
-import { formatUrl } from "@library/utility/appUtils";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 
 const reactionsStory = storiesOf("Embeds", module);

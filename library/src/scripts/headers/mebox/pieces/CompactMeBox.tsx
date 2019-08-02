@@ -25,7 +25,7 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { user } from "@library/icons/header";
+import { user } from "@library/icons/titleBar";
 import { TouchScrollable } from "react-scrolllock";
 
 interface IProps extends IInjectableUserState, IMeBoxProps {}

@@ -16,7 +16,17 @@ const merge = require("webpack-merge");
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeStoryConfig(baseStorybookConfig: any, entryModel: EntryModel) {
+export async function makeStoryConfig(baseStorybookConfig: Configuration, entryModel: EntryModel) {
+    baseStorybookConfig.module!.rules.push({
+        test: /\.story\.tsx?$/,
+        loaders: [
+            {
+                loader: require.resolve("@storybook/addon-storysource/loader"),
+                options: { parser: "typescript" },
+            },
+        ],
+        enforce: "pre",
+    });
     const baseConfig: Configuration = await makeBaseConfig(entryModel, "storybook");
     baseConfig.mode = "development";
     baseConfig.optimization = {

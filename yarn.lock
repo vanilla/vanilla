@@ -7064,6 +7064,13 @@ eslint-plugin-jsx-a11y@^6.2.1:
     has "^1.0.3"
     jsx-ast-utils "^2.0.1"
 
+eslint-plugin-lodash@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-lodash/-/eslint-plugin-lodash-5.1.0.tgz#f7dc6c14f104cacb169a18d17c27d9c015a53924"
+  integrity sha512-mMKmf1OMLS8VExtaHCcrwBmsYIiOVYEibnAFDzXrbJdtFGOcLEw37tryN/WGYKBiJy6nAIGC43i5Wh3KA9lO2g==
+  dependencies:
+    lodash "4.17.11"
+
 eslint-plugin-react-hooks@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-1.6.0.tgz#348efcda8fb426399ac7b8609607c7b4025a6f5f"

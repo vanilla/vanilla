@@ -12,7 +12,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { settings } from "@library/icons/header";
+import { settings } from "@library/icons/titleBar";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";

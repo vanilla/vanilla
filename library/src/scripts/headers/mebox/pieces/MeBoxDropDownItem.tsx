@@ -7,7 +7,7 @@
 import React from "react";
 import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@library/utility/appUtils";
-import { noUserPhoto } from "@library/icons/header";
+import { noUserPhoto } from "@library/icons/titleBar";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartLink from "@library/routing/links/SmartLink";
 import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";

@@ -48,18 +48,12 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
                 return buttonUtils.buttonIcon;
             case ButtonTypes.ICON_COMPACT:
                 return buttonUtils.buttonIconCompact;
-            case ButtonTypes.COMPACT:
-                return classes.compact;
-            case ButtonTypes.COMPACT_PRIMARY:
-                return classes.compactPrimary;
             case ButtonTypes.PRIMARY:
                 return classes.primary;
             case ButtonTypes.TRANSPARENT:
                 return classes.transparent;
             case ButtonTypes.TRANSLUCID:
                 return classes.translucid;
-            case ButtonTypes.INVERTED:
-                return classes.inverted;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
             default:

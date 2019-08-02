@@ -8,15 +8,35 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import classNames from "classnames";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
-interface IProps {
-    children: JSX.Element;
+export interface IStoryTileProps {
+    mouseOverText?: string;
+    children: React.ReactNode;
+    type?: string;
+    scaleContents?: number;
+    tag?: string;
 }
 
 /**
  * Separator, for react storybook.
  */
-export function StoryTile(props: IProps) {
+export function StoryTile(props: IStoryTileProps) {
     const classes = storyBookClasses();
-    return <li className={classes.tile}>{props.children}</li>;
+    const Tag = `${props.tag ? props.tag : "li"}`;
+    return (
+        // @ts-ignore
+        <Tag
+            title={props.mouseOverText}
+            className={classNames(classes.tile, { [classes.setBackground(props.type!)]: props.type })}
+        >
+            <ConditionalWrap
+                condition={props.scaleContents !== undefined}
+                className={classes.scaleContents(props.scaleContents!)}
+            >
+                {props.children}
+            </ConditionalWrap>
+        </Tag>
+    );
 }

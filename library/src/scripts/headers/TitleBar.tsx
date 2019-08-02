@@ -213,14 +213,14 @@ export class TitleBar extends React.Component<IProps, IState> {
             return (
                 <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
                     <TitleBarNavItem
-                        buttonType={ButtonTypes.TRANSLUCID}
+                        buttonType={ButtonTypes.TRANSPARENT}
                         linkClassName={classNames(classes.signIn, classes.guestButton)}
                         to={`/entry/signin?target=${window.location.pathname}`}
                     >
                         {t("Sign In")}
                     </TitleBarNavItem>
                     <TitleBarNavItem
-                        buttonType={ButtonTypes.INVERTED}
+                        buttonType={ButtonTypes.TRANSLUCID}
                         linkClassName={classNames(classes.register, classes.guestButton)}
                         to={`/entry/register?target=${window.location.pathname}`}
                     >

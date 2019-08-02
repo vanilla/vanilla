@@ -25,7 +25,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
-import { compose } from "@library/icons/header";
+import { compose } from "@library/icons/titleBar";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs

@@ -32,8 +32,8 @@ import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { signIn } from "@library/icons/common";
 import SmartLink from "@library/routing/links/SmartLink";
+import { SignInIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -194,7 +194,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                     className={classNames(classes.centeredButtonClass, classes.button)}
                     to={`/entry/signin?target=${window.location.pathname}`}
                 >
-                    {signIn("titleBar-signInIcon")}
+                    <SignInIcon className={"titleBar-signInIcon"} />
                 </SmartLink>
             );
         } else {

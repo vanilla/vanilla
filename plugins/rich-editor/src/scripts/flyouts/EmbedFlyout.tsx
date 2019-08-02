@@ -7,7 +7,6 @@
 import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { embed } from "@library/icons/editorIcons";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
@@ -22,6 +21,7 @@ import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
+import { EmbedIcon } from "@library/icons/editorIcons";
 
 interface IProps {
     disabled?: boolean;
@@ -108,7 +108,7 @@ export default function EmbedFlyout(props: IProps) {
                 onClose={clearInput}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
-                buttonContents={<IconForButtonWrap icon={embed()} />}
+                buttonContents={<IconForButtonWrap icon={<EmbedIcon />} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}

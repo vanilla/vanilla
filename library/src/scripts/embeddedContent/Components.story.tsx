@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
@@ -12,8 +11,8 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ComposeIcon } from "@library/icons/titleBar";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { compose } from "@library/icons/common";
 
 const reactionsStory = storiesOf("Components", module);
 
@@ -42,14 +41,18 @@ reactionsStory.add("Buttons", () => {
                             globalVars.buttonIcon.size
                         } pixels`}
                     >
-                        <Button baseClass={ButtonTypes.ICON}>{compose()}</Button>
+                        <Button baseClass={ButtonTypes.ICON}>
+                            <ComposeIcon />
+                        </Button>
                     </StoryTileAndTextCompact>
                     <StoryTileAndTextCompact
                         text={`Compact icon button - ${globalVars.icon.sizes.default} x ${
                             globalVars.icon.sizes.default
                         } pixels`}
                     >
-                        <Button baseClass={ButtonTypes.ICON_COMPACT}>{compose()}</Button>
+                        <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                            <ComposeIcon />
+                        </Button>
                     </StoryTileAndTextCompact>
 
                     <StoryTileAndTextCompact type={"titleBar"} text={"For TitleBar call to action (login)"}>
@@ -70,7 +73,7 @@ reactionsStory.add("Buttons", () => {
                     <StoryHeading>Icon with text</StoryHeading>
                     <Button baseClass={ButtonTypes.PRIMARY}>
                         <>
-                            {compose()}
+                            <ComposeIcon />
                             <span className={classes.buttonIconLeftMargin}>Example with icon</span>
                         </>
                     </Button>

@@ -25,8 +25,8 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { user } from "@library/icons/titleBar";
 import { TouchScrollable } from "react-scrolllock";
+import { UserIcon } from "@library/icons/titleBar";
 
 interface IProps extends IInjectableUserState, IMeBoxProps {}
 
@@ -88,8 +88,16 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                             }
                             tabs={[
                                 {
-                                    buttonContent: <MeBoxIcon compact={true}>{user(false)}</MeBoxIcon>,
-                                    openButtonContent: <MeBoxIcon compact={true}>{user(true)}</MeBoxIcon>,
+                                    buttonContent: (
+                                        <MeBoxIcon compact={true}>
+                                            <UserIcon filled={false} />
+                                        </MeBoxIcon>
+                                    ),
+                                    openButtonContent: (
+                                        <MeBoxIcon compact={true}>
+                                            <UserIcon filled={true} />
+                                        </MeBoxIcon>
+                                    ),
                                     panelContent: (
                                         <TouchScrollable>
                                             <UserDropDownContents className={classes.scrollContainer} />

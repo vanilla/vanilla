@@ -12,7 +12,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { settings } from "@library/icons/titleBar";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -26,6 +25,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import { SettingsIcon } from "@library/icons/titleBar";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -53,7 +53,7 @@ export class NotificationsContents extends React.Component<IProps> {
                             baseClass={ButtonTypes.ICON}
                             to={`/profile/preferences/${userSlug}`}
                         >
-                            {settings()}
+                            <SettingsIcon />
                         </LinkAsButton>
                     </FrameHeaderWithAction>
                 }

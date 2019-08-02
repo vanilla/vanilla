@@ -13,49 +13,50 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import {
-    emojiGroup_smileysPeople,
-    emojiGroup_animalsNature,
-    emojiGroup_foodDrink,
-    emojiGroup_travelPlaces,
-    emojiGroup_activities,
-    emojiGroup_objects,
-    emojiGroup_symbols,
-    emojiGroup_flags,
+    EmojiGroupActivitiesIcon,
+    EmojiGroupAnimalsNatureIcon,
+    EmojiGroupFlagsIcon,
+    EmojiGroupFoodDrinkIcon,
+    EmojiGroupObjectsIcon,
+    EmojiGroupSmileysPeopleIcon,
+    EmojiGroupSymbolsIcon,
+    EmojiGroupTravelPlacesIcon,
 } from "@library/icons/emojiGroups";
 
 export const EMOJI_GROUPS = [
     {
         name: "Smileys & People",
-        icon: emojiGroup_smileysPeople(),
+        icon: <EmojiGroupSmileysPeopleIcon />,
     },
     {
         name: "Animals & Nature",
-        icon: emojiGroup_animalsNature(),
+        icon: <EmojiGroupAnimalsNatureIcon />,
     },
     {
         name: "Food & Drink",
-        icon: emojiGroup_foodDrink(),
+        icon: <EmojiGroupFoodDrinkIcon />,
     },
     {
         name: "Travel & Places",
-        icon: emojiGroup_travelPlaces(),
+        icon: <EmojiGroupTravelPlacesIcon />,
     },
     {
         name: "Activities",
-        icon: emojiGroup_activities(),
+        icon: <EmojiGroupActivitiesIcon />,
     },
     {
         name: "Objects",
-        icon: emojiGroup_objects(),
+        icon: <EmojiGroupObjectsIcon />,
     },
     {
         name: "Symbols",
-        icon: emojiGroup_symbols(),
+        icon: <EmojiGroupSymbolsIcon />,
     },
     {
         name: "Flags",
-        icon: emojiGroup_flags(),
+        icon: <EmojiGroupFlagsIcon />,
     },
 ];
 

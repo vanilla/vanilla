@@ -7,8 +7,8 @@
 import React from "react";
 import { IUserFragment } from "@library/@types/api/users";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { user } from "@library/icons/titleBar";
 import classNames from "classnames";
+import { UserIcon } from "@library/icons/titleBar";
 
 export enum UserPhotoSize {
     SMALL = "small",
@@ -48,7 +48,7 @@ export class UserPhoto extends React.Component<IProps> {
                 {!!photoUrl && (
                     <img src={photoUrl} alt={name || ""} className={classNames("userPhoto-photo", classes.photo)} />
                 )}
-                {!photoUrl && user(open, classNames("userPhoto-photo", classes.photo))}
+                {!photoUrl && <UserIcon filled={open} className={classNames("userPhoto-photo", classes.photo)} />}
             </div>
         );
     }

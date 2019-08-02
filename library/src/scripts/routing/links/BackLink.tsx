@@ -9,8 +9,8 @@ import classNames from "classnames";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { formatUrl, t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router";
-import { leftChevronCompact } from "@library/icons/common";
 import { Link } from "react-router-dom";
+import { LeftChevronCompactIcon } from "@library/icons/common";
 
 interface IProps extends RouteComponentProps<{}> {
     fallbackUrl?: string;
@@ -50,7 +50,7 @@ export class BackLink extends React.Component<IProps> {
                             this.props.linkClassName,
                         )}
                     >
-                        {leftChevronCompact(classes.icon)}
+                        <LeftChevronCompactIcon className={classes.icon} />
                         {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
                     </Link>
                 </div>

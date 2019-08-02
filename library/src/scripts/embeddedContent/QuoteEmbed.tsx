@@ -11,10 +11,10 @@ import classnames from "classnames";
 import { makeProfileUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import DateTime from "@library/content/DateTime";
-import { bottomChevron, topChevron } from "@library/icons/common";
 import CollapsableUserContent from "@library/content/CollapsableContent";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { BottomChevronIcon, TopChevronIcon } from "@library/icons/common";
 
 interface IProps extends IBaseEmbedProps {
     body: string;
@@ -81,9 +81,11 @@ export function QuoteEmbed(props: IProps) {
                                 onClick={toggleCollapseState}
                                 aria-pressed={isCollapsed}
                             >
-                                {isCollapsed
-                                    ? bottomChevron("embedQuote-chevronDown")
-                                    : topChevron("embedQuote-chevronUp")}
+                                {isCollapsed ? (
+                                    <BottomChevronIcon className={"embedQuote-chevronDown"} />
+                                ) : (
+                                    <TopChevronIcon className={"embedQuote-chevronUp"} />
+                                )}
                             </button>
                         )}
                     </div>

@@ -14,6 +14,7 @@ import {
     ListUnorderedIcon,
     SpoilerIcon,
     Heading4Icon,
+    Heading5Icon,
 } from "@library/icons/editorIcons";
 import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";

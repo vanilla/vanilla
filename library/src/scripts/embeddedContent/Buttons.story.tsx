@@ -13,10 +13,11 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { checkCompact, closeCompact, compose, plusCircle } from "@library/icons/common";
 import { StoryTile } from "@library/storybook/StoryTile";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
+import { CheckCompactIcon, CloseCompactIcon } from "@library/icons/common";
+import { ComposeIcon } from "@library/icons/titleBar";
 const reactionsStory = storiesOf("Components", module);
 
 reactionsStory.add("Buttons", () => {
@@ -64,7 +65,7 @@ reactionsStory.add("Buttons", () => {
                     title={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
                 >
                     <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
-                        {closeCompact()}
+                        <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
@@ -72,7 +73,9 @@ reactionsStory.add("Buttons", () => {
                         globalVars.icon.sizes.default,
                     )})`}
                 >
-                    <Button baseClass={ButtonTypes.ICON_COMPACT}>{checkCompact()}</Button>
+                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                        <CheckCompactIcon />
+                    </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
                     text={
@@ -91,7 +94,7 @@ reactionsStory.add("Buttons", () => {
             <StoryTiles>
                 <StoryTileAndTextCompact>
                     <Button baseClass={ButtonTypes.STANDARD}>
-                        {compose(classesButtonUtility.buttonIconRightMargin)}
+                        <ComposeIcon className={classesButtonUtility.buttonIconRightMargin} />
                         {"Icon and Text"}
                     </Button>
                 </StoryTileAndTextCompact>

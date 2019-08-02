@@ -7,7 +7,6 @@
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
-import { chevronUp, downTriangle } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
@@ -23,6 +22,7 @@ import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
+import { ChevronUpIcon, DownTriangleIcon } from "@library/icons/common";
 
 export interface IProps {
     className?: string;
@@ -62,7 +62,9 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                 >
                     <span className={classNames(classes.buttonContents)}>
                         <span className={classes.title}>{this.props.title}</span>
-                        <span className={classes.icon}>{downTriangle("mobileDropDown-downTriangle")}</span>
+                        <span className={classes.icon}>
+                            <DownTriangleIcon className={"mobileDropDown-downTriangle"} />
+                        </span>
                     </span>
                 </Button>
                 {this.state.open && (
@@ -116,7 +118,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                         baseClass={ButtonTypes.CUSTOM}
                                         className={classes.closeModal}
                                     >
-                                        {chevronUp(classes.closeModalIcon)}
+                                        <ChevronUpIcon className={classes.closeModalIcon} />
                                     </Button>
                                 </FrameFooter>
                             }

@@ -6,9 +6,9 @@
 import React from "react";
 import classNames from "classnames";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
-import { userWarning } from "@library/icons/titleBar";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
+import { UserWarningIcon } from "@library/icons/titleBar";
 
 interface IProps {
     children: string;
@@ -29,7 +29,7 @@ export default class StandardEmbedError extends React.Component<IProps> {
                 aria-live="assertive"
                 tabIndex={-1}
             >
-                {userWarning("embedLoader-icon embedLoader-warningIcon")}
+                <UserWarningIcon className={"embedLoader-icon embedLoader-warningIcon"} />
                 <span id={descriptionId} className="embedLoader-errorMessage">
                     {this.props.children}
                 </span>

@@ -7,7 +7,6 @@
 import React from "react";
 import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@library/utility/appUtils";
-import { noUserPhoto } from "@library/icons/titleBar";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartLink from "@library/routing/links/SmartLink";
 import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";
@@ -15,6 +14,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
+import { NoUserPhotoIcon } from "@library/icons/titleBar";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -77,7 +77,7 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                         {this.props.photo ? (
                             <img className={classesMeBoxMessage.image} src={this.props.photo} />
                         ) : (
-                            noUserPhoto(classesMeBoxMessage.image)
+                            <NoUserPhotoIcon className={classesMeBoxMessage.image} />
                         )}
                     </div>
                     <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>

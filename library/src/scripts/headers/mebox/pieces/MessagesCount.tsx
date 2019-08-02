@@ -5,7 +5,7 @@
  */
 
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { messages } from "@library/icons/titleBar";
+import { MessagesIcon } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 
@@ -22,7 +22,7 @@ export default function MessagesCount(props: IProps) {
 
     return (
         <MeBoxIcon count={0} countLabel={t("Messages") + ": "} compact={compact}>
-            {messages(!!open)}
+            <MessagesIcon filled={!!open} />
         </MeBoxIcon>
     );
 }

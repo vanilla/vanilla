@@ -13,9 +13,9 @@ import classNames from "classnames";
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
-    checked: boolean;
+    checked?: boolean;
     disabled?: boolean;
-    onChange: any;
+    onChange?: any;
     label: string;
 }
 

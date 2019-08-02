@@ -8,6 +8,7 @@ import { border, calc, color, em, important, percent, scale, translateX } from "
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -59,8 +60,13 @@ export const storyBookClasses = useThemeCache(() => {
             weight: globalVars.fonts.weights.normal,
             lineHeight: 1.43,
         }),
-        ...margins({ vertical: vars.spacing.default }),
-        $nest: lineHeightAdjustment(),
+        ...margins({ bottom: vars.spacing.default }),
+        $nest: {
+            ...lineHeightAdjustment(),
+            [`& + &`]: {
+                ...margins({ top: vars.spacing.default }),
+            },
+        },
     });
 
     const heading = style("heading", {
@@ -71,7 +77,6 @@ export const storyBookClasses = useThemeCache(() => {
             lineHeight: 1.25,
         }),
         transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
-        $nest: lineHeightAdjustment(),
     });
 
     const headingH1 = style("headingH1", {
@@ -87,25 +92,22 @@ export const storyBookClasses = useThemeCache(() => {
         ...fonts({
             size: 18,
         }),
-        ...margins({
-            vertical: vars.spacing.large,
-        }),
+
         ...paddings({
             bottom: vars.spacing.tight,
             horizontal: unit(vars.spacing.tight / 2),
         }),
+        ...margins({
+            top: vars.spacing.large,
+            bottom: vars.spacing.tight,
+        }),
+
         borderBottom: singleBorder({
             width: 1,
             color: vars.colors.border,
         }),
         width: calc(`100% + ${unit(vars.spacing.tight)}`),
         transform: translateX(`-${unit(vars.spacing.tight / 2)}`),
-
-        $nest: {
-            [`& + .${paragraph}`]: {
-                marginTop: unit(vars.spacing.tight),
-            },
-        },
     });
 
     const headingH3 = style("headingH1", {

@@ -18,8 +18,8 @@ export enum InputTextBlockBaseClass {
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
     inputProps: {
-        value: string;
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        value?: string;
+        onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
         inputClassNames?: string;
         type?: string;
         defaultValue?: string;

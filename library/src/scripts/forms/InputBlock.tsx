@@ -25,7 +25,7 @@ type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
     label: ReactNode;
-    children: JSX.Element | CallbackChildren;
+    children: React.ReactNode | CallbackChildren;
     className?: string;
     labelClassName?: string;
     noteAfterInput?: string;

@@ -41,5 +41,4 @@ class InteropContainer implements InteropContainerInterface {
     public function has($id) {
         return $this->container->has($id);
     }
-
 }

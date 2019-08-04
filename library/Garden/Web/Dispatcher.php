@@ -13,7 +13,7 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 

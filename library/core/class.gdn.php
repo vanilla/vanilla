@@ -545,8 +545,12 @@ class Gdn {
         if (self::$container === null) {
             $dic = new Garden\Container\Container();
 
-            $dic->setInstance('Garden\Container\Container', $dic)
-                ->setInstance('Interop\Container\ContainerInterface', $dic);
+            $dic->setInstance(\Garden\Container\Container::class, $dic)
+                ->setInstance(\Psr\Container\ContainerInterface::class, $dic)
+
+                ->rule(\Interop\Container\ContainerInterface::class)
+                ->setClass(\Vanilla\InteropContainer::class)
+            ;
 
             self::$container = $dic;
         }

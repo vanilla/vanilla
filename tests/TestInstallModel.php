@@ -7,7 +7,7 @@
 
 namespace VanillaTests;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
 

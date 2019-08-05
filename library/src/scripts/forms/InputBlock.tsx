@@ -60,7 +60,9 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
 
         let children;
         if (typeof this.props.children === "function") {
-            children = this.props.children({ hasErrors, errorID: this.errorID, labelID: this.labelID });
+            // Type is checked, but typechecker not accepting it.
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            children = (this.props.children as Function)({ hasErrors, errorID: this.errorID, labelID: this.labelID });
         } else {
             children = this.props.children;
         }

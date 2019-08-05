@@ -66,6 +66,9 @@ export const storyBookClasses = useThemeCache(() => {
             [`& + &`]: {
                 ...margins({ top: vars.spacing.default }),
             },
+            [`a`]: {
+                textDecoration: "underline",
+            },
         },
     });
 
@@ -239,6 +242,12 @@ export const storyBookClasses = useThemeCache(() => {
             },
             [`.${tileText}`]: {
                 width: percent(100),
+            },
+            [`.${paragraph}`]: {
+                ...margins({
+                    top: vars.spacing.tight,
+                    bottom: 0,
+                }),
             },
         },
     });

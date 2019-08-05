@@ -18,6 +18,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
 import { CheckCompactIcon, CloseCompactIcon } from "@library/icons/common";
 import { ComposeIcon } from "@library/icons/titleBar";
+import Paragraph from "@library/layout/Paragraph";
 const reactionsStory = storiesOf("Components", module);
 
 reactionsStory.add("Buttons", () => {
@@ -104,7 +105,26 @@ reactionsStory.add("Buttons", () => {
 });
 
 reactionsStory.add("Modals", () => {
-    return <StoryHeading depth={1}>Modals</StoryHeading>;
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>Modals</StoryHeading>
+            <StoryParagraph>
+                Click button to see modals. Note that they are rendered through a{" "}
+                <a href="https://reactjs.org/docs/portals.html" rel="noopener noreferrer" target="_blank">
+                    react portal.
+                </a>
+            </StoryParagraph>
+
+            <StoryTiles>
+                <StoryTileAndTextCompact>
+                    <Button>Standard Modal</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact>
+                    <Button>Standard Modal</Button>
+                </StoryTileAndTextCompact>
+            </StoryTiles>
+        </StoryContent>
+    );
 });
 
 reactionsStory.add("Examples", () => {

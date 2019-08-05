@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-use \Garden\EventManager;
+use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 
 /**
  * Class VanillaHtmlFormatter
@@ -140,8 +140,20 @@ class VanillaHtmlFormatter {
         'colgroup'
     ];
 
+    /** @var LegacyEmbedReplacer */
+    private $legacyEmbedReplacer;
+
     /** @var array Extra allowed classes. */
     protected $extraAllowedClasses = [];
+
+    /**
+     * DI.
+     *
+     * @param LegacyEmbedReplacer $legacyEmbedReplacer
+     */
+    public function __construct(LegacyEmbedReplacer $legacyEmbedReplacer) {
+        $this->legacyEmbedReplacer = $legacyEmbedReplacer;
+    }
 
     /**
      * Filter provided HTML through htmlLawed and return the result.
@@ -182,7 +194,7 @@ class VanillaHtmlFormatter {
         }
 
         // Turn embedded videos into simple links (legacy workaround)
-        $html = Gdn_Format::unembedContent($html);
+        $html = $this->legacyEmbedReplacer->unembedContent($html);
 
         // We check the flag within Gdn_Format to see
         // if htmLawed should place rel="nofollow" links

@@ -21,7 +21,7 @@ abstract class BaseFormat implements FormatInterface {
      *
      * @inheritdoc
      */
-    public function renderExcerpt(string $content, string $query = null): string {
+    public function renderExcerpt(string $content): string {
         $plainText = $this->renderPlainText($content);
 
         $excerpt = mb_ereg_replace("\n", ' ', $plainText);

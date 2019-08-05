@@ -59,7 +59,8 @@ class Filterer {
             }
 
             if (!is_array($embed['data'] ?? null)) {
-                // We only care about embeds operations.
+                // Strip off any malformed embeds.
+                unset($operations[$key]);
                 continue;
             }
             $embedData = &$embed['data'];
@@ -99,8 +100,7 @@ class Filterer {
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            // We also need to ensure we've safely rendered the body to prevent innacurate content.
-            $embedData['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
+            $embedData['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $format);
         }
 
         return array_values($operations);

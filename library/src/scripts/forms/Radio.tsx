@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import {getRequiredID, IOptionalComponentID, useUniqueID} from "@library/utility/idUtils";
+import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
 
@@ -29,31 +29,30 @@ interface IState {
 /**
  * A styled, accessible checkbox component.
  */
-export default function Checkbox(props) {
+export default function Radio(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
     const Tag = props.externalLabel ? "div" : "label";
-    return {
-        return (
-            {/*<Tag className="radioButton">*/}
-            {/*    <input*/}
-            {/*        className="radioButton-input"*/}
-            {/*        onChange={props.onChange}*/}
-            {/*        aria-disabled={props.disabled}*/}
-            {/*        radioGroup={props.radioGroup}*/}
-            {/*        disabled={props.disabled}*/}
-            {/*        type="radio"*/}
-            {/*    />*/}
-            {/*    <span className="radioButton-disk">*/}
-            {/*        <span className="radioButton-state">*/}
-            {/*            <svg className="radioButton-icon radioButton-diskIcon">*/}
-            {/*                <title>{t("Radio Button")}</title>*/}
-            {/*                <circle fill="currentColor" cx="3" cy="3" r="3" />*/}
-            {/*            </svg>*/}
-            {/*        </span>*/}
-            {/*    </span>*/}
-            {/*    {props.note && <span className="radioButton-labelNote">{props.note}</span>}}*/}
-            {/*</Tag>*/}
-        );
-    }
+
+    return (
+        <Tag className="radioButton">
+            <input
+                className="radioButton-input"
+                onChange={props.onChange}
+                aria-disabled={props.disabled}
+                radioGroup={props.radioGroup}
+                disabled={props.disabled}
+                type="radio"
+            />
+            <span className="radioButton-disk">
+                <span className="radioButton-state">
+                    <svg className="radioButton-icon radioButton-diskIcon">
+                        <title>{t("Radio Button")}</title>
+                        <circle fill="currentColor" cx="3" cy="3" r="3" />
+                    </svg>
+                </span>
+            </span>
+            {props.note && <span className="radioButton-labelNote">{props.note}</span>}}
+        </Tag>
+    );
 }

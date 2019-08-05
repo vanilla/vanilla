@@ -22,7 +22,6 @@ import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import { t } from "@library/utility/appUtils";
 import { SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import RadioTab from "@library/forms/radioTabs/RadioTab";
-// import Checkbox from "@library/forms/Checkbox";
 import Permission from "@library/features/users/Permission";
 import { boolean } from "@storybook/addon-knobs";
 import InputBlock from "@library/forms/InputBlock";
@@ -30,7 +29,6 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import Paragraph from "@library/layout/Paragraph";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
-import StoryExampleAdvancedSearch from "@knowledge/modules/search/components/StoryExampleAdvancedSearch";
 import AdvancedSearch from "@knowledge/modules/search/components/AdvancedSearch";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import IndependentSearch from "@library/features/search/IndependentSearch";
@@ -41,12 +39,13 @@ import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { MemoryRouter } from "react-router";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import Checkbox from "@library/forms/Checkbox";
 
 const reactionsStory = storiesOf("FormElements", module);
 
 // Radio as tabs
 
-reactionsStory.add("Radio Buttons as Tabs", () => {
+reactionsStory.add("Form Elements", () => {
     let activeTab = SearchDomain.ARTICLES;
 
     const doNothing = () => {
@@ -65,7 +64,7 @@ reactionsStory.add("Radio Buttons as Tabs", () => {
         <StoryContent>
             <StoryHeading depth={1}>Form Elements</StoryHeading>
             <StoryHeading>Checkbox</StoryHeading>
-            {/*<Checkbox label={t("Simple Checkbox")} className="inputBlock" />*/}
+            <Checkbox label={t("Simple Checkbox")} className="inputBlock" />
             <StoryHeading>InputBlock</StoryHeading>
             <StoryParagraph>Helper component to add label to various inputs</StoryParagraph>
             <InputBlock label={"Cool Label"}>

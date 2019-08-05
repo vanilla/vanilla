@@ -35,7 +35,7 @@ class ParserTest extends SharedBootstrapTestCase {
     public function assertParseResults(array $ops, array $expected) {
         $error = "The parser failed to instantiate through the container";
         try {
-            $parser = \Gdn::getContainer()->get(Parser::class);
+            $parser = self::container()->get(Parser::class);
         } catch (\Exception $e) {
             $this->fail($error);
         }

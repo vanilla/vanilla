@@ -1,0 +1,3 @@
+https://vanillaforums.example/discussion/comment/1#Comment_1
+@notAMention
+ @@thisIsARealMention @@duplicateMention@@duplicateMention @@@@@@!@#$%^&amp;*()&quot;&quot;

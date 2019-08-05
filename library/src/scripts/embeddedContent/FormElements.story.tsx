@@ -40,10 +40,13 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { MemoryRouter } from "react-router";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import Checkbox from "@library/forms/Checkbox";
+import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDropDownSearch";
 
 const reactionsStory = storiesOf("FormElements", module);
 
 // Radio as tabs
+
+const doNothing = () => {};
 
 reactionsStory.add("Form Elements", () => {
     let activeTab = SearchDomain.ARTICLES;
@@ -136,6 +139,8 @@ reactionsStory.add("Form Elements", () => {
             />
 
             <StoryHeading>DropDown with search</StoryHeading>
+            <StoryExampleDropDownSearch onChange={doNothing} />
+
             {/*<KnowledgeBaseInput*/}
             {/*    className="inputBlock"*/}
             {/*    onChange={doNothing}*/}

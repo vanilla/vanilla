@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 
-const reactionsStory = storiesOf("Embeds", module);
+const story = storiesOf("Embeds", module);
 
 // tslint:disable:jsx-use-translation-function
 
@@ -19,7 +19,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac 
 
 const date = "2019-06-05 20:59:01";
 
-reactionsStory.add("LinkEmbed", () => {
+story.add("LinkEmbed", () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: LinkEmbed</StoryHeading>

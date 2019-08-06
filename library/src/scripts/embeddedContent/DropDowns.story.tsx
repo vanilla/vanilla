@@ -14,13 +14,13 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryExampleDropDown } from "./StoryExampleDropDown";
 
-const reactionsStory = storiesOf("Dropdowns", module);
+const story = storiesOf("Components", module);
 
 // Radio as tabs
 
 const doNothing = () => {};
 
-reactionsStory.add("Dropdowns", () => {
+story.add("Dropdowns", () => {
     const doNothing = () => {
         return;
     };

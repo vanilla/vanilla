@@ -244,10 +244,10 @@ export function CheckCompactIcon(props: { className?: string }) {
     );
 }
 
-export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
-    let transform;
-    if (props.deg) {
-        transform = { transform: `rotate(${props.deg}deg` };
+export function UpTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
+    let inlineStyles: React.CSSProperties = {};
+    if (props.deg !== undefined) {
+        inlineStyles = { transform: `rotate(${props.deg}deg)` };
     }
     return (
         <svg
@@ -255,10 +255,28 @@ export function DownTriangleIcon(props: { className?: string; title?: string; de
             viewBox="0 0 8 8"
             className={classNames("icon", "icon-triangleRight", props.className)}
             aria-hidden="true"
-            style={transform}
+            style={inlineStyles}
         >
             <title>{props.title ? props.title : `▾`}</title>
-            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
+            <path fill="currentColor" fillRule="evenodd" d="M12 14.5l4-4.5H8z" />
+        </svg>
+    );
+}
+
+export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
+    let transform: string | undefined = undefined;
+    if (props.deg !== undefined) {
+        transform = `rotate(${props.deg}, 4, 4)`;
+    }
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 8 8"
+            className={classNames("icon", "icon-triangleRight", props.className)}
+            aria-hidden="true"
+        >
+            <title>{props.title ? props.title : `▾`}</title>
+            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" transform={transform} />
         </svg>
     );
 }

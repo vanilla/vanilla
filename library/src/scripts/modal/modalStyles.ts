@@ -168,6 +168,7 @@ export const modalClasses = useThemeCache(() => {
                 maxHeight: percent(100),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
+                border: "none",
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
@@ -205,6 +206,7 @@ export const modalClasses = useThemeCache(() => {
             },
         },
         mediaQueries.oneColumnDown({
+            height: unit(titleBarVars.sizing.mobile.height),
             minHeight: unit(titleBarVars.sizing.mobile.height),
         }),
     );

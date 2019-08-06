@@ -51,22 +51,30 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
         const classes = mobileDropDownClasses();
         const classesFrameHeader = frameHeaderClasses();
         const { className, children, title, buttonClass } = this.props;
-        return children ? (
-            <div className={classNames(classes.root, className)}>
+
+        const TitleButton = (props: { icon: React.ReactNode; onClick: React.MouseEventHandler }) => {
+            return (
                 <Button
                     title={this.props.title}
                     className={classNames(classes.toggleButton, buttonClass)}
-                    onClick={this.open}
+                    onClick={props.onClick}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}
                 >
                     <span className={classNames(classes.buttonContents)}>
                         <span className={classes.title}>{this.props.title}</span>
-                        <span className={classes.icon}>
-                            <DownTriangleIcon className={"mobileDropDown-downTriangle"} />
-                        </span>
+                        <span className={classes.icon}>{props.icon}</span>
                     </span>
                 </Button>
+            );
+        };
+
+        return children ? (
+            <div className={classNames(classes.root, className)}>
+                <TitleButton
+                    icon={<DownTriangleIcon className={"mobileDropDown-downTriangle"} />}
+                    onClick={this.open}
+                />
                 {this.state.open && (
                     <Modal
                         size={ModalSizes.MODAL_AS_DROP_DOWN}
@@ -81,30 +89,15 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                     <Container>
                                         <PanelWidgetHorizontalPadding>
                                             <div className={classes.headerContent}>
-                                                <FlexSpacer
-                                                    className={classNames(
-                                                        "frameHeader-leftSpacer",
-                                                        classesFrameHeader.leftSpacer,
-                                                    )}
+                                                <TitleButton
+                                                    onClick={this.close}
+                                                    icon={
+                                                        <DownTriangleIcon
+                                                            deg={180}
+                                                            className={"mobileDropDown-downTriangle"}
+                                                        />
+                                                    }
                                                 />
-                                                <Heading
-                                                    title={title}
-                                                    className={classNames(
-                                                        "frameHeader-heading",
-                                                        "frameHeader-centred",
-                                                        classesFrameHeader.centred,
-                                                        classesFrameHeader.heading,
-                                                    )}
-                                                >
-                                                    <SmartAlign>{title}</SmartAlign>
-                                                </Heading>
-                                                <div className={classNames(classesFrameHeader.action)}>
-                                                    <CloseButton
-                                                        className={classNames(classes.closeButton)}
-                                                        onClick={this.close}
-                                                        compact={true}
-                                                    />
-                                                </div>
                                             </div>
                                         </PanelWidgetHorizontalPadding>
                                     </Container>

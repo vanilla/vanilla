@@ -6,24 +6,17 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React, { useMemo } from "react";
+import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import { t } from "@library/utility/appUtils";
-import { SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import RadioTab from "@library/forms/radioTabs/RadioTab";
 import InputBlock from "@library/forms/InputBlock";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import IndependentSearch from "@library/features/search/IndependentSearch";
-import { splashClasses } from "@library/splash/splashStyles";
 import DateRange from "@library/forms/DateRange";
-import SearchContext from "@library/contexts/SearchContext";
-import { MockSearchData } from "@library/contexts/DummySearchContext";
-import { MemoryRouter } from "react-router";
 import Checkbox from "@library/forms/Checkbox";
 import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDropDownSearch";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";

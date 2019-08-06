@@ -154,7 +154,7 @@ export const searchBarClasses = useThemeCache(() => {
     );
 
     const results = style("results", {
-        position: "relative",
+        position: "absolute",
         width: percent(100),
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),

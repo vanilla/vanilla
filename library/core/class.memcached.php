@@ -45,6 +45,17 @@ class Gdn_Memcached extends Gdn_Cache {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
 
+        $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, Memcached::OPT_COMPRESSION);
+        $this->registerFeature(Gdn_Cache::FEATURE_EXPIRY);
+        $this->registerFeature(Gdn_Cache::FEATURE_TIMEOUT);
+        $this->registerFeature(Gdn_Cache::FEATURE_NOPREFIX);
+        $this->registerFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
+        $this->registerFeature(Gdn_Cache::FEATURE_SHARD);
+
+        if (c('Garden.Cache.Local', true)) {
+            $this->registerFeature(Gdn_Cache::FEATURE_LOCAL);
+        }
+
         if ($cache !== null) {
             $this->memcache = $cache;
             $this->injected = true;
@@ -69,17 +80,6 @@ class Gdn_Memcached extends Gdn_Cache {
             $this->memcache = new Memcached($poolKey);
         } else {
             $this->memcache = new Memcached;
-        }
-
-        $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, Memcached::OPT_COMPRESSION);
-        $this->registerFeature(Gdn_Cache::FEATURE_EXPIRY);
-        $this->registerFeature(Gdn_Cache::FEATURE_TIMEOUT);
-        $this->registerFeature(Gdn_Cache::FEATURE_NOPREFIX);
-        $this->registerFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
-        $this->registerFeature(Gdn_Cache::FEATURE_SHARD);
-
-        if (c('Garden.Cache.Local', true)) {
-            $this->registerFeature(Gdn_Cache::FEATURE_LOCAL);
         }
 
         $this->StoreDefaults = [

@@ -23,9 +23,6 @@ const reactionsStory = storiesOf("Dropdowns", module);
 const doNothing = () => {};
 
 reactionsStory.add("Dropdowns", () => {
-    let activeTab = SearchDomain.ARTICLES;
-    const classesInputBlock = inputBlockClasses();
-
     const doNothing = () => {
         return;
     };

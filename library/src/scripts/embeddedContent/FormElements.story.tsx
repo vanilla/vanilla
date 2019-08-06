@@ -38,7 +38,7 @@ const reactionsStory = storiesOf("FormElements", module);
 const doNothing = () => {};
 
 reactionsStory.add("Form Elements", () => {
-    let activeTab = SearchDomain.ARTICLES;
+    let activeTab = "Tab A";
     const classesInputBlock = inputBlockClasses();
 
     const doNothing = () => {
@@ -93,8 +93,8 @@ reactionsStory.add("Form Elements", () => {
                 activeTab={activeTab}
                 childClass="advancedSearchDomain-tab"
             >
-                <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />
-                <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />
+                <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />
+                <RadioTab label={t("Tab B")} position="right" data={"Tab B"} />
             </RadioTabs>
 
             <StoryHeading>Tokens Input</StoryHeading>

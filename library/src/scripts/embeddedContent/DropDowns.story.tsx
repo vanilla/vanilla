@@ -12,20 +12,9 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import DropDown from "@library/flyouts/DropDown";
-import { t } from "@library/utility/appUtils";
-import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
-import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { DeviceProvider, Devices, useDevice } from "@library/layout/DeviceContext";
-import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDropDownSearch";
 import { StoryExampleDropDown } from "./StoryExampleDropDown";
-// import "react-day-picker/lib/style.css";
 
 const reactionsStory = storiesOf("Dropdowns", module);
 
@@ -48,10 +37,6 @@ reactionsStory.add("Dropdowns", () => {
         // Do something
         doNothing();
     };
-
-    //<DeviceProvider>
-    // const device = useDevice();
-    // </DeviceProvider>
 
     return (
         <StoryContent>

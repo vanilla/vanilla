@@ -97,29 +97,6 @@ reactionsStory.add("Form Elements", () => {
                 <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />
             </RadioTabs>
 
-            {/*<StoryHeading>Token Input</StoryHeading>*/}
-            {/*<MultiUserInput*/}
-            {/*    onChange={doNothing}*/}
-            {/*    value={[*/}
-            {/*        {*/}
-            {/*            value: "Value A",*/}
-            {/*            label: "Thing 1",*/}
-            {/*            data: {},*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "Value B",*/}
-            {/*            label: "Thing 2",*/}
-            {/*            data: {},*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "Value C",*/}
-            {/*            label: "Thing 3",*/}
-            {/*            data: {},*/}
-            {/*        },*/}
-            {/*    ]}*/}
-            {/*/>*/}
-            {/*};*/}
-
             <StoryHeading>Tokens Input</StoryHeading>
             <MultiUserInput
                 onChange={handleUserChange}
@@ -145,35 +122,6 @@ reactionsStory.add("Form Elements", () => {
 
             <StoryHeading>DropDown with search</StoryHeading>
             <StoryExampleDropDownSearch onChange={doNothing} />
-
-            {/*<KnowledgeBaseInput*/}
-            {/*    className="inputBlock"*/}
-            {/*    onChange={doNothing}*/}
-            {/*    value={*/}
-            {/*        [*/}
-            {/*            {*/}
-            {/*                label: "Development",*/}
-            {/*                value: 4,*/}
-            {/*            },*/}
-            {/*            {*/}
-            {/*                label: "Information Security",*/}
-            {/*                value: 7,*/}
-            {/*            },*/}
-            {/*            {*/}
-            {/*                label: "Internal Testing",*/}
-            {/*                value: 6,*/}
-            {/*            },*/}
-            {/*            {*/}
-            {/*                label: "Success",*/}
-            {/*                value: 5,*/}
-            {/*            },*/}
-            {/*            {*/}
-            {/*                label: "Support",*/}
-            {/*                value: 8,*/}
-            {/*            },*/}
-            {/*        ] as IComboBoxOption[]*/}
-            {/*    }*/}
-            {/*/>*/}
 
             <StoryHeading>Date Range</StoryHeading>
             <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />

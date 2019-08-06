@@ -178,7 +178,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
-        height: unit(vars.header.minHeight - globalVars.border.width * 6),
+        height: unit(vars.header.minHeight - globalVars.border.width * 4),
         margin: "auto",
         width: percent(100),
     });

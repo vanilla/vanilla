@@ -22,7 +22,7 @@ import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { ChevronUpIcon, DownTriangleIcon } from "@library/icons/common";
+import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
 
 export interface IProps {
     className?: string;
@@ -89,15 +89,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                     <Container>
                                         <PanelWidgetHorizontalPadding>
                                             <div className={classes.headerContent}>
-                                                <TitleButton
-                                                    onClick={this.close}
-                                                    icon={
-                                                        <DownTriangleIcon
-                                                            deg={180}
-                                                            className={"mobileDropDown-downTriangle"}
-                                                        />
-                                                    }
-                                                />
+                                                <TitleButton onClick={this.close} icon={<UpTriangleIcon />} />
                                             </div>
                                         </PanelWidgetHorizontalPadding>
                                     </Container>

@@ -245,29 +245,22 @@ export function CheckCompactIcon(props: { className?: string }) {
 }
 
 export function UpTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
-    let inlineStyles: React.CSSProperties = {};
-    if (props.deg !== undefined) {
-        inlineStyles = { transform: `rotate(${props.deg}deg)` };
-    }
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 8 8"
-            className={classNames("icon", "icon-triangleRight", props.className)}
-            aria-hidden="true"
-            style={inlineStyles}
-        >
-            <title>{props.title ? props.title : `▾`}</title>
-            <path fill="currentColor" fillRule="evenodd" d="M12 14.5l4-4.5H8z" />
-        </svg>
-    );
+    return <DownTriangleIcon deg={180} translateY={-2} />;
 }
 
-export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
-    let transform: string | undefined = undefined;
+export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number; translateY?: number }) {
+    let rotation: string | undefined = undefined;
     if (props.deg !== undefined) {
-        transform = `rotate(${props.deg}, 4, 4)`;
+        rotation = `rotate(${props.deg}, 4, 4)`;
     }
+
+    let translate: string | undefined = undefined;
+    if (props.translateY) {
+        translate = `translate(0, ${props.translateY})`;
+    }
+
+    const transform = [rotation, translate].filter(item => item !== undefined).join(", ");
+
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

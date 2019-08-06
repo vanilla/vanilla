@@ -8,11 +8,13 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { frameVariables } from "@library/layout/frame/frameStyles";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
     const globalVars = globalVariables();
     const style = styleFactory("frameBody");
+    const classesInputBlock = inputBlockClasses();
 
     const root = style({
         position: "relative",
@@ -27,7 +29,7 @@ export const frameBodyClasses = useThemeCache(() => {
                     right: 0,
                 }),
             },
-            "& > .inputBlock": {
+            [`& > .${classesInputBlock.root}`]: {
                 $nest: {
                     "&.isFirst": {
                         marginTop: unit(globalVars.gutter.half),

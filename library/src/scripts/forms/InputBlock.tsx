@@ -10,6 +10,7 @@ import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { IFieldError } from "@library/@types/api/core";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -25,7 +26,7 @@ type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
     label: ReactNode;
-    children: JSX.Element | CallbackChildren;
+    children: React.ReactNode | CallbackChildren;
     className?: string;
     labelClassName?: string;
     noteAfterInput?: string;
@@ -55,27 +56,33 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
     }
 
     public render() {
-        const componentClasses = classNames(this.props.baseClass, this.props.className);
+        const classesInputBlock = inputBlockClasses();
+        const componentClasses = classNames(
+            this.props.baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
+            this.props.className,
+        );
         const hasErrors = !!this.props.errors && this.props.errors.length > 0;
 
         let children;
         if (typeof this.props.children === "function") {
-            children = this.props.children({ hasErrors, errorID: this.errorID, labelID: this.labelID });
+            // Type is checked, but typechecker not accepting it.
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            children = (this.props.children as Function)({ hasErrors, errorID: this.errorID, labelID: this.labelID });
         } else {
             children = this.props.children;
         }
 
         return (
             <label className={componentClasses}>
-                <span id={this.labelID} className="inputBlock-labelAndDescription">
-                    <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
+                <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
+                    <span className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
                         {this.props.label}
                     </span>
-                    <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>
+                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                 </span>
 
-                <span className="inputBlock-inputWrap">{children}</span>
-                <Paragraph className="inputBlock-labelNote">{this.props.noteAfterInput}</Paragraph>
+                <span className={classesInputBlock.inputWrap}>{children}</span>
+                <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );

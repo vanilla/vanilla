@@ -88,38 +88,6 @@ export const checkRadioClasses = useThemeCache(() => {
     const style = styleFactory("checkRadio");
     const flexes = flexHelper();
 
-    //.radioButton,
-    //.checkbox
-    const root = style({
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        whiteSpace: "nowrap",
-        outline: 0,
-        $nest: {
-            "&.focus-accessible": {},
-            "&:hover": {
-                $nest: {
-                    "& .radioButton-input:not([disabled]), & .checkbox-input:not([disabled])": {
-                        $nest: {
-                            "& + .radioButton-disk, & + .checkbox-box": {
-                                borderColor: vars.main.hover.border.color.toString(),
-                                opacity: vars.main.hover.opacity,
-                                backgroundColor: vars.main.hover.bg.toString(),
-                            },
-                        },
-                    },
-                    "& .radioButton-disk, & .checkbox-box": {
-                        backgroundColor: vars.main.hover.bg.toString(),
-                    },
-                },
-            },
-            "& + .radioButton, & + .checkbox": {
-                marginTop: px(12),
-            },
-        },
-    });
-
     //.radioButton-label,
     // .checkbox-label
     const label = style("label", {
@@ -176,10 +144,14 @@ export const checkRadioClasses = useThemeCache(() => {
     // .checkbox-state
     const state = style("state", {
         ...absolutePosition.fullSizeOfParent(),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         color: vars.main.checked.fg.toString(),
     });
 
     const diskIcon = style({
+        display: "none",
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,
     });
@@ -189,37 +161,73 @@ export const checkRadioClasses = useThemeCache(() => {
     const input = style("input", {
         ...srOnly(),
         $nest: {
-            "&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible ": {
+            [`&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible`]: {
                 $nest: {
-                    "& + .radioButton-disk, & + .checkbox-box": {
+                    [`& + .${checkIcon}`]: {
                         borderColor: vars.main.hover.border.color.toString(),
                         opacity: vars.main.hover.opacity,
                         backgroundColor: vars.main.hover.bg.toString(),
                     },
                 },
             },
-            "&:checked + .radioButton-disk, &:checked + .checkbox-box": {
+            [`&:checked + .${iconContainer}`]: {
                 backgroundColor: important(vars.main.checked.bg.toString()),
                 borderColor: vars.main.checked.fg.toString(),
                 $nest: {
-                    "& .radioButton-diskIcon, & .checkbox-checkIcon": {
+                    [`& .${checkIcon}`]: {
+                        display: "block",
+                    },
+                    [`& .${diskIcon}`]: {
                         display: "block",
                     },
                 },
             },
-            "&.isDisabled, &[disabled]": {
+            [`&.isDisabled, &[disabled]`]: {
                 $nest: {
                     "&:not(:checked)": {
                         $nest: {
-                            "& + .radioButton-disk, & + .checkbox-box": {
+                            [`& + .${checkIcon}`]: {
                                 backgroundColor: vars.main.bg.toString(),
                             },
                         },
                     },
-                    "& ~ .radioButton-label, & ~ .checkbox-label, & + .radioButton-disk, & + .checkbox-box": {
+                    [`& ~ .${label}, & + .${checkIcon}`]: {
                         ...disabledInput(),
                     },
                 },
+            },
+        },
+    });
+
+    //.radioButton,
+    //.checkbox
+    const root = style({
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        whiteSpace: "nowrap",
+        outline: 0,
+        cursor: "pointer",
+        $nest: {
+            "&.focus-accessible": {},
+            "&:hover": {
+                $nest: {
+                    [`& .${input}:not([disabled]), & .${input}:not([disabled])`]: {
+                        $nest: {
+                            [`& + .${state}`]: {
+                                borderColor: vars.main.hover.border.color.toString(),
+                                opacity: vars.main.hover.opacity,
+                                backgroundColor: vars.main.hover.bg.toString(),
+                            },
+                        },
+                    },
+                    "& .radioButton-disk, & .checkbox-box": {
+                        backgroundColor: vars.main.hover.bg.toString(),
+                    },
+                },
+            },
+            "& + .radioButton, & + .checkbox": {
+                marginTop: px(12),
             },
         },
     });

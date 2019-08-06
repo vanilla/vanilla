@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import DatePicker from "@library/forms/DatePicker";
 import moment from "moment";
 import classNames from "classnames";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 interface IProps {
     start: string | undefined;
@@ -30,10 +31,13 @@ export default class DateRange extends React.PureComponent<IProps> {
         const fromLabel = t("From");
         const toLabel = t("To");
         const rangeClasses = dateRangeClasses();
+        const classesInputBlock = inputBlockClasses();
 
         return (
-            <fieldset className={classNames("dateRange", "inputBlock", this.props.className, rangeClasses.root)}>
-                <legend className={classNames("inputBlock-sectionTitle")}>{t("Date Updated")}</legend>
+            <fieldset
+                className={classNames("dateRange", classesInputBlock.root, this.props.className, rangeClasses.root)}
+            >
+                <legend className={classNames(classesInputBlock.sectionTitle)}>{t("Date Updated")}</legend>
                 <label className={classNames("dateRange-boundary", rangeClasses.boundary)}>
                     <span className={classNames("dateRange-label", rangeClasses.label)}>{fromLabel}</span>
                     <DatePicker

@@ -8,6 +8,7 @@ import React from "react";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { IFieldError } from "@library/@types/api/core";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 interface IProps extends IRequiredComponentID {
     className?: string;
@@ -28,13 +29,13 @@ export default class ErrorMessages extends React.Component<IProps, IState> {
 
     public render() {
         const { errors } = this.props;
-
+        const classesInputBlock = inputBlockClasses();
         if (errors && errors.length > 0) {
-            const componentClasses = classNames("inputBlock-errors", this.props.className);
+            const componentClasses = classNames(classesInputBlock.errors, this.props.className);
 
             const errorList = (errors as any).map((error: any, index) => {
                 return (
-                    <span key={index} className="inputBlock-error">
+                    <span key={index} className={classesInputBlock.error}>
                         {error.message}
                     </span>
                 );

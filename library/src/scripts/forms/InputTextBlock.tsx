@@ -10,6 +10,7 @@ import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
 import { Omit } from "@library/@types/utils";
 import classNames from "classnames";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -18,8 +19,8 @@ export enum InputTextBlockBaseClass {
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
     inputProps: {
-        value: string;
-        onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        value?: string;
+        onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
         inputClassNames?: string;
         type?: string;
         defaultValue?: string;
@@ -49,15 +50,16 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
 
     public render() {
         const classesInput = inputClasses();
+        const classesInputBlock = inputBlockClasses();
 
         const { inputProps, ...blockProps } = this.props;
-        const classes = classNames("inputBlock-inputText", "inputText", inputProps.inputClassNames, {
+        const classes = classNames(classesInputBlock.inputText, "inputText", inputProps.inputClassNames, {
             InputBox: this.props.legacyMode,
             [classesInput.text]: !this.props.legacyMode,
         });
 
         return (
-            <InputBlock {...blockProps}>
+            <InputBlock {...blockProps} className={classesInputBlock.root}>
                 {blockParams => {
                     const { labelID, errorID, hasErrors } = blockParams;
                     let describedBy;

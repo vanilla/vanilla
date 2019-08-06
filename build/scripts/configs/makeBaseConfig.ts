@@ -91,9 +91,13 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        [BuildMode.DEVELOPMENT, BuildMode.TEST, BuildMode.TEST_DEBUG, BuildMode.TEST_WATCH].includes(
-                            options.mode,
-                        )
+                        [
+                            BuildMode.DEVELOPMENT,
+                            BuildMode.TEST,
+                            BuildMode.TEST_DEBUG,
+                            BuildMode.TEST_WATCH,
+                            BuildMode.DEVELOPMENT,
+                        ].includes(options.mode) || section === "storybook"
                             ? "style-loader"
                             : MiniCssExtractPlugin.loader,
                         {

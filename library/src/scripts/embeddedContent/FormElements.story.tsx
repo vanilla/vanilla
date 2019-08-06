@@ -29,7 +29,7 @@ import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDro
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import RadioButton from "@library/forms/RadioButton";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-// import "react-day-picker/lib/style.css";
+import "@library/forms/datePicker.scss";
 
 const reactionsStory = storiesOf("FormElements", module);
 
@@ -56,7 +56,6 @@ reactionsStory.add("Form Elements", () => {
     // To avoid clashing with other components also using these radio buttons, you need to generate a unique ID for the group.
 
     const radioButtonGroup1 = uniqueIDFromPrefix("radioButtonGroupA");
-    const radioButtonGroup2 = uniqueIDFromPrefix("radioButtonGroupB");
 
     return (
         <StoryContent>
@@ -175,38 +174,6 @@ reactionsStory.add("Form Elements", () => {
             {/*        ] as IComboBoxOption[]*/}
             {/*    }*/}
             {/*/>*/}
-
-            <StoryHeading>Independent Search</StoryHeading>
-
-            <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <MemoryRouter>
-                    {/*<IndependentSearch*/}
-                    {/*    buttonClass={splashClasses().searchButton}*/}
-                    {/*    buttonBaseClass={ButtonTypes.CUSTOM}*/}
-                    {/*    isLarge={true}*/}
-                    {/*    placeholder={t("Search")}*/}
-                    {/*    inputClass={splashClasses().input}*/}
-                    {/*    iconClass={splashClasses().icon}*/}
-                    {/*    buttonLoaderClassName={splashClasses().buttonLoader}*/}
-                    {/*    contentClass={splashClasses().content}*/}
-                    {/*    valueContainerClasses={splashClasses().valueContainer}*/}
-                    {/*/>*/}
-
-                    <div className={splashClasses().searchContainer}>
-                        <IndependentSearch
-                            buttonClass={splashClasses().searchButton}
-                            buttonBaseClass={ButtonTypes.CUSTOM}
-                            isLarge={true}
-                            placeholder={t("Search")}
-                            inputClass={splashClasses().input}
-                            iconClass={splashClasses().icon}
-                            buttonLoaderClassName={splashClasses().buttonLoader}
-                            contentClass={splashClasses().content}
-                            valueContainerClasses={splashClasses().valueContainer}
-                        />
-                    </div>
-                </MemoryRouter>
-            </SearchContext.Provider>
 
             <StoryHeading>Date Range</StoryHeading>
             <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />

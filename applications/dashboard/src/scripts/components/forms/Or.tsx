@@ -5,6 +5,8 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import classNames from "classnames";
 
 interface IProps {
     visible: boolean;
@@ -16,8 +18,9 @@ export default class Or extends React.PureComponent<IProps, {}> {
     };
 
     public render() {
+        const classes = inputBlockClasses();
         return this.props.visible ? (
-            <div className="inputBlock-labelText authenticateUser-divider">{t("or")}</div>
+            <div className={classNames(classes.labelText, "authenticateUser-divider")}>{t("or")}</div>
         ) : null;
     }
 }

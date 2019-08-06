@@ -17,9 +17,7 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     onChange?: any;
     label: string;
-    radioGroup: string;
-    note?: string;
-    externalLabel: boolean;
+    name?: string;
 }
 
 interface IState {
@@ -29,30 +27,35 @@ interface IState {
 /**
  * A styled, accessible checkbox component.
  */
-export default function Radio(props: IProps) {
+export default function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
-    const Tag = props.externalLabel ? "div" : "label";
 
     return (
-        <Tag className="radioButton">
+        <label className={classNames("radioButton", classes.root)}>
             <input
-                className="radioButton-input"
+                className={classNames("radioButton-input", classes.input)}
                 onChange={props.onChange}
                 aria-disabled={props.disabled}
-                radioGroup={props.radioGroup}
+                name={props.name}
                 disabled={props.disabled}
                 type="radio"
+                checked={props.checked}
+                tabIndex={0}
             />
-            <span className="radioButton-disk">
-                <span className="radioButton-state">
-                    <svg className="radioButton-icon radioButton-diskIcon">
+            <span className={classNames("radioButton-disk", classes.iconContainer, classes.disk)}>
+                <span className={classNames("checkbox-state", classes.state)}>
+                    <svg className={classNames(classes.diskIcon, "radioButton-icon", "radioButton-diskIcon")}>
                         <title>{t("Radio Button")}</title>
                         <circle fill="currentColor" cx="3" cy="3" r="3" />
                     </svg>
                 </span>
             </span>
-            {props.note && <span className="radioButton-labelNote">{props.note}</span>}}
-        </Tag>
+            {props.label && (
+                <span id={labelID} className={classNames("radioButton-label", classes.label)}>
+                    {props.label}
+                </span>
+            )}
+        </label>
     );
 }

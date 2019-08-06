@@ -14,6 +14,7 @@ import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { StoryTile } from "@library/storybook/StoryTile";
 import { Omit } from "@library/@types/utils";
 import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
 
@@ -48,58 +49,58 @@ export function StoryExampleModalConfirm(props: IProps) {
                     </Button>
                 </StoryTile>
             </li>
-            {open && (
-                {/*<Modal*/}
-                {/*    size={ModalSizes.SMALL}*/}
-                {/*    elementToFocus={*/}
-                {/*        openButtonRef ? ((openButtonRef.current as unknown) as HTMLButtonElement) : undefined*/}
-                {/*    }*/}
-                {/*    exitHandler={() => {*/}
-                {/*        setOpen(false);*/}
-                {/*    }}*/}
-                {/*    titleID={titleID}*/}
-                {/*    elementToFocusOnExit={(openButtonRef.current as unknown) as HTMLButtonElement}*/}
-                {/*>*/}
-                {/*    <Frame*/}
-                {/*        header={*/}
-                {/*            <FrameHeader*/}
-                {/*                titleID={titleID}*/}
-                {/*                closeFrame={() => {*/}
-                {/*                    setOpen(false);*/}
-                {/*                }}*/}
-                {/*                title={t("Example Modal")}*/}
-                {/*            />*/}
-                {/*        }*/}
-                {/*        body={*/}
-                {/*            <FrameBody>*/}
-                {/*                <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>*/}
-                {/*                    {}*/}
-                {/*                </SmartAlign>*/}
-                {/*            </FrameBody>*/}
-                {/*        }*/}
-                {/*        footer={*/}
-                {/*            <FrameFooter justifyRight={true}>*/}
-                {/*                <Button*/}
-                {/*                    className={classFrameFooter.actionButton}*/}
-                {/*                    baseClass={ButtonTypes.TEXT}*/}
-                {/*                    buttonRef={this.cancelRef}*/}
-                {/*                    onClick={onCancel}*/}
-                {/*                >*/}
-                {/*                    {t("Cancel")}*/}
-                {/*                </Button>*/}
-                {/*                <Button*/}
-                {/*                    className={classFrameFooter.actionButton}*/}
-                {/*                    onClick={onConfirm}*/}
-                {/*                    baseClass={ButtonTypes.TEXT_PRIMARY}*/}
-                {/*                    disabled={isConfirmLoading}*/}
-                {/*                >*/}
-                {/*                    {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}*/}
-                {/*                </Button>*/}
-                {/*            </FrameFooter>*/}
-                {/*        }*/}
-                    // />
-                </Modal>
-            )}
+            {/*{open && (*/}
+            {/*<Modal*/}
+            {/*    size={ModalSizes.SMALL}*/}
+            {/*    elementToFocus={*/}
+            {/*        openButtonRef ? ((openButtonRef.current as unknown) as HTMLButtonElement) : undefined*/}
+            {/*    }*/}
+            {/*    exitHandler={() => {*/}
+            {/*        setOpen(false);*/}
+            {/*    }}*/}
+            {/*    titleID={titleID}*/}
+            {/*    elementToFocusOnExit={(openButtonRef.current as unknown) as HTMLButtonElement}*/}
+            {/*>*/}
+            {/*    <Frame*/}
+            {/*        header={*/}
+            {/*            <FrameHeader*/}
+            {/*                titleID={titleID}*/}
+            {/*                closeFrame={() => {*/}
+            {/*                    setOpen(false);*/}
+            {/*                }}*/}
+            {/*                title={t("Example Modal")}*/}
+            {/*            />*/}
+            {/*        }*/}
+            {/*        body={*/}
+            {/*            <FrameBody>*/}
+            {/*                <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>*/}
+            {/*                    {}*/}
+            {/*                </SmartAlign>*/}
+            {/*            </FrameBody>*/}
+            {/*        }*/}
+            {/*        footer={*/}
+            {/*            <FrameFooter justifyRight={true}>*/}
+            {/*                <Button*/}
+            {/*                    className={classFrameFooter.actionButton}*/}
+            {/*                    baseClass={ButtonTypes.TEXT}*/}
+            {/*                    buttonRef={this.cancelRef}*/}
+            {/*                    onClick={onCancel}*/}
+            {/*                >*/}
+            {/*                    {t("Cancel")}*/}
+            {/*                </Button>*/}
+            {/*                <Button*/}
+            {/*                    className={classFrameFooter.actionButton}*/}
+            {/*                    onClick={onConfirm}*/}
+            {/*                    baseClass={ButtonTypes.TEXT_PRIMARY}*/}
+            {/*                    disabled={isConfirmLoading}*/}
+            {/*                >*/}
+            {/*                    {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}*/}
+            {/*                </Button>*/}
+            {/*            </FrameFooter>*/}
+            {/*        }*/}
+            {/*     />*/}
+            {/*</Modal>*/}
+            {/*// )}*/}
         </>
     );
 }

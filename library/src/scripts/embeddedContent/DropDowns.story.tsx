@@ -7,9 +7,7 @@
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryHeading } from "@library/storybook/StoryHeading";
@@ -25,14 +23,6 @@ const doNothing = () => {};
 reactionsStory.add("Dropdowns", () => {
     const doNothing = () => {
         return;
-    };
-
-    /**
-     * Simple form setter.
-     */
-    const handleUserChange = (options: IComboBoxOption[]) => {
-        // Do something
-        doNothing();
     };
 
     return (

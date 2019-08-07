@@ -164,6 +164,7 @@ export const userContentClasses = useThemeCache(() => {
         },
 
         "&& > *:first-child": {
+            $unique: true, // Required to prevent collapsing in with some other variable.
             marginTop: 0,
         },
     };

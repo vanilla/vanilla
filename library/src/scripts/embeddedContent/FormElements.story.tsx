@@ -24,13 +24,13 @@ import RadioButton from "@library/forms/RadioButton";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import "@library/forms/datePicker.scss";
 
-const story = storiesOf("FormElements", module);
+const story = storiesOf("Form Elements", module);
 
 // Radio as tabs
 
 const doNothing = () => {};
 
-story.add("Form Elements", () => {
+story.add("Inputs", () => {
     let activeTab = "Tab A";
     const classesInputBlock = inputBlockClasses();
 

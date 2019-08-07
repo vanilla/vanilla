@@ -6,60 +6,43 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React, { useMemo } from "react";
+import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import { t } from "@library/utility/appUtils";
-import { SearchDomain } from "@knowledge/modules/search/SearchPageModel";
-import RadioTab from "@library/forms/radioTabs/RadioTab";
-import InputBlock from "@library/forms/InputBlock";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import MultiUserInput from "@library/features/users/MultiUserInput";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import { splashClasses } from "@library/splash/splashStyles";
-import DateRange from "@library/forms/DateRange";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { MemoryRouter } from "react-router";
-import Checkbox from "@library/forms/Checkbox";
-import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDropDownSearch";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import RadioButton from "@library/forms/RadioButton";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import Result from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
-// import "react-day-picker/lib/style.css";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import { PublishStatus } from "@library/@types/api/core";
+import { IUserFragment } from "@library/@types/api/users";
+import { ICrumbString } from "@library/navigation/BreadCrumbString";
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
+import DraftsList from "@knowledge/modules/editor/components/DraftsList";
+import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem";
+import { string } from "prop-types";
+import { DraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
+import DraftList from "@knowledge/modules/drafts/components/DraftList";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import classNames from "classnames";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDown from "@library/flyouts/DropDown";
+import { StoryExampleDropDownDraft } from "./StoryExampleDropDownDraft";
 
 const story = storiesOf("Search", module);
 
-// Radio as tabs
-
-const doNothing = () => {};
-
-story.add("Search Elements", () => {
-    let activeTab = SearchDomain.ARTICLES;
-    const classesInputBlock = inputBlockClasses();
-
-    const doNothing = () => {
-        return;
+story.add("Search Components", () => {
+    const dummyUserFragment = {
+        userID: 1,
+        name: "Joe",
+        photoUrl: "",
+        dateLastActive: "2016-07-25 17:51:15",
     };
-
-    /**
-     * Simple form setter.
-     */
-    const handleUserChange = (options: IComboBoxOption[]) => {
-        // Do something
-        doNothing();
-    };
-
-    // To avoid clashing with other components also using these radio buttons, you need to generate a unique ID for the group.
-
-    const radioButtonGroup1 = uniqueIDFromPrefix("radioButtonGroupA");
-    const radioButtonGroup2 = uniqueIDFromPrefix("radioButtonGroupB");
 
     return (
         <StoryContent>
@@ -84,26 +67,166 @@ story.add("Search Elements", () => {
                 </MemoryRouter>
             </SearchContext.Provider>
 
-            <StoryHeading>Search Result</StoryHeading>
-            <Result
-                location={[{}]}
-                meta={[
-                    <ResultMeta
-                        updateUser={{
-                            userID: 1,
-                        }}
-                        dateUpdated={"2016-07-25 17:51:15"}
-                    />,
+            <StoryHeading>Search Results</StoryHeading>
+            <ResultList
+                results={[
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                        attachments: [{ name: "My File", type: AttachmentType.WORD }],
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        image: "https://upload.wikimedia.org/wikipedia/en/7/70/Bob_at_Easel.jpg",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                    },
                 ]}
-                name={"Example search result"}
-                url={"#"}
             />
-
-            <StoryHeading>Search Result - No meta</StoryHeading>
-            <StoryHeading>Search Result - No Excerpt</StoryHeading>
-            <StoryHeading>Search Result - No Excerpt, no meta</StoryHeading>
-            <StoryHeading>Draft (same results component)</StoryHeading>
-            <StoryHeading>Category (same results component)</StoryHeading>
+            <StoryHeading>Category result (used on categories page)</StoryHeading>
+            <ResultList
+                results={[
+                    {
+                        name: "Example category result",
+                        headingLevel: 3,
+                        url: "#",
+                        meta: <ResultMeta dateUpdated={"2016-07-25 17:51:15"} updateUser={dummyUserFragment} />,
+                    },
+                ]}
+            />
+            <StoryHeading>Draft result (used on categories page)</StoryHeading>
+            <MemoryRouter>
+                <DraftsList hideTitle={true}>
+                    <DraftPreview
+                        dateUpdated={"2016-07-25 17:51:15"}
+                        updateUserID={1}
+                        insertUserID={1}
+                        body={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        headingLevel={3}
+                        draftID={1}
+                        recordType={"article"}
+                        excerpt={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        attributes={{
+                            name: "Draft example",
+                        }}
+                        menuOverwrite={<StoryExampleDropDownDraft />}
+                    />
+                    <DraftPreview
+                        dateUpdated={"2016-07-25 17:51:15"}
+                        updateUserID={1}
+                        insertUserID={1}
+                        body={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        headingLevel={3}
+                        draftID={1}
+                        recordType={"article"}
+                        excerpt={""}
+                        attributes={{
+                            name: "",
+                        }}
+                        menuOverwrite={<StoryExampleDropDownDraft />}
+                    />
+                    <DraftPreview
+                        dateUpdated={"2016-07-25 17:51:15"}
+                        updateUserID={1}
+                        insertUserID={1}
+                        body={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        headingLevel={3}
+                        draftID={1}
+                        recordType={"article"}
+                        excerpt={""}
+                        attributes={{
+                            name: "Draft example",
+                        }}
+                        menuOverwrite={<StoryExampleDropDownDraft />}
+                    />
+                    <DraftPreview
+                        dateUpdated={"2016-07-25 17:51:15"}
+                        updateUserID={1}
+                        insertUserID={1}
+                        body={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        headingLevel={3}
+                        draftID={1}
+                        recordType={"article"}
+                        excerpt={
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
+                        }
+                        attributes={{
+                            name: "",
+                        }}
+                        menuOverwrite={<StoryExampleDropDownDraft />}
+                    />
+                </DraftsList>
+            </MemoryRouter>
         </StoryContent>
     );
 });

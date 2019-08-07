@@ -83,7 +83,7 @@ export function ImageEmbedMenu(props: IProps) {
                         <FrameBody className={classes.verticalPadding}>
                             <InputTextBlock
                                 label={t("Alternative text helps users with accessibility concerns and improves SEO.")}
-                                labelClass={classes.paragraph}
+                                labelClassName={classes.paragraph}
                                 inputProps={{
                                     required: true,
                                     value: alt,

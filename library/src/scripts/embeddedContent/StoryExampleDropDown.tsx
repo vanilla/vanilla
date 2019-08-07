@@ -14,7 +14,7 @@ import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { StoryTile } from "@library/storybook/StoryTile";
 import { Omit } from "@library/@types/utils";
 import { DeviceProvider, Devices, useDevice } from "@library/layout/DeviceContext";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
@@ -33,7 +33,7 @@ export function StoryExampleDropDown(props: IProps) {
             <DropDown
                 name={t("Article Options")}
                 renderLeft={true}
-                paddedList={true}
+                flyoutType={FlyoutType.LIST}
                 openAsModal={device === Devices.MOBILE || device === Devices.XS}
             >
                 <InsertUpdateMetas

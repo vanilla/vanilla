@@ -28,7 +28,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     label: ReactNode;
     children: React.ReactNode | CallbackChildren;
     className?: string;
-    labelClass?: string;
+    labelClassName?: string;
     noteAfterInput?: string;
     labelNote?: string;
     labelID?: string;

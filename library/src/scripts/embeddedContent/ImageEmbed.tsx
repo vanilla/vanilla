@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";

@@ -48,11 +48,6 @@ export const embedMenuClasses = useThemeCache(() => {
         "imageContainer",
         {
             position: "relative",
-            $nest: {
-                "&:hover::after": {
-                    display: "none", // Hide the box shadow
-                },
-            },
         },
         mediaQueriesEmbed.noRoomForMenuOnLeft({
             marginTop: unit(globalVars.buttonIcon.size),

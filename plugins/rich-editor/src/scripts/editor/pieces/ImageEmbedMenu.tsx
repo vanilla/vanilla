@@ -20,6 +20,7 @@ import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps extends IImageMeta {
     onSave: (meta: IImageMeta) => void;
+    onVisibilityChange: (newIsVisible: boolean) => void;
     className?: string;
 }
 
@@ -46,12 +47,17 @@ export function ImageEmbedMenu(props: IProps) {
         }
     }, []);
 
+    const { onVisibilityChange } = props;
     const prevVisibility = useLastValue(isVisible);
     useEffect(() => {
         if (!prevVisibility && isVisible && inputRef.current) {
             inputRef.current && inputRef.current.focus();
         }
-    }, [prevVisibility, isVisible, inputRef]);
+
+        if (prevVisibility !== isVisible) {
+            onVisibilityChange(isVisible);
+        }
+    }, [prevVisibility, isVisible, inputRef, onVisibilityChange]);
 
     return (
         <div

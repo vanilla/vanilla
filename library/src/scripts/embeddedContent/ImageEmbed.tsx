@@ -4,12 +4,13 @@
  */
 
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
 import classNames from "classnames";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useFocusWatcher } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -24,18 +25,30 @@ interface IProps extends IBaseEmbedProps {
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
-    const divRef = useRef<HTMLDivElement>(null);
+    const [contentElement, setContentElement] = useState<HTMLDivElement | null>(null);
+    const [isFocused, setFocused] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    useFocusWatcher(contentElement, newFocusValue => {
+        setFocused(newFocusValue);
+    });
 
     return (
         <DeviceProvider>
-            <div className={classNames("embedExternal-content", embedMenuClasses().imageContainer)}>
-                <EmbedContent type="Image" className="u-excludeFromPointerEvents" inEditor={props.inEditor}>
-                    <div ref={divRef} className="embedImage-link">
-                        <img className="embedImage-img" src={props.url} alt={props.name} />
-                    </div>
-                </EmbedContent>
-                {props.inEditor && (
+            <div
+                ref={ref => setContentElement(ref)}
+                className={classNames("embedImage", embedMenuClasses().imageContainer)}
+            >
+                <div className="embedImage-link">
+                    <img
+                        className={classNames("embedImage-img", FOCUS_CLASS)}
+                        src={props.url}
+                        alt={props.name}
+                        tabIndex={props.inEditor ? -1 : undefined}
+                    />
+                </div>
+                {props.inEditor && (isFocused || isOpen) && (
                     <ImageEmbedMenu
+                        onVisibilityChange={setIsOpen}
                         onSave={newValue => {
                             props.syncBackEmbedValue &&
                                 props.syncBackEmbedValue({

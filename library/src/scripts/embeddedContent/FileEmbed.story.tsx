@@ -10,7 +10,7 @@ import React from "react";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { formatUrl } from "@library/utility/appUtils";
 
-const reactionsStory = storiesOf("Embeds", module);
+const story = storiesOf("Embeds", module);
 
 // tslint:disable:jsx-use-translation-function
 
@@ -20,7 +20,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac 
 
 const date = "2019-06-05 20:59:01";
 
-reactionsStory.add("FileEmbed", () => {
+story.add("FileEmbed", () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: FileEmbed</StoryHeading>

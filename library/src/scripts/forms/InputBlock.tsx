@@ -25,7 +25,7 @@ interface ICallbackProps {
 type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
-    label: ReactNode;
+    label?: ReactNode;
     children: React.ReactNode | CallbackChildren;
     className?: string;
     labelClassName?: string;
@@ -72,19 +72,23 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
             children = this.props.children;
         }
 
+        const Tag = this.props.label ? "label" : "div";
+
         return (
-            <label className={componentClasses}>
-                <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
-                    <span className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
-                        {this.props.label}
+            <Tag className={componentClasses}>
+                {this.props.label && (
+                    <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
+                        <span className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
+                            {this.props.label}
+                        </span>
+                        <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                     </span>
-                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
-                </span>
+                )}
 
                 <span className={classesInputBlock.inputWrap}>{children}</span>
                 <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
-            </label>
+            </Tag>
         );
     }
 

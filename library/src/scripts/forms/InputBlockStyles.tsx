@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -42,8 +42,10 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
-        marginBottom: unit(formElementVars.spacing.margin),
         $nest: {
+            [`& + &`]: {
+                marginTop: unit(formElementVars.spacing.margin),
+            },
             [`&.hasError .${inputText}`]: {
                 borderColor: colorOut(globalVars.messageColors.error.fg),
                 backgroundColor: colorOut(globalVars.messageColors.error.fg),

@@ -40,9 +40,9 @@ import {
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
 
-const reactionsStory = storiesOf("Components", module);
+const story = storiesOf("Components", module);
 
-reactionsStory.add("Icons", () => {
+story.add("Icons", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Global Icons</StoryHeading>

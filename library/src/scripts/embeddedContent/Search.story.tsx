@@ -19,9 +19,6 @@ import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
-import DraftsList from "@knowledge/modules/editor/components/DraftsList";
-import { DraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import { StoryExampleDropDownDraft } from "./StoryExampleDropDownDraft";
 
 const story = storiesOf("Search", module);
 
@@ -143,79 +140,6 @@ story.add("Search Components", () => {
                     },
                 ]}
             />
-            <StoryHeading>Draft result (used on categories page)</StoryHeading>
-            <MemoryRouter>
-                <DraftsList hideTitle={true}>
-                    <DraftPreview
-                        dateUpdated={"2016-07-25 17:51:15"}
-                        updateUserID={1}
-                        insertUserID={1}
-                        body={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        headingLevel={3}
-                        draftID={1}
-                        recordType={"article"}
-                        excerpt={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        attributes={{
-                            name: "Draft example",
-                        }}
-                        menuOverwrite={<StoryExampleDropDownDraft />}
-                    />
-                    <DraftPreview
-                        dateUpdated={"2016-07-25 17:51:15"}
-                        updateUserID={1}
-                        insertUserID={1}
-                        body={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        headingLevel={3}
-                        draftID={1}
-                        recordType={"article"}
-                        excerpt={""}
-                        attributes={{
-                            name: "",
-                        }}
-                        menuOverwrite={<StoryExampleDropDownDraft />}
-                    />
-                    <DraftPreview
-                        dateUpdated={"2016-07-25 17:51:15"}
-                        updateUserID={1}
-                        insertUserID={1}
-                        body={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        headingLevel={3}
-                        draftID={1}
-                        recordType={"article"}
-                        excerpt={""}
-                        attributes={{
-                            name: "Draft example",
-                        }}
-                        menuOverwrite={<StoryExampleDropDownDraft />}
-                    />
-                    <DraftPreview
-                        dateUpdated={"2016-07-25 17:51:15"}
-                        updateUserID={1}
-                        insertUserID={1}
-                        body={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        headingLevel={3}
-                        draftID={1}
-                        recordType={"article"}
-                        excerpt={
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake."
-                        }
-                        attributes={{
-                            name: "",
-                        }}
-                        menuOverwrite={<StoryExampleDropDownDraft />}
-                    />
-                </DraftsList>
-            </MemoryRouter>
         </StoryContent>
     );
 });

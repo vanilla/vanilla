@@ -121,8 +121,10 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "auto",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
-        zIndex: 3,
         $nest: {
+            "&&": {
+                zIndex: 3,
+            },
             "&.isMedium": {
                 width: unit(vars.sizing.widths.medium),
             },

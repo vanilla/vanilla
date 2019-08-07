@@ -11,6 +11,7 @@ import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 
 interface IProps extends INotificationsProps {
     countUnread: number;
@@ -39,7 +40,6 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
     public render() {
         const { userSlug } = this.props;
         const classesHeader = titleBarClasses();
-
         return (
             <DropDown
                 id={this.id}

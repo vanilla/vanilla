@@ -1278,11 +1278,7 @@ class CommentModel extends Gdn_Model {
             }
 
             // Notify any users who were mentioned in the comment.
-            if ($Fields['Format'] === 'Rich') {
-                $Usernames = Gdn_Format::getRichMentionUsernames($Fields['Body']);
-            } else {
-                $Usernames = getMentions($Fields['Body']);
-            }
+            $Usernames = Gdn::formatService()->parseMentions($Fields['Body'], $Fields['Format']);
 
             $userModel = Gdn::userModel();
             foreach ($Usernames as $i => $Username) {

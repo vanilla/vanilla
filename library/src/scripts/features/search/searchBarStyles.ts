@@ -13,6 +13,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -79,6 +80,7 @@ export const searchBarClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
+    const classesInputBlock = inputBlockClasses();
 
     const root = style(
         {
@@ -91,7 +93,7 @@ export const searchBarClasses = useThemeCache(() => {
 
                 "& .suggestedTextInput-valueContainer": {
                     $nest: {
-                        ".inputBlock-inputText": {
+                        [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
                         },
                     },
@@ -152,6 +154,8 @@ export const searchBarClasses = useThemeCache(() => {
     );
 
     const results = style("results", {
+        position: "relative",
+        width: percent(100),
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
         $nest: {

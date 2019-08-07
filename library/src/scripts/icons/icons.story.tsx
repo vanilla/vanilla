@@ -40,7 +40,7 @@ import {
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
 
-const reactionsStory = storiesOf("Components/Icons", module);
+const reactionsStory = storiesOf("Components", module);
 
 reactionsStory.add("Icons", () => {
     return (

@@ -20,6 +20,7 @@ import { border, calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -170,14 +171,14 @@ export const mobileDropDownClasses = useThemeCache(() => {
     });
 
     const header = style("header", {
-        borderBottom: singleBorder(),
+        ...shadowHelper().embed(),
     });
 
     const headerContent = style("headerContent", {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
-        height: unit(vars.header.minHeight - globalVars.border.width * 6),
+        height: unit(vars.header.minHeight - globalVars.border.width * 4),
         margin: "auto",
         width: percent(100),
     });

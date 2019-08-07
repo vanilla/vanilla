@@ -192,6 +192,10 @@ function useOperationsQueue() {
 
             if (typeof operation === "string") {
                 quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+                // Trim starting whitespace if we have it.
+                if (quill.getText(0, 1) === "\n") {
+                    quill.updateContents([{ delete: 1 }]);
+                }
             } else {
                 const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
                 quill.updateContents([offsetOperations, ...operation]);

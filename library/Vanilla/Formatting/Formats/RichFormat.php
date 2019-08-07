@@ -27,7 +27,7 @@ class RichFormat extends BaseFormat {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
-    const FORMAT_KEY = "Rich";
+    const FORMAT_KEY = "rich";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
@@ -58,14 +58,18 @@ class RichFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content): string {
+    public function renderHTML(string $content, bool $throw = false): string {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
             return $this->renderer->render($blotGroups);
         } catch (\Throwable $e) {
             $this->logBadInput($e);
-            return $this->renderErrorMessage();
+            if ($throw) {
+                throw new FormattingException($e->getMessage(), $e->getCode(), $e);
+            } else {
+                return $this->renderErrorMessage();
+            }
         }
     }
 
@@ -82,7 +86,7 @@ class RichFormat extends BaseFormat {
             foreach ($blotGroups as $blotGroup) {
                 $text .= $blotGroup->getUnsafeText();
             }
-            return $text;
+            return trim($text);
         } catch (\Throwable $e) {
             $this->logBadInput($e);
             return self::t(self::RENDER_ERROR_MESSAGE);
@@ -113,7 +117,7 @@ class RichFormat extends BaseFormat {
      */
     public function filter(string $content): string {
         $filtered = $this->filterer->filter($content);
-        $this->renderHTML($filtered);
+        $this->renderHTML($filtered, true);
         return $filtered;
     }
 

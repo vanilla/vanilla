@@ -1,0 +1,17 @@
+[
+    {
+        "text": "heading 1",
+        "level": 1,
+        "ref": "heading-1"
+    },
+    {
+        "text": "heading 2",
+        "level": 2,
+        "ref": "heading-2"
+    },
+    {
+        "text": "heading 2",
+        "level": 2,
+        "ref": "heading-2-1"
+    }
+]

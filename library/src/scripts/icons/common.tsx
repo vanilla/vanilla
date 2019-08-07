@@ -244,21 +244,32 @@ export function CheckCompactIcon(props: { className?: string }) {
     );
 }
 
-export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
-    let transform;
-    if (props.deg) {
-        transform = { transform: `rotate(${props.deg}deg` };
+export function UpTriangleIcon(props: { className?: string; title?: string; deg?: number }) {
+    return <DownTriangleIcon deg={180} translateY={-2} />;
+}
+
+export function DownTriangleIcon(props: { className?: string; title?: string; deg?: number; translateY?: number }) {
+    let rotation: string | undefined = undefined;
+    if (props.deg !== undefined) {
+        rotation = `rotate(${props.deg}, 4, 4)`;
     }
+
+    let translate: string | undefined = undefined;
+    if (props.translateY) {
+        translate = `translate(0, ${props.translateY})`;
+    }
+
+    const transform = [rotation, translate].filter(item => item !== undefined).join(", ");
+
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 8 8"
             className={classNames("icon", "icon-triangleRight", props.className)}
             aria-hidden="true"
-            style={transform}
         >
             <title>{props.title ? props.title : `▾`}</title>
-            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
+            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" transform={transform} />
         </svg>
     );
 }

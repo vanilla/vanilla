@@ -1,0 +1,2 @@
+alert("xss");
+Heading in Script

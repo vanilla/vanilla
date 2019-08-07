@@ -1,2 +1,0 @@
-bolditalicstrikeAll inline formats
-Link

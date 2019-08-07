@@ -100,9 +100,6 @@ export class FocusWatcher {
                     this.rootNode &&
                     activeElement &&
                     (activeElement === this.rootNode || this.rootNode.contains(activeElement));
-                console.log("Root node:", this.rootNode);
-                console.log("has focus:", hasFocus);
-                console.log("active element", activeElement);
 
                 // We will only invalidate based on something actually getting focus.
                 callback(!!hasFocus);

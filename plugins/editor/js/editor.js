@@ -1244,7 +1244,7 @@
                 // Match image URLs
                 var imageUrl = e.target.value;
                 // Doesn't have to be perfect, because URL can still not exist.
-                var imageUrlRegex = /(?:\/\/)(?:.+)(\/)(.*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+                var imageUrlRegex = /(?:\/\/)(?:.+)(\/)(.*\.(?:jpe?g|gif|png|webp))(?:\?([^#]*))?(?:#(.*))?/i;
                 if (imageUrlRegex.test(imageUrl)) {
 
                     editorInstance.focus();

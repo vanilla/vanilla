@@ -119,7 +119,7 @@ class DropDown extends React.Component<IProps, IState> {
                             size={
                                 this.props.flyoutType === FlyoutType.FRAME
                                     ? DropDownContentSize.MEDIUM
-                                    : DropDownContentSize.MEDIUM
+                                    : DropDownContentSize.SMALL
                             }
                         >
                             {title ? (

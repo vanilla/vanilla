@@ -27,24 +27,15 @@ export function StoryExampleModalConfirm(props: IProps) {
 
     return (
         <>
-            <li className={classNames(storyBookClasses().tilesAndText, storyBookClasses().compactTilesAndText)}>
-                <StoryTile
-                    tag={"div"}
-                    mouseOverText={props.mouseOverText}
-                    type={props.type}
-                    scaleContents={props.scaleContents}
-                >
-                    <Button
-                        id={toggleButton}
-                        onClick={() => {
-                            setOpen(true);
-                        }}
-                        buttonRef={openButtonRef}
-                    >
-                        Confirm Modal
-                    </Button>
-                </StoryTile>
-            </li>
+            <Button
+                id={toggleButton}
+                onClick={() => {
+                    setOpen(true);
+                }}
+                buttonRef={openButtonRef}
+            >
+                Confirm Modal
+            </Button>
             {open && (
                 <ModalConfirm
                     title={"Do you agree?"}

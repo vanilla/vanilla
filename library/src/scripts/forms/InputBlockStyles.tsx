@@ -42,8 +42,10 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
-        marginBottom: unit(formElementVars.spacing.margin),
         $nest: {
+            [`& + &`]: {
+                marginTop: unit(formElementVars.spacing.margin),
+            },
             [`&.hasError .${inputText}`]: {
                 borderColor: colorOut(globalVars.messageColors.error.fg),
                 backgroundColor: colorOut(globalVars.messageColors.error.fg),

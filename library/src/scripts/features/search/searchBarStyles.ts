@@ -142,6 +142,12 @@ export const searchBarClasses = useThemeCache(() => {
                 "& .searchBar__indicators": {
                     display: "none",
                 },
+                "& .searchBar__input": {
+                    width: percent(100),
+                },
+                "& .searchBar__input input": {
+                    width: important(`100%`),
+                },
             },
         },
         mediaQueries.oneColumnDown({

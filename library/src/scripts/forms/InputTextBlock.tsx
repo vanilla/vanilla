@@ -21,6 +21,7 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
     inputProps: {
         value?: string;
         onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        onKeyPress?: React.KeyboardEventHandler;
         inputClassNames?: string;
         type?: string;
         defaultValue?: string;
@@ -28,6 +29,7 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         valid?: boolean;
         required?: boolean;
         disabled?: boolean;
+        inputRef?: React.RefObject<HTMLInputElement>;
     };
 }
 
@@ -41,7 +43,10 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
     };
 
     private id: string;
-    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
+    private ownInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+    private get inputRef() {
+        return this.props.inputProps.inputRef || this.ownInputRef;
+    }
 
     public constructor(props) {
         super(props);
@@ -81,6 +86,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             aria-labelledby={labelID}
                             onChange={this.onChange}
                             ref={this.inputRef}
+                            onKeyPress={inputProps.onKeyPress}
                         />
                     );
                 }}

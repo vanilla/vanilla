@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
@@ -49,7 +49,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
-                selfPadded={true}
+                flyoutType={FlyoutType.FRAME}
             >
                 <NotificationsContents userSlug={userSlug} />
             </DropDown>

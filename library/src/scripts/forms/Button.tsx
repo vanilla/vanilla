@@ -33,7 +33,7 @@ interface IState {
     id?: string;
 }
 
-export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => {
+export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
@@ -85,7 +85,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            getDynamicClassFromButtonType(this.props.baseClass),
+            getButtonStyleFromBaseClass(this.props.baseClass),
             { Button: this.props.legacyMode },
             this.props.className,
         );

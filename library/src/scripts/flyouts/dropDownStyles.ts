@@ -21,6 +21,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+export const notUserContent = "u-notUserContent";
+
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("dropDown");
@@ -85,6 +87,7 @@ export const dropDownVariables = useThemeCache(() => {
         },
         padding: {
             vertical: 9,
+            horizontal: 16,
         },
     });
 
@@ -188,12 +191,13 @@ export const dropDownClasses = useThemeCache(() => {
 
     // wrapping element
     const item = style("item", {
+        ...userSelect("none"),
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
         width: percent(100),
+        margin: 0,
         color: "inherit",
-        ...userSelect("none"),
         textAlign: "left",
         lineHeight: globalVars.lineHeights.condensed,
     });
@@ -304,19 +308,29 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
+    const noVerticalPadding = style("noVerticalPadding", {
+        ...paddings({ vertical: 0 }),
+    });
+
     const title = style("title", {
         ...fonts({
-            weight: globalVars.fonts.weights.semiBold as 400,
+            weight: globalVars.fonts.weights.semiBold,
             size: globalVars.fonts.size.medium,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         ...paddings({
-            top: 0,
-            right: 0,
-            bottom: 0,
+            all: 0,
         }),
+        ...margins({
+            all: 0,
+        }),
+        textAlign: "left",
         flexGrow: 1,
         color: colorOut(vars.title.color),
+    });
+
+    const paddedFrame = style("paddedFrame", {
+        ...paddings(vars.contents.padding),
     });
 
     return {
@@ -338,5 +352,7 @@ export const dropDownClasses = useThemeCache(() => {
         count,
         verticalPadding,
         title,
+        noVerticalPadding,
+        paddedFrame,
     };
 });

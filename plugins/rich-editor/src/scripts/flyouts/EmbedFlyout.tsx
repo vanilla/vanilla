@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Frame from "@library/layout/frame/Frame";
@@ -92,9 +92,10 @@ export default function EmbedFlyout(props: IProps) {
     const classesInsertMedia = insertMediaClasses();
     const placeholderText = `https://`;
 
-    function handleVisibilityChange() {
-        inputRef.current && inputRef.current.focus();
-        forceSelectionUpdate();
+    function handleVisibilityChange(newVisibility: boolean) {
+        if (newVisibility) {
+            inputRef.current && inputRef.current.focus();
+        }
     }
 
     return (
@@ -104,17 +105,14 @@ export default function EmbedFlyout(props: IProps) {
                 name={t("Insert Media")}
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
                 title={t("Insert Media")}
-                paddedList={true}
-                onClose={clearInput}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
                 buttonContents={<IconForButtonWrap icon={<EmbedIcon />} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}
-                selfPadded={true}
                 initialFocusElement={inputRef.current}
-                flyoutSize={FlyoutSizes.MEDIUM}
+                flyoutType={FlyoutType.FRAME}
                 contentsClassName={!legacyMode ? classesRichEditor.flyoutOffset : ""}
             >
                 <Frame

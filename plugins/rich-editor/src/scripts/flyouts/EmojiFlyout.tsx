@@ -12,8 +12,8 @@ import classNames from "classnames";
 import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { EmojiIcon } from "@library/icons/editorIcons";
 
 interface IProps {

@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { hasPermission } from "@library/features/users/permissionUtils";
 import getStore from "@library/redux/getStore";
 import { Editor } from "@rich-editor/editor/Editor";
@@ -12,10 +13,9 @@ import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import classNames from "classnames";
-import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
+import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
@@ -29,12 +29,8 @@ interface IProps {
 export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
-    useEffect(() => {
-        document.body.classList.add(EDITOR_SCROLL_CONTAINER_CLASS);
-        return () => {
-            document.body.classList.remove(EDITOR_SCROLL_CONTAINER_CLASS);
-        };
-    }, []);
+
+    const embedOptionsID = useUniqueID("embedOptions");
 
     return (
         <Provider store={store}>

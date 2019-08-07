@@ -10,8 +10,8 @@ import { t } from "@library/utility/appUtils";
 import { LiveMessage } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IMessageProps {
     className?: string;

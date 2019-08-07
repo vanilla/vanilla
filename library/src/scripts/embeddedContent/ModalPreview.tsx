@@ -19,9 +19,9 @@ import { unit } from "@library/styles/styleHelpers";
 import { CheckCompactIcon, CloseCompactIcon } from "@library/icons/common";
 import { ComposeIcon } from "@library/icons/titleBar";
 import Paragraph from "@library/layout/Paragraph";
-const reactionsStory = storiesOf("Components", module);
+const story = storiesOf("Components", module);
 
-reactionsStory.add("Buttons", () => {
+story.add("Buttons", () => {
     const globalVars = globalVariables();
     const classesButtonUtility = buttonUtilityClasses();
     return (
@@ -104,7 +104,7 @@ reactionsStory.add("Buttons", () => {
     );
 });
 
-reactionsStory.add("Modals", () => {
+story.add("Modals", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Modals</StoryHeading>
@@ -127,6 +127,6 @@ reactionsStory.add("Modals", () => {
     );
 });
 
-reactionsStory.add("Examples", () => {
+story.add("Examples", () => {
     return <StoryHeading depth={1}>Modal Examples</StoryHeading>;
 });

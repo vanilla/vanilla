@@ -9,9 +9,9 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-const reactionsStory = storiesOf("Philosophy", module);
+const story = storiesOf("Philosophy", module);
 
-reactionsStory.add("Goals", () => {
+story.add("Goals", () => {
     return (
         <>
             <StoryHeading depth={1}>Goals</StoryHeading>
@@ -30,7 +30,7 @@ reactionsStory.add("Goals", () => {
     );
 });
 
-reactionsStory.add("Variables", () => {
+story.add("Variables", () => {
     return (
         <>
             <StoryHeading depth={1}>Variables</StoryHeading>
@@ -46,7 +46,7 @@ reactionsStory.add("Variables", () => {
     );
 });
 
-reactionsStory.add("Colors", () => {
+story.add("Colors", () => {
     return (
         <>
             <StoryHeading depth={1}>Colors</StoryHeading>

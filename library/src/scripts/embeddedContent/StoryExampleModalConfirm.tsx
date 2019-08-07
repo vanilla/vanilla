@@ -4,14 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
-import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { StoryTile } from "@library/storybook/StoryTile";
 import { Omit } from "@library/@types/utils";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
@@ -27,24 +24,15 @@ export function StoryExampleModalConfirm(props: IProps) {
 
     return (
         <>
-            <li className={classNames(storyBookClasses().tilesAndText, storyBookClasses().compactTilesAndText)}>
-                <StoryTile
-                    tag={"div"}
-                    mouseOverText={props.mouseOverText}
-                    type={props.type}
-                    scaleContents={props.scaleContents}
-                >
-                    <Button
-                        id={toggleButton}
-                        onClick={() => {
-                            setOpen(true);
-                        }}
-                        buttonRef={openButtonRef}
-                    >
-                        Confirm Modal
-                    </Button>
-                </StoryTile>
-            </li>
+            <Button
+                id={toggleButton}
+                onClick={() => {
+                    setOpen(true);
+                }}
+                buttonRef={openButtonRef}
+            >
+                Confirm Modal
+            </Button>
             {open && (
                 <ModalConfirm
                     title={"Do you agree?"}

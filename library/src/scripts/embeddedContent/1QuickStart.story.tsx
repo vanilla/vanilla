@@ -14,9 +14,9 @@ import { StoryLink } from "@library/storybook/StoryLink";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-const reactionsStory = storiesOf("Quick Start", module);
+const story = storiesOf("Quick Start", module);
 
-reactionsStory.add("Colors", () => {
+story.add("Colors", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Colors</StoryHeading>

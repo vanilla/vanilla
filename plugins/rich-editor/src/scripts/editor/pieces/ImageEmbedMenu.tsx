@@ -102,7 +102,7 @@ export function ImageEmbedMenu(props: IProps) {
                                     value: alt,
                                     onChange: handleTextChange,
                                     inputRef,
-                                    placeholder: t("(Image description)"),
+                                    placeholder: t("Example: Image of a Coffee"),
                                     onKeyPress: (event: React.KeyboardEvent) => {
                                         if (event.key === "Enter") {
                                             event.preventDefault();

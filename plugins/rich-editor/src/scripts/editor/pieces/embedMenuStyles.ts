@@ -56,17 +56,22 @@ export const embedMenuClasses = useThemeCache(() => {
 
     // Extra specific and defensive here because it's within userContent styles.
     const paragraph = style("paragraph", {
-        ...paddings({
-            all: 0,
-            top: importantUnit(globalVars.gutter.quarter),
-        }),
-        ...fonts({
-            weight: globalVars.fonts.weights.normal,
-            lineHeight: globalVars.lineHeights.base,
-            color: globalVars.meta.colors.fg,
-            size: globalVars.fonts.size.medium,
-            align: "left",
-        }),
+        $nest: {
+            "&&": {
+                // Specificity required to override default label styles
+                ...paddings({
+                    all: 0,
+                    top: importantUnit(globalVars.gutter.quarter),
+                }),
+                ...fonts({
+                    weight: globalVars.fonts.weights.normal,
+                    lineHeight: globalVars.lineHeights.base,
+                    color: globalVars.meta.colors.fg,
+                    size: globalVars.fonts.size.medium,
+                    align: "left",
+                }),
+            },
+        },
     });
 
     const verticalPadding = style("verticalPadding", {

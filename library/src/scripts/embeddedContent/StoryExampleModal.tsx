@@ -4,20 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
-import { getRequiredID, useUniqueID } from "@library/utility/idUtils";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { StoryTile } from "@library/storybook/StoryTile";
+import { useUniqueID } from "@library/utility/idUtils";
 import { Omit } from "@library/@types/utils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
-import SmartAlign from "@library/layout/SmartAlign";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@library/utility/appUtils";

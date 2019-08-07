@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";

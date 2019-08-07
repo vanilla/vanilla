@@ -48,7 +48,7 @@ export function StoryExampleModal(props: IProps) {
                 }}
                 buttonRef={openButtonRef}
             >
-                Confirm Modal
+                Modal with text input
             </Button>
             {open && (
                 <Modal

@@ -238,8 +238,8 @@ export const searchBarClasses = useThemeCache(() => {
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
         ...borderRadii({
-            left: important("0px"),
-            right: vars.border.radius,
+            left: important("0"),
+            right: important(vars.border.radius),
         }),
     });
 

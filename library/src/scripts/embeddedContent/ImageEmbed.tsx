@@ -54,7 +54,7 @@ export function ImageEmbed(props: IProps) {
                                     name: newValue.alt,
                                 });
                         }}
-                        alt={props.name}
+                        initialAlt={props.name}
                     />
                 )}
             </div>

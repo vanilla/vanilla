@@ -18,10 +18,11 @@ import classNames from "classnames";
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { useLastValue } from "@vanilla/react-utils";
 
-interface IProps extends IImageMeta {
+interface IProps {
     onSave: (meta: IImageMeta) => void;
     onVisibilityChange: (newIsVisible: boolean) => void;
     className?: string;
+    initialAlt: string;
 }
 
 export interface IImageMeta {
@@ -34,9 +35,9 @@ export interface IImageMeta {
 export function ImageEmbedMenu(props: IProps) {
     const classes = embedMenuClasses();
     const icon = accessibleImageMenu();
-    const [alt, setAlt] = useState(props.alt);
+    const [alt, setAlt] = useState(props.initialAlt);
     const device = useDevice();
-    const [isVisible, setVisible] = useState(false);
+    const [isVisible, internalSetVisible] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleTextChange = useCallback(event => {
@@ -48,16 +49,28 @@ export function ImageEmbedMenu(props: IProps) {
     }, []);
 
     const { onVisibilityChange } = props;
+    const setVisible = (newVisibility: boolean, resetValue = true) => {
+        internalSetVisible(newVisibility);
+        onVisibilityChange(newVisibility);
+        if (resetValue && !newVisibility) {
+            setAlt(props.initialAlt);
+        }
+    };
+
+    // Focus the input when opened.
     const prevVisibility = useLastValue(isVisible);
     useEffect(() => {
         if (!prevVisibility && isVisible && inputRef.current) {
             inputRef.current && inputRef.current.focus();
         }
+    }, [prevVisibility, isVisible, inputRef, onVisibilityChange, setAlt, props.initialAlt]);
 
-        if (prevVisibility !== isVisible) {
-            onVisibilityChange(isVisible);
-        }
-    }, [prevVisibility, isVisible, inputRef, onVisibilityChange]);
+    const saveAndClose = () => {
+        props.onSave({
+            alt,
+        });
+        setVisible(false, false);
+    };
 
     return (
         <div
@@ -90,6 +103,13 @@ export function ImageEmbedMenu(props: IProps) {
                                     onChange: handleTextChange,
                                     inputRef,
                                     placeholder: t("(Image description)"),
+                                    onKeyPress: (event: React.KeyboardEvent) => {
+                                        if (event.key === "Enter") {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            saveAndClose();
+                                        }
+                                    },
                                 }}
                             />
                         </FrameBody>
@@ -99,15 +119,10 @@ export function ImageEmbedMenu(props: IProps) {
                                 onClick={e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    e.nativeEvent.stopPropagation();
-                                    e.nativeEvent.stopImmediatePropagation();
-                                    props.onSave({
-                                        alt,
-                                    });
-                                    setVisible(false);
+                                    saveAndClose();
                                 }}
                             >
-                                {t("Insert")}
+                                {t("Save")}
                             </Button>
                         </FrameFooter>
                     </form>

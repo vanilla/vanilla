@@ -62,6 +62,7 @@ export const inputClasses = useThemeCache(() => {
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),
         outline: 0,
+        fontWeight: globalVars.fonts.weights.normal,
         $nest: {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),

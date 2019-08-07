@@ -87,7 +87,7 @@ abstract class AbstractAPIv2Test extends TestCase {
             if (array_intersect(array_keys($row), $this->formattedFields) && array_key_exists('format', $row)) {
                 foreach ($this->formattedFields as $field) {
                     if (array_key_exists($field, $row)) {
-                        $row[$field] = \Gdn_Format::to($row[$field], $row['format']);
+                        $row[$field] = \Gdn::formatService()->renderHTML($row[$field], $row['format']);
                     }
                 }
                 unset($row['format']);

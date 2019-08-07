@@ -19,6 +19,8 @@ import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut } from "@library/styles/styleHelpersColors";
 
 const story = storiesOf("Search", module);
 
@@ -37,18 +39,27 @@ story.add("Search Components", () => {
             <StoryHeading>Search Box</StoryHeading>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <MemoryRouter>
-                    <div className={splashClasses().searchContainer}>
-                        <IndependentSearch
-                            buttonClass={splashClasses().searchButton}
-                            buttonBaseClass={ButtonTypes.CUSTOM}
-                            isLarge={true}
-                            placeholder={t("Search")}
-                            inputClass={splashClasses().input}
-                            iconClass={splashClasses().icon}
-                            buttonLoaderClassName={splashClasses().buttonLoader}
-                            contentClass={splashClasses().content}
-                            valueContainerClasses={splashClasses().valueContainer}
-                        />
+                    <div
+                        style={{
+                            backgroundColor: globalVariables()
+                                .mixBgAndFg(0.5)
+                                .toHexString(),
+                            padding: `30px 10px`,
+                        }}
+                    >
+                        <div className={splashClasses().searchContainer}>
+                            <IndependentSearch
+                                buttonClass={splashClasses().searchButton}
+                                buttonBaseClass={ButtonTypes.CUSTOM}
+                                isLarge={true}
+                                placeholder={t("Search")}
+                                inputClass={splashClasses().input}
+                                iconClass={splashClasses().icon}
+                                buttonLoaderClassName={splashClasses().buttonLoader}
+                                contentClass={splashClasses().content}
+                                valueContainerClasses={splashClasses().valueContainer}
+                            />
+                        </div>
                     </div>
                 </MemoryRouter>
             </SearchContext.Provider>

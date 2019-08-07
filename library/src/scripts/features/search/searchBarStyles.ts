@@ -142,6 +142,12 @@ export const searchBarClasses = useThemeCache(() => {
                 "& .searchBar__indicators": {
                     display: "none",
                 },
+                "& .searchBar__input": {
+                    width: percent(100),
+                },
+                "& .searchBar__input input": {
+                    width: important(`100%`),
+                },
             },
         },
         mediaQueries.oneColumnDown({
@@ -238,8 +244,8 @@ export const searchBarClasses = useThemeCache(() => {
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
         ...borderRadii({
-            left: important("0px"),
-            right: vars.border.radius,
+            left: important("0"),
+            right: important(vars.border.radius),
         }),
     });
 

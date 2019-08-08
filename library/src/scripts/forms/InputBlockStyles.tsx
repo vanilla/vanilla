@@ -92,6 +92,11 @@ export const inputBlockClasses = useThemeCache(() => {
         marginBottom: unit(formElementVars.spacing.margin / 2),
     });
 
+    const sectionTitle = style("sectionTitle", {
+        fontWeight: globalVars.fonts.weights.semiBold,
+        lineHeight: globalVars.lineHeights.base,
+    });
+
     const fieldsetGroup = style("fieldsetGroup", {
         marginTop: unit(formElementVars.spacing.margin),
     });
@@ -105,6 +110,7 @@ export const inputBlockClasses = useThemeCache(() => {
         labelText,
         inputWrap,
         labelAndDescription,
+        sectionTitle,
         fieldsetGroup,
     };
 });

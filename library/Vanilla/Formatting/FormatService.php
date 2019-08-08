@@ -43,10 +43,11 @@ class FormatService {
      * @return string
      *
      * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
+     * @throws FormatterNotFoundException If the format doesn't have a match.
      */
     public function filter(string $content, string $format): string {
         return $this
-            ->getFormatter($format)
+            ->getFormatter($format, true)
             ->filter($content);
     }
 

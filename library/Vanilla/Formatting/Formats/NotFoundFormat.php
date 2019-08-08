@@ -68,7 +68,9 @@ class NotFoundFormat implements FormatInterface {
      * @inheritdoc
      */
     public function filter(string $content): string {
-        throw new FormatterNotFoundException($this->getErrorMessage());
+        // For backwards compatibility with custom formats that haven't been updated yet
+        // We don't want to throw any exceptions if we don't recognize the format.
+        return $content;
     }
 
     /**

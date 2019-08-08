@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\NullCache;
 /**
  * Tests for the EmbedService class.
  */
-class EmbedServiceTestMinimal extends MinimalContainerTestCase {
+class EmbedServiceTest extends MinimalContainerTestCase {
 
     /** @var EmbedService */
     private $embedService;

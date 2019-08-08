@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class GettyImagesEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var GettyImagesEmbedFactory */
     private $factory;

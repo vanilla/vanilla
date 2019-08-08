@@ -6,34 +6,36 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
-use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
+use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Verify embed class capabilities.
  */
-class TwitterEmbedTestMinimal extends MinimalContainerTestCase {
+class InstagramEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
     public function testLegacyDataFormat() {
         $legacyJSON = <<<JSON
 {
-    "url": "https://twitter.com/hootsuite/status/1009883861617135617",
-    "type": "twitter",
+    "url": "https://www.instagram.com/p/BTjnolqg4po/?taken-by=vanillaforums",
+    "type": "instagram",
     "name": null,
     "body": null,
     "photoUrl": null,
     "height": null,
     "width": null,
     "attributes": {
-        "statusID": "1009883861617135617"
+        "permaLink": "https://www.instagram.com/p/BTjnolqg4po",
+        "isCaptioned": true,
+        "versionNumber": "8"
     }
 }
 JSON;
 
         $data = json_decode($legacyJSON, true);
-        $embed = new TwitterEmbed($data);
-        $this->assertInstanceOf(TwitterEmbed::class, $embed);
+        $embed = new InstagramEmbed($data);
+        $this->assertInstanceOf(InstagramEmbed::class, $embed);
     }
 }

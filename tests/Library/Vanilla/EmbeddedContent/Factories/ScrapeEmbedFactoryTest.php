@@ -17,7 +17,7 @@ use VanillaTests\Fixtures\MockPageScraper;
 /**
  * Tests for the giphy embed and factory.
  */
-class ScrapeEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var ScrapeEmbedFactory */
     private $factory;

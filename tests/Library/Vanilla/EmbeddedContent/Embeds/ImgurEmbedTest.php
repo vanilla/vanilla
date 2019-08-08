@@ -6,36 +6,35 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
-use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
+use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Verify embed class capabilities.
  */
-class InstagramEmbedTestMinimal extends MinimalContainerTestCase {
+class ImgurEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
     public function testLegacyDataFormat() {
         $legacyJSON = <<<JSON
 {
-    "url": "https://www.instagram.com/p/BTjnolqg4po/?taken-by=vanillaforums",
-    "type": "instagram",
+    "url": "https://imgur.com/gallery/arP2Otg",
+    "type": "imgur",
     "name": null,
     "body": null,
     "photoUrl": null,
     "height": null,
     "width": null,
     "attributes": {
-        "permaLink": "https://www.instagram.com/p/BTjnolqg4po",
-        "isCaptioned": true,
-        "versionNumber": "8"
+        "postID": "arP2Otg",
+        "isAlbum": false
     }
 }
 JSON;
 
         $data = json_decode($legacyJSON, true);
-        $embed = new InstagramEmbed($data);
-        $this->assertInstanceOf(InstagramEmbed::class, $embed);
+        $embed = new ImgurEmbed($data);
+        $this->assertInstanceOf(ImgurEmbed::class, $embed);
     }
 }

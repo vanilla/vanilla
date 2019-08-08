@@ -12,7 +12,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class YouTubeEmbedTestMinimal extends MinimalContainerTestCase {
+class YouTubeEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */

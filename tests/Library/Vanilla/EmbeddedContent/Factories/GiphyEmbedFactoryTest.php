@@ -8,17 +8,17 @@
 namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Garden\Http\HttpResponse;
-use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
-use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
+use Vanilla\EmbeddedContent\Factories\GiphyEmbedFactory;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the giphy embed and factory.
  */
-class CodePenEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class GiphyEmbedFactoryTest extends MinimalContainerTestCase {
 
-    /** @var CodePenEmbedFactory */
+    /** @var GiphyEmbedFactory */
     private $factory;
 
     /** @var MockHttpClient */
@@ -30,7 +30,7 @@ class CodePenEmbedFactoryTestMinimal extends MinimalContainerTestCase {
     public function setUp() {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
-        $this->factory = new CodePenEmbedFactory($this->httpClient);
+        $this->factory = new GiphyEmbedFactory($this->httpClient);
     }
 
 
@@ -49,7 +49,9 @@ class CodePenEmbedFactoryTestMinimal extends MinimalContainerTestCase {
      */
     public function supportedDomainsProvider(): array {
         return [
-            ['https://codepen.io/hiroshi_m/pen/YoKYVv'], // Only 1 image format.
+            ['https://gph.is/291u1MC'],
+            ['https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO'],
+            ['https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif']
         ];
     }
 
@@ -57,14 +59,13 @@ class CodePenEmbedFactoryTestMinimal extends MinimalContainerTestCase {
      * Test network request fetching and handling.
      */
     public function testCreateEmbedForUrl() {
-        $urlToCheck = 'https://codepen.io/hiroshi_m/pen/YoKYVv';
-        $endpoint = CodePenEmbedFactory::OEMBED_URL_BASE . '?url=' . urlencode($urlToCheck) . '&format=json';
+        $urlToCheck = 'https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO';
+        $endpoint = GiphyEmbedFactory::OEMBED_URL_BASE . '?url=' . urlencode($urlToCheck);
 
-        $name = 'Hello title';
+        $title = 'Hello title';
         $width = 500;
         $height = 400;
-        $frameSrc = 'https://codepen.io/hiroshi_m/embed/preview/YoKYVv?height=300';
-        $cpId = 'YoKYVv';
+        $finalUrl = 'https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif';
 
         $this->httpClient->addMockResponse(
             $endpoint,
@@ -73,32 +74,31 @@ class CodePenEmbedFactoryTestMinimal extends MinimalContainerTestCase {
                 'Content-Type: application/json',
                 json_encode([
                     'width' => $width,
-                    'title' => $name,
+                    'title' => $title,
                     'height' => $height,
-                    'html' => "<iframe id='cp_embed_$cpId' src='$frameSrc'></iframe>",
+                    'url' => $finalUrl,
                 ])
             )
         );
 
         // Check over the network.
-        $embed = $this->factory->createEmbedForUrl($urlToCheck);
-        $embedData = $embed->jsonSerialize();
+        $giphyEmbed = $this->factory->createEmbedForUrl($urlToCheck);
+        $embedData = $giphyEmbed->jsonSerialize();
         $this->assertEquals(
             [
                 'width' => $width,
-                'name' => $name,
+                'name' => $title,
                 'height' => $height,
                 'url' => $urlToCheck, // The original URL.
-                'embedType' => CodePenEmbed::TYPE,
-                'codePenID' => $cpId,
-                'author' => 'hiroshi_m',
+                'embedType' => GiphyEmbed::TYPE,
+                'giphyID' => 'kW8mnYSNkUYKc',
             ],
             $embedData,
-            'Data can be fetched over the network to create the embed from a URL.'
+            'Data cna be fetched over the network to create the embed from a URL.'
         );
 
         // Just verify that this doesn't throw an exception.
-        $dataEmbed = new CodePenEmbed($embedData);
-        $this->assertInstanceOf(CodePenEmbed::class, $dataEmbed);
+        $dataEmbed = new GiphyEmbed($embedData);
+        $this->assertInstanceOf(GiphyEmbed::class, $dataEmbed);
     }
 }

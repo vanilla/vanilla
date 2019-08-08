@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class YouTubeEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var YouTubeEmbedFactory */
     private $factory;

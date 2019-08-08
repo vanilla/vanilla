@@ -13,7 +13,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class CodePenEmbedTestMinimal extends MinimalContainerTestCase {
+class CodePenEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create code pen embed from the old data format that might still
      * live in the DB.

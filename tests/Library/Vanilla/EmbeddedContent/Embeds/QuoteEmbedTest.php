@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\EmbeddedContent\LegacyEmbedFixtures;
 /**
  * Test for the individual linkembed.
  */
-class QuoteEmbedTestMinimal extends MinimalContainerTestCase {
+class QuoteEmbedTest extends MinimalContainerTestCase {
 
     /**
      * Setup.

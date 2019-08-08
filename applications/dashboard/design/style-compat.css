@@ -1027,84 +1027,132 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   display: flex;
 }
 
+.Popup.hasRichEditor .Border {
+  width: 100%;
+  box-sizing: border-box;
+}
+.Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
+.Popup.hasRichEditor .CommentForm .PreviewButton,
+.Popup.hasRichEditor #Form_Preview {
+  display: none !important;
+}
+
 @media (min-width: 700px) {
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm select,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
     max-width: 100%;
   }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
     padding-right: 0;
   }
-  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap,
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
     display: none;
   }
-  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper,
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
     padding-right: 0;
     padding-left: 0;
   }
-  body.hasRichEditor .CommentForm .richEditor {
+  .Popup.hasRichEditor .CommentForm .richEditor,
+body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor .CommentForm .richEditor .richEditor {
+  .Popup.hasRichEditor .CommentForm .richEditor .richEditor,
+body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
     padding-right: 0;
   }
-  body.hasRichEditor .CommentForm .Buttons {
+  .Popup.hasRichEditor .CommentForm .Buttons,
+body.hasRichEditor .CommentForm .Buttons {
     padding-right: 36px;
   }
-  body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+  .Popup.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+.Popup.hasRichEditor #GroupForm .Form-HeaderWrap,
+.Popup.hasRichEditor #MessageForm .Form-HeaderWrap,
+.Popup.hasRichEditor #ConversationForm .Form-HeaderWrap,
+body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
 body.hasRichEditor #GroupForm .Form-HeaderWrap,
 body.hasRichEditor #MessageForm .Form-HeaderWrap,
 body.hasRichEditor #ConversationForm .Form-HeaderWrap {
     display: none;
   }
-  body.hasRichEditor #EventAddEditForm .FormWrapper,
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper,
+.Popup.hasRichEditor #GroupForm .FormWrapper,
+.Popup.hasRichEditor #MessageForm .FormWrapper,
+.Popup.hasRichEditor #ConversationForm .FormWrapper,
+body.hasRichEditor #EventAddEditForm .FormWrapper,
 body.hasRichEditor #GroupForm .FormWrapper,
 body.hasRichEditor #MessageForm .FormWrapper,
 body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #GroupForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #MessageForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #ConversationForm .FormWrapper .richEditor,
+body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
 body.hasRichEditor #GroupForm .FormWrapper .richEditor,
 body.hasRichEditor #MessageForm .FormWrapper .richEditor,
 body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
     padding-right: 0;
     padding-left: 0;
   }
-  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
     padding-right: 36px;
     padding-left: 0;
   }
-  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
     padding-left: 36px;
   }
-  body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
+  .Popup.hasRichEditor.Section-Conversation .CommentForm .Buttons,
+body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
     padding-right: 0;
   }
-  body.hasRichEditor .Popup.hasRichEditor .Border {
+  .Popup.hasRichEditor .Popup.hasRichEditor .Border,
+body.hasRichEditor .Popup.hasRichEditor .Border {
     width: 100%;
     box-sizing: border-box;
   }
-  body.hasRichEditor .Popup.hasRichEditor .Content {
+  .Popup.hasRichEditor .Popup.hasRichEditor .Content,
+body.hasRichEditor .Popup.hasRichEditor .Content {
     margin-top: 10px;
   }
-  body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
+  .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
+body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
     padding-left: 36px;
   }
-  body.hasRichEditor .Popup.hasRichEditor .FormWrapper {
+  .Popup.hasRichEditor .Popup.hasRichEditor .FormWrapper,
+body.hasRichEditor .Popup.hasRichEditor .FormWrapper {
     background: none;
     padding-top: 3px;
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor .Popup.hasRichEditor .richEditor {
+  .Popup.hasRichEditor .Popup.hasRichEditor .richEditor,
+body.hasRichEditor .Popup.hasRichEditor .richEditor {
     padding-left: 0;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper,
+body.hasRichEditor .NoteForm.FormWrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper .richEditor,
+body.hasRichEditor .NoteForm.FormWrapper .richEditor {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 .richEditor-text {
@@ -2075,120 +2123,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .icon-folderClosed {
   width: 16px;
   height: 14px;
-}
-
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
- */
-.inputBlock {
-  display: block;
-  margin-bottom: 8px;
-}
-.inputBlock.hasError .inputText {
-  border-color: #ff3933;
-  background-color: #ffebeb;
-  color: #ff3933;
-}
-.inputBlock.isHorizontal {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 100%;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-}
-.inputBlock.isHorizontal .inputBlock-labelAndDescription {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  width: auto;
-}
-.inputBlock.isHorizontal .inputBlock-inputWrap {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-}
-
-.inputBlock-columns {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.inputBlock-errors {
-  display: block;
-  font-size: 12px;
-}
-
-.inputBlock-error {
-  display: block;
-  color: #ff3933;
-}
-.inputBlock-error + .inputBlock-error {
-  margin-top: 6px;
-}
-
-.inputBlock-labelNote {
-  display: block;
-  font-size: 12px;
-  font-weight: 400;
-  opacity: 0.6;
-}
-
-.inputBlock-labelText {
-  display: block;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.inputBlock-inlineLabel {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.inputBlock-inputWrap + .checkbox, .inputBlock-inputWrap + .radioButton {
-  margin-top: 6px;
-}
-
-.inputBlock-labelAndDescription {
-  display: block;
-  width: 100%;
-}
-
-.inputBlock-inlineLabel {
-  height: 36px;
-  line-height: 36px;
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.inputBlock-miniInputs {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-}
-
-.inputBlock-miniInput {
-  width: 100px;
-}
-
-.inputBlock-sectionTitle {
-  font-weight: 600;
-  line-height: 1.5;
-  margin-bottom: 6px;
 }
 
 /**

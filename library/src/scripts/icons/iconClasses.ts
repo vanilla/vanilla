@@ -69,9 +69,35 @@ export const iconVariables = useThemeCache(() => {
         width: 40,
         height: 40,
     });
+
     const close = themeVars("close", {
         width: 12,
         height: 12,
+    });
+
+    const chevronLeftCompact = themeVars("chevronLeftCompact", {
+        width: 12,
+        height: 21,
+    });
+
+    const selectedCategory = themeVars("selectedCategory", {
+        width: 16.8,
+        height: 13,
+    });
+
+    const signIn = themeVars("signIn", {
+        width: 24,
+        height: 18,
+    });
+
+    const chevronUp = themeVars("selectedCategory", {
+        width: 51,
+        height: 17,
+    });
+
+    const plusCircle = themeVars("plusCircle", {
+        width: 14,
+        height: 14,
     });
 
     return {
@@ -88,6 +114,11 @@ export const iconVariables = useThemeCache(() => {
         user,
         userWarning,
         close,
+        chevronLeftCompact,
+        selectedCategory,
+        signIn,
+        chevronUp,
+        plusCircle,
     };
 });
 
@@ -160,6 +191,31 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.close.height),
     });
 
+    const chevronLeftCompact = style("chevronLeftCompact", {
+        width: unit(vars.chevronLeftCompact.width),
+        height: unit(vars.chevronLeftCompact.height),
+    });
+
+    const selectedCategory = style("selectedCategory", {
+        width: unit(vars.selectedCategory.width),
+        height: unit(vars.selectedCategory.height),
+    });
+
+    const signIn = style("signIn", {
+        width: unit(vars.signIn.width),
+        height: unit(vars.signIn.height),
+    });
+
+    const chevronUp = style("chevronUp", {
+        width: unit(vars.chevronUp.width),
+        height: unit(vars.chevronUp.height),
+    });
+
+    const plusCircle = style("plusCircle", {
+        width: unit(vars.plusCircle.width),
+        height: unit(vars.plusCircle.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -174,5 +230,10 @@ export const iconClasses = useThemeCache(() => {
         user,
         userWarning,
         close,
+        chevronLeftCompact,
+        selectedCategory,
+        signIn,
+        chevronUp,
+        plusCircle,
     };
 });

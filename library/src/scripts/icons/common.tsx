@@ -68,7 +68,7 @@ export function LeftChevronCompactIcon(props: { className?: string }) {
     const classes = iconClasses();
     return (
         <svg
-            className={classNames(classes.standard, "icon-chevronLeftCompact", props.className)}
+            className={classNames(classes.chevronLeftCompact, "icon-chevronLeftCompact", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 12 21"
             aria-hidden="true"
@@ -244,7 +244,7 @@ export function CheckCompactIcon(props: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(classes.standard, "icon-selectedCategory", props.className)}
+            className={classNames(classes.selectedCategory, "icon-selectedCategory", props.className)}
             viewBox="0 0 16.8 13"
             role="img"
             aria-label={title}
@@ -280,7 +280,7 @@ export function DownTriangleIcon(props: { className?: string; title?: string; de
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 8 8"
-            className={classNames(classes.standard, "icon-triangleRight", props.className)}
+            className={classNames("icon-triangleRight", props.className)}
             aria-hidden="true"
         >
             <title>{props.title ? props.title : `▾`}</title>
@@ -300,7 +300,7 @@ export function HelpIcon(props: { className?: string }) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames(classes.standard, "icon-help", props.className)}
+            className={classNames(classes.compact, "icon-help", props.className)}
             role="img"
             aria-label={title}
         >
@@ -338,7 +338,7 @@ export function PlusCircleIcon(props: { className?: string }) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 14 14"
-            className={classNames(classes.standard, "icon-plusCircle", props.className)}
+            className={classNames(classes.plusCircle, "icon-plusCircle", props.className)}
             role="img"
             aria-hidden="true"
         >
@@ -358,7 +358,7 @@ export function SignInIcon(props: { className?: string }) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="-4 0 24 18"
-            className={classNames(classes.standard, "icon-signIn", props.className)}
+            className={classNames(classes.signIn, "icon-signIn", props.className)}
             role="img"
         >
             <title>{title}</title>
@@ -381,7 +381,7 @@ export function ChevronUpIcon(props: { className?: string }) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 51 17"
-            className={classNames(classes.standard, "icon-chevronUp", props.className)}
+            className={classNames(classes.chevronUp, "icon-chevronUp", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>

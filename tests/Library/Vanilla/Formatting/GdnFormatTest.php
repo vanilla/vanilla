@@ -7,14 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting;
 
-use Vanilla\Formatting\Formats\RichFormat;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 
 /**
  * Unit tests for the Gdn_Format class.
  */
-class GdnFormatTestMinimal extends MinimalContainerTestCase {
+class GdnFormatTest extends MinimalContainerTestCase {
 
     use AssertsFixtureRenderingTrait;
 

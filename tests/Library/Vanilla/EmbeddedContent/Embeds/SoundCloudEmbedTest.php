@@ -12,7 +12,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class SoundCloudEmbedTestMinimal extends MinimalContainerTestCase {
+class SoundCloudEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */

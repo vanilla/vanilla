@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class InstagramEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class InstagramEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var InstagramEmbedFactory */
     private $factory;

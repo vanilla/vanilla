@@ -14,7 +14,7 @@ use VanillaTests\Fixtures\EmbeddedContent\MockEmbedFactory;
 /**
  * Tests for the embed factory.
  */
-class AbstractEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class AbstractEmbedFactoryTest extends MinimalContainerTestCase {
 
     /**
      * @inheritdoc

@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class ImgurEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var ImgurEmbedFactory */
     private $factory;

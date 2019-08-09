@@ -7,17 +7,17 @@
 namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Garden\Http\HttpResponse;
-use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
-use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
+use Vanilla\EmbeddedContent\Factories\WistiaEmbedFactory;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class WistiaEmbedFactoryTest extends MinimalContainerTestCase {
 
-    /** @var TwitchEmbedFactory */
+    /** @var WistiaEmbedFactory */
     private $factory;
 
     /** @var MockHttpClient */
@@ -29,7 +29,7 @@ class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
     public function setUp() {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
-        $this->factory = new TwitchEmbedFactory($this->httpClient);
+        $this->factory = new WistiaEmbedFactory($this->httpClient);
     }
 
     /**
@@ -47,7 +47,8 @@ class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
      */
     public function supportedDomainsProvider(): array {
         return [
-            [ "https://www.twitch.tv/videos/441409883" ]
+            [ "https://dave.wistia.com/medias/0k5h1g1chs" ],
+            [ "https://dave.wi.st/medias/0k5h1g1chs" ],
         ];
     }
 
@@ -55,31 +56,28 @@ class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
      * Test network request fetching and handling.
      */
     public function testCreateEmbedForUrl() {
-        $url = "https://www.twitch.tv/videos/441409883";
-        $videoID = "441409883";
-        $frameSrc = "https://player.twitch.tv/?video=441409883";
+        $url = "https://dave.wistia.com/medias/0k5h1g1chs";
+        $videoID = "0k5h1g1chs";
+        $frameSrc = "https://fast.wistia.net/embed/iframe/0k5h1g1chs?autoPlay=1";
 
         $oembedParams = http_build_query([ "url" => $url ]);
-        $oembedUrl = TwitchEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
+        $oembedUrl = WistiaEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength
         $data = [
-            "version" => 1,
+            "version" => "1.0",
             "type" => "video",
-            "twitch_type" => "vod",
-            "title" => "Movie Magic",
-            "author_name" => "Jerma985",
-            "author_url" => "https://www.twitch.tv/jerma985",
-            "provider_name" => "Twitch",
-            "provider_url" => "https://www.twitch.tv/",
-            "thumbnail_url" => "https://static-cdn.jtvnw.net/s3_vods/aa1bb413e849cf63b446_jerma985_34594404336_1230815694/thumb/thumb0-640x360.jpg",
-            "video_length" => 19593,
-            "created_at" => "2019-06-19T21:22:59Z",
-            "game" => "The Movies",
-            "html" => "<iframe src=\"https://player.twitch.tv/?%21branding=&amp;autoplay=false&amp;video=v441409883\" width=\"500\" height=\"281\" frameborder=\"0\" scrolling=\"no\" allowfullscreen></iframe>",
-            "width" => 500,
-            "height" => 281,
-            "request_url" => "https://www.twitch.tv/videos/441409883",
+            "html" => "<iframe src=\"https://fast.wistia.net/embed/iframe/0k5h1g1chs\" title=\"Lenny Delivers a Video - oEmbed glitch\" allowtransparency=\"true\" frameborder=\"0\" scrolling=\"no\" class=\"wistia_embed\" name=\"wistia_embed\" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen width=\"960\" height=\"540\"></iframe>\n<script src=\"https://fast.wistia.net/assets/external/E-v1.js\" async></script>",
+            "width" => 960,
+            "height" => 540,
+            "provider_name" => "Wistia, Inc.",
+            "provider_url" => "https://wistia.com",
+            "title" => "Lenny Delivers a Video - oEmbed glitch",
+            "thumbnail_url" => "https://embed-ssl.wistia.com/deliveries/99f3aefb8d55eef2d16583886f610ebedd1c6734.jpg?image_crop_resized=960x540",
+            "thumbnail_width" => 960,
+            "thumbnail_height" => 540,
+            "player_color" => "54bbff",
+            "duration" => 40.264,
         ];
         // phpcs:enable Generic.Files.LineLength
 
@@ -100,9 +98,9 @@ class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
                 "height" => $data["height"],
                 "width" => $data["width"],
                 "photoUrl" => $data["thumbnail_url"],
-                "twitchID" => "video:{$videoID}",
+                "videoID" => $videoID,
                 "url" => $url,
-                "embedType" => TwitchEmbed::TYPE,
+                "embedType" => WistiaEmbed::TYPE,
                 "name" => $data["title"],
                 "frameSrc" => $frameSrc,
             ],
@@ -111,7 +109,7 @@ class TwitchEmbedFactoryTestMinimal extends MinimalContainerTestCase {
         );
 
         // Just verify that this doesn't throw an exception.
-        $dataEmbed = new TwitchEmbed($embedData);
-        $this->assertInstanceOf(TwitchEmbed::class, $dataEmbed);
+        $dataEmbed = new WistiaEmbed($embedData);
+        $this->assertInstanceOf(WistiaEmbed::class, $dataEmbed);
     }
 }

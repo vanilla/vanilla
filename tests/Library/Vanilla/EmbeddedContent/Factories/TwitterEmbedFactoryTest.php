@@ -14,7 +14,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class TwitterEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class TwitterEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var TwitterEmbedFactory */
     private $factory;

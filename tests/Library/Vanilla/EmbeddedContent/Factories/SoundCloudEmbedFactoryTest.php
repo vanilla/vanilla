@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class SoundCloudEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var SoundCloudEmbedFactory */
     private $factory;

@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Formatting\Formats\MarkdownFormat;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
 use VanillaTests\MinimalContainerTestCase;
@@ -20,7 +21,7 @@ use Vanilla\Formatting\Quill\Formats\Link;
 /**
  * General testing of Filterer.
  */
-class FiltererTestMinimal extends MinimalContainerTestCase {
+class FiltererTest extends MinimalContainerTestCase {
 
     /**
      * Assert that the filterer is validating json properly.
@@ -55,10 +56,10 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
-                            'type' => QuoteEmbed::TYPE,
+                            'embedType' => QuoteEmbed::TYPE,
                             'body' => "Fake body contents, should be replaced.",
                             'bodyRaw' => 'Rendered Body',
-                            'format' => 'Markdown',
+                            'format' => MarkdownFormat::FORMAT_KEY,
                         ],
                     ],
                 ],
@@ -67,7 +68,7 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
-                            'type' => QuoteEmbed::TYPE,
+                            'embedType' => QuoteEmbed::TYPE,
                             'format' => RichFormat::FORMAT_KEY,
                             'body' => '<div><script>alert("This should be replaced!")</script></div>',
                             'bodyRaw' => [
@@ -105,10 +106,10 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
-                            'type' => QuoteEmbed::TYPE,
+                            'embedType' => QuoteEmbed::TYPE,
                             'body' => "<p>Rendered Body</p>\n",
                             'bodyRaw' => 'Rendered Body',
-                            'format' => 'Markdown',
+                            'format' => MarkdownFormat::FORMAT_KEY,
                         ],
                     ],
                 ],
@@ -117,9 +118,9 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
                 'insert' => [
                     'embed-external' => [
                         'data' => [
-                            'type' => QuoteEmbed::TYPE,
-                            'format' => 'Rich',
-                            'body' => \Gdn::formatService()->renderQuote($expectedEmbedBodyRaw, RichFormat::FORMAT_KEY),
+                            'embedType' => QuoteEmbed::TYPE,
+                            'format' => RichFormat::FORMAT_KEY,
+                            'body' => \Gdn::formatService()->renderQuote(json_encode($expectedEmbedBodyRaw), RichFormat::FORMAT_KEY),
                             'bodyRaw' => $expectedEmbedBodyRaw,
                         ],
                     ],
@@ -127,7 +128,12 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
             ],
         ];
 
-        $this->assertSame(json_encode($expected), $filterer->filter(json_encode($input)));
+        // Pretty print.
+        $actual =  json_encode(
+            json_decode($filterer->filter(json_encode($input)), true),
+            JSON_PRETTY_PRINT
+        );
+        $this->assertSame(json_encode($expected, JSON_PRETTY_PRINT), $actual);
     }
 
     /**
@@ -137,21 +143,21 @@ class FiltererTestMinimal extends MinimalContainerTestCase {
      */
     public function provideIO() {
         $loadingEmbed = <<<JSON
-   {  
-      "insert":{  
-         "embed-external":{  
-            "loaderData":{  
+   {
+      "insert":{
+         "embed-external":{
+            "loaderData":{
                "type":"file",
-               "file":{  
+               "file":{
 
                },
-               "progressEventEmitter":{  
-                  "listeners":[  
+               "progressEventEmitter":{
+                  "listeners":[
                      null
                   ]
                }
             },
-            "dataPromise":{  
+            "dataPromise":{
 
             }
          }

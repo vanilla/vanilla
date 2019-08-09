@@ -12,7 +12,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class TwitchEmbedTestMinimal extends MinimalContainerTestCase {
+class TwitchEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */

@@ -13,7 +13,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Test for the individual linkembed.
  */
-class LinkEmbedTestMinimal extends MinimalContainerTestCase {
+class LinkEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create giphy embed from the old data format that might still
      * live in the DB.

@@ -15,7 +15,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class VimeoEmbedFactoryTestMinimal extends MinimalContainerTestCase {
+class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var VimeoEmbedFactory */
     private $factory;

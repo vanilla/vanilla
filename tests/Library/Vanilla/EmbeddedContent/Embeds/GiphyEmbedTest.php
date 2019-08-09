@@ -13,7 +13,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class GiphyEmbedTestMinimal extends MinimalContainerTestCase {
+class GiphyEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create giphy embed from the old data format that might still
      * live in the DB.

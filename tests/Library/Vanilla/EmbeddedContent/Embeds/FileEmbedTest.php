@@ -12,7 +12,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class FileEmbedTestMinimal extends MinimalContainerTestCase {
+class FileEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create file embed embed from the old data format that might still
      * live in the DB.
@@ -45,7 +45,7 @@ class FileEmbedTestMinimal extends MinimalContainerTestCase {
 JSON;
 
         $oldData = json_decode($oldDataJSON, true);
-        $dataEmbed = new FileEmbedTestMinimal($oldData);
-        $this->assertInstanceOf(FileEmbedTestMinimal::class, $dataEmbed);
+        $dataEmbed = new FileEmbedTest($oldData);
+        $this->assertInstanceOf(FileEmbedTest::class, $dataEmbed);
     }
 }

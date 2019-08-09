@@ -9,28 +9,6 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconClasses";
 
-export function CloseIcon(props: { className?: string; noPadding?: boolean }) {
-    const title = t("Close");
-    const viewBox = props.noPadding ? "0 0 16 16" : "0 0 24 24";
-    const transform = props.noPadding ? "translate(-4 -4)" : "";
-    const classes = iconClasses();
-    return (
-        <svg
-            className={classNames(props.noPadding ? classes.compact : classes.close, props.className)}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox={viewBox}
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                transform={transform}
-                fill="currentColor"
-                d="M12,10.6293581 L5.49002397,4.11938207 C5.30046135,3.92981944 4.95620859,3.96673045 4.69799105,4.22494799 L4.22494799,4.69799105 C3.97708292,4.94585613 3.92537154,5.29601344 4.11938207,5.49002397 L10.6293581,12 L4.11938207,18.509976 C3.92981944,18.6995387 3.96673045,19.0437914 4.22494799,19.3020089 L4.69799105,19.775052 C4.94585613,20.0229171 5.29601344,20.0746285 5.49002397,19.8806179 L12,13.3706419 L18.509976,19.8806179 C18.6995387,20.0701806 19.0437914,20.0332695 19.3020089,19.775052 L19.775052,19.3020089 C20.0229171,19.0541439 20.0746285,18.7039866 19.8806179,18.509976 L13.3706419,12 L19.8806179,5.49002397 C20.0701806,5.30046135 20.0332695,4.95620859 19.775052,4.69799105 L19.3020089,4.22494799 C19.0541439,3.97708292 18.7039866,3.92537154 18.509976,4.11938207 L12,10.6293581 Z"
-            />
-        </svg>
-    );
-}
-
 export function CheckIcon(props: { className?: string }) {
     const title = `✓`;
     const classes = iconClasses();
@@ -307,14 +285,15 @@ export function UserWarningIcon(props: { className?: string }) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 40 40"
-            className={classNames(classes.userWarning, "icon-userWaning", props.className)}
+            className={classNames(classes.userWarning, props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
-            <rect width="40" height="40" fill="#d0021b" opacity="0.31" />
             <path
                 d="M32.707,25.862a2.167,2.167,0,0,1-1.876,3.249H9.169a2.168,2.168,0,0,1-1.877-3.249L18.123,7.083a2.168,2.168,0,0,1,3.754,0Z"
                 fill="#d0021b"
+                stroke="#fff"
+                strokeWidth="1px"
             />
             <path
                 d="M20,20.979a2.077,2.077,0,1,0,2.076,2.077A2.076,2.076,0,0,0,20,20.979Zm-1.971-7.463.335,6.139a.541.541,0,0,0,.54.512H21.1a.543.543,0,0,0,.541-.512l.334-6.139a.542.542,0,0,0-.54-.572H18.569A.542.542,0,0,0,18.029,13.516Z"

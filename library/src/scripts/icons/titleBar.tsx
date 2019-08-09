@@ -13,9 +13,10 @@ export function CloseIcon(props: { className?: string; noPadding?: boolean }) {
     const title = t("Close");
     const viewBox = props.noPadding ? "0 0 16 16" : "0 0 24 24";
     const transform = props.noPadding ? "translate(-4 -4)" : "";
+    const classes = iconClasses();
     return (
         <svg
-            className={classNames("icon", "icon-close", props.className)}
+            className={classNames(props.noPadding ? classes.compact : classes.close, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox={viewBox}
             aria-hidden="true"
@@ -32,9 +33,10 @@ export function CloseIcon(props: { className?: string; noPadding?: boolean }) {
 
 export function CheckIcon(props: { className?: string }) {
     const title = `✓`;
+    const classes = iconClasses();
     return (
         <svg
-            className={classNames("icon", "icon-check", props.className)}
+            className={classNames(classes.standard, "icon-check", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -47,11 +49,12 @@ export function CheckIcon(props: { className?: string }) {
 
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-help", props.className)}
+            className={classNames(classes.compact, "icon-help", props.className)}
             role="img"
             aria-label={title}
         >
@@ -66,11 +69,12 @@ export function HelpIcon(props: { className?: string }) {
 }
 
 export function ComposeIcon(props: { className?: string }) {
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "icon-compose", props.className)}
+            className={classNames(classes.standard, "icon-compose", props.className)}
             aria-hidden="true"
         >
             <path
@@ -83,11 +87,12 @@ export function ComposeIcon(props: { className?: string }) {
 
 export function DownloadIcon(props: { className?: string }) {
     const title = t("Download");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "icon-compose", props.className)}
+            className={classNames(classes.standard, "icon-compose", props.className)}
             role="img"
             aria-label={title}
         >
@@ -148,11 +153,12 @@ export function VanillaLogo(props: { className?: string; fill?: string }) {
 
 export function SettingsIcon(props: { className?: string }) {
     const title = t("Settings");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 18"
-            className={classNames("icon", "icon-settings", props.className)}
+            className={classNames(classes.settings, "icon-settings", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -167,11 +173,12 @@ export function SettingsIcon(props: { className?: string }) {
 
 export function SearchIcon(props: { className?: string }) {
     const title = t("Search");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 13.312 13.311"
-            className={classNames("icon", "icon-search", props.className)}
+            className={classNames(classes.search, "icon-search", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -186,11 +193,12 @@ export function SearchIcon(props: { className?: string }) {
 
 export function NotificationsIcon(props: { filled?: boolean; className?: string }) {
     const title = t("Notifications");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 20"
-            className={classNames("icon", "icon-notifications", props.className)}
+            className={classNames(classes.notifications, "icon-notifications", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -212,11 +220,12 @@ export function NotificationsIcon(props: { filled?: boolean; className?: string 
 
 export function MessagesIcon(props: { filled?: boolean; className?: string }) {
     const title = t("Messages");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20.051 14.016"
-            className={classNames("icon", "icon-messages", props.className)}
+            className={classNames(classes.messages, "icon-messages", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -247,11 +256,12 @@ export function MessagesIcon(props: { filled?: boolean; className?: string }) {
 
 export function UserIcon(props: { filled?: boolean; className?: string }) {
     const title = t("Me");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
-            className={classNames("icon", "icon-user", props.className)}
+            className={classNames(classes.user, "icon-user", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -273,11 +283,12 @@ export function UserIcon(props: { filled?: boolean; className?: string }) {
 
 export function NoUserPhotoIcon(props: { className?: string }) {
     const title = t("User");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "icon-noUserPhoto", props.className)}
+            className={classNames(classes.standard, "icon-noUserPhoto", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -291,11 +302,12 @@ export function NoUserPhotoIcon(props: { className?: string }) {
 
 export function UserWarningIcon(props: { className?: string }) {
     const title = t("Warning");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 40 40"
-            className={classNames("icon", "icon-userWaning", props.className)}
+            className={classNames(classes.userWarning, "icon-userWaning", props.className)}
             aria-hidden="true"
         >
             <title>{title}</title>

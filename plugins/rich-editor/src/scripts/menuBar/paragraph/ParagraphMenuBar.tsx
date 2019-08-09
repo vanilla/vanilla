@@ -23,7 +23,7 @@ import {
 import { RangeStatic } from "quill/core";
 import { t } from "@library/utility/appUtils";
 import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { srOnly, unit } from "@library/styles/styleHelpers";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";

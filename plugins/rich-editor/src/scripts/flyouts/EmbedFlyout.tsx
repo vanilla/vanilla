@@ -14,7 +14,7 @@ import { isAllowedUrl, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";

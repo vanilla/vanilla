@@ -1216,6 +1216,19 @@ body.isMobile .Popup.hasRichEditor .Border {
   min-height: 236px;
 }
 
+.richEditor-close.richEditor-close {
+  display: block;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .richEditorFlyout .richEditorFlyout-header.richEditorFlyout-header {
+    display: table;
+  }
+  .richEditorFlyout .richEditorFlyout-title.richEditorFlyout-title {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only

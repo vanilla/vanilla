@@ -9,7 +9,7 @@ import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";

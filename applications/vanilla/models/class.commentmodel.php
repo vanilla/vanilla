@@ -1041,8 +1041,7 @@ class CommentModel extends Gdn_Model {
         }
         $minCommentLength = c('Vanilla.Comment.MinLength');
         if ($minCommentLength && is_numeric($minCommentLength)) {
-            $this->Validation->setSchemaProperty('Body', 'MinLength', $minCommentLength);
-            $this->Validation->addRule('MinTextLength', 'function:ValidateMinTextLength');
+            $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
             $this->Validation->applyRule('Body', 'MinTextLength');
         }
 

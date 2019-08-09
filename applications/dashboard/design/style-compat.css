@@ -2078,120 +2078,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
- */
-.inputBlock {
-  display: block;
-  margin-bottom: 8px;
-}
-.inputBlock.hasError .inputText {
-  border-color: #ff3933;
-  background-color: #ffebeb;
-  color: #ff3933;
-}
-.inputBlock.isHorizontal {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 100%;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-}
-.inputBlock.isHorizontal .inputBlock-labelAndDescription {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  width: auto;
-}
-.inputBlock.isHorizontal .inputBlock-inputWrap {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-}
-
-.inputBlock-columns {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.inputBlock-errors {
-  display: block;
-  font-size: 12px;
-}
-
-.inputBlock-error {
-  display: block;
-  color: #ff3933;
-}
-.inputBlock-error + .inputBlock-error {
-  margin-top: 6px;
-}
-
-.inputBlock-labelNote {
-  display: block;
-  font-size: 12px;
-  font-weight: 400;
-  opacity: 0.6;
-}
-
-.inputBlock-labelText {
-  display: block;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.inputBlock-inlineLabel {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.inputBlock-inputWrap + .checkbox, .inputBlock-inputWrap + .radioButton {
-  margin-top: 6px;
-}
-
-.inputBlock-labelAndDescription {
-  display: block;
-  width: 100%;
-}
-
-.inputBlock-inlineLabel {
-  height: 36px;
-  line-height: 36px;
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.inputBlock-miniInputs {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-}
-
-.inputBlock-miniInput {
-  width: 100px;
-}
-
-.inputBlock-sectionTitle {
-  font-weight: 600;
-  line-height: 1.5;
-  margin-bottom: 6px;
-}
-
-/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -2561,7 +2447,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  font-family: "Apple Color Emoji", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   vertical-align: middle;
   text-align: center;
   height: 1em;
@@ -2570,7 +2456,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .nativeEmoji {
-  font-family: "Segoe UI Emoji", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
 .fallBackEmoji {

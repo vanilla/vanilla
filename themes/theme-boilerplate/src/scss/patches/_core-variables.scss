@@ -119,7 +119,7 @@ $global-condensed_lineHeight                         : 1.25 !default;
 
 $global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
-$global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
 $global-heading_lineHeightRatio                      : .8;
 

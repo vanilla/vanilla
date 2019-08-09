@@ -9,7 +9,6 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class for filtering Rich content before it gets inserted into the database.
@@ -60,7 +59,8 @@ class Filterer {
             }
 
             if (!is_array($embed['data'] ?? null)) {
-                // We only care about embeds operations.
+                // Strip off any malformed embeds.
+                unset($operations[$key]);
                 continue;
             }
             $embedData = &$embed['data'];

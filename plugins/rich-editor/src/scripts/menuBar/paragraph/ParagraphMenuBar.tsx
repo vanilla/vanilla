@@ -10,15 +10,15 @@ import ParagraphMenuBarTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMe
 import ParagraphMenuResetTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuResetTab";
 import ParagraphMenuHeadingsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuHeadingsTabContent";
 import {
-    blockquote,
-    codeBlock,
-    heading2,
-    heading3,
-    heading4,
-    heading5,
-    listOrdered,
-    listUnordered,
-    spoiler,
+    BlockquoteIcon,
+    CodeBlockIcon,
+    Heading2Icon,
+    Heading3Icon,
+    Heading4Icon,
+    Heading5Icon,
+    ListOrderedIcon,
+    ListUnorderedIcon,
+    SpoilerIcon,
 } from "@library/icons/editorIcons";
 import { RangeStatic } from "quill/core";
 import { t } from "@library/utility/appUtils";
@@ -113,25 +113,25 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 items: [
                     {
                         formatFunction: formatter.h2,
-                        icon: heading2(iconStyle),
+                        icon: <Heading2Icon className={"iconStyle"} />,
                         text: t("Heading 2"),
                         checked: menuActiveFormats.headings.heading2,
                     },
                     {
                         formatFunction: formatter.h3,
-                        icon: heading3(iconStyle),
+                        icon: <Heading3Icon className={"iconStyle"} />,
                         text: t("Heading 3"),
                         checked: menuActiveFormats.headings.heading3,
                     },
                     {
                         formatFunction: formatter.h4,
-                        icon: heading4(iconStyle),
+                        icon: <Heading4Icon className={"iconStyle"} />,
                         text: t("Heading 4"),
                         checked: menuActiveFormats.headings.heading4,
                     },
                     {
                         formatFunction: formatter.h5,
-                        icon: heading5(iconStyle),
+                        icon: <Heading5Icon className={"iconStyle"} />,
                         text: t("Heading 5"),
                         checked: menuActiveFormats.headings.heading5,
                     },
@@ -149,7 +149,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 items: [
                     {
                         formatFunction: formatter.bulletedList,
-                        icon: listUnordered(iconStyle),
+                        icon: <ListUnorderedIcon className={iconStyle} />,
                         text: t("Bulleted List"),
                         checked: menuActiveFormats.lists.unordered,
                         disabled:
@@ -159,7 +159,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                     },
                     {
                         formatFunction: formatter.orderedList,
-                        icon: listOrdered(iconStyle),
+                        icon: <ListOrderedIcon className={iconStyle} />,
                         text: t("Ordered List"),
                         checked: menuActiveFormats.lists.ordered,
                         disabled:
@@ -185,19 +185,19 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 items: [
                     {
                         formatFunction: formatter.blockquote,
-                        icon: blockquote(iconStyle),
+                        icon: <BlockquoteIcon className={iconStyle} />,
                         text: t("Quote"),
                         checked: menuActiveFormats.specialFormats.blockQuote,
                     },
                     {
                         formatFunction: formatter.codeBlock,
-                        icon: codeBlock(iconStyle),
+                        icon: <CodeBlockIcon className={iconStyle} />,
                         text: t("Code Block"),
                         checked: menuActiveFormats.specialFormats.codeBlock,
                     },
                     {
                         formatFunction: formatter.spoiler,
-                        icon: spoiler(iconStyle),
+                        icon: <SpoilerIcon className={iconStyle} />,
                         text: t("Spoiler"),
                         checked: menuActiveFormats.specialFormats.spoiler,
                     },

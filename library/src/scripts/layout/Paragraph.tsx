@@ -8,13 +8,13 @@ import React from "react";
 import classNames from "classnames";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
 
-interface IProps extends IOptionalComponentID {
+export interface IParagraphProps extends IOptionalComponentID {
     className?: string;
     isError?: boolean;
     children?: React.ReactNode;
 }
 
-export default class Paragraph extends React.Component<IProps> {
+export default class Paragraph extends React.Component<IParagraphProps> {
     public static defaultProps = {
         id: false,
     };

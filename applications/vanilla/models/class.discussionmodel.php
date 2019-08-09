@@ -2226,7 +2226,7 @@ class DiscussionModel extends Gdn_Model {
                     }
 
                     // Notify all of the users that were mentioned in the discussion.
-                    $usernames = Gdn::formatService()->parseMentions($fields['Body'], $fields['Format']);
+                    $usernames = Gdn::formatService()->parseMentions($fields['Body'], $discussionName . ' ' . $story);
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $activity;

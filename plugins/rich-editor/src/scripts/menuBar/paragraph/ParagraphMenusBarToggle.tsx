@@ -6,15 +6,15 @@
 
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import {
-    blockquote,
-    codeBlock,
-    heading2,
-    heading3,
-    heading4,
-    heading5,
-    listOrdered,
-    listUnordered,
-    spoiler,
+    BlockquoteIcon,
+    CodeBlockIcon,
+    Heading2Icon,
+    Heading3Icon,
+    ListOrderedIcon,
+    ListUnorderedIcon,
+    SpoilerIcon,
+    Heading4Icon,
+    Heading5Icon,
 } from "@library/icons/editorIcons";
 import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
@@ -193,25 +193,25 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     }
 
     private topLevelIcons = menuActiveFormats => {
-        let headingMenuIcon = heading2();
+        let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
-            headingMenuIcon = heading3();
+            headingMenuIcon = <Heading3Icon />;
         } else if (menuActiveFormats.headings.heading4) {
-            headingMenuIcon = heading4();
+            headingMenuIcon = <Heading4Icon />;
         } else if (menuActiveFormats.headings.heading5) {
-            headingMenuIcon = heading5();
+            headingMenuIcon = <Heading5Icon />;
         }
 
-        let specialBlockMenuIcon = blockquote();
+        let specialBlockMenuIcon = <BlockquoteIcon />;
         if (menuActiveFormats.specialFormats.codeBlock) {
-            specialBlockMenuIcon = codeBlock();
+            specialBlockMenuIcon = <CodeBlockIcon />;
         } else if (menuActiveFormats.specialFormats.spoiler) {
-            specialBlockMenuIcon = spoiler();
+            specialBlockMenuIcon = <SpoilerIcon />;
         }
 
-        let listMenuIcon = listUnordered();
+        let listMenuIcon = <ListUnorderedIcon />;
         if (menuActiveFormats.lists.ordered) {
-            listMenuIcon = listOrdered();
+            listMenuIcon = <ListOrderedIcon />;
         }
 
         return {

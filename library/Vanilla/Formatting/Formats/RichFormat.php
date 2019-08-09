@@ -27,7 +27,7 @@ class RichFormat extends BaseFormat {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
-    const FORMAT_KEY = "Rich";
+    const FORMAT_KEY = "rich";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';

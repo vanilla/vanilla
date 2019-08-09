@@ -31,14 +31,6 @@
 
         var stylesheetsInclude = [assets + '/design/editor.css?v=' + editorVersion];
 
-        /*
-         // If you want to include other stylsheets from the main page in the iframe.
-         $('link').each(function(i, el) {
-         if (el.href.indexOf("style.css") !== -1 || el.href.indexOf("custom.css") !== -1) {
-         stylesheetsInclude.push(el.href);
-         }
-         });
-         */
 
         // Some communities may want to modify just the styling of the Wysiwyg
         // while editing, so this file will let them.

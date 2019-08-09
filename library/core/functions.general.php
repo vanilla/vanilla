@@ -1742,7 +1742,7 @@ if (!function_exists('getAllMentions')) {
             }
 
             // Filter empty mentions
-            if ($mention !== "") {
+            if ($mention) {
                 $mentions[] = $mention;
             }
         }
@@ -3059,6 +3059,7 @@ if (!function_exists('redirectTo')) {
             echo json_encode([
                 'FormSaved' => true,
                 'RedirectUrl' => $url,
+                'RedirectTo' => $url,
             ]);
         } else {
             safeHeader('Location: ' . $url, true, $statusCode);

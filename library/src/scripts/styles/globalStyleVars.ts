@@ -16,6 +16,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -121,7 +122,7 @@ export const globalVariables = useThemeCache(() => {
         base: 1.5,
         condensed: 1.25,
         code: 1.45,
-        excerpt: 1.45,
+        excerpt: 1.4,
         meta: 1.5,
     });
 
@@ -315,6 +316,41 @@ export const globalVariables = useThemeCache(() => {
         hyphenationZone: "6em",
     });
 
+    // This function should not be used in production, but is helpful for development.
+    // Helps to find the right "mix" of bg and fg for a target hex color
+
+    const findColorMatch = (hexCode: string) => {
+        if (process.env.NODE_ENV === "development") {
+            logWarning("Don't use 'findColorMatch' in production");
+            const globalVars = globalVariables();
+            const colorToMatch = color(hexCode.replace("#", ""));
+            const max = 100;
+            const lightnessPrecision = 3;
+            const targetLightness = colorToMatch.lightness().toFixed(lightnessPrecision);
+            for (let i = 0; i <= max; i++) {
+                const mix = i / max;
+                const currentColor = globalVars.mixBgAndFg(mix);
+                if (currentColor.toHexString() === colorToMatch.toHexString()) {
+                    logDebug("---exact match");
+                    logDebug("real grey: " + colorToMatch.toHexString());
+                    logDebug("target grey: " + currentColor.toHexString());
+                    logDebug("mix: " + mix);
+                    logDebug("---");
+                    i = max;
+                    return;
+                }
+                if (currentColor.lightness().toFixed(lightnessPrecision) === targetLightness) {
+                    logDebug("---lightness match: " + mix);
+                    i = max;
+                    return;
+                }
+            }
+        } else if (process.env.NODE_ENV === "test") {
+            throw new Error("Don't use 'findColorMatch' in production");
+        }
+        logError("The function 'findColorMatch' is not meant for production");
+    };
+
     return {
         utility,
         elementaryColors,
@@ -342,6 +378,7 @@ export const globalVariables = useThemeCache(() => {
         mixPrimaryAndBg,
         separator,
         userContentHyphenation,
+        findColorMatch,
     };
 });
 

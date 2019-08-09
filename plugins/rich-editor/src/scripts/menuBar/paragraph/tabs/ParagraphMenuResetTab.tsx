@@ -5,12 +5,12 @@
  */
 
 import React from "react";
-import { pilcrow } from "@library/icons/editorIcons";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { PilcrowIcon } from "@library/icons/editorIcons";
 
 interface IProps {
     formatParagraphHandler: () => void;
@@ -49,7 +49,13 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
                 tabIndex={this.props.tabIndex}
             >
                 <ScreenReaderContent>{t("Paragraph")}</ScreenReaderContent>
-                <IconForButtonWrap icon={<span aria-hidden={true}>{pilcrow()}</span>} />
+                <IconForButtonWrap
+                    icon={
+                        <span aria-hidden={true}>
+                            <PilcrowIcon />
+                        </span>
+                    }
+                />
             </button>
         );
     }

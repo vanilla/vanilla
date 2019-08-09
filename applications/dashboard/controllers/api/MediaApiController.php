@@ -109,27 +109,7 @@ class MediaApiController extends AbstractApiController {
 
         switch ($type) {
             case self::TYPE_IMAGE:
-                $imageSize = getimagesize($file);
-                if (is_array($imageSize)) {
-                    $media['ImageWidth'] = $imageSize[0];
-                    $media['ImageHeight'] = $imageSize[1];
-                }
-        }
-
-        // image dimensions are higher than limit, it needs resizing
-        if ($this->config->get("ImageUpload.Limits.Enabled")) {
-            if ($media['ImageWidth'] > $this->config->get("ImageUpload.Limits.Width") ||
-                $media['ImageHeight'] > $this->config->get("ImageUpload.Limits.Height")
-            ) {
-                $this->imageResizer->resize(
-                    $file,
-                    null,
-                    [
-                        "height" => $this->config->get("ImageUpload.Limits.Height"),
-                        "width" => $this->config->get("ImageUpload.Limits.Width"), "crop" => false
-                    ]
-                );
-            }
+                [$media['ImageWidth'], $media['ImageHeight']] = $this->preprocessImage($upload);
         }
 
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
@@ -388,7 +368,7 @@ class MediaApiController extends AbstractApiController {
 
         $in = $this->schema([
             'file' => $uploadSchema,
-        ],'in')->setDescription('Add a media item.');
+        ], 'in')->setDescription('Add a media item.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
@@ -436,6 +416,44 @@ class MediaApiController extends AbstractApiController {
         $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
 
         $result = $out->validate($pageInfo);
+        return $result;
+    }
+
+    /**
+     * Prepare an image to be saved. This includes optional resizing and re-orienting, based on EXIF data.
+     *
+     * @param UploadedFile $upload
+     * @return array
+     */
+    private function preprocessImage(UploadedFile $upload): array {
+        $file = $upload->getFile();
+        $size = getimagesize($file);
+
+        if (empty($size)) {
+            throw new ClientException("File is not a valid image.");
+        }
+
+        [$width, $height] = $size;
+        $options = [
+            "crop" => false,
+            "height" => $height ?? 0,
+            "width" => $width ?? 0,
+        ];
+
+        if ($this->config->get("ImageUpload.Limits.Enabled")) {
+            if ($newWidth = filter_var($this->config->get("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
+                $options["width"] = $newWidth;
+            }
+            if ($newHeight = filter_var($this->config->get("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT)) {
+                $options["height"] = $newHeight;
+            }
+        }
+
+        // Resize and re-orient the image as necessary.
+        $this->imageResizer->resize($file, null, $options);
+
+        // Get the new details, after resizing and re-orienting the image.
+        $result = getimagesize($file);
         return $result;
     }
 }

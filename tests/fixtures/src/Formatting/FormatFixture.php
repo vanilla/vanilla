@@ -9,6 +9,14 @@ namespace VanillaTests\Fixtures\Formatting;
 
 /**
  * Class for fetching content of fixtures in the body.
+ *
+ * - input: input.*
+ * - html output: output.html
+ * - text output: output.txt
+ * - excerpt output: output-excerpt.txt
+ * - parsed mentions: output-mentions.json
+ * - parsed headings: output-headings.json
+ * - quote output: output-quote.html
  */
 class FormatFixture {
 

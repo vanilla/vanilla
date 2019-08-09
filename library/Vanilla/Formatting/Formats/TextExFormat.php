@@ -15,7 +15,7 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
  */
 class TextExFormat extends TextFormat {
 
-    const FORMAT_KEY = "TextEx";
+    const FORMAT_KEY = "textex";
 
     /** @var HtmlEnhancer */
     private $htmlEnhancer;

@@ -16,7 +16,7 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
  */
 class BBCodeFormat extends HtmlFormat {
 
-    const FORMAT_KEY = "BBCode";
+    const FORMAT_KEY = "bbcode";
 
     /** @var \BBCode */
     private $bbcodeParser;

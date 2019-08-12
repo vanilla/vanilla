@@ -169,8 +169,8 @@ describe("UserSuggestionModel", () => {
         const sortProvider: SortProviderTuple[] = [
             [["c", "b", "a", "z"], "f", ["a", "b", "c", "z"]],
             [["c", "b", "a", "z"], "z", ["z", "a", "b", "c"]], // Exact results come first
-            [["stephane", "Stéphane", "z"], "ste", ["stephane", "Stéphane", "z"]], // Exact results come first
-            [["Stephane", "stéphane", "z"], "sté", ["stéphane", "Stephane", "z"]], // Exact results come first
+            [["Stéphane", "stephane", "z"], "ste", ["stephane", "Stéphane", "z"]], // Exact accent come first
+            [["Stephane", "stéphane", "z"], "Sté", ["stéphane", "Stephane", "z"]], // Exact accent come first
             [["testg", "testé", "testë", "testa", "teste"], "te", ["testa", "teste", "testé", "testë", "testg"]],
             [["testg", "testé", "testë", "testa", "teste"], "test", ["testa", "teste", "testé", "testë", "testg"]],
         ];

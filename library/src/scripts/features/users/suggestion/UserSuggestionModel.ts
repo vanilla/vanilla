@@ -109,8 +109,20 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             }
         }
 
-        const sortByName = (userA: IUserSuggestion, userB: IUserSuggestion) =>
-            looseCollator.compare(userA.name, userB.name);
+        const sortByName = (userA: IUserSuggestion, userB: IUserSuggestion) => {
+            const casedSearchName = searchName.toLocaleLowerCase();
+            const aCasedName = userA.name.toLocaleLowerCase();
+            const bCasedName = userB.name.toLocaleLowerCase();
+
+            // Return partial matches first.
+            if (aCasedName.startsWith(casedSearchName) && !bCasedName.startsWith(casedSearchName)) {
+                return -1;
+            }
+            if (bCasedName.startsWith(casedSearchName) && !aCasedName.startsWith(casedSearchName)) {
+                return 1;
+            }
+            return looseCollator.compare(userA.name.toLocaleLowerCase(), userB.name.toLocaleLowerCase());
+        };
 
         const exactToTheTop = (userA: IUserSuggestion, userB: IUserSuggestion) => {
             const casedSearchName = searchName.toLocaleLowerCase();

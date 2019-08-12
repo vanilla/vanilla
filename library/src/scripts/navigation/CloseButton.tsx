@@ -8,8 +8,7 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
-import { CloseCompactIcon } from "@library/icons/common";
-import { CloseIcon } from "@library/icons/titleBar";
+import { CloseCompactIcon, CloseIcon } from "@library/icons/common";
 
 interface IProps {
     className?: string;

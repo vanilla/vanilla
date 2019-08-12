@@ -117,14 +117,14 @@ export function BottomChevronIcon(props: { className?: string }) {
     );
 }
 
-export function CloseIcon(props: { className?: string; noPadding?: boolean }) {
+export function CloseIcon(props: { className?: string; compact?: boolean }) {
     const title = t("Close");
-    const viewBox = props.noPadding ? "0 0 16 16" : "0 0 24 24";
-    const transform = props.noPadding ? "translate(-4 -4)" : "";
+    const viewBox = props.compact ? "0 0 16 16" : "0 0 24 24";
+    const transform = props.compact ? "translate(-4 -4)" : "";
     const classes = iconClasses();
     return (
         <svg
-            className={classNames(props.noPadding ? classes.compact : classes.close, props.className)}
+            className={classNames(props.compact ? classes.compact : classes.close, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox={viewBox}
             aria-hidden="true"
@@ -140,7 +140,7 @@ export function CloseIcon(props: { className?: string; noPadding?: boolean }) {
 }
 
 export function CloseCompactIcon(props: { className?: string }) {
-    return <CloseIcon noPadding={true} className={props.className} />;
+    return <CloseIcon compact={true} className={props.className} />;
 }
 
 export function ClearIcon(props: { className?: string }) {

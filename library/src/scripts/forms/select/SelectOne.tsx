@@ -98,7 +98,7 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
         });
         const classesInputBlock = inputBlockClasses();
         return (
-            <div className={this.props.className}>
+            <div className={classNames(classesInputBlock.root, this.props.className)}>
                 <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
                     <span className={classNames(classesInputBlock.labelText, this.props.label)}>
                         {this.props.label}

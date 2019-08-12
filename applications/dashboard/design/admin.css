@@ -12744,7 +12744,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .userContent ol ol,
 .userContent ol ul {
-  margin: "0 0 0 1em";
+  margin: 0 0 0 1em;
 }
 
 .userContent ul li {
@@ -12752,7 +12752,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .userContent ul ol,
 .userContent ul ul {
-  margin: "0 0 0 1em";
+  margin: 0 0 0 1em;
 }
 
 .userContent li,

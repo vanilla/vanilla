@@ -12,9 +12,10 @@ import MarkdownModule, {
 } from "@rich-editor/quill/MarkdownModule";
 import { expect } from "chai";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
-import { promiseTimeout } from "@vanilla/utils";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
-describe.only("NewLineClickInsertionModule", () => {
+describe("NewLineClickInsertionModule", () => {
     let quill: Quill;
     let markdownModule: MarkdownModule;
 
@@ -107,7 +108,67 @@ describe.only("NewLineClickInsertionModule", () => {
         type: MarkdownMacroType.INLINE,
     });
 
-    interface ITestSpaceFormat {
+    testBlockFormat({
+        name: "header 2",
+        text: "##",
+        expectedFormats: {
+            header: {
+                level: 2,
+                ref: "",
+            },
+        },
+    });
+
+    testBlockFormat({
+        name: "header 3",
+        text: "###",
+        expectedFormats: {
+            header: {
+                level: 3,
+                ref: "",
+            },
+        },
+    });
+
+    testBlockFormat({
+        name: "header 4",
+        text: "####",
+        expectedFormats: {
+            header: {
+                level: 4,
+                ref: "",
+            },
+        },
+    });
+
+    testBlockFormat({
+        name: "header 5",
+        text: "#####",
+        expectedFormats: {
+            header: {
+                level: 5,
+                ref: "",
+            },
+        },
+    });
+
+    testBlockFormat({
+        name: "Quote",
+        text: ">",
+        expectedFormats: {
+            [BlockquoteLineBlot.blotName]: true,
+        },
+    });
+
+    testBlockFormat({
+        name: "Spoiler",
+        text: "!>",
+        expectedFormats: {
+            [SpoilerLineBlot.blotName]: true,
+        },
+    });
+
+    interface ITestInlineFormat {
         name: string;
         text: string;
         wrapWith: string;
@@ -116,26 +177,21 @@ describe.only("NewLineClickInsertionModule", () => {
         trailingCharacter?: string;
     }
 
-    function testInlineFormat(options: ITestSpaceFormat) {
+    function testInlineFormat(options: ITestInlineFormat) {
         const { text, wrapWith, expectedFormats, type, name } = options;
 
         const trailingCharacter = options.trailingCharacter || "";
 
         describe(name, () => {
             const wrappedText = wrapWith + text + wrapWith;
+            const triggerKeys = Object.values(MarkdownInlineTriggers);
 
-            const triggerKeys =
-                type === MarkdownMacroType.BLOCK
-                    ? Object.values(MarkdownBlockTriggers)
-                    : Object.values(MarkdownInlineTriggers);
-
-            describe("triggering on various keypress marks", () => {
-                // This is not all keys covered by the regex but it is most of them.
+            describe("triggering on various punctuation marks", () => {
                 for (const triggerKey of triggerKeys) {
                     it("converts a line of just the format for the trigger key " + triggerKey, async () => {
                         quill.setContents([OpUtils.op(wrappedText)]);
                         quill.setSelection(wrappedText.length, 0);
-                        quill.root.dispatchEvent(new KeyboardEvent("keypress", { key: triggerKey }));
+                        quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
                         expect(quill.getContents().ops).deep.eq([
                             OpUtils.op(text, expectedFormats),
                             OpUtils.op(`${trailingCharacter}\n`),
@@ -146,7 +202,7 @@ describe.only("NewLineClickInsertionModule", () => {
                         const startPadding = "asdf42 asdf asdf_!@#$%^&*( ";
                         quill.setContents([OpUtils.op(startPadding + wrappedText)]);
                         quill.setSelection(startPadding.length + wrappedText.length, 0);
-                        quill.root.dispatchEvent(new KeyboardEvent("keypress", { key: triggerKey }));
+                        quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
                         expect(quill.getContents().ops).deep.eq([
                             OpUtils.op(startPadding),
                             OpUtils.op(text, expectedFormats),
@@ -159,12 +215,33 @@ describe.only("NewLineClickInsertionModule", () => {
                         () => {
                             quill.setContents([OpUtils.op(wrappedText + " ")]);
                             quill.setSelection(wrappedText.length + 1, 0);
-                            quill.root.dispatchEvent(new KeyboardEvent("keypress", { key: triggerKey }));
+                            quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
                             expect(quill.getContents().ops).deep.eq([OpUtils.op(wrappedText + ` \n`)]);
                         },
                     );
                 }
             });
+        });
+    }
+
+    interface ITestBlockFormat {
+        name: string;
+        text: string;
+        expectedFormats: IFormats;
+    }
+
+    function testBlockFormat(options: ITestBlockFormat) {
+        const { text, expectedFormats, name } = options;
+
+        describe(name, () => {
+            for (const triggerKey of Object.values(MarkdownBlockTriggers)) {
+                it("can handle it's macro for the trigger key " + triggerKey, () => {
+                    quill.setContents([OpUtils.op(text)]);
+                    quill.setSelection(text.length, 0);
+                    quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+                    expect(quill.getContents().ops).deep.eq([OpUtils.op("\n", expectedFormats)]);
+                });
+            }
         });
     }
 });

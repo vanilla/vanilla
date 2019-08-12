@@ -14,6 +14,7 @@ import Formatter from "@rich-editor/quill/Formatter";
 
 export enum MarkdownBlockTriggers {
     ENTER = "Enter",
+    SPACE = " ",
 }
 
 export enum MarkdownMacroType {
@@ -22,6 +23,7 @@ export enum MarkdownMacroType {
 }
 
 export enum MarkdownInlineTriggers {
+    ENTER = "Enter",
     SPACE = " ",
     PERIOD = ".",
     COMMA = ",",
@@ -78,7 +80,7 @@ export default class MarkdownModule {
      */
     public registerHandler() {
         // Handler that looks for insert deltas that match specific characters
-        this.quill.root.addEventListener("keypress", this.keyDownHandler);
+        this.quill.root.addEventListener("keydown", this.keyDownHandler);
     }
 
     /**
@@ -161,14 +163,14 @@ export default class MarkdownModule {
             this.quill.history.cutoff();
             match.handler(text, selection, match.pattern, lineStart);
             this.quill.history.cutoff();
-            break;
+            return false;
         }
     };
 
     private matchers: IMarkdownMatch[] = [
         {
             name: "header",
-            type: MarkdownMacroType.INLINE,
+            type: MarkdownMacroType.BLOCK,
             preventsDefault: true,
             pattern: /^(#){2,5}$/g,
             handler: (text, selection, pattern) => {
@@ -187,12 +189,13 @@ export default class MarkdownModule {
         },
         {
             name: "blockquote",
-            type: MarkdownMacroType.INLINE,
+            type: MarkdownMacroType.BLOCK,
+            preventsDefault: true,
             pattern: /^(>)/g,
             handler: (text, selection) => {
                 const offset = text.length;
                 const delta = new Delta()
-                    .retain(selection.index - offset)
+                    .retain(selection.index - offset - 1)
                     .delete(offset)
                     .retain(1, { [BlockquoteLineBlot.blotName]: true });
                 this.quill.updateContents(delta, Quill.sources.USER);
@@ -200,14 +203,16 @@ export default class MarkdownModule {
         },
         {
             name: "spoiler",
-            type: MarkdownMacroType.INLINE,
+            type: MarkdownMacroType.BLOCK,
             pattern: /^!>$/g,
+            preventsDefault: true,
             handler: (text, selection) => {
                 const offset = text.length;
                 const delta = new Delta()
                     .retain(selection.index - offset)
                     .delete(offset)
-                    .retain(1, { [SpoilerLineBlot.blotName]: true });
+                    .retain(1, { [SpoilerLineBlot.blotName]: true })
+                    .delete(1);
                 this.quill.updateContents(delta, Quill.sources.USER);
             },
         },

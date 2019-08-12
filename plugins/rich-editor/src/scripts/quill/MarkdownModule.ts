@@ -10,17 +10,41 @@ import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import Delta from "quill-delta";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import Formatter from "@rich-editor/quill/Formatter";
 
-enum TriggerKey {
+export enum MarkdownBlockTriggers {
     ENTER = "Enter",
-    SPACE = " ",
 }
+
+export enum MarkdownMacroType {
+    INLINE = "inline",
+    BLOCK = "block",
+}
+
+export enum MarkdownInlineTriggers {
+    SPACE = " ",
+    PERIOD = ".",
+    COMMA = ",",
+    QUESTION = "?",
+    QUESTION_INVERT = "¿",
+    SLASH = "/",
+    ESCLAME = "!",
+    ESCLAME_INVERT = "¡",
+    QUOTE = '"',
+    APOSTOPH = "'",
+    STAR = "*",
+    COLON = ":",
+    SEMI_COLON = ";",
+}
+
+// Precompjuted to prevent doing it on every keypress.
+const allTriggerKeys = [...Object.values(MarkdownBlockTriggers), ...Object.values(MarkdownInlineTriggers)];
 
 interface IMarkdownMatch {
     name: string;
     pattern: RegExp;
     preventsDefault?: boolean;
-    triggerKey: TriggerKey;
+    type: MarkdownMacroType;
     handler: (text: string, selection: RangeStatic, pattern: RegExp, lineStart: number) => void;
 }
 
@@ -54,45 +78,72 @@ export default class MarkdownModule {
      */
     public registerHandler() {
         // Handler that looks for insert deltas that match specific characters
-        this.quill.root.addEventListener("keydown", this.keyDownHandler);
+        this.quill.root.addEventListener("keypress", this.keyDownHandler);
     }
 
     /**
      * Check if the current quill line is valid for enabling keyboard shortcuts.
      *
-     * @param line - The line blot to check.
+     * @param range - The range to check.
      */
-    private isValidLine(line: Blot): boolean {
-        if (!(line.domNode instanceof HTMLElement)) {
-            return false;
-        }
+    private canFormatRange(range: RangeStatic): boolean {
+        const formats = this.quill.getFormat(range);
+        let hasExistingInlineFormat = false;
+        Formatter.INLINE_FORMAT_NAMES.forEach(name => {
+            if (formats[name]) {
+                hasExistingInlineFormat = true;
+            }
+        });
 
-        const { textContent, tagName } = line.domNode;
-        return typeof textContent !== "undefined" && !!textContent && !this.ignoreTags.includes(tagName);
+        return !hasExistingInlineFormat;
     }
 
     /**
      * Handle a keydown event and trigger markdown actions.
      */
     private keyDownHandler = (event: KeyboardEvent) => {
-        if (!Object.values(TriggerKey).includes(event.key)) {
+        if (!allTriggerKeys.includes(event.key)) {
             return;
         }
         const selection = this.quill.getSelection();
         if (!selection) {
             return;
         }
+
+        // Only short selections apply.
+        if (selection.length > 0) {
+            return;
+        }
+
         const [line, offset] = this.quill.getLine(selection.index);
-        const text = line.domNode.textContent;
-        const lineStart = selection.index - offset;
-        if (!this.isValidLine(line)) {
+        let lineStart = selection.index - offset;
+        let text = this.quill.getText(lineStart, selection.index);
+
+        // Adjust the text so that it's only after the last whitespace character.
+        // Because this is a markdown MACRO and not a parser, we only look at stuff after the previous whitespace character.
+        const lastIndex = text.lastIndexOf(" ");
+        if (lastIndex > 0) {
+            lineStart += lastIndex;
+            text = text.substr(lastIndex);
+        }
+
+        if (!this.canFormatRange(line)) {
             return;
         }
 
         // Iterate through our matchers and execute the first one.
         for (const match of this.matchers) {
-            if (match.triggerKey !== event.key) {
-                continue;
+            switch (match.type) {
+                case MarkdownMacroType.INLINE:
+                    if (!Object.values(MarkdownInlineTriggers).includes(event.key)) {
+                        continue;
+                    }
+                    break;
+                case MarkdownMacroType.BLOCK:
+                    if (!Object.values(MarkdownBlockTriggers).includes(event.key)) {
+                        continue;
+                    }
+                    break;
             }
 
             const matchedText = text.match(match.pattern);
@@ -103,6 +154,7 @@ export default class MarkdownModule {
             if (match.preventsDefault) {
                 event.preventDefault();
                 event.stopPropagation();
+                event.stopImmediatePropagation();
             }
 
             // Cutoff the history before an after so this is it's own action to undo.
@@ -116,7 +168,7 @@ export default class MarkdownModule {
     private matchers: IMarkdownMatch[] = [
         {
             name: "header",
-            triggerKey: TriggerKey.SPACE,
+            type: MarkdownMacroType.INLINE,
             preventsDefault: true,
             pattern: /^(#){2,5}$/g,
             handler: (text, selection, pattern) => {
@@ -135,7 +187,7 @@ export default class MarkdownModule {
         },
         {
             name: "blockquote",
-            triggerKey: TriggerKey.SPACE,
+            type: MarkdownMacroType.INLINE,
             pattern: /^(>)/g,
             handler: (text, selection) => {
                 const offset = text.length;
@@ -148,8 +200,8 @@ export default class MarkdownModule {
         },
         {
             name: "spoiler",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /^!>/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /^!>$/g,
             handler: (text, selection) => {
                 const offset = text.length;
                 const delta = new Delta()
@@ -161,9 +213,9 @@ export default class MarkdownModule {
         },
         {
             name: "code-block",
-            triggerKey: TriggerKey.ENTER,
+            type: MarkdownMacroType.BLOCK,
             preventsDefault: true,
-            pattern: /^`{3}/g,
+            pattern: /^`{3}$/g,
             handler: (text, selection) => {
                 const delta = new Delta()
                     .retain(selection.index - 3)
@@ -175,8 +227,8 @@ export default class MarkdownModule {
         },
         {
             name: "bolditalic",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /(?:\*|_){3}(.+?)(?:\*|_){3}/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /(?:\*|_){3}(.+?)(?:\*|_){3}$/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
                 if (!match) {
@@ -197,8 +249,8 @@ export default class MarkdownModule {
         },
         {
             name: "bold",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /(?:\*|_){2}(.+?)(?:\*|_){2}/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /(?:\*|_){2}(.+?)(?:\*|_){2}$/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
                 if (!match) {
@@ -219,8 +271,8 @@ export default class MarkdownModule {
         },
         {
             name: "italic",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /(?:\*|_){1}(.+?)(?:\*|_){1}/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /(?:\*|_){1}(.+?)(?:\*|_){1}$/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
                 if (!match) {
@@ -241,8 +293,8 @@ export default class MarkdownModule {
         },
         {
             name: "strikethrough",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /(?:~~)(.+?)(?:~~)/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /(?:~~)(.+?)(?:~~)$/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
                 if (!match) {
@@ -263,8 +315,8 @@ export default class MarkdownModule {
         },
         {
             name: "code",
-            triggerKey: TriggerKey.SPACE,
-            pattern: /(?:`)(.+?)(?:`)/g,
+            type: MarkdownMacroType.INLINE,
+            pattern: /(?:`)(.+?)(?:`)$/g,
             handler: (text, selection, pattern, lineStart) => {
                 const match = pattern.exec(text);
                 if (!match) {

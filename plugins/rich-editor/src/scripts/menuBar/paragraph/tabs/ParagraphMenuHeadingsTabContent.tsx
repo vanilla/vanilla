@@ -10,7 +10,7 @@ import ParagraphMenuBarRadioGroup, {
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 interface IProps {
     items: IMenuBarRadioButton[];

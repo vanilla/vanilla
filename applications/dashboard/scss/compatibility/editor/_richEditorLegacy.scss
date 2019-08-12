@@ -377,3 +377,21 @@ body.isMobile {
 .richEditor-textWrap {
     min-height: 236px;
 }
+
+.richEditor-close.richEditor-close {
+    display: block;
+}
+
+// IE 10 and 11 specific CSS
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+    .richEditorFlyout {
+        .richEditorFlyout-header.richEditorFlyout-header {
+            display: table;
+        }
+
+        .richEditorFlyout-title.richEditorFlyout-title {
+            display: table-cell;
+            vertical-align: middle;
+        }
+    }
+}

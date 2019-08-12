@@ -1264,6 +1264,19 @@ body.isMobile .Popup.hasRichEditor .Border {
   min-height: 236px;
 }
 
+.richEditor-close.richEditor-close {
+  display: block;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .richEditorFlyout .richEditorFlyout-header.richEditorFlyout-header {
+    display: table;
+  }
+  .richEditorFlyout .richEditorFlyout-title.richEditorFlyout-title {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -2493,7 +2506,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  font-family: "Apple Color Emoji", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   vertical-align: middle;
   text-align: center;
   height: 1em;
@@ -2502,7 +2515,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .nativeEmoji {
-  font-family: "Segoe UI Emoji", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
 .fallBackEmoji {

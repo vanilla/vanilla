@@ -12,7 +12,7 @@ import ParagraphMenuBarRadioGroup, {
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSeparator from "@rich-editor/menuBar/paragraph/items/ParagraphMenuSeparator";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IndentIcon, OutdentIcon } from "@library/icons/editorIcons";
 
 interface IProps {

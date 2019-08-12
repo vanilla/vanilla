@@ -8,13 +8,15 @@
  * @package Core
  * @since 2.0
  */
+
 use Vanilla\AddonManager;
+use Vanilla\Contracts\LocaleInterface;
 
 /**
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
  */
-class Gdn_Locale extends Gdn_Pluggable {
+class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
     use \Garden\StaticCacheConfigTrait;
 
     /**  @var string The name of the currently loaded Locale. */

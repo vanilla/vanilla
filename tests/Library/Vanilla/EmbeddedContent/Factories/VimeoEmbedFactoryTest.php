@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\VimeoEmbed;
 use Vanilla\EmbeddedContent\Factories\VimeoEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class VimeoEmbedFactoryTest extends ContainerTestCase {
+class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var VimeoEmbedFactory */
     private $factory;

@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class InstagramEmbedFactoryTest extends ContainerTestCase {
+class InstagramEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var InstagramEmbedFactory */
     private $factory;

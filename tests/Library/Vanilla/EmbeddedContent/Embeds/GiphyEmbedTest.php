@@ -8,12 +8,12 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Validation logic test.
  */
-class GiphyEmbedTest extends ContainerTestCase {
+class GiphyEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create giphy embed from the old data format that might still
      * live in the DB.

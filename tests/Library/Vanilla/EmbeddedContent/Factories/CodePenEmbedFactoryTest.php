@@ -10,13 +10,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the giphy embed and factory.
  */
-class CodePenEmbedFactoryTest extends ContainerTestCase {
+class CodePenEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var CodePenEmbedFactory */
     private $factory;

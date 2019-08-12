@@ -28,7 +28,7 @@ class LinkEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'body:s',
+            'body:s?',
             'photoUrl:s?',
         ]);
     }

@@ -5,15 +5,9 @@
  */
 
 .embedImage {
-    .embedExternal-content {
-        width: auto;
-        max-width: $embed_width;
-        display: inline-block;
-
-        @include ieHack {
-            width: 100%;
-        }
-    }
+    width: 100%;
+    max-width: $embed_width;
+    display: inline-block;
 }
 
 .Message img .embedImage-img, // Compatibility
@@ -25,5 +19,15 @@
         right: auto;
     }
     max-width: 100%;
-    width: 100%;
+    max-height: 400px;
+}
+
+.richEditor .embedImage-img {
+    &:hover {
+        box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
+    }
 }

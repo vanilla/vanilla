@@ -6,6 +6,7 @@ jobs:
     # PHP 7.3 Job. This only runs in the daily cron jobs.
     # Once infrastructure has been updated to 7.3+ this will be run on pull requests.
     - name: PHP 7.3
+      if: type = cron OR type = api
       language: php
       php: 7.3
       addons:
@@ -50,11 +51,10 @@ jobs:
         - ls -lah ./conf
         - cat /tmp/error.log
         - cat /tmp/access.log
-    # PHP 7.1 Job. This only runs in the daily cron jobs.
+    # PHP 7.1 Job. This job always runs.
     - name: PHP 7.1
       language: php
       php: 7.1
-      if: type = cron OR type = api
       addons:
         apt:
           packages:

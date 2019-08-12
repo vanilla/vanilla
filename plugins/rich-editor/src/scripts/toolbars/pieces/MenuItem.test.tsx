@@ -7,8 +7,8 @@
 import React from "react";
 import { shallow } from "enzyme";
 import sinon from "sinon";
-import { bold } from "@library/icons/editorIcons";
 import MenuItem from "@rich-editor/toolbars/pieces/MenuItem";
+import { BoldIcon } from "@library/icons/editorIcons";
 
 const noop = () => {
     return;
@@ -22,7 +22,7 @@ describe("MenuItem", () => {
                 onClick={spy}
                 label="Bold"
                 role="menuitem"
-                icon={bold()}
+                icon={<BoldIcon />}
                 focusNextItem={noop}
                 focusPrevItem={noop}
                 isActive={true}

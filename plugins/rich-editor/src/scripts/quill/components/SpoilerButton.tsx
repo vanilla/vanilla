@@ -5,7 +5,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { spoiler } from "@library/icons/editorIcons";
+import { SpoilerIcon } from "@library/icons/editorIcons";
 
 export default class SpoilerButton extends React.Component<{}> {
     public render() {
@@ -14,7 +14,7 @@ export default class SpoilerButton extends React.Component<{}> {
                 <button title={t("Toggle Spoiler")} disabled className="iconButton button-spoiler" type="button">
                     <span className="spoiler-warning">
                         <span className="spoiler-warningMain">
-                            {spoiler("spoiler-icon")}
+                            <SpoilerIcon className={"spoiler-icon"} />
                             <strong className="spoiler-warningBefore">{t("Warning")}</strong>
                             <span className="spoiler-warningAfter">{t("This is a spoiler")}</span>
                         </span>

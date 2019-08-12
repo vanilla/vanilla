@@ -10,6 +10,9 @@
  * @since 2.2
  */
 
+use Garden\EventManager;
+use \Vanilla\Formatting\FormatUtil;
+
 /**
  * Interpreting Emoji emoticons.
  */
@@ -93,9 +96,9 @@ class Emoji {
     public $rdelim = ':';
 
     /**
-     *
+     * @param EventManager $eventManager
      */
-    protected function __construct() {
+    public function __construct(EventManager $eventManager) {
         $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)
@@ -244,7 +247,7 @@ class Emoji {
             $this->enabled = false;
         }
 
-        Gdn::pluginManager()->callEventHandlers($this, 'Emoji', 'Init', 'Handler');
+        $eventManager->fire('Emoji_Init', $this);
 
         // Add emoji to definition list for whole site. This used to be in the
         // advanced editor plugin, but since moving atmentions to core, had to
@@ -590,7 +593,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::replaceButProtectCodeBlocks(
+                $text = FormatUtil::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text
@@ -603,7 +606,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = FormatUtil::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -622,7 +625,7 @@ class Emoji {
      */
     public static function instance() {
         if (Emoji::$instance === null) {
-            Emoji::$instance = new Emoji();
+            Emoji::$instance = Gdn::getContainer()->get(Emoji::class);
         }
 
         return Emoji::$instance;

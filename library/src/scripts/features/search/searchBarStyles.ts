@@ -13,6 +13,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -79,6 +80,7 @@ export const searchBarClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
+    const classesInputBlock = inputBlockClasses();
 
     const root = style(
         {
@@ -91,7 +93,7 @@ export const searchBarClasses = useThemeCache(() => {
 
                 "& .suggestedTextInput-valueContainer": {
                     $nest: {
-                        ".inputBlock-inputText": {
+                        [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
                         },
                     },
@@ -140,6 +142,12 @@ export const searchBarClasses = useThemeCache(() => {
                 "& .searchBar__indicators": {
                     display: "none",
                 },
+                "& .searchBar__input": {
+                    width: percent(100),
+                },
+                "& .searchBar__input input": {
+                    width: important(`100%`),
+                },
             },
         },
         mediaQueries.oneColumnDown({
@@ -152,6 +160,8 @@ export const searchBarClasses = useThemeCache(() => {
     );
 
     const results = style("results", {
+        position: "absolute",
+        width: percent(100),
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
         $nest: {
@@ -234,8 +244,8 @@ export const searchBarClasses = useThemeCache(() => {
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
         ...borderRadii({
-            left: 0,
-            right: vars.border.radius,
+            left: important("0"),
+            right: important(vars.border.radius),
         }),
     });
 

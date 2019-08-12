@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
 use Vanilla\EmbeddedContent\Factories\WistiaEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class WistiaEmbedFactoryTest extends ContainerTestCase {
+class WistiaEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var WistiaEmbedFactory */
     private $factory;

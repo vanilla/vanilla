@@ -45,6 +45,7 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             "& .searchBar__input": {
                 color: colorOut(vars.colors.fg),
+                width: percent(100),
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),

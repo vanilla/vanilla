@@ -16,15 +16,10 @@ export function ensureScript(scriptUrl: string): Promise<void> {
         if (rejectionCache.has(scriptUrl)) {
             reject(rejectionCache.get(scriptUrl));
         }
-        if (existingScript) {
-            if (loadEventCallbacks.has(existingScript)) {
-                // Add another resolveCallback into the weakmap.
-                const callbacks = loadEventCallbacks.get(existingScript);
-                callbacks && callbacks.push(resolve);
-            } else {
-                // Script is already loaded. Resolve immediately.
-                resolve();
-            }
+        if (existingScript && loadEventCallbacks.has(existingScript)) {
+            // Add another resolveCallback into the weakmap.
+            const callbacks = loadEventCallbacks.get(existingScript);
+            callbacks && callbacks.push(resolve);
         } else {
             // The script doesn't exist. Lets create it.
             const head = document.getElementsByTagName("head")[0];

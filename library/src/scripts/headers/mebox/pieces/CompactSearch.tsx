@@ -12,13 +12,13 @@ import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
-import { search } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { SearchIcon } from "@library/icons/titleBar";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -75,7 +75,9 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames(this.props.buttonContentClassName)}>{search()}</div>
+                        <div className={classNames(this.props.buttonContentClassName)}>
+                            <SearchIcon />
+                        </div>
                     </Button>
                 )}
                 {this.props.open && (

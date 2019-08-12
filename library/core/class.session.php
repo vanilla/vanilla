@@ -692,12 +692,17 @@ class Gdn_Session {
             $return = ($forceValid && Gdn::request()->isPostBack()) ||
                 (hash_equals($this->_TransientKey, $foreignKey) && !empty($this->_TransientKey));
         }
+
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {
                 Logger::event(
                     'csrf_failure',
                     Logger::ERROR,
-                    'Invalid transient key for {username}.'
+                    'Invalid transient key for {username}.',
+                    [
+                        "User TK" => $foreignKey,
+                        "Site TK" => $this->_TransientKey,
+                    ]
                 );
             } else {
                 Logger::event(

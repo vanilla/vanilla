@@ -8,7 +8,7 @@ import React from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import { getDynamicClassFromButtonType } from "@library/forms/Button";
+import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
@@ -38,7 +38,7 @@ export class TitleBarNavItem extends React.Component<IProps> {
                     className={classNames(
                         this.props.linkClassName,
                         classes.link,
-                        this.props.buttonType ? getDynamicClassFromButtonType(this.props.buttonType) : "",
+                        this.props.buttonType ? getButtonStyleFromBaseClass(this.props.buttonType) : "",
                     )}
                 >
                     <div

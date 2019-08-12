@@ -29,11 +29,10 @@ interface FormatInterface {
      * Render a safe, sanitized, short version of some content.
      *
      * @param string $content The content to render.
-     * @param string $query A string to try and ensure is in the outputted excerpt.
      *
      * @return string
      */
-    public function renderExcerpt(string $content, string $query = null): string;
+    public function renderExcerpt(string $content): string;
 
     /**
      * Render a plain text version of some content.

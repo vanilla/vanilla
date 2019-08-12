@@ -6,17 +6,17 @@
 
 import { IUsersStoreState } from "@library/features/users/userModel";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { notifications } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import { connect } from "react-redux";
+import { NotificationsIcon } from "@library/icons/titleBar";
 
 function NotificationsCount(props: IProps) {
     const { count, open, compact } = props;
 
     return (
         <MeBoxIcon count={count} countLabel={t("Notifications") + ": "} compact={compact}>
-            {notifications(!!open)}
+            <NotificationsIcon filled={!!open} />
         </MeBoxIcon>
     );
 }

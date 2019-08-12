@@ -14,6 +14,7 @@ use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ListLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -395,11 +396,13 @@ class BlotGroup {
      */
     public function getUnsafeText(): string {
         $text = "";
+        $mainBlot = $this->getMainBlot();
+        if ($mainBlot instanceof SpoilerLineTerminatorBlot) {
+            return \Gdn::translate("(Spoiler)") . "\n";
+        }
+
         foreach ($this->blots as $blot) {
-            if ($blot instanceof TextBlot
-                || $blot instanceof ExternalBlot) {
-                $text .= $blot->getContent();
-            }
+            $text .= $blot->getContent();
         }
 
         return $text;

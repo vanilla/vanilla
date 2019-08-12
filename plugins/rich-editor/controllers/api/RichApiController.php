@@ -4,10 +4,22 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Formatting\FormatService;
+
 /**
  * API Controller for the Rich Editor endpoint.
  */
 class RichApiController extends AbstractApiController {
+
+    /** @var FormatService */
+    private $formatService;
+
+    /**
+     * @param FormatService $formatService
+     */
+    public function __construct(FormatService $formatService) {
+        $this->richFormat = $formatService;
+    }
 
     /**
      * Create a rich-compatible HTML representation of a string for quoting.
@@ -31,7 +43,7 @@ class RichApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $quote = [
-            'quote' => Gdn_Format::quoteEmbed($body['body'], $body['format'])
+            'quote' => $this->formatService->renderQuote($body['body'], $body['format']),
         ];
         $result = $out->validate($quote);
         return $result;

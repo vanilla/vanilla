@@ -176,7 +176,7 @@ describe("NewLineClickInsertionModule", () => {
         },
     });
 
-    describe.only("works with inline embeds on the line", () => {
+    describe("works with inline embeds on the line", () => {
         it("handles an inline embed at the start of the line", () => {
             quill.setContents([OpUtils.op(MENTION_INSERT), OpUtils.op(" _te@st_")]);
             quill.setSelection(9, 0);

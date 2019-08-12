@@ -141,6 +141,24 @@ export const userContentClasses = useThemeCache(() => {
                 [`li`]: {
                     listStyle: "decimal",
                 },
+                [`ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
+                [`ol ol ol ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`ol ol ol ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`ol ol ol ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
             },
         },
         ["& ul"]: {

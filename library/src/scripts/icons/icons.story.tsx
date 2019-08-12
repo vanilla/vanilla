@@ -54,10 +54,10 @@ story.add("Icons", () => {
 
             <StoryHeading>Common</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;RightChevronIconLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;RightChevronIcon/&gt;`}>
                     <CommonIcons.RightChevronIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;leftChevron/&gt;`}>
+                <StoryTile mouseOverText={`&lt;LeftChevronIcon/&gt;`}>
                     <CommonIcons.LeftChevronIcon />
                 </StoryTile>
                 <StoryTile mouseOverText={`&lt;TopChevronIcon/&gt;`}>
@@ -66,100 +66,100 @@ story.add("Icons", () => {
                 <StoryTile mouseOverText={`&lt;BottomChevronIcon/&gt;`}>
                     <CommonIcons.BottomChevronIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;CloseIcon/&gt;`}>
-                    <CommonIcons.CloseIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;clearIcon/&gt;`}>
+                <StoryTile mouseOverText={`&lt;ClearIcon/&gt;`}>
                     <CommonIcons.ClearIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;checkIcon/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CheckIcon/&gt;`}>
                     <CommonIcons.CheckIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;dropDownMenuIcon/&gt;`}>
+                <StoryTile mouseOverText={`&lt;DropDownMenuIcon/&gt;`}>
                     <CommonIcons.DropDownMenuIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;newFolderIcon/&gt;`}>
+                <StoryTile mouseOverText={`&lt;NewFolderIcon/&gt;`}>
                     <CommonIcons.NewFolderIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;categoryIconLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CategoryIcon/&gt;`}>
                     <CommonIcons.CategoryIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;checkCompactLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CheckCompactIcon/&gt;`}>
                     <CommonIcons.CheckCompactIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;downTriangleLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;DownTriangleIcon/&gt;`}>
                     <CommonIcons.DownTriangleIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;rightTriangleLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;RightTriangleIcon/&gt;`}>
                     <CommonIcons.RightTriangleIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;helpLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;HelpIcon/&gt;`}>
                     <CommonIcons.HelpIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;composeLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;ComposeIcon/&gt;`}>
                     <CommonIcons.ComposeIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;plusCircleLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;PlusCircleIcon/&gt;`}>
                     <CommonIcons.PlusCircleIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;signInLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;SignInIcon/&gt;`}>
                     <CommonIcons.SignInIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;chevronUpLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;ChevronUpIcon/&gt;`}>
                     <CommonIcons.ChevronUpIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;searchErrorLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;SearchErrorIcon/&gt;`}>
                     <CommonIcons.SearchErrorIcon />
+                </StoryTile>
+                <StoryTile mouseOverText={`&lt;ClearIcon/&gt;`}>
+                    <CommonIcons.ClearIcon />
                 </StoryTile>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;boldLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;BoldIcon/&gt;`}>
                     <EditorIcons.BoldIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;italicLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;ItalicIcon/&gt;`}>
                     <EditorIcons.ItalicIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;strikeLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;StrikeIcon/&gt;`}>
                     <EditorIcons.StrikeIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;codeLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CodeIcon/&gt;`}>
                     <EditorIcons.CodeIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;linkLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;LinkIcon/&gt;`}>
                     <EditorIcons.LinkIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;emojiLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;EmojiIcon/&gt;`}>
                     <EditorIcons.EmojiIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;embedErrorLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;EmbedErrorIcon/&gt;`}>
                     <EditorIcons.EmbedErrorIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;pilcrowLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;PilcrowIcon/&gt;`}>
                     <EditorIcons.PilcrowIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;heading2Logo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;Heading2Icon/&gt;`}>
                     <EditorIcons.Heading2Icon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;heading3Logo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;Heading3Icon/&gt;`}>
                     <EditorIcons.Heading3Icon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;heading4Logo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;Heading4Icon/&gt;`}>
                     <EditorIcons.Heading4Icon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;heading5Logo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;Heading5Icon/&gt;`}>
                     <EditorIcons.Heading5Icon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;blockquoteLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;BlockquoteIcon/&gt;`}>
                     <EditorIcons.BlockquoteIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;codeBlockLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CodeBlockIcon/&gt;`}>
                     <EditorIcons.CodeBlockIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;spoilerLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;SpoilerIcon/&gt;`}>
                     <EditorIcons.SpoilerIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;embedLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;EmbedIcon/&gt;`}>
                     <EditorIcons.EmbedIcon />
                 </StoryTile>
                 <StoryTile mouseOverText={`&lt;ImageIcon/&gt;`}>
@@ -237,40 +237,37 @@ story.add("Icons", () => {
             </StoryTiles>
             <StoryHeading>Title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;CloseIcon/&gt;`}>
-                    <TitleBarIcons.CloseIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CheckLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;CheckIcon/&gt;`}>
                     <TitleBarIcons.CheckIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;HelpLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;HelpIcon/&gt;`}>
                     <TitleBarIcons.HelpIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;ComposeLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;ComposeIcon/&gt;`}>
                     <TitleBarIcons.ComposeIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;DownloadLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;DownloadIcon/&gt;`}>
                     <TitleBarIcons.DownloadIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;SettingsLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;SettingsIcon/&gt;`}>
                     <TitleBarIcons.SettingsIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;SearchLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;SearchIcon/&gt;`}>
                     <TitleBarIcons.SearchIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;NotificationsLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;NotificationsIcon/&gt;`}>
                     <TitleBarIcons.NotificationsIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;MessagesLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;MessagesIcon/&gt;`}>
                     <TitleBarIcons.MessagesIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;UserLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;UserIcon/&gt;`}>
                     <TitleBarIcons.UserIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;UserWarningLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;UserWarningIcon/&gt;`}>
                     <TitleBarIcons.UserWarningIcon />
                 </StoryTile>
-                <StoryTile mouseOverText={`&lt;NoUserPhotoLogo/&gt;`}>
+                <StoryTile mouseOverText={`&lt;NoUserPhotoIcon/&gt;`}>
                     <div className={"icon"}>
                         <TitleBarIcons.NoUserPhotoIcon />
                     </div>

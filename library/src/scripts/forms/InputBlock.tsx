@@ -26,8 +26,10 @@ type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
     label?: ReactNode;
+    legend?: boolean;
     children: React.ReactNode | CallbackChildren;
     className?: string;
+    wrapClassName?: string;
     labelClassName?: string;
     noteAfterInput?: string;
     labelNote?: string;
@@ -56,6 +58,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
     }
 
     public render() {
+        const { label, legend } = this.props;
         const classesInputBlock = inputBlockClasses();
         const componentClasses = classNames(
             this.props.baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
@@ -72,23 +75,30 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
             children = this.props.children;
         }
 
-        const Tag = this.props.label ? "label" : "div";
+        const OuterTag = label ? (legend ? "fieldset" : "label") : "div";
+        const LabelTag = label && legend ? "legend" : "span";
 
         return (
-            <Tag className={componentClasses}>
+            <OuterTag className={componentClasses}>
                 {this.props.label && (
                     <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
-                        <span className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
+                        <LabelTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
                             {this.props.label}
-                        </span>
+                        </LabelTag>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                     </span>
                 )}
 
-                <span className={classesInputBlock.inputWrap}>{children}</span>
+                <span
+                    className={classNames(classesInputBlock.inputWrap, this.props.wrapClassName, [
+                        classesInputBlock.fieldsetGroup,
+                    ])}
+                >
+                    {children}
+                </span>
                 <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
-            </Tag>
+            </OuterTag>
         );
     }
 

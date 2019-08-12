@@ -32,9 +32,9 @@ export default function RadioButton(props: IProps) {
     const classes = checkRadioClasses();
 
     return (
-        <label className={classNames("radioButton", classes.root)}>
+        <label className={classNames(classes.root, props.className)}>
             <input
-                className={classNames("radioButton-input", classes.input)}
+                className={classes.input}
                 onChange={props.onChange}
                 aria-disabled={props.disabled}
                 name={props.name}
@@ -43,16 +43,16 @@ export default function RadioButton(props: IProps) {
                 checked={props.checked}
                 tabIndex={0}
             />
-            <span className={classNames("radioButton-disk", classes.iconContainer, classes.disk)}>
-                <span className={classNames("checkbox-state", classes.state)}>
-                    <svg className={classNames(classes.diskIcon, "radioButton-icon", "radioButton-diskIcon")}>
+            <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
+                <span className={classes.state}>
+                    <svg className={classes.diskIcon}>
                         <title>{t("Radio Button")}</title>
                         <circle fill="currentColor" cx="3" cy="3" r="3" />
                     </svg>
                 </span>
             </span>
             {props.label && (
-                <span id={labelID} className={classNames("radioButton-label", classes.label)}>
+                <span id={labelID} className={classes.label}>
                     {props.label}
                 </span>
             )}

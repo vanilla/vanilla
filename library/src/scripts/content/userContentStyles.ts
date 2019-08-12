@@ -146,7 +146,7 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const paragraphSpacing: NestedCSSSelectors = {
-        "& p": {
+        "& > p": {
             marginTop: 0,
             marginBottom: 0,
             $nest: {

@@ -200,7 +200,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 padding: 0,
                 margin: 0,
                 $nest: {
-                    ".richEditor-button, &.richEditor-button": {
+                    ".richEditor-button": {
+                        display: "block",
                         width: unit(vars.menuButton.size),
                         fontSize: unit((vars.menuButton.size * 24) / 39),
                         lineHeight: unit(vars.menuButton.size),

@@ -55,6 +55,10 @@ export const tokensClasses = useThemeCache(() => {
                 },
             },
             ".tokens__value-container": {
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "flexStart",
                 minHeight: unit(formElVars.sizing.height),
                 paddingTop: 0,
                 paddingRight: px(12),
@@ -63,6 +67,20 @@ export const tokensClasses = useThemeCache(() => {
                 $nest: {
                     "&.tokens__value-container--has-value": {
                         padding: px(3),
+                    },
+                    "& .tokens__multi-value + div:not(.tokens__multi-value)": {
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        justifyContent: "flexStart",
+                        flexGrow: 1,
+                    },
+                    ".tokens__input": {
+                        flexGrow: 1,
+                    },
+                    input: {
+                        width: percent(100),
+                        minWidth: unit(45),
                     },
                 },
             },

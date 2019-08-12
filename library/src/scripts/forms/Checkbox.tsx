@@ -24,9 +24,9 @@ export default function CheckBox(props: IProps) {
     const classes = checkRadioClasses();
 
     return (
-        <label id={labelID} className={classNames("checkbox", props.className, classes.root)}>
+        <label id={labelID} className={classNames(props.className, classes.root)}>
             <input
-                className={classNames("checkbox-input", classes.input)}
+                className={classes.input}
                 aria-labelledby={labelID}
                 type="checkbox"
                 onChange={props.onChange}
@@ -34,10 +34,10 @@ export default function CheckBox(props: IProps) {
                 disabled={props.disabled}
                 tabIndex={0}
             />
-            <span className={classNames("checkbox-box", classes.iconContainer)} aria-hidden="true">
-                <span className={classNames("checkbox-state", classes.state)}>
+            <span className={classes.iconContainer} aria-hidden="true">
+                <span className={classes.state}>
                     <svg
-                        className={classNames("checkbox-icon checkbox-checkIcon", classes.checkIcon)}
+                        className={classNames(classes.checkIcon)}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 10 10"
                     >
@@ -50,7 +50,7 @@ export default function CheckBox(props: IProps) {
                 </span>
             </span>
             {props.label && (
-                <span id={labelID} className={classNames("checkbox-label", classes.label)}>
+                <span id={labelID} className={classes.label}>
                     {props.label}
                 </span>
             )}

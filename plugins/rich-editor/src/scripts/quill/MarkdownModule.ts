@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import EmbedBlot from "quill/blots/embed";
 import Quill, { RangeStatic, Blot } from "quill/core";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
@@ -11,6 +12,7 @@ import Delta from "quill-delta";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
+import ContainerBlot from "quill/blots/container";
 
 export enum MarkdownBlockTriggers {
     ENTER = "Enter",
@@ -100,6 +102,60 @@ export default class MarkdownModule {
         return !hasExistingInlineFormat;
     }
 
+    private getFormattableText(): {
+        text: string;
+        lineStart: number;
+    } | null {
+        const selection = this.quill.getSelection();
+        if (!selection) {
+            return null;
+        }
+
+        // Only short selections apply.
+        if (selection.length > 0) {
+            return null;
+        }
+
+        const [line, offset] = this.quill.getLine(selection.index);
+        if (!line.children) {
+            return null;
+        }
+        let lineStart = selection.index - offset;
+        let text = this.quill.getText(lineStart, selection.index);
+
+        // Adjust the text so that it's only after the last whitespace character.
+        // Because this is a markdown MACRO and not a parser, we only look at stuff after the previous whitespace character.
+        const lastIndex = text.lastIndexOf(" ");
+        if (lastIndex >= 0) {
+            // We can't use the normal index because `getText()` isn't very smart about selecting inline embeds.
+            // See original get text implementation https://github.com/quilljs/quill/blob/develop/core/editor.js#L147-L152
+            // It needs to be offset by the count of inline embeds which each have a length of 1.
+            let inlineEmbedCount = 0;
+            const checkBlot = (child: Blot) => {
+                if (child instanceof EmbedBlot) {
+                    inlineEmbedCount++;
+                    return;
+                }
+
+                if ((child as ContainerBlot).children) {
+                    (child as ContainerBlot).children.forEach(checkBlot);
+                }
+            };
+            line.children.forEachAt(0, selection.index - lineStart, checkBlot);
+            lineStart += lastIndex + inlineEmbedCount + 1;
+            text = text.substr(lastIndex + 1);
+        }
+
+        if (!this.canFormatRange({ index: lineStart, length: text.length })) {
+            return null;
+        }
+
+        return {
+            text,
+            lineStart,
+        };
+    }
+
     /**
      * Handle a keydown event and trigger markdown actions.
      */
@@ -107,31 +163,11 @@ export default class MarkdownModule {
         if (!allTriggerKeys.includes(event.key)) {
             return;
         }
-        const selection = this.quill.getSelection();
-        if (!selection) {
+        const result = this.getFormattableText();
+        if (!result) {
             return;
         }
-
-        // Only short selections apply.
-        if (selection.length > 0) {
-            return;
-        }
-
-        const [line, offset] = this.quill.getLine(selection.index);
-        let lineStart = selection.index - offset;
-        let text = this.quill.getText(lineStart, selection.index);
-
-        // Adjust the text so that it's only after the last whitespace character.
-        // Because this is a markdown MACRO and not a parser, we only look at stuff after the previous whitespace character.
-        const lastIndex = text.lastIndexOf(" ");
-        if (lastIndex > 0) {
-            lineStart += lastIndex;
-            text = text.substr(lastIndex);
-        }
-
-        if (!this.canFormatRange(line)) {
-            return;
-        }
+        const { text, lineStart } = result;
 
         // Iterate through our matchers and execute the first one.
         for (const match of this.matchers) {
@@ -161,7 +197,7 @@ export default class MarkdownModule {
 
             // Cutoff the history before an after so this is it's own action to undo.
             this.quill.history.cutoff();
-            match.handler(text, selection, match.pattern, lineStart);
+            match.handler(text, this.quill.getSelection(), match.pattern, lineStart);
             this.quill.history.cutoff();
             return false;
         }

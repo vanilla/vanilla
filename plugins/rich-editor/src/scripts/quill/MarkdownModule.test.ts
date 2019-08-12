@@ -15,6 +15,10 @@ import OpUtils from "@rich-editor/__tests__/OpUtils";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
+const MENTION_INSERT = {
+    mention: { name: "meadwayk", userID: 24562 },
+};
+
 describe("NewLineClickInsertionModule", () => {
     let quill: Quill;
     let markdownModule: MarkdownModule;
@@ -24,6 +28,10 @@ describe("NewLineClickInsertionModule", () => {
         markdownModule = new MarkdownModule(quill);
         markdownModule.registerHandler();
     });
+
+    function dispatchKey(key: string) {
+        quill.root.dispatchEvent(new KeyboardEvent("keydown", { key }));
+    }
 
     testInlineFormat({
         name: "inline code",
@@ -168,6 +176,45 @@ describe("NewLineClickInsertionModule", () => {
         },
     });
 
+    describe.only("works with inline embeds on the line", () => {
+        it("handles an inline embed at the start of the line", () => {
+            quill.setContents([OpUtils.op(MENTION_INSERT), OpUtils.op(" _te@st_")]);
+            quill.setSelection(9, 0);
+            dispatchKey(MarkdownInlineTriggers.SPACE);
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op(" "),
+                OpUtils.op("te@st", {
+                    italic: true,
+                }),
+                OpUtils.newline(),
+            ]);
+        });
+
+        it("handles multiple inline embeds at the start of the line", () => {
+            quill.setContents([
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op("    "),
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op("  _te@st_"),
+            ]);
+            quill.setSelection(16, 0);
+            dispatchKey(MarkdownInlineTriggers.SPACE);
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op("    "),
+                OpUtils.op(MENTION_INSERT),
+                OpUtils.op("  "),
+                OpUtils.op("te@st", {
+                    italic: true,
+                }),
+                OpUtils.newline(),
+            ]);
+        });
+    });
+
     interface ITestInlineFormat {
         name: string;
         text: string;
@@ -191,7 +238,7 @@ describe("NewLineClickInsertionModule", () => {
                     it("converts a line of just the format for the trigger key " + triggerKey, async () => {
                         quill.setContents([OpUtils.op(wrappedText)]);
                         quill.setSelection(wrappedText.length, 0);
-                        quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+                        dispatchKey(triggerKey);
                         expect(quill.getContents().ops).deep.eq([
                             OpUtils.op(text, expectedFormats),
                             OpUtils.op(`${trailingCharacter}\n`),
@@ -202,7 +249,7 @@ describe("NewLineClickInsertionModule", () => {
                         const startPadding = "asdf42 asdf asdf_!@#$%^&*( ";
                         quill.setContents([OpUtils.op(startPadding + wrappedText)]);
                         quill.setSelection(startPadding.length + wrappedText.length, 0);
-                        quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+                        dispatchKey(triggerKey);
                         expect(quill.getContents().ops).deep.eq([
                             OpUtils.op(startPadding),
                             OpUtils.op(text, expectedFormats),
@@ -215,7 +262,7 @@ describe("NewLineClickInsertionModule", () => {
                         () => {
                             quill.setContents([OpUtils.op(wrappedText + " ")]);
                             quill.setSelection(wrappedText.length + 1, 0);
-                            quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+                            dispatchKey(triggerKey);
                             expect(quill.getContents().ops).deep.eq([OpUtils.op(wrappedText + ` \n`)]);
                         },
                     );
@@ -238,7 +285,7 @@ describe("NewLineClickInsertionModule", () => {
                 it("can handle it's macro for the trigger key " + triggerKey, () => {
                     quill.setContents([OpUtils.op(text)]);
                     quill.setSelection(text.length, 0);
-                    quill.root.dispatchEvent(new KeyboardEvent("keydown", { key: triggerKey }));
+                    dispatchKey(triggerKey);
                     expect(quill.getContents().ops).deep.eq([OpUtils.op("\n", expectedFormats)]);
                 });
             }

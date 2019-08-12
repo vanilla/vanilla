@@ -42,7 +42,16 @@ class BodyFormatValidator {
         } catch (FormattingException $e) {
             $result = new Invalid($e->getMessage());
         } catch (FormatterNotFoundException $e) {
-            $result = new Invalid($e->getMessage());
+            // For backwards compatibility unknown formatters are allowed in this validator.
+            // The old models handle their own format validation where necessary.
+            trigger_error(
+                "Could not validate format $format. A formatter was not found."
+                . "This is currently a warning, but may be an exception in the future.\n"
+                . "To fix this, implement `Vanilla\Contracts\Formatting\FormatInterface` for $format "
+                . "and register it with the `Vanilla\Formatting\FormatService`",
+                E_USER_WARNING
+            );
+            return $value;
         }
 
         return $result;

@@ -8,6 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { CheckCompactIcon } from "./common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -16,11 +17,12 @@ const currentColorFill = {
 // Placeholder
 export function RevisionStatusRevisionIcon(props: { className?: string }) {
     const title = t("Revision");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-revision", props.className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-revision", props.className)}
             role="img"
             aria-label={title}
         >
@@ -32,11 +34,12 @@ export function RevisionStatusRevisionIcon(props: { className?: string }) {
 
 export function RevisionStatusDraftIcon(props: { className?: string }) {
     const title = t("Draft");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-draft", props.className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-draft", props.className)}
             role="img"
             aria-label={title}
         >
@@ -55,11 +58,12 @@ export function RevisionStatusDraftIcon(props: { className?: string }) {
 
 export function RevisionStatusPendingIcon(props: { className?: string }) {
     const title = t("Pending");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-pending", props.className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-pending", props.className)}
             role="img"
             aria-label={title}
         >
@@ -78,11 +82,12 @@ export function RevisionStatusPublishedIcon(props: { className?: string }) {
 
 export function RevisionStatusDeletedIcon(props: { className?: string }) {
     const title = t("Deleted");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-deleted", props.className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-deleted", props.className)}
             role="img"
             aria-label={title}
         >

@@ -18,7 +18,7 @@ import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { CloseIcon } from "@library/icons/titleBar";
+import { CloseCompactIcon } from "@library/icons/common";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -109,7 +109,9 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
                 title={t("Clear")}
                 aria-label={t("Clear")}
             >
-                <CloseIcon className={classNames("suggestedTextInput-tokenRemoveIcon", classesTokens.removeIcon)} />
+                <CloseCompactIcon
+                    className={classNames("suggestedTextInput-tokenRemoveIcon", classesTokens.removeIcon)}
+                />
             </button>
         </components.MultiValueRemove>
     );

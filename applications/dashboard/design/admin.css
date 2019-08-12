@@ -12452,8 +12452,6 @@ body.isMobile .Popup.hasRichEditor .Border {
  */
 .icon, .btn-icon, .bookmark, .search-wrap .search-icon-wrap {
   display: inline-block;
-  width: 24px;
-  height: 24px;
   vertical-align: middle;
 }
 .icon.isSmall, .isSmall.btn-icon, .isSmall.bookmark, .search-wrap .isSmall.search-icon-wrap {

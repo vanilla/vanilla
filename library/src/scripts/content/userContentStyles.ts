@@ -73,6 +73,9 @@ const userContentVariables = useThemeCache(() => {
         listDecoration: {
             minWidth: em(2),
         },
+        nestedList: {
+            margin: "0 0 0 1em",
+        },
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -136,7 +139,7 @@ export const userContentClasses = useThemeCache(() => {
     const lists: NestedCSSSelectors = {
         ["& ol"]: {
             listStylePosition: "inside",
-            margin: `1em 0 1em 3em`,
+            margin: `0 0 1em 3em`,
             $nest: {
                 [`li`]: {
                     listStyle: "decimal",
@@ -159,6 +162,9 @@ export const userContentClasses = useThemeCache(() => {
                 [`ol ol ol ol ol ol li`]: {
                     listStyle: "decimal",
                 },
+                [`ol, ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
             },
         },
         ["& ul"]: {
@@ -168,6 +174,9 @@ export const userContentClasses = useThemeCache(() => {
             $nest: {
                 [`li`]: {
                     listStyle: "disc",
+                },
+                [`ol, ul`]: {
+                    margin: vars.list.nestedList.margin,
                 },
             },
         },

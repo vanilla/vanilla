@@ -6,6 +6,9 @@
 
 // Rich editor needs to force styling of list elements.
 
+$nestedList-margin: "0 0 0 1em";
+
+
 .userContent ul,
 .userContent ol {
     margin: 1em 0 1em 3em;
@@ -34,6 +37,10 @@
         ol ol ol ol ol ol li {
             list-style: decimal !important;
         }
+        ol,
+        ul {
+            margin: $nestedList-margin;
+        }
     }
 }
 
@@ -41,6 +48,10 @@
     ul {
         li {
             list-style: disc !important;
+        }
+        ol,
+        ul {
+            margin: $nestedList-margin;
         }
     }
 }

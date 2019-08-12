@@ -2329,9 +2329,17 @@ body.isMobile .Popup.hasRichEditor .Border {
 .userContent ol ol ol ol ol ol ol li {
   list-style: decimal !important;
 }
+.userContent ol ol,
+.userContent ol ul {
+  margin: "0 0 0 1em";
+}
 
 .userContent ul li {
   list-style: disc !important;
+}
+.userContent ul ol,
+.userContent ul ul {
+  margin: "0 0 0 1em";
 }
 
 .userContent li,

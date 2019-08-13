@@ -183,10 +183,10 @@ export const userContentClasses = useThemeCache(() => {
         [`& li`]: {
             margin: `5px 0`,
             $nest: {
-                [`&, *:first-child`]: {
+                [`&, & *:first-child`]: {
                     marginTop: 0,
                 },
-                [`&, *:last-child`]: {
+                [`&, & *:last-child`]: {
                     marginBottom: 0,
                 },
             },

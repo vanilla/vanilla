@@ -5,7 +5,7 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { em } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { margins, unit } from "@library/styles/styleHelpers";
 
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
@@ -71,8 +71,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const close = themeVars("close", {
-        width: 12,
-        height: 12,
+        width: 20,
+        height: 20,
     });
 
     const chevronLeftCompact = themeVars("chevronLeftCompact", {
@@ -100,6 +100,12 @@ export const iconVariables = useThemeCache(() => {
         height: 14,
     });
 
+    const categoryIcon = themeVars("categoryIcon", {
+        width: 18,
+        height: 18,
+        opacity: ".8",
+    });
+
     return {
         standard,
         newFolder,
@@ -119,6 +125,7 @@ export const iconVariables = useThemeCache(() => {
         signIn,
         chevronUp,
         plusCircle,
+        categoryIcon,
     };
 });
 
@@ -191,6 +198,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.close.height),
     });
 
+    const closeCompact = style("close", {
+        width: unit(vars.close.width),
+        height: unit(vars.close.height),
+    });
+
     const chevronLeftCompact = style("chevronLeftCompact", {
         width: unit(vars.chevronLeftCompact.width),
         height: unit(vars.chevronLeftCompact.height),
@@ -216,6 +228,12 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.plusCircle.height),
     });
 
+    const categoryIcon = style("categoryIcon", {
+        width: unit(vars.categoryIcon.width),
+        height: unit(vars.categoryIcon.height),
+        opacity: vars.categoryIcon.opacity,
+    });
+
     return {
         standard,
         newFolder,
@@ -235,5 +253,6 @@ export const iconClasses = useThemeCache(() => {
         signIn,
         chevronUp,
         plusCircle,
+        categoryIcon,
     };
 });

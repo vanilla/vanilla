@@ -140,7 +140,8 @@ export function CloseIcon(props: { className?: string; compact?: boolean }) {
 }
 
 export function CloseCompactIcon(props: { className?: string }) {
-    return <CloseIcon compact={true} className={props.className} />;
+    const classes = iconClasses();
+    return <CloseIcon compact={true} className={classNames(classes.close, props.className)} />;
 }
 
 export function ClearIcon(props: { className?: string }) {
@@ -224,7 +225,7 @@ export function CategoryIcon(props: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(classes.standard, "icon-categoryIcon", props.className)}
+            className={classNames(classes.categoryIcon, "icon-categoryIcon", props.className)}
             viewBox="0 0 24 24"
             role="img"
             aria-label={title}

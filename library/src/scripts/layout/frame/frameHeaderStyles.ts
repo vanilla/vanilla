@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc, percent } from "csx";
+import { calc, em, percent } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const frameHeaderClasses = useThemeCache(() => {
@@ -116,6 +116,12 @@ export const frameHeaderClasses = useThemeCache(() => {
         border: 0,
     });
 
+    const categoryIcon = style("categoryIcon", {
+        flexBasis: unit(18),
+        marginRight: ".6em",
+        opacity: 0.8,
+    });
+
     return {
         root,
         backButton,
@@ -126,5 +132,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         action,
         backButtonIcon,
         close,
+        categoryIcon,
     };
 });

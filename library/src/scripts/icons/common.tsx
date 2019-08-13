@@ -224,7 +224,7 @@ export function CategoryIcon(props: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(classes.standard, "icon-categoryIcon", props.className)}
+            className={classNames(classes.categoryIcon, "icon-categoryIcon", props.className)}
             viewBox="0 0 24 24"
             role="img"
             aria-label={title}

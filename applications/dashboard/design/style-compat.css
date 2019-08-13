@@ -2303,21 +2303,47 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.richEditor-text ul,
-.richEditor-text ol {
+.userContent ul,
+.userContent ol {
   margin: 1em 0 1em 3em;
 }
 
-.richEditor-text ol li {
+.userContent ol li {
   list-style: decimal !important;
 }
-
-.richEditor-text ul li {
-  list-style: disc !important;
+.userContent ol ol li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol li {
+  list-style: decimal !important;
+}
+.userContent ol ol ol ol ol li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol ol ol ol li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol ol ol ol li {
+  list-style: decimal !important;
+}
+.userContent ol ol,
+.userContent ol ul {
+  margin: 0 0 0 1em;
 }
 
-.richEditor-text li,
-.richEditor-text.richEditor-text ul li {
+.userContent ul li {
+  list-style: disc !important;
+}
+.userContent ul ol,
+.userContent ul ul {
+  margin: 0 0 0 1em;
+}
+
+.userContent li,
+.userContent.userContent ul li {
   margin: 5px 0;
 }
 

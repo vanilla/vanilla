@@ -64,7 +64,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         });
 
         return (
-            <InputBlock {...blockProps} className={classesInputBlock.root}>
+            <InputBlock {...blockProps} className={classNames(classesInputBlock.root, this.props.className)}>
                 {blockParams => {
                     const { labelID, errorID, hasErrors } = blockParams;
                     let describedBy;

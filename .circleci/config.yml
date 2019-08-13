@@ -10,6 +10,7 @@ orbs:
                         PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
 
                         if [ -z "$PR_NUMBER" ]; then
+                            echo "Not a pull request. Skipping this step."
                             exit
                         fi
 
@@ -22,6 +23,7 @@ orbs:
                             target_branch=$(
                                 curl "$url" | ./jq '.base.ref' | tr -d '"'
                             )
+                            echo 'Found target branch $target_branch'.
                             echo 'CUSTOM_TARGET_BRANCH="target_branch"' >> $BASH_ENV
                         fi
                 - run:

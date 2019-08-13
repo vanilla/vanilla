@@ -141,28 +141,28 @@ export const userContentClasses = useThemeCache(() => {
             listStylePosition: "inside",
             margin: `0 0 1em 3em`,
             $nest: {
-                [`li`]: {
+                [`& li`]: {
                     listStyle: "decimal",
                 },
-                [`ol li`]: {
+                [`& ol li`]: {
                     listStyle: "lower-alpha",
                 },
-                [`ol ol li`]: {
+                [`& ol ol li`]: {
                     listStyle: "lower-roman",
                 },
-                [`ol ol ol li`]: {
+                [`& ol ol ol li`]: {
                     listStyle: "decimal",
                 },
-                [`ol ol ol ol li`]: {
+                [`& ol ol ol ol li`]: {
                     listStyle: "lower-alpha",
                 },
-                [`ol ol ol ol ol li`]: {
+                [`& ol ol ol ol ol li`]: {
                     listStyle: "lower-roman",
                 },
-                [`ol ol ol ol ol ol li`]: {
+                [`& ol ol ol ol ol ol li`]: {
                     listStyle: "decimal",
                 },
-                [`ol, ul`]: {
+                [`& ol, & ul`]: {
                     margin: vars.list.nestedList.margin,
                 },
             },
@@ -172,15 +172,15 @@ export const userContentClasses = useThemeCache(() => {
             listStyle: "disc",
             margin: `1em 0 1em 3em`,
             $nest: {
-                [`li`]: {
+                [`& li`]: {
                     listStyle: "disc",
                 },
-                [`ol, ul`]: {
+                [`& ol, & ul`]: {
                     margin: vars.list.nestedList.margin,
                 },
             },
         },
-        [`li`]: {
+        [`& li`]: {
             margin: `5px 0`,
             $nest: {
                 [`&, *:first-child`]: {

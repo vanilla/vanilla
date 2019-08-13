@@ -4,10 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { embed } from "@library/icons/editorIcons";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
@@ -15,13 +14,14 @@ import { isAllowedUrl, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
+import { EmbedIcon } from "@library/icons/editorIcons";
 
 interface IProps {
     disabled?: boolean;
@@ -92,9 +92,10 @@ export default function EmbedFlyout(props: IProps) {
     const classesInsertMedia = insertMediaClasses();
     const placeholderText = `https://`;
 
-    function handleVisibilityChange() {
-        inputRef.current && inputRef.current.focus();
-        forceSelectionUpdate();
+    function handleVisibilityChange(newVisibility: boolean) {
+        if (newVisibility) {
+            inputRef.current && inputRef.current.focus();
+        }
     }
 
     return (
@@ -104,17 +105,14 @@ export default function EmbedFlyout(props: IProps) {
                 name={t("Insert Media")}
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
                 title={t("Insert Media")}
-                paddedList={true}
-                onClose={clearInput}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
-                buttonContents={<IconForButtonWrap icon={embed()} />}
+                buttonContents={<IconForButtonWrap icon={<EmbedIcon />} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}
-                selfPadded={true}
                 initialFocusElement={inputRef.current}
-                flyoutSize={FlyoutSizes.MEDIUM}
+                flyoutType={FlyoutType.FRAME}
                 contentsClassName={!legacyMode ? classesRichEditor.flyoutOffset : ""}
             >
                 <Frame

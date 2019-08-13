@@ -8,12 +8,12 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Validation logic test.
  */
-class CodePenEmbedTest extends ContainerTestCase {
+class CodePenEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create code pen embed from the old data format that might still
      * live in the DB.

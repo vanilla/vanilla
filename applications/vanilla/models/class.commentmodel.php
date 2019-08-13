@@ -1041,8 +1041,7 @@ class CommentModel extends Gdn_Model {
         }
         $minCommentLength = c('Vanilla.Comment.MinLength');
         if ($minCommentLength && is_numeric($minCommentLength)) {
-            $this->Validation->setSchemaProperty('Body', 'MinLength', $minCommentLength);
-            $this->Validation->addRule('MinTextLength', 'function:ValidateMinTextLength');
+            $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
             $this->Validation->applyRule('Body', 'MinTextLength');
         }
 
@@ -1278,11 +1277,7 @@ class CommentModel extends Gdn_Model {
             }
 
             // Notify any users who were mentioned in the comment.
-            if ($Fields['Format'] === 'Rich') {
-                $Usernames = Gdn_Format::getRichMentionUsernames($Fields['Body']);
-            } else {
-                $Usernames = getMentions($Fields['Body']);
-            }
+            $Usernames = Gdn::formatService()->parseMentions($Fields['Body'], $Fields['Format']);
 
             $userModel = Gdn::userModel();
             foreach ($Usernames as $i => $Username) {

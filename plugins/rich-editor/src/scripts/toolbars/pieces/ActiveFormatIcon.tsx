@@ -8,16 +8,16 @@ import React from "react";
 import { IFormats } from "quill/core";
 import HeadingBlot from "quill/formats/header";
 import {
-    heading2,
-    heading3,
-    blockquote,
-    codeBlock,
-    spoiler,
-    pilcrow,
-    heading4,
-    heading5,
-    listOrdered,
-    listUnordered,
+    Heading2Icon,
+    Heading3Icon,
+    Heading4Icon,
+    PilcrowIcon,
+    Heading5Icon,
+    ListOrderedIcon,
+    ListUnorderedIcon,
+    CodeBlockIcon,
+    SpoilerIcon,
+    BlockquoteIcon,
 } from "@library/icons/editorIcons";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
@@ -30,25 +30,25 @@ interface IProps {
 export default class ActiveFormatIcon extends React.Component<IProps, {}> {
     public render() {
         const { activeFormats } = this.props;
-        let icon = pilcrow();
+        let icon = <PilcrowIcon />;
         if (activeFormats.headings.heading2) {
-            icon = heading2();
+            icon = <Heading2Icon />;
         } else if (activeFormats.headings.heading3) {
-            icon = heading3();
+            icon = <Heading3Icon />;
         } else if (activeFormats.headings.heading4) {
-            icon = heading4();
+            icon = <Heading4Icon />;
         } else if (activeFormats.headings.heading5) {
-            icon = heading5();
+            icon = <Heading5Icon />;
         } else if (activeFormats.lists.ordered) {
-            icon = listOrdered();
+            icon = <ListOrderedIcon />;
         } else if (activeFormats.lists.unordered) {
-            icon = listUnordered();
+            icon = <ListUnorderedIcon />;
         } else if (activeFormats.specialFormats.blockQuote) {
-            icon = blockquote();
+            icon = <BlockquoteIcon />;
         } else if (activeFormats.specialFormats.codeBlock) {
-            icon = codeBlock();
+            icon = <CodeBlockIcon />;
         } else if (activeFormats.specialFormats.spoiler) {
-            icon = spoiler();
+            icon = <SpoilerIcon />;
         }
         return icon;
     }

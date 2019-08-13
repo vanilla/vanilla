@@ -7,8 +7,8 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { leftChevron, rightChevron } from "@library/icons/common";
 import SmartLink from "@library/routing/links/SmartLink";
+import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 
 export enum LeftRight {
     LEFT = "left",
@@ -44,7 +44,11 @@ export default class AdjacentLink extends React.Component<IAdjacentLinks> {
                 </span>
                 <span className={classNames(classes.title, "adjacentLinks-title")}>
                     <span className={classNames(classes.chevron, isLeft ? classes.chevronLeft : classes.chevronRight)}>
-                        {isLeft ? leftChevron("adjacentLinks-icon") : rightChevron("adjacentLinks-icon")}
+                        {isLeft ? (
+                            <LeftChevronIcon className={"adjacentLinks-icon"} />
+                        ) : (
+                            <RightChevronIcon className={"adjacentLinks-icon"} />
+                        )}
                     </span>
                     {title}
                 </span>

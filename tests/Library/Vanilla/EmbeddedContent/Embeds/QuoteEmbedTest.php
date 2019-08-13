@@ -10,13 +10,13 @@ namespace VanillaTests\Library\EmbeddedContent\Embeds;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\LegacyEmbedFixtures;
 
 /**
  * Test for the individual linkembed.
  */
-class QuoteEmbedTest extends ContainerTestCase {
+class QuoteEmbedTest extends MinimalContainerTestCase {
 
     /**
      * Setup.
@@ -25,7 +25,7 @@ class QuoteEmbedTest extends ContainerTestCase {
         parent::setUp();
         $container = \Gdn::getContainer();
         $container->rule(FormatService::class)
-            ->addCall('registerFormat', [RichFormat::FORMAT_KEY, RichFormat::class]);
+            ->addCall('registerFormat', [RichFormat::FORMAT_KEY, $container->get(RichFormat::class)]);
     }
 
     /**

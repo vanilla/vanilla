@@ -18,6 +18,7 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -270,8 +271,8 @@ class Bootstrap {
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Formatting\FormatService::class)
-            ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+            ->rule(FormatService::class)
+            ->addCall('registerBuiltInFormats')
             ->setShared(true)
 
             ->rule('HtmlFormatter')

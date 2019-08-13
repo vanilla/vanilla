@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class GettyImagesEmbedFactoryTest extends ContainerTestCase {
+class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var GettyImagesEmbedFactory */
     private $factory;

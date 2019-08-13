@@ -5,16 +5,15 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Vanilla\Formatting\Quill;
+namespace VanillaTests\Library\Vanilla\Formatting;
 
-use Vanilla\Formatting\Formats\RichFormat;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
-use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Unit tests for the Gdn_Format class.
  */
-class GdnFormatTest extends SharedBootstrapTestCase {
+class GdnFormatTest extends MinimalContainerTestCase {
 
     use AssertsFixtureRenderingTrait;
 
@@ -73,55 +72,6 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         $this->assertFixturePassesForFormat($fixtureDir, 'html');
     }
 
-
-    /**
-     * Test results of Gdn_Format::excerpt with rich-formatted content.
-     *
-     * @param string $fixtureDir The directory of the fixture to use for the testCase.
-     * @dataProvider provideRichExcerpts
-     */
-    public function testRichExcerpt(string $fixtureDir) {
-        list($body, $unused, $expected) = $this->getFixture($fixtureDir);
-        $actual = \Gdn_Format::excerpt($body, RichFormat::FORMAT_KEY);
-        $this->assertEquals(
-            $expected,
-            $actual,
-            "Expected excerpt outputs for fixture $fixtureDir did not match."
-        );
-    }
-
-
-    /**
-     * Test results of Gdn_Format::plainText with rich-formatted content.
-     *
-     * @param string $fixtureDir The directory of the fixture to use for the testCase.
-     * @dataProvider provideRichPlainText
-     */
-    public function testRichPlainText(string $fixtureDir) {
-        list($body, $unused, $expected) = $this->getFixture($fixtureDir);
-        $actual = \Gdn_Format::plainText($body, RichFormat::FORMAT_KEY);
-        $this->assertEquals(
-            $expected,
-            $actual,
-            "Expected excerpt outputs for fixture $fixtureDir did not match."
-        );
-    }
-
-
-    /**
-     * Test using a rich-format array of operations with the quoteEmbed method.
-     */
-    public function testRichQuoteEmbedAsArray() {
-        $richEmbed = [
-            ["insert" => "Hello world."],
-        ];
-
-        $this->assertEquals(
-            "<p>Hello world.</p>",
-            \Gdn_Format::quoteEmbed($richEmbed, RichFormat::FORMAT_KEY)
-        );
-    }
-
     /**
      * Test the wysiwyg HTML rendering.
      *
@@ -170,60 +120,42 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @return array
      */
     public function provideHtml(): array {
-        return $this->createFixtureDataProvider('/formats/html/html');
+        return $this->createFixtureDataProvider('/formats/html');
     }
 
     /**
      * @return array
      */
     public function provideBBCode(): array {
-        return $this->createFixtureDataProvider('/formats/bbcode/html');
+        return $this->createFixtureDataProvider('/formats/bbcode');
     }
 
     /**
      * @return array
      */
     public function provideMarkdown(): array {
-        return $this->createFixtureDataProvider('/formats/markdown/html');
+        return $this->createFixtureDataProvider('/formats/markdown');
     }
 
     /**
      * @return array
      */
     public function provideText(): array {
-        return $this->createFixtureDataProvider('/formats/text/html');
+        return $this->createFixtureDataProvider('/formats/text');
     }
 
     /**
      * @return array
      */
     public function provideTextEx(): array {
-        return $this->createFixtureDataProvider('/formats/textex/html');
-    }
-
-    /**
-     * Provide data for testing the excerpt method with the rich format.
-     *
-     * @return array
-     */
-    public function provideRichExcerpts(): array {
-        return $this->createFixtureDataProvider("/formats/rich/excerpt");
-    }
-
-    /**
-     * Provide data for testing the plainText method.
-     *
-     * @return array
-     */
-    public function provideRichPlainText(): array {
-        return $this->createFixtureDataProvider("/formats/rich/plain-text");
+        return $this->createFixtureDataProvider('/formats/textex');
     }
 
     /**
      * @return array
      */
     public function provideWysiwyg(): array {
-        return $this->createFixtureDataProvider('/formats/wysiwyg/html');
+        return $this->createFixtureDataProvider('/formats/wysiwyg');
     }
 
     /**
@@ -236,15 +168,18 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         list($input, $expectedHtml, $expectedText) = $this->getFixture($fixtureDir);
         $outputHtml = \Gdn_Format::to($input, $format);
         $this->assertHtmlStringEqualsHtmlString(
-            $expectedHtml, // Needed so code blocks are equivalently decoded
-            $outputHtml, // Gdn_Format does htmlspecialchars
+            $expectedHtml,
+            $outputHtml,
             "Expected $format -> html conversion for fixture $fixtureDir to match."
         );
 
         $outputText = \Gdn_Format::plainText($input, $format);
-        $this->assertHtmlStringEqualsHtmlString(
-            $expectedText,
-            $outputText,
+        $this->assertEquals(
+            trim($expectedText),
+            // Gdn_Format (deprecated) encodes special chars.
+            // Format interfaces don't.
+            // Undo this so we can work with the same fixtures.
+            htmlspecialchars_decode($outputText),
             "Expected $format -> text conversion for fixture $fixtureDir to match."
         );
     }

@@ -115,13 +115,11 @@ export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript(TWITTER_SCRIPT);
-        if (window.twttr) {
-            const promises = tweets.map(contentElement => {
-                return renderTweet(contentElement as HTMLElement);
-            });
+        const promises = tweets.map(contentElement => {
+            return renderTweet(contentElement as HTMLElement);
+        });
 
-            // Render all the pages twitter embeds at the same time.
-            await Promise.all(promises);
-        }
+        // Render all the pages twitter embeds at the same time.
+        await Promise.all(promises);
     }
 }

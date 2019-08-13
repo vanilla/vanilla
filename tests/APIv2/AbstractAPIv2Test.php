@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Utility\CamelCaseScheme;
 use VanillaTests\InternalClient;
 use VanillaTests\SiteTestTrait;
@@ -87,7 +88,7 @@ abstract class AbstractAPIv2Test extends TestCase {
             if (array_intersect(array_keys($row), $this->formattedFields) && array_key_exists('format', $row)) {
                 foreach ($this->formattedFields as $field) {
                     if (array_key_exists($field, $row)) {
-                        $row[$field] = \Gdn_Format::to($row[$field], $row['format']);
+                        $row[$field] = \Gdn::formatService()->renderHTML($row[$field] ?? '', $row['format'] ?? TextFormat::FORMAT_KEY);
                     }
                 }
                 unset($row['format']);

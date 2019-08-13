@@ -313,6 +313,7 @@ export const splashClasses = useThemeCache(() => {
                 maxWidth: percent(100),
                 width: px(vars.searchContainer.width),
                 margin: "auto",
+                zIndex: 2,
             },
         },
     });

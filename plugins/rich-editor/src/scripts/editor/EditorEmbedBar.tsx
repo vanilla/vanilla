@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";

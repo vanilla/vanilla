@@ -18,7 +18,7 @@ export const AnalyticsData: FC<IProps> = (props: IProps) => {
 
     useEffect(() => {
         document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail: data }));
-    }, [uniqueKey]);
+    }, [uniqueKey, data]);
     return <>{null}</>;
 };
 

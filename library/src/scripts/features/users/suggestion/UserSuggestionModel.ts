@@ -109,25 +109,32 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             }
         }
 
-        const sortByName = (userA: IUserSuggestion, userB: IUserSuggestion) =>
-            looseCollator.compare(userA.name, userB.name);
-
-        const exactToTheTop = (userA: IUserSuggestion, userB: IUserSuggestion) => {
+        const sortByName = (userA: IUserSuggestion, userB: IUserSuggestion) => {
             const casedSearchName = searchName.toLocaleLowerCase();
             const aCasedName = userA.name.toLocaleLowerCase();
             const bCasedName = userB.name.toLocaleLowerCase();
 
+            // Return partial matches first.
+            if (aCasedName.startsWith(casedSearchName) && !bCasedName.startsWith(casedSearchName)) {
+                return -1;
+            }
+            if (bCasedName.startsWith(casedSearchName) && !aCasedName.startsWith(casedSearchName)) {
+                return 1;
+            }
+            return looseCollator.compare(userA.name.toLocaleLowerCase(), userB.name.toLocaleLowerCase());
+        };
+
+        const exactToTheTop = (userA: IUserSuggestion, userB: IUserSuggestion) => {
+            const casedSearchName = searchName.toLocaleLowerCase();
+            const aCasedName = userA.name.toLocaleLowerCase();
+
             //  Return exact matches first.
-            if (aCasedName.includes(casedSearchName) && !bCasedName.includes(casedSearchName)) {
+            if (aCasedName === casedSearchName) {
                 return -1;
             }
 
-            if (bCasedName.includes(casedSearchName) && !aCasedName.includes(casedSearchName)) {
-                return 1;
-            }
-
-            // Fallback to the collator
-            return looseCollator.compare(userA.name, userB.name);
+            // Don't affect the sorts otherwise.
+            return 0;
         };
 
         // Sort each set of users separately.

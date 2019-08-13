@@ -1,0 +1,76 @@
+[
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
+                    "type": "quote",
+                    "recordID": 4,
+                    "recordType": "comment",
+                    "bodyRaw": [
+                        {
+                            "insert": "Hello world.\n"
+                        }
+                    ],
+                    "dateInserted": "2019-01-01T00:00:01+00:00",
+                    "dateUpdated": "2019-01-01T00:00:01+00:00",
+                    "insertUser": {
+                        "userID": 2,
+                        "name": "Vanilla",
+                        "photoUrl": "//wa.vanillicon.com/v2/2ab2554ee531b4bc41921f97c36b3169.svg",
+                        "dateLastActive": "2019-01-01T00:00:01+00:00"
+                    },
+                    "format": "Rich"
+                },
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://vanillaforums.example/discussion/comment/1#Comment_1"
+                }
+            }
+        }
+    },
+    {
+        "insert": "@notAMention\n"
+    },
+    {
+        "insert": " "
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "@thisIsARealMention",
+                "userID": 543
+            }
+        }
+    },
+    {
+        "insert": " "
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "@duplicateMention",
+                "userID": 542
+            }
+        }
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "@duplicateMention",
+                "userID": 542
+            }
+        }
+    },
+    {
+        "insert": " "
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "@@@@@!@#$%^&*()\"\"",
+                "userID": 1
+            }
+        }
+    }
+]

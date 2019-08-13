@@ -78,8 +78,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         ...pointerEvents(),
         content: quote(``),
         ...absolutePosition.middleOfParent(),
-        width: percent(100),
-        height: percent(100),
+        width: unit(vars.iconWrap.width),
+        height: unit(vars.iconWrap.width),
         ...borders({
             radius: 3,
             color: globalVars.elementaryColors.transparent,

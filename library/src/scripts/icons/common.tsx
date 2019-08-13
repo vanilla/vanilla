@@ -140,8 +140,7 @@ export function CloseIcon(props: { className?: string; compact?: boolean }) {
 }
 
 export function CloseCompactIcon(props: { className?: string }) {
-    const classes = iconClasses();
-    return <CloseIcon compact={true} className={classNames(classes.close, props.className)} />;
+    return <CloseIcon compact={true} className={props.className} />;
 }
 
 export function ClearIcon(props: { className?: string }) {

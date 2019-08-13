@@ -43,6 +43,9 @@ export const inputBlockClasses = useThemeCache(() => {
             [`& + &`]: {
                 marginTop: unit(formElementVars.spacing.margin),
             },
+            [`&.isLast`]: {
+                marginBottom: unit(formElementVars.spacing.margin),
+            },
             [`&.hasError .${inputText}`]: {
                 borderColor: colorOut(globalVars.messageColors.error.fg),
                 backgroundColor: colorOut(globalVars.messageColors.error.fg),

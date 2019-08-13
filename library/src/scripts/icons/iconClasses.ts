@@ -36,8 +36,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const compact = themeVars("compact", {
-        width: 16,
-        height: 16,
+        width: 12,
+        height: 12,
     });
 
     const settings = themeVars("settings", {
@@ -46,8 +46,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const search = themeVars("settings", {
-        width: 13.312,
-        height: 13.311,
+        width: 18,
+        height: 20,
     });
 
     const notifications = themeVars("settings", {
@@ -146,6 +146,7 @@ export const iconClasses = useThemeCache(() => {
     const newFolder = style("newFolder", {
         width: unit(vars.newFolder.width),
         height: unit(vars.newFolder.height),
+        paddingRight: unit(1),
     });
 
     const attachmentError = style("attachmentError", {

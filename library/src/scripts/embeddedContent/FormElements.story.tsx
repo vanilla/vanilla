@@ -78,7 +78,7 @@ story.add("Inputs", () => {
                 <div>{"[Some Input]"}</div>
             </InputBlock>
             <StoryHeading>Input Text Block</StoryHeading>
-            <InputTextBlock label={t("Text Input")} inputProps={{}} />
+            <InputTextBlock label={t("Text Input")} inputProps={{ value: "Some Text!" }} />
             <StoryHeading>Input Text (password type)</StoryHeading>
             <StoryParagraph>You can set the `type` of the text input to any standard HTML5 values.</StoryParagraph>
             <InputTextBlock label={t("Password")} type={"password"} inputProps={{ type: "password" }} />

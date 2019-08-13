@@ -23,14 +23,17 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
+    noContainer?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
     const classes = messagesClasses();
+
+    const WrapperElement = props.noContainer ? React.Fragment : Container;
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
-                <Container>
+                <WrapperElement>
                     <div className={classNames(classes.wrap)}>
                         <div className={classes.message}>{props.contents || props.stringContents}</div>
                         {props.onConfirm && (
@@ -52,7 +55,7 @@ export default function Message(props: IMessageProps) {
                             </Button>
                         )}
                     </div>
-                </Container>
+                </WrapperElement>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />

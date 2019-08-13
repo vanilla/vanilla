@@ -7,12 +7,18 @@ orbs:
                 - run:
                     name: Check target branch
                     command: |
-                        if [[ -n ${CIRCLE_PR_NUMBER} ]]
+                        PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
+
+                        if [ -z "$PR_NUMBER" ]; then
+                            exit
+                        fi
+
+                        if [[ -n ${PR_NUMBER} ]]
                         then
                             curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" \
                                 -o jq
                             chmod +x jq
-                            url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$CIRCLE_PR_NUMBER?access_token=$GITHUB_TOKEN"
+                            url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
                             target_branch=$(
                                 curl "$url" | ./jq '.base.ref' | tr -d '"'
                             )

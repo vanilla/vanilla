@@ -46,7 +46,11 @@ Some checks only run in nighly builds (See the `nightly` workflow vs the `commit
 
 ## Tips & Tricks
 
+-   It is highly recommend to grab the [circleci CLI](https://circleci.com/docs/2.0/local-cli/). This can be used to validate/expand configs, and run single jobs locally.
+-   Workspace attachment is the preferable way to pass data between different parts of workflows. It is very fast. Using the cache commands requires zipping/unzipping/validating all contents, sending that to S3, and downloading it back which is SLOW with a lot of directories (eg. `node_modules`). Be careful with how the caching is used if added, because it can actually slow down builds significantly. See [Caching, Artificats, and Workspaces](https://circleci.com/blog/persisting-data-in-workflows-when-to-use-caching-artifacts-and-workspaces/).
+
 ## Good general resources
 
 -   [Orb authoring guide](https://circleci.com/docs/2.0/orb-author/)
 -   [Minimal Config example w/ inline orbs](https://github.com/CircleCI-Public/config-preview-sdk/tree/v2.1/docs/example_config_pack)
+-   [Persisting Data in Workflows: When to Use Caching, Artifacts, and Workspaces](https://circleci.com/blog/persisting-data-in-workflows-when-to-use-caching-artifacts-and-workspaces/)

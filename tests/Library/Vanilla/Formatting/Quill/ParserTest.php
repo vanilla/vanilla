@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineTerminatorBlot;
@@ -21,16 +22,28 @@ use VanillaTests\Fixtures\EmbeddedContent\EmbedFixtures;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Parser;
 
+/**
+ * Tests for the Quill parser.
+ */
 class ParserTest extends SharedBootstrapTestCase {
 
+    /**
+     * Utility to make a single line in a paragraph's parsed representation.
+     *
+     * @param int $count The number of newlines ot make.
+     *
+     * @return array
+     */
     private function makeParagraphLine(int $count = 1) {
         $content = str_repeat("\n", $count);
         return ["class" => ParagraphLineTerminatorBlot::class, "content" => $content];
     }
 
     /**
-     * @param array $ops
-     * @param array $expected
+     * Assert that some operations turn into some expected parsing results.
+     *
+     * @param array $ops The actual operations.
+     * @param array $expected The expected parse results.
      */
     public function assertParseResults(array $ops, array $expected) {
         $error = "The parser failed to instantiate through the container";
@@ -48,6 +61,61 @@ class ParserTest extends SharedBootstrapTestCase {
         }
     }
 
+    /**
+     * Test converting various content in JSON operations.
+     *
+     * @param string $input
+     * @param array $expectedOps
+     * @param string|null $expectedExceptionClass
+     *
+     * @dataProvider provideJsonToOps
+     */
+    public function testJsonToOperations(string $input, array $expectedOps, ?string $expectedExceptionClass = null) {
+        if ($expectedExceptionClass) {
+            $this->expectException($expectedExceptionClass);
+        }
+        $actual = Parser::jsonToOperations($input);
+        $this->assertSame($actual, $expectedOps);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideJsonToOps(): array {
+        return [
+            'empty' => [
+                '',
+                Parser::SINGLE_NEWLINE_CONTENTS,
+            ],
+            'empty array' => [
+                '[]',
+                Parser::SINGLE_NEWLINE_CONTENTS,
+            ],
+            'mangled content' => [
+                '[asdf%$}}}}',
+                [],
+                FormattingException::class
+            ],
+            'good content' => [
+                json_encode(Parser::SINGLE_NEWLINE_CONTENTS),
+                Parser::SINGLE_NEWLINE_CONTENTS,
+            ],
+            'not an array' => [
+                '{ "insert": "\n" }',
+                [],
+                FormattingException::class,
+            ],
+            'not an array 2' => [
+                'false',
+                [],
+                FormattingException::class,
+            ],
+        ];
+    }
+
+    /**
+     * Test parsing of an external blot.
+     */
     public function testParseExternalBlot() {
         $ops = [[
             "insert" => [

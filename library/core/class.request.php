@@ -191,8 +191,10 @@ class Gdn_Request implements RequestInterface {
                     $value = !is_null($value) ? trim($value, '/') : $value;
                     break;
                 case 'HOST':
-                    $hostParts = explode(':', $value);
-                    $value = array_shift($hostParts);
+                    //debug_print_backtrace();
+                    //die();
+//                    $hostParts = explode(':', $value);
+//                    $value = array_shift($hostParts);
                     break;
                 case 'METHOD':
                     $value = strtoupper($value);
@@ -730,63 +732,27 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Load the basics of the current environment
-     *
-     * The purpose of this method is to consolidate all the various environment information into one
-     * array under a set of common names, thereby removing the tedium of figuring out which superglobal
-     * and key combination contain the requested information each time it is needed.
-     *
-     * @return void
+     * Load host related environment variables: SCHEME, HOST, PORT
      */
-    protected function _loadEnvironment() {
-        $this->_environmentElement('ConfigWebRoot', Gdn::config('Garden.WebRoot'));
-        $this->_environmentElement('ConfigStripUrls', Gdn::config('Garden.StripWebRoot', false));
-
+    private function loadHost() {
         if (isset($_SERVER['HTTP_HOST'])) {
             $host = $_SERVER['HTTP_HOST'];
         } else {
             $host = $_SERVER['SERVER_NAME'] ?? false;
         }
-
         // The host can have the port passed in, remove it here if it exists
-        $hostParts = explode(':', $host, 2);
-        $host = $hostParts[0];
-
         $rawPort = null;
-        if (count($hostParts) > 1) {
-            $rawPort = $hostParts[1];
-        }
-
-        $this->_environmentElement('HOST', $host);
-        $this->_environmentElement('METHOD', $_SERVER['REQUEST_METHOD'] ?? 'CONSOLE');
-
-        // Request IP
-
-        // Load balancers
-        $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? false;
-
-
-        if (strpos($ip, ',') !== false) {
-            $matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $ip, $matches);
-
-            // If we found matching IPs
-            if ($matched) {
-                $ips = $matches[1];
-                $ip = $ips[0];
-
-                // Fallback
-            } else {
-                $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? false;
-
-                if (strpos($remoteAddr, ',') !== false) {
-                    $remoteAddr = substr($remoteAddr, 0, strpos($remoteAddr, ','));
-                }
-
-                $ip = $remoteAddr;
+        //if $host is pure ipv4 ior ipv6 address skip port detection part
+        if ($host !== filter_var($host, FILTER_VALIDATE_IP)) {
+            // we can't use explode() function here
+            // because host:port could be valid ipv6 address with port, like: [::1]:8080 or [2001:db8::1]:8080
+            if ($splitPos = strrpos($host, ':')) {
+                $rawPort = substr($host, -(strlen($host) - $splitPos - 1));
+                $host = substr($host, 0, $splitPos);
             }
         }
 
-        $this->_environmentElement('ADDRESS', $ip);
+        $this->_environmentElement('HOST', $host);
 
         // Request Scheme
 
@@ -816,6 +782,52 @@ class Gdn_Request implements RequestInterface {
             }
         }
         $this->port($port);
+    }
+
+    /**
+     * Load the basics of the current environment
+     *
+     * The purpose of this method is to consolidate all the various environment information into one
+     * array under a set of common names, thereby removing the tedium of figuring out which superglobal
+     * and key combination contain the requested information each time it is needed.
+     *
+     * @return void
+     */
+    protected function _loadEnvironment() {
+        $this->_environmentElement('ConfigWebRoot', Gdn::config('Garden.WebRoot'));
+        $this->_environmentElement('ConfigStripUrls', Gdn::config('Garden.StripWebRoot', false));
+
+        $this->loadHost();
+
+        $this->_environmentElement('METHOD', $_SERVER['REQUEST_METHOD'] ?? 'CONSOLE');
+
+        // Request IP
+
+        // Load balancers
+        $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? false;
+
+
+        if (strpos($ip, ',') !== false) {
+            $matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $ip, $matches);
+
+            // If we found matching IPs
+            if ($matched) {
+                $ips = $matches[1];
+                $ip = $ips[0];
+
+                // Fallback
+            } else {
+                $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? false;
+
+                if (strpos($remoteAddr, ',') !== false) {
+                    $remoteAddr = substr($remoteAddr, 0, strpos($remoteAddr, ','));
+                }
+
+                $ip = $remoteAddr;
+            }
+        }
+
+        $this->_environmentElement('ADDRESS', $ip);
 
         $path = '';
         if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {

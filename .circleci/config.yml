@@ -23,8 +23,8 @@ orbs:
                             target_branch=$(
                                 curl "$url" | ./jq '.base.ref' | tr -d '"'
                             )
-                            echo 'Found target branch "$target_branch"'.
-                            echo 'CUSTOM_TARGET_BRANCH="$target_branch"' >> $BASH_ENV
+                            echo "Found target branch $target_branch".
+                            echo "CUSTOM_TARGET_BRANCH='$target_branch'" >> $BASH_ENV
                         fi
                 - run:
                     name: Checkout

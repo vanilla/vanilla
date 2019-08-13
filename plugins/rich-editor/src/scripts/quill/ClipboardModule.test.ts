@@ -70,7 +70,7 @@ describe("ClipboardModule", () => {
                     out: [
                         OpUtils.op("Unordered"),
                         OpUtils.list(ListType.BULLETED),
-                        OpUtils.op("\nOrdered"),
+                        OpUtils.op("Ordered"),
                         OpUtils.list(ListType.ORDERED),
                     ],
                 },

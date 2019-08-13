@@ -53,6 +53,10 @@ interface IState {
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
 }
 
+// With some effort we could probably calculate this value.
+// For now this is good enough.
+const APPROXIMATE_MAX_MENU_HEIGHT = 170;
+
 // Implements the paragraph menubar
 export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
     private quill: Quill;
@@ -280,7 +284,9 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            this.props.renderAbove || (scrollBounds.height >= 170 && scrollBounds.height - bounds.bottom <= 170)
+            this.props.renderAbove ||
+                (scrollBounds.height >= APPROXIMATE_MAX_MENU_HEIGHT &&
+                    scrollBounds.height - bounds.bottom <= APPROXIMATE_MAX_MENU_HEIGHT)
                 ? "isUp"
                 : "isDown",
         );

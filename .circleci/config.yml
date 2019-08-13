@@ -2,7 +2,7 @@ version: 2.1
 orbs:
     vanilla:
         commands:
-            get_target_branch:
+            checkout:
                 steps:
                 - run:
                     name: Check target branch
@@ -16,9 +16,6 @@ orbs:
                             export CUSTOM_TARGET_BRANCH=$(
                                 curl "$url" | ./jq '.base.ref' | tr -d '"'
                             )
-            checkout:
-                steps:
-                - vanilla/get_target_branch
                 - run:
                     name: Checkout
                     command: |

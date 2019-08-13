@@ -7,6 +7,9 @@ orbs:
                 - run:
                     name: Check target branch
                     command: |
+                        # Script for creating an environmental variable for the target branch.
+                        # CircleCI idea to provide this automatically: https://ideas.circleci.com/ideas/CCI-I-894
+                        # Saves the env variable into
                         PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
 
                         if [ -z "$PR_NUMBER" ]; then
@@ -27,16 +30,12 @@ orbs:
                 - run:
                     name: Checkout
                     command: |
-                        # !/bin/bash
                         # Script for checking out our git repo.
                         # Fixes a few shortcomings of the built in `checkout script`.
                         #
-                        # - Merges the target branch into our branch if possible.
-                        #   this ensures that all tests pass with the latest upstream changes.
-                        #   https://ideas.circleci.com/ideas/CCI-I-431
-                        # - Get's rid of the `git reset --hard` to preserve default branch history.
-                        #   https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
-                        #   https://discuss.circleci.com/t/the-checkout-step-mangles-branches-messes-the-history/24975
+                        # Get's rid of the `git reset --hard` to preserve default branch history.
+                        # https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
+                        # https://discuss.circleci.com/t/the-checkout-step-mangles-branches-messes-the-history/24975
                         set -e
 
                         # Add githubs known SSH key.
@@ -87,6 +86,10 @@ orbs:
                 - run:
                     name: Merge master
                     command: |
+                        # Merges the target branch into our branch if possible.
+                        # this ensures that all tests pass with the latest upstream changes
+                        #
+                        # https://ideas.circleci.com/ideas/CCI-I-431
                         set -eu -o pipefail
                         cd $TARGET_DIR
                         # Merge target branch back into ourselves if we need to.

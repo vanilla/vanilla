@@ -103,7 +103,7 @@ export const iconVariables = useThemeCache(() => {
     const categoryIcon = themeVars("categoryIcon", {
         width: 18,
         height: 18,
-        opacity: ".8",
+        opacity: 0.8,
     });
 
     return {

@@ -16,12 +16,10 @@ orbs:
 
                         if [[ -n ${PR_NUMBER} ]]
                         then
-                            curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" \
-                                -o jq
-                            chmod +x jq
+                            sudo apt-get update && sudo apt-get install -y jq
                             url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
                             target_branch=$(
-                                curl "$url" | ./jq '.base.ref' | tr -d '"'
+                                curl "$url" | jq '.base.ref' | tr -d '"'
                             )
                             echo "Found target branch $target_branch".
                             echo "CUSTOM_TARGET_BRANCH='$target_branch'" >> $BASH_ENV

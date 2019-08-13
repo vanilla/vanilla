@@ -25,7 +25,7 @@ orbs:
 
                         (umask 077; touch ~/.ssh/id_rsa)
                         chmod 0600 ~/.ssh/id_rsa
-                        (cat <<EOF > ~/.ssh/id_rsa
+                        (cat \<\<EOF > ~/.ssh/id_rsa
                         $CHECKOUT_KEY
                         EOF
                         )
@@ -82,7 +82,7 @@ orbs:
 
                         if [ "$err" -ne "0" ]; then
                             echo
-                            echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
+                            # echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
                             echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
                             exit $err
                         fi

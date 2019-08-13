@@ -181,7 +181,7 @@ aliases:
                 .circleci/scripts/php-lint.sh ./themes
 
                 # Run code sniffer on the diffed files.
-                ./.circleci/scripts/diff-standards.sh
+                ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
     - &prepare_mysql
         run:
             name: Prepare Database Dependencies

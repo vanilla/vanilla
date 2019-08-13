@@ -1,4 +1,91 @@
-version: 2
+version: 2.1
+orbs:
+    vanilla:
+        commands:
+            checkout:
+                steps:
+                - run:
+                    name: Checkout
+                    command: |
+                        # !/bin/bash
+                        # Script for checking out our git repo.
+                        # Fixes a few shortcomings of the built in `checkout script`.
+                        #
+                        # - Merges the target branch into our branch if possible.
+                        #   this ensures that all tests pass with the latest upstream changes.
+                        #   https://ideas.circleci.com/ideas/CCI-I-431
+                        # - Get's rid of the `git reset --hard` to preserve default branch history.
+                        #   https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
+                        #   https://discuss.circleci.com/t/the-checkout-step-mangles-branches-messes-the-history/24975
+                        set -e
+
+                        mkdir -p ~/.ssh
+
+                        echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' >> ~/.ssh/known_hosts
+
+                        (umask 077; touch ~/.ssh/id_rsa)
+                        chmod 0600 ~/.ssh/id_rsa
+                        (cat <<EOF > ~/.ssh/id_rsa
+                        $CHECKOUT_KEY
+                        EOF
+                        )
+
+                        # use git+ssh instead of https
+                        git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
+                        git config --global gc.auto 0 || true
+
+                        if [ -e $TARGET_DIR/.git ]
+                        then
+                            cd $TARGET_DIR
+                            git remote set-url origin "$CIRCLE_REPOSITORY_URL" || true
+                        else
+                            mkdir -p $TARGET_DIR
+                            cd $TARGET_DIR
+                            git clone "$CIRCLE_REPOSITORY_URL" .
+                            ls
+                        fi
+
+                        echo $PWD
+                        ls ~/workspace
+
+                        if [ -n "$CIRCLE_TAG" ]
+                        then
+                            git fetch --force origin "refs/tags/${CIRCLE_TAG}"
+                        else
+                            git fetch --force origin "${CIRCLE_BRANCH}:remotes/origin/${CIRCLE_BRANCH}"
+                        fi
+
+                        if [ -n "$CIRCLE_TAG" ]
+                        then
+                            # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
+                            git checkout -q "$CIRCLE_TAG"
+                        elif [ -n "$CIRCLE_BRANCH" ]
+                        then
+                            # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
+                            git checkout -q "$CIRCLE_BRANCH"
+                        fi
+                        # Ensures the remote and local branch are in sync after the fetch (see above).
+                        git reset --hard "$CIRCLE_SHA1"
+
+
+                        # Merge target branch back into ourselves if we need to.
+                        set -eu -o pipefail
+
+                        PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
+                        err=0
+
+                        if [ -z "$PR_NUMBER" ]; then
+                            exit
+                        fi
+
+                        (set -x && git pull --ff-only origin "refs/pull/$PR_NUMBER/merge") || err=$?
+
+                        if [ "$err" -ne "0" ]; then
+                            echo
+                            echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
+                            echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
+                            exit $err
+                        fi
 aliases:
     - &db_env
         MYSQL_USER: circleci
@@ -17,91 +104,6 @@ aliases:
         - image: circleci/php:7.3.6-fpm-stretch-node
         - image: mysql:5.7.26
           environment: *db_env
-    - &better_checkout
-        run:
-            name: Checkout
-            command: |
-                # !/bin/bash
-                # Script for checking out our git repo.
-                # Fixes a few shortcomings of the built in `checkout script`.
-                #
-                # - Merges the target branch into our branch if possible.
-                #   this ensures that all tests pass with the latest upstream changes.
-                #   https://ideas.circleci.com/ideas/CCI-I-431
-                # - Get's rid of the `git reset --hard` to preserve default branch history.
-                #   https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
-                #   https://discuss.circleci.com/t/the-checkout-step-mangles-branches-messes-the-history/24975
-                set -e
-
-                mkdir -p ~/.ssh
-
-                echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
-                bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
-                ' >> ~/.ssh/known_hosts
-
-                (umask 077; touch ~/.ssh/id_rsa)
-                chmod 0600 ~/.ssh/id_rsa
-                (cat <<EOF > ~/.ssh/id_rsa
-                $CHECKOUT_KEY
-                EOF
-                )
-
-                # use git+ssh instead of https
-                git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
-                git config --global gc.auto 0 || true
-
-                if [ -e $TARGET_DIR/.git ]
-                then
-                    cd $TARGET_DIR
-                    git remote set-url origin "$CIRCLE_REPOSITORY_URL" || true
-                else
-                    mkdir -p $TARGET_DIR
-                    cd $TARGET_DIR
-                    git clone "$CIRCLE_REPOSITORY_URL" .
-                    ls
-                fi
-
-                echo $PWD
-                ls ~/workspace
-
-                if [ -n "$CIRCLE_TAG" ]
-                then
-                    git fetch --force origin "refs/tags/${CIRCLE_TAG}"
-                else
-                    git fetch --force origin "${CIRCLE_BRANCH}:remotes/origin/${CIRCLE_BRANCH}"
-                fi
-
-                if [ -n "$CIRCLE_TAG" ]
-                then
-                    # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
-                    git checkout -q "$CIRCLE_TAG"
-                elif [ -n "$CIRCLE_BRANCH" ]
-                then
-                    # git reset --hard "$CIRCLE_SHA1"  # Commented out because it wrecks local git branch.es
-                    git checkout -q "$CIRCLE_BRANCH"
-                fi
-                # Ensures the remote and local branch are in sync after the fetch (see above).
-                git reset --hard "$CIRCLE_SHA1"
-
-
-                # Merge target branch back into ourselves if we need to.
-                set -eu -o pipefail
-
-                PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
-                err=0
-
-                if [ -z "$PR_NUMBER" ]; then
-                    exit
-                fi
-
-                (set -x && git pull --ff-only origin "refs/pull/$PR_NUMBER/merge") || err=$?
-
-                if [ "$err" -ne "0" ]; then
-                    echo
-                    echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
-                    echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
-                    exit $err
-                fi
     - &is_php
         run:
             name: Configuring as Frontend
@@ -194,7 +196,7 @@ jobs:
                     node --version
                     yarn --version
             - *is_frontend
-            - *better_checkout
+            - vanilla/checkout
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -251,7 +253,7 @@ jobs:
                     php --version
                     composer --version
             - *is_php
-            - *better_checkout
+            - vanilla/checkout
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
@@ -263,7 +265,7 @@ jobs:
         docker: *php72
         steps: &php_lint_steps
             - *is_php
-            - *better_checkout
+            - vanilla/checkout
             - *run_composer
             - *run_php_lint
     php_72_tests:
@@ -334,7 +336,7 @@ jobs:
         docker: *php72
         steps:
             - *is_frontend
-            - *better_checkout
+            - vanilla/checkout
             - *post_checkout_frontend
             - run: yarn audit
 

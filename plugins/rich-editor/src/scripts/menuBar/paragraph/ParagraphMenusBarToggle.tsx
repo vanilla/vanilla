@@ -280,7 +280,9 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            this.props.renderAbove || scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
+            this.props.renderAbove || (scrollBounds.height >= 170 && scrollBounds.height - bounds.bottom <= 170)
+                ? "isUp"
+                : "isDown",
         );
     }
 

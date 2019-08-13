@@ -124,6 +124,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         position: "relative",
         width: unit(vars.menuButton.size * 4),
         overflow: "hidden",
+        zIndex: 1,
     });
 
     const menuBarToggles = style("menuBarToggles", {

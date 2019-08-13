@@ -9,17 +9,18 @@ import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { resetQuillContent, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import classNames from "classnames";
-import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { IAutoHighlightResult } from "highlight.js";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -49,6 +50,29 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
+let highLightJs: any;
+
+/**
+ * Use a dynamically imported highlight.js to highlight text synchronously.
+ *
+ * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
+ * but until then we need this hack.60FPS
+ *
+ * - If highLightJs is loaded, run it.
+ * - Otherwise return the text back and start loading highLightJs.
+ */
+function highLightText(text: string): IAutoHighlightResult | string {
+    if (!highLightJs) {
+        void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
+            highLightJs = imported.default;
+            highLightJs.highlightAuto(text).value;
+        });
+        return text;
+    } else {
+        return highLightJs.highlightAuto(text).value;
+    }
+}
+
 /**
  * Manage and construct a quill instance ot some ref.
  *
@@ -64,7 +88,7 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
             theme: "vanilla",
             modules: {
                 syntax: {
-                    highlight: text => hljs.highlightAuto(text).value,
+                    highlight: highLightText,
                 },
             },
         };
@@ -168,6 +192,10 @@ function useOperationsQueue() {
 
             if (typeof operation === "string") {
                 quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+                // Trim starting whitespace if we have it.
+                if (quill.getText(0, 1) === "\n") {
+                    quill.updateContents([{ delete: 1 }]);
+                }
             } else {
                 const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
                 quill.updateContents([offsetOperations, ...operation]);

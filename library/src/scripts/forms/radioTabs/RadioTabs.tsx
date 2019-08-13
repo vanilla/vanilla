@@ -10,6 +10,7 @@ import TabContext from "@library/contexts/TabContext";
 import classNames from "classnames";
 import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 interface IProps {
     prefix: string;
@@ -34,6 +35,7 @@ export default class RadioTabs extends React.Component<IProps> {
 
     public render() {
         const classes = radioTabClasses();
+        const classesInputBlock = inputBlockClasses();
         return (
             <TabContext.Provider
                 value={{
@@ -46,7 +48,7 @@ export default class RadioTabs extends React.Component<IProps> {
                 <fieldset
                     className={classNames(
                         "_searchBarAdvanced-searchIn",
-                        "inputBlock",
+                        classesInputBlock.root,
                         classes.root,
                         this.props.className,
                     )}

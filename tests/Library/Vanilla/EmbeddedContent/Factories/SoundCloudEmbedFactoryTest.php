@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\SoundCloudEmbed;
 use Vanilla\EmbeddedContent\Factories\SoundCloudEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class SoundCloudEmbedFactoryTest extends ContainerTestCase {
+class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var SoundCloudEmbedFactory */
     private $factory;

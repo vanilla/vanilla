@@ -3,10 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { DeviceProvider } from "@library/layout/DeviceContext";
+import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
+import classNames from "classnames";
+import React, { useRef, useState } from "react";
+import { useFocusWatcher } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -21,11 +24,40 @@ interface IProps extends IBaseEmbedProps {
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
+    const [contentElement, setContentElement] = useState<HTMLDivElement | null>(null);
+    const [isFocused, setFocused] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    useFocusWatcher(contentElement, newFocusValue => {
+        setFocused(newFocusValue);
+    });
+
     return (
-        <EmbedContent type="Image" inEditor={props.inEditor}>
-            <div className="embedImage-link">
-                <img className="embedImage-img" src={props.url} alt={props.name} />
+        <DeviceProvider>
+            <div
+                ref={ref => setContentElement(ref)}
+                className={classNames("embedImage", embedMenuClasses().imageContainer)}
+            >
+                <div className="embedImage-link">
+                    <img
+                        className={classNames("embedImage-img", FOCUS_CLASS)}
+                        src={props.url}
+                        alt={props.name}
+                        tabIndex={props.inEditor ? -1 : undefined}
+                    />
+                </div>
+                {props.inEditor && (isFocused || isOpen) && (
+                    <ImageEmbedMenu
+                        onVisibilityChange={setIsOpen}
+                        onSave={newValue => {
+                            props.syncBackEmbedValue &&
+                                props.syncBackEmbedValue({
+                                    name: newValue.alt,
+                                });
+                        }}
+                        initialAlt={props.name}
+                    />
+                )}
             </div>
-        </EmbedContent>
+        </DeviceProvider>
     );
 }

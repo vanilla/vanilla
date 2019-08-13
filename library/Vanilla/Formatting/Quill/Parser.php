@@ -19,6 +19,11 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
+    /** @var array Represents the operations of an "empty" body. */
+    const SINGLE_NEWLINE_CONTENTS = [[
+        'insert' => "\n",
+    ]];
+
     const PARSE_MODE_NORMAL = "normal";
     const PARSE_MODE_QUOTE = "quote";
 
@@ -142,12 +147,42 @@ class Parser {
      * @throws FormattingException If valid operations could not be produced.
      */
     public static function jsonToOperations(string $json): array {
+        // Ensure that empty posts still get some body content.
+        // This will ensure that they will render/validate correctly where empty is allowed
+        // And that empty bodies by properly caught in length validation.
+        if (empty($json)) {
+            return self::SINGLE_NEWLINE_CONTENTS;
+        }
         $operations = json_decode($json, true);
 
+        $errMessage = "JSON could not be converted into quill operations.\n $json";
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($operations)) {
-            throw new FormattingException("JSON could not be converted into quill operations.\n $json");
+            throw new FormattingException($errMessage);
         }
+
+        // Also normalizing an empty array to have at least 1 operation.
+        if (empty($operations)) {
+            return self::SINGLE_NEWLINE_CONTENTS;
+        }
+
+        if (!self::areArrayKeysSequentialInts($operations)) {
+            throw new FormattingException($errMessage);
+        }
+
         return $operations;
+    }
+
+    /**
+     * Determine if an array is sequential (IE. not assosciative).
+     *
+     * @param array $arr
+     * @return bool
+     */
+    private static function areArrayKeysSequentialInts(array &$arr): bool {
+        for (reset($arr), $base = 0; key($arr) === $base++;) {
+            next($arr);
+        }
+        return is_null(key($arr));
     }
 
     /**

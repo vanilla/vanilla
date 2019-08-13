@@ -1,6 +1,15 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+use Garden\EventManager;
 use Nbbc\BBCode as Nbbc;
 
+/**
+ * A wrapper around Nbbc\BBCode with some custom configuration.
+ */
 class BBCode extends Gdn_Pluggable {
 
     /**
@@ -12,6 +21,17 @@ class BBCode extends Gdn_Pluggable {
      * @var Nbbc An instance of Nbbc\BBcode.
      */
     protected $nbbc;
+
+    /** @var EventManager */
+    private $eventManager;
+
+    /**
+     * @param EventManager $eventManager
+     */
+    public function __construct(EventManager $eventManager = null) {
+        // There are some old empty constructed usages.
+        $this->eventManager = $eventManager ?? \Gdn::getContainer()->get(EventManager::class);
+    }
 
     /**
      * Perform formatting against a string for the attach tag.
@@ -310,7 +330,7 @@ class BBCode extends Gdn_Pluggable {
                 $commentIDList[] = $controller->Comment->CommentID;
             }
 
-            $this->fireEvent('BeforePreloadDiscussionMedia');
+            $this->eventManager->fire('BBCode_BeforePreloadDiscussionMedia');
 
             $mediaQuery = Gdn::sql()
                 ->select('m.*')
@@ -500,8 +520,7 @@ class BBCode extends Gdn_Pluggable {
             $nbbc->addRule('tr', []);
             $nbbc->addRule('td', []);
 
-            $this->EventArguments['BBCode'] = $nbbc;
-            $this->fireEvent('AfterBBCodeSetup');
+            $this->eventManager->fire('BBCode_AfterBBCodeSetup', $this, ['BBCode' => $nbbc]);
             $this->nbbc = $nbbc;
         }
 

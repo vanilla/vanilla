@@ -19,6 +19,7 @@ import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { onContent } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
+import Quill from "quill/core";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
@@ -31,6 +32,8 @@ export interface IBaseEmbedProps {
     // Frontend only
     inEditor?: boolean;
     onRenderComplete?: () => void;
+    syncBackEmbedValue?: (values: object) => void;
+    quill?: Quill | null;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {

@@ -8,13 +8,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
 use Vanilla\EmbeddedContent\Factories\TwitterEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class TwitterEmbedFactoryTest extends ContainerTestCase {
+class TwitterEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var TwitterEmbedFactory */
     private $factory;

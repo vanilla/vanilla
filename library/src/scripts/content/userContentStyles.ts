@@ -4,13 +4,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, setAllLinkColors } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
+import { notUserContent } from "@library/flyouts/dropDownStyles";
 
 const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -73,7 +74,20 @@ const userContentVariables = useThemeCache(() => {
         },
     });
 
-    return { fonts, list, blocks, code, codeInline, codeBlock, embeds };
+    const spacing = makeThemeVars("spacing", {
+        base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
+    });
+
+    return {
+        fonts,
+        list,
+        blocks,
+        code,
+        codeInline,
+        codeBlock,
+        embeds,
+        spacing,
+    };
 });
 
 /**
@@ -103,18 +117,18 @@ export const userContentClasses = useThemeCache(() => {
 
     const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): NestedCSSProperties => {
         return {
-            marginTop: globalVars.spacer.size,
+            marginTop: unit(vars.spacing.base),
             fontSize,
             $nest: lineHeightAdjustment(),
         };
     };
     const headings: NestedCSSSelectors = {
-        "& h1": headingStyle("h1", vars.fonts.headings.h1),
-        "& h2": headingStyle("h2", vars.fonts.headings.h2),
-        "& h3": headingStyle("h3", vars.fonts.headings.h3),
-        "& h4": headingStyle("h4", vars.fonts.headings.h4),
-        "& h5": headingStyle("h5", vars.fonts.headings.h5),
-        "& h6": headingStyle("h6", vars.fonts.headings.h6),
+        "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h1),
+        "& h2:not(.heading)": headingStyle("h2", vars.fonts.headings.h2),
+        "& h3:not(.heading)": headingStyle("h3", vars.fonts.headings.h3),
+        "& h4:not(.heading)": headingStyle("h4", vars.fonts.headings.h4),
+        "& h5:not(.heading)": headingStyle("h5", vars.fonts.headings.h5),
+        "& h6:not(.heading)": headingStyle("h6", vars.fonts.headings.h6),
     };
 
     const lists: NestedCSSSelectors = {
@@ -125,14 +139,14 @@ export const userContentClasses = useThemeCache(() => {
             ...listItem,
             listStyle: "decimal",
         },
-        "& ul li": {
+        [`& ul li:not('.${notUserContent}')`]: {
             ...listItem,
             listStyle: "initial",
         },
     };
 
     const paragraphSpacing: NestedCSSSelectors = {
-        "& p": {
+        "& > p": {
             marginTop: 0,
             marginBottom: 0,
             $nest: {
@@ -150,6 +164,7 @@ export const userContentClasses = useThemeCache(() => {
         },
 
         "&& > *:first-child": {
+            $unique: true, // Required to prevent collapsing in with some other variable.
             marginTop: 0,
         },
     };

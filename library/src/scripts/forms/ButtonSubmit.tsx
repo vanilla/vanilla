@@ -30,20 +30,12 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
     }
 
     public render() {
-        const componentClasses = classNames(
-            "Primary",
-            "buttonCTA",
-            "BigButton",
-            "button-fullWidth",
-            this.props.className,
-        );
-
         return (
             <Button
                 id={this.props.id}
                 disabled={this.props.disabled}
                 submit={true}
-                className={componentClasses}
+                className={this.props.className}
                 prefix="submitButton"
                 legacyMode={this.props.legacyMode}
                 baseClass={this.props.baseClass}

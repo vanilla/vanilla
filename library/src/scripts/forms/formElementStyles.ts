@@ -45,10 +45,6 @@ export const formElementsVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
-    const miniInput = makeThemeVars("miniInput", {
-        width: 100,
-    });
-
     const colors = makeThemeVars("colors", {
         fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
@@ -91,7 +87,6 @@ export const formElementsVariables = useThemeCache(() => {
         border,
         giantInput,
         largeInput,
-        miniInput,
         colors,
         placeholder,
         disabled,

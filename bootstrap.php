@@ -3,7 +3,10 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
@@ -295,6 +298,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
+    ->rule(\Emoji::class)
+    ->setShared(true)
+
     ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
@@ -312,7 +318,16 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule(Vanilla\Formatting\FormatService::class)
-    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
+    ->addCall('registerBuiltInFormats')
+    ->setShared(true)
+
+    ->rule(LegacyEmbedReplacer::class)
+    ->setShared(true)
+
+    ->rule(HtmlEnhancer::class)
+    ->setShared(true)
+
+    ->rule(HtmlSanitizer::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Analytics\Client::class)

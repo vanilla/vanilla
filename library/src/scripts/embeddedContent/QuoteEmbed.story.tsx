@@ -1,5 +1,5 @@
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -11,7 +11,7 @@ import React from "react";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { IUserFragment } from "@library/@types/api/users";
 
-const reactionsStory = storiesOf("Embeds", module);
+const story = storiesOf("Embeds", module);
 
 // tslint:disable:jsx-use-translation-function
 
@@ -28,7 +28,7 @@ const dummyUser: IUserFragment = {
 
 const dummyDate = "2019-02-10T23:54:14+00:00";
 
-reactionsStory.add("QuoteEmbed", () => {
+story.add("QuoteEmbed", () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: QuoteEmbed</StoryHeading>

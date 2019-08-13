@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Factories\ImgurEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class ImgurEmbedFactoryTest extends ContainerTestCase {
+class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var ImgurEmbedFactory */
     private $factory;

@@ -13,9 +13,10 @@ orbs:
                                 -o jq
                             chmod +x jq
                             url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$CIRCLE_PR_NUMBER?access_token=$GITHUB_TOKEN"
-                            export CUSTOM_TARGET_BRANCH=$(
+                            target_branch=$(
                                 curl "$url" | ./jq '.base.ref' | tr -d '"'
                             )
+                            echo 'CUSTOM_TARGET_BRANCH="target_branch"' >> $BASH_ENV
                 - run:
                     name: Checkout
                     command: |

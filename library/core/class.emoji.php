@@ -247,7 +247,7 @@ class Emoji {
             $this->enabled = false;
         }
 
-        $eventManager->fire('Emoji_Init', $this);
+        $eventManager->fire('Emoji_Init', $this, []); // Empty $argrs array needed for backwards compatibility.
 
         // Add emoji to definition list for whole site. This used to be in the
         // advanced editor plugin, but since moving atmentions to core, had to

@@ -23,13 +23,13 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
-    noContainer?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
     const classes = messagesClasses();
 
-    const WrapperElement = props.noContainer ? React.Fragment : Container;
+    // When fixed we need to apply an extra layer for padding.
+    const WrapperElement = props.isFixed ? Container : React.Fragment;
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>

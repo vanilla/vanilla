@@ -330,7 +330,8 @@ class BBCode extends Gdn_Pluggable {
                 $commentIDList[] = $controller->Comment->CommentID;
             }
 
-            $this->eventManager->fire('BBCode_BeforePreloadDiscussionMedia');
+            // Empty array needed for backwards compatibility args.
+            $this->eventManager->fire('BBCode_BeforePreloadDiscussionMedia', $this, []);
 
             $mediaQuery = Gdn::sql()
                 ->select('m.*')

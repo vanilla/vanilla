@@ -88,13 +88,23 @@ orbs:
                         fi
                         # Ensures the remote and local branch are in sync after the fetch (see above).
                         git reset --hard "$CIRCLE_SHA1"
-
-
+                - run:
+                    name: Merge master
+                    command: |
+                        set -eu -o pipefail
                         # Merge target branch back into ourselves if we need to.
+                        err=0
                         if [ -n "$CUSTOM_TARGET_BRANCH" ]
                         then
-                            git merge-base $CUSTOM_TARGET_BRANCH
+                            (set -x && git merge $CUSTOM_TARGET_BRANCH) || err=$?
                         fi
+
+                        if [ "$err" -ne "0" ]
+                        then
+                            echo -e "\033[0;31mERROR: Failed to merge your branch with target branch $CUSTOM_TARGET_BRANCH."
+                            echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
+                        fi
+                        exit $err
 aliases:
     - &db_env
         MYSQL_USER: circleci

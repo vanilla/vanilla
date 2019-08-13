@@ -2,8 +2,23 @@ version: 2.1
 orbs:
     vanilla:
         commands:
+            get_target_branch:
+                steps:
+                - run:
+                    name: Check target branch
+                    command: |
+                        if [[ -n ${CIRCLE_PR_NUMBER} ]]
+                        then
+                            curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" \
+                                -o jq
+                            chmod +x jq
+                            url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$CIRCLE_PR_NUMBER?access_token=$GITHUB_TOKEN"
+                            export CUSTOM_TARGET_BRANCH=$(
+                                curl "$url" | ./jq '.base.ref' | tr -d '"'
+                            )
             checkout:
                 steps:
+                - vanilla/get_target_branch
                 - run:
                     name: Checkout
                     command: |
@@ -69,22 +84,9 @@ orbs:
 
 
                         # Merge target branch back into ourselves if we need to.
-                        set -eu -o pipefail
-
-                        PR_NUMBER=${CI_PULL_REQUEST//*pull\//}
-                        err=0
-
-                        if [ -z "$PR_NUMBER" ]; then
-                            exit
-                        fi
-
-                        (set -x && git pull --ff-only origin "refs/pull/$PR_NUMBER/merge") || err=$?
-
-                        if [ "$err" -ne "0" ]; then
-                            echo
-                            # echo -e "\033[0;31mERROR: Failed to merge your branch with the latest master."
-                            echo -e "Please manually merge master into your branch, and push the changes to GitHub.\033[0m"
-                            exit $err
+                        if [ -n "$CUSTOM_TARGET_BRANCH" ]
+                        then
+                            git merge-base $CUSTOM_TARGET_BRANCH
                         fi
 aliases:
     - &db_env

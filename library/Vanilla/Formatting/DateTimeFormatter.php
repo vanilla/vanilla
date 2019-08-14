@@ -47,7 +47,8 @@ class DateTimeFormatter {
         }
 
         if ($timestamp === null) {
-            return self::t('Null Date', self::NULL_TIMESTAMP_DEFALT_VALUE);
+            return self::t('Null Da' .
+                'te', self::NULL_TIMESTAMP_DEFALT_VALUE);
         }
 
         $gmTimestamp = $timestamp;

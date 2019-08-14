@@ -11,7 +11,7 @@ $nestedList-margin: 0 0 0 1em;
 
 .userContent ul,
 .userContent ol {
-    margin: 1em 0 1em 3em;
+    margin: 1em 0 1em 2em;
 }
 
 .userContent {
@@ -47,7 +47,15 @@ $nestedList-margin: 0 0 0 1em;
 .userContent {
     ul {
         li {
-            list-style: disc !important;
+            list-style: none !important;
+            position: "relative";
+
+            &::before {
+                content: "•";
+                font-family: 'Arial', serif;
+                position: "absolute";
+                left: em(-1);
+            }
         }
         ol,
         ul {

@@ -170,10 +170,17 @@ export const userContentClasses = useThemeCache(() => {
         ["& ul"]: {
             listStylePosition: "inside",
             listStyle: "disc",
-            margin: `1em 0 1em 3em`,
+            margin: `1em 0 1em 2em`,
             $nest: {
                 [`& li`]: {
-                    listStyle: "disc",
+                    listStyle: "none",
+                    position: "relative",
+                },
+                [`& li::before`]: {
+                    fontFamily: `'Arial', serif`,
+                    content: `"•"`,
+                    position: "absolute",
+                    left: em(-1),
                 },
                 [`& ol, & ul`]: {
                     margin: vars.list.nestedList.margin,

@@ -75,6 +75,16 @@ export const iconVariables = useThemeCache(() => {
         height: 20,
     });
 
+    const closeCompact = themeVars("closeCompact", {
+        width: 16,
+        height: 16,
+    });
+
+    const closeTiny = themeVars("closeTiny", {
+        width: 10,
+        height: 10,
+    });
+
     const chevronLeftCompact = themeVars("chevronLeftCompact", {
         width: 12,
         height: 21,
@@ -120,6 +130,8 @@ export const iconVariables = useThemeCache(() => {
         user,
         userWarning,
         close,
+        closeCompact,
+        closeTiny,
         chevronLeftCompact,
         selectedCategory,
         signIn,
@@ -199,9 +211,16 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.close.height),
     });
 
-    const closeCompact = style("close", {
-        width: unit(vars.close.width),
-        height: unit(vars.close.height),
+    // Same as close, but without extra padding
+    const closeCompact = style("closeCompact", {
+        width: unit(vars.closeCompact.width),
+        height: unit(vars.closeCompact.height),
+    });
+
+    // For really small close buttons, like on tokens
+    const closeTiny = style("closeTiny", {
+        width: unit(vars.closeTiny.width),
+        height: unit(vars.closeTiny.height),
     });
 
     const chevronLeftCompact = style("chevronLeftCompact", {
@@ -249,6 +268,8 @@ export const iconClasses = useThemeCache(() => {
         user,
         userWarning,
         close,
+        closeCompact,
+        closeTiny,
         chevronLeftCompact,
         selectedCategory,
         signIn,

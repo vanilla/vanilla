@@ -109,7 +109,7 @@ export const storyBookClasses = useThemeCache(() => {
             width: 1,
             color: vars.colors.border,
         }),
-        width: calc(`100% + ${unit(vars.spacing.tight)}`),
+        width: calc(`100% + ${unit(vars.spacing.tight / 2)}`),
         transform: translateX(`-${unit(vars.spacing.tight / 2)}`),
     });
 
@@ -183,7 +183,7 @@ export const storyBookClasses = useThemeCache(() => {
         $nest: {
             [`.${tile}`]: {
                 margin: 0,
-                minWidth: unit(vars.tiles.wideWidth),
+                minWidth: unit(vars.tiles.width),
             },
         },
     });

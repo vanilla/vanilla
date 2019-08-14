@@ -9,10 +9,9 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { StoryTiles } from "@library/storybook/StoryTiles";
-import { StoryTile } from "@library/storybook/StoryTile";
+import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import * as EditorIcons from "@library/icons/editorIcons";
-import * as TitleBarIcons from "@library/icons/titleBar";
+import * as titleBarIcons from "@library/icons/titleBar";
 import * as CommonIcons from "@library/icons/common";
 import {
     EmojiGroupSmileysPeopleIcon,
@@ -39,6 +38,7 @@ import {
     RevisionStatusPendingIcon,
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
+import { StoryTiles } from "@library/storybook/StoryTiles";
 
 const story = storiesOf("Components", module);
 
@@ -54,239 +54,245 @@ story.add("Icons", () => {
 
             <StoryHeading>Common</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;RightChevronIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`RightChevronIcon`}>
                     <CommonIcons.RightChevronIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;LeftChevronIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`LeftChevronIcon`}>
                     <CommonIcons.LeftChevronIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;TopChevronIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`TopChevronIcon`}>
                     <CommonIcons.TopChevronIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;BottomChevronIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`BottomChevronIcon`}>
                     <CommonIcons.BottomChevronIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ClearIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ClearIcon`}>
                     <CommonIcons.ClearIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CheckIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CheckIcon`}>
                     <CommonIcons.CheckIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;DropDownMenuIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`DropDownMenuIcon`}>
                     <CommonIcons.DropDownMenuIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;NewFolderIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`NewFolderIcon`}>
                     <CommonIcons.NewFolderIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CategoryIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CategoryIcon`}>
                     <CommonIcons.CategoryIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CheckCompactIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CheckCompactIcon`}>
                     <CommonIcons.CheckCompactIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;DownTriangleIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`DownTriangleIcon`}>
                     <CommonIcons.DownTriangleIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;RightTriangleIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`RightTriangleIcon`}>
                     <CommonIcons.RightTriangleIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;HelpIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`HelpIcon`}>
                     <CommonIcons.HelpIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ComposeIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ComposeIcon`}>
                     <CommonIcons.ComposeIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;PlusCircleIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`PlusCircleIcon`}>
                     <CommonIcons.PlusCircleIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;SignInIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`SignInIcon`}>
                     <CommonIcons.SignInIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ChevronUpIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ChevronUpIcon`}>
                     <CommonIcons.ChevronUpIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;SearchErrorIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`SearchErrorIcon`}>
                     <CommonIcons.SearchErrorIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ClearIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CloseIcon`}>
+                    <CommonIcons.CloseIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ClearIcon`}>
                     <CommonIcons.ClearIcon />
-                </StoryTile>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CloseTinyIcon`}>
+                    <CommonIcons.CloseTinyIcon />
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;BoldIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`BoldIcon`}>
                     <EditorIcons.BoldIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ItalicIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ItalicIcon`}>
                     <EditorIcons.ItalicIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;StrikeIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`StrikeIcon`}>
                     <EditorIcons.StrikeIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CodeIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CodeIcon`}>
                     <EditorIcons.CodeIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;LinkIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`LinkIcon`}>
                     <EditorIcons.LinkIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiIcon`}>
                     <EditorIcons.EmojiIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmbedErrorIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmbedErrorIcon`}>
                     <EditorIcons.EmbedErrorIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;PilcrowIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`PilcrowIcon`}>
                     <EditorIcons.PilcrowIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;Heading2Icon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`Heading2Icon`}>
                     <EditorIcons.Heading2Icon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;Heading3Icon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`Heading3Icon`}>
                     <EditorIcons.Heading3Icon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;Heading4Icon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`Heading4Icon`}>
                     <EditorIcons.Heading4Icon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;Heading5Icon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`Heading5Icon`}>
                     <EditorIcons.Heading5Icon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;BlockquoteIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`BlockquoteIcon`}>
                     <EditorIcons.BlockquoteIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;CodeBlockIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`CodeBlockIcon`}>
                     <EditorIcons.CodeBlockIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;SpoilerIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`SpoilerIcon`}>
                     <EditorIcons.SpoilerIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmbedIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmbedIcon`}>
                     <EditorIcons.EmbedIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ImageIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ImageIcon`}>
                     <EditorIcons.ImageIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;AttachmentIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`AttachmentIcon`}>
                     <EditorIcons.AttachmentIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ListUnorderedIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ListUnorderedIcon`}>
                     <EditorIcons.ListUnorderedIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ListOrderedIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ListOrderedIcon`}>
                     <EditorIcons.ListOrderedIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;IndentIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`IndentIcon`}>
                     <EditorIcons.IndentIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;OutdentIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`OutdentIcon`}>
                     <EditorIcons.OutdentIcon />
-                </StoryTile>
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Emoji Groups</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;EmojiGroupSmileysPeopleIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`EmojiGroupSmileysPeopleIcon`}>
                     <EmojiGroupSmileysPeopleIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupAnimalsNatureIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupAnimalsNatureIcon`}>
                     <EmojiGroupAnimalsNatureIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupFoodDrinkIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupFoodDrinkIcon`}>
                     <EmojiGroupFoodDrinkIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupTravelPlacesIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupTravelPlacesIcon`}>
                     <EmojiGroupTravelPlacesIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupActivitiesIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupActivitiesIcon`}>
                     <EmojiGroupActivitiesIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupObjectsIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupObjectsIcon`}>
                     <EmojiGroupObjectsIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupSymbolsIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupSymbolsIcon`}>
                     <EmojiGroupSymbolsIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;EmojiGroupFlagsIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`EmojiGroupFlagsIcon`}>
                     <EmojiGroupFlagsIcon />
-                </StoryTile>
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>File Types</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;FileTypeGenericIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`FileTypeGenericIcon`}>
                     <FileTypeGenericIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypeWordIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypeWordIcon`}>
                     <FileTypeWordIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypeExcelIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypeExcelIcon`}>
                     <FileTypeExcelIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypePDFIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypePDFIcon`}>
                     <FileTypePDFIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypeImageIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypeImageIcon`}>
                     <FileTypeImageIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypePowerPointIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypePowerPointIcon`}>
                     <FileTypePowerPointIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;FileTypeZipIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`FileTypeZipIcon`}>
                     <FileTypeZipIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;AttachmentErrorIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`AttachmentErrorIcon`}>
                     <AttachmentErrorIcon />
-                </StoryTile>
+                </StoryTileAndTextCompact>
             </StoryTiles>
-            <StoryHeading>Title Bar</StoryHeading>
+            <StoryHeading>title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;CheckIcon/&gt;`}>
-                    <TitleBarIcons.CheckIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;HelpIcon/&gt;`}>
-                    <TitleBarIcons.HelpIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;ComposeIcon/&gt;`}>
-                    <TitleBarIcons.ComposeIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;DownloadIcon/&gt;`}>
-                    <TitleBarIcons.DownloadIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;SettingsIcon/&gt;`}>
-                    <TitleBarIcons.SettingsIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;SearchIcon/&gt;`}>
-                    <TitleBarIcons.SearchIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;NotificationsIcon/&gt;`}>
-                    <TitleBarIcons.NotificationsIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;MessagesIcon/&gt;`}>
-                    <TitleBarIcons.MessagesIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;UserIcon/&gt;`}>
-                    <TitleBarIcons.UserIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;UserWarningIcon/&gt;`}>
-                    <TitleBarIcons.UserWarningIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;NoUserPhotoIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`CheckIcon`}>
+                    <titleBarIcons.CheckIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`HelpIcon`}>
+                    <titleBarIcons.HelpIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`ComposeIcon`}>
+                    <titleBarIcons.ComposeIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`DownloadIcon`}>
+                    <titleBarIcons.DownloadIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`SettingsIcon`}>
+                    <titleBarIcons.SettingsIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`SearchIcon`}>
+                    <titleBarIcons.SearchIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`NotificationsIcon`}>
+                    <titleBarIcons.NotificationsIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`MessagesIcon`}>
+                    <titleBarIcons.MessagesIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`UserIcon`}>
+                    <titleBarIcons.UserIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`UserWarningIcon`}>
+                    <titleBarIcons.UserWarningIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`NoUserPhotoIcon`}>
                     <div className={"icon"}>
-                        <TitleBarIcons.NoUserPhotoIcon />
+                        <titleBarIcons.NoUserPhotoIcon />
                     </div>
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;VanillaLogo/>`} scaleContents={0.5}>
-                    {<TitleBarIcons.VanillaLogo />}
-                </StoryTile>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`VanillaLogo/>`} scaleContents={0.5}>
+                    {<titleBarIcons.VanillaLogo />}
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>
             <StoryTiles>
-                <StoryTile mouseOverText={`&lt;RevisionStatusDraftIcon/&gt;`}>
+                <StoryTileAndTextCompact title={`RevisionStatusDraftIcon`}>
                     <RevisionStatusDraftIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;RevisionStatusPendingIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`RevisionStatusPendingIcon`}>
                     <RevisionStatusPendingIcon />
-                </StoryTile>
-                <StoryTile mouseOverText={`&lt;RevisionStatusPublishedIcon/&gt;`}>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact title={`RevisionStatusPublishedIcon`}>
                     <RevisionStatusPublishedIcon />
-                </StoryTile>
+                </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>
     );

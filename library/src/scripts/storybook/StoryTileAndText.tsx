@@ -27,12 +27,7 @@ export function StoryTileAndText(props: IStoryTileAndTextProps) {
     const classes = storyBookClasses();
     return (
         <li className={classNames(classes.tilesAndText, { [classes.compactTilesAndText]: props.compact })}>
-            <StoryTile
-                tag={"div"}
-                mouseOverText={props.mouseOverText}
-                type={props.type}
-                scaleContents={props.scaleContents}
-            >
+            <StoryTile tag={"div"} mouseOverText={props.title} type={props.type} scaleContents={props.scaleContents}>
                 {props.children}
             </StoryTile>
             {(props.title || props.text) && (

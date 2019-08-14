@@ -143,6 +143,26 @@ export function CloseCompactIcon(props: { className?: string }) {
     return <CloseIcon compact={true} className={props.className} />;
 }
 
+export function CloseTinyIcon(props: { className?: string }) {
+    const title = t("Close");
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.closeTiny, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 9.5 9.5"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M10.836,11.75,7.793,8.707A1,1,0,0,1,9.207,7.293l3.043,3.043,3.043-3.043a1,1,0,0,1,1.414,1.414L13.664,11.75l3.043,3.043a1,1,0,0,1-1.414,1.414L12.25,13.164,9.207,16.207a1,1,0,1,1-1.439-1.389l.025-.025Z"
+                transform="translate(-7.488 -7.012)"
+            />
+        </svg>
+    );
+}
+
 export function ClearIcon(props: { className?: string }) {
     const title = t("Clear");
     const classes = iconClasses();

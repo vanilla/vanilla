@@ -12,11 +12,16 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
+use Mimey\MimeTypes;
 
+/**
+ * Validation for uploaded files.
+ */
 class UploadedFileSchema extends Schema {
 
-    /** @var \Gdn_Configuration $config */
-    private $config;
+    protected const UNKNOWN_CONTENT_TYPE = "application/octet-stream";
+
+    protected const TEXT_CONTENT_TYPE = "text/plain";
 
     /** @var int $maxFileSize */
     private $maxSize;
@@ -24,26 +29,38 @@ class UploadedFileSchema extends Schema {
     /** @var array $extensions */
     private $allowedExtensions = [];
 
+    /** @var bool */
+    private $allowUnknownTypes = false;
+
+    /** @var MimeTypes */
+    private $mimeTypes;
+
     /**
      * Initialize an instance of a new UploadedFileSchema class.
+     *
+     * @param array $options
      */
     public function __construct(array $options = []) {
-        $this->config = Gdn::getContainer()->get('Config');
-
         if (array_key_exists('allowedExtensions', $options)) {
             $allowedExtensions = $options['allowedExtensions'];
         } else {
-            $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+            $allowedExtensions = Gdn::getContainer()->get('Config')>get('Garden.Upload.AllowedFileExtensions', []);
         }
 
         if (array_key_exists('maxSize', $options)) {
             $maxSize = $options['maxSize'];
         } else {
-            $maxSize = Gdn_Upload::unformatFileSize($this->config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize')));
+            $maxSize = Gdn_Upload::unformatFileSize(Gdn::getContainer()->get('Config')->get(
+                'Garden.Upload.MaxFileSize',
+                ini_get('upload_max_filesize')
+            ));
         }
 
         $this->setMaxSize($maxSize);
         $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));
+
+        $this->mimeTypes = new MimeTypes();
+        $this->setAllowUnknownTypes($options["allowUnknownTypes"] ?? false);
 
         parent::__construct([
             'id' => 'UploadedFile',
@@ -59,6 +76,15 @@ class UploadedFileSchema extends Schema {
      */
     public function getAllowedExtensions() {
         return $this->allowedExtensions;
+    }
+
+    /**
+     * Should unknown file content types be allowed?
+     *
+     * @return boolean
+     */
+    public function getAllowUnknownTypes(): bool {
+        return $this->allowUnknownTypes;
     }
 
     /**
@@ -78,6 +104,16 @@ class UploadedFileSchema extends Schema {
      */
     public function setAllowedExtensions(array $allowedExtensions) {
         return $this->allowedExtensions = $allowedExtensions;
+    }
+
+    /**
+     * Set whether or not unknown file content types be allowed.
+     *
+     * @param bool $allowUnknownTypes
+     * @return bool
+     */
+    public function setAllowUnknownTypes(bool $allowUnknownTypes): bool {
+        return $this->allowUnknownTypes = $allowUnknownTypes;
     }
 
     /**
@@ -108,6 +144,40 @@ class UploadedFileSchema extends Schema {
         }
 
         return $data;
+    }
+
+    /**
+     * Validate the upload's MIME content type.
+     *
+     * @param UploadedFile $upload
+     * @param ValidationField $field
+     * @param string $extension
+     */
+    protected function validateContentType(UploadedFile $upload, ValidationField $field, string $extension): void {
+        $file = $upload->getFile();
+
+        $detectedType = mime_content_type($file);
+        if (!is_string($detectedType)) {
+            $field->addError("invalid", ["messageCode" => "Content type of {field} cannot be detected."]);
+            return;
+        }
+
+        $extension = strtolower($extension);
+        $validExtensions = $this->mimeTypes->getAllExtensions($detectedType);
+
+        if (in_array($extension, $validExtensions) || $detectedType === self::TEXT_CONTENT_TYPE) {
+            return;
+        }
+
+        if ($detectedType === self::UNKNOWN_CONTENT_TYPE && $this->getAllowUnknownTypes() === false) {
+            $field->addError("invalid", ["messageCode" => "{field} is an unknown file type."]);
+            return;
+        } elseif (empty($validExtensions)) {
+            $this->logger();
+        } else {
+            $field->addError("invalid", ["messageCode" => "{field} has an extension that is not valid for the content type."]);
+            return;
+        }
     }
 
     /**
@@ -144,6 +214,7 @@ class UploadedFileSchema extends Schema {
         if (is_string($file) && $ext = pathinfo($file, PATHINFO_EXTENSION)) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
+                $this->validateContentType($upload, $field, $ext);
                 $result = true;
             }
         } else {

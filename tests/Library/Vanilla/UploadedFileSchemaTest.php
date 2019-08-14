@@ -119,4 +119,47 @@ class UploadedFileSchemaTest extends TestCase {
         ));
         $this->assertTrue(true);
     }
+
+    /**
+     * 
+     * @dataProvider provideContentTypeFiles
+     */
+    public function testContentType(UploadedFile $file, bool $isValid) {
+        $schema = new UploadedFileSchema();
+        $result = $schema->isValid($file);
+        $this->assertSame($isValid, $result);
+    }
+
+    /**
+     * Provide content types.
+     */
+    public function provideContentTypeFiles(): array {
+        return [
+            [
+                $this->createUploadFile("html.fla", "text/plain"),
+                false,
+            ],
+            [
+                $this->createUploadFile("text.txt", "text/plain"),
+                true,
+            ]
+        ];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $file
+     * @param [type] $mime
+     */
+    private function createUploadFile($file, $mime): UploadedFile {
+        return new UploadedFile(
+            new Gdn_Upload(),
+            PATH_FIXTURES . "/uploads/$file",
+            80,
+            UPLOAD_ERR_OK,
+            $file,
+            $mime
+        );
+    }
 }

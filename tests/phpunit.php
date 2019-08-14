@@ -15,6 +15,7 @@ foreach ($classCompatibility as $class => $legacyClass) {
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
+define("PATH_FIXTURES", PATH_ROOT . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "fixtures");
 
 // Copy the cgi-bin files.
 $dir = PATH_ROOT.'/cgi-bin';

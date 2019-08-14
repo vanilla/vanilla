@@ -16,28 +16,6 @@ type LoadFunction = () => Promise<any>;
  * Class for managing routing and matching a particular page.
  */
 export default class RouteHandler<GeneratorProps> {
-    /**
-     * Local cache of react nodes caching a route.
-     * This is used to allow multiple routes to share the same component instance if their key matches.
-     *
-     * Example:
-     * <ResourceEditorPage /> has 2 allowed URL formats. /resource/:id/edit & /resource/editor
-     *
-     * We may want to change the URL from one 2 the other at some point of the lifecycle,
-     * but we don't want the component to be umounted/remounted.
-     *
-     * In this case by passing the same `key` when constructing the route handler,
-     * the same component instance will be re-used for both routes.
-     */
-    private static routeCache: { [key: string]: React.ReactNode } = {};
-
-    /**
-     * Clear the cached routes on the static RouteHandler.
-     */
-    public static clearRouteCache() {
-        RouteHandler.routeCache = {};
-    }
-
     /** A react-loadable instance. */
     public loadable;
 
@@ -49,7 +27,7 @@ export default class RouteHandler<GeneratorProps> {
 
     public constructor(
         componentPromise: LoadFunction,
-        public path: string,
+        public path: string | string[],
         public url: (data: GeneratorProps) => string,
         loadingComponent: React.ReactNode = Loader,
         key?: string,
@@ -58,15 +36,9 @@ export default class RouteHandler<GeneratorProps> {
             loading: loadingComponent as any,
             loader: componentPromise,
         });
-        this.key = key || path;
-
-        const cachedRoute = RouteHandler.routeCache[this.key];
-        if (cachedRoute) {
-            this.route = cachedRoute;
-        } else {
-            this.route = <Route exact path={this.path} component={this.loadable} key={this.key} />;
-            RouteHandler.routeCache[this.key] = this.route;
-        }
+        const finalPath = Array.isArray(path) ? path : [path];
+        this.key = key || finalPath.join("-");
+        this.route = <Route exact path={path} component={this.loadable} key={this.key} />;
     }
 
     /**

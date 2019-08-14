@@ -15,6 +15,7 @@ export const storyBookVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("storyBook");
 
     const spacing = makeThemeVars("spacing", {
+        extraLarge: 40,
         large: 24,
         default: 16,
         verticalTitle: 22,
@@ -82,15 +83,6 @@ export const storyBookClasses = useThemeCache(() => {
         transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
     });
 
-    const headingH1 = style("headingH1", {
-        ...fonts({
-            size: 24,
-            family: globalVars.fonts.families.body,
-            weight: globalVars.fonts.weights.bold,
-        }),
-        marginBottom: unit(16),
-    });
-
     const headingH2 = style("headingH2", {
         ...fonts({
             size: 18,
@@ -101,7 +93,7 @@ export const storyBookClasses = useThemeCache(() => {
             horizontal: unit(vars.spacing.tight / 2),
         }),
         ...margins({
-            top: vars.spacing.large,
+            top: vars.spacing.extraLarge,
             bottom: vars.spacing.tight,
         }),
 
@@ -111,6 +103,27 @@ export const storyBookClasses = useThemeCache(() => {
         }),
         width: calc(`100% + ${unit(vars.spacing.tight / 2)}`),
         transform: translateX(`-${unit(vars.spacing.tight / 2)}`),
+        $nest: {
+            [`& + *:not(.${paragraph})`]: {
+                marginTop: unit(32),
+            },
+        },
+    });
+
+    const headingH1 = style("headingH1", {
+        ...fonts({
+            size: 24,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.bold,
+        }),
+        marginBottom: unit(16),
+        $nest: {
+            [`& .${headingH2}`]: {
+                ...margins({
+                    top: vars.spacing.large,
+                }),
+            },
+        },
     });
 
     const headingH3 = style("headingH1", {
@@ -148,6 +161,13 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
         maxWidth: percent(100),
         width: unit(672),
+    });
+
+    const smallContent = style("smallContent", {
+        position: "relative",
+        display: "block",
+        maxWidth: percent(100),
+        width: unit(216),
     });
 
     const tiles = style("tiles", {
@@ -267,6 +287,7 @@ export const storyBookClasses = useThemeCache(() => {
         tiles,
         tile,
         content,
+        smallContent,
         scaleContents,
         setBackground,
         tilesAndText,

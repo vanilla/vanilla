@@ -25,6 +25,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import "@library/forms/datePicker.scss";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
+import { StorySmallContent } from "@library/storybook/StorySmallContent";
 
 const story = storiesOf("Form Elements", module);
 
@@ -74,7 +75,8 @@ story.add("Inputs", () => {
             </RadioButtonGroup>
             <StoryHeading>InputBlock</StoryHeading>
             <StoryParagraph>Helper component to add label to various inputs</StoryParagraph>
-            <InputBlock label={"Example of label that can be used for any input"}>
+            <StoryHeading>Example of label that can be used for any input</StoryHeading>
+            <InputBlock label={"My Label"}>
                 <div>{"[Some Input]"}</div>
             </InputBlock>
             <StoryHeading>Input Text Block</StoryHeading>
@@ -95,6 +97,7 @@ story.add("Inputs", () => {
             >
                 <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />
                 <RadioTab label={t("Tab B")} position="right" data={"Tab B"} />
+                <RadioTab label={t("Tab C")} position="right" data={"Tab C"} />
             </RadioTabs>
             <StoryHeading>Tokens Input</StoryHeading>
             <MultiUserInput
@@ -121,7 +124,9 @@ story.add("Inputs", () => {
             <StoryHeading>DropDown with search</StoryHeading>
             <StoryExampleDropDownSearch onChange={doNothing} />
             <StoryHeading>Date Range</StoryHeading>
-            <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
+            <StorySmallContent>
+                <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
+            </StorySmallContent>
         </StoryContent>
     );
 });

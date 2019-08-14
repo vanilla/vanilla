@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, fonts, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -12,6 +12,7 @@ import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { notUserContent } from "@library/flyouts/dropDownStyles";
+import { cssRule } from "typestyle";
 
 const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -72,6 +73,9 @@ const userContentVariables = useThemeCache(() => {
         listDecoration: {
             minWidth: em(2),
         },
+        nestedList: {
+            margin: "0 0 0 1em",
+        },
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -122,6 +126,7 @@ export const userContentClasses = useThemeCache(() => {
             $nest: lineHeightAdjustment(),
         };
     };
+
     const headings: NestedCSSSelectors = {
         "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h1),
         "& h2:not(.heading)": headingStyle("h2", vars.fonts.headings.h2),
@@ -132,21 +137,64 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const lists: NestedCSSSelectors = {
-        "& ol": {
+        ["& ol"]: {
             listStylePosition: "inside",
+            margin: `0 0 1em 3em`,
+            $nest: {
+                [`& li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol ol ol ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol ol ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol, & ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
+            },
         },
-        "& ol li": {
-            ...listItem,
-            listStyle: "decimal",
+        ["& ul"]: {
+            listStylePosition: "inside",
+            listStyle: "disc",
+            margin: `1em 0 1em 3em`,
+            $nest: {
+                [`& li`]: {
+                    listStyle: "disc",
+                },
+                [`& ol, & ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
+            },
         },
-        [`& ul li:not('.${notUserContent}')`]: {
-            ...listItem,
-            listStyle: "initial",
+        [`& li`]: {
+            margin: `5px 0`,
+            $nest: {
+                [`&, & *:first-child`]: {
+                    marginTop: 0,
+                },
+                [`&, & *:last-child`]: {
+                    marginBottom: 0,
+                },
+            },
         },
     };
 
     const paragraphSpacing: NestedCSSSelectors = {
-        "& p": {
+        "& > p": {
             marginTop: 0,
             marginBottom: 0,
             $nest: {

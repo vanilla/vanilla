@@ -8,7 +8,7 @@
 import Quill, { QuillOptionsStatic, RangeStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
 

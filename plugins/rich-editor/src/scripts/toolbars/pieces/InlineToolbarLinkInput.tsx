@@ -11,7 +11,7 @@ import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertLinkClasses } from "@rich-editor/toolbars/pieces/insertLinkClasses";
 
 interface IProps extends IWithEditorProps {

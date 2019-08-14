@@ -23,6 +23,8 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import RadioButton from "@library/forms/RadioButton";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import "@library/forms/datePicker.scss";
+import RadioButtonGroup from "@library/forms/RadioButtonGroup";
+import CheckboxGroup from "@library/forms/CheckboxGroup";
 
 const story = storiesOf("Form Elements", module);
 
@@ -55,16 +57,21 @@ story.add("Inputs", () => {
             <StoryHeading depth={1}>Form Elements</StoryHeading>
             <StoryHeading>Checkbox</StoryHeading>
             <Checkbox label={t("Simple Checkbox")} />
-            <StoryHeading>Radio Buttons - In Group</StoryHeading>
-
-            <InputBlock label={"Gaggle of radio buttons"}>
+            <StoryHeading>Checkboxes - In a Group</StoryHeading>
+            <CheckboxGroup label={"A sleuth of check boxes"}>
+                <Checkbox label={t("Option A")} />
+                <Checkbox label={t("Option B")} />
+                <Checkbox label={t("Option C")} />
+                <Checkbox label={t("Option D")} />
+            </CheckboxGroup>
+            <StoryHeading>Radio Buttons - In a Group</StoryHeading>
+            <RadioButtonGroup label={"Gaggle of radio buttons"}>
                 <RadioButton label={"Option A"} name={radioButtonGroup1} />
                 <RadioButton label={"Option B"} name={radioButtonGroup1} />
                 <RadioButton label={"Option C"} name={radioButtonGroup1} />
                 <RadioButton label={"Option D"} name={radioButtonGroup1} />
                 <RadioButton label={"Option E"} name={radioButtonGroup1} />
-            </InputBlock>
-
+            </RadioButtonGroup>
             <StoryHeading>InputBlock</StoryHeading>
             <StoryParagraph>Helper component to add label to various inputs</StoryParagraph>
             <InputBlock label={"Example of label that can be used for any input"}>
@@ -89,7 +96,6 @@ story.add("Inputs", () => {
                 <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />
                 <RadioTab label={t("Tab B")} position="right" data={"Tab B"} />
             </RadioTabs>
-
             <StoryHeading>Tokens Input</StoryHeading>
             <MultiUserInput
                 onChange={handleUserChange}
@@ -112,10 +118,8 @@ story.add("Inputs", () => {
                     },
                 ]}
             />
-
             <StoryHeading>DropDown with search</StoryHeading>
             <StoryExampleDropDownSearch onChange={doNothing} />
-
             <StoryHeading>Date Range</StoryHeading>
             <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
         </StoryContent>

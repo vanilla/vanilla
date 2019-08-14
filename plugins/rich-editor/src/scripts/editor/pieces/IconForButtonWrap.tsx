@@ -11,7 +11,7 @@
  */
 
 import React from "react";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 interface IProps {
     icon: JSX.Element;

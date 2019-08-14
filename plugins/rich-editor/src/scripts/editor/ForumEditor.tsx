@@ -11,7 +11,7 @@ import EditorContent from "@rich-editor/editor/EditorContent";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
 import { Provider } from "react-redux";
 import { DeviceProvider } from "@library/layout/DeviceContext";

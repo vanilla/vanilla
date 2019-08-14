@@ -221,15 +221,19 @@ export const checkRadioClasses = useThemeCache(() => {
                             },
                         },
                     },
-                    "& .radioButton-disk, & .checkbox-box": {
+                    [`& ${iconContainer}`]: {
                         backgroundColor: vars.main.hover.bg.toString(),
                     },
                 },
             },
-            "& + .radioButton, & + .checkbox": {
-                marginTop: px(12),
+            [`& + &`]: {
+                marginTop: px(globalVars.spacer.size / 2),
             },
         },
+    });
+
+    const group = style("group", {
+        marginTop: unit(globalVars.spacer.size / 2),
     });
 
     return {
@@ -243,5 +247,6 @@ export const checkRadioClasses = useThemeCache(() => {
         state,
         diskIcon,
         input,
+        group,
     };
 });

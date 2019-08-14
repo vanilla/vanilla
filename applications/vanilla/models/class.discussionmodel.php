@@ -1957,9 +1957,16 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
                 $this->Validation->applyRule('Body', 'Length');
+            }
+
+            // Add min length if body is required.
+            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                $this->Validation->applyRule('Body', 'MinTextLength');
             }
         }
 

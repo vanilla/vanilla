@@ -24,17 +24,14 @@ export const inputBlockClasses = useThemeCache(() => {
     const vars = inputBlockVariables();
     const formElementVars = formElementsVariables();
 
-    const inputText = style("inputText", {});
-    const inputWrap = style("inputWrap", {
-        $nest: {
-            "& + .checkbox": {
-                marginTop: unit(6),
-            },
-            "& + .radioButton": {
-                marginTop: unit(6),
-            },
-        },
+    const inputText = style("inputText", {
+        display: "block",
     });
+
+    const inputWrap = style("inputWrap", {
+        display: "block",
+    });
+
     const labelAndDescription = style("labelAndDescription", {
         display: "block",
         width: percent(100),
@@ -45,6 +42,9 @@ export const inputBlockClasses = useThemeCache(() => {
         $nest: {
             [`& + &`]: {
                 marginTop: unit(formElementVars.spacing.margin),
+            },
+            [`&.isLast`]: {
+                marginBottom: unit(formElementVars.spacing.margin),
             },
             [`&.hasError .${inputText}`]: {
                 borderColor: colorOut(globalVars.messageColors.error.fg),
@@ -92,13 +92,16 @@ export const inputBlockClasses = useThemeCache(() => {
         display: "block",
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.medium),
-        marginBottom: unit(6),
+        marginBottom: unit(formElementVars.spacing.margin / 2),
     });
 
     const sectionTitle = style("sectionTitle", {
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.base,
-        marginBottom: unit(formElementVars.spacing.margin / 2),
+    });
+
+    const fieldsetGroup = style("fieldsetGroup", {
+        marginTop: unit(formElementVars.spacing.margin),
     });
 
     return {
@@ -111,5 +114,6 @@ export const inputBlockClasses = useThemeCache(() => {
         inputWrap,
         labelAndDescription,
         sectionTitle,
+        fieldsetGroup,
     };
 });

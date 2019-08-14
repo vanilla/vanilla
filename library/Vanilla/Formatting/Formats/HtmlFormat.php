@@ -140,12 +140,7 @@ class HtmlFormat extends BaseFormat {
 
         /** @var \DOMNode $domHeading */
         foreach ($domHeadings as $domHeading) {
-            $level = (int)str_replace('h', '', $domHeading->tagName);
-            $level = filter_var($level, FILTER_VALIDATE_INT);
-
-            if (!$level) {
-                continue;
-            }
+            $level = (int) str_replace('h', '', $domHeading->tagName);
 
             $text = $domHeading->textContent;
             $slug = slugify($text);
@@ -158,7 +153,7 @@ class HtmlFormat extends BaseFormat {
             $headings[] = new Heading(
                 $domHeading->textContent,
                 $level,
-                slugify($slug)
+                $slug
             );
         }
 

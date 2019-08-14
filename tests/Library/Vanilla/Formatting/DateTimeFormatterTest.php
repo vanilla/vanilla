@@ -22,6 +22,17 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
     // Saturday, July 27, 2015 12:00:01 AM
     const NOW = 1437955201;
 
+    public $runTestInSeparateProcess = true;
+    public $preserveGlobalState = false;
+
+    /**
+     * Configure a standard timezone.
+     */
+    public function setUp() {
+        parent::setUp();
+        date_default_timezone_set("UTC");
+    }
+
     /**
      * @return DateTimeFormatter
      */
@@ -36,11 +47,9 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
      * Test the HTML formatting.
      * This test needs a separate process because of the time zone setting.
      *
-     * @preserveGlobalState
      * @runInSeparateProcess
      */
     public function testFormatDateHtml() {
-        date_default_timezone_set("UTC");
         $actual = self::getFormatter()->formatDate(self::NOW, true);
         $expected = '<time datetime=2015-07-27T00:00:01+00:00 title="Mon Jul 27 00:00:01 2015">12:00AM</time>';
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
@@ -63,12 +72,8 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
     /**
      * Test passing a custom format.
      * This test needs a separate process because of the time zone setting.
-     *
-     * @preserveGlobalState
-     * @runInSeparateProcess
      */
     public function testForceFullFormat() {
-        date_default_timezone_set("UTC");
         $actual = self::getFormatter()->formatDate(
             self::NOW,
             false,

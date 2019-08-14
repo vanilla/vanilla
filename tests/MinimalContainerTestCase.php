@@ -45,7 +45,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Setup the container.
      */
-    public static function setUpBeforeClass() {
+    private function configureContainer() {
         \Gdn::setContainer(new Container());
         self::container()
             ->rule(FormatService::class)
@@ -155,6 +155,7 @@ class MinimalContainerTestCase extends TestCase {
     public function setUp() {
         parent::setUp();
         $this->setGlobals();
+        $this->configureContainer();
     }
 
     /**

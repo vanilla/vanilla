@@ -121,29 +121,44 @@ class UploadedFileSchemaTest extends TestCase {
     }
 
     /**
-     * 
-     * @dataProvider provideContentTypeFiles
+     * Assert that an uploaded file has the correct mime type..
+     *
+     * @param string $file The name of the file in the fixtures/uploads folder.
+     * @param string $mime The mime type that the browser uploaded with the file..
+     * @param bool $expected Whether or not the upload should be valid.
+     * @param string[] An optional array of allowed extensions.
      */
-    public function testContentType(UploadedFile $file, bool $isValid) {
+    protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $allowedExtensions = []) {
+        $file = $this->createUploadFile($file, $mime);
         $schema = new UploadedFileSchema();
-        $result = $schema->isValid($file);
-        $this->assertSame($isValid, $result);
+        if (!empty($allowedExtensions)) {
+            $schema->setAllowedExtensions($allowedExtensions);
+        }
+
+        $actual = $schema->isValid($file);
+        $this->assertSame($expected, $actual);
     }
 
     /**
-     * Provide content types.
+     * Test a file with a bad content type.
      */
-    public function provideContentTypeFiles(): array {
-        return [
-            [
-                $this->createUploadFile("html.fla", "text/plain"),
-                false,
-            ],
-            [
-                $this->createUploadFile("text.txt", "text/plain"),
-                true,
-            ]
-        ];
+    public function testContentTypeBad() {
+        $this->assertUploadedFileMimeType('html.fla', 'text/plain', false);
+    }
+
+    /**
+     * Test a file with a good content type.
+     */
+    public function testMimeTypeGood() {
+        $this->assertUploadedFileMimeType('text.txt', 'text/plain', true);
+    }
+
+    public function testUnknownGoodFileExtension() {
+        $this->assertUploadedFileMimeType('test.confz0', 'text/plain', true, ['confz0']);
+    }
+
+    public function testNonexistantFile() {
+        $this->assertUploadedFileMimeType('dont-create-me.text', 'text/plain', false);
     }
 
     /**

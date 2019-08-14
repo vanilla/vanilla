@@ -44,7 +44,7 @@ class UploadedFileSchema extends Schema {
         if (array_key_exists('allowedExtensions', $options)) {
             $allowedExtensions = $options['allowedExtensions'];
         } else {
-            $allowedExtensions = Gdn::getContainer()->get('Config')>get('Garden.Upload.AllowedFileExtensions', []);
+            $allowedExtensions = Gdn::getContainer()->get('Config')->get('Garden.Upload.AllowedFileExtensions', []);
         }
 
         if (array_key_exists('maxSize', $options)) {
@@ -173,7 +173,7 @@ class UploadedFileSchema extends Schema {
             $field->addError("invalid", ["messageCode" => "{field} is an unknown file type."]);
             return;
         } elseif (empty($validExtensions)) {
-            $this->logger();
+            trigger_error("No known mime type for extension: $extension.", E_USER_NOTICE);
         } else {
             $field->addError("invalid", ["messageCode" => "{field} has an extension that is not valid for the content type."]);
             return;
@@ -191,6 +191,7 @@ class UploadedFileSchema extends Schema {
         if (!($value instanceof UploadedFile)) {
             $field->addError('invalid', ['messageCode' => '{field} is not a valid file upload.']);
         }
+        /* @var UploadedFile $value */
         $this->validateSize($value, $field);
         $this->validateExtension($value, $field);
 
@@ -211,10 +212,12 @@ class UploadedFileSchema extends Schema {
         $result = false;
         $file = $upload->getClientFilename();
 
-        if (is_string($file) && $ext = pathinfo($file, PATHINFO_EXTENSION)) {
+        if (is_string($file) && $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
-                $this->validateContentType($upload, $field, $ext);
+                if (file_exists($upload->getFile())) {
+                    $this->validateContentType($upload, $field, $ext);
+                }
                 $result = true;
             }
         } else {

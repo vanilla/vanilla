@@ -3,12 +3,22 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache, styleFactory, variableFactory, DEBUG_STYLES } from "@library/styles/styleUtils";
-import { borders, colorOut, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fonts,
+    importantUnit,
+    margins,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { border, calc, color, em, important, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
+import { iconVariables } from "@library/icons/iconClasses";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -210,6 +220,7 @@ export const storyBookClasses = useThemeCache(() => {
 
     const tileTitle = style("tileTitle", {
         fontSize: unit(14),
+        marginTop: unit(10),
     });
     const tileText = style("tileText", {
         width: calc(`100% - ${unit(vars.tiles.width)}`),
@@ -272,6 +283,12 @@ export const storyBookClasses = useThemeCache(() => {
         },
     });
 
+    const iconVars = iconVariables();
+    const smallerLogo = style("smallerLogo", {
+        height: importantUnit(iconVars.vanillaLogo.height / 2),
+        width: importantUnit(iconVars.vanillaLogo.width / 2),
+    });
+
     return {
         heading,
         headingH1,
@@ -295,5 +312,6 @@ export const storyBookClasses = useThemeCache(() => {
         tileText,
         tileTextPaddingLeft,
         compactTilesAndText,
+        smallerLogo,
     };
 });

@@ -32,7 +32,7 @@ export function StoryTileAndText(props: IStoryTileAndTextProps) {
             </StoryTile>
             {(props.title || props.text) && (
                 <div className={classNames(classes.tileText, { [classes.tileTextPaddingLeft]: !props.compact })}>
-                    {props.title && <StoryHeading depth={3}>{props.title}</StoryHeading>}
+                    {props.title && <h3 className={classes.tileTitle}>{props.title}</h3>}
                     {props.text && <StoryParagraph>{props.text}</StoryParagraph>}
                 </div>
             )}

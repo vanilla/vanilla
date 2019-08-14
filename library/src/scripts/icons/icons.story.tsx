@@ -39,10 +39,12 @@ import {
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
 import { StoryTiles } from "@library/storybook/StoryTiles";
+import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 const story = storiesOf("Components", module);
 
 story.add("Icons", () => {
+    const classes = storyBookClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Global Icons</StoryHeading>
@@ -278,8 +280,8 @@ story.add("Icons", () => {
                         <titleBarIcons.NoUserPhotoIcon />
                     </div>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={`VanillaLogo/>`} scaleContents={0.5}>
-                    {<titleBarIcons.VanillaLogo />}
+                <StoryTileAndTextCompact title={`VanillaLogo`}>
+                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} />}
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>

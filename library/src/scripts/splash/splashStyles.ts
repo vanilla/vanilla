@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -60,12 +60,15 @@ export const splashVariables = useThemeCache(() => {
         borderColor: globalVars.mainColors.fg.fade(0.4),
     });
 
-    const outerBackground: IBackground = makeThemeVars("outerBackground", {
+    const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
+    const outerBackground = makeThemeVars("outerBackground", {
         color: colors.primary,
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
         fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
+        useFilter: false,
+        brightnessFilterPercentage: isContrastLight ? percent(70) : percent(130),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -268,6 +271,9 @@ export const splashClasses = useThemeCache(() => {
                 !url && (vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage)
                     ? 0.4
                     : undefined,
+            filter: vars.outerBackground.useFilter
+                ? `brightness(${vars.outerBackground.brightnessFilterPercentage})`
+                : undefined,
         });
     };
 

@@ -130,7 +130,7 @@ class UploadedFileSchemaTest extends TestCase {
      */
     protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $allowedExtensions = []) {
         $file = $this->createUploadFile($file, $mime);
-        $schema = new UploadedFileSchema(['validateMimeTypes' => true]);
+        $schema = new UploadedFileSchema(['validateContentTypes' => true]);
         if (!empty($allowedExtensions)) {
             $schema->setAllowedExtensions($allowedExtensions);
         }

@@ -38,7 +38,7 @@ class UploadedFileSchema extends Schema {
     /**
      * @var bool Whether or not to validate mime types.
      */
-    private $validateMimeTypes = false;
+    private $validateContentTypes = false;
 
     /**
      * Initialize an instance of a new UploadedFileSchema class.
@@ -61,10 +61,10 @@ class UploadedFileSchema extends Schema {
             ));
         }
 
-        if (array_key_exists('validateMimeTypes', $options)) {
-            $this->setValidateMimeTypes($options['validateMimeTypes']);
+        if (array_key_exists('validateContentTypes', $options)) {
+            $this->setValidateContentTypes($options['validateContentTypes']);
         } else {
-            $this->setValidateMimeTypes(FeatureFlagHelper::featureEnabled('validateMimeTypes'));
+            $this->setValidateContentTypes(FeatureFlagHelper::featureEnabled('validateContentTypes'));
         }
 
         $this->setMaxSize($maxSize);
@@ -186,7 +186,7 @@ class UploadedFileSchema extends Schema {
             // This code looks redundant, but sometimes mime_content_type() returns odd double strings.
             // ex: application/vnd.openxmlformats-officedocument.wordprocessingml.documentapplication/vnd.openxmlformats-officedocument.wordprocessingml.document
             foreach ($validTypes as $validType) {
-                if (strpos($detectedType, $validType) !== false) {
+                if (!empty($validType) && strpos($detectedType, $validType) !== false) {
                     return;
                 }
             }
@@ -242,7 +242,7 @@ class UploadedFileSchema extends Schema {
         if (is_string($file) && $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
-                if (file_exists($upload->getFile()) && $this->getValidateMimeTypes()) {
+                if (file_exists($upload->getFile()) && $this->getValidateContentTypes()) {
                     $this->validateContentType($upload, $field, $ext);
                 }
                 $result = true;
@@ -280,18 +280,18 @@ class UploadedFileSchema extends Schema {
      *
      * @return bool Returns **true** if mime types are validated or **false** otherwise.
      */
-    public function getValidateMimeTypes(): bool {
-        return $this->validateMimeTypes;
+    public function getValidateContentTypes(): bool {
+        return $this->validateContentTypes;
     }
 
     /**
      * Whether or not to validate mime types.
      *
-     * @param bool $validateMimeTypes The new value.
+     * @param bool $validateContentTypes The new value.
      * @return $this
      */
-    public function setValidateMimeTypes(bool $validateMimeTypes): self {
-        $this->validateMimeTypes = $validateMimeTypes;
+    public function setValidateContentTypes(bool $validateContentTypes): self {
+        $this->validateContentTypes = $validateContentTypes;
         return $this;
     }
 }

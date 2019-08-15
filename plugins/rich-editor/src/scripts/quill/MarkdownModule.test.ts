@@ -19,7 +19,7 @@ const MENTION_INSERT = {
     mention: { name: "meadwayk", userID: 24562 },
 };
 
-describe("NewLineClickInsertionModule", () => {
+describe.only("NewLineClickInsertionModule", () => {
     let quill: Quill;
     let markdownModule: MarkdownModule;
 
@@ -224,6 +224,11 @@ describe("NewLineClickInsertionModule", () => {
         trailingCharacter?: string;
     }
 
+    // We run the tests with empty newlines in the beginning to ensure our offests
+    // from the beginning of the document are calculated properly.
+    const startLines = [OpUtils.op("\n\n\n")];
+    const startLinesLength = 3;
+
     function testInlineFormat(options: ITestInlineFormat) {
         const { text, wrapWith, expectedFormats, type, name } = options;
 
@@ -236,17 +241,18 @@ describe("NewLineClickInsertionModule", () => {
             describe("triggering on various punctuation marks", () => {
                 for (const triggerKey of triggerKeys) {
                     it("converts a line of just the format for the trigger key " + triggerKey, async () => {
-                        quill.setContents([OpUtils.op(wrappedText)]);
-                        quill.setSelection(wrappedText.length, 0);
+                        quill.setContents([...startLines, OpUtils.op(wrappedText)]);
+                        quill.setSelection(wrappedText.length + startLinesLength, 0);
                         dispatchKey(triggerKey);
                         expect(quill.getContents().ops).deep.eq([
+                            ...startLines,
                             OpUtils.op(text, expectedFormats),
                             OpUtils.op(`${trailingCharacter}\n`),
                         ]);
                     });
 
                     it("converts later in the line for the trigger key " + triggerKey, () => {
-                        const startPadding = "asdf42 asdf asdf_!@#$%^&*( ";
+                        const startPadding = "\n\n\nasdf42 asdf asdf_!@#$%^&*( ";
                         quill.setContents([OpUtils.op(startPadding + wrappedText)]);
                         quill.setSelection(startPadding.length + wrappedText.length, 0);
                         dispatchKey(triggerKey);
@@ -260,10 +266,10 @@ describe("NewLineClickInsertionModule", () => {
                     it(
                         "does not convert except right at the end of formatted part for trigger key " + triggerKey,
                         () => {
-                            quill.setContents([OpUtils.op(wrappedText + " ")]);
-                            quill.setSelection(wrappedText.length + 1, 0);
+                            quill.setContents([...startLines, OpUtils.op(wrappedText + " ")]);
+                            quill.setSelection(wrappedText.length + startLinesLength + 1, 0);
                             dispatchKey(triggerKey);
-                            expect(quill.getContents().ops).deep.eq([OpUtils.op(wrappedText + ` \n`)]);
+                            expect(quill.getContents().ops).deep.eq([OpUtils.op("\n\n\n" + wrappedText + ` \n`)]);
                         },
                     );
                 }
@@ -283,10 +289,10 @@ describe("NewLineClickInsertionModule", () => {
         describe(name, () => {
             for (const triggerKey of Object.values(MarkdownBlockTriggers)) {
                 it("can handle it's macro for the trigger key " + triggerKey, () => {
-                    quill.setContents([OpUtils.op(text)]);
-                    quill.setSelection(text.length, 0);
+                    quill.setContents([...startLines, OpUtils.op(text)]);
+                    quill.setSelection(text.length + startLinesLength, 0);
                     dispatchKey(triggerKey);
-                    expect(quill.getContents().ops).deep.eq([OpUtils.op("\n", expectedFormats)]);
+                    expect(quill.getContents().ops).deep.eq([...startLines, OpUtils.op("\n", expectedFormats)]);
                 });
             }
         });

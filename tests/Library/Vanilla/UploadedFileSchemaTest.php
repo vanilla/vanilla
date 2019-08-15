@@ -171,11 +171,10 @@ class UploadedFileSchemaTest extends TestCase {
      * Assert an uploaded file.
      *
      * @param string $filename The name of the file.
-     * @param bool $expected Whether the file should pass.
      * @dataProvider provideTestFiles
      */
-    public function testFile(string $filename, bool $expected) {
-        $this->assertUploadedFileMimeType($filename, '', $expected, [strtolower(pathinfo($filename, PATHINFO_EXTENSION))]);
+    public function testValidFile(string $filename) {
+        $this->assertUploadedFileMimeType($filename, '', true, [strtolower(pathinfo($filename, PATHINFO_EXTENSION))]);
     }
 
     /**
@@ -184,14 +183,15 @@ class UploadedFileSchemaTest extends TestCase {
      * @return array Returns a data provider array.
      */
     public function provideTestFiles() {
-        $r = [
-            ['doc.docx', true],
-            ['pdf.pdf', true],
-            ['ppt.pptx', true],
-            ['xls.xlsx', true],
-        ];
+        $files = glob(PATH_FIXTURES.'/uploads/valid/*.*');
 
-        return array_column($r, null, 0);
+        $r = [];
+        foreach ($files as $path) {
+            $file = basename($path);
+            $r[$file] = [$file];
+        }
+
+        return $r;
     }
 
     /**

@@ -120,8 +120,8 @@ export default class MarkdownModule {
         if (!line.children) {
             return null;
         }
-        let lineStart = selection.index - offset;
-        let text = this.quill.getText(lineStart, selection.index);
+        let lineStart = line.offset(this.quill.scroll);
+        let text = this.quill.getText(lineStart, selection.index - lineStart);
 
         // Adjust the text so that it's only after the last whitespace character.
         // Because this is a markdown MACRO and not a parser, we only look at stuff after the previous whitespace character.
@@ -231,7 +231,7 @@ export default class MarkdownModule {
             handler: (text, selection) => {
                 const offset = text.length;
                 const delta = new Delta()
-                    .retain(selection.index - offset - 1)
+                    .retain(selection.index - offset)
                     .delete(offset)
                     .retain(1, { [BlockquoteLineBlot.blotName]: true });
                 this.quill.updateContents(delta, Quill.sources.USER);

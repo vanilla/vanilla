@@ -36,6 +36,11 @@ class UploadedFileSchema extends Schema {
     private $mimeTypes;
 
     /**
+     * @var bool Whether or not to validate mime types.
+     */
+    private $validateMimeTypes = false;
+
+    /**
      * Initialize an instance of a new UploadedFileSchema class.
      *
      * @param array $options
@@ -54,6 +59,12 @@ class UploadedFileSchema extends Schema {
                 'Garden.Upload.MaxFileSize',
                 ini_get('upload_max_filesize')
             ));
+        }
+
+        if (array_key_exists('validateMimeTypes', $options)) {
+            $this->setValidateMimeTypes($options['validateMimeTypes']);
+        } else {
+            $this->setValidateMimeTypes(FeatureFlagHelper::featureEnabled('validateMimeTypes'));
         }
 
         $this->setMaxSize($maxSize);
@@ -169,13 +180,29 @@ class UploadedFileSchema extends Schema {
             return;
         }
 
+        if (!empty($detectedType)) {
+            $validTypes = $this->mimeTypes->getAllMimeTypes($extension);
+            // Check to see if the mime type is part of the valid mime type string.
+            // This code looks redundant, but sometimes mime_content_type() returns odd double strings.
+            // ex: application/vnd.openxmlformats-officedocument.wordprocessingml.documentapplication/vnd.openxmlformats-officedocument.wordprocessingml.document
+            foreach ($validTypes as $validType) {
+                if (strpos($detectedType, $validType) !== false) {
+                    return;
+                }
+            }
+        }
+
         if ($detectedType === self::UNKNOWN_CONTENT_TYPE && $this->getAllowUnknownTypes() === false) {
-            $field->addError("invalid", ["messageCode" => "{field} is an unknown file type."]);
+            $field->addError("invalid", ["messageCode" => "The file has an unknown mime type."]);
             return;
         } elseif (empty($validExtensions)) {
             trigger_error("No known mime type for extension: $extension.", E_USER_NOTICE);
         } else {
-            $field->addError("invalid", ["messageCode" => "{field} has an extension that is not valid for the content type."]);
+            $field->addError("invalid", [
+                "messageCode" => "The file has an extension that is not valid for its content type. ({ext} does not match {mime})",
+                "ext" => $extension,
+                "mime" => $detectedType,
+            ]);
             return;
         }
     }
@@ -215,7 +242,7 @@ class UploadedFileSchema extends Schema {
         if (is_string($file) && $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
-                if (file_exists($upload->getFile())) {
+                if (file_exists($upload->getFile()) && $this->getValidateMimeTypes()) {
                     $this->validateContentType($upload, $field, $ext);
                 }
                 $result = true;
@@ -246,5 +273,25 @@ class UploadedFileSchema extends Schema {
             $field->addError('invalid', ['messageCode' => '{field} exceeds the maximum file size.']);
         }
         return $upload;
+    }
+
+    /**
+     * Whether or not to validate mime types.
+     *
+     * @return bool Returns **true** if mime types are validated or **false** otherwise.
+     */
+    public function getValidateMimeTypes(): bool {
+        return $this->validateMimeTypes;
+    }
+
+    /**
+     * Whether or not to validate mime types.
+     *
+     * @param bool $validateMimeTypes The new value.
+     * @return $this
+     */
+    public function setValidateMimeTypes(bool $validateMimeTypes): self {
+        $this->validateMimeTypes = $validateMimeTypes;
+        return $this;
     }
 }

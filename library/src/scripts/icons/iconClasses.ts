@@ -5,7 +5,8 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { em } from "csx";
-import { margins, unit } from "@library/styles/styleHelpers";
+import { margins, unit, colorOut } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
@@ -38,6 +39,12 @@ export const iconVariables = useThemeCache(() => {
     const compact = themeVars("compact", {
         width: 12,
         height: 12,
+    });
+
+    const warning = themeVars("warning", {
+        width: 16,
+        height: 16,
+        color: "#f5af15",
     });
 
     const settings = themeVars("settings", {
@@ -114,6 +121,7 @@ export const iconVariables = useThemeCache(() => {
         vanillaLogo,
         compact,
         settings,
+        warning,
         search,
         notifications,
         messages,
@@ -167,6 +175,12 @@ export const iconClasses = useThemeCache(() => {
     const settings = style("settings", {
         width: unit(vars.settings.width),
         height: unit(vars.settings.height),
+    });
+
+    const warning = style("warning", {
+        width: unit(vars.warning.width),
+        height: unit(vars.warning.height),
+        color: colorOut(vars.warning.color),
     });
 
     const search = style("search", {
@@ -238,6 +252,7 @@ export const iconClasses = useThemeCache(() => {
     return {
         standard,
         newFolder,
+        warning,
         fileType,
         attachmentError,
         vanillaLogo,

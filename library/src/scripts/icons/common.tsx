@@ -218,6 +218,28 @@ export function NewFolderIcon(props: { className?: string; title?: string }) {
     );
 }
 
+export function WarningIcon(props: { className?: string; warningMessage: string }) {
+    const classes = iconClasses();
+
+    return (
+        <svg
+            className={classNames(classes.warning, props.className)}
+            aria-label={props.warningMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+        >
+            <title>{props.warningMessage}</title>
+            <circle cx="8" cy="8" r="8" style={currentColorFill} />
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
+            <path
+                d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z"
+                transform="translate(-4 -4)"
+                style={{ fill: "#fff" }}
+            />
+        </svg>
+    );
+}
+
 export function CategoryIcon(props: { className?: string }) {
     const title = t("Folder");
     const classes = iconClasses();

@@ -196,6 +196,12 @@ label,
   border: $border-width solid #ccc;
 }
 
+.form-sectionTitle {
+    padding: 0 $spacer;
+    margin-top: $spacer;
+    margin-bottom: 0;
+}
+
 .form-footer {
   display: flex;
   justify-content: flex-end;

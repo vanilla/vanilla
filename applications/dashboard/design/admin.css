@@ -6706,6 +6706,12 @@ label,
   border: 0.0625rem solid #ccc;
 }
 
+.form-sectionTitle {
+  padding: 0 1.125rem;
+  margin-top: 1.125rem;
+  margin-bottom: 0;
+}
+
 .form-footer {
   display: -webkit-flex;
   display: -ms-flexbox;

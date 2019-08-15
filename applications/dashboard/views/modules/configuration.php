@@ -109,6 +109,10 @@ echo $Form->errors();
                 echo $Form->textBox($Row['Name'], $Row['Options']);
                 echo '</div>';
                 break;
+            case 'title':
+                $title = htmlspecialchars($Row['Title']);
+                echo "<h2 class='form-sectionTitle'>$title</h2>";
+                break;
             default:
                 echo "Error a control type of {$Row['Control']} is not supported.";
                 break;

@@ -126,7 +126,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @param string $file The name of the file in the fixtures/uploads folder.
      * @param string $mime The mime type that the browser uploaded with the file..
      * @param bool $expected Whether or not the upload should be valid.
-     * @param string[] An optional array of allowed extensions.
+     * @param string[] $allowedExtensions An optional array of allowed extensions.
      */
     protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $allowedExtensions = []) {
         $file = $this->createUploadFile($file, $mime);

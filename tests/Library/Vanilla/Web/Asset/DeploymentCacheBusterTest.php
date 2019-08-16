@@ -20,7 +20,6 @@ class DeploymentCacheBusterTest extends TestCase {
      */
     public function testFallback() {
         $buster = new DeploymentCacheBuster(
-            new \DateTimeImmutable(1000),
             null
         );
 
@@ -32,39 +31,20 @@ class DeploymentCacheBusterTest extends TestCase {
      */
     public function testValue() {
         $firstValue = (new DeploymentCacheBuster(
-            new \DateTimeImmutable(1000),
             900
         ))->value();
         $secondValue = (new DeploymentCacheBuster(
-            new \DateTimeImmutable(1000),
             900
         ))->value();
         $this->assertEquals($firstValue, $secondValue, "Busters should be consistent between each other");
 
         $thirdValue = (new DeploymentCacheBuster(
-            new \DateTimeImmutable(1000),
             500
         ))->value();
         $this->assertNotEquals(
             $secondValue,
             $thirdValue,
             "Busters created at different times should have different values"
-        );
-
-        $deployTime = 900;
-        $beforeGracePeriodEllapsed = (new DeploymentCacheBuster(
-            new \DateTimeImmutable('@' . ($deployTime + DeploymentCacheBuster::GRACE_PERIOD - 1)),
-            $deployTime
-        ))->value();
-        $afterGracePeriodEllapsed = (new DeploymentCacheBuster(
-            new \DateTimeImmutable('@' . ($deployTime + DeploymentCacheBuster::GRACE_PERIOD + 1)),
-            $deployTime
-        ))->value();
-
-        $this->assertNotEquals(
-            $beforeGracePeriodEllapsed,
-            $afterGracePeriodEllapsed,
-            "The buster should change after the grace period."
         );
     }
 
@@ -73,7 +53,6 @@ class DeploymentCacheBusterTest extends TestCase {
      */
     public function testConsistentValue() {
         $buster = new DeploymentCacheBuster(
-            new \DateTimeImmutable(1000),
             500
         );
 

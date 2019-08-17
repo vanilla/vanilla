@@ -5,12 +5,17 @@ orbs:
             checkout:
                 steps:
                 - run:
-                    name: Clone own repo
-                    command: |
-                        git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts
-                        ~/workspace/ci-scripts/get-target-branch.sh
-                        ~/workspace/ci-scripts/clone-repo.sh
-                        ~/workspace/ci-scripts/merge-master.sh
+                    name: Clone Scripts
+                    command: git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts
+                - run:
+                    name: Prepare target branches
+                    command: ~/workspace/ci-scripts/get-target-branch.sh
+                - run:
+                    name: Clone Repo
+                    command: ~/workspace/ci-scripts/clone-repo.sh
+                - run:
+                    name: Merge Target Branch
+                    command: ~/workspace/ci-scripts/merge-master.sh
             prepare_mysql:
                 steps:
                 - run:

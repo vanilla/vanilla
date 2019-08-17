@@ -7,10 +7,15 @@ orbs:
                 - run:
                     name: Clone own repo
                     command: |
-                        git clone https://github.com/vanilla/workspace/ci-scripts.git ~/workspace/ci-scripts
+                        git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts
                         ~/workspace/ci-scripts/get-target-branch.sh
                         ~/workspace/ci-scripts/clone-repo.sh
                         ~/workspace/ci-scripts/merge-master.sh
+            prepare_mysql:
+                steps:
+                - run:
+                    name: Prepare MySQL
+                    command: ~/workspace/ci-scripts/prepare-mysql.sh
 aliases:
     - &db_env
         MYSQL_USER: circleci
@@ -89,28 +94,6 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
-    - &prepare_mysql
-        run:
-            name: Prepare Database Dependencies
-            command: |
-                sudo apt-get update && sudo apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
-                sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
-                sudo docker-php-ext-install pdo pdo_mysql gd
-                sudo apt-get install mysql-client
-                # Create the SQL "circleci" user. Once we remove travis this should no longer be necessary.
-                mysql -h 127.0.0.1 -u root -e \
-                    "CREATE USER 'circleci'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'circleci'@'127.0.0.1' IDENTIFIED BY '';"
-    - &await_mysql
-        run:
-            name: Waiting for MySQL to be ready
-            command: |
-                for i in `seq 1 30`;
-                do
-                nc -z 127.0.0.1 3306 && echo Success && exit 0
-                echo -n .
-                sleep 1
-                done
-                echo Failed waiting for MySQL && exit 1
 jobs:
     frontend_setup:
         docker: *node
@@ -203,8 +186,7 @@ jobs:
                 command: |
                     cd ~/workspace/php
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - *prepare_mysql
-            - *await_mysql
+                    - vanilla/prepare_mysql
             - run:
                 name: Library Tests
                 command: |
@@ -221,8 +203,7 @@ jobs:
             - *attach_workspace
             - *set_hosts
             - *install_nginx
-            - *prepare_mysql
-            - *await_mysql
+            - vanilla/prepare_mysql
             - run:
                 name: Starrt PHP-FPM/Nginx
                 command: |

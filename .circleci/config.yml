@@ -7,10 +7,10 @@ orbs:
                 - run:
                     name: Clone own repo
                     command: |
-                        git clone https://github.com/vanilla/ci-scripts.git /ci-scripts
-                        /ci-scripts/get-target-branch.sh
-                        /ci-scripts/clone-repo.sh
-                        /ci-scripts/merge-master.sh
+                        git clone https://github.com/vanilla/ci-scripts.git ~/ci-scripts
+                        ~/ci-scripts/get-target-branch.sh
+                        ~/ci-scripts/clone-repo.sh
+                        ~/ci-scripts/merge-master.sh
 aliases:
     - &db_env
         MYSQL_USER: circleci

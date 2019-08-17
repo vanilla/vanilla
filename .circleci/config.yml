@@ -197,12 +197,6 @@ jobs:
             - vanilla/prepare_nginx
             - vanilla/prepare_php_tests
             - run:
-                name: Start PHP-FPM/Nginx
-                command: |
-                    cd  ~/workspace/repo
-                    php-fpm --daemonize
-                    sudo ./.circleci/scripts/start-nginx.sh
-            - run:
                 name: APIv0 Tests
                 command: |
                     cd ~/workspace/repo

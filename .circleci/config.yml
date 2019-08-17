@@ -101,7 +101,7 @@ jobs:
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
-                    - frontend
+                    - repo
     frontend_build:
         docker: *node
         steps:
@@ -151,7 +151,7 @@ jobs:
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
-                    - php
+                    - repo
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps

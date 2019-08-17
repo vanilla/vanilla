@@ -357,7 +357,7 @@ class MediaApiController extends AbstractApiController {
      * Return information from the media row along with a full URL to the file.
      *
      * @param array $body The request body.
-     * @return arrayx
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');

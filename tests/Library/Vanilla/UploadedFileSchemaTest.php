@@ -145,10 +145,10 @@ class UploadedFileSchemaTest extends TestCase {
      *
      * @param string $file The name of the file in the fixtures/uploads folder.
      * @param string $mime The mime type that the browser uploaded with the file..
-     * @param bool $expected Whether or not the upload should be valid.
+     * @param bool|null $expected Whether or not the upload should be valid.
      * @param array $options Options for the `UploadFileSchema`.
      */
-    protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $options = []) {
+    protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected = null, array $options = []) {
         $file = $this->createUploadFile($file, $mime);
 
         $options += [
@@ -159,8 +159,13 @@ class UploadedFileSchemaTest extends TestCase {
         ];
         $schema = new UploadedFileSchema($options);
 
-        $actual = $schema->isValid($file);
-        $this->assertSame($expected, $actual);
+        if ($expected === null) {
+            $schema->validate($file);
+            $this->assertTrue(true);
+        } else {
+            $actual = $schema->isValid($file);
+            $this->assertSame($expected, $actual);
+        }
     }
 
     /**
@@ -212,7 +217,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @dataProvider provideTestFiles
      */
     public function testValidFile(string $filename) {
-        $this->assertUploadedFileMimeType("valid/$filename", '', true);
+        $this->assertUploadedFileMimeType("valid/$filename", '', null);
     }
 
     /**

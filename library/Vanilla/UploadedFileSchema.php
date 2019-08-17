@@ -18,10 +18,14 @@ use Mimey\MimeTypes;
  * Validation for uploaded files.
  */
 class UploadedFileSchema extends Schema {
-
     protected const UNKNOWN_CONTENT_TYPE = "application/octet-stream";
 
     protected const TEXT_CONTENT_TYPE = "text/plain";
+
+    const OPTION_ALLOWED_EXTENSIONS = 'allowedExtensions';
+    const OPTION_MAX_SIZE = 'maxSize';
+    const OPTION_VALIDATE_CONTENT_TYPES = 'validateContentTypes';
+    const OPTION_ALLOW_UNKNOWN_TYPES = "allowUnknownTypes";
 
     /** @var int $maxFileSize */
     private $maxSize;
@@ -46,14 +50,18 @@ class UploadedFileSchema extends Schema {
      * @param array $options
      */
     public function __construct(array $options = []) {
-        if (array_key_exists('allowedExtensions', $options)) {
-            $allowedExtensions = $options['allowedExtensions'];
+        $options += [
+            self::OPTION_VALIDATE_CONTENT_TYPES => false,
+        ];
+
+        if (array_key_exists(self::OPTION_ALLOWED_EXTENSIONS, $options)) {
+            $allowedExtensions = $options[self::OPTION_ALLOWED_EXTENSIONS];
         } else {
             $allowedExtensions = Gdn::getContainer()->get('Config')->get('Garden.Upload.AllowedFileExtensions', []);
         }
 
-        if (array_key_exists('maxSize', $options)) {
-            $maxSize = $options['maxSize'];
+        if (array_key_exists(self::OPTION_MAX_SIZE, $options)) {
+            $maxSize = $options[self::OPTION_MAX_SIZE];
         } else {
             $maxSize = Gdn_Upload::unformatFileSize(Gdn::getContainer()->get('Config')->get(
                 'Garden.Upload.MaxFileSize',
@@ -61,17 +69,13 @@ class UploadedFileSchema extends Schema {
             ));
         }
 
-        if (array_key_exists('validateContentTypes', $options)) {
-            $this->setValidateContentTypes($options['validateContentTypes']);
-        } else {
-            $this->setValidateContentTypes(FeatureFlagHelper::featureEnabled('validateContentTypes'));
-        }
+        $this->setValidateContentTypes($options[self::OPTION_VALIDATE_CONTENT_TYPES]);
 
         $this->setMaxSize($maxSize);
         $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));
 
         $this->mimeTypes = new MimeTypes();
-        $this->setAllowUnknownTypes($options["allowUnknownTypes"] ?? false);
+        $this->setAllowUnknownTypes($options[self::OPTION_ALLOW_UNKNOWN_TYPES] ?? false);
 
         parent::__construct([
             'id' => 'UploadedFile',
@@ -192,9 +196,10 @@ class UploadedFileSchema extends Schema {
             }
         }
 
-        if ($detectedType === self::UNKNOWN_CONTENT_TYPE && $this->getAllowUnknownTypes() === false) {
-            $field->addError("invalid", ["messageCode" => "The file has an unknown mime type."]);
-            return;
+        if ($detectedType === self::UNKNOWN_CONTENT_TYPE) {
+            if (!$this->getAllowUnknownTypes()) {
+                $field->addError("invalid", ["messageCode" => "The file has an unknown mime type."]);
+            }
         } elseif (empty($validExtensions)) {
             trigger_error("No known mime type for extension: $extension.", E_USER_NOTICE);
         } else {
@@ -203,7 +208,6 @@ class UploadedFileSchema extends Schema {
                 "ext" => $extension,
                 "mime" => $detectedType,
             ]);
-            return;
         }
     }
 
@@ -219,8 +223,10 @@ class UploadedFileSchema extends Schema {
             $field->addError('invalid', ['messageCode' => '{field} is not a valid file upload.']);
         }
         /* @var UploadedFile $value */
-        $this->validateSize($value, $field);
-        $this->validateExtension($value, $field);
+        if ($this->validateExists($value, $field)) {
+            $this->validateSize($value, $field);
+            $this->validateExtension($value, $field);
+        }
 
         if ($field->getErrorCount() > 0) {
             $value = Invalid::value();
@@ -293,5 +299,20 @@ class UploadedFileSchema extends Schema {
     public function setValidateContentTypes(bool $validateContentTypes): self {
         $this->validateContentTypes = $validateContentTypes;
         return $this;
+    }
+
+    /**
+     * Validate that an uploaded file exists.
+     *
+     * @param UploadedFile $file The file to test.
+     * @param ValidationField $field The field to collect errors.
+     * @return bool Returns **true** if the file validated or **false** otherwise.
+     */
+    protected function validateExists(UploadedFile $file, ValidationField $field): bool {
+        if (!file_exists($file->getFile())) {
+            $field->addError("required", ["messageCode" => "File doesn't exist."]);
+            return false;
+        }
+        return true;
     }
 }

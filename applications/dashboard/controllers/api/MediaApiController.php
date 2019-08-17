@@ -363,8 +363,9 @@ class MediaApiController extends AbstractApiController {
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => $allowedExtensions,
-            "allowUnknownTypes" => $this->config->get("Garden.Upload.AllowUnknownTypes", true)
+            UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
+            UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => $this->config->get("Garden.Upload.AllowUnknownTypes", true),
+            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled('validateContentTypes'),
         ]);
 
         $in = $this->schema([

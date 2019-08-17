@@ -25,7 +25,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @expectedException \Garden\Schema\ValidationException
      */
     public function testBadExtension() {
-        $schema = new UploadedFileSchema();
+        $schema = new UploadedFileSchema(['validateContentTypes' => true]);
         $schema->setAllowedExtensions(['jpg']);
 
         $schema->validate(new UploadedFile(
@@ -91,7 +91,7 @@ class UploadedFileSchemaTest extends TestCase {
 
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
-            '/tmp/php123',
+            PATH_FIXTURES . '/apple.jpg',
             80,
             UPLOAD_ERR_OK,
             'image.JPG',
@@ -111,7 +111,7 @@ class UploadedFileSchemaTest extends TestCase {
 
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
-            '/tmp/php123',
+            PATH_FIXTURES . '/apple.jpg',
             80,
             UPLOAD_ERR_OK,
             'image.jpg',
@@ -126,13 +126,21 @@ class UploadedFileSchemaTest extends TestCase {
      * @param string $file The name of the file in the fixtures/uploads folder.
      * @param string $mime The mime type that the browser uploaded with the file..
      * @param bool $expected Whether or not the upload should be valid.
-     * @param string[] $allowedExtensions An optional array of allowed extensions.
+     * @param array $options Options for the `UploadFileSchema`.
      */
-    protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $allowedExtensions = []) {
+    protected function assertUploadedFileMimeType(string $file, string $mime, bool $expected, array $options = []) {
         $file = $this->createUploadFile($file, $mime);
-        $schema = new UploadedFileSchema(['validateContentTypes' => true]);
-        if (!empty($allowedExtensions)) {
-            $schema->setAllowedExtensions($allowedExtensions);
+
+        $options += [
+            'validateContentTypes' => true,
+            'allowedExtensions' => ['jpg'],
+            'maxSize' => 80,
+            'allowUnknownTypes' => false,
+        ];
+
+        $schema = new UploadedFileSchema($options);
+        if (!empty($options)) {
+            $schema->setAllowedExtensions($options);
         }
 
         $actual = $schema->isValid($file);
@@ -164,7 +172,21 @@ class UploadedFileSchemaTest extends TestCase {
      * A non-existent file should fail upload validation.
      */
     public function testNonexistantFile() {
-        $this->assertUploadedFileMimeType('dont-create-me.text', 'text/plain', false);
+        $this->assertUploadedFileMimeType('dont-create-me.txt', 'text/plain', false);
+    }
+
+    /**
+     * A random binary file should be allowed if we allow unknown types.
+     */
+    public function testRandomFileValid() {
+        $this->assertUploadedFileMimeType('random.fooxds', '', true, [UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => true]);
+    }
+
+    /**
+     * By default a random binary file should be invalid.
+     */
+    public function testRandomFileInvalid() {
+        $this->assertUploadedFileMimeType('random.fooxds', '', false);
     }
 
     /**
@@ -174,7 +196,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @dataProvider provideTestFiles
      */
     public function testValidFile(string $filename) {
-        $this->assertUploadedFileMimeType($filename, '', true, [strtolower(pathinfo($filename, PATHINFO_EXTENSION))]);
+        $this->assertUploadedFileMimeType("valid/$filename", '', true, [strtolower(pathinfo($filename, PATHINFO_EXTENSION))]);
     }
 
     /**

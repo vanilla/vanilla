@@ -30,6 +30,7 @@
         "php": ">=7.1.0",
         "ext-pdo": "*",
         "ext-json": "*",
+        "ext-fileinfo": "*",
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
         "firebase/php-jwt": "~5.0",

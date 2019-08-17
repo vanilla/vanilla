@@ -178,7 +178,7 @@ class UploadedFileSchemaTest extends TestCase {
     /**
      * Test a file with a good content type.
      */
-    public function testMimeTypeGood() {
+    public function testContentTypeGood() {
         $this->assertUploadedFileMimeType('text.txt', 'text/plain', true);
     }
 
@@ -217,7 +217,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @dataProvider provideTestFiles
      */
     public function testValidFile(string $filename) {
-        $this->assertUploadedFileMimeType("valid/$filename", '', null);
+        $this->assertUploadedFileMimeType("valid/$filename", '', null, [UploadedFileSchema::OPTION_ALLOW_NON_STRICT_TYPES => true]);
     }
 
     /**

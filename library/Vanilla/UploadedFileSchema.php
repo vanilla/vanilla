@@ -26,6 +26,7 @@ class UploadedFileSchema extends Schema {
     const OPTION_MAX_SIZE = 'maxSize';
     const OPTION_VALIDATE_CONTENT_TYPES = 'validateContentTypes';
     const OPTION_ALLOW_UNKNOWN_TYPES = "allowUnknownTypes";
+    const OPTION_ALLOW_NON_STRICT_TYPES = 'allowNonStrictTypes';
 
     /** @var int $maxFileSize */
     private $maxSize;
@@ -45,6 +46,20 @@ class UploadedFileSchema extends Schema {
     private $validateContentTypes = false;
 
     /**
+     * @var bool Whether or not to allow non-strict types without checking.
+     */
+    private $allowNonStrictTypes = false;
+
+    /**
+     * @var string[] Content types that must match their extensions.
+     */
+    private $strictContentTypes = [
+        'text/html',
+        'application/x-shockwave-flash',
+        'application/xhtml+xml',
+    ];
+
+    /**
      * Initialize an instance of a new UploadedFileSchema class.
      *
      * @param array $options
@@ -52,6 +67,7 @@ class UploadedFileSchema extends Schema {
     public function __construct(array $options = []) {
         $options += [
             self::OPTION_VALIDATE_CONTENT_TYPES => false,
+            self::OPTION_ALLOW_NON_STRICT_TYPES => false,
         ];
 
         if (array_key_exists(self::OPTION_ALLOWED_EXTENSIONS, $options)) {
@@ -70,6 +86,7 @@ class UploadedFileSchema extends Schema {
         }
 
         $this->setValidateContentTypes($options[self::OPTION_VALIDATE_CONTENT_TYPES]);
+        $this->setAllowNonStrictTypes($options[self::OPTION_ALLOW_NON_STRICT_TYPES]);
 
         $this->setMaxSize($maxSize);
         $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));
@@ -162,41 +179,32 @@ class UploadedFileSchema extends Schema {
     }
 
     /**
-     * Validate the upload's MIME content type.
+     * Validate that a mime type matches its extension.
      *
-     * @param UploadedFile $upload
-     * @param ValidationField $field
-     * @param string $extension
+     * @param string $mime The mime type to test.
+     * @param string $extension The file extension.
+     * @param ValidationField $field The error collector.
      */
-    protected function validateContentType(UploadedFile $upload, ValidationField $field, string $extension): void {
-        $file = $upload->getFile();
+    private function validateContentTypeExtension(string $mime, string $extension, ValidationField $field): void {
+        $validExtensions = $this->mimeTypes->getAllExtensions($mime);
 
-        $detectedType = mime_content_type($file);
-        if (!is_string($detectedType)) {
-            $field->addError("invalid", ["messageCode" => "Content type of {field} cannot be detected."]);
+        if (in_array($extension, $validExtensions) || $mime === self::TEXT_CONTENT_TYPE) {
             return;
         }
 
-        $extension = strtolower($extension);
-        $validExtensions = $this->mimeTypes->getAllExtensions($detectedType);
-
-        if (in_array($extension, $validExtensions) || $detectedType === self::TEXT_CONTENT_TYPE) {
-            return;
-        }
-
-        if (!empty($detectedType)) {
+        if (!empty($mime)) {
             $validTypes = $this->mimeTypes->getAllMimeTypes($extension);
             // Check to see if the mime type is part of the valid mime type string.
             // This code looks redundant, but sometimes mime_content_type() returns odd double strings.
             // ex: application/vnd.openxmlformats-officedocument.wordprocessingml.documentapplication/vnd.openxmlformats-officedocument.wordprocessingml.document
             foreach ($validTypes as $validType) {
-                if (!empty($validType) && strpos($detectedType, $validType) !== false) {
+                if (!empty($validType) && strpos($mime, $validType) !== false) {
                     return;
                 }
             }
         }
 
-        if ($detectedType === self::UNKNOWN_CONTENT_TYPE) {
+        if ($mime === self::UNKNOWN_CONTENT_TYPE) {
             if (!$this->getAllowUnknownTypes()) {
                 $field->addError("invalid", ["messageCode" => "The file has an unknown mime type."]);
             }
@@ -206,8 +214,29 @@ class UploadedFileSchema extends Schema {
             $field->addError("invalid", [
                 "messageCode" => "The file has an extension that is not valid for its content type. ({ext} does not match {mime})",
                 "ext" => $extension,
-                "mime" => $detectedType,
+                "mime" => $mime,
             ]);
+        }
+    }
+
+    /**
+     * Validate the upload's MIME content type.
+     *
+     * @param UploadedFile $upload
+     * @param ValidationField $field
+     * @param string $extension
+     */
+    private function validateContentType(UploadedFile $upload, ValidationField $field, string $extension): void {
+        $file = $upload->getFile();
+
+        $detectedType = strtolower(mime_content_type($file));
+        if (!is_string($detectedType)) {
+            $field->addError("invalid", ["messageCode" => "Content type of {field} cannot be detected."]);
+            return;
+        }
+
+        if (!$this->getAllowNonStrictTypes() || in_array($detectedType, $this->getStrictContentTypes())) {
+            $this->validateContentTypeExtension($detectedType, $extension, $field);
         }
     }
 
@@ -314,5 +343,61 @@ class UploadedFileSchema extends Schema {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get an array of content types that must match their file extensions.
+     *
+     * Strict content types mast match their file extensions.
+     *
+     * @return string[] Returns an array of mime types..
+     */
+    public function getStrictContentTypes(): array {
+        return $this->strictContentTypes;
+    }
+
+    /**
+     * Set the strict content types.
+     *
+     * @param string $strictContentTypes A list of mime types.
+     * @return $this
+     */
+    public function setStrictContentTypes(array $strictContentTypes): self {
+        $this->strictContentTypes = $strictContentTypes;
+        return $this;
+    }
+
+    /**
+     * Add a new strict content type.
+     *
+     * @param string $mime The mime type of the content.
+     * @return UploadedFileSchema
+     */
+    public function addStrictContentType(string $mime): self {
+        $this->strictContentTypes[] = $mime;
+    }
+
+    /**
+     * Whether or not to allow all files that aren't in the strict types array.
+     *
+     * @return bool Returns **true** to allow or **false** otherwise.
+     */
+    public function getAllowNonStrictTypes(): bool {
+        return $this->allowNonStrictTypes;
+    }
+
+    /**
+     * Set whether or not to allow all files that aren't in the strict types array.
+     *
+     * Be very careful when setting this property to **true**. Content type detection varies from server to server and
+     * is not very accurate in general. It is recommended that you set this to true if you know the file types you will
+     * be allowing.
+     *
+     * @param bool $allowNonStrictTypes The new value.
+     * @return $this
+     */
+    public function setAllowNonStrictTypes(bool $allowNonStrictTypes): self {
+        $this->allowNonStrictTypes = $allowNonStrictTypes;
+        return $this;
     }
 }

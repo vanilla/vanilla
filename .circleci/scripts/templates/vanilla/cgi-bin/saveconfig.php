@@ -73,6 +73,9 @@ class SimpleConfig {
         }
     }
 
+    /**
+     * Get a path to the configuration.
+     */
     public function getConfigPath() {
         $host = $_SERVER['HTTP_HOST'];
         if (strpos($host, ':') !== false) {
@@ -152,42 +155,13 @@ class SimpleConfig {
     }
 
     /**
-     * Return the value from an associative array or an object.
-     *
-     * This function differs from getValue() in that $Key can be a string consisting of dot notation that will be used
-     * to recursively traverse the collection.
-     *
-     * @param string $key The key or property name of the value.
-     * @param mixed $collection The array or object to search.
-     * @param mixed $default The value to return if the key does not exist.
-     * @return mixed The value from the array or object.
-     */
-    private function getvalr($key, $collection, $default = false) {
-        $path = explode('.', $key);
-
-        $value = $collection;
-        for ($i = 0; $i < count($path); ++$i) {
-            $subKey = $path[$i];
-
-            if (is_array($value) && isset($value[$subKey])) {
-                $value = $value[$subKey];
-            } elseif (is_object($value) && isset($value->$subKey)) {
-                $value = $value->$subKey;
-            } else {
-                return $default;
-            }
-        }
-        return $value;
-    }
-
-    /**
      * Set a key to a value in a collection.
      *
      * Works with single keys or "dot" notation. If $key is an array, a simple
      * shallow array_merge is performed.
      *
      * @param string $key The key or property name of the value.
-     * @param array &$collection The array or object to search.
+     * @param array $collection The array or object to search.
      * @param mixed $value The value to set.
      * @return mixed Newly set value or if array merge.
      */

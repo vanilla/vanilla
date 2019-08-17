@@ -102,6 +102,7 @@ jobs:
                 root: ~/workspace
                 paths:
                     - repo
+                    - ci-scripts
     frontend_build:
         docker: *node
         steps:
@@ -152,6 +153,7 @@ jobs:
                 root: ~/workspace
                 paths:
                     - repo
+                    - ci-scripts
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps
@@ -168,7 +170,7 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-                    - vanilla/prepare_mysql
+            - vanilla/prepare_mysql
             - run:
                 name: Library Tests
                 command: |
@@ -187,7 +189,7 @@ jobs:
             - *install_nginx
             - vanilla/prepare_mysql
             - run:
-                name: Starrt PHP-FPM/Nginx
+                name: Start PHP-FPM/Nginx
                 command: |
                     cd  ~/workspace/repo
                     php-fpm --daemonize

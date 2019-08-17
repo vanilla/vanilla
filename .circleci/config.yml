@@ -115,6 +115,7 @@ jobs:
                     - ci-scripts
     frontend_build:
         executor: vanilla/node
+        resource_class: large
         steps:
             - *attach_workspace
             - run:

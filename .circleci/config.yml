@@ -36,23 +36,6 @@ aliases:
         - image: circleci/php:7.3.6-fpm-stretch-node
         - image: mysql:5.7.26
           environment: *db_env
-    - &is_php
-        run:
-            name: Configuring as Frontend
-            command: |
-                mkdir $HOME/workspace
-                echo 'TARGET_DIR="$HOME/workspace/php"' >> $BASH_ENV
-    - &is_frontend
-        run:
-            name: Configuring as Frontend
-            command: |
-                mkdir $HOME/workspace
-                echo 'TARGET_DIR="$HOME/workspace/frontend"' >> $BASH_ENV
-    - &post_checkout_frontend
-        run:
-            name: Merge Target Branch
-            command: |
-                cd ~/workspace/frontend && ~/workspace/frontend/.circleci/scripts/merge-master.sh
     - &install_nginx
         run:
             name: Installing NGINX
@@ -63,7 +46,7 @@ aliases:
         run:
             name: Install Yarn Packages
             command: |
-                cd ~/workspace/frontend
+                cd ~/workspace/repo
                 yarn install --pure-lockfile
                 yarn install-all
     - &set_hosts
@@ -80,13 +63,13 @@ aliases:
         run:
             name: Install Composer Packages
             command: |
-                cd ~/workspace/php
+                cd ~/workspace/repo
                 VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
     - &run_php_lint
         run:
             name: Linting PHP
             command: |
-                cd ~/workspace/php
+                cd ~/workspace/repo
                 # Validate syntax in all the files
                 .circleci/scripts/php-lint.sh ./applications
                 .circleci/scripts/php-lint.sh ./conf
@@ -105,13 +88,12 @@ jobs:
                 command: |
                     node --version
                     yarn --version
-            - *is_frontend
             - vanilla/checkout
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
                 command: |
-                    cd ~/workspace/frontend
+                    cd ~/workspace/repo
                     rm -rf .git
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
@@ -127,7 +109,7 @@ jobs:
             - run:
                 name: Build Frontend
                 command: |
-                    cd ~/workspace/frontend
+                    cd ~/workspace/repo
                     yarn build
     frontend_test:
         docker: *node
@@ -136,14 +118,14 @@ jobs:
             - run:
                 name: Build Frontend
                 command: |
-                    cd ~/workspace/frontend
+                    cd ~/workspace/repo
                     yarn test
     frontend_lint:
         docker: *node
         steps:
             - *attach_workspace
             - run: |
-                cd ~/workspace/frontend
+                cd ~/workspace/repo
                 yarn lint
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
@@ -152,7 +134,7 @@ jobs:
         steps:
             - *attach_workspace
             - run: |
-                cd ~/workspace/frontend
+                cd ~/workspace/repo
                 yarn check-types
     php_setup:
         docker: *php72
@@ -162,7 +144,6 @@ jobs:
                 command: |
                     php --version
                     composer --version
-            - *is_php
             - vanilla/checkout
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
@@ -174,7 +155,6 @@ jobs:
     php_72_lint:
         docker: *php72
         steps: &php_lint_steps
-            - *is_php
             - vanilla/checkout
             - *run_composer
             - *run_php_lint
@@ -186,18 +166,18 @@ jobs:
             - run:
                 name: Test setup
                 command: |
-                    cd ~/workspace/php
+                    cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
                     - vanilla/prepare_mysql
             - run:
                 name: Library Tests
                 command: |
-                    cd ~/workspace/php
+                    cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
             - run:
                 name: APIv2 Tests
                 command: |
-                    cd ~/workspace/php
+                    cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
     php_72_integration:
         docker: *php72
@@ -209,18 +189,18 @@ jobs:
             - run:
                 name: Starrt PHP-FPM/Nginx
                 command: |
-                    cd  ~/workspace/php
+                    cd  ~/workspace/repo
                     php-fpm --daemonize
                     sudo ./.circleci/scripts/start-nginx.sh
             - run:
                 name: APIv0 Tests
                 command: |
-                    cd ~/workspace/php
+                    cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
             - run:
                 name: Models Tests
                 command: |
-                    cd ~/workspace/php
+                    cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
     php_73_lint:
         docker: *php73
@@ -243,9 +223,7 @@ jobs:
     dependency_audit:
         docker: *php72
         steps:
-            - *is_frontend
             - vanilla/checkout
-            - *post_checkout_frontend
             - run: yarn audit
 
 workflows:

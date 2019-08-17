@@ -1,7 +1,6 @@
 /**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import React from "react";
@@ -17,13 +16,18 @@ type LoadFunction = () => Promise<any>;
  * Class for managing routing and matching a particular page.
  */
 export default class RouteHandler<GeneratorProps> {
+    /** A react-loadable instance. */
     public loadable;
+
+    /** A react node representing the route of the component. */
     public route: React.ReactNode;
+
+    /** Key to identify the route. Components with the same key share the same instance. */
     private key: string;
 
     public constructor(
         componentPromise: LoadFunction,
-        public path: string,
+        public path: string | string[],
         public url: (data: GeneratorProps) => string,
         loadingComponent: React.ReactNode = Loader,
         key?: string,
@@ -32,10 +36,16 @@ export default class RouteHandler<GeneratorProps> {
             loading: loadingComponent as any,
             loader: componentPromise,
         });
-        this.key = key || path;
-        this.route = <Route exact path={this.path} component={this.loadable} key={this.key} />;
+        const finalPath = Array.isArray(path) ? path : [path];
+        this.key = key || finalPath.join("-");
+        this.route = <Route exact path={path} component={this.loadable} key={this.key} />;
     }
 
+    /**
+     * A component representing a link to the component.
+     *
+     * - Preloads the loadable for the component on hover.
+     */
     public Link = (props: Omit<NavLinkProps, "to"> & { data: GeneratorProps }) => {
         return (
             <Hoverable duration={50} onHover={this.preload}>
@@ -44,7 +54,10 @@ export default class RouteHandler<GeneratorProps> {
         );
     };
 
+    /**
+     * Call this to preload the route.
+     */
     public preload = () => {
-        (this.loadable as LoadableComponent).preload();
+        return (this.loadable as LoadableComponent).preload();
     };
 }

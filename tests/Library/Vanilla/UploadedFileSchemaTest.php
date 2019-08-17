@@ -30,7 +30,7 @@ class UploadedFileSchemaTest extends TestCase {
 
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
-            '/tmp/php123',
+            PATH_FIXTURES . '/uploads/valid/doc.docx',
             40,
             UPLOAD_ERR_OK,
             'image.gif',
@@ -44,6 +44,7 @@ class UploadedFileSchemaTest extends TestCase {
      *
      * @throws \Garden\Schema\ValidationException
      * @expectedException \Garden\Schema\ValidationException
+     * @expectedExceptionMessageRegExp `exceeds the maximum file size`
      */
     public function testBadSize() {
         $schema = new UploadedFileSchema();
@@ -51,7 +52,7 @@ class UploadedFileSchemaTest extends TestCase {
 
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
-            '/tmp/php123',
+            PATH_FIXTURES . '/uploads/valid/doc.docx',
             200,
             UPLOAD_ERR_OK,
             'image.jpg',
@@ -65,13 +66,14 @@ class UploadedFileSchemaTest extends TestCase {
      *
      * @throws \Garden\Schema\ValidationException
      * @expectedException \Garden\Schema\ValidationException
+     * @expectedExceptionMessageRegExp `does not contain a file extension`
      */
     public function testNoExtension() {
         $schema = new UploadedFileSchema();
 
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
-            '/tmp/php123',
+            PATH_FIXTURES . '/uploads/valid/doc.docx',
             40,
             UPLOAD_ERR_OK,
             'image',
@@ -92,6 +94,24 @@ class UploadedFileSchemaTest extends TestCase {
         $schema->validate(new UploadedFile(
             new Gdn_Upload(),
             PATH_FIXTURES . '/apple.jpg',
+            80,
+            UPLOAD_ERR_OK,
+            'image.JPG',
+            'image/jpeg'
+        ));
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Real uploads have a different filename than the actual file.
+     */
+    public function testDifferentClientFilename() {
+        $schema = new UploadedFileSchema();
+        $schema->setAllowedExtensions(['jpg']);
+
+        $schema->validate(new UploadedFile(
+            new Gdn_Upload(),
+            PATH_FIXTURES . '/uploads/apple',
             80,
             UPLOAD_ERR_OK,
             'image.JPG',
@@ -132,16 +152,12 @@ class UploadedFileSchemaTest extends TestCase {
         $file = $this->createUploadFile($file, $mime);
 
         $options += [
-            'validateContentTypes' => true,
-            'allowedExtensions' => ['jpg'],
-            'maxSize' => 80,
-            'allowUnknownTypes' => false,
+            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => true,
+            UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => [strtolower(pathinfo($file->getFile(), PATHINFO_EXTENSION))],
+            UploadedFileSchema::OPTION_MAX_SIZE => 80,
+            UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => false,
         ];
-
         $schema = new UploadedFileSchema($options);
-        if (!empty($options)) {
-            $schema->setAllowedExtensions($options);
-        }
 
         $actual = $schema->isValid($file);
         $this->assertSame($expected, $actual);
@@ -165,7 +181,7 @@ class UploadedFileSchemaTest extends TestCase {
      * An unknown file extension that is really just plain text should pass.
      */
     public function testUnknownGoodFileExtension() {
-        $this->assertUploadedFileMimeType('test.confz0', 'text/plain', true, ['confz0']);
+        $this->assertUploadedFileMimeType('test.confz0', 'text/plain', true, [UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => ['confz0']]);
     }
 
     /**
@@ -196,7 +212,7 @@ class UploadedFileSchemaTest extends TestCase {
      * @dataProvider provideTestFiles
      */
     public function testValidFile(string $filename) {
-        $this->assertUploadedFileMimeType("valid/$filename", '', true, [strtolower(pathinfo($filename, PATHINFO_EXTENSION))]);
+        $this->assertUploadedFileMimeType("valid/$filename", '', true);
     }
 
     /**

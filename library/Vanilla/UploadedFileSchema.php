@@ -248,7 +248,7 @@ class UploadedFileSchema extends Schema {
         if (is_string($file) && $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
-                if (file_exists($upload->getFile()) && $this->getValidateContentTypes()) {
+                if ($this->getValidateContentTypes()) {
                     $this->validateContentType($upload, $field, $ext);
                 }
                 $result = true;

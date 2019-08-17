@@ -12,17 +12,17 @@ orbs:
                 docker:
                 - image: circleci/php:7.1.30-fpm-stretch-node
                 - image: mysql:5.7.26
-                environment: *db_env
+                  environment: *db_env
             php72:
                 docker:
                 - image: circleci/php:7.2.19-fpm-stretch-node
                 - image: mysql:5.7.26
-                environment: *db_env
+                  environment: *db_env
             php73:
                 docker:
                 - image: circleci/php:7.3.6-fpm-stretch-node
                 - image: mysql:5.7.26
-                environment: *db_env
+                  environment: *db_env
             node:
                 docker:
                     - image: circleci/node:lts-browsers

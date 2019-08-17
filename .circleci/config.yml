@@ -19,10 +19,6 @@ orbs:
                         $CHECKOUT_KEY
                         EOF
                         )
-
-                        # use git+ssh instead of https
-                        git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
-                        git config --global gc.auto 0 || true
                 - run:
                     name: Clone Scripts
                     command: git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts

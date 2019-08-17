@@ -194,8 +194,8 @@ jobs:
         executor: vanilla/php72
         steps: &php_integration_test_steps
             - *attach_workspace
-            - vanilla/prepare_nginx
             - vanilla/prepare_php_tests
+            - vanilla/prepare_nginx
             - run:
                 name: APIv0 Tests
                 command: |

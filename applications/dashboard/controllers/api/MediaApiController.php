@@ -9,6 +9,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use \Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;

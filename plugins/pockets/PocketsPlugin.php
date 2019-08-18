@@ -728,7 +728,6 @@ class PocketsPlugin extends Gdn_Plugin {
      * Toggle pocket locations.
      *
      * @param SettingsController $sender
-     * @throws Gdn_UserException
      */
     private function toggleLocations(SettingsController $sender) {
         $sender->Request->isAuthenticatedPostBack(true);

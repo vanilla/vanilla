@@ -141,7 +141,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setHighlightRoute('settings/pockets');
         $sender->addJsFile('pockets.js', 'plugins/pockets');
 
-        $page = val(0, $args);
+        $page = $args[0] ?? null;
         switch (strtolower($page)) {
             case 'add':
                 return $this->_add($sender);
@@ -157,6 +157,9 @@ class PocketsPlugin extends Gdn_Plugin {
                 break;
             case 'disable':
                 return $this->_disable($sender, val(1, $args));
+                break;
+            case 'toggle-locations':
+                return $this->toggleLocations($sender, $args);
                 break;
             default:
                 return $this->_index($sender, $args);
@@ -238,17 +241,6 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setData('PocketData', $pocketData);
 
         $form = new Gdn_Form();
-
-        // Save global options.
-        switch (val(0, $args)) {
-            case 'showlocations':
-                saveToConfig('Plugins.Pockets.ShowLocations', true);
-                break;
-            case 'hidelocations':
-                saveToConfig('Plugins.Pockets.ShowLocations', false, ['RemoveEmpty' => true]);
-                break;
-        }
-
         $sender->Form = $form;
         $sender->render('Index', '', 'plugins/pockets');
     }
@@ -730,6 +722,31 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     protected static function _var($name, $value) {
         return '<li class="Var"><b>'.htmlspecialchars($name).'</b><span>'.htmlspecialchars($value).'</span></li>';
+    }
+
+    /**
+     * Toggle pocket locations.
+     *
+     * @param SettingsController $sender
+     * @throws Gdn_UserException
+     */
+    private function toggleLocations(SettingsController $sender) {
+        $sender->Request->isAuthenticatedPostBack(true);
+
+        // Save global options.
+        if ($sender->Request->get('hide')) {
+            saveToConfig('Plugins.Pockets.ShowLocations', false, ['RemoveEmpty' => true]);
+            $t = ['off', 'on'];
+        } else {
+            saveToConfig('Plugins.Pockets.ShowLocations', true);
+            $t = ['on', 'off'];
+        }
+
+        $sender->jsonTarget('#pocket-locations-toggle .toggle-wrap', 'toggle-wrap-'.$t[0], 'AddClass');
+        $sender->jsonTarget('#pocket-locations-toggle .toggle-wrap', 'toggle-wrap-'.$t[1], 'RemoveClass');
+
+        $sender->setRedirectTo('/settings/pockets');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 }
 

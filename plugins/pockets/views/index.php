@@ -13,9 +13,9 @@ echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/
         <span id="pocket-locations-toggle">
             <?php
             if (!c('Plugins.Pockets.ShowLocations')) {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/showlocations'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/toggle-locations', 'js-hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             } else {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/hidelocations'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/toggle-locations?hide=1', 'js-hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
             }
             ?>
         </span>

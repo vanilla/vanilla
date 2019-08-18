@@ -70,6 +70,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param Gdn_Pluggable $sender The firing pluggable instance.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var NestedCollectionAdapter $menu */
         $menu = $sender->EventArguments['SideMenu'];
         $menu->addItem('Appearance', t('Appearance'));
         $menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
@@ -132,7 +133,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Main list for a pocket management.
      *
-     * @param Gdn_Controller $sender
+     * @param SettingsController $sender
      * @param array $args
      * @return mixed
      */
@@ -141,28 +142,29 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setHighlightRoute('settings/pockets');
         $sender->addJsFile('pockets.js', 'plugins/pockets');
 
-        $page = $args[0] ?? null;
+        $args += [null, ''];
+        $page = $args[0];
         switch (strtolower($page)) {
             case 'add':
                 return $this->_add($sender);
                 break;
             case 'edit':
-                return $this->_edit($sender, val(1, $args));
+                return $this->_edit($sender, $args[1]);
                 break;
             case 'delete':
-                return $this->_delete($sender, val(1, $args));
+                return $this->_delete($sender, $args[1]);
                 break;
             case 'enable':
-                return $this->_enable($sender, val(1, $args));
+                return $this->_enable($sender, $args[1]);
                 break;
             case 'disable':
-                return $this->_disable($sender, val(1, $args));
+                return $this->_disable($sender, $args[1]);
                 break;
             case 'toggle-locations':
-                return $this->toggleLocations($sender, $args);
+                return $this->toggleLocations($sender);
                 break;
             default:
-                return $this->_index($sender, $args);
+                return $this->_index($sender);
         }
     }
 
@@ -170,9 +172,8 @@ class PocketsPlugin extends Gdn_Plugin {
      * Render the /settings/pockets page.
      *
      * @param SettingsController $sender The controller instance.
-     * @param array $args Routing arguments.
      */
-    protected function _index($sender, $args) {
+    protected function _index($sender) {
         $sender->setData('Title', t('Pockets'));
 
         // Grab the pockets from the DB.
@@ -263,15 +264,10 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param string $pocketID The ID of the pocket to modify.
      * @param string $disabledState Either Pocket::ENABLED or Pocket::DISABLED
-     *
-     * @throws Exception If the method is called without proper authentication.
      */
     private function setDisabled($sender, $pocketID, $disabledState) {
         $sender->permission('Plugins.Pockets.Manage');
-
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
+        Gdn::request()->isAuthenticatedPostBack(true);
 
         if (empty($pocketID)) {
             $sender->errorMessage('Must specify pocket ID.');
@@ -391,9 +387,11 @@ class PocketsPlugin extends Gdn_Plugin {
 
                 // Convert some of the pocket data into a format digestable by the form.
                 list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
+                $repeatFrequency += [1, 1];
+
                 $pocket['RepeatType'] = $repeatType;
-                $pocket['EveryFrequency'] = getValue(0, $repeatFrequency, 1);
-                $pocket['EveryBegin'] = getValue(1, $repeatFrequency, 1);
+                $pocket['EveryFrequency'] = $repeatFrequency[0];
+                $pocket['EveryBegin'] = $repeatFrequency[1];
                 $pocket['Indexes'] = implode(',', $repeatFrequency);
                 $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
                 $pocket['TestMode'] = Pocket::inTestMode($pocket);

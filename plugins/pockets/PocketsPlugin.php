@@ -694,6 +694,26 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Return the toggle UI for toggling pocket locations.
+     *
+     * @param bool $on Whether or not the toggle is currently on.
+     * @return string Returns an HTML string.
+     */
+    public static function locationsToggle(bool $on): string {
+        $r = wrap(
+            anchor(
+                '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                '/settings/pockets/toggle-locations'.($on ? '?hide=1' : ''),
+                'js-hijack'
+            ),
+            'span',
+            ['class' => "toggle-wrap toggle-wrap-".($on ? 'on' : 'off')]
+        );
+
+        return $r;
+    }
+
+    /**
      * Render debugging information for pockets.
      *
      * @param Gdn_Controller $sender
@@ -731,18 +751,10 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->Request->isAuthenticatedPostBack(true);
 
         // Save global options.
-        if ($sender->Request->get('hide')) {
-            saveToConfig('Plugins.Pockets.ShowLocations', false, ['RemoveEmpty' => true]);
-            $t = ['off', 'on'];
-        } else {
-            saveToConfig('Plugins.Pockets.ShowLocations', true);
-            $t = ['on', 'off'];
-        }
+        $on = !$sender->Request->get('hide');
+        saveToConfig('Plugins.Pockets.ShowLocations', $on, ['RemoveEmpty' => true]);
 
-        $sender->jsonTarget('#pocket-locations-toggle .toggle-wrap', 'toggle-wrap-'.$t[0], 'AddClass');
-        $sender->jsonTarget('#pocket-locations-toggle .toggle-wrap', 'toggle-wrap-'.$t[1], 'RemoveClass');
-
-        $sender->setRedirectTo('/settings/pockets');
+        $sender->jsonTarget('#pocket-locations-toggle', static::locationsToggle($on), 'Html');
         $sender->render('blank', 'utility', 'dashboard');
     }
 }

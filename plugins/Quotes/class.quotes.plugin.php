@@ -126,7 +126,7 @@ class QuotesPlugin extends Gdn_Plugin {
         ]);
 
         // Form submission handling.
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack(true)) {
             $newFoldingLevel = $sender->Form->getValue('QuoteFolding', '1');
             if ($newFoldingLevel != $quoteFolding) {
                 Gdn::userModel()->savePreference($userID, 'Quotes.Folding', $newFoldingLevel);

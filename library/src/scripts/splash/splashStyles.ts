@@ -67,8 +67,10 @@ export const splashVariables = useThemeCache(() => {
         backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
         fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
-        useFilter: false,
-        brightnessFilterPercentage: isContrastLight ? percent(70) : percent(130),
+        useOverlay: false,
+        overlayColor: isContrastLight
+            ? globalVars.elementaryColors.black.fade(0.3)
+            : globalVars.elementaryColors.white.fade(0.3),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -271,11 +273,18 @@ export const splashClasses = useThemeCache(() => {
                 !url && (vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage)
                     ? 0.4
                     : undefined,
-            filter: vars.outerBackground.useFilter
-                ? `brightness(${vars.outerBackground.brightnessFilterPercentage})`
-                : undefined,
         });
     };
+
+    const outerBackgroundOverlay = style("outerBackgroundOverlay", {
+        display: "block",
+        position: "absolute",
+        top: px(0),
+        left: px(0),
+        width: percent(100),
+        height: percent(100),
+        background: vars.outerBackground.useOverlay ? colorOut(vars.outerBackground.overlayColor) : undefined,
+    });
 
     const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),
@@ -396,5 +405,6 @@ export const splashClasses = useThemeCache(() => {
         titleWrap,
         content,
         valueContainer,
+        outerBackgroundOverlay,
     };
 });

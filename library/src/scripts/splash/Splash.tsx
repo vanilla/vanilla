@@ -36,6 +36,7 @@ export class Splash extends React.Component<IProps> {
         return (
             <div className={classNames(className, classes.root)}>
                 <div className={classNames(classes.outerBackground(this.props.outerBackgroundImage))} />
+                <div className={classes.outerBackgroundOverlay} />
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>

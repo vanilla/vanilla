@@ -48,13 +48,13 @@ $nestedList-margin: 0 0 0 1em;
     ul {
         li {
             list-style: none !important;
-            position: "relative";
+            position: relative;
 
             &::before {
                 content: "•";
                 font-family: 'Arial', serif;
-                position: "absolute";
-                left: em(-1);
+                position: absolute;
+                left: -1em;
             }
         }
         ol,

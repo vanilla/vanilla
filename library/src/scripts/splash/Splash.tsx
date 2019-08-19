@@ -29,14 +29,13 @@ interface IProps extends IDeviceProps {
 export class Splash extends React.Component<IProps> {
     public render() {
         const classes = splashClasses();
-        const vars = splashVariables();
         const { action, className } = this.props;
         const title = this.props.title;
 
         return (
             <div className={classNames(className, classes.root)}>
                 <div className={classNames(classes.outerBackground(this.props.outerBackgroundImage))} />
-                <div className={classes.outerBackgroundOverlay} />
+                <div className={classes.backgroundOverlay} />
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>

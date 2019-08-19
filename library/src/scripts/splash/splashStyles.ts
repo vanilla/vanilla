@@ -61,16 +61,19 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
+    const backgrounds = makeThemeVars("backgrounds", {
+        useOverlay: false,
+        overlayColor: isContrastLight
+            ? globalVars.elementaryColors.black.fade(0.3)
+            : globalVars.elementaryColors.white.fade(0.3),
+    });
+
     const outerBackground = makeThemeVars("outerBackground", {
         color: colors.primary,
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
         fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
-        useOverlay: false,
-        overlayColor: isContrastLight
-            ? globalVars.elementaryColors.black.fade(0.3)
-            : globalVars.elementaryColors.white.fade(0.3),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -232,6 +235,7 @@ export const splashVariables = useThemeCache(() => {
 
     return {
         outerBackground,
+        backgrounds,
         spacing,
         searchContainer,
         innerBackground,
@@ -276,14 +280,14 @@ export const splashClasses = useThemeCache(() => {
         });
     };
 
-    const outerBackgroundOverlay = style("outerBackgroundOverlay", {
+    const backgroundOverlay = style("backgroundOverlay", {
         display: "block",
         position: "absolute",
         top: px(0),
         left: px(0),
         width: percent(100),
         height: percent(100),
-        background: vars.outerBackground.useOverlay ? colorOut(vars.outerBackground.overlayColor) : undefined,
+        background: vars.backgrounds.useOverlay ? colorOut(vars.backgrounds.overlayColor) : undefined,
     });
 
     const innerContainer = style("innerContainer", {
@@ -405,6 +409,6 @@ export const splashClasses = useThemeCache(() => {
         titleWrap,
         content,
         valueContainer,
-        outerBackgroundOverlay,
+        backgroundOverlay,
     };
 });

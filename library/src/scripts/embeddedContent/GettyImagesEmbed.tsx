@@ -8,6 +8,7 @@ import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useEffect } from "react";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -23,8 +24,10 @@ interface IProps extends IBaseEmbedProps {
  * A class for rendering Getty Images embeds.
  */
 export function GettyImagesEmbed(props: IProps): JSX.Element {
+    const throwError = useThrowError();
+
     useEffect(() => {
-        void convertGettyEmbeds();
+        void convertGettyEmbeds().catch(throwError);
     });
 
     return (

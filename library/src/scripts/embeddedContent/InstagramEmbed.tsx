@@ -8,6 +8,7 @@ import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useEffect } from "react";
 import { ensureScript } from "@vanilla/dom-utils";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     version: number;
@@ -21,8 +22,9 @@ interface IProps extends IBaseEmbedProps {
  * A class for rendering Instagram embeds.
  */
 export function InstagramEmbed(props: IProps): JSX.Element {
+    const throwError = useThrowError();
     useEffect(() => {
-        void convertInstagramEmbeds();
+        void convertInstagramEmbeds().catch(throwError);
     });
 
     const permaLink = `https://www.instagram.com/p/${props.postID}`;

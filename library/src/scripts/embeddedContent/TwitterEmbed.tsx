@@ -10,7 +10,7 @@ import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import { EmbedRenderError } from "@library/embeddedContent/EmbedRenderError";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     statusID: string;
@@ -18,33 +18,12 @@ interface IProps extends IBaseEmbedProps {
 
 const TWITTER_SCRIPT = "https://platform.twitter.com/widgets.js";
 
-function useErrorPropagationEffect(callback: () => void | Promise<void>, args: any[]) {
-    const [state, setState] = useState();
-
-    useEffect(() => {
-        const handleError = (e: Error) => {
-            console.log("handling error");
-            setState(() => {
-                throw e;
-            });
-        };
-
-        try {
-            var result = callback();
-        } catch (e) {
-            handleError(e);
-        }
-        if (result instanceof Promise) {
-            result.catch(handleError);
-        }
-    }, [callback, setState, ...args]);
-}
-
 /**
  * A class for rendering Twitter embeds.
  */
 export function TwitterEmbed(props: IProps): JSX.Element {
     const [twitterLoaded, setTwitterLoaded] = useState(false);
+    const throwError = useThrowError();
     const classes = twitterEmbedClasses();
     const { onRenderComplete } = props;
 
@@ -53,13 +32,15 @@ export function TwitterEmbed(props: IProps): JSX.Element {
         onRenderComplete && onRenderComplete();
     }, [twitterLoaded, onRenderComplete]);
 
-    useErrorPropagationEffect(() => {
-        void convertTwitterEmbeds().then(() => {
-            // We need to track the load status for the internal representation.
-            // Otherwise we end up with a flash of the URL next to the rendered tweet.
-            setTwitterLoaded(true);
-        });
-    }, [setTwitterLoaded]);
+    useEffect(() => {
+        void convertTwitterEmbeds()
+            .then(() => {
+                // We need to track the load status for the internal representation.
+                // Otherwise we end up with a flash of the URL next to the rendered tweet.
+                setTwitterLoaded(true);
+            })
+            .catch(throwError);
+    }, [setTwitterLoaded, throwError]);
 
     return (
         <>

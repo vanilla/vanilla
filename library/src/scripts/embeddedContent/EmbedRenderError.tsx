@@ -22,8 +22,8 @@ export function EmbedRenderError(props: IProps) {
         "https://success.vanillaforums.com/kb/articles/13-rich-editor#what-causes-the-warning-icon-while-inserting-a-rich-embed";
 
     return (
-        <div className={classes.renderErrorRoot}>
-            <SmartLink tabIndex={-1} to={props.url} rel="nofollow" className={classNames(FOCUS_CLASS)}>
+        <div className={classNames(FOCUS_CLASS, classes.renderErrorRoot, "embedLinkLoader-link")} tabIndex={-1}>
+            <SmartLink to={props.url} rel="nofollow">
                 {props.url}
             </SmartLink>
             <SmartLink className={classes.renderErrorIconLink} to={helpUrl}>

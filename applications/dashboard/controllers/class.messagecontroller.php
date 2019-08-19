@@ -66,7 +66,9 @@ class MessageController extends DashboardController {
     public function dismiss($messageID = '', $transientKey = false) {
         $session = Gdn::session();
 
-        if ($transientKey !== false && $session->validateTransientKey($transientKey)) {
+        $message = (object) $this->MessageModel->getID($messageID);
+        $allowDismiss = $message->AllowDismiss ?? 0;
+        if ($transientKey !== false && $session->validateTransientKey($transientKey) && $allowDismiss === 1) {
             $prefs = $session->getPreference('DismissedMessages', []);
             $prefs[] = $messageID;
             $session->setPreference('DismissedMessages', $prefs);

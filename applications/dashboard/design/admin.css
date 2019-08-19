@@ -12724,7 +12724,7 @@ body.isMobile .Popup.hasRichEditor .Border {
  */
 .userContent ul,
 .userContent ol {
-  margin: 1em 0 1em 3em;
+  margin: 1em 0 1em 2em;
 }
 
 .userContent ol li {
@@ -12754,7 +12754,14 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .userContent ul li {
-  list-style: disc !important;
+  list-style: none !important;
+  position: relative;
+}
+.userContent ul li::before {
+  content: "•";
+  font-family: "Arial", serif !important;
+  position: absolute;
+  left: -1em;
 }
 .userContent ul ol,
 .userContent ul ul {

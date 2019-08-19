@@ -74,9 +74,9 @@ class TestInstallModel extends InstallModel {
                 'title' => __CLASS__
             ],
             'admin' => [
-                'email' => 'travis@example.com',
-                'name' => 'travis',
-                'password' => 'travis'
+                'email' => 'circleci@example.com',
+                'name' => 'circleci',
+                'password' => 'circleci'
             ]
         ], $data);
 

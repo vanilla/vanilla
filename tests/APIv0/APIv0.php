@@ -207,10 +207,10 @@ class APIv0 extends HttpClient {
             'Database-dot-User' => $this->getDbUser(),
             'Database-dot-Password' => $this->getDbPassword(),
             'Garden-dot-Title' => $title ?: 'Vanilla Tests',
-            'Email' => 'travis@example.com',
-            'Name' => 'travis',
-            'Password' => 'travis',
-            'PasswordMatch' => 'travis',
+            'Email' => 'circleci@example.com',
+            'Name' => 'circleci',
+            'Password' => 'circleci',
+            'PasswordMatch' => 'circleci',
             'HtaccessAction' => 'skip',
         ];
 

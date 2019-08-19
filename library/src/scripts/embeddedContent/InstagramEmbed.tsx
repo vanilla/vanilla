@@ -6,7 +6,7 @@
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { ensureScript } from "@vanilla/dom-utils";
 import { useThrowError } from "@vanilla/react-utils";
 
@@ -23,7 +23,7 @@ interface IProps extends IBaseEmbedProps {
  */
 export function InstagramEmbed(props: IProps): JSX.Element {
     const throwError = useThrowError();
-    useEffect(() => {
+    useLayoutEffect(() => {
         void convertInstagramEmbeds().catch(throwError);
     });
 

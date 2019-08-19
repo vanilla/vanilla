@@ -52,7 +52,7 @@ $nestedList-margin: 0 0 0 1em;
 
             &::before {
                 content: "•";
-                font-family: 'Arial', serif;
+                font-family: 'Arial', serif !important;
                 position: absolute;
                 left: -1em;
             }

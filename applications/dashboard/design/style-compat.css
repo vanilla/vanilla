@@ -2340,7 +2340,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .userContent ul li::before {
   content: "•";
-  font-family: "Arial", serif;
+  font-family: "Arial", serif !important;
   position: absolute;
   left: -1em;
 }

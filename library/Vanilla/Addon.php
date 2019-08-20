@@ -115,7 +115,6 @@ class Addon implements Contracts\AddonInterface {
 
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
-
     }
 
     /**
@@ -531,13 +530,17 @@ class Addon implements Contracts\AddonInterface {
             yield $path;
         }
 
-        // Don't recursively scan the root of an addon.
-        if (empty($dir)) {
-            return;
-        }
+        $isDirRoot = $dir === '';
 
         // Get all of the php files from subdirectories.
         foreach ($this->glob("$dir/*", true) as $subdir) {
+            // Don't recursively scan the root of an addon unless it is uppercase.
+            // This means it may be part of a namespace.
+            $trimmedDir = ltrim($subdir, '/\\');
+            $isUppercaseDirName = strlen($trimmedDir) > 0 && ctype_upper($trimmedDir[0]);
+            if ($isDirRoot && !$isUppercaseDirName) {
+                continue;
+            }
             foreach ($this->scanDirPhp($subdir) as $path) {
                 yield $path;
             }

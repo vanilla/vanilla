@@ -88,7 +88,6 @@ jQuery(document).ready(function($) {
             } else {
                 $("#ConnectPassword").show();
             }
-      //  }
     };
     if (gdn.definition("userSearchAvailable", true)) {
         checkConnectName();

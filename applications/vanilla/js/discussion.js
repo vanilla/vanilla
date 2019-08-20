@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
             var currentVal = $(textbox).val()
             type = 'Draft';
             // Don't save draft if string is empty
-            if (!defaultValues.includes(currentVal))
+            if (defaultValues.includes(currentVal))
                 return false;
 
             if (draftSaving > 0)

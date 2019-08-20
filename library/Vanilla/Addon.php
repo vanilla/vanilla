@@ -496,11 +496,11 @@ class Addon implements Contracts\AddonInterface {
     private function scanClassPaths() {
         $dirs = [
             '',
-            '/[Cc]ontrollers',
+            '/controllers',
             '/library',
             '/src',
-            '/[Mm]odels',
-            '/[Mm]odules',
+            '/models',
+            '/modules',
             '/settings/class.hooks.php'
         ];
 

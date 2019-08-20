@@ -35,6 +35,12 @@ jQuery(document).ready(function($) {
         var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
         var type = 'Post';
         var preview = $(btn).hasClass('PreviewButton');
+        var defaultValues = [
+            undefined,
+            null,
+            '',
+            '[{\"insert\":\"\\n\"}]'
+        ];
         if (preview) {
             type = 'Preview';
             // If there is already a preview showing, kill processing.
@@ -44,9 +50,10 @@ jQuery(document).ready(function($) {
         }
         var draft = $(btn).hasClass('DraftButton');
         if (draft) {
+            var currentVal = $(textbox).val()
             type = 'Draft';
             // Don't save draft if string is empty
-            if (jQuery.trim($(textbox).val()) == '')
+            if (!defaultValues.includes(currentVal))
                 return false;
 
             if (draftSaving > 0)

@@ -18,6 +18,7 @@ class WysiwygFormat extends HtmlFormat {
 
     const FORMAT_KEY = "wysiwyg";
 
+    const ALT_FORMAT_KEY = "raw";
 
     /**
      * Constructor for dependency Injection.

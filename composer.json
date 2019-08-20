@@ -84,7 +84,7 @@
         "pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
         "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
         "post-install-cmd": "Vanilla\\Setup\\ComposerHelper::postUpdate",
-        "lint-diff": "./tests/travis/diff-standards.sh"
+        "lint-diff": "./.circleci/scripts/diff-standards.sh"
     },
     "autoload-dev": {
         "psr-4": {

@@ -50,11 +50,7 @@ class OpenApiApiController extends Controller {
      * @deprecated
      */
     public function get_v2() {
-        if ($this->allowOpenApiAccess) {
-            $this->permission('');
-        } else {
-            $this->permission('Garden.Settings.Manage');
-        }
+        $this->permission('Garden.Settings.Manage');
 
         $this->schema(
             new Schema(['$ref' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v2.0/schema.json']),

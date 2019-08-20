@@ -14,6 +14,7 @@ import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { inputVariables } from "@library/forms/inputStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -278,6 +279,11 @@ export const searchBarClasses = useThemeCache(() => {
 
     const form = style("form", {
         display: "block",
+        $nest: {
+            [".inputText"]: {
+                borderColor: colorOut(vars.input.bg),
+            },
+        },
     });
 
     const content = style("content", {

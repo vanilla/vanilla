@@ -43,33 +43,33 @@ buttonStory.add("Buttons", () => {
                 .
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact title={"Most common button"}>
+                <StoryTileAndTextCompact text={"Most common button"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={"Call to action"}>
+                <StoryTileAndTextCompact text={"Call to action"}>
                     <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact type="titleBar" title={"For Title Bar (Sign in Button)"}>
+                <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact type="titleBar" title={"For Title Bar (Register)"}>
+                <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Register)"}>
                     <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={"Simple text button"}>
+                <StoryTileAndTextCompact text={"Simple text button"}>
                     <Button baseClass={ButtonTypes.TEXT}>Text</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={"Text with primary color"}>
+                <StoryTileAndTextCompact text={"Text with primary color"}>
                     <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    title={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
+                    text={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
                 >
                     <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
                         <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    title={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
+                    text={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
                         globalVars.icon.sizes.default,
                     )})`}
                 >
@@ -92,7 +92,7 @@ buttonStory.add("Buttons", () => {
                     'a "compact" version of your icon that doesn\'t have as much padding that will look better.'}
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Icon and Text Example"}>
                     <Button baseClass={ButtonTypes.STANDARD}>
                         <ComposeIcon className={classesButtonUtility.buttonIconRightMargin} />
                         {"Icon and Text"}

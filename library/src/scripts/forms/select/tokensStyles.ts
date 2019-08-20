@@ -16,7 +16,7 @@ export const tokensVariables = useThemeCache(() => {
 
     const token = {
         fontSize: globalVars.meta.text.fontSize,
-        bg: globalVars.mixBgAndFg(0.15),
+        bg: globalVars.mixBgAndFg(0.1),
         textShadow: `${globalVars.mainColors.bg} 0 0 1px`,
         minHeight: 26,
     };
@@ -80,11 +80,10 @@ export const tokensClasses = useThemeCache(() => {
                 fontSize: unit(vars.token.fontSize),
                 fontWeight: globalVars.fonts.weights.bold,
                 textShadow: vars.token.textShadow,
-                // paddingLeft: px(3),
-                // paddingRight: px(2),
                 margin: px((formElVars.sizing.height - vars.token.minHeight) / 2 - formElVars.border.width),
-                backgroundColor: vars.token.bg.toString(),
+                backgroundColor: colorOut(vars.token.bg),
                 minHeight: unit(vars.token.minHeight),
+                borderRadius: px(2),
                 ...userSelect(),
             },
             "& .tokens__multi-value__label": {

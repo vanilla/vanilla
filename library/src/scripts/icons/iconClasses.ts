@@ -219,8 +219,10 @@ export const iconClasses = useThemeCache(() => {
 
     // For really small close buttons, like on tokens
     const closeTiny = style("closeTiny", {
+        display: "block",
         width: unit(vars.closeTiny.width),
         height: unit(vars.closeTiny.height),
+        margin: "auto",
     });
 
     const chevronLeftCompact = style("chevronLeftCompact", {

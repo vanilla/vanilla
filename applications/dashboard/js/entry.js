@@ -5,17 +5,17 @@ jQuery(document).ready(function($) {
         $("#Register input[name=Email], body.register input[name=Email]").blur(function() {
             var email = $(this).val();
             if (email != "") {
-                var checkUrl = gdn.url("/user/emailavailable");
+                var checkUrl = gdn.url("/user/emailavailable.json");
                 $.ajax({
                     type: "GET",
                     url: checkUrl,
                     data: { email: email },
-                    dataType: "text",
+                    dataType: "json",
                     error: function(xhr) {
                         gdn.informError(xhr, true);
                     },
-                    success: function(text) {
-                        if (text == "FALSE") $("#EmailUnavailable").show();
+                    success: function(data) {
+                        if (data.Data === false) $("#EmailUnavailable").show();
                         else $("#EmailUnavailable").hide();
                     },
                 });
@@ -26,16 +26,17 @@ jQuery(document).ready(function($) {
         $("#Register input[name=Name], body.register input[name=Name]").blur(function() {
             var name = $(this).val();
             if (name != "") {
-                var checkUrl = gdn.url("/user/usernameavailable/" + encodeURIComponent(name));
+                var checkUrl = gdn.url("/user/usernameavailable.json");
                 $.ajax({
                     type: "GET",
                     url: checkUrl,
-                    dataType: "text",
+                    data: { name: name },
+                    dataType: "json",
                     error: function(xhr) {
                         gdn.informError(xhr, true);
                     },
-                    success: function(text) {
-                        if (text == "FALSE") $("#NameUnavailable").show();
+                    success: function(data) {
+                        if (data.Data === false) $("#NameUnavailable").show();
                         else $("#NameUnavailable").hide();
                     },
                 });
@@ -44,54 +45,56 @@ jQuery(document).ready(function($) {
     }
 
     var checkConnectName = function() {
-        // If config setting AllowConnect is set to false, hide the password and return.
-        if (!gdn.definition("AllowConnect", true)) {
-            $("#ConnectPassword").hide();
-            return;
-        }
-        if (gdn.definition("NoConnectName", false)) {
-            $("#ConnectPassword").show();
-            return;
-        }
-        var fineprint = $("#Form_ConnectName").siblings(".FinePrint");
-        var selectedName = $("input[name=UserSelect]:checked").val();
-        if (!selectedName || selectedName == "other") {
-            var name = $("#Form_ConnectName").val();
-            if (typeof name == "string" && name != "") {
-                var checkUrl = gdn.url("/user/usernameavailable/" + encodeURIComponent(name));
-                $.ajax({
-                    type: "GET",
-                    url: checkUrl,
-                    dataType: "text",
-                    error: function(xhr) {
-                        gdn.informError(xhr, true);
-                    },
-                    success: function(text) {
-                        if (text == "TRUE") {
-                            $("#ConnectPassword").hide();
-                            if (fineprint.length) {
-                                fineprint.html(gdn.definition("Choose a name to identify yourself on the site."));
-                            }
-                        } else {
-                            $("#ConnectPassword").show();
-                            if (fineprint.length) {
-                                fineprint.html(gdn.definition("Username already exists."));
-                            }
-                        }
-                    },
-                });
-            } else {
+            // If config setting AllowConnect is set to false, hide the password and return.
+            if (!gdn.definition("AllowConnect", true)) {
                 $("#ConnectPassword").hide();
+                return;
             }
-        } else {
-            $("#ConnectPassword").show();
-        }
+            if (gdn.definition("NoConnectName", false)) {
+                $("#ConnectPassword").show();
+                return;
+            }
+            var fineprint = $("#Form_ConnectName").siblings(".FinePrint");
+            var selectedName = $("input[name=UserSelect]:checked").val();
+            if (!selectedName || selectedName == "other") {
+                var name = $("#Form_ConnectName").val();
+                if (typeof name == "string" && name != "") {
+                    var checkUrl = gdn.url("/user/usernameavailable.json");
+                    $.ajax({
+                        type: "GET",
+                        url: checkUrl,
+                        data: { name: name },
+                        dataType: "json",
+                        error: function (xhr) {
+                            gdn.informError(xhr, true);
+                        },
+                        success: function (data) {
+                            if (data.Data === true) {
+                                $("#ConnectPassword").hide();
+                                if (fineprint.length) {
+                                    fineprint.html(gdn.definition("Choose a name to identify yourself on the site."));
+                                }
+                            } else {
+                                $("#ConnectPassword").show();
+                                if (fineprint.length) {
+                                    fineprint.html(gdn.definition("Username already exists."));
+                                }
+                            }
+                        },
+                    });
+                } else {
+                    $("#ConnectPassword").hide();
+                }
+            } else {
+                $("#ConnectPassword").show();
+            }
+      //  }
     };
-
-    checkConnectName();
-    $("#Form_ConnectName").keyup(checkConnectName);
-    $("input[name=UserSelect]").click(checkConnectName);
-
+    if (gdn.definition("userSearchAvailable", true)) {
+        checkConnectName();
+        $("#Form_ConnectName").keyup(checkConnectName);
+        $("input[name=UserSelect]").click(checkConnectName);
+    }
     // Check to see if passwords match
     $("input[name=PasswordMatch]").blur(function() {
         var $pwmatch = $(this);

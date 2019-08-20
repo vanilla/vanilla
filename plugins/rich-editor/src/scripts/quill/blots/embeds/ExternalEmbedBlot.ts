@@ -5,9 +5,8 @@
  */
 
 import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { escapeHTML, getData, setData } from "@vanilla/dom-utils";
+import { getData, setData } from "@vanilla/dom-utils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
-import { t } from "@library/utility/appUtils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import ErrorBlot, { ErrorBlotType, IErrorData } from "@rich-editor/quill/blots/embeds/ErrorBlot";
@@ -33,14 +32,6 @@ interface IEmbedLoadedValue {
     loaderData: ILoaderData;
     data: IBaseEmbedProps;
 }
-
-const WARNING_HTML = title => `
-<svg class="embedLinkLoader-failIcon" title="${title}" aria-label="${title}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-    <title>${title}</title>
-    <circle cx="8" cy="8" r="8" style="fill: #f5af15"/>
-    <circle cx="8" cy="8" r="7.5" style="fill: none;stroke: #000;stroke-opacity: 0.122"/>
-    <path d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z" transform="translate(-4 -4)" style="fill: #fff"/>
-</svg>`;
 
 export type IEmbedValue = IEmbedLoadedValue | IEmbedUnloadedValue;
 
@@ -78,33 +69,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
-     * Create an warning state for the embed element. This occurs when the data fetching has succeeded,
-     * but the browser rendering has not.
-     *
-     * In other words, the blot has all of the data in needs to render in another browser, but not the
-     * current one.
-     *
-     * A usual case for this is having tracking protection on in Firefox (twitter + instagram scripts blocked) .
-     *
-     * @param linkText - The text of the link that failed to be embeded.
-     */
-    public static createEmbedWarningFallback(linkText: string) {
-        const div = document.createElement("div");
-        div.classList.add("embedExternal");
-        div.classList.add("embedLinkLoader");
-        div.classList.add("embedLinkLoader-error");
-
-        const sanitizedText = escapeHTML(linkText);
-
-        // In the future this message should point to a knowledge base article.
-        const warningTitle = t("This embed could not be loaded in your browser.");
-        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}" tabindex="-1">${sanitizedText}&nbsp;${WARNING_HTML(
-            warningTitle,
-        )}</a>`;
-        return div;
-    }
-
-    /**
      * Callback for syncing some values back into the blot data from a react rendered embed.
      */
     private syncMountedValues = (newValues: object) => {
@@ -133,28 +97,19 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         // Append these nodes.
         loaderElement && jsEmbed.appendChild(loaderElement);
 
-        try {
-            await mountEmbed(
-                jsEmbed,
-                {
-                    ...data,
-                    syncBackEmbedValue: this.syncMountedValues,
-                    quill: this.quill,
-                },
-                true,
-            );
-            // Remove the focus class. It should be handled by the mounted embed at this point.
-            loaderElement && loaderElement.remove();
-            jsEmbed.classList.remove(FOCUS_CLASS);
-            jsEmbed.removeAttribute("tabindex");
-        } catch (e) {
-            const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-            // Cleanup existing HTML.
-            jsEmbed.innerHTML = "";
-
-            // Add the warning.
-            jsEmbed.appendChild(warning);
-        }
+        await mountEmbed(
+            jsEmbed,
+            {
+                ...data,
+                syncBackEmbedValue: this.syncMountedValues,
+                quill: this.quill,
+            },
+            true,
+        );
+        // Remove the focus class. It should be handled by the mounted embed at this point.
+        loaderElement && loaderElement.remove();
+        jsEmbed.classList.remove(FOCUS_CLASS);
+        jsEmbed.removeAttribute("tabindex");
 
         // Replace the old dom node.
         this.domNode.parentNode!.insertBefore(jsEmbed, this.domNode);

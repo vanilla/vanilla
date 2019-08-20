@@ -47,7 +47,7 @@ if (!count($this->FlaggedItems)) {
                     $flaggedBy .= sprintf(t('<strong>%s</strong> on %s'), anchor(htmlspecialchars($Flag['InsertName']), userUrl(['UserID' => $Flag['InsertUserID'], 'Name' => $Flag['InsertName']])), $Flag['DateInserted']).' '.t('said:');
                     $flaggedBy .= '<div class="FlaggedReason">'.Gdn_Format::text($Flag['Comment']).'</div>';
                 }
-                $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');
+                $options = anchor(t('Take Action'), safeURL($Flag['ForeignURL']), 'btn btn-primary');
                 $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm', ['data-body' => t('Are you sure you want to dismiss this flag?')]);
                 ?>
                 <tr>

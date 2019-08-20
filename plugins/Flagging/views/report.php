@@ -18,4 +18,4 @@ printf(t('%s reported%s <strong>%s</strong>'), anchor($Flag['UserName'], '/profi
             echo '&#8230;';
 
         ?></blockquote>
-<?php echo anchor(t('ViewFlagged', 'View &raquo;'), $Flag['URL']); ?>
+<?php echo anchor(t('ViewFlagged', 'View &raquo;'), safeURL($Flag['URL'])); ?>

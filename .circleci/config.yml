@@ -1,63 +1,6 @@
 version: 2.1
 orbs:
-    vanilla:
-        aliases:
-        - &db_env
-            MYSQL_USER: circleci
-            MYSQL_PASSWORD: ''
-            MYSQL_DATABASE: vanilla_test
-            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-        executors:
-            php71:
-                docker:
-                - image: circleci/php:7.1.30-fpm-node
-                - image: mysql:5.7.26
-                  environment: *db_env
-            php72:
-                docker:
-                - image: circleci/php:7.2.19-fpm-node
-                - image: mysql:5.7.26
-                  environment: *db_env
-            php73:
-                docker:
-                - image: circleci/php:7.3.6-fpm-node
-                - image: mysql:5.7.26
-                  environment: *db_env
-            node:
-                docker:
-                    - image: circleci/node:lts-browsers
-        commands:
-            checkout:
-                steps:
-                - run:
-                    name: Clone Scripts
-                    command: git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts
-                - run:
-                    name: Clone Repo
-                    command: ~/workspace/ci-scripts/clone-repo.sh
-                - run:
-                    name: Merge Target Branch
-                    command: ~/workspace/ci-scripts/merge-target-branch.sh
-            prepare_php_tests:
-                steps:
-                - run:
-                    name: Prepare MySQL
-                    command: ~/workspace/ci-scripts/prepare-mysql.sh
-                - run:
-                    name: Configuring Hosts
-                    command: |
-                        # Localhost redirects
-                        echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
-                        cat /etc/hosts
-            prepare_nginx:
-                steps:
-                - run:
-                    name: Prepare NGINX
-                    command: |
-                        sudo apt-get update && sudo apt-get install nginx
-                        cd  ~/workspace/repo
-                        php-fpm --daemonize
-                        sudo ./.circleci/scripts/start-nginx.sh
+    core: vanilla/core@2.1.0
 aliases:
     - &run_yarn
         run:
@@ -91,14 +34,14 @@ aliases:
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
 jobs:
     frontend_setup:
-        executor: vanilla/node
+        executor: core/node
         steps:
             - run:
                 name: Versions
                 command: |
                     node --version
                     yarn --version
-            - vanilla/checkout
+            - core/checkout
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -114,7 +57,7 @@ jobs:
                     - repo
                     - ci-scripts
     frontend_build:
-        executor: vanilla/node
+        executor: core/node
         resource_class: large
         steps:
             - *attach_workspace
@@ -124,7 +67,7 @@ jobs:
                     cd ~/workspace/repo
                     yarn build
     frontend_test:
-        executor: vanilla/node
+        executor: core/node
         steps:
             - *attach_workspace
             - run:
@@ -133,7 +76,7 @@ jobs:
                     cd ~/workspace/repo
                     yarn test
     frontend_lint:
-        executor: vanilla/node
+        executor: core/node
         steps:
             - *attach_workspace
             - run: |
@@ -141,7 +84,7 @@ jobs:
                 yarn lint
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
-        executor: vanilla/node
+        executor: core/node
         resource_class: large
         steps:
             - *attach_workspace
@@ -149,14 +92,14 @@ jobs:
                 cd ~/workspace/repo
                 yarn check-types
     php_setup:
-        executor: vanilla/php72
+        executor: core/php72
         steps:
             - run:
                 name: Versions
                 command: |
                     php --version
                     composer --version
-            - vanilla/checkout
+            - core/checkout
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
@@ -166,13 +109,13 @@ jobs:
                     - repo
                     - ci-scripts
     php_72_lint:
-        executor: vanilla/php72
+        executor: core/php72
         steps: &php_lint_steps
-            - vanilla/checkout
+            - core/checkout
             - *run_composer
             - *run_php_lint
     php_72_tests:
-        executor: vanilla/php72
+        executor: core/php72
         steps: &php_unit_test_steps
             - *attach_workspace
             - run:
@@ -180,7 +123,7 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - vanilla/prepare_php_tests
+            - core/prepare_php_tests
             - run:
                 name: Library Tests
                 command: |
@@ -192,11 +135,11 @@ jobs:
                     cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
     php_72_integration:
-        executor: vanilla/php72
+        executor: core/php72
         steps: &php_integration_test_steps
             - *attach_workspace
-            - vanilla/prepare_php_tests
-            - vanilla/prepare_nginx
+            - core/prepare_php_tests
+            - core/prepare_nginx
             - run:
                 name: APIv0 Tests
                 command: |
@@ -208,27 +151,27 @@ jobs:
                     cd ~/workspace/repo
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
     php_73_lint:
-        executor: vanilla/php73
+        executor: core/php73
         steps: *php_lint_steps
     php_73_tests:
-        executor: vanilla/php73
+        executor: core/php73
         steps: *php_unit_test_steps
     php_73_integration:
-        executor: vanilla/php73
+        executor: core/php73
         steps: *php_integration_test_steps
     php_71_lint:
-        executor: vanilla/php71
+        executor: core/php71
         steps: *php_lint_steps
     php_71_tests:
-        executor: vanilla/php71
+        executor: core/php71
         steps: *php_unit_test_steps
     php_71_integration:
-        executor: vanilla/php71
+        executor: core/php71
         steps: *php_integration_test_steps
     dependency_audit:
-        executor: vanilla/php72
+        executor: core/php72
         steps:
-            - vanilla/checkout
+            - core/checkout
             - run: yarn audit
 
 workflows:

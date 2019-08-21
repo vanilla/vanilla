@@ -123,7 +123,7 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - vanilla/prepare_php_tests
+            - core/prepare_php_tests
             - run:
                 name: Library Tests
                 command: |
@@ -138,8 +138,8 @@ jobs:
         executor: core/php72
         steps: &php_integration_test_steps
             - *attach_workspace
-            - vanilla/prepare_php_tests
-            - vanilla/prepare_nginx
+            - core/prepare_php_tests
+            - core/prepare_nginx
             - run:
                 name: APIv0 Tests
                 command: |

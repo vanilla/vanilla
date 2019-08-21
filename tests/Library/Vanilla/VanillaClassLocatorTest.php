@@ -8,7 +8,6 @@ namespace VanillaTests\Library\Vanilla;
 
 use Deeply\Nested\Namespaced\Fixture\NamespacedPlugin;
 use Garden\Container\Container;
-use Interop\Container\ContainerInterface;
 use Garden\EventManager;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -21,7 +20,10 @@ class VanillaClassLocatorTest extends ClassLocatorTest {
 
     public function testFindMethodWithOverride() {
         $container = new Container();
-        $container->setInstance(ContainerInterface::class, $container)
+        $container
+            ->setInstance(Container::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
+
             ->defaultRule()
             ->setShared(true)
             ->rule(EventManager::class)

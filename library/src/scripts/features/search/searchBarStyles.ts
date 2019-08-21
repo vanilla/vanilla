@@ -87,7 +87,7 @@ export const searchBarClasses = useThemeCache(() => {
             cursor: "pointer",
             $nest: {
                 "& .searchBar__placeholder": {
-                    color: colorOut(globalVars.mixBgAndFg(0.5)),
+                    color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",
                 },
 

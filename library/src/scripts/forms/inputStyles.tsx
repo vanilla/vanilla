@@ -25,7 +25,7 @@ export const inputVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         placeholder: globalVars.mixBgAndFg(0.5),
-        fg: globalVars.mixBgAndFg(0.8),
+        fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         state: {
             fg: globalVars.mainColors.primary,
@@ -77,7 +77,7 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", textStyles as NestedCSSProperties);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(".inputText", textStyles as NestedCSSProperties);
+    const applyInputCSSRules = () => cssRule(" .inputText", textStyles as NestedCSSProperties);
 
     const inputText = style("inputText", {
         marginBottom: 0,

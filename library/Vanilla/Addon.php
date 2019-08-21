@@ -115,6 +115,7 @@ class Addon implements Contracts\AddonInterface {
 
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
+
     }
 
     /**
@@ -494,7 +495,7 @@ class Addon implements Contracts\AddonInterface {
      * @return \Traversable Returns a list of paths to PHP files.
      */
     private function scanClassPaths() {
-        $dirs = [
+        $dirsToScan = [
             '',
             '/controllers',
             '/library',
@@ -504,7 +505,20 @@ class Addon implements Contracts\AddonInterface {
             '/settings/class.hooks.php'
         ];
 
-        foreach ($dirs as $dir) {
+        // Get all the uppercase top level directories (likely namespaces)
+        // and add them to the list.
+        $rootDir = $this->path('', Addon::PATH_FULL);
+        $subDirs = glob($rootDir . '/*', GLOB_ONLYDIR);
+        foreach ($subDirs as $subDir) {
+            $trimmedDir = ltrim($subDir, '/\\');
+            $isUppercaseDirName = strlen($trimmedDir) > 0 && ctype_upper($trimmedDir[0]);
+            if ($isUppercaseDirName) {
+                $dir[] = $subDir;
+            }
+        }
+
+
+        foreach ($dirsToScan as $dir) {
             foreach ($this->scanDirPhp($dir) as $path) {
                 yield $path;
             }
@@ -530,17 +544,13 @@ class Addon implements Contracts\AddonInterface {
             yield $path;
         }
 
-        $isDirRoot = $dir === '';
+        // Don't recursively scan the root of an addon.
+        if (empty($dir)) {
+            return;
+        }
 
         // Get all of the php files from subdirectories.
         foreach ($this->glob("$dir/*", true) as $subdir) {
-            // Don't recursively scan the root of an addon unless it is uppercase.
-            // This means it may be part of a namespace.
-            $trimmedDir = ltrim($subdir, '/\\');
-            $isUppercaseDirName = strlen($trimmedDir) > 0 && ctype_upper($trimmedDir[0]);
-            if ($isDirRoot && !$isUppercaseDirName) {
-                continue;
-            }
             foreach ($this->scanDirPhp($subdir) as $path) {
                 yield $path;
             }

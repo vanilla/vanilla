@@ -259,6 +259,26 @@ class UtilityController extends DashboardController {
      * @access public
      */
     public function update() {
+        $isTokenUpdate = false;
+
+        // Do some checks for backwards for behavior for CD.
+        if ($this->Request->getMethod() === 'GET') {
+            trigger_error("utility/update called with GET.", E_USER_WARNING);
+        } elseif ($this->Request->isPostBack() &&
+            $this->Request->hasHeader('Authorization') &&
+            preg_match('`Bearer\s+(.+)`i', $this->Request->getHeader('Authorization'), $m)) {
+
+            $token = $m[1];
+            if (!hash_equals(Gdn::config()->get('Garden.UpdateToken'), $token)) {
+                trigger_error("utility/update invalid update token.", E_USER_WARNING);
+            } else {
+                Gdn::session()->validateTransientKey(true);
+                $isTokenUpdate = true;
+            }
+        } elseif (!$this->Request->isAuthenticatedPostBack(false)) {
+            trigger_error("'Invalid transient key on utility/update.'", E_USER_WARNING);
+        }
+
         // Check for permission or flood control.
         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
         $now = time();
@@ -278,7 +298,7 @@ class UtilityController extends DashboardController {
             } catch (Exception $ex) {
                 // Once more we sit, watching the breath.
             }
-            if ($count > 5) {
+            if ($count > 5 && !$isTokenUpdate) {
                 if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                     // We are only allowing an update of 5 times every 24 hours.
                     throw permissionException();
@@ -298,6 +318,11 @@ class UtilityController extends DashboardController {
         try {
             // Run the structure.
             $updateModel = new UpdateModel();
+
+            if (isset($isTokenUpdate)) {
+                $updateModel->setUseSystemUser(true);
+            }
+
             $updateModel->runStructure();
             $this->setData('Success', true);
         } catch (Exception $ex) {
@@ -362,19 +387,6 @@ class UtilityController extends DashboardController {
             }
             $this->setData('DeletedFiles', $existingFiles);
         }
-    }
-
-    /**
-     * A special endpoint for users upgrading their Vanilla installation.
-     * Adds a special check for deleted files that may still exist post-upgrade.
-     *
-     * @since 2.0.18
-     * @access public
-     */
-    public function upgrade() {
-        $this->permission('Garden.Settings.Manage');
-        $this->checkDeleted();
-        $this->update();
     }
 
     /**

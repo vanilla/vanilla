@@ -19,6 +19,11 @@ class UpdateModel extends Gdn_Model {
     public $AddonSiteUrl = 'http://vanilla.local';
 
     /**
+     * @var bool
+     */
+    private $useSystemUser;
+
+    /**
      *
      *
      * @param $addon
@@ -680,6 +685,11 @@ class UpdateModel extends Gdn_Model {
 
                 try {
                     include $addon->path($structure);
+
+                    // Use the system user if specified.
+                    if ($addon->getGlobalKey() === 'dashboard' && $this->getUseSystemUser()) {
+                        Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false, false);
+                    }
                 } catch (\Exception $ex) {
                     if (debug()) {
                         throw $ex;
@@ -732,5 +742,14 @@ class UpdateModel extends Gdn_Model {
             return $Structure->Database->CapturedSql;
         }
         return [];
+    }
+
+    /**
+     * Whether or not to start the system user session.
+     *
+     * @param bool $use The new value.
+     */
+    public function setUseSystemUser(bool $use): void {
+        $this->useSystemUser = $use;
     }
 }

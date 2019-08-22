@@ -687,7 +687,7 @@ class UpdateModel extends Gdn_Model {
                     include $addon->path($structure);
 
                     // Use the system user if specified.
-                    if ($addon->getGlobalKey() === 'dashboard' && Gdn::userModel()->getUseSystemUser()) {
+                    if ($addon->getGlobalKey() === 'dashboard' && Gdn::userModel()->getSystemUserID()) {
                         Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false, false);
                     }
                 } catch (\Exception $ex) {

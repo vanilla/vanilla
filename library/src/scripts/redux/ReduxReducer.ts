@@ -11,11 +11,6 @@ import { IAction } from "@library/redux/ReduxActions";
  */
 export default abstract class ReduxReducer<S> {
     /**
-     * The initial state of the object.
-     */
-    public abstract readonly initialState: S;
-
-    /**
      * The reducer function for redux.
      */
     public abstract reducer: (state: S, action: IAction<any>) => S;

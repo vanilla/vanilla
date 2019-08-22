@@ -40,7 +40,7 @@
         "smarty/smarty": "~3.1",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
-        "vanilla/garden-container": "^1.3.4",
+        "vanilla/garden-container": "^2.0",
         "vanilla/garden-http": "~2.0",
         "vanilla/garden-schema": "~1.0",
         "vanilla/garden-password": "~1.0",
@@ -84,7 +84,7 @@
         "pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
         "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
         "post-install-cmd": "Vanilla\\Setup\\ComposerHelper::postUpdate",
-        "lint-diff": "./tests/travis/diff-standards.sh"
+        "lint-diff": "./.circleci/scripts/diff-standards.sh"
     },
     "autoload-dev": {
         "psr-4": {

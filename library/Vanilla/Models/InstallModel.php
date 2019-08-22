@@ -10,7 +10,7 @@ namespace Vanilla\Models;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use PDO;
 
 /**

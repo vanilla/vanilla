@@ -4,10 +4,10 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -20,8 +20,10 @@ interface IProps extends IBaseEmbedProps {
  * A class for rendering Imgur embeds.
  */
 export function ImgurEmbed(props: IProps): JSX.Element {
-    useEffect(() => {
-        void convertImgurEmbeds();
+    const throwError = useThrowError();
+
+    useLayoutEffect(() => {
+        void convertImgurEmbeds().catch(throwError);
     });
 
     return (

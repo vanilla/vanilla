@@ -12,7 +12,7 @@ use Garden\Web\Dispatcher;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
 use Garden\Web\ResourceRoute;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use Vanilla\AddonManager;

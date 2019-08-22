@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
     core: vanilla/core@2.1.0
+    chromatic: wave/chromatic@1.0.1
 aliases:
     - &run_yarn
         run:
@@ -178,6 +179,14 @@ workflows:
     version: 2
     commit:
         jobs:
+            - chromatic/test:
+                filters:
+                    branches:
+                        ignore: master
+            - chromatic/run-and-accept-all:
+                filters:
+                    branches:
+                        only: master
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
             - php_72_lint

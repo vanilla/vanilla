@@ -215,7 +215,7 @@
                                                     <div class="Profile-row">
                                                         {if isset($Rank)}
                                                             <span class="Profile-rank">
-                                                                {$Rank.Label|escape:'html'}
+                                                                {$Rank.Label}
                                                             </span>
                                                         {/if}
                                                     </div>

@@ -8,7 +8,7 @@
 namespace Garden;
 
 use Garden\Exception\ContainerNotFoundException;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * A basic container that stores its objects in an array.

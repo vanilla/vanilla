@@ -9,7 +9,8 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     statusID: string;
@@ -22,21 +23,24 @@ const TWITTER_SCRIPT = "https://platform.twitter.com/widgets.js";
  */
 export function TwitterEmbed(props: IProps): JSX.Element {
     const [twitterLoaded, setTwitterLoaded] = useState(false);
+    const throwError = useThrowError();
     const classes = twitterEmbedClasses();
     const { onRenderComplete } = props;
 
-    useEffect(() => {
-        void convertTwitterEmbeds().then(() => {
-            // We need to track the load status for the internal representation.
-            // Otherwise we end up with a flash of the URL next to the rendered tweet.
-            setTwitterLoaded(true);
-        });
-    }, [setTwitterLoaded]);
-
-    useEffect(() => {
+    useLayoutEffect(() => {
         // Don't count our tweet as rendered until the tweet is fully loaded.
         onRenderComplete && onRenderComplete();
     }, [twitterLoaded, onRenderComplete]);
+
+    useEffect(() => {
+        void convertTwitterEmbeds()
+            .then(() => {
+                // We need to track the load status for the internal representation.
+                // Otherwise we end up with a flash of the URL next to the rendered tweet.
+                setTwitterLoaded(true);
+            })
+            .catch(throwError);
+    }, [setTwitterLoaded, throwError]);
 
     return (
         <>

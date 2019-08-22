@@ -11,11 +11,11 @@ if [ "$TRAVIS_BRANCH" = "master" ]; then
 fi
 
 if [ "$DO_LINT" = true ]; then
-    tests/travis/php-lint.sh ./applications
-    tests/travis/php-lint.sh ./conf
-    tests/travis/php-lint.sh ./library
-    tests/travis/php-lint.sh ./plugins
-    tests/travis/php-lint.sh ./themes
+    .circleci/scripts/php-lint.sh ./applications
+    .circleci/scripts/php-lint.sh ./conf
+    .circleci/scripts/php-lint.sh ./library
+    .circleci/scripts/php-lint.sh ./plugins
+    .circleci/scripts/php-lint.sh ./themes
 else
     echo "Skipping code linting..."
 fi
@@ -31,7 +31,7 @@ PHPUNIT_RESULT=$?
 
 # Run standards check on pull requests.
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-    ./tests/travis/diff-standards.sh $TRAVIS_BRANCH $TRAVIS_BUILD_DIR
+    ./.circleci/scripts/diff-standards.sh $TRAVIS_BRANCH $TRAVIS_BUILD_DIR
     PHPCODESNIFFER_RESULT=$?
 else
     PHPCODESNIFFER_RESULT=0

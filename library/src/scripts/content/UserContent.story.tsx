@@ -7,13 +7,18 @@
 import UserContent from "@library/content/UserContent";
 import { storiesOf } from "@storybook/react";
 import React from "react";
+import { StoryContent } from "@library/storybook/StoryContent";
 
 storiesOf("User Content", module)
     .add("Inline", () => {
         const content = `
     <h2 data-id="inline-operations">Inline operations</h2><p>Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxy rise the sky calls to us! Descended from astronomers?</p><p>Some Text Here. <code class="code codeInline" spellcheck="false">Code Inline</code> Some More Text</p><p><strong>Bold</strong></p><p><em>italic</em></p><p><strong><em>bold italic</em></strong></p><p><strong><em><s>bold italic strike</s></em></strong></p><p><a href="http://test.com/" rel="nofollow"><strong><em><s>bold italic strike link</s></em></strong></a></p><p>Some text with a mention in it&nbsp;<a class="atMention" data-username="Alex Other Name" data-userid="23" href="http://dev.vanilla.localhost/profile/Alex%20Other%20Name">@Alex Other Name</a>&nbsp;Another mention&nbsp;<a class="atMention" data-username="System" data-userid="1" href="http://dev.vanilla.localhost/profile/System">@System</a>.</p><p>Some text with emojis🤗🤔🤣.</p>`;
 
-        return <UserContent content={content} />;
+        return (
+            <StoryContent>
+                <UserContent content={content} />{" "}
+            </StoryContent>
+        );
     })
     .add("Paragraph Formatting", () => {
         const content = `
@@ -71,5 +76,9 @@ storiesOf("User Content", module)
            </span>
        </button></div><div class="spoiler-content"><p class="spoiler-line">Some Spoiler content with formatting <strong>bold</strong> <em>italic </em><s>strike</s></p><p class="spoiler-line"><br></p><p class="spoiler-line"><br></p><p></p><p class="spoiler-line">Newlines above <a href="unsafe:test link" rel="nofollow">Link</a></p><p class="spoiler-line">Another line</p></div></div><p><br></p><p>A blockquote will be next.</p><p><br></p><p></p><div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">Some Block quote content<strong>bold</strong> <em>italic </em><s>strike</s></p><p class="blockquote-line"><s>More blockquote content</s></p></div></div><p></p><p><br></p><p></p><p>Unordered List</p><ul><li>Line 1</li><li>Line 2 (2 empty list items after this)</li><li><br></li><li><br></li><li>Line 5 item with <strong>bold and a </strong><a href="https://vanillaforums.com" rel="nofollow"><strong>link</strong></a><strong>.</strong></li><li>Line 6 item with an emoji<span class="safeEmoji nativeEmoji">😉</span>.</li></ul><p>Ordered List</p><ol><li>Number 1</li><li>Number 2</li><li>Number 3 (Empty line below)</li><li><br></li><li>Number 5 with <strong>bold and a </strong><a href="https://vanillaforums.com/" rel="nofollow"><strong>link</strong></a><strong>.</strong></li></ol><p><br></p>`;
 
-        return <UserContent content={content} />;
+        return (
+            <StoryContent>
+                <UserContent content={content} />{" "}
+            </StoryContent>
+        );
     });

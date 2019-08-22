@@ -17,7 +17,7 @@ import {
     userSelect,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -25,16 +25,15 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("checkRadio");
+    const themeVars = variableFactory("checkRadio");
 
-    const border = {
+    const border = themeVars("border", {
         width: formElementVars.border.width,
         radius: 2,
         color: globalVars.mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const main = {
+    const main = themeVars("check", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.bg,
         checked: {
@@ -43,15 +42,14 @@ export const checkRadioVariables = useThemeCache(() => {
         },
         hover: {
             border: {
-                color: globalVars.mixPrimaryAndBg(0.682),
+                color: globalVars.mainColors.primary,
             },
-            bg: globalVars.states.hover.color,
+            bg: globalVars.mainColors.primary.fade(0.1),
             opacity: 0.8,
         },
-        ...themeVars.subComponentStyles("check"),
-    };
+    });
 
-    const checkBox = {
+    const checkBox = themeVars("checkBox", {
         check: {
             width: 10,
             height: 10,
@@ -60,26 +58,32 @@ export const checkRadioVariables = useThemeCache(() => {
             width: 6,
             height: 6,
         },
-    };
+    });
 
-    const radioButton = {
+    const radioButton = themeVars("radioButton", {
         icon: {
             width: 6,
             height: 6,
         },
-    };
+    });
 
-    const labelNote = {
+    const labelNote = themeVars("labelNote", {
         fontSize: ".8em",
         opacity: 0.7,
-        ...themeVars.subComponentStyles("labelNote"),
-    };
+    });
 
-    const sizing = {
+    const sizing = themeVars("sizing", {
         width: 16,
-    };
+    });
 
-    return { border, main, checkBox, radioButton, labelNote, sizing };
+    return {
+        border,
+        main,
+        checkBox,
+        radioButton,
+        labelNote,
+        sizing,
+    };
 });
 
 export const checkRadioClasses = useThemeCache(() => {
@@ -209,22 +213,25 @@ export const checkRadioClasses = useThemeCache(() => {
         outline: 0,
         cursor: "pointer",
         $nest: {
-            "&.focus-accessible": {},
-            "&:hover": {
-                $nest: {
-                    [`& .${input}:not([disabled]), & .${input}:not([disabled])`]: {
-                        $nest: {
-                            [`& + .${state}`]: {
-                                borderColor: vars.main.hover.border.color.toString(),
-                                opacity: vars.main.hover.opacity,
-                                backgroundColor: vars.main.hover.bg.toString(),
-                            },
-                        },
-                    },
-                    [`& ${iconContainer}`]: {
-                        backgroundColor: vars.main.hover.bg.toString(),
-                    },
-                },
+            [`&:hover .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`&.focus-accessible .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`&:focus .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`.${input}:not([disabled]):hover + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`.${input}:not([disabled]):focus + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
             },
             [`& + &`]: {
                 marginTop: px(globalVars.spacer.size / 2),

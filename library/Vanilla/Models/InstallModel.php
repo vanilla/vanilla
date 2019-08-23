@@ -58,7 +58,6 @@ class InstallModel {
      * token.
      *
      * @return string Returns a new random token.
-     * @throws \Exception
      */
     public static function generateUpdateToken(): string {
         return sha1(random_bytes(40));

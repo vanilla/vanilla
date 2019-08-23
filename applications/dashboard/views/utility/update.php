@@ -1,28 +1,27 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
 
-<div class="SplashInfo">
-    <?php
-    if ($this->data('Success')) {
-        echo '<h1>', t('Success'), '</h1>';
-        echo '<p>', t('The update was successful.'), '</p>';
-    } else {
-        echo '<h1>', t('Failure'), '</h1>';
-        echo '<p>', t('The update was not successful.'), '</p>';
-    }
-    ?>
-    <!--   <p><?php echo t('The page you were looking for could not be found.'); ?></p>-->
-    <?php $deletedFiles = $this->data('DeletedFiles', []); ?>
-    <?php if ($deletedFiles) : ?>
-        <h2><?php echo t('Deleted Files'); ?></h2>
-        <p><?php
-            echo t('These files have been deleted since the last Vanilla release.').' '
-                .t('You may encounter some issues if you do not manually remove them from your installation.');
-            ?>
-        </p>
+echo $this->Form->open();
+?>
+    <div class="Title">
+        <h1>
+            <?php echo img('applications/dashboard/design/images/vanilla_logo.png', ['alt' => 'Vanilla']); ?>
+            <p><?php echo "Db Update" ?></p>
+        </h1>
+    </div>
+    <div class="Form">
+        <?php echo $this->Form->errors(); ?>
         <ul>
-        <?php foreach ($deletedFiles as $file) {
-            echo wrap($file, 'li');
-        } ?>
+            <li>
+                <?php
+                echo $this->Form->label('Update Token');
+                echo '<div class="Description">Enter your <a href="https://docs.vanillaforums.com/developer/installation/self-hosting/#update-token">update token</a> below.</div>';
+                echo $this->Form->textBox('updateToken');
+                ?>
+            </li>
         </ul>
-    <?php endif; ?>
-</div>
+        <div class="Button">
+            <?php echo $this->Form->button('Update'); ?>
+        </div>
+    </div>
+<?php
+echo $this->Form->close();

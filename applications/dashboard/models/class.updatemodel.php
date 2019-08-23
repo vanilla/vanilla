@@ -21,7 +21,7 @@ class UpdateModel extends Gdn_Model {
     /**
      * @var bool
      */
-    private $useSystemUser;
+    private $runAsSystem;
 
     /**
      *
@@ -687,7 +687,7 @@ class UpdateModel extends Gdn_Model {
                     include $addon->path($structure);
 
                     // Use the system user if specified.
-                    if ($addon->getGlobalKey() === 'dashboard' && Gdn::userModel()->getSystemUserID()) {
+                    if ($addon->getGlobalKey() === 'dashboard' && $this->getUseSystemUser()) {
                         Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false, false);
                     }
                 } catch (\Exception $ex) {
@@ -747,9 +747,16 @@ class UpdateModel extends Gdn_Model {
     /**
      * Whether or not to start the system user session.
      *
-     * @param bool $use The new value.
+     * @param bool $system The new value.
      */
-    public function setUseSystemUser(bool $use): void {
-        $this->useSystemUser = $use;
+    public function setRunAsSystem(bool $system): void {
+        $this->runAsSystem = $system;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRunAsSystem(): bool {
+        return $this->runAsSystem;
     }
 }

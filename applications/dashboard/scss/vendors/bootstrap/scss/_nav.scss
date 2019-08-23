@@ -38,7 +38,7 @@
 
   .nav-item + .nav-item,
   .nav-link + .nav-link {
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 }
 
@@ -57,7 +57,7 @@
     margin-bottom: -1px;
 
     + .nav-item {
-      margin-left: .2rem;
+      margin-left: 3.2px;
     }
   }
 
@@ -102,7 +102,7 @@
     float: left;
 
     + .nav-item {
-      margin-left: .2rem;
+      margin-left: 3.2px;
     }
   }
 
@@ -129,7 +129,7 @@
     float: none;
 
     + .nav-item {
-      margin-top: .2rem;
+      margin-top: 3.2px;
       margin-left: 0;
     }
   }

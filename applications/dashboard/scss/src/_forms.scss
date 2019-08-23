@@ -847,6 +847,7 @@ select + select {
     }
   }
 
+
   .search-icon-wrap {
     @extend .btn-icon;
     padding: 6px 12px;
@@ -1227,7 +1228,7 @@ label[id^=iCheck] {
 
 .spoiler {
   position: relative;
-  min-height: 2.32px;
+  min-height: 35px;
 
   &.spoiler-visible {
     .spoiler-trigger {

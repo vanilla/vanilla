@@ -7,28 +7,24 @@ import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 
 interface IProps {
-    label?: string;
+    label: string;
     description?: string;
-    labelType?: FormLabelType;
+    labelType?: DashboardLabelType;
 }
 
-export enum FormLabelType {
-    STANDARD = "",
-    WIDE = "-wide",
-    RIGHT = "-right",
+export enum DashboardLabelType {
+    STANDARD = "standard",
+    WIDE = "wide",
 }
 
 export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
-    const { inputID } = useFormGroup();
+    const { inputID, labelID } = useFormGroup();
 
-    if (!props.label && !props.description) {
-        return null;
-    }
-
-    const rootClass = "label-wrap" + (props.labelType !== undefined ? props.labelType : FormLabelType.STANDARD);
+    const labelType = props.labelType !== undefined ? props.labelType : DashboardLabelType.STANDARD;
+    const rootClass = labelType === DashboardLabelType.WIDE ? "label-wrap-wide" : "label-wrap";
 
     return (
-        <div className={rootClass}>
+        <div className={rootClass} id={labelID}>
             {props.label && <label htmlFor={inputID}>{props.label}</label>}
             {props.description && <div className="info">{props.description}</div>}
         </div>

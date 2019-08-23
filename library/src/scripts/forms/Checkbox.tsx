@@ -17,14 +17,17 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     onChange?: any;
     label: string;
+    isHorizontal?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
     const labelID = useUniqueID("checkbox_label");
     const classes = checkRadioClasses();
 
+    const { isHorizontal } = props;
+
     return (
-        <label id={labelID} className={classNames(props.className, classes.root)}>
+        <label id={labelID} className={classNames(props.className, classes.root, { isHorizontal })}>
             <input
                 className={classes.input}
                 aria-labelledby={labelID}

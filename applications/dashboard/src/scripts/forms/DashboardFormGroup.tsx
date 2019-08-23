@@ -5,20 +5,21 @@
 
 import React, { useContext, useMemo } from "react";
 import { useUniqueID } from "@library/utility/idUtils";
-import { DashboardFormLabel, FormLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardFormLabel, DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps {
-    label?: string;
+    label: string;
     description?: string;
-    labelType?: FormLabelType;
+    labelType?: DashboardLabelType;
     tag?: keyof JSX.IntrinsicElements;
     children: React.ReactNode;
 }
 
 interface IGroupContext {
     inputID: string;
-    hasLabel: boolean;
+    labelID: string;
+    labelType: DashboardLabelType;
 }
 
 const FormGroupContext = React.createContext<IGroupContext | null>(null);
@@ -30,7 +31,7 @@ export function useFormGroup(): IGroupContext {
     if (context === null) {
         throwError(
             new Error(
-                "Attempting to create a <DashboardFormLabel /> without a form group. Be sure to place it in a <DashboardFormGroup />",
+                "Attempting to create a dashboard from component without a form group. Be sure to place it in a <DashboardFormGroup />",
             ),
         );
     }
@@ -40,11 +41,13 @@ export function useFormGroup(): IGroupContext {
 export function DashboardFormGroup(props: IProps) {
     const LiTag = (props.tag || "li") as "li";
     const inputID = useUniqueID("formGroup-");
-    const hasLabel = !!(props.label || props.children);
+    const labelID = inputID + "-label";
 
     return (
         <LiTag className="form-group">
-            <FormGroupContext.Provider value={{ inputID, hasLabel }}>
+            <FormGroupContext.Provider
+                value={{ inputID, labelID, labelType: props.labelType || DashboardLabelType.STANDARD }}
+            >
                 <DashboardFormLabel {...props} />
                 {props.children}
             </FormGroupContext.Provider>

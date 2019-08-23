@@ -7555,7 +7555,7 @@ label[id^=iCheck] {
 
 .spoiler {
   position: relative;
-  min-height: 2.32px;
+  min-height: 35px;
 }
 .spoiler.spoiler-visible .spoiler-trigger {
   display: none !important;

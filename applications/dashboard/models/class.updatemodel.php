@@ -24,19 +24,6 @@ class UpdateModel extends Gdn_Model {
     private $runAsSystem;
 
     /**
-     *
-     *
-     * @param $addon
-     * @param $addons
-     * @deprecated since 2.3
-     */
-    private static function addAddon($addon, &$addons) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $slug = strtolower($addon['AddonKey']).'-'.strtolower($addon['AddonType']);
-        $addons[$slug] = $addon;
-    }
-
-    /**
      * Find a list of filenames in a folder or zip.
      *
      * @param string $path Folder or zip file to look in.

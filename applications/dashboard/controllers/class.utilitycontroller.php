@@ -575,6 +575,7 @@ class UtilityController extends DashboardController {
             $token = $this->Request->post('updateToken');
         }
 
+        $isTokenUpdate = false;
         if (!empty($token)) {
             $knownString = (string)Gdn::config()->get('Garden.UpdateToken', '');
             if (!empty($knownString) && hash_equals($knownString, $token)) {

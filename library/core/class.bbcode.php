@@ -311,7 +311,7 @@ class BBCode extends Gdn_Pluggable {
     public function media() {
         if ($this->media === null) {
             $controller = Gdn::controller();
-            if (!$controller instanceof Gdn_Controller) {
+            if (!($controller instanceof Gdn_Controller)) {
                 return;
             }
             $commentIDList = [];

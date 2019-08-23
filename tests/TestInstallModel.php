@@ -7,7 +7,7 @@
 
 namespace VanillaTests;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
 
@@ -74,9 +74,9 @@ class TestInstallModel extends InstallModel {
                 'title' => __CLASS__
             ],
             'admin' => [
-                'email' => 'travis@example.com',
-                'name' => 'travis',
-                'password' => 'travis'
+                'email' => 'circleci@example.com',
+                'name' => 'circleci',
+                'password' => 'circleci'
             ]
         ], $data);
 

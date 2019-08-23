@@ -5,7 +5,8 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { em } from "csx";
-import { margins, unit } from "@library/styles/styleHelpers";
+import { margins, unit, colorOut } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
@@ -38,6 +39,12 @@ export const iconVariables = useThemeCache(() => {
     const compact = themeVars("compact", {
         width: 12,
         height: 12,
+    });
+
+    const warning = themeVars("warning", {
+        width: 16,
+        height: 16,
+        color: "#f5af15",
     });
 
     const settings = themeVars("settings", {
@@ -73,6 +80,16 @@ export const iconVariables = useThemeCache(() => {
     const close = themeVars("close", {
         width: 20,
         height: 20,
+    });
+
+    const closeCompact = themeVars("closeCompact", {
+        width: 16,
+        height: 16,
+    });
+
+    const closeTiny = themeVars("closeTiny", {
+        width: 10,
+        height: 10,
     });
 
     const chevronLeftCompact = themeVars("chevronLeftCompact", {
@@ -114,12 +131,15 @@ export const iconVariables = useThemeCache(() => {
         vanillaLogo,
         compact,
         settings,
+        warning,
         search,
         notifications,
         messages,
         user,
         userWarning,
         close,
+        closeCompact,
+        closeTiny,
         chevronLeftCompact,
         selectedCategory,
         signIn,
@@ -169,6 +189,12 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.settings.height),
     });
 
+    const warning = style("warning", {
+        width: unit(vars.warning.width),
+        height: unit(vars.warning.height),
+        color: colorOut(vars.warning.color),
+    });
+
     const search = style("search", {
         width: unit(vars.search.width),
         height: unit(vars.search.height),
@@ -199,9 +225,18 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.close.height),
     });
 
-    const closeCompact = style("close", {
-        width: unit(vars.close.width),
-        height: unit(vars.close.height),
+    // Same as close, but without extra padding
+    const closeCompact = style("closeCompact", {
+        width: unit(vars.closeCompact.width),
+        height: unit(vars.closeCompact.height),
+    });
+
+    // For really small close buttons, like on tokens
+    const closeTiny = style("closeTiny", {
+        display: "block",
+        width: unit(vars.closeTiny.width),
+        height: unit(vars.closeTiny.height),
+        margin: "auto",
     });
 
     const chevronLeftCompact = style("chevronLeftCompact", {
@@ -238,6 +273,7 @@ export const iconClasses = useThemeCache(() => {
     return {
         standard,
         newFolder,
+        warning,
         fileType,
         attachmentError,
         vanillaLogo,
@@ -249,6 +285,8 @@ export const iconClasses = useThemeCache(() => {
         user,
         userWarning,
         close,
+        closeCompact,
+        closeTiny,
         chevronLeftCompact,
         selectedCategory,
         signIn,

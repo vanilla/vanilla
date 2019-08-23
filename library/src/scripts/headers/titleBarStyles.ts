@@ -18,12 +18,20 @@ import {
     userSelect,
     absolutePosition,
     pointerEvents,
+    singleBorder,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+
+enum TitleBarBorderType {
+    BORDER = "border",
+    NONE = "none",
+    SHADOW = "shadow",
+}
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -46,6 +54,10 @@ export const titleBarVariables = useThemeCache(() => {
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
+    });
+
+    const border = makeThemeVars("border", {
+        type: TitleBarBorderType.NONE,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -128,6 +140,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     return {
+        border,
         sizing,
         colors,
         signIn,
@@ -154,10 +167,27 @@ export const titleBarClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("titleBar");
 
+    const getBorderVars = (): NestedCSSProperties => {
+        switch (vars.border.type) {
+            case TitleBarBorderType.BORDER:
+                return {
+                    borderBottom: singleBorder(),
+                };
+            case TitleBarBorderType.SHADOW:
+                return {
+                    boxShadow: shadowHelper().makeShadow(),
+                };
+            case TitleBarBorderType.NONE:
+            default:
+                return {};
+        }
+    };
+
     const root = style({
         maxWidth: percent(100),
         backgroundColor: headerColors.bg.toString(),
         color: headerColors.fg.toString(),
+        ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {
                 color: vars.colors.fg.toString(),

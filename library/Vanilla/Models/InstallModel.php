@@ -117,7 +117,7 @@ class InstallModel {
         // Make sure that we install the addons as the admin user.
         if (!$this->session->isValid()) {
             $oldConfigValue = $this->config->get('Garden.Installed');
-            $this->config ->set('Garden.Installed', true);
+            $this->config->set('Garden.Installed', true);
             $this->session->start($adminUserID, false);
             $this->config->set('Garden.Installed', $oldConfigValue);
         }

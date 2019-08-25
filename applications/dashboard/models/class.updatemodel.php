@@ -667,9 +667,11 @@ class UpdateModel extends Gdn_Model {
     }
 
     /**
-     * @param bool $captureOnly
-     * @return array
-     * @throws Exception
+     * Run the structure update.
+     *
+     * @param bool $captureOnly If **true** will just capture SQL.
+     * @return array Returns an array of update SQL.
+     * @throws Exception Throws an exception if in debug mode.
      */
     private function runStructureInternal(bool $captureOnly): array {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());

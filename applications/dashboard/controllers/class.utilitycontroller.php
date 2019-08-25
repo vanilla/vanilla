@@ -249,6 +249,87 @@ class UtilityController extends DashboardController {
     }
 
     /**
+     * Legacy version of update.
+     */
+    private function legacyUpdate() {
+        // Check for permission or flood control.
+        // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
+        $now = time();
+        $lastTime = 0;
+        $count = 0;
+        try {
+            $lastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        } catch (Exception $ex) {
+            // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
+        }
+        if ($lastTime + (60 * 60 * 24) > $now) {
+            // Check for flood control.
+            try {
+                $count = Gdn::get('Garden.Update.Count', 0) + 1;
+            } catch (Exception $ex) {
+                // Once more we sit, watching the breath.
+            }
+            if ($count > 5) {
+                if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                    // We are only allowing an update of 5 times every 24 hours.
+                    throw permissionException();
+                }
+            }
+        } else {
+            $count = 1;
+        }
+        try {
+            Gdn::set('Garden.Update.LastTimestamp', $now);
+            Gdn::set('Garden.Update.Count', $count);
+        } catch (Exception $ex) {
+            // What is a GDN_UserMeta table, really? Suffering.
+        }
+        try {
+            // Run the structure.
+            $updateModel = new UpdateModel();
+            $updateModel->runStructure();
+            $this->setData('Success', true);
+        } catch (Exception $ex) {
+            $this->setData('Success', false);
+            $this->setData('Error', $ex->getMessage());
+            if (debug()) {
+                throw $ex;
+            }
+        }
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            saveToConfig('Garden.Version', APPLICATION_VERSION);
+        }
+        if ($target = $this->Request->get('Target')) {
+            redirectTo($target);
+        }
+        $this->fireEvent('AfterUpdate');
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // Make sure that we do not disclose anything too sensitive here!
+            $this->Data = array_filter($this->Data, function($key) {
+                return in_array(strtolower($key), ['success', 'error']);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+        $this->MasterView = 'empty';
+        $this->CssClass = 'Home';
+        Gdn_Theme::section('Utility');
+        $this->render('update-legacy', 'utility', 'dashboard');
+    }
+
+    /**
+     * Run a structure update on the database.
+     *
+     * @since 2.0.?
+     * @access public
+     */
+    public function update() {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled('updateTokens')) {
+            $this->updateWithToken();
+        } else {
+            $this->legacyUpdate();
+        }
+    }
+
+    /**
      * Run a structure update on the database.
      *
      * It should always be possible to call this method, even if no database tables exist yet.
@@ -258,11 +339,9 @@ class UtilityController extends DashboardController {
      * @since 2.0.?
      * @access public
      */
-    public function update() {
+    public function updateWithToken() {
         $this->ApplicationFolder = 'dashboard';
         $this->MasterView = 'setup';
-
-        $isTokenUpdate = false;
 
         // Do some checks for backwards for behavior for CD.
         if ($this->Request->isPostBack()) {
@@ -282,8 +361,7 @@ class UtilityController extends DashboardController {
         $this->addJsFile('jquery.js');
         Gdn_Theme::section('Utility');
 
-
-
+        $this->setData('_isAdmin', Gdn::session()->checkPermission('Garden.Settings.Manager'));
         $this->render($this->View, 'utility', 'dashboard');
     }
 
@@ -582,57 +660,24 @@ class UtilityController extends DashboardController {
                 Gdn::session()->validateTransientKey(true);
                 $isTokenUpdate = true;
             } else {
-                if ($this->deliveryType() === DELIVERY_METHOD_XHTML) {
-                    $this->Form->addError("Invalid update token", "updateToken");
-                }
+                $this->Form->addError("Invalid update token", "updateToken");
                 trigger_error("utility/update invalid update token.", E_USER_WARNING);
+                return false;
             }
         } else {
+            if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                // We are only allowing an update of 5 times every 24 hours.
+                throw permissionException();
+            }
             if (!$this->Request->isAuthenticatedPostBack(false)) {
                 trigger_error("Invalid transient key on utility/update.", E_USER_WARNING);
+                $this->Request->isAuthenticatedPostBack(true);
             }
         }
 
-        // Check for permission or flood control.
-        // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-        $now = time();
-        $lastTime = 0;
-        $count = 0;
-
+        // Run the structure.
+        $updateModel = new UpdateModel();
         try {
-            $lastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
-        } catch (Exception $ex) {
-            // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
-        }
-
-        if ($lastTime + (60 * 60 * 24) > $now) {
-            // Check for flood control.
-            try {
-                $count = Gdn::get('Garden.Update.Count', 0) + 1;
-            } catch (Exception $ex) {
-                // Once more we sit, watching the breath.
-            }
-            if ($count > 500 && !$isTokenUpdate) {
-                if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                    // We are only allowing an update of 5 times every 24 hours.
-                    throw permissionException();
-                }
-            }
-        } else {
-            $count = 1;
-        }
-
-        try {
-            Gdn::set('Garden.Update.LastTimestamp', $now);
-            Gdn::set('Garden.Update.Count', $count);
-        } catch (Exception $ex) {
-            // What is a GDN_UserMeta table, really? Suffering.
-        }
-
-        try {
-            // Run the structure.
-            $updateModel = new UpdateModel();
-
             if (isset($isTokenUpdate)) {
                 $updateModel->setRunAsSystem(true);
             }
@@ -642,14 +687,12 @@ class UtilityController extends DashboardController {
         } catch (Exception $ex) {
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
+
             if (debug()) {
                 throw $ex;
             }
         }
-
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            saveToConfig('Garden.Version', APPLICATION_VERSION);
-        }
+        saveToConfig('Garden.Version', APPLICATION_VERSION);
 
         $this->fireEvent('AfterUpdate');
 

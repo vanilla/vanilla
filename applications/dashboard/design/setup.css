@@ -54,6 +54,13 @@ h1 {
     font-size: 180%;
 }
 
+.Container {
+    width: 100%;
+    max-width: 532px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
 div.Form {
     text-align: center;
 }
@@ -273,6 +280,10 @@ div.Info li {
     padding: 1px 0;
     margin: 0;
     text-shadow: none;
+}
+
+.Notice {
+    text-align: center;
 }
 
 .Description {

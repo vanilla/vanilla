@@ -8,12 +8,13 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { StoryContent } from "@library/storybook/StoryContent";
 
 const story = storiesOf("Philosophy", module);
 
 story.add("Goals", () => {
     return (
-        <>
+        <StoryContent>
             <StoryHeading depth={1}>Goals</StoryHeading>
             <StoryParagraph>
                 As our clients grow, it becomes increasingly difficult to update our product. With so many
@@ -26,13 +27,13 @@ story.add("Goals", () => {
                 With components in Storybook, we can run automated tests for regressions. We will be able to update more
                 easily. Cut down on support.
             </StoryParagraph>
-        </>
+        </StoryContent>
     );
 });
 
 story.add("Variables", () => {
     return (
-        <>
+        <StoryContent>
             <StoryHeading depth={1}>Variables</StoryHeading>
             <StoryParagraph>
                 The themes are built with many variables. Having said that, with only a few variables set, you will have
@@ -42,14 +43,14 @@ story.add("Variables", () => {
             <ul>
                 <li />
             </ul>
-        </>
+        </StoryContent>
     );
 });
 
 story.add("Colors", () => {
     return (
-        <>
+        <StoryContent>
             <StoryHeading depth={1}>Colors</StoryHeading>
-        </>
+        </StoryContent>
     );
 });

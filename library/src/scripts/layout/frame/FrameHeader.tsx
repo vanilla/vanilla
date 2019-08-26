@@ -55,7 +55,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         if (this.props.closeFrame) {
             closeButton = (
                 <div className={classes.action}>
-                    <CloseButton className={classes.close} onClick={this.props.closeFrame} />
+                    <CloseButton className={classes.close} onClick={this.props.closeFrame} compact />
                 </div>
             );
         }

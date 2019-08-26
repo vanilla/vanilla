@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
+import { colorOut, debugHelper, paddings, unit, userSelect } from "@library/styles/styleHelpers";
 import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
@@ -16,13 +16,9 @@ export const tokensVariables = useThemeCache(() => {
 
     const token = {
         fontSize: globalVars.meta.text.fontSize,
-        bg: globalVars.mixBgAndFg(0.15),
+        bg: globalVars.mixBgAndFg(0.1),
         textShadow: `${globalVars.mainColors.bg} 0 0 1px`,
-    };
-
-    const clear = {
-        width: 16,
-        ...themeVars.subComponentStyles("clear"),
+        minHeight: 26,
     };
 
     const clearIcon = {
@@ -30,7 +26,10 @@ export const tokensVariables = useThemeCache(() => {
         ...themeVars.subComponentStyles("clearIcon"),
     };
 
-    return { clearIcon, clear, token };
+    return {
+        clearIcon,
+        token,
+    };
 });
 
 export const tokensClasses = useThemeCache(() => {
@@ -41,20 +40,7 @@ export const tokensClasses = useThemeCache(() => {
 
     const root = style({
         $nest: {
-            ".tokens-clear": {
-                height: unit(vars.clear.width),
-                width: unit(vars.clear.width),
-                padding: 0,
-                borderRadius: percent(50),
-                marginLeft: px(1),
-                $nest: {
-                    "&:hover, &:focus": {
-                        backgroundColor: globalVars.mainColors.primary.toString(),
-                        color: globalVars.mainColors.bg.toString(),
-                    },
-                },
-            },
-            ".tokens__value-container": {
+            "& .tokens__value-container": {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
@@ -66,7 +52,10 @@ export const tokensClasses = useThemeCache(() => {
                 paddingLeft: px(12),
                 $nest: {
                     "&.tokens__value-container--has-value": {
-                        padding: px(3),
+                        ...paddings({
+                            horizontal: 4,
+                            vertical: 0,
+                        }),
                     },
                     "& .tokens__multi-value + div:not(.tokens__multi-value)": {
                         display: "flex",
@@ -84,18 +73,33 @@ export const tokensClasses = useThemeCache(() => {
                     },
                 },
             },
-            ".tokens__multi-value": {
+            "& .tokens__multi-value": {
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "nowrap",
                 fontSize: unit(vars.token.fontSize),
                 fontWeight: globalVars.fonts.weights.bold,
                 textShadow: vars.token.textShadow,
-                paddingLeft: px(3),
-                paddingRight: px(2),
-                margin: px(3),
-                backgroundColor: vars.token.bg.toString(),
+                margin: px((formElVars.sizing.height - vars.token.minHeight) / 2 - formElVars.border.width),
+                backgroundColor: colorOut(vars.token.bg),
+                minHeight: unit(vars.token.minHeight),
+                borderRadius: px(2),
                 ...userSelect(),
             },
             "& .tokens__multi-value__label": {
-                paddingLeft: px(3),
+                paddingLeft: px(6),
+                fontWeight: globalVars.fonts.weights.normal,
+                fontSize: globalVars.fonts.size.small,
+            },
+            "& .tokens-clear": {
+                height: unit(globalVars.icon.sizes.default),
+                width: unit(globalVars.icon.sizes.default),
+                padding: 0,
+                $nest: {
+                    "&:hover, &:focus": {
+                        color: globalVars.mainColors.primary.toString(),
+                    },
+                },
             },
         },
     });

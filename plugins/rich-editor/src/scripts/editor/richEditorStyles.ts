@@ -79,7 +79,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         content: quote(``),
         ...absolutePosition.middleOfParent(),
         width: unit(vars.iconWrap.width),
-        height: unit(vars.iconWrap.height),
+        height: unit(vars.iconWrap.width),
         ...borders({
             radius: 3,
             color: globalVars.elementaryColors.transparent,
@@ -124,6 +124,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         position: "relative",
         width: unit(vars.menuButton.size * 4),
         overflow: "hidden",
+        zIndex: 1,
     });
 
     const menuBarToggles = style("menuBarToggles", {

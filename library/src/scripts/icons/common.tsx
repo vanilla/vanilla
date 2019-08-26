@@ -143,6 +143,26 @@ export function CloseCompactIcon(props: { className?: string }) {
     return <CloseIcon compact={true} className={props.className} />;
 }
 
+export function CloseTinyIcon(props: { className?: string }) {
+    const title = t("Close");
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.closeTiny, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 9.5 9.5"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M10.836,11.75,7.793,8.707A1,1,0,0,1,9.207,7.293l3.043,3.043,3.043-3.043a1,1,0,0,1,1.414,1.414L13.664,11.75l3.043,3.043a1,1,0,0,1-1.414,1.414L12.25,13.164,9.207,16.207a1,1,0,1,1-1.439-1.389l.025-.025Z"
+                transform="translate(-7.488 -7.012)"
+            />
+        </svg>
+    );
+}
+
 export function ClearIcon(props: { className?: string }) {
     const title = t("Clear");
     const classes = iconClasses();
@@ -218,13 +238,35 @@ export function NewFolderIcon(props: { className?: string; title?: string }) {
     );
 }
 
+export function WarningIcon(props: { className?: string; warningMessage: string }) {
+    const classes = iconClasses();
+
+    return (
+        <svg
+            className={classNames(classes.warning, props.className)}
+            aria-label={props.warningMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+        >
+            <title>{props.warningMessage}</title>
+            <circle cx="8" cy="8" r="8" style={currentColorFill} />
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
+            <path
+                d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z"
+                transform="translate(-4 -4)"
+                style={{ fill: "#fff" }}
+            />
+        </svg>
+    );
+}
+
 export function CategoryIcon(props: { className?: string }) {
     const title = t("Folder");
     const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(classes.standard, "icon-categoryIcon", props.className)}
+            className={classNames(classes.categoryIcon, "icon-categoryIcon", props.className)}
             viewBox="0 0 24 24"
             role="img"
             aria-label={title}
@@ -432,6 +474,36 @@ export function accessibleImageMenu(message?: string, className?: string) {
                 fill="currentColor"
                 d="M16.06 9.004h-.005l-3.06.336a2.823 2.823 0 0 1-.313.018H11.32c-.104 0-.208-.006-.312-.017l-3.065-.337c-.482-.047-.902.394-.94.984-.038.59.321 1.106.803 1.153l2.473.275c.15.017.265.17.265.355v.822c0 .179-.027.356-.08.522L9.06 17.494c-.195.541.005 1.174.446 1.414.442.24.958-.005 1.154-.546l1.336-4.007 1.349 4.017c.201.528.71.762 1.144.528.435-.235.637-.853.456-1.391l-1.408-4.395a1.717 1.717 0 0 1-.08-.521v-.822c0-.185.115-.339.265-.355l2.47-.275c.48-.045.841-.56.804-1.15-.036-.59-.456-1.033-.938-.988z"
             />
+        </svg>
+    );
+}
+
+export function EditIcon(props: { className?: string }) {
+    const classes = iconClasses();
+
+    return (
+        <svg viewBox="0 0 17 17" className={classNames(classes.editIcon, props.className)}>
+            <title>{t("Edit")}</title>
+            <path
+                d="M13.5754065,2.1553463 L14.8688993,3.4488391 C15.0983678,3.67830757 15.0723706,4.07662713 14.8043247,4.34467303 L6.49695447,12.6520433 C6.37003985,12.7789579 6.16486621,12.9276627 6.00618072,13.0078902 L2.5717011,15.1354526 C2.21530869,15.3156359 1.88011416,15.0009834 2.04178835,14.638015 L4.01917231,11.0372356 C4.09346538,10.8704431 4.23787156,10.661622 4.37220235,10.5272912 L12.6795726,2.21992091 C12.9450215,1.95447206 13.3449607,1.92490046 13.5754065,2.1553463 L13.5754065,2.1553463 Z M13.0063615,2.95550803 L5.00549952,10.9563701 C4.91814867,11.0437209 4.80296101,11.1836308 4.7423645,11.2747238 L2.57725597,14.5294691 L5.7443798,12.2923015 C5.83848787,12.2258262 5.98314663,12.1034751 6.06787558,12.0187461 L14.0687376,4.01788409 C14.1560885,3.93053323 14.1909447,3.83326056 14.1524475,3.7947633 L13.2294823,2.87179816 C13.190426,2.83274183 13.0063615,2.95550803 13.0063615,2.95550803 L13.0063615,2.95550803 Z M3.92039914,13.7478601 L2.56175867,14.5673369 L3.34476172,13.1722227 L3.06720431,12.8946653 L3.92039914,13.7478601 L3.92039914,13.7478601 Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function DeleteIcon(props: { className?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg viewBox="0 0 16 16" className={classNames(classes.deleteIcon, props.className)}>
+            <title>{t("Delete")}</title>
+            <g fillRule="evenodd" fill="currentColor">
+                <path d="M14,4 L14,13.007983 C14,14.1081436 13.0998238,15 12.007983,15 L4.99201702,15 C3.8918564,15 3,14.0998238 3,13.007983 L3,4 L2.29462433,4 C2.13190781,4 2,3.86095428 2,3.70537567 L2,3.29462433 C2,3.13190781 2.13293028,3 2.29840803,3 L5.5,3 L5.7558589,1.97656441 C5.89069431,1.43722278 6.44371665,1 6.99980749,1 L10.0001925,1 C10.5523709,1 11.1109662,1.44386482 11.2441411,1.97656441 L11.5,3 L14.701592,3 C14.8663982,3 15,3.13904572 15,3.29462433 L15,3.70537567 C15,3.86809219 14.8609543,4 14.7053757,4 L14,4 Z M6.96143803,2.19281006 C6.98273522,2.086324 7.08654881,2 7.19683838,2 L9.80316162,2 C9.91187246,2 10.018457,2.09228516 10.038562,2.19281006 L10.1999998,3 L6.80000019,3 L6.96143803,2.19281006 Z M4,4 L13,4 L13,13.0046024 C13,13.5543453 12.5536886,14 12.0024554,14 L4.99754465,14 C4.44661595,14 4,13.5443356 4,13.0046024 L4,4 Z" />
+                <rect fillOpacity="0.1" x="4" y="4" width="9" height="10" />
+                <rect x="8" y="5.5" width="1" height="7" rx="0.5" />
+                <rect x="10" y="5.5" width="1" height="7" rx="0.5" />
+                <rect x="6" y="5.5" width="1" height="7" rx="0.5" />
+            </g>
         </svg>
     );
 }

@@ -120,8 +120,8 @@
 
     .icon {
       position: absolute;
-      right: 1rem;
-      top: 1rem;
+      right: 16px;
+      top: 16px;
     }
   }
 
@@ -140,7 +140,7 @@
     }
 
     .media-left {
-      height: 5.25rem;
+      height: 84px;
       padding-right: $spacer;
     }
   }
@@ -163,13 +163,13 @@
     }
 
     .btn.btn-sm-rounded {
-      min-width: 3.75rem;
-      padding: .0625rem .5rem;
-      font-size: to-rem(9);
+      min-width: 312px;
+      padding: 1px 8px;
+      font-size: 9px;
 
       svg {
         position: relative;
-        width: to-rem(9);
+        width: 9px;
       }
     }
   }

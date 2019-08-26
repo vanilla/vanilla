@@ -10762,7 +10762,7 @@ button.Close {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.Popup .Content > h1:first-child, .Popup .Content h2:first-child, .Popup .Content .analytics-widget-header .title:first-child, .analytics-widget-header .Popup .Content .title:first-child, .Popup .Content h3:first-child {
+.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .analytics-widget-header .Content > .title:first-child, .analytics-widget-header .Popup .Content > .title:first-child, .Popup .Content > h3:first-child {
   font-size: 20px;
   margin-top: 0;
   margin-bottom: 14px;

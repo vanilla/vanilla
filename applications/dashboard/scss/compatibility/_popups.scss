@@ -4,7 +4,7 @@
  */
 
 .Popup .Content {
-    > h1, h2, h3 {
+    > h1, > h2, > h3 {
         &:first-child {
             // Target all first headings and treat them as titles.
             // This is largely needed because the legacy popups have such diverse HTML content spread

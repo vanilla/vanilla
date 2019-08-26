@@ -11556,10 +11556,6 @@ body.hasRichEditor .Popup.hasRichEditor .Border {
     width: 100%;
     box-sizing: border-box;
   }
-  .Popup.hasRichEditor .Popup.hasRichEditor .Content,
-body.hasRichEditor .Popup.hasRichEditor .Content {
-    margin-top: 10px;
-  }
   .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
 body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
     padding-left: 36px;

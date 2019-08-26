@@ -6695,6 +6695,14 @@ label,
   display: block;
 }
 
+.input-wrap.inline, .inline.color-picker {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
 .input-wrap.inline label, .inline.color-picker label {
   margin-right: 4.5px;
 }

@@ -15,6 +15,7 @@ import {
     srOnly,
     unit,
     userSelect,
+    margins,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -206,7 +207,7 @@ export const checkRadioClasses = useThemeCache(() => {
     //.radioButton,
     //.checkbox
     const root = style({
-        display: "flex",
+        display: important("flex"),
         flexWrap: "wrap",
         alignItems: "center",
         whiteSpace: "nowrap",
@@ -236,6 +237,10 @@ export const checkRadioClasses = useThemeCache(() => {
             [`& + &`]: {
                 marginTop: px(globalVars.spacer.size / 2),
             },
+            [`&.isHorizontal.isHorizontal.isHorizontal`]: margins({
+                all: 0,
+                right: px(globalVars.spacer.size / 2),
+            }),
         },
     });
 

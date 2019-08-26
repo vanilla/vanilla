@@ -184,6 +184,9 @@ label,
 }
 
 .input-wrap.inline {
+  display: flex;
+  align-items: center;
+
   label {
     margin-right: $spacer / 4;
   }

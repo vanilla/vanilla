@@ -231,6 +231,8 @@ class FlaggingPlugin extends Gdn_Plugin {
         ]);
 
         if ($sender->Form->authenticatedPostBack()) {
+            $sender->Form->setFormValue('FlaggedUrl', $uRL);
+            $sender->Form->validateRule('FlaggedUrl', 'function:ValidateRelativeUrl', 'Invalid URL to Flagged Post');
             $sQL = Gdn::sql();
             $comment = $sender->Form->getValue('Plugin.Flagging.Reason');
             $sender->setData('Plugin.Flagging.Reason', $comment);
@@ -387,5 +389,16 @@ class FlaggingPlugin extends Gdn_Plugin {
 
     public function setup() {
         $this->structure();
+    }
+}
+
+if (!function_exists('validateRelativeUrl')) {
+    function validateRelativeUrl($value, $fieldName) {
+        // Make sure the URL is not a full path.
+        $urlParts = parse_url($value);
+        if ($urlParts === false || isset($urlParts['scheme']) || isset($urlParts['host'])) {
+            return false;
+        }
+        return true;
     }
 }

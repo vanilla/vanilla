@@ -7,6 +7,23 @@
 
 class FlaggingPlugin extends Gdn_Plugin {
 
+    /** @var CommentModel */
+    private $commentModel;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /**
+     * Configure the plugin instance.
+     *
+     * @param CommentModel $commentModel
+     * @param DiscussionModel $discussionModel
+     */
+    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel) {
+        $this->commentModel = $commentModel;
+        $this->discussionModel = $discussionModel;
+    }
+
     /**
      * Add Flagging to Dashboard menu.
      */
@@ -171,6 +188,10 @@ class FlaggingPlugin extends Gdn_Plugin {
      * Output Flag link.
      */
     protected function addFlagButton($sender, $args, $context = 'comment') {
+        if (!in_array($context, ["comment", "discussion"])) {
+            return;
+        }
+
         $elementID = ($context == 'comment') ? $args['Comment']->CommentID : $args['Discussion']->DiscussionID;
 
         if (!is_object($args['Author']) || !isset($args['Author']->UserID)) {
@@ -180,20 +201,12 @@ class FlaggingPlugin extends Gdn_Plugin {
             $elementAuthorID = $args['Author']->UserID;
             $elementAuthor = $args['Author']->Name;
         }
-        switch ($context) {
-            case 'comment':
-                $uRL = "/discussion/comment/{$elementID}/#Comment_{$elementID}";
-                break;
 
-            case 'discussion':
-                $uRL = "/discussion/{$elementID}/".Gdn_Format::url($args['Discussion']->Name);
-                break;
-
-            default:
-                return;
-        }
-        $encodedURL = str_replace('=', '-', base64_encode($uRL));
-        $flagLink = anchor(t('Flag'), "discussion/flag/{$context}/{$elementID}/{$elementAuthorID}/".Gdn_Format::url($elementAuthor)."/{$encodedURL}", 'FlagContent Popup');
+        $flagLink = anchor(
+            t('Flag'),
+            "discussion/flag/{$context}/{$elementID}/{$elementAuthorID}/".Gdn_Format::url($elementAuthor),
+            'FlagContent Popup'
+        );
         echo wrap($flagLink, 'span', ['class' => 'MItem CommentFlag']);
     }
 
@@ -208,16 +221,26 @@ class FlaggingPlugin extends Gdn_Plugin {
         $userName = Gdn::session()->User->Name;
 
         $arguments = $sender->RequestArgs;
-        if (sizeof($arguments) != 5) {
+        if (sizeof($arguments) < 4) {
             return;
         }
-        list($context, $elementID, $elementAuthorID, $elementAuthor, $encodedURL) = $arguments;
-        $uRL = htmlspecialchars(base64_decode(str_replace('-', '=', $encodedURL)));
+        list($context, $elementID, $elementAuthorID, $elementAuthor) = $arguments;
 
         // Verify user has permission on that discussion
-        $discussionModel = new DiscussionModel();
-        if ($elementID && !$discussionModel->canView($elementID, $userID)) {
+        if ($elementID && !$this->discussionModel->canView($elementID, $userID)) {
             throw permissionException('Vanilla.Discussions.View');
+        }
+
+        if ($context === "comment") {
+            $row = $this->commentModel->getID($elementID);
+            if ($row) {
+                $url = commentUrl($row, false);
+            }
+        } else {
+            $row = $this->discussionModel->getID($elementID);
+            if ($row) {
+                $url = discussionUrl($row, false);
+            }
         }
 
         $sender->setData('Plugin.Flagging.Data', [
@@ -225,14 +248,13 @@ class FlaggingPlugin extends Gdn_Plugin {
             'ElementID' => $elementID,
             'ElementAuthorID' => $elementAuthorID,
             'ElementAuthor' => $elementAuthor,
-            'URL' => $uRL,
+            'URL' => $url,
             'UserID' => $userID,
-            'UserName' => $userName
+            'UserName' => $userName,
         ]);
 
         if ($sender->Form->authenticatedPostBack()) {
-            $sender->Form->setFormValue('FlaggedUrl', $uRL);
-            $sender->Form->validateRule('FlaggedUrl', 'function:ValidateRelativeUrl', 'Invalid URL to Flagged Post');
+            $sender->Form->setFormValue("FlaggedUrl", $url);
             $sQL = Gdn::sql();
             $comment = $sender->Form->getValue('Plugin.Flagging.Reason');
             $sender->setData('Plugin.Flagging.Reason', $comment);
@@ -253,8 +275,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                         ->get()
                         ->firstRow();
                 } elseif ($context == 'discussion') {
-                    $discussionModel = new DiscussionModel();
-                    $result = $discussionModel->getID($elementID);
+                    $result = $this->discussionModel->getID($elementID);
                 }
 
                 $discussionName = val('Name', $result);
@@ -308,8 +329,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                     ]);
 
                     // Update discussion count
-                    $discussionModel = new DiscussionModel();
-                    $discussionModel->updateDiscussionCount($categoryID);
+                    $this->discussionModel->updateDiscussionCount($categoryID);
                 }
             }
 
@@ -321,9 +341,9 @@ class FlaggingPlugin extends Gdn_Plugin {
                     'InsertName' => $userName,
                     'AuthorID' => $elementAuthorID,
                     'AuthorName' => $elementAuthor,
-                    'ForeignURL' => $uRL,
                     'ForeignID' => $elementID,
                     'ForeignType' => $context,
+                    'ForeignURL' => $url,
                     'Comment' => $comment,
                     'DateInserted' => date('Y-m-d H:i:s')
                 ]);
@@ -389,28 +409,8 @@ class FlaggingPlugin extends Gdn_Plugin {
 
     /**
      * Runs the structure function when the plugin is turned on.
-     *
-     * @return bool|void
      */
     public function setup() {
         $this->structure();
-    }
-}
-
-if (!function_exists('validateRelativeUrl')) {
-    /**
-     * Valadiate that the path being submitted is not a full URL.
-     *
-     * @param mixed $value
-     * @param string $fieldName
-     * @return bool
-     */
-    function validateRelativeUrl($value, $fieldName) {
-        // Make sure the URL is not a full path.
-        $urlParts = parse_url($value);
-        if ($urlParts === false || isset($urlParts['scheme']) || isset($urlParts['host'])) {
-            return false;
-        }
-        return true;
     }
 }

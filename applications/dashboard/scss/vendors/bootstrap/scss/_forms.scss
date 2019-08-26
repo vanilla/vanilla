@@ -182,7 +182,7 @@
   margin-bottom: ($spacer * .75);
 
   label {
-    padding-left: 1.25rem;
+    padding-left: 20px;
     margin-bottom: 0;
     font-weight: normal;
     cursor: pointer;
@@ -198,15 +198,15 @@
 .checkbox input[type="checkbox"],
 .checkbox-inline input[type="checkbox"] {
   position: absolute;
-  margin-top: .25rem;
+  margin-top: 4px;
   // margin-top: 4px \9;
-  margin-left: -1.25rem;
+  margin-left: -20px;
 }
 
 .radio + .radio,
 .checkbox + .checkbox {
   // Move up sibling radios or checkboxes for tighter spacing
-  margin-top: -.25rem;
+  margin-top: -4px;
 }
 
 // Radios and checkboxes on same line
@@ -214,7 +214,7 @@
 .checkbox-inline {
   position: relative;
   display: inline-block;
-  padding-left: 1.25rem;
+  padding-left: 20px;
   margin-bottom: 0;
   font-weight: normal;
   vertical-align: middle;
@@ -223,7 +223,7 @@
 .radio-inline + .radio-inline,
 .checkbox-inline + .checkbox-inline {
   margin-top: 0;
-  margin-left: .75rem;
+  margin-left: 12px;
 }
 
 // Apply same disabled cursor tweak as for inputs

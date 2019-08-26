@@ -35,10 +35,10 @@
     .filter-date {
       padding-left: $spacer / 2;
       padding-right: $spacer / 2;
-      min-width: to-rem(210) + $spacer;
+      min-width: 210px + $spacer;
 
       &:after {
-        right: to-rem(9) + $spacer / 2;
+        right: 9px + $spacer / 2;
       }
     }
   }
@@ -123,7 +123,7 @@
     @extend .nav-stats-item;
     padding: $spacer ($spacer * 2) !important;
     margin-top: ($spacer / 2);
-    min-width: to-rem(180);
+    min-width: 180px;
 
     &:last-child {
       border-right: 0;

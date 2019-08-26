@@ -18,6 +18,7 @@ interface IProps extends IOptionalComponentID {
     onChange?: any;
     label: string;
     name?: string;
+    isHorizontal?: boolean;
 }
 
 interface IState {
@@ -30,9 +31,10 @@ interface IState {
 export default function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
+    const { isHorizontal } = props;
 
     return (
-        <label className={classNames(classes.root, props.className)}>
+        <label className={classNames(classes.root, props.className, { isHorizontal })}>
             <input
                 className={classes.input}
                 onChange={props.onChange}

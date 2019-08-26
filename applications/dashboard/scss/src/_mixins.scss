@@ -15,7 +15,7 @@
 }
 
 @mixin has-top-border() {
-  margin-top: - to-rem(1);
+  margin-top: - 1px;
 }
 
 @mixin fixed-table {
@@ -28,8 +28,8 @@
   display: inline-block;
   width: 0;
   height: 0;
-  margin-right: .25rem;
-  margin-left: .25rem;
+  margin-right: 4px;
+  margin-left: 4px;
   vertical-align: middle;
   content: '';
   border-top: $caret-width solid;
@@ -139,9 +139,9 @@
 }
 
 @mixin image-wrap(
-  $width: 5.25rem,
-  $height: 5.25rem,
-  $radius: .25rem,
+  $width: 84px,
+  $height: 84px,
+  $radius: 4px,
   $has-border: true,
   $background-color: $grey-light) {
 

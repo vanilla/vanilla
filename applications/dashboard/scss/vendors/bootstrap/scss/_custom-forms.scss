@@ -10,7 +10,7 @@
 .c-input {
   position: relative;
   display: inline;
-  padding-left: 1.5rem;
+  padding-left: 24px;
   color: #555;
   cursor: pointer;
 
@@ -27,7 +27,7 @@
 
     &:focus ~ .c-indicator {
       // the mixin is not used here to make sure there is feedback
-      box-shadow: 0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9;
+      box-shadow: 0 0 0 .12px #fff, 0 0 0 3.2px #0074d9;
     }
 
     &:active ~ .c-indicator {
@@ -38,7 +38,7 @@
   }
 
   + .c-input {
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 }
 
@@ -51,10 +51,10 @@
   top: 0;
   left: 0;
   display: block;
-  width: 1rem;
-  height: 1rem;
+  width: 16px;
+  height: 16px;
   font-size: 65%;
-  line-height: 1rem;
+  line-height: 16px;
   color: #eee;
   text-align: center;
   user-select: none;
@@ -62,7 +62,7 @@
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 50% 50%;
-  @include box-shadow(inset 0 .125rem .125rem rgba(0,0,0,.1));
+  @include box-shadow(inset 0 2px 2px rgba(0,0,0,.1));
 }
 
 // Checkboxes
@@ -71,7 +71,7 @@
 
 .c-checkbox {
   .c-indicator {
-    border-radius: .25rem;
+    border-radius: 4px;
   }
 
   input:checked ~ .c-indicator {
@@ -111,7 +111,7 @@
 
     &::after {
       display: block;
-      margin-bottom: .25rem;
+      margin-bottom: 4px;
       content: "";
     }
 
@@ -132,11 +132,11 @@
 .c-select {
   display: inline-block;
   max-width: 100%;
-  padding: .375rem 1.75rem .375rem .75rem;
-  padding-right: .75rem \9;
+  padding: .12px 112px .12px 12px;
+  padding-right: 12px \9;
   color: $input-color;
   vertical-align: middle;
-  background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC) no-repeat right .75rem center;
+  background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC) no-repeat right 12px center;
   background-image: none \9;
   background-size: 8px 10px;
   border: $input-btn-border-width solid $input-border-color;
@@ -175,11 +175,11 @@
 .file {
   position: relative;
   display: inline-block;
-  height: 2.5rem;
+  height: 40px;
   cursor: pointer;
 }
 .file input {
-  min-width: 14rem;
+  min-width: 224px;
   margin: 0;
   filter: alpha(opacity = 0);
   opacity: 0;
@@ -190,37 +190,37 @@
   right: 0;
   left: 0;
   z-index: 5;
-  height: 2.5rem;
-  padding: .5rem 1rem;
+  height: 40px;
+  padding: 8px 16px;
   line-height: 1.5;
   color: #555;
   user-select: none;
   background-color: #fff;
   border: $input-btn-border-width solid #ddd;
-  border-radius: .25rem;
-  @include box-shadow(inset 0 .2rem .4rem rgba(0,0,0,.05));
+  border-radius: 4px;
+  @include box-shadow(inset 0 3.2px 6.4px rgba(0,0,0,.05));
 }
 .file-custom::after {
   content: "Choose file...";
 }
 .file-custom::before {
   position: absolute;
-  top: -.075rem;
-  right: -.075rem;
-  bottom: -.075rem;
+  top: -.12px;
+  right: -.12px;
+  bottom: -.12px;
   z-index: 6;
   display: block;
-  height: 2.5rem;
-  padding: .5rem 1rem;
+  height: 40px;
+  padding: 8px 16px;
   line-height: 1.5;
   color: #555;
   content: "Browse";
   background-color: #eee;
   border: $input-btn-border-width solid #ddd;
-  border-radius: 0 .25rem .25rem 0;
+  border-radius: 0 4px 4px 0;
 }
 
 // Focus state
 .file input:focus ~ .file-custom {
-  @include box-shadow(0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9);
+  @include box-shadow(0 0 0 .12px #fff, 0 0 0 3.2px #0074d9);
 }

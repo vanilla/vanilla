@@ -72,14 +72,14 @@
 .plank {
   display: flex;
   align-items: center;
-  margin-bottom: to-rem(6);
-  min-height: $control-height-rem;
+  margin-bottom: 6px;
+  min-height: $control-height;
   background-color: $grey-lightest;
   border: $border-width solid $border-color;
   border-radius: 2px;
 
   svg {
-    height: to-rem(16);
+    height: 16px;
     vertical-align: middle;
   }
 
@@ -99,8 +99,8 @@
   margin-bottom: -$border-width;
 
   .dropdown-toggle {
-    padding: to-rem(6) to-rem(10);
-    line-height: to-rem(22);
+    padding: 6px 10px;
+    line-height: 22px;
   }
 }
 
@@ -166,12 +166,12 @@
 
 .plank-container-grid {
   @extend .row;
-  padding: $spacer $spacer - to-rem(3);
+  padding: $spacer $spacer - 3px;
 
   .plank-wrapper {
     @include grid-item-large();
-    padding-left: to-rem(3);
-    padding-right: to-rem(3);
+    padding-left: 3px;
+    padding-right: 3px;
   }
 }
 

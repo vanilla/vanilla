@@ -20,6 +20,7 @@ import { onContent } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
 import React from "react";
 import Quill from "quill/core";
+import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
@@ -76,7 +77,9 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
         const onMountComplete = () => resolve();
         // If the component is flagged as async, then it will confirm when the render is complete.
         mountReact(
-            <EmbedClass {...data} inEditor={inEditor} onRenderComplete={isAsync ? onMountComplete : undefined} />,
+            <EmbedErrorBoundary url={data.url}>
+                <EmbedClass {...data} inEditor={inEditor} onRenderComplete={isAsync ? onMountComplete : undefined} />
+            </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,
         );

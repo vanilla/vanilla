@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -60,7 +60,15 @@ export const splashVariables = useThemeCache(() => {
         borderColor: globalVars.mainColors.fg.fade(0.4),
     });
 
-    const outerBackground: IBackground = makeThemeVars("outerBackground", {
+    const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
+    const backgrounds = makeThemeVars("backgrounds", {
+        useOverlay: false,
+        overlayColor: isContrastLight
+            ? globalVars.elementaryColors.black.fade(0.3)
+            : globalVars.elementaryColors.white.fade(0.3),
+    });
+
+    const outerBackground = makeThemeVars("outerBackground", {
         color: colors.primary,
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
@@ -227,6 +235,7 @@ export const splashVariables = useThemeCache(() => {
 
     return {
         outerBackground,
+        backgrounds,
         spacing,
         searchContainer,
         innerBackground,
@@ -270,6 +279,16 @@ export const splashClasses = useThemeCache(() => {
                     : undefined,
         });
     };
+
+    const backgroundOverlay = style("backgroundOverlay", {
+        display: "block",
+        position: "absolute",
+        top: px(0),
+        left: px(0),
+        width: percent(100),
+        height: percent(100),
+        background: vars.backgrounds.useOverlay ? colorOut(vars.backgrounds.overlayColor) : undefined,
+    });
 
     const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),
@@ -367,7 +386,6 @@ export const splashClasses = useThemeCache(() => {
     const content = style("content", {
         $nest: {
             "&&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(vars.colors.contrast),
                 boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
                 zIndex: 1,
             },
@@ -390,5 +408,6 @@ export const splashClasses = useThemeCache(() => {
         titleWrap,
         content,
         valueContainer,
+        backgroundOverlay,
     };
 });

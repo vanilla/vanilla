@@ -151,7 +151,7 @@ class UploadedFileSchema extends Schema {
     /**
      * Set the maximum file size, in bytes.
      *
-     * @param $maxSize
+     * @param int $maxSize
      * @return int
      */
     public function setMaxSize($maxSize) {

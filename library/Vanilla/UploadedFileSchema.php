@@ -241,7 +241,7 @@ class UploadedFileSchema extends Schema {
             ]);
 
             if ($this->triggerContentTypeError) {
-                $errorMessage = str_replace(["ext", "mime"], [$extension, $mime], $errorMessage);
+                $errorMessage = str_replace(["{ext}", "{mime}"], [$extension, $mime], $errorMessage);
                 trigger_error($errorMessage, E_USER_WARNING);
             }
         }

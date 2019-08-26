@@ -387,12 +387,24 @@ class FlaggingPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Runs the structure function when the plugin is turned on.
+     *
+     * @return bool|void
+     */
     public function setup() {
         $this->structure();
     }
 }
 
 if (!function_exists('validateRelativeUrl')) {
+    /**
+     * Valadiate that the path being submitted is not a full URL.
+     *
+     * @param $value
+     * @param $fieldName
+     * @return bool
+     */
     function validateRelativeUrl($value, $fieldName) {
         // Make sure the URL is not a full path.
         $urlParts = parse_url($value);

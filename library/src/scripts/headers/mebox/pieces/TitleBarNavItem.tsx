@@ -68,4 +68,4 @@ export class TitleBarNavItem extends React.Component<IProps> {
     };
 }
 
-export default withRouter<IProps>(TitleBarNavItem);
+export default withRouter(TitleBarNavItem);

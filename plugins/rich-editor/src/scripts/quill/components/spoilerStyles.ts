@@ -46,38 +46,6 @@ export const spoilerVariables = useThemeCache(() => {
             width: 0,
             radius: 0,
         },
-        // hover: {
-        //     fonts: {
-        //         color: globalVars.mainColors.bg,
-        //     },
-        //     colors: {
-        //         bg: globalVars.mainColors.secondary,
-        //     },
-        // },
-        // active: {
-        //     fonts: {
-        //         color: globalVars.mainColors.bg,
-        //     },
-        //     colors: {
-        //         bg: globalVars.mainColors.secondary,
-        //     },
-        // },
-        // focus: {
-        //     fonts: {
-        //         color: globalVars.mainColors.bg,
-        //     },
-        //     colors: {
-        //         bg: globalVars.mainColors.secondary,
-        //     },
-        // },
-        // focusAccessible: {
-        //     fonts: {
-        //         color: globalVars.mainColors.bg,
-        //     },
-        //     colors: {
-        //         bg: globalVars.mainColors.secondary,
-        //     },
-        // },
     });
 
     return {
@@ -89,7 +57,6 @@ export const spoilerVariables = useThemeCache(() => {
 });
 
 export const spoilerClasses = useThemeCache(() => {
-    const style = styleFactory("spoiler");
     const globalVars = globalVariables();
     const vars = spoilerVariables();
     const spoilerStyles = generateButtonStyleProperties(vars.button, false);

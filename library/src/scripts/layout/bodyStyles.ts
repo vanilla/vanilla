@@ -8,6 +8,7 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule } from "typestyle";
 import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { spoilerClasses } from "@rich-editor/quill/components/spoilerStyles";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -82,6 +83,8 @@ export const bodyCSS = useThemeCache(() => {
             display: "none",
         },
     );
+
+    spoilerClasses();
 });
 
 export const bodyClasses = useThemeCache(() => {

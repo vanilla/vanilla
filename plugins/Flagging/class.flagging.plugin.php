@@ -401,8 +401,8 @@ if (!function_exists('validateRelativeUrl')) {
     /**
      * Valadiate that the path being submitted is not a full URL.
      *
-     * @param $value
-     * @param $fieldName
+     * @param mixed $value
+     * @param string $fieldName
      * @return bool
      */
     function validateRelativeUrl($value, $fieldName) {

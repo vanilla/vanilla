@@ -2665,7 +2665,8 @@ div.Popup small {
   font-size: 11px;
 }
 
-div.Popup form p {
+div.Popup form p,
+div.Popup .userContent p {
   padding: 0;
 }
 

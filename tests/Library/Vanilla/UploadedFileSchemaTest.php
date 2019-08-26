@@ -158,6 +158,7 @@ class UploadedFileSchemaTest extends TestCase {
             UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => false,
         ];
         $schema = new UploadedFileSchema($options);
+        $schema->setTriggerContentTypeError(false);
 
         if ($expected === null) {
             $schema->validate($file);

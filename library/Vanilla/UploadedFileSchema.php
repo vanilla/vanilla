@@ -40,6 +40,9 @@ class UploadedFileSchema extends Schema {
     /** @var MimeTypes */
     private $mimeTypes;
 
+    /** Trigger warning-level errors when content-type validation fails. */
+    private $triggerContentTypeError = true;
+
     /**
      * @var bool Whether or not to validate mime types.
      */
@@ -129,6 +132,15 @@ class UploadedFileSchema extends Schema {
     }
 
     /**
+     * Get whether or not warning-level user errors should be triggered if content type validation fails.
+     *
+     * @return boolean
+     */
+    public function getTriggerContentTypeError(): bool {
+        return $this->triggerContentTypeError;
+    }
+
+    /**
      * Set allowed file extensions.
      *
      * @param array $allowedExtensions
@@ -156,6 +168,16 @@ class UploadedFileSchema extends Schema {
      */
     public function setMaxSize($maxSize) {
         return $this->maxSize = (int)$maxSize;
+    }
+
+    /**
+     * Should a warning-level user error be triggered if content type validation fails?
+     *
+     * @param boolean $triggerContentTypeError
+     * @return boolean
+     */
+    public function setTriggerContentTypeError(bool $triggerContentTypeError): bool {
+        return $this->triggerContentTypeError = $triggerContentTypeError;
     }
 
     /**
@@ -211,11 +233,17 @@ class UploadedFileSchema extends Schema {
         } elseif (empty($validExtensions)) {
             trigger_error("No known mime type for extension: $extension.", E_USER_NOTICE);
         } else {
+            $errorMessage = "The file has an extension that is not valid for its content type. ({ext} does not match {mime})";
             $field->addError("invalid", [
-                "messageCode" => "The file has an extension that is not valid for its content type. ({ext} does not match {mime})",
+                "messageCode" => $errorMessage,
                 "ext" => $extension,
                 "mime" => $mime,
             ]);
+
+            if ($this->triggerContentTypeError) {
+                $errorMessage = str_replace(["ext", "mime"], [$extension, $mime], $errorMessage);
+                trigger_error($errorMessage, E_USER_WARNING);
+            }
         }
     }
 

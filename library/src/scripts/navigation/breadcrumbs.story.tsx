@@ -18,20 +18,17 @@ story.add("Breadcrumbs", () => {
         <>
             <StoryHeading depth={1}>Breadcrumbs</StoryHeading>
             <StoryHeading>Standard</StoryHeading>
-            <Breadcrumbs
-                forceDisplay={true}
-                /* eslint-disable-next-line react/no-children-prop */
-                children={[
+            <Breadcrumbs forceDisplay={true}>
+                {[
                     { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
                     {
                         name: "Appearance (Theming)",
                         url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
                     },
                 ]}
-            />
+            </Breadcrumbs>
             <StoryHeading>Location (Used in the location picker)</StoryHeading>
             <LocationBreadcrumbs
-                /* eslint-disable-next-line react/no-children-prop */
                 locationData={[
                     { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
                     {

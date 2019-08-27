@@ -135,7 +135,7 @@ export const buttonVariables = useThemeCache(() => {
             color: globalVars.mainColors.bg,
         },
         spinnerColor: globalVars.mainColors.bg,
-        border: {
+        borders: {
             color: globalVars.mainColors.primary,
             radius: globalVars.border.radius,
         },
@@ -182,7 +182,7 @@ export const buttonVariables = useThemeCache(() => {
         fonts: {
             color: globalVars.mainColors.bg,
         },
-        border: {
+        borders: {
             color: globalVars.mainColors.fg,
             radius: globalVars.border.radius,
         },
@@ -217,7 +217,7 @@ export const buttonVariables = useThemeCache(() => {
             color: globalVars.mainColors.primary,
         },
         spinnerColor: globalVars.mainColors.bg,
-        border: {
+        borders: {
             color: globalVars.mainColors.bg,
             radius: globalVars.border.radius,
         },
@@ -225,7 +225,7 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
+            borders: {
                 color: globalVars.mainColors.bg,
             },
         },
@@ -233,7 +233,7 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
+            borders: {
                 color: globalVars.mainColors.bg,
             },
         },
@@ -241,7 +241,7 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
+            borders: {
                 color: globalVars.mainColors.bg,
             },
         },
@@ -249,7 +249,7 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
+            borders: {
                 color: globalVars.mainColors.bg,
             },
         },

@@ -15,6 +15,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { inputVariables } from "@library/forms/inputStyles";
+import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -277,10 +278,6 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
-    const form = style("form", {
-        display: "block",
-    });
-
     const content = style("content", {
         display: "flex",
         alignItems: "flex-start",
@@ -288,6 +285,17 @@ export const searchBarClasses = useThemeCache(() => {
         position: "relative",
         height: unit(vars.sizing.height),
         width: percent(100),
+        $nest: {
+            [`&:not(.${splashClasses().content})`]: {
+                [`&.hasFocus .searchBar-valueContainer`]: {
+                    borderColor: colorOut(globalVars.mainColors.primary),
+                },
+            },
+        },
+    });
+
+    const form = style("form", {
+        display: "block",
     });
 
     // special selector

@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import ErrorPage from "@knowledge/pages/ErrorPage";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";

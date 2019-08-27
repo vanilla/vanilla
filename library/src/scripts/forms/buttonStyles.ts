@@ -305,6 +305,10 @@ export enum ButtonTypes {
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
     ICON_COMPACT = "iconCompact",
+    DASHBOARD_STANDARD = "dashboardStandard",
+    DASHBOARD_PRIMARY = "dashboardPrimary",
+    DASHBOARD_SECONDARY = "dashboardSecondary",
+    DASHBOARD_LINK = "dashboardLink",
 }
 
 export const buttonClasses = useThemeCache(() => {

@@ -213,32 +213,20 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            borders: {
-                color: globalVars.mainColors.bg,
-            },
         },
         active: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
-            },
-            borders: {
-                color: globalVars.mainColors.bg,
             },
         },
         focus: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            borders: {
-                color: globalVars.mainColors.bg,
-            },
         },
         focusAccessible: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
-            },
-            borders: {
-                color: globalVars.mainColors.bg,
             },
         },
     });

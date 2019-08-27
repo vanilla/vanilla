@@ -280,6 +280,7 @@ export const iconClasses = useThemeCache(() => {
         width: unit(vars.categoryIcon.width),
         height: unit(vars.categoryIcon.height),
         opacity: vars.categoryIcon.opacity,
+        marginRight: unit(3),
     });
 
     const deleteIcon = style("deleteIcon", {

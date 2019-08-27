@@ -10758,6 +10758,16 @@ button.Close {
   opacity: 0.4;
 }
 
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .analytics-widget-header .Content > .title:first-child, .analytics-widget-header .Popup .Content > .title:first-child, .Popup .Content > h3:first-child {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -11546,10 +11556,6 @@ body.hasRichEditor .Popup.hasRichEditor .Border {
     width: 100%;
     box-sizing: border-box;
   }
-  .Popup.hasRichEditor .Popup.hasRichEditor .Content,
-body.hasRichEditor .Popup.hasRichEditor .Content {
-    margin-top: 10px;
-  }
   .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
 body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
     padding-left: 36px;
@@ -12207,7 +12213,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-title {
-  max-width: calc(100% - 36px);
+  padding-right: 36px;
 }
 
 .embedQuote-chevronUp,
@@ -12243,6 +12249,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-body {
   display: block;
   margin: 0;
+  padding: 0;
 }
 .embedQuote-body::before, .embedQuote-body::after {
   content: initial;

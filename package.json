@@ -145,6 +145,7 @@
         "sass": "^1.20.1",
         "sass-loader": "^7.1.0",
         "sinon": "^7.3.2",
+        "storybook-chromatic": "^2.1.1",
         "style-loader": "^0.23.1",
         "terser-webpack-plugin": "^1.2.3",
         "ts-lint": "^4.5.1",
@@ -179,6 +180,8 @@
         "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
         "lint": "eslint \"**/*.{ts,tsx}\"",
         "storybook": "start-storybook -p 9001 -c build/.storybook",
-        "bootstrap": "lerna bootstrap"
+        "build-storybook": "build-storybook -c build/.storybook -o build/.out",
+        "bootstrap": "lerna bootstrap",
+        "chromatic": "chromatic test"
     }
 }

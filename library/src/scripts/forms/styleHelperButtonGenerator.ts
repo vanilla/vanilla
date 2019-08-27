@@ -34,26 +34,30 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         },
         buttonTypeVars,
     );
+
     // Remove debug and fallback
-    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
+    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border, buttonTypeVars.name === "spoiler");
 
-    const hoverBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.hover && buttonTypeVars.hover.borders),
-    };
+    const hoverBorder =
+        buttonTypeVars.hover && buttonTypeVars.hover.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.hover.borders))
+            : {};
 
-    const activeBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.active && buttonTypeVars.active.borders),
-    };
-    const focusBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.focus && buttonTypeVars.focus.borders),
-    };
-    const focusAccessibleBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders),
-    };
+    const activeBorder =
+        buttonTypeVars.active && buttonTypeVars.active.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.active.borders))
+            : {};
+
+    const focusBorder =
+        buttonTypeVars.focus && buttonTypeVars.focus.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
+            : defaultBorder;
+
+    const focusAccessibleBorder =
+        buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
+            ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders))
+            : {};
+
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",

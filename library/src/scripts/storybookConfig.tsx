@@ -12,12 +12,14 @@ import getStore from "@library/redux/getStore";
 import { ensureScript } from "@vanilla/dom-utils";
 import "../scss/_base.scss";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
 const Error = () => <p>{errorMessage}</p>;
 const styleDecorator = storyFn => {
     const classes = storyBookClasses();
+    blotCSS();
     return (
         <>
             <Provider store={getStore()}>

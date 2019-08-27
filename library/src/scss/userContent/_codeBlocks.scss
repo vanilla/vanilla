@@ -7,8 +7,8 @@
 // Compatibility with older themes. These are not styles we plan on carrying over to future projects.
 // However, we're using some of the same variables for future compatibility.
 
-$code_fontSize: .85em !default;
-$code_borderRadius: 0 !default;
+//$code_fontSize: .85em !default;
+//$code_borderRadius: 0 !default;
 $code_bg: mix($global-color_fg, $global-color_bg, 5%) !default; // target rgba(127, 127, 127, .15);
 $code_fg: darken($global-color_fg, 20%) !default;
 

@@ -7,15 +7,13 @@
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { cssRule } from "typestyle";
 import { colorOut } from "@library/styles/styleHelpersColors";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { borders } from "@library/styles/styleHelpersBorders";
-import { absolutePosition, margins, paddings, unit, userSelect } from "@library/styles/styleHelpers";
+import { absolutePosition, margins, paddings, unit, userSelect, fonts } from "@library/styles/styleHelpers";
 import { percent } from "csx";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 export const spoilerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -29,9 +27,10 @@ export const spoilerVariables = useThemeCache(() => {
         bg: globalVars.mixBgAndFg(0.95),
     });
 
-    const border = makeThemeVars("border", {
+    const borders = makeThemeVars("border", {
         color: globalVars.border.color,
-        radius: globalVars.border.radius,
+        width: 0,
+        radius: 2,
     });
 
     const button: IButtonType = makeThemeVars("spoilerButton", {
@@ -42,30 +41,36 @@ export const spoilerVariables = useThemeCache(() => {
         fonts: {
             color: globalVars.mainColors.fg,
         },
-        border: {
+        borders: {
             width: 0,
             radius: 0,
         },
-    });
+    } as IButtonType);
 
     return {
         font,
         colors,
-        border,
+        borders,
         button,
     };
 });
 
-export const spoilerClasses = useThemeCache(() => {
+export const spoilerCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = spoilerVariables();
     const spoilerStyles = generateButtonStyleProperties(vars.button, false);
+    const userContentVars = userContentVariables();
+    cssRule(".spoiler-icon", {
+        position: "relative",
+        width: unit(globalVars.icon.sizes.default),
+        height: unit(globalVars.icon.sizes.default),
+        marginRight: unit(6),
+        color: colorOut(userContentVars.blocks.fg),
+    });
     cssRule(".spoiler", {
-        ...borders({
-            radius: vars.border.radius,
-            color: vars.border.color,
-        }),
-        backgroundColor: colorOut(vars.colors.bg),
+        backgroundColor: colorOut(userContentVars.blocks.bg),
+        color: colorOut(userContentVars.blocks.fg),
+        border: 0,
         $nest: {
             "& .spoiler-content": {
                 display: "none",
@@ -107,10 +112,13 @@ export const spoilerClasses = useThemeCache(() => {
             "& .button-spoiler": {
                 ...spoilerStyles,
                 ...userSelect(),
+                background: colorOut(userContentVars.blocks.bg),
+                color: colorOut(userContentVars.blocks.fg),
                 width: percent(100),
                 maxWidth: percent(100),
                 fontSize: unit(vars.font.size),
-                minHeight: unit(globalVars.icon.sizes.default * 2),
+                minHeight: unit(44),
+                textTransform: "uppercase",
                 ...paddings({
                     vertical: 0,
                     horizontal: globalVars.embed.text.padding,
@@ -137,18 +145,13 @@ export const spoilerClasses = useThemeCache(() => {
                 display: "flex",
                 boxSizing: "border-box",
                 justifyContent: "center",
+                alignItems: "center",
                 ...paddings({
                     vertical: 0,
                     horizontal: globalVars.icon.sizes.default,
                 }),
                 width: percent(100),
                 lineHeight: 1,
-            },
-            "& .spoiler-icon": {
-                position: "relative",
-                width: unit(globalVars.icon.sizes.default),
-                height: unit(globalVars.icon.sizes.default),
-                marginRight: unit(12),
             },
             "& .spoiler-chevron": {
                 ...absolutePosition.middleRightOfParent(globalVars.embed.text.padding),
@@ -158,17 +161,15 @@ export const spoilerClasses = useThemeCache(() => {
                 alignItems: "center",
                 opacity: globalVars.states.icon.opacity,
             },
-            "& .spoiler-warningAfter": {
-                lineHeight: unit(globalVars.icon.sizes.default),
+            "& .spoiler-warningBefore": {
                 margin: 0,
                 padding: 0,
-            },
-            "& .spoiler-warningBefore": {
-                lineHeight: unit(globalVars.icon.sizes.default),
-                padding: 0,
+                ...fonts({
+                    size: globalVars.fonts.size.medium,
+                    weight: globalVars.fonts.weights.semiBold,
+                }),
                 ...margins({
                     all: 0,
-                    right: 6,
                 }),
             },
             "& .spoiler-buttonContainer": {

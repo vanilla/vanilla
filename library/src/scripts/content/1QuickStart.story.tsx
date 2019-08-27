@@ -22,10 +22,10 @@ story.add("Quick Start", () => {
             <StoryHeading depth={1}>Quick Start</StoryHeading>
 
             <StoryParagraph>
-                Welcome to the Vanilla's Knowledge Base - Storybook. Our storybook was created to help you understand,
-                compose and produce new design elements with the same rules and consistency. It was based in our
-                Knowledge Base but the goal is to help in all our systems and products. It was designed to help you with
-                new products as well.
+                Welcome to the Vanilla&quot;s Knowledge Base - Storybook. Our storybook was created to help you
+                understand, compose and produce new design elements with the same rules and consistency. It was based in
+                our Knowledge Base but the goal is to help in all our systems and products. It was designed to help you
+                with new products as well.
             </StoryParagraph>
             <StoryParagraph>
                 If you want to check it out the Design System:
@@ -60,15 +60,15 @@ story.add("Quick Start", () => {
             <StoryHeading depth={4}>Foreground (fg)</StoryHeading>
             <StoryParagraph>This color is primarily used for text, icons and border colors.</StoryParagraph>
             <StoryHeading depth={4}>Background (bg)</StoryHeading>
-            <StoryParagraph>This color is the main background color we'll find on the site.</StoryParagraph>
+            <StoryParagraph>This color is the main background color we&quot;ll find on the site.</StoryParagraph>
             <StoryHeading depth={4}>Primary</StoryHeading>
             <StoryParagraph>
-                This is your brand colors. It's used as a call to action and for decoration.
+                This is your brand colors. It&quot;s used as a call to action and for decoration.
             </StoryParagraph>
             <StoryHeading depth={4}>Secondary</StoryHeading>
             <StoryParagraph>
-                By default this is a variation on your brand color. It's mainly used for hover/focus states on elements
-                with the brand color. If you have a second brand color, you may set it here as well.
+                By default this is a variation on your brand color. It&quot;s mainly used for hover/focus states on
+                elements with the brand color. If you have a second brand color, you may set it here as well.
             </StoryParagraph>
             <StoryHeading depth={3}>Derived Colors</StoryHeading>
             <StoryParagraph>

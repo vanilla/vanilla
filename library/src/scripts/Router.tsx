@@ -21,7 +21,11 @@ export function Router(props: IProps) {
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
 
     useEffect(() => {
-        onRouteChange && onRouteChange(history);
+        if (onRouteChange) {
+            const unregister = history.listen(() => onRouteChange(history));
+            // Return the cleanup function.
+            return unregister;
+        }
     }, [history, onRouteChange]);
 
     let routes = (

@@ -34,7 +34,7 @@ Router.addRoutes([
 
 // Routing
 addComponent("App", () => (
-    <AppContext>
+    <AppContext variablesOnly>
         <Router disableDynamicRouting />
     </AppContext>
 ));

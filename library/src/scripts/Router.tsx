@@ -3,20 +3,26 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import { Router as ReactRouter, Switch, Route } from "react-router-dom";
 import { formatUrl } from "@library/utility/appUtils";
-import { createBrowserHistory } from "history";
+import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 
 interface IProps {
     disableDynamicRouting?: boolean;
     sectionRoot?: string;
+    onRouteChange?: (history: History) => void;
 }
 
 export function Router(props: IProps) {
+    const { onRouteChange } = props;
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
+
+    useEffect(() => {
+        onRouteChange && onRouteChange(history);
+    }, [history, onRouteChange]);
 
     let routes = (
         <Switch>

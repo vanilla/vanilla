@@ -14,7 +14,6 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
-import WebFont from "webfontloader";
 import { loadThemeFonts } from "./loadThemeFonts";
 
 export interface IWithThemeProps {
@@ -23,17 +22,22 @@ export interface IWithThemeProps {
 
 class BaseThemeProvider extends React.Component<IProps> {
     public render() {
-        const { assets } = this.props;
-        switch (assets.status) {
-            case LoadStatus.PENDING:
-            case LoadStatus.LOADING:
-                return <Loader />;
-            case LoadStatus.ERROR:
-                return this.props.errorComponent;
-        }
+        const { assets, variablesOnly } = this.props;
+        if (this.props)
+            switch (assets.status) {
+                case LoadStatus.PENDING:
+                case LoadStatus.LOADING:
+                    return <Loader />;
+                case LoadStatus.ERROR:
+                    return this.props.errorComponent;
+            }
 
         if (!assets.data) {
             return null;
+        }
+
+        if (this.props.variablesOnly) {
+            return this.props.children;
         }
 
         // Apply kludged input text styling everywhere.
@@ -49,6 +53,11 @@ class BaseThemeProvider extends React.Component<IProps> {
 
     public componentDidMount() {
         void this.props.requestData();
+
+        if (this.props.variablesOnly) {
+            return;
+        }
+
         const themeHeader = document.getElementById("themeHeader");
         const themeFooter = document.getElementById("themeFooter");
 
@@ -68,6 +77,7 @@ interface IOwnProps {
     children: React.ReactNode;
     themeKey: string;
     errorComponent: React.ReactNode;
+    variablesOnly?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

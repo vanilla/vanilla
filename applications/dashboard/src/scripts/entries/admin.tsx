@@ -14,7 +14,7 @@ onContent(() => initAllUserContent());
 
 // Routing
 addComponent("App", () => (
-    <AppContext>
+    <AppContext variablesOnly>
         <Router disableDynamicRouting />
     </AppContext>
 ));

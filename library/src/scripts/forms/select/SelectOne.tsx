@@ -7,21 +7,19 @@
 import { IFieldError } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import * as selectOverrides from "@library/forms/select/overwrites";
+import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 import Paragraph from "@library/layout/Paragraph";
-import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
-import { styleFactory } from "@library/styles/styleUtils";
-import { calc } from "csx";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export interface ISelectOneProps extends IOptionalComponentID {
-    label: string;
+    label: string | null;
+    labelID?: string;
     disabled?: boolean;
     className?: string;
     placeholder?: string;
@@ -35,6 +33,7 @@ export interface ISelectOneProps extends IOptionalComponentID {
     value: IComboBoxOption | undefined;
     noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
+    inputClassName?: string;
 }
 
 interface IState {
@@ -44,147 +43,85 @@ interface IState {
 /**
  * Implements the search bar component
  */
-export default class SelectOne extends React.Component<ISelectOneProps, IState> {
-    private id: string;
-    private prefix = "SelectOne";
-    private inputID: string;
-    private errorID: string;
-    private focus: boolean;
+export default function SelectOne(props: ISelectOneProps) {
+    // Overwrite components in Select component
+    const overrideProps = useOverrideProps(props);
 
-    constructor(props: ISelectOneProps) {
-        super(props);
-        this.id = getRequiredID(props, this.prefix);
-        this.inputID = this.id + "-input";
-        this.errorID = this.id + "-errors";
-        this.focus = false;
-        this.state = {
-            focus: false,
-        };
+    const prefix = "SelectOne";
+    const [isFocused, setIsFocused] = useState(false);
+    const generatedID = useUniqueID(prefix);
+    const id = props.id || generatedID;
+    const inputID = id + "-input";
+    const errorID = id + "-errors";
+
+    const { className, disabled, options, searchable } = props;
+    let describedBy;
+    const hasErrors = props.errors && props.errors!.length > 0;
+    if (hasErrors) {
+        describedBy = errorID;
     }
 
-    public render() {
-        const { className, disabled, options, searchable } = this.props;
-        const style = styleFactory("SelectOne");
-        let describedBy;
-        const hasErrors = this.props.errors && this.props.errors!.length > 0;
-        if (hasErrors) {
-            describedBy = this.errorID;
-        }
-
-        const rightPadding = 30;
-        const inputWrapClass = style("inputWrarp", {
-            $nest: {
-                "&.hasFocus .inputBlock-inputText": {
-                    borderColor: colorOut(globalVariables().mainColors.primary),
-                },
-                ".inputBlock-inputText": {
-                    paddingRight: unit(rightPadding),
-                    position: "relative",
-                },
-                ".SelectOne__indicators": {
-                    position: "absolute",
-                    top: 0,
-                    right: 6,
-                    bottom: 0,
-                },
-                ".SelectOne__indicator": {
-                    cursor: "pointer",
-                },
-                "& .SelectOne__single-value": {
-                    textOverflow: "ellipsis",
-                    maxWidth: calc(`100% - ${unit(rightPadding + 26)}`),
-                },
-            },
-        });
-        const classesInputBlock = inputBlockClasses();
-        return (
-            <div className={classNames(classesInputBlock.root, this.props.className)}>
-                <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
-                    <span className={classNames(classesInputBlock.labelText, this.props.label)}>
-                        {this.props.label}
-                    </span>
-                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+    const classes = selectOneClasses();
+    const classesInputBlock = inputBlockClasses();
+    return (
+        <div className={classNames(classesInputBlock.root, props.className)}>
+            {props.label !== null && (
+                <label htmlFor={inputID} className={classesInputBlock.labelAndDescription}>
+                    <span className={classNames(classesInputBlock.labelText, props.label)}>{props.label}</span>
+                    <Paragraph className={classesInputBlock.labelNote}>{props.labelNote}</Paragraph>
                 </label>
+            )}
 
-                <div
-                    className={classNames(classesInputBlock.inputWrap, inputWrapClass, { hasFocus: this.state.focus })}
-                >
-                    <Select
-                        id={this.id}
-                        options={options}
-                        inputId={this.inputID}
-                        onChange={this.props.onChange}
-                        onInputChange={this.props.onInputChange}
-                        components={this.componentOverwrites}
-                        isClearable={true}
-                        isDisabled={disabled}
-                        classNamePrefix={this.prefix}
-                        className={classNames(this.prefix, className)}
-                        aria-label={this.props.label}
-                        theme={this.getTheme}
-                        styles={this.getStyles()}
-                        aria-invalid={hasErrors}
-                        aria-describedby={describedBy}
-                        isSearchable={searchable}
-                        value={this.props.value}
-                        placeholder={this.props.placeholder}
-                        isLoading={this.props.isLoading}
-                        onFocus={this.onFocus}
-                        onBlur={this.onBlur}
-                    />
-                    <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
-                    <ErrorMessages id={this.errorID} errors={this.props.errors} />
-                </div>
+            <div className={classNames(classesInputBlock.inputWrap, classes, { hasFocus: isFocused })}>
+                <Select
+                    {...overrideProps}
+                    id={id}
+                    options={options}
+                    inputId={inputID}
+                    onChange={props.onChange}
+                    onInputChange={props.onInputChange}
+                    isClearable={true}
+                    isDisabled={disabled}
+                    classNamePrefix={prefix}
+                    className={classNames(prefix, className)}
+                    aria-label={props.label || undefined}
+                    aria-labelledby={props.labelID || undefined}
+                    aria-invalid={hasErrors}
+                    aria-describedby={describedBy}
+                    isSearchable={searchable}
+                    value={props.value}
+                    menuIsOpen={isFocused === false ? false : undefined}
+                    placeholder={props.placeholder}
+                    isLoading={props.isLoading}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                />
+                <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
+                <ErrorMessages id={errorID} errors={props.errors} />
             </div>
-        );
-    }
+        </div>
+    );
+}
 
-    /*
-     * Overwrite components in Select component
-     */
-    private componentOverwrites = {
-        Menu: selectOverrides.Menu,
-        MenuList: selectOverrides.MenuList,
-        Option: selectOverrides.SelectOption,
-        ValueContainer: selectOverrides.ValueContainer,
-        NoOptionsMessage: this.props.noOptionsMessage || selectOverrides.NoOptionsMessage,
-        LoadingMessage: selectOverrides.OptionLoader,
-    };
-
-    /**
-     * Set class for focus
-     */
-    private onFocus = () => {
-        this.setState({
-            focus: true,
-        });
-    };
-
-    /**
-     * Set class for blur
-     */
-    private onBlur = () => {
-        this.setState({
-            focus: false,
-        });
-    };
-
-    /**
-     * Overwrite theme in Select component
-     */
-    private getTheme = theme => {
+/**
+ * Hook to create react-select override props.
+ */
+function useOverrideProps(props: ISelectOneProps) {
+    const { inputClassName, noOptionsMessage } = props;
+    const componentOverwrites = useMemo(() => {
         return {
-            ...theme,
-            borderRadius: {},
-            borderWidth: 0,
-            colors: {},
-            spacing: {},
+            Menu: selectOverrides.Menu,
+            MenuList: selectOverrides.MenuList,
+            Option: selectOverrides.SelectOption,
+            ValueContainer: function CustomValueContainer(localProps) {
+                return <selectOverrides.ValueContainer {...localProps} className={inputClassName} />;
+            },
+            NoOptionsMessage: noOptionsMessage || selectOverrides.NoOptionsMessage,
+            LoadingMessage: selectOverrides.OptionLoader,
         };
-    };
-    /**
-     * Overwrite styles in Select component
-     */
-    private getStyles = () => {
+    }, [inputClassName, noOptionsMessage]);
+
+    const customStyles = useMemo(() => {
         return {
             option: () => ({}),
             menu: base => {
@@ -194,5 +131,22 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
                 borderWidth: 0,
             }),
         };
+    }, []);
+
+    // Overwrite theme in Select component
+    const getTheme = useCallback(theme => {
+        return {
+            ...theme,
+            borderRadius: {},
+            borderWidth: 0,
+            colors: {},
+            spacing: {},
+        };
+    }, []);
+
+    return {
+        components: componentOverwrites,
+        theme: getTheme,
+        styles: customStyles,
     };
 }

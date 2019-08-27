@@ -10,7 +10,7 @@ import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps {
     label: string;
-    description?: string;
+    description?: React.ReactNode;
     labelType?: DashboardLabelType;
     tag?: keyof JSX.IntrinsicElements;
     children: React.ReactNode;

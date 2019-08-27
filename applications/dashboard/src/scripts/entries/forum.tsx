@@ -17,7 +17,7 @@ import PasswordPage from "@dashboard/pages/authenticate/PasswordPage";
 import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswordPage";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { Router } from "@library/Router";
-import { Application } from "@library/Application";
+import { AppContext } from "@library/AppContext";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -34,7 +34,7 @@ Router.addRoutes([
 
 // Routing
 addComponent("App", () => (
-    <Application>
+    <AppContext>
         <Router disableDynamicRouting />
-    </Application>
+    </AppContext>
 ));

@@ -8,13 +8,13 @@ import "@dashboard/legacy";
 import { initAllUserContent } from "@library/content";
 import { onContent, addComponent } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
-import { Application } from "@library/Application";
+import { AppContext } from "@library/AppContext";
 
 onContent(() => initAllUserContent());
 
 // Routing
 addComponent("App", () => (
-    <Application>
+    <AppContext>
         <Router disableDynamicRouting />
-    </Application>
+    </AppContext>
 ));

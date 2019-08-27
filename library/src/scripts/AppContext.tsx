@@ -24,7 +24,7 @@ interface IProps {
 /**
  * Core provider set for running most Vanilla components.
  */
-export function Application(props: IProps) {
+export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
     return (

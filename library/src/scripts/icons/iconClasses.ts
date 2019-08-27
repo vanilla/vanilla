@@ -118,13 +118,13 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const deleteIcon = themeVars("deleteIcon", {
-        width: 20,
+        width: 24,
         height: 24,
     });
 
     const editIcon = themeVars("editIcon", {
-        width: 22,
-        height: 22,
+        width: 24,
+        height: 24,
     });
 
     const categoryIcon = themeVars("categoryIcon", {

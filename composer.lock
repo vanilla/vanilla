@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "857489d11d82cd4b48f14ed687efae7f",
+    "content-hash": "8a4320fa486e5e3a572512769c7e5677",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -737,21 +737,21 @@
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.5.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87"
+                "reference": "25f213022d41292c69425573c9bac98d9deb703e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/b718c9b4c1040643620922b3ac988dadc38f3b87",
-                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/25f213022d41292c69425573c9bac98d9deb703e",
+                "reference": "25f213022d41292c69425573c9bac98d9deb703e",
                 "shasum": ""
             },
             "require": {
-                "container-interop/container-interop": "^1.1",
-                "php": ">=5.6.0"
+                "php": ">=5.6.0",
+                "psr/container": "^1.0"
             },
             "type": "library",
             "autoload": {
@@ -770,7 +770,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-05-05T17:46:16+00:00"
+            "time": "2018-08-13T20:13:16+00:00"
         },
         {
             "name": "vanilla/garden-http",

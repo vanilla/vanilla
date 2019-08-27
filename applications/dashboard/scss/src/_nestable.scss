@@ -58,7 +58,7 @@
 
 .nestable-item .nestable-item,
 .nestable-item .nestable-placeholder {
-  margin-left: to-rem(30);
+  margin-left: 30px;
 }
 
 .nestable-item,
@@ -66,7 +66,7 @@
 .nestable-placeholder {
   display: block;
   position: relative;
-  margin: 0 0 to-rem(6);
+  margin: 0 0 6px;
   padding: 0;
 }
 
@@ -82,17 +82,17 @@
 .nestable-collapse {
   position: absolute;
   display: block;
-  width: to-rem(20);
-  height: $control-height-rem;
-  left: to-rem(36);
+  width: 20px;
+  height: $control-height;
+  left: 36px;
 }
 
 // The section of the item that you can click on to reorder it.
 .nestable-handle {
   position: absolute;
   display: block;
-  width: $control-height-rem;
-  height: $control-height-rem;
+  width: $control-height;
+  height: $control-height;
   cursor: move;
   cursor: grab;
 }
@@ -107,5 +107,5 @@
 }
 
 .nestable-content {
-  margin-bottom: to-rem(6);
+  margin-bottom: 6px;
 }

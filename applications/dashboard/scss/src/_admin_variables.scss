@@ -18,7 +18,7 @@ $rem-base:                   16;
 }
 
 @function to-rem($px) {
-  @return ($px / $rem-base * 1rem);
+  @return ($px / $rem-base * 16px);
 }
 @function from-rem($rem) {
   @return (strip-unit($rem) * $rem-base * 1px);
@@ -70,7 +70,7 @@ $link-color:                $brand-primary;
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:               24;
-$grid-gutter-width:          36 / 16 * 1rem;
+$grid-gutter-width:          36 / 16 * 16px;
 
 // Typography
 //
@@ -91,8 +91,8 @@ $font-size-xs:               to-rem(11);
 
 $font-size-h1:               to-rem(32);
 $font-size-h2:               to-rem(18);
-$font-size-h3:               1rem;
-$font-size-h4:               1rem;
+$font-size-h3:               16px;
+$font-size-h4:               16px;
 $font-size-h5:               to-rem(14);
 $font-size-h6:               to-rem(14);
 
@@ -140,11 +140,11 @@ $caret-width-lg:         $caret-width !default;
 // For each of Bootstrap's buttons, define text, background and border color.
 
 $control-height:                 36;
-$control-height-rem:             ($control-height / $rem-base * 1rem);
+$control-height-rem:             ($control-height / $rem-base * 16px);
 $control-padding-y:              ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
 
 $btn-min-width:                  $spacer * 6.75;
-$btn-padding-x:                  1rem !default;
+$btn-padding-x:                  16px !default;
 $btn-padding-y:                  $control-padding-y;
 $btn-font-weight:                normal !default;
 $btn-line-height:                1;
@@ -161,11 +161,11 @@ $btn-secondary-border:           #ccc !default;
 
 $btn-link-disabled-color:        $grey-dark-border;
 
-$btn-padding-x-sm:               .75rem;
-$btn-padding-y-sm:               .125rem;
+$btn-padding-x-sm:               12px;
+$btn-padding-y-sm:               2px;
 
-$btn-padding-x-lg:               1.25rem !default;
-$btn-padding-y-lg:               .75rem !default;
+$btn-padding-x-lg:               20px !default;
+$btn-padding-y-lg:               12px !default;
 
 $btn-border-radius-navbar:       to-rem(10);
 
@@ -201,8 +201,8 @@ $border-color:                              #e7e8e9;
 $font-size-tables:                          to-rem(13);
 
 // Cards
-$card-spacer-x:            1.25rem !default;
-$card-spacer-y:            .75rem !default;
+$card-spacer-x:            20px !default;
+$card-spacer-y:            12px !default;
 $card-border-width:        1px !default;
 $card-border-radius:       $border-radius !default;
 $card-border-color:        $border-color;
@@ -232,18 +232,18 @@ $grid-breakpoints: (
 
 
 $icon-sizes: (
-  9: 9,
-  10: 10,
-  11: 11,
-  12: 12,
-  16: 16,
-  24: 24,
-  30: 30,
-  48: 48
+  9: 9px,
+  10: 10px,
+  11: 11px,
+  12: 12px,
+  16: 16px,
+  24: 24px,
+  30: 30px,
+  48: 48px
 );
 
 // Dropdowns
-$dropdown-font-size:             1rem;
+$dropdown-font-size:             16px;
 $dropdown-min-width:             to-rem(180);
 $dropdown-padding-y:             to-rem(6);
 $dropdown-margin-top:            to-rem(2);

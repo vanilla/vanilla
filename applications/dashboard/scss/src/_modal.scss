@@ -293,7 +293,7 @@
 .modal-footer,
 .modal-header {
   z-index: 1005;
-  padding: ((to-rem(60) - $control-height-rem) / 2) $spacer;
+  padding: ((60px - $control-height) / 2) $spacer;
 }
 
 .modal-footer {
@@ -309,11 +309,11 @@
   &::before {
     position: absolute;
     left: 0;
-    bottom: to-rem(61);
+    bottom: 61px;
     display: block;
     width: 100%;
-    height: 1rem;
-    box-shadow: inset 0 -.75rem .75rem 0 rgba(255,255,255,1);
+    height: 16px;
+    box-shadow: inset 0 -12px 12px 0 rgba(255,255,255,1);
     content: '';
   }
 }
@@ -334,7 +334,7 @@
   padding: 0;
 
   svg {
-    height: to-rem(52) - 1.5rem;
+    height: 52px - 18px;
   }
 }
 

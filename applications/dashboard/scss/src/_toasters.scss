@@ -26,7 +26,7 @@
   margin-top: $spacer / 8;
   font-weight: 400;
   font-size: $font-size-md;
-  line-height: to-rem(18);
+  line-height: 18px;
   color: $white;
   background: #333;
   border: $border-width solid $black;
@@ -50,7 +50,7 @@
 
 .toaster-close {
   position: absolute;
-  top: $spacer - to-rem(2);
+  top: $spacer - 2px;
   right: $spacer;
   cursor: pointer;
 
@@ -62,13 +62,13 @@
 
 .toasters {
   position: fixed;
-  bottom: to-rem(24);
-  left: to-rem(24);
+  bottom: 24px;
+  left: 24px;
   z-index: 1050;
 
   @include media-breakpoint-down(sm) {
-    left: to-rem(12);
-    right: to-rem(12);
-    bottom: to-rem(12);
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
   }
 }

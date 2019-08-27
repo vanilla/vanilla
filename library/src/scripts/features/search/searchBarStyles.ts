@@ -50,7 +50,7 @@ export const searchBarVariables = useThemeCache(() => {
     const searchIcon = themeVars("searchIcon", {
         gap: 32,
         height: 13,
-        width: 13,
+        width: 14,
         fg: input.fg.fade(0.7),
     });
 
@@ -279,11 +279,6 @@ export const searchBarClasses = useThemeCache(() => {
 
     const form = style("form", {
         display: "block",
-        $nest: {
-            [".inputText"]: {
-                borderColor: colorOut(vars.input.bg),
-            },
-        },
     });
 
     const content = style("content", {
@@ -304,6 +299,10 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
+    const icon = style("icon", {
+        color: colorOut(vars.searchIcon.fg),
+    });
+
     const iconContainer = style("iconContainer", {
         position: "absolute",
         top: 0,
@@ -316,6 +315,12 @@ export const searchBarClasses = useThemeCache(() => {
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
         cursor: "text",
+        $nest: {
+            [`.${icon}`]: {
+                width: unit(vars.searchIcon.width),
+                height: unit(vars.searchIcon.height),
+            },
+        },
     });
 
     const iconContainerBigInput = style("iconContainerBig", {
@@ -324,12 +329,6 @@ export const searchBarClasses = useThemeCache(() => {
                 height: unit(vars.sizing.height),
             },
         },
-    });
-
-    const icon = style("icon", {
-        width: unit(vars.searchIcon.width),
-        height: unit(vars.searchIcon.height),
-        color: colorOut(vars.searchIcon.fg),
     });
 
     const menu = style("menu", {

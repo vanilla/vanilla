@@ -174,9 +174,9 @@ fieldset[disabled] a.btn {
 .btn-icon {
   @extend .btn-link;
   @extend .icon;
-  padding: to-rem(3);
+  padding: 3px;
   margin: 0;
-  margin-left: 1rem;
+  margin-left: 16px;
   font-size: $font-size-sm;
   line-height: 24px;
   border-width: 0;
@@ -187,8 +187,8 @@ fieldset[disabled] a.btn {
   }
 
   svg {
-    height: to-rem(24);
-    width: to-rem(24);
+    height: 24px;
+    width: 24px;
     vertical-align: top;
   }
 
@@ -203,8 +203,8 @@ fieldset[disabled] a.btn {
 
   &.btn-icon-sm {
     svg {
-      height: to-rem(18);
-      width: to-rem(18);
+      height: 18px;
+      width: 18px;
     }
   }
 }
@@ -213,9 +213,9 @@ fieldset[disabled] a.btn {
   @include button-variant($link-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
 
   $btn-icon-height: 24px;
-  $btn-icon-padding-v: 5px; //(to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  $btn-icon-padding-v: 5px;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
-  margin: 0 0 0 .5rem;
+  margin: 0 0 0 8px;
 
   svg {
     height: $btn-icon-height;
@@ -294,7 +294,7 @@ fieldset[disabled] a.btn {
   }
 
   .btn-icon + .btn-icon {
-    margin-left: to-rem(6);
+    margin-left: 6px;
   }
 }
 
@@ -310,10 +310,10 @@ fieldset[disabled] a.btn {
   text-transform: uppercase;
 
   svg {
-    margin-top: - to-rem(2);
+    margin-top: - 2px;
   }
 
-  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, to-rem(10), to-rem(14), $btn-border-radius-navbar);
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, 10px, 14px, $btn-border-radius-navbar);
 }
 
 // Small Rounded Button

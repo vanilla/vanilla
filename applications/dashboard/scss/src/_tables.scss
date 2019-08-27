@@ -158,7 +158,7 @@
     }
 
     .toggle-wrap {
-        margin-left: to-rem(12);
+        margin-left: 12px;
         @extend .toggle-wrap-sm;
     }
 
@@ -212,7 +212,7 @@
 
     th,
     td {
-        width: to-rem(100);
+        width: 100px;
         padding: ($spacer / 2) ($spacer * .75);
 
         border-right: $table-border-width solid #eee;
@@ -398,8 +398,8 @@
         // Title cell
         th {
             font-weight: 700;
-            max-width: to-rem(120);
-            min-width: to-rem(120);
+            max-width: 120px;
+            min-width: 120px;
             @extend .truncate;
         }
     }
@@ -418,13 +418,13 @@
         tbody {
             td,
             th {
-                font-size: to-rem(12);
-                padding: to-rem(6);
+                font-size: 12px;
+                padding: 6px;
             }
         }
 
         tbody th {
-            font-size: to-rem(13);
+            font-size: 13px;
         }
 
         thead {
@@ -435,14 +435,14 @@
             // We gotta fit the column headings in somehow, so rotate them.
             td {
                 position: relative;
-                width: to-rem(36);
-                height: to-rem(90);
+                width: 36px;
+                height: 90px;
 
                 a {
                     position: relative;
                     display: block;
                     transform: rotate(90deg);
-                    top: - to-rem(24);
+                    top: - 24px;
                 }
             }
         }
@@ -579,7 +579,7 @@
     td {
         @extend .table-data-cell;
         text-align: center;
-        padding: $table-cell-padding to-rem(12);
+        padding: $table-cell-padding 12px;
 
         &:first-child {
             text-align: left;
@@ -594,7 +594,7 @@
         th,
         td {
             width: 60%;
-            padding: ($spacer / 2) to-rem(12);
+            padding: ($spacer / 2) 12px;
             text-transform: uppercase;
             font-weight: 600;
             font-size: $font-size-sm;
@@ -603,14 +603,14 @@
 
             .table-summary-cell-main {
                 width: 100%;
-                min-width: to-rem(120);
+                min-width: 120px;
             }
         }
     }
 }
 
 .table-summary-title {
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 600;
 }
 

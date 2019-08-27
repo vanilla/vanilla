@@ -286,10 +286,8 @@ export const searchBarClasses = useThemeCache(() => {
         height: unit(vars.sizing.height),
         width: percent(100),
         $nest: {
-            [`&:not(.${splashClasses().content})`]: {
-                [`&.hasFocus .searchBar-valueContainer`]: {
-                    borderColor: colorOut(globalVars.mainColors.primary),
-                },
+            [`&:not(.${splashClasses().content}).hasFocus .searchBar-valueContainer`]: {
+                borderColor: colorOut(globalVars.mainColors.primary),
             },
         },
     });

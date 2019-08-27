@@ -185,7 +185,7 @@ const _components = {};
  * @param name The name of the component.
  * @param component The component to register.
  */
-export function addComponent(name: string, component: ComponentClass) {
+export function addComponent(name: string, component: React.ComponentType) {
     _components[name.toLowerCase()] = component;
 }
 
@@ -227,34 +227,6 @@ export function _mountComponents(parent: Element) {
             logError("Could not find component %s.", name);
         }
     });
-}
-
-/**
- * @type {Array} The currently registered routes.
- * @private
- */
-const _routes: any[] = [];
-
-/**
- * Register one or more routes to the app component.
- *
- * @param routes An array of routes to add.
- */
-export function addRoutes(routes: Array<React.ReactElement<RouteProps>>) {
-    if (!Array.isArray(routes)) {
-        _routes.push(routes);
-    } else {
-        _routes.push(...routes);
-    }
-}
-
-/**
- * Get all of the currently registered routes.
- *
- * @returns Returns an array of routes.
- */
-export function getRoutes(): Array<React.ReactElement<RouteProps>> {
-    return _routes;
 }
 
 /**

@@ -10,7 +10,6 @@ import React from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import SiteNav from "@library/navigation/SiteNav";
-import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 
 const story = storiesOf("Navigation", module);
@@ -1103,33 +1102,13 @@ story.add("Site Nav", () => {
             <StoryHeading depth={1}>Navigation</StoryHeading>
             <StoryHeading>Guide</StoryHeading>
             <SiteNavProvider categoryRecordType="knowledgeCategory">
-                <SiteNav
-                    {...guideData}
-                    clickableCategoryLabels={true}
-                    collapsible={true}
-                    bottomCTA={
-                        <NavigationAdminLinks
-                            knowledgeBase={guideData.knowledgeBase.data!}
-                            showDivider={guideData.navItems.data!.length > 0}
-                        />
-                    }
-                >
+                <SiteNav {...guideData} clickableCategoryLabels={true} collapsible={true}>
                     {guideData.navItems.data}
                 </SiteNav>
             </SiteNavProvider>
             <StoryHeading>Help</StoryHeading>
             <SiteNavProvider categoryRecordType="article">
-                <SiteNav
-                    {...helpData}
-                    bottomCTA={
-                        <NavigationAdminLinks
-                            knowledgeBase={helpData.knowledgeBase.data!}
-                            showDivider={helpData.navItems.data!.length > 0}
-                        />
-                    }
-                >
-                    {helpData.navItems.data}
-                </SiteNav>
+                <SiteNav {...helpData}>{helpData.navItems.data}</SiteNav>
             </SiteNavProvider>
         </>
     );

@@ -21,6 +21,7 @@ interface IProps extends IDeviceProps {
     title?: string; // Often the message to display isn't the real H1
     className?: string;
     outerBackgroundImage?: string;
+    styleOverwrite?: any;
 }
 
 /**
@@ -28,8 +29,8 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const classes = splashClasses();
-        const { action, className } = this.props;
+        const { action, className, styleOverwrite } = this.props;
+        const classes = splashClasses(styleOverwrite);
         const title = this.props.title;
 
         return (

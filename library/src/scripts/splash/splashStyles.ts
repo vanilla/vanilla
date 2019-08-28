@@ -26,7 +26,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
-export const splashVariables = useThemeCache(() => {
+export const splashVariables = useThemeCache(styleOverwrite => {
     const makeThemeVars = variableFactory("splash");
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
@@ -163,7 +163,7 @@ export const splashVariables = useThemeCache(() => {
             bg: colors.bg,
         },
         borders: {
-            color: globalVars.elementaryColors.transparent,
+            color: colors.bg,
             width: 0,
             left: {
                 color: searchBar.border.leftColor,
@@ -247,8 +247,8 @@ export const splashVariables = useThemeCache(() => {
     };
 });
 
-export const splashClasses = useThemeCache(() => {
-    const vars = splashVariables();
+export const splashClasses = useThemeCache(styleOverwrite => {
+    const vars = splashVariables(styleOverwrite);
     const style = styleFactory("splash");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();

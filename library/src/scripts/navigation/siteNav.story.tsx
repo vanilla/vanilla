@@ -4,21 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { DashboardInput } from "@dashboard/forms/DashboardInput";
-import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
-import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import { Navigation } from "@knowledge/navigation/Navigation";
 import { LoadStatus } from "@library/@types/api/core";
 import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import SiteNav from "@library/navigation/SiteNav";
+import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 
 const story = storiesOf("Components", module);
 
-const data = {
+const guideData = {
     collapsible: true,
     activeRecord: {
         recordID: 79,
@@ -1117,11 +1113,38 @@ const data = {
     },
 };
 
-story.add("Navigation", () => {
+const helpData = guideData;
+
+story.add("Site Nav", () => {
     return (
         <>
             <StoryHeading depth={1}>Navigation</StoryHeading>
-            <Navigation collapsible={true} {...data} />
+            <StoryHeading>Guide</StoryHeading>
+            <SiteNav
+                {...guideData}
+                clickableCategoryLabels={true}
+                collapsible={true}
+                bottomCTA={
+                    <NavigationAdminLinks
+                        knowledgeBase={guideData.knowledgeBase.data!}
+                        showDivider={guideData.navItems.data!.length > 0}
+                    />
+                }
+            >
+                {guideData.navItems.data}
+            </SiteNav>
+            <StoryHeading>Help</StoryHeading>
+            <SiteNav
+                {...helpData}
+                bottomCTA={
+                    <NavigationAdminLinks
+                        knowledgeBase={helpData.knowledgeBase.data!}
+                        showDivider={helpData.navItems.data!.length > 0}
+                    />
+                }
+            >
+                {helpData.navItems.data}
+            </SiteNav>
         </>
     );
 });

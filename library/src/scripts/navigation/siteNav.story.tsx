@@ -11,8 +11,11 @@ import { LoadStatus } from "@library/@types/api/core";
 import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import SiteNav from "@library/navigation/SiteNav";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
+import SiteNavProvider from "@library/navigation/SiteNavContext";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 
-const story = storiesOf("Components", module);
+const story = storiesOf("Navigation", module);
 
 const guideData = {
     collapsible: true,
@@ -1066,25 +1069,6 @@ const guideData = {
                     },
                 ],
             },
-            {
-                articleID: 125,
-                knowledgeCategoryID: 13,
-                sort: 6,
-                score: 0,
-                views: 0,
-                insertUserID: 2,
-                dateInserted: "2019-07-23 15:14:39",
-                updateUserID: 2,
-                dateUpdated: "2019-08-26 15:26:50",
-                status: "published",
-                name: "test",
-                knowledgeBaseID: 4,
-                recordType: "article",
-                parentID: 13,
-                recordID: 125,
-                url: "https://dev.vanilla.localhost/en-hutch/kb/articles/125-test",
-                children: [],
-            },
         ],
     },
     knowledgeBase: {
@@ -1120,31 +1104,35 @@ story.add("Site Nav", () => {
         <>
             <StoryHeading depth={1}>Navigation</StoryHeading>
             <StoryHeading>Guide</StoryHeading>
-            <SiteNav
-                {...guideData}
-                clickableCategoryLabels={true}
-                collapsible={true}
-                bottomCTA={
-                    <NavigationAdminLinks
-                        knowledgeBase={guideData.knowledgeBase.data!}
-                        showDivider={guideData.navItems.data!.length > 0}
-                    />
-                }
-            >
-                {guideData.navItems.data}
-            </SiteNav>
+            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+                <SiteNav
+                    {...guideData}
+                    clickableCategoryLabels={true}
+                    collapsible={true}
+                    bottomCTA={
+                        <NavigationAdminLinks
+                            knowledgeBase={guideData.knowledgeBase.data!}
+                            showDivider={guideData.navItems.data!.length > 0}
+                        />
+                    }
+                >
+                    {guideData.navItems.data}
+                </SiteNav>
+            </SiteNavProvider>
             <StoryHeading>Help</StoryHeading>
-            <SiteNav
-                {...helpData}
-                bottomCTA={
-                    <NavigationAdminLinks
-                        knowledgeBase={helpData.knowledgeBase.data!}
-                        showDivider={helpData.navItems.data!.length > 0}
-                    />
-                }
-            >
-                {helpData.navItems.data}
-            </SiteNav>
+            <SiteNavProvider categoryRecordType={KbRecordType.ARTICLE}>
+                <SiteNav
+                    {...helpData}
+                    bottomCTA={
+                        <NavigationAdminLinks
+                            knowledgeBase={helpData.knowledgeBase.data!}
+                            showDivider={helpData.navItems.data!.length > 0}
+                        />
+                    }
+                >
+                    {helpData.navItems.data}
+                </SiteNav>
+            </SiteNavProvider>
         </>
     );
 });

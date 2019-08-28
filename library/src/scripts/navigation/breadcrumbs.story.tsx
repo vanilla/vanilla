@@ -8,8 +8,8 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
-import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import { CategoryIcon } from "@library/icons/common";
+import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
 
 const story = storiesOf("Navigation", module);
 

@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { addComponent, onContent } from "@library/utility/appUtils";
 import React from "react";
+import { onContent } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -18,6 +18,7 @@ import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswor
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
+import { addComponent } from "@library/utility/componentRegistry";
 
 initAllUserContent();
 onContent(convertAllUserContent);

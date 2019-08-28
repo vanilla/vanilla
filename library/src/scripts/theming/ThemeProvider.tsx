@@ -12,7 +12,7 @@ import { prepareShadowRoot } from "@vanilla/dom-utils";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import React from "react";
+import React, { Children } from "react";
 import { connect } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 
@@ -22,7 +22,10 @@ export interface IWithThemeProps {
 
 class BaseThemeProvider extends React.Component<IProps> {
     public render() {
-        const { assets, variablesOnly } = this.props;
+        const { assets } = this.props;
+        if (this.props.disabled) {
+            return this.props.children;
+        }
         if (this.props)
             switch (assets.status) {
                 case LoadStatus.PENDING:
@@ -52,6 +55,9 @@ class BaseThemeProvider extends React.Component<IProps> {
     }
 
     public componentDidMount() {
+        if (this.props.disabled) {
+            return;
+        }
         void this.props.requestData();
 
         if (this.props.variablesOnly) {
@@ -78,6 +84,7 @@ interface IOwnProps {
     themeKey: string;
     errorComponent: React.ReactNode;
     variablesOnly?: boolean;
+    disabled?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

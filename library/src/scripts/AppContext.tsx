@@ -16,6 +16,7 @@ import { Provider } from "react-redux";
 interface IProps {
     children: React.ReactNode;
     variablesOnly?: boolean;
+    noTheme?: boolean;
     errorComponent?: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ export function AppContext(props: IProps) {
         <Provider store={store}>
             <LiveAnnouncer>
                 <ThemeProvider
+                    disabled={props.noTheme}
                     errorComponent={props.errorComponent || null}
                     themeKey={getMeta("ui.themeKey", "keystone")}
                     variablesOnly={props.variablesOnly}

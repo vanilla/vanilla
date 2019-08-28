@@ -6,15 +6,17 @@
 import React from "react";
 import "@dashboard/legacy";
 import { initAllUserContent } from "@library/content";
-import { onContent, addComponent } from "@library/utility/appUtils";
+import { onContent } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
+import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
 
+disableComponentTheming();
 onContent(() => initAllUserContent());
 
 // Routing
 addComponent("App", () => (
-    <AppContext variablesOnly>
+    <AppContext noTheme>
         <Router disableDynamicRouting />
     </AppContext>
 ));

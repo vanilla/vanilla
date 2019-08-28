@@ -13,21 +13,17 @@ import {
     centeredBackgroundProps,
     fonts,
     getBackgroundImage,
-    IBackground,
     IFont,
     paddings,
     unit,
     colorOut,
     background,
     absolutePosition,
-    borders,
     modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
 import { assetUrl } from "@library/utility/appUtils";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
 export const splashVariables = useThemeCache(() => {

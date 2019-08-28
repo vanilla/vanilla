@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { important, px } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
-export function deviceCheckerClasses() {
+export const deviceCheckerClasses = useThemeCache(() => {
     const style = styleFactory("deviceChecker");
     const queries = layoutVariables().mediaQueries();
 
@@ -35,4 +35,4 @@ export function deviceCheckerClasses() {
     );
 
     return { root };
-}
+});

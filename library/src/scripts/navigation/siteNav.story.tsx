@@ -13,7 +13,7 @@ import SiteNavProvider from "@library/navigation/SiteNavContext";
 
 const story = storiesOf("Navigation", module);
 
-const guideData = {
+const data = {
     collapsible: true,
     activeRecord: {
         recordID: 79,
@@ -1073,7 +1073,7 @@ const guideData = {
             knowledgeBaseID: 4,
             name: "Development",
             description: "Processes and guidance for developers.",
-            sortArticles: KnowledgeBaseSortMode.MANUAL,
+            sortArticles: "manual",
             insertUserID: 48,
             dateInserted: "2019-03-06T16:09:30+00:00",
             updateUserID: 2,
@@ -1085,7 +1085,7 @@ const guideData = {
             icon: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
             bannerImage: "",
             sourceLocale: "",
-            viewType: KbViewType.GUIDE,
+            viewType: "guide",
             rootCategoryID: 13,
             defaultArticleID: 79,
             status: "published",
@@ -1093,21 +1093,19 @@ const guideData = {
     },
 };
 
-const helpData = guideData;
-
 story.add("Site Nav", () => {
     return (
         <>
             <StoryHeading depth={1}>Navigation</StoryHeading>
             <StoryHeading>Guide</StoryHeading>
             <SiteNavProvider categoryRecordType="knowledgeCategory">
-                <SiteNav {...guideData} clickableCategoryLabels={true} collapsible={true}>
-                    {guideData.navItems.data}
+                <SiteNav {...data} clickableCategoryLabels={true} collapsible={true}>
+                    {data.navItems.data}
                 </SiteNav>
             </SiteNavProvider>
             <StoryHeading>Help</StoryHeading>
             <SiteNavProvider categoryRecordType="article">
-                <SiteNav {...helpData}>{helpData.navItems.data}</SiteNav>
+                <SiteNav {...data}>{data.navItems.data}</SiteNav>
             </SiteNavProvider>
         </>
     );

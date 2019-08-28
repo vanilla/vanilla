@@ -9,8 +9,9 @@ import React, { ComponentClass } from "react";
 import ReactDOM from "react-dom";
 import gdn from "@library/gdn";
 import { RouteProps } from "react-router";
-import { logError, PromiseOrNormalCallback } from "@vanilla/utils";
+import { logError, PromiseOrNormalCallback, logWarning } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
+import { mountReact } from "@vanilla/react-utils";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -218,11 +219,21 @@ export function getComponent(name: string): ComponentClass | undefined {
  */
 export function _mountComponents(parent: Element) {
     const nodes = parent.querySelectorAll("[data-react]").forEach(node => {
+        if (!(node instanceof HTMLElement)) {
+            logWarning("Attempting to mount a data-react component on an invalid element", node);
+            return;
+        }
+
         const name = node.getAttribute("data-react") || "";
+        let props = node.getAttribute("data-props") || {};
+        if (typeof props === "string") {
+            props = JSON.parse(props);
+        }
+
         const Component = getComponent(name);
 
         if (Component) {
-            ReactDOM.render(<Component />, node);
+            mountReact(<Component {...props} />, node, undefined, { overwrite: true });
         } else {
             logError("Could not find component %s.", name);
         }

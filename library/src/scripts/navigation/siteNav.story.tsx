@@ -8,7 +8,6 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LoadStatus } from "@library/@types/api/core";
-import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import SiteNav from "@library/navigation/SiteNav";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 

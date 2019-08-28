@@ -4,12 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
-import throttle from "lodash/throttle";
-import { deviceCheckerClasses } from "@library/layout/deviceCheckerStyles";
-import { forceRenderStyles } from "typestyle";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import throttle from "lodash/throttle";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 export enum Devices {
     XS = "xs",
@@ -35,16 +33,8 @@ interface IProps {
     children: React.ReactNode;
 }
 
-export class DeviceProvider extends React.Component<IProps> {
-    public render() {
-        forceRenderStyles();
-        return <DeviceContext.Provider value={this.device}>{this.props.children}</DeviceContext.Provider>;
-    }
-
-    /**
-     * Query div in page to get device based on media query from CSS
-     */
-    private get device() {
+export function DeviceProvider(props: IProps) {
+    const calculateDevice = useCallback(() => {
         const breakpoints = layoutVariables().panelLayoutBreakPoints;
         const width = document.body.clientWidth;
         if (width <= breakpoints.xs) {
@@ -58,29 +48,20 @@ export class DeviceProvider extends React.Component<IProps> {
         } else {
             return Devices.DESKTOP;
         }
-    }
+    }, []);
+    const [device, setDevice] = useState<Devices>(calculateDevice());
 
-    /**
-     * @inheritdoc
-     */
-    public componentDidMount() {
-        // Add a listener to update the device when window size changes.
-        window.addEventListener("resize", this.throttledUpdateOnResize);
-    }
+    useEffect(() => {
+        const throttledUpdate = throttle(() => {
+            setDevice(calculateDevice);
+        }, 100);
+        window.addEventListener("resize", throttledUpdate);
+        return () => {
+            window.removeEventListener("resize", throttledUpdate);
+        };
+    }, [calculateDevice, setDevice]);
 
-    /**
-     * @inheritDoc
-     */
-    public componentWillUnmount() {
-        window.removeEventListener("resize", this.throttledUpdateOnResize);
-    }
-
-    /**
-     * A throttled version of updateOnResize.
-     */
-    private throttledUpdateOnResize = throttle(() => {
-        this.forceUpdate();
-    }, 100);
+    return <DeviceContext.Provider value={device}>{props.children}</DeviceContext.Provider>;
 }
 
 /**

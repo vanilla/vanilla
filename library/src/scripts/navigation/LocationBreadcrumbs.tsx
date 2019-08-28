@@ -7,7 +7,6 @@
 import { t } from "@library/utility/appUtils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import * as React from "react";
-import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 
 interface IProps {

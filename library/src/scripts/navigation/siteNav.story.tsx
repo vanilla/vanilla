@@ -12,8 +12,6 @@ import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/Kn
 import SiteNav from "@library/navigation/SiteNav";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 
 const story = storiesOf("Navigation", module);
 
@@ -1104,7 +1102,7 @@ story.add("Site Nav", () => {
         <>
             <StoryHeading depth={1}>Navigation</StoryHeading>
             <StoryHeading>Guide</StoryHeading>
-            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+            <SiteNavProvider categoryRecordType="knowledgeCategory">
                 <SiteNav
                     {...guideData}
                     clickableCategoryLabels={true}
@@ -1120,7 +1118,7 @@ story.add("Site Nav", () => {
                 </SiteNav>
             </SiteNavProvider>
             <StoryHeading>Help</StoryHeading>
-            <SiteNavProvider categoryRecordType={KbRecordType.ARTICLE}>
+            <SiteNavProvider categoryRecordType="article">
                 <SiteNav
                     {...helpData}
                     bottomCTA={

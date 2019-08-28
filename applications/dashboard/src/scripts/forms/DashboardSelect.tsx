@@ -28,10 +28,10 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
             <SelectOne
                 label={null}
                 labelID={labelID}
+                inputID={inputID}
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}
-                id={inputID}
                 inputClassName={classes}
             />
         </div>

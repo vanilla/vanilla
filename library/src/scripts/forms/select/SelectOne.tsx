@@ -17,8 +17,10 @@ import React, { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
 
-export interface ISelectOneProps extends IOptionalComponentID {
+export interface ISelectOneProps {
     label: string | null;
+    id?: string;
+    inputID?: string;
     labelID?: string;
     disabled?: boolean;
     className?: string;
@@ -51,7 +53,7 @@ export default function SelectOne(props: ISelectOneProps) {
     const [isFocused, setIsFocused] = useState(false);
     const generatedID = useUniqueID(prefix);
     const id = props.id || generatedID;
-    const inputID = id + "-input";
+    const inputID = props.inputID || id + "-input";
     const errorID = id + "-errors";
 
     const { className, disabled, options, searchable } = props;
@@ -72,7 +74,7 @@ export default function SelectOne(props: ISelectOneProps) {
                 </label>
             )}
 
-            <div className={classNames(classesInputBlock.inputWrap, classes, { hasFocus: isFocused })}>
+            <div className={classNames(classesInputBlock.inputWrap, classes.inputWrap, { hasFocus: isFocused })}>
                 <Select
                     {...overrideProps}
                     id={id}

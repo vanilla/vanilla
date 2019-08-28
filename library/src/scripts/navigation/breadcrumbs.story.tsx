@@ -11,7 +11,7 @@ import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import { CategoryIcon } from "@library/icons/common";
 
-const story = storiesOf("Components", module);
+const story = storiesOf("Navigation", module);
 
 story.add("Breadcrumbs", () => {
     return (

@@ -32,7 +32,7 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
  * Can optionaly take validation filters that will live filter the input.
  */
 export function TextInput(props: IProps) {
-    const { inputStyle, validationFilter, className, onChange, value, defaultValue, ...rest } = props;
+    const { inputStyle, validationFilter, className, onChange, value, defaultValue, inputRef, ...rest } = props;
     const [ownValue, setOwnValue] = useState(defaultValue);
 
     // Get our change handler together.
@@ -61,7 +61,7 @@ export function TextInput(props: IProps) {
     return (
         <input
             {...rest}
-            ref={props.inputRef}
+            ref={inputRef}
             type={inputType}
             onChange={actualOnChange}
             value={actualValue}

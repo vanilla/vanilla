@@ -50,6 +50,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var array */
+    private $featureFlags;
+
     /**
      * SiteMeta constructor.
      *
@@ -66,6 +69,8 @@ class SiteMeta implements \JsonSerializable {
         $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+
+        $this->featureFlags = $config->get('Feature', []);
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
@@ -119,6 +124,7 @@ class SiteMeta implements \JsonSerializable {
                 'maxSize' => $this->maxUploadSize,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
+            'featureFlags' => $this->featureFlags,
         ];
     }
 

@@ -15,6 +15,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { inputVariables } from "@library/forms/inputStyles";
+import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,7 +51,7 @@ export const searchBarVariables = useThemeCache(() => {
     const searchIcon = themeVars("searchIcon", {
         gap: 32,
         height: 13,
-        width: 13,
+        width: 14,
         fg: input.fg.fade(0.7),
     });
 
@@ -277,15 +278,6 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
-    const form = style("form", {
-        display: "block",
-        $nest: {
-            [".inputText"]: {
-                borderColor: colorOut(vars.input.bg),
-            },
-        },
-    });
-
     const content = style("content", {
         display: "flex",
         alignItems: "flex-start",
@@ -293,6 +285,15 @@ export const searchBarClasses = useThemeCache(() => {
         position: "relative",
         height: unit(vars.sizing.height),
         width: percent(100),
+        $nest: {
+            [`&:not(.${splashClasses().content}).hasFocus .searchBar-valueContainer`]: {
+                borderColor: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    const form = style("form", {
+        display: "block",
     });
 
     // special selector
@@ -302,6 +303,10 @@ export const searchBarClasses = useThemeCache(() => {
                 marginBottom: unit(vars.heading.margin),
             },
         },
+    });
+
+    const icon = style("icon", {
+        color: colorOut(vars.searchIcon.fg),
     });
 
     const iconContainer = style("iconContainer", {
@@ -316,6 +321,12 @@ export const searchBarClasses = useThemeCache(() => {
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
         cursor: "text",
+        $nest: {
+            [`.${icon}`]: {
+                width: unit(vars.searchIcon.width),
+                height: unit(vars.searchIcon.height),
+            },
+        },
     });
 
     const iconContainerBigInput = style("iconContainerBig", {
@@ -324,12 +335,6 @@ export const searchBarClasses = useThemeCache(() => {
                 height: unit(vars.sizing.height),
             },
         },
-    });
-
-    const icon = style("icon", {
-        width: unit(vars.searchIcon.width),
-        height: unit(vars.searchIcon.height),
-        color: colorOut(vars.searchIcon.fg),
     });
 
     const menu = style("menu", {

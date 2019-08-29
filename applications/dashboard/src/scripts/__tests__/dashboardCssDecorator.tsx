@@ -15,13 +15,7 @@ import React, { useEffect } from "react";
 export const dashboardCssDecorator: StoryDecorator = (getStory: () => any) => {
     require("./_adminStylesNested.scss");
     const AdminStyles = () => {
-        useEffect(() => {
-            document.body.classList.add("storybookDashboardStyles");
-            () => {
-                document.body.classList.remove("storybookDashboardStyles");
-            };
-        });
-        return getStory();
+        return <div className="storybookDashboardStyles">{getStory()}</div>;
     };
     return <AdminStyles />;
 };

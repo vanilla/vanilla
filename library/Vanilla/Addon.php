@@ -496,7 +496,6 @@ class Addon implements Contracts\AddonInterface {
      */
     private function scanClassPaths() {
         $dirsToScan = [
-            '',
             '/controllers',
             '/library',
             '/src',
@@ -510,10 +509,10 @@ class Addon implements Contracts\AddonInterface {
         $rootDir = $this->path('', Addon::PATH_FULL);
         $subDirs = glob($rootDir . '/*', GLOB_ONLYDIR);
         foreach ($subDirs as $subDir) {
-            $trimmedDir = ltrim($subDir, '/\\');
+            $trimmedDir = basename($subDir);
             $isUppercaseDirName = strlen($trimmedDir) > 0 && ctype_upper($trimmedDir[0]);
             if ($isUppercaseDirName) {
-                $dir[] = $subDir;
+                $dirsToScan[] = "/" . $trimmedDir;
             }
         }
 

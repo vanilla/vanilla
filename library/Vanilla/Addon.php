@@ -496,6 +496,7 @@ class Addon implements Contracts\AddonInterface {
      */
     private function scanClassPaths() {
         $dirsToScan = [
+            '',
             '/controllers',
             '/library',
             '/src',

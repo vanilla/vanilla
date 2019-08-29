@@ -8,33 +8,77 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import Splash from "@library/splash/Splash";
+import Splash, { ISplashStyleOverwrite } from "@library/splash/Splash";
 import { MemoryRouter, Router } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import merge from "lodash/merge";
+import { assetUrl } from "@library/utility/appUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { splashFallbackBG } from "@library/splash/splashStyles";
+import { color } from "csx";
 
 const story = storiesOf("Home Page", module);
 
 story.add("Splash", () => {
-    const resetSplashData = {};
+    const globalVars = globalVariables();
+
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <StoryContent>
                     <StoryHeading depth={1}>Splash</StoryHeading>
-                </StoryContent>
-                <StoryContent>
                     <StoryHeading>Default Background</StoryHeading>
                 </StoryContent>
-                <Splash title={"How can we help you?"} styleOverwrite={merge(resetSplashData, {})} />
+                <Splash
+                    title={"How can we help you?"}
+                    styleOverwrite={{
+                        colors: {
+                            bg: globalVars.mainColors.bg,
+                            fg: globalVars.mainColors.fg,
+                        },
+                        outerBackgroundImage: splashFallbackBG,
+                        backgrounds: {
+                            useOverlay: false,
+                        },
+                    }}
+                />
                 <StoryContent>
                     <StoryHeading>Custom Background</StoryHeading>
                 </StoryContent>
                 <Splash
-                    outerBackgroundImage={"https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg"}
-                    title={"How can we help you?"}
-                    styleOverwrite={merge(resetSplashData, {})}
+                    title={"What can we do for you?"}
+                    styleOverwrite={{
+                        colors: {
+                            bg: globalVars.mainColors.bg,
+                            fg: globalVars.mainColors.fg,
+                        },
+                        outerBackgroundImage: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                        backgrounds: {
+                            useOverlay: true,
+                        },
+                    }}
+                />
+
+                <StoryContent>
+                    <StoryHeading>Custom Colors</StoryHeading>
+                </StoryContent>
+                <Splash
+                    title={"What's on your mind?"}
+                    styleOverwrite={
+                        {
+                            colors: {
+                                contrast: color("#f7ff92"),
+                                primary: color("#f75fff"),
+                                bg: color("#ff0005"),
+                                fg: color("#00ff3a"),
+                            },
+                            backgrounds: {
+                                useOverlay: false,
+                            },
+                            outerBackgroundImage: "none",
+                        } as ISplashStyleOverwrite
+                    }
                 />
             </SearchContext.Provider>
         </MemoryRouter>

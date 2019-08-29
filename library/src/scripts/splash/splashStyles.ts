@@ -254,7 +254,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
     };
 });
 
-export const splashClasses = useThemeCache(styleOverwrite => {
+export const splashClasses = useThemeCache((styleOverwrite = {}) => {
     const vars = splashVariables(styleOverwrite);
     const style = styleFactory("splash");
     const formElementVars = formElementsVariables();

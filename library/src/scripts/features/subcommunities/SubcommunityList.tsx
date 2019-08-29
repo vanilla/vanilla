@@ -36,6 +36,8 @@ export default class SubcommunityList extends React.Component<IProps> {
         const { className, items } = this.props;
         const classes = subcommunityListClasses();
 
+        window.console.log(this.props);
+
         if (items.length === 0) {
             return (
                 <div className={classNames("subcommunityList", className, "isEmpty", classes.root)}>

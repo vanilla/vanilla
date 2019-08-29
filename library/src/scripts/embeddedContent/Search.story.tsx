@@ -20,7 +20,6 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
 
 const story = storiesOf("Search", module);
 
@@ -32,6 +31,7 @@ story.add("Search Components", () => {
         dateLastActive: "2016-07-25 17:51:15",
     };
 
+    const classesSearch = splashClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Elements</StoryHeading>
@@ -47,17 +47,17 @@ story.add("Search Components", () => {
                             padding: `30px 10px`,
                         }}
                     >
-                        <div className={splashClasses().searchContainer}>
+                        <div className={classesSearch.searchContainer}>
                             <IndependentSearch
-                                buttonClass={splashClasses().searchButton}
+                                buttonClass={classesSearch.searchButton}
                                 buttonBaseClass={ButtonTypes.CUSTOM}
                                 isLarge={true}
                                 placeholder={t("Search")}
-                                inputClass={splashClasses().input}
-                                iconClass={splashClasses().icon}
-                                buttonLoaderClassName={splashClasses().buttonLoader}
-                                contentClass={splashClasses().content}
-                                valueContainerClasses={splashClasses().valueContainer}
+                                inputClass={classesSearch.input}
+                                iconClass={classesSearch.icon}
+                                buttonLoaderClassName={classesSearch.buttonLoader}
+                                contentClass={classesSearch.content}
+                                valueContainerClasses={classesSearch.valueContainer}
                             />
                         </div>
                     </div>

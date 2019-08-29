@@ -253,7 +253,7 @@
         }
 
         &.column-checkbox {
-            width: from-rem($spacer) + 2 * $table-padding-x;
+            width: $spacer + 2 * $table-padding-x;
         }
     }
 }

@@ -68,10 +68,10 @@ story.add("Splash", () => {
                     styleOverwrite={
                         {
                             colors: {
-                                contrast: color("#f7ff92"),
-                                primary: color("#f75fff"),
-                                bg: color("#ff0005"),
-                                fg: color("#00ff3a"),
+                                contrast: color("rgb(42,42,42)"),
+                                primary: color("#9279a8"),
+                                bg: color("#699dff"),
+                                fg: color("rgb(255,254,250)"),
                             },
                             backgrounds: {
                                 useOverlay: false,

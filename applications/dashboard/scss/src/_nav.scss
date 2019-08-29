@@ -52,11 +52,11 @@
   .nav-item-title {
     line-height: 1;
     font-weight: 600;
-    margin-bottom: to-rem(6);
+    margin-bottom: 6px;
   }
 
   .nav-item-description {
-    margin-bottom: - to-rem(5);
+    margin-bottom: - 5px;
   }
 
   .nav-link {
@@ -75,7 +75,7 @@
 
     svg {
       display: block;
-      height: to-rem(24);
+      height: 24px;
     }
 
     &:hover {
@@ -92,8 +92,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: to-rem(36);
-    height: to-rem(36);
+    width: 36px;
+    height: 36px;
     border: $border-width solid $border-color;
     border-radius: $border-radius;
     margin-right: $spacer;
@@ -153,7 +153,7 @@
 
 .nav-stats-value {
   font-weight: 300;
-  font-size: to-rem(40);
+  font-size: 40px;
 }
 
 // Panel navigation
@@ -168,9 +168,9 @@
 
   a {
     display: block;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-left: .75rem;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 12px;
     border-bottom: 1px dotted rgba(0,0,0,.0875);
     font-size: $font-size-sm;
     font-weight: 600;
@@ -183,8 +183,8 @@
       top: -1px;
       -webkit-transform: rotate(0deg);
       tranform: rotate(0deg);
-      margin-left: -1rem;
-      margin-right: .5rem;
+      margin-left: -16px;
+      margin-right: 8px;
       transition: all .1s ease-out;
     }
 
@@ -204,7 +204,7 @@
 
   .nav-item + .nav-item,
   .nav-link + .nav-link {
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 }
 

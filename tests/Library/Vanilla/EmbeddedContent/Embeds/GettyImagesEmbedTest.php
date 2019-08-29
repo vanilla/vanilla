@@ -7,12 +7,12 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Verify embed class capabilities.
  */
-class GettyImagesEmbedTest extends ContainerTestCase {
+class GettyImagesEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */

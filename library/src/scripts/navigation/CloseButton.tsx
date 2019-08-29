@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
-import { close, closeCompact } from "@library/icons/common";
+import { CloseCompactIcon, CloseIcon } from "@library/icons/common";
 
 interface IProps {
     className?: string;
@@ -42,7 +42,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
                 onClick={this.props.onClick}
                 baseClass={this.props.baseClass}
             >
-                {this.props.compact ? closeCompact() : close()}
+                {this.props.compact ? <CloseCompactIcon /> : <CloseIcon />}
             </Button>
         );
     }

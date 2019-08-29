@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { important, px } from "csx";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
 export * from "@library/styles/styleHelpersTypography";
@@ -19,8 +20,6 @@ export * from "@library/styles/styleHelpersReset";
 export * from "@library/styles/styleHelpersSpinner";
 export * from "@library/styles/styleHelpersTypography";
 export * from "@library/styles/styleHelpersVisibility";
-
-import { px } from "csx";
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -55,6 +54,11 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     } else {
         return val;
     }
+};
+
+export const importantUnit = (val: string | number | undefined, unitFunction = px) => {
+    const withUnit = unit(val);
+    return withUnit ? important(withUnit.toString()) : withUnit;
 };
 
 export const negative = val => {

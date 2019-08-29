@@ -18,6 +18,7 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { calc } from "csx";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export interface ISelectOneProps extends IOptionalComponentID {
     label: string;
@@ -95,14 +96,19 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
                 },
             },
         });
+        const classesInputBlock = inputBlockClasses();
         return (
-            <div className={this.props.className}>
-                <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
-                    <span className={classNames("inputBlock-labelText", this.props.label)}>{this.props.label}</span>
-                    <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>
+            <div className={classNames(classesInputBlock.root, this.props.className)}>
+                <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
+                    <span className={classNames(classesInputBlock.labelText, this.props.label)}>
+                        {this.props.label}
+                    </span>
+                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                 </label>
 
-                <div className={classNames("inputBlock-inputWrap", inputWrapClass, { hasFocus: this.state.focus })}>
+                <div
+                    className={classNames(classesInputBlock.inputWrap, inputWrapClass, { hasFocus: this.state.focus })}
+                >
                     <Select
                         id={this.id}
                         options={options}
@@ -126,7 +132,7 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
                     />
-                    <Paragraph className="inputBlock-labelNote">{this.props.noteAfterInput}</Paragraph>
+                    <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
                     <ErrorMessages id={this.errorID} errors={this.props.errors} />
                 </div>
             </div>

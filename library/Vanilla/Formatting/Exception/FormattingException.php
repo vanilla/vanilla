@@ -10,5 +10,5 @@ namespace Vanilla\Formatting\Exception;
 /**
  * Exception to be thrown if an error is encountered while formatting.
  */
-class FormattingException extends \Garden\Web\Exception\ServerException {
+class FormattingException extends \Exception {
 }

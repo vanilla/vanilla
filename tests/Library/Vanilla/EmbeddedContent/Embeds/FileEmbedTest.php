@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Validation logic test.
  */
-class FileEmbedTest extends ContainerTestCase {
+class FileEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create file embed embed from the old data format that might still
      * live in the DB.

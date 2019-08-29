@@ -10,14 +10,14 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockPageScraper;
 
 /**
  * Tests for the giphy embed and factory.
  */
-class ScrapeEmbedFactoryTest extends ContainerTestCase {
+class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var ScrapeEmbedFactory */
     private $factory;

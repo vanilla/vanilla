@@ -6,21 +6,21 @@
 
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import {
-    blockquote,
-    codeBlock,
-    heading2,
-    heading3,
-    heading4,
-    heading5,
-    listOrdered,
-    listUnordered,
-    spoiler,
+    BlockquoteIcon,
+    CodeBlockIcon,
+    Heading2Icon,
+    Heading3Icon,
+    ListOrderedIcon,
+    ListUnorderedIcon,
+    SpoilerIcon,
+    Heading4Icon,
+    Heading5Icon,
 } from "@library/icons/editorIcons";
 import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -52,6 +52,10 @@ interface IState {
     hasFocus: boolean;
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
 }
+
+// With some effort we could probably calculate this value.
+// For now this is good enough.
+const APPROXIMATE_MAX_MENU_HEIGHT = 170;
 
 // Implements the paragraph menubar
 export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
@@ -193,25 +197,25 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     }
 
     private topLevelIcons = menuActiveFormats => {
-        let headingMenuIcon = heading2();
+        let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
-            headingMenuIcon = heading3();
+            headingMenuIcon = <Heading3Icon />;
         } else if (menuActiveFormats.headings.heading4) {
-            headingMenuIcon = heading4();
+            headingMenuIcon = <Heading4Icon />;
         } else if (menuActiveFormats.headings.heading5) {
-            headingMenuIcon = heading5();
+            headingMenuIcon = <Heading5Icon />;
         }
 
-        let specialBlockMenuIcon = blockquote();
+        let specialBlockMenuIcon = <BlockquoteIcon />;
         if (menuActiveFormats.specialFormats.codeBlock) {
-            specialBlockMenuIcon = codeBlock();
+            specialBlockMenuIcon = <CodeBlockIcon />;
         } else if (menuActiveFormats.specialFormats.spoiler) {
-            specialBlockMenuIcon = spoiler();
+            specialBlockMenuIcon = <SpoilerIcon />;
         }
 
-        let listMenuIcon = listUnordered();
+        let listMenuIcon = <ListUnorderedIcon />;
         if (menuActiveFormats.lists.ordered) {
-            listMenuIcon = listOrdered();
+            listMenuIcon = <ListOrderedIcon />;
         }
 
         return {
@@ -280,7 +284,11 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            this.props.renderAbove || scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
+            this.props.renderAbove ||
+                (scrollBounds.height >= APPROXIMATE_MAX_MENU_HEIGHT &&
+                    scrollBounds.height - bounds.bottom <= APPROXIMATE_MAX_MENU_HEIGHT)
+                ? "isUp"
+                : "isDown",
         );
     }
 

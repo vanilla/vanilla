@@ -287,6 +287,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         parent::__construct();
         $this->ControllerName = strtolower($this->ClassName);
+
+        $currentTheme = Gdn::getContainer()->get(\Vanilla\AddonManager::class)->getTheme();
+        if ($currentTheme instanceof \Vanilla\Addon) {
+            $this->addDefinition('currentThemePath', $currentTheme->getSubdir());
+        }
     }
 
     /**

@@ -94,6 +94,7 @@ export const searchResultsClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        position: "relative",
         borderTop: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
@@ -243,6 +244,7 @@ export const searchResultClasses = useThemeCache(() => {
     const excerpt = style("excerpt", {
         marginTop: unit(12),
         color: colorOut(vars.excerpt.fg),
+        lineHeight: globalVars.lineHeights.excerpt,
     });
 
     return {

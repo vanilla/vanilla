@@ -16,6 +16,14 @@ export class TabHandler {
     private tabbableElements: HTMLElement[];
 
     /**
+     * Determine if an element is tabbable.
+     */
+    public static isTabbable(element: Node) {
+        const children = tabbable(element.parentNode);
+        return children.includes(element);
+    }
+
+    /**
      * Construct the handler. Don't be afraid to construct multiple of these.
      *
      * The elements in a particular TabHandler are very moment specific.

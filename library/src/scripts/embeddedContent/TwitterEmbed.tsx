@@ -9,7 +9,8 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import { useThrowError } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     statusID: string;
@@ -22,21 +23,24 @@ const TWITTER_SCRIPT = "https://platform.twitter.com/widgets.js";
  */
 export function TwitterEmbed(props: IProps): JSX.Element {
     const [twitterLoaded, setTwitterLoaded] = useState(false);
+    const throwError = useThrowError();
     const classes = twitterEmbedClasses();
     const { onRenderComplete } = props;
 
-    useEffect(() => {
-        void convertTwitterEmbeds().then(() => {
-            // We need to track the load status for the internal representation.
-            // Otherwise we end up with a flash of the URL next to the rendered tweet.
-            setTwitterLoaded(true);
-        });
-    }, [setTwitterLoaded]);
-
-    useEffect(() => {
+    useLayoutEffect(() => {
         // Don't count our tweet as rendered until the tweet is fully loaded.
         onRenderComplete && onRenderComplete();
     }, [twitterLoaded, onRenderComplete]);
+
+    useEffect(() => {
+        void convertTwitterEmbeds()
+            .then(() => {
+                // We need to track the load status for the internal representation.
+                // Otherwise we end up with a flash of the URL next to the rendered tweet.
+                setTwitterLoaded(true);
+            })
+            .catch(throwError);
+    }, [setTwitterLoaded, throwError]);
 
     return (
         <>
@@ -115,13 +119,11 @@ export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript(TWITTER_SCRIPT);
-        if (window.twttr) {
-            const promises = tweets.map(contentElement => {
-                return renderTweet(contentElement as HTMLElement);
-            });
+        const promises = tweets.map(contentElement => {
+            return renderTweet(contentElement as HTMLElement);
+        });
 
-            // Render all the pages twitter embeds at the same time.
-            await Promise.all(promises);
-        }
+        // Render all the pages twitter embeds at the same time.
+        await Promise.all(promises);
     }
 }

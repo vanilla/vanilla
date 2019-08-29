@@ -7,12 +7,12 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Verify embed class capabilities.
  */
-class ImgurEmbedTest extends ContainerTestCase {
+class ImgurEmbedTest extends MinimalContainerTestCase {
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */

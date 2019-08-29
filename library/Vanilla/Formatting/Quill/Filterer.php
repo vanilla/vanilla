@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class for filtering Rich content before it gets inserted into the database.
@@ -30,7 +31,7 @@ class Filterer {
         $operations = Parser::jsonToOperations($content);
         // Re-encode the value to escape unicode values.
         $operations = $this->cleanupEmbeds($operations);
-        $operations = json_encode($operations);
+        $operations = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $operations;
     }
 
@@ -59,7 +60,8 @@ class Filterer {
             }
 
             if (!is_array($embed['data'] ?? null)) {
-                // We only care about embeds operations.
+                // Strip off any malformed embeds.
+                unset($operations[$key]);
                 continue;
             }
             $embedData = &$embed['data'];
@@ -74,16 +76,18 @@ class Filterer {
             // Remove the rendered bodies. The raw bodies are the source of truth.
             $format = &$embedData['format'] ?? null;
             $bodyRaw = &$embedData['bodyRaw'] ?? null;
-            $type = &$embedData['type'] ?? null;
+            $type = $embedData['embedType'] ?? $embedData['type'] ?? null;
 
             if ($type !== QuoteEmbed::TYPE) {
                 // We only care about quote embeds specifically.
                 continue;
             }
 
+            $stringBodyRaw = $bodyRaw;
+
             // Remove nested external embed data. We don't want it rendered and this will prevent it from being
             // searched.
-            if ($format === 'Rich' && is_array($bodyRaw)) {
+            if (strtolower($format) === RichFormat::FORMAT_KEY && is_array($bodyRaw)) {
                 // Iterate through the nested embed.
                 foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
                     $insert = &$subInsertOp['insert'];
@@ -96,11 +100,11 @@ class Filterer {
                         }
                     }
                 }
+                $stringBodyRaw = json_encode($bodyRaw);
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            // We also need to ensure we've safely rendered the body to prevent innacurate content.
-            $embedData['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
+            $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);
         }
 
         return array_values($operations);

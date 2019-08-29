@@ -1,0 +1,27 @@
+[
+    {
+        "text": "h1",
+        "level": 1,
+        "ref": "h1"
+    },
+    {
+        "text": "h2",
+        "level": 2,
+        "ref": "h2"
+    },
+    {
+        "text": "Title with same key",
+        "level": 2,
+        "ref": "title-with-same-key"
+    },
+    {
+        "text": "Title with same key",
+        "level": 2,
+        "ref": "title-with-same-key-1"
+    },
+    {
+        "text": "Title with same key",
+        "level": 3,
+        "ref": "title-with-same-key-2"
+    }
+]

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { vanillaLogo } from "@library/icons/header";
+import { VanillaLogo } from "@library/icons/titleBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
@@ -20,7 +20,7 @@ class ThemeLogo extends React.Component<IProps> {
         if (this.props.logoUrl) {
             content = <img className={this.props.className} src={this.props.logoUrl} />;
         } else {
-            content = vanillaLogo(this.props.className);
+            content = <VanillaLogo className={this.props.className} />;
         }
 
         return content;

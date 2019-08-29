@@ -11,13 +11,13 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
-use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -72,8 +72,11 @@ class Bootstrap {
             ->setInstance('@baseUrl', $this->getBaseUrl())
             ->setInstance(Container::class, $container)
 
-            ->rule(ContainerInterface::class)
+            ->rule(\Psr\Container\ContainerInterface::class)
             ->setAliasOf(Container::class)
+
+            ->rule(\Interop\Container\ContainerInterface::class)
+            ->setClass(\Vanilla\InteropContainer::class)
 
             // Base classes that want to support DI without polluting their constructor implement this.
             ->rule(InjectableInterface::class)
@@ -270,8 +273,8 @@ class Bootstrap {
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Formatting\FormatService::class)
-            ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+            ->rule(FormatService::class)
+            ->addCall('registerBuiltInFormats')
             ->setShared(true)
 
             ->rule('HtmlFormatter')

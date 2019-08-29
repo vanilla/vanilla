@@ -9,6 +9,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Handles user data.
@@ -100,6 +101,22 @@ class UserModel extends Gdn_Model {
 
         $this->nameUnique = (bool)c('Garden.Registration.NameUnique', true);
         $this->emailUnique = (bool)c('Garden.Registration.EmailUnique', true);
+    }
+
+    /**
+     * Should guest users be allowed to search existing users by name and email?
+     *
+     * @return bool
+     */
+    public function allowGuestUserSearch(): bool {
+        $config = Gdn::getContainer()->get(ConfigurationInterface::class);
+        $isPrivateCommunity = (bool)$config->get("Garden.PrivateCommunity", false);
+
+        $registrationMethod = $config->get("Garden.Registration.Method", "");
+        $isBasicRegistration = is_string($registrationMethod) ? strtolower($registrationMethod) === "basic" : false;
+
+        $result = !$isPrivateCommunity || $isBasicRegistration;
+        return $result;
     }
 
     /**
@@ -2880,6 +2897,11 @@ class UserModel extends Gdn_Model {
             return false;
         }
 
+        if (!empty($invitation->AcceptedUserID)) {
+            $this->Validation->addValidationResult('InvitationCode', 'Invitation has been used.');
+            return false;
+        }
+
         // Get expiration date in timestamp. If nothing set, grab config default.
         $inviteExpiration = $invitation->DateExpires;
         if ($inviteExpiration != null) {
@@ -3793,6 +3815,11 @@ class UserModel extends Gdn_Model {
      * @return int
      */
     public function getInvitationCount($userID) {
+        if (Gdn::config('Garden.Registration.Method') !== 'Invitation') {
+            // If registration method has been changed
+            return 0;
+        }
+
         // If this user is master admin, they should have unlimited invites.
         if ($this->SQL
                 ->select('UserID')

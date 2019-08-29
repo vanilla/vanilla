@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats;
+
 if (!function_exists('alternate')) {
     /**
      * Write alternating strings on each call.
@@ -887,12 +889,14 @@ if (!function_exists('fixnl2br')) {
      * @param string $text The text to fix.
      * @return string
      * @since 2.1
+     *
+     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
      */
     function fixnl2br($text) {
-        $allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary|li|tbody|tr|td|th|thead|tbody|tfoot|col|colgroup|caption|dt|dd)';
-        $text = preg_replace('!(?:<br\s*/>){1,2}\s*(<'.$allblocks.'[^>]*>)!', "\n$1", $text);
-        $text = preg_replace('!(</'.$allblocks.'[^>]*>)\s*(?:<br\s*/>){1,2}!', "$1\n", $text);
-        return $text;
+        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
+        /** @var Formats\HtmlFormat $htmlFormat */
+        $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
+        return $htmlFormat->cleanupLineBreaks((string) $text);
     }
 }
 

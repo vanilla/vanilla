@@ -12,6 +12,10 @@
  */
 
 use Garden\EventManager;
+use \Vanilla\Formatting;
+use \Vanilla\Formatting\Formats;
+use \Vanilla\Formatting\FormatUtil;
+use \Vanilla\Formatting\Html;
 
 /**
  * Output formatter.
@@ -40,11 +44,6 @@ class Gdn_Format {
     protected static $SanitizedFormats = [
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich'
     ];
-
-    /**
-     * @var EventManager
-     */
-    private static $eventManager;
 
     /**
      * The ActivityType table has some special sprintf search/replace values in the
@@ -229,8 +228,6 @@ class Gdn_Format {
      */
     public static function arrayValueForPhp($string) {
         return str_replace('\\', '\\', html_entity_decode($string, ENT_QUOTES));
-        // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
-        // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
     }
 
     /**
@@ -238,8 +235,10 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
+     * @deprecated 3.2 The formatting method should be saved in the DB.
      */
     public static function auto($mixed) {
+        deprecated(__FUNCTION__, 'Any other formatting method.');
         $formatter = c('Garden.InputFormatter');
         if (!method_exists('Gdn_Format', $formatter)) {
             return $mixed;
@@ -253,33 +252,14 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\BBCodeFormat::FORMAT_KEY);
      */
     public static function bbCode($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'BBCode');
+        } else {
+            return Gdn::formatService()->renderHtml($mixed, Formats\BBCodeFormat::FORMAT_KEY);
         }
-
-        // See if there is a custom BBCode formatter.
-        $bBCodeFormatter = Gdn::getContainer()->get('BBCodeFormatter');
-        // Standard BBCode parsing.
-        $mixed = $bBCodeFormatter->format($mixed);
-
-        // Always filter after basic parsing.
-        // Add htmLawed-compatible specification updates.
-        $options = [
-            'codeBlockEntities' => false,
-            'spec' => [
-                'span' => [
-                    'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
-                ]
-            ]
-        ];
-        $sanitized = Gdn_Format::htmlFilter($mixed, $options);
-
-        // Vanilla magic parsing.
-        $sanitized = Gdn_Format::processHTML($sanitized);
-
-        return $sanitized;
     }
 
     /**
@@ -596,6 +576,7 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
+     * @deprecated 3.2 Use a specific formatting method.
      */
     public static function display($mixed) {
         if (!is_string($mixed)) {
@@ -603,9 +584,10 @@ class Gdn_Format {
         } else {
             $mixed = htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
             $mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $mixed);
-            $mixed = Gdn_Format::processHTML($mixed);
 
-
+            /** @var Html\HtmlEnhancer $htmlEnhancer */
+            $htmlEnhancer = Gdn::getContainer()->get(Html\HtmlEnhancer::class);
+            $mixed = $htmlEnhancer->enhance($mixed);
             return $mixed;
         }
     }
@@ -777,26 +759,14 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\HtmlFormat::FORMAT_KEY);
      */
     public static function html($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Html');
-        } else {
-
-            // Always filter - in this case, no basic parsing is needed because we're already in HTML.
-            $sanitized = Gdn_Format::htmlFilter($mixed);
-
-            // Fix newlines in code blocks.
-            if (c('Garden.Format.ReplaceNewlines', true)) {
-                $sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $sanitized);
-                $sanitized = fixNl2Br($sanitized);
-            }
-
-            // Vanilla magic parsing.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
         }
+
+        return Gdn::formatService()->renderHTML($mixed, Formats\HtmlFormat::FORMAT_KEY);
     }
 
     /**
@@ -808,39 +778,15 @@ class Gdn_Format {
      * @param array $options An array of filter options. These will also be passed through to the formatter.
      *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 HtmlSanitizer
      */
     public static function htmlFilter($mixed, $options = []) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'HtmlFilter');
         } else {
-            if (self::isHtml($mixed)) {
-                // Purify HTML with our formatter.
-                $formatter = Gdn::factory('HtmlFormatter');
-                if (is_null($formatter)) {
-                    // If there is no HtmlFormatter then make sure that script injections won't work.
-                    return self::display($mixed);
-                }
-
-                // Allow the code tag to keep all enclosed HTML encoded.
-                $codeBlockEntities = val('codeBlockEntities', $options, true);
-                if ($codeBlockEntities) {
-                    $mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
-                        $result = "<code{$matches[1]}>" .
-                            htmlspecialchars($matches[2]) .
-                            '</code>';
-                        return $result;
-                    }, $mixed);
-                }
-
-                // Do HTML filtering before our special changes.
-                $result = $formatter->format($mixed, $options);
-            } else {
-                // The text does not contain HTML and does not have to be purified.
-                // This is an optimization because purifying is very slow and memory intense.
-                $result = htmlspecialchars($mixed, ENT_NOQUOTES, 'UTF-8');
-            }
-
-            return $result;
+            /** @var Html\HtmlSanitizer $htmlSanitizer */
+            $htmlSanitizer = Gdn::getContainer()->get(Html\HtmlSanitizer::class);
+            return $htmlSanitizer->filter((string) $mixed);
         }
     }
 
@@ -870,62 +816,6 @@ class Gdn_Format {
     }
 
     /**
-     * Detect HTML for the purposes of doing advanced filtering.
-     *
-     * @param $text
-     * @return bool
-     */
-    protected static function isHtml($text) {
-        return strpos($text, '<') !== false || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $text);
-    }
-
-    /**
-     * Check to see if a string has spoilers and replace them with an innocuous string.
-     *
-     * Good for displaying excerpts from discussions and without showing the spoiler text.
-     *
-     * @param string $html An HTML-formatted string.
-     * @param string $replaceWith The translation code to replace spoilers with.
-     * @return string Returns the html with spoilers removed.
-     */
-    protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
-        if (preg_match('/class="(User)?Spoiler"/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
-
-            foreach($htmlDom->query('.Spoiler') as $spoilerBlock) {
-                $spoilerBlock->html(t($replaceWith));
-            }
-            $html = (string)$htmlDom;
-        }
-
-        return $html;
-    }
-
-    /**
-     * Check to see if a string has quotes and replace with them with a placeholder.
-     *
-     * Good for displaying excerpts from discussions without showing quotes.
-     *
-     * @param string $html An HTML-formatted string.
-     * @param string $replaceWith The translation code to replace quotes with.
-     *
-     * @return string Returns the html with quotes removed.
-     */
-    protected static function replaceQuotes($html, $replaceWith = '(Quote)') {
-        // This regex can't have an end quote because BBCode formats with both Quote and UserQuote classes.
-        if (preg_match('/class="(User)?Quote/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
-
-            foreach($htmlDom->query('.UserQuote, .Quote') as $quoteBlock) {
-                $quoteBlock->html(t($replaceWith));
-            }
-            $html = (string)$htmlDom;
-        }
-
-        return $html;
-    }
-
-    /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper.
      *
      * Parsers for NBBC and Markdown should use this function to format thier spoilers.
@@ -940,97 +830,24 @@ class Gdn_Format {
     }
 
     /**
-     * Spoilers with backwards compatibility.
-     *
-     * In the Spoilers plugin, we would render BBCode-style spoilers in any format post and allow a title.
-     *
-     * @param string $html
-     * @return string
-     */
-    protected static function legacySpoilers($html) {
-        if (strpos($html, '[/spoiler]') !== false) {
-            $count = 0;
-            do {
-                $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\](.*?)\[\/spoiler\]`usi', '<div class="Spoiler">$1</div>', $html, -1, $count);
-            } while ($count > 0);
-        }
-        return $html;
-    }
-
-    /**
-     * Replaces opening html list tags with an asterisk and closing list tags with new lines.
-     *
-     * Accepts both encoded and decoded html strings.
-     *
-     * @param  string $html An HTML-formatted string.
-     * @return string Returns the html with all list items removed.
-     */
-    protected static function replaceListItems($html) {
-        $html = str_replace(['<li>', '&lt;li&gt;'], '* ', $html);
-        $items = ['/(<\/?(?:li|ul|ol)([^>]+)?>)/', '/(&lt;\/?(?:li|ul|ol)([^&]+)?&gt;)/'];
-        $html = preg_replace($items, "\n", $html);
-        return $html;
-    }
-
-    /**
-     * Convert common tags in an HTML strings to plain text. You still need to sanitize your string!!!
-     *
-     * @param string $html An HTML-formatted string.
-     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
-     *
-     * @return string An HTML-formatted strings with common tags replaced with plainText
-     */
-    protected static function convertCommonHTMLTagsToPlainText($html, $collapse = false) {
-        // Remove returns and then replace html return tags with returns.
-        $result = str_replace(["\n", "\r"], ' ', $html);
-        $result = preg_replace('`<br\s*/?>`', "\n", $result);
-
-        // Fix lists.
-        $result = Gdn_Format::replaceListItems($result);
-
-        $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-        $pattern = "</{$allBlocks}>";
-        if ($collapse) {
-            $pattern = "((\s+)?{$pattern})+";
-        }
-        $result = preg_replace("`{$pattern}`", "\n\n", $result);
-
-        // TODO: Fix hard returns within pre blocks.
-
-        return strip_tags($result);
-    }
-
-    /**
      * Format a string as plain text.
      *
      * @param string $body The text to format.
      * @param string $format The current format of the text.
-     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
      *
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 FormatService::renderPlainText
      */
-    public static function plainText($body, $format = 'Html', $collapse = false) {
-        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return htmlspecialchars(self::getRichFormatter()->renderPlainText($body));
-        }
+    public static function plainText($body, $format = 'Html') {
+        $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
+        $plainText = Gdn::formatService()->renderPlainText((string) $body, (string) $format);
 
-        if (strcasecmp($format, 'text') === 0) {
-            // for content that is initially content, we can skip a lot of processing.
-            // We still need to filter/sanitize afterwards though.
-            $result = $body;
-        } else {
-            $result = Gdn_Format::to($body, $format);
-            $result = Gdn_Format::replaceSpoilers($result);
-            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-            $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
-        }
-
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($result);
-
-        // No magic `processHTML()` for plain text.
-
+        // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
+        // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
+        // Some use cases RELY on this sanitization, so if you want to remove this, you'll have to go find those usages.
+        // Really just use `FormatInterface::renderPlainText()` instead.
+        $sanitized = htmlspecialchars($plainText);
         return $sanitized;
     }
 
@@ -1048,25 +865,17 @@ class Gdn_Format {
      *
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 FormatService::renderExcerpt
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            $result = htmlspecialchars(self::getRichFormatter()->renderExcerpt($body));
-            return $result;
-        }
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-        $result = Gdn_Format::replaceQuotes($result);
-        if (strtolower($format) !== 'text') {
-            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-        }
-        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
+        $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
+        $plainText = Gdn::formatService()->renderExcerpt((string) $body, (string) $format);
 
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($result);
-
-        // No magic `processHTML()` for plain text.
-
+        // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
+        // it's kind of stuck here since https://github.com/vanilla/vanilla/commit/21c800bb0e326b72a320c6e8f61e89b45e19ec96
+        // Some use cases RELY on this sanitization, so if you want to remove this, you'll have to go find those usages.
+        // Really just use `FormatInterface::renderExcerpt()` instead.
+        $sanitized = htmlspecialchars($plainText);
         return $sanitized;
     }
 
@@ -1161,18 +970,20 @@ class Gdn_Format {
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param bool $isHtml Should $mixed be considered to be a valid HTML string?
+     * @param bool $doEmbeds Should we format links into embeds?
+     *
      * @return string
      */
-    public static function links($mixed, bool $isHtml = false) {
-        if (!c('Garden.Format.Links', true)) {
-            return $mixed;
-        }
-
+    public static function links($mixed, bool $isHtml = false, bool $doEmbeds = true) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Links');
         }
 
-        $linksCallback = function ($matches) use ($isHtml) {
+        if (!c('Garden.Format.Links', true)) {
+            return $mixed;
+        }
+
+        $linksCallback = function ($matches) use ($isHtml, $doEmbeds) {
             static $inTag = 0;
             static $inAnchor = false;
 
@@ -1216,9 +1027,11 @@ class Gdn_Format {
 
             $url = $matches[4];
 
-            $embeddedResult = self::embedReplacement($url);
-            if ($embeddedResult !== '') {
-                return $embeddedResult;
+            if ($doEmbeds) {
+                $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? '');
+                if ($embeddedResult !== '') {
+                    return $embeddedResult;
+                }
             }
 
             // Unformatted links
@@ -1272,14 +1085,20 @@ class Gdn_Format {
             $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
-        $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+        $mixed = FormatUtil::replaceButProtectCodeBlocks(
             $regex,
             $linksCallback,
             $mixed,
             true
         );
 
-        Gdn::pluginManager()->fireAs('Format')->fireEvent('Links', ['Mixed' => &$mixed]);
+        Gdn::getContainer()
+            ->get(EventManager::class)
+            ->fire(
+                'Format_Links',
+                null, // To comply with the only handler type expecting (mixed $sender, array $args)
+                ['Mixed' => &$mixed]
+            );
 
         return $mixed;
     }
@@ -1294,423 +1113,68 @@ class Gdn_Format {
      * it doesn't effectively block YouTube iframes or objects.
      *
      * @param mixed $mixed
-     * @return HTML string
+     * @return string
+     * @deprecated 3.2 \Vanilla\EmbeddedContent\LegacyEmbedReplacer::unembedContent()
      */
     public static function unembedContent($mixed) {
+        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\LegacyEmbedReplacer::unembedContent()');
         if (!is_string($mixed)) {
             return self::to($mixed, 'UnembedContent');
         } else {
-            if (c('Garden.Format.YouTube')) {
-                $mixed = preg_replace('`<iframe.*src="https?://.*youtube\.com/embed/([a-z0-9_-]*)".*</iframe>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $mixed);
-                $mixed = preg_replace('`<object.*value="https?://.*youtube\.com/v/([a-z0-9_-]*)[^"]*".*</object>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $mixed);
-            }
-            if (c('Garden.Format.Vimeo')) {
-                $mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $mixed);
-                $mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $mixed);
-            }
-            if (c('Garden.Format.Getty', true)) {
-                $mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $mixed);
-            }
+            return self::getLegacyReplacer()->unembedContent($mixed);
         }
+    }
 
-        return $mixed;
+
+    /**
+     * @return \Vanilla\EmbeddedContent\EmbedConfig
+     */
+    private static function getEmbedConfig(): \Vanilla\EmbeddedContent\EmbedConfig {
+        $embedReplacer = Gdn::getContainer()->get(\Vanilla\EmbeddedContent\EmbedConfig::class);
+        return $embedReplacer;
     }
 
     /**
-     * Transform url to embedded representation.
+     * Get an instance of the legacy embed replacer.
      *
-     * Takes a url and tests to see if we can embed it in a post. If so, returns the the embed code. Otherwise,
-     * returns an empty string.
-     *
-     * @param string $url The url to test whether it's embeddable.
-     * @return string The embed code for the given url.
+     * @return \Vanilla\EmbeddedContent\LegacyEmbedReplacer
      */
-    private static function embedReplacement($url) {
-
-        if (c('Garden.Format.DisableUrlEmbeds', false)) {
-            return '';
-        }
-
-        if (!isset($width)) {
-            list($width, $height) = Gdn_Format::getEmbedSize();
-        }
-
-        $urlParts = parse_url($url);
-
-        parse_str(val('query', $urlParts,  ''), $query);
-        // There's the possibility the query string could be encoded, resulting in parameters that begin with "amp;"
-        foreach ($query as $key => $val) {
-            $newKey = stringBeginsWith($key, 'amp;', false, true);
-            if ($newKey !== $key) {
-                $query[$newKey] = $val;
-                unset($query[$key]);
-            }
-        }
-
-        // For each embed, add a key, a string to test the url against using strpos, and the regex for the url to parse.
-        // The is an array of strings. If there are more than one way to match the url, you can add multiple regex strings
-        // in the regex array. This is useful for backwards-compatibility when a service updates its url structure.
-        $embeds = [
-            'YouTube' => [
-                'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i']
-            ],
-            'Twitter' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitter\.com\/(?:#!\/)?(?:[^\/]+)\/status(?:es)?\/([\d]+)/i']
-            ],
-            'Vimeo' => [
-                'regex' => ['/https?:\/\/(?:www\.)?vimeo\.com\/(?:channels\/[a-z0-9]+\/)?(\d+)/i']
-            ],
-            'Vine' => [
-                'regex' => ['/https?:\/\/(?:www\.)?vine\.co\/(?:v\/)?([\w]+)/i']
-            ],
-            'Instagram' => [
-                'regex' => ['/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+)/i']
-            ],
-            'Pinterest' => [
-                'regex' => [
-                    '/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i',
-                    '/https?:\/\/(?:www\.)?pinterest\.ca\/pin\/([\d]+)/i'
-                ]
-            ],
-            'Getty' => [
-                'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
-            ],
-            'Twitch' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)$/i']
-            ],
-            'TwitchRecorded' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/videos\/(\w+)$/i']
-            ],
-            'Soundcloud' => [
-                'regex' => ['/https?:(?:www\.)?\/\/soundcloud\.com\/([\w=?&;+-_]*)\/([\w=?&;+-_]*)/i']
-            ],
-            'Gifv' => [
-                'regex' => ['/https?:\/\/i\.imgur\.com\/([a-z0-9]+)\.gifv/i'],
-            ],
-            'Wistia' => [
-                'regex' => [
-                    '/https?:\/\/(?:[A-za-z0-9\-]+\.)?(?:wistia\.com|wi\.st)\/.*?\?wvideo=(?<videoID>([A-za-z0-9]+))(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?/i',
-                    '/https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/medias\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?/i'
-                ]
-            ]
-        ];
-
-        $key = '';
-        $matches = [];
-
-        foreach ($embeds as $embedKey => $value) {
-            foreach ($value['regex'] as $regex) {
-                if (preg_match($regex, $url, $matches)) {
-                    $key = $embedKey;
-                    break;
-                }
-            }
-            if ($key !== '') {
-                break;
-            }
-        }
-
-        if (!c('Garden.Format.'.$key, true)) {
-            return '';
-        }
-
-        switch ($key) {
-            case 'YouTube':
-                // Supported youtube embed urls:
-                //
-                // http://www.youtube.com/playlist?list=PL4CFF79651DB8159B
-                // https://www.youtube.com/playlist?list=PL4CFF79651DB8159B
-                // https://www.youtube.com/watch?v=sjm_gBpJ63k&list=PL4CFF79651DB8159B&index=1
-                // http://youtu.be/sjm_gBpJ63k
-                // https://www.youtube.com/watch?v=sjm_gBpJ63k
-                // http://YOUTU.BE/sjm_gBpJ63k?list=PL4CFF79651DB8159B
-                // http://youtu.be/GUbyhoU81sQ?t=1m8s
-                // https://m.youtube.com/watch?v=iAEKPcz9www
-                // https://youtube.com/watch?v=iAEKPcz9www
-                // https://www.youtube.com/watch?v=p5kcBxL7-qI
-                // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
-
-                $videoId = val('videoId', $matches);
-                $listId = val('listId', $matches);
-
-                if (!empty($listId)) {
-                    // Playlist.
-                    if (empty($videoId)) {
-                        // Playlist, no video.
-                        $result = <<<EOT
-<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
-EOT;
-                    } else {
-                        // Video in a playlist.
-                        $result = <<<EOT
-<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
-EOT;
-                    }
-                } else {
-                    // Regular ol' youtube video embed.
-                    $minutes = val('minutes', $matches);
-                    $seconds = val('seconds', $matches);
-                    $fullUrl = $videoId.'?autoplay=1';
-                    if (!empty($minutes) || !empty($seconds)) {
-                        $time = $minutes * 60 + $seconds;
-                        $fullUrl .= '&start='.$time;
-                    }
-
-                    // Jump to start time.
-                    if ($start = val('start', $matches)) {
-                        $fullUrl .= '&start='.$start;
-                        $start = '#t='.$start;
-                    }
-
-                    if (array_key_exists('rel', $query)) {
-                        $fullUrl .= "&rel={$query['rel']}";
-                    }
-
-                    $result = '<span class="VideoWrap">';
-                    $result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
-
-                    $result .= '<span class="VideoPreview"><a href="https://www.youtube.com/watch?v='.$videoId.$start.'">';
-                    $result .= '<img src="https://img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$width.'" height="'.$height.'" border="0" /></a></span>';
-                    $result .= '<span class="VideoPlayer"></span>';
-                    $result .= '</span>';
-
-                }
-                $result .= '</span>';
-                return $result;
-                break;
-
-            case 'Vimeo':
-                $id = $matches[1];
-                return <<<EOT
-<iframe src="https://player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-EOT;
-                break;
-
-            case 'Gifv':
-                $id = $matches[1];
-                $modernBrowser = t('Your browser does not support HTML5 video!');
-                return <<<EOT
-<div class="imgur-gifv VideoWrap">
-<video poster="https://i.imgur.com/{$id}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
-<source src="https://i.imgur.com/{$id}.webm" type="video/webm">
-<source src="https://i.imgur.com/{$id}.mp4" type="video/mp4">
-<p>{$modernBrowser} https://i.imgur.com/{$id}.gifv</p>
-</video>
-</div>
-EOT;
-                break;
-
-            case 'Twitter':
-                return <<<EOT
-<div class="twitter-card js-twitterCard" data-tweeturl="{$matches[0]}" data-tweetid="{$matches[1]}"><a 
-href="{$matches[0]}" 
-class="tweet-url" rel="nofollow">{$matches[0]}</a></div>
-EOT;
-                break;
-
-            case 'Vine':
-                return <<<EOT
-<div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe>
-</div>
-EOT;
-                break;
-
-            case 'Instagram':
-                return <<<EOT
-<div class="instagram-video VideoWrap">
-   <iframe src="https://instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-</div>
-EOT;
-                break;
-
-            case 'Pinterest':
-                return <<<EOT
-<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
-EOT;
-                break;
-
-            case 'Getty':
-                return <<<EOT
-<iframe src="https://embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
-EOT;
-                break;
-
-            case 'Twitch':
-                return <<<EOT
-<iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
-EOT;
-                break;
-
-            case 'TwitchRecorded':
-                return <<<EOT
-<iframe src="https://player.twitch.tv/?video={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
-EOT;
-                break;
-
-            case 'Soundcloud':
-                return <<<EOT
-<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/{$matches[1]}/{$matches[2]}&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>
-EOT;
-                break;
-
-            case 'Wistia':
-                if (!$matches['videoID']) {
-                    break;
-                }
-                $wistiaClass = "wistia_embed wistia_async_{$matches['videoID']} videoFoam=true allowThirdParty=false";
-
-                if (!empty($matches['time'])) {
-                    $wistiaClass .= " time={$matches['time']}";
-                }
-
-                return <<<EOT
-<script charset="ISO-8859-1" src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
-EOT;
-        }
-
-        return '';
-    }
-
-    /**
-     * Get the event manager.
-     *
-     * The event manager should only be used by the formatter itself so leave this private.
-     *
-     * @return EventManager Returns the eventManager.
-     */
-    private static function getEventManager() {
-        if (self::$eventManager === null) {
-            global $dic;
-            static::$eventManager = $dic->get(EventManager::class);
-        }
-
-        return self::$eventManager;
-    }
-
-    /**
-     * Formats BBCode list items.
-     *
-     * @param array $matches
-     * @return string
-     */
-    protected static function listCallback($matches) {
-        $content = explode("[*]", $matches[1]);
-        $result = '';
-        foreach ($content as $item) {
-            if (trim($item) != '') {
-                $result .= '<li>'.$item.'</li>';
-            }
-        }
-        $result = '<ul>'.$result.'</ul>';
-        return $result;
+    private static function getLegacyReplacer(): \Vanilla\EmbeddedContent\LegacyEmbedReplacer {
+        $embedReplacer = Gdn::getContainer()->get(\Vanilla\EmbeddedContent\LegacyEmbedReplacer::class);
+        return $embedReplacer;
     }
 
     /**
      * Returns embedded video width and height, based on configuration.
      *
+     * @deprecated 3.2 \Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()
      * @return array array(Width, Height)
      */
     public static function getEmbedSize() {
-        $sizes = [
-            'tiny' => [400, 225],
-            'small' => [560, 340],
-            'normal' => [640, 385],
-            'big' => [853, 505],
-            'huge' => [1280, 745]];
-        $size = Gdn::config('Garden.Format.EmbedSize', 'normal');
-
-        // We allow custom sizes <Width>x<Height>
-        if (!isset($sizes[$size])) {
-            if (strpos($size, 'x')) {
-                list($width, $height) = explode('x', $size);
-                $width = intval($width);
-                $height = intval($height);
-
-                // Dimensions are too small, or 0
-                if ($width < 30 or $height < 30) {
-                    $size = 'normal';
-                }
-            } else {
-                $size = 'normal';
-            }
-        }
-        if (isset($sizes[$size])) {
-            list($width, $height) = $sizes[$size];
-        }
-        return [$width, $height];
+        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()');
+        return self::getEmbedConfig()->getLegacyEmbedSize();
     }
 
     /**
      * Format a string using Markdown syntax.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
-     * @param boolean $flavored Optional. Parse with Vanilla-flavored settings? Default true.
+     * @param null $flavor Deprecated param.
      * @return string Sanitized HTML.
+     * @deprecated 3.2 FormatService::renderHtml($mixed, Formats\MarkdownFormat::FORMAT_KEY)
      */
-    public static function markdown($mixed, $flavored = true) {
+    public static function markdown($mixed, $flavor = null) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            $markdown = new MarkdownVanilla();
-
-            /**
-             * By default, code blocks have their contents run through htmlspecialchars. Gdn_Format::htmlFilter
-             * also runs code blocks through htmlspecialchars. Here, the callback is modified to only return the block
-             * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
-             */
-            $codeCallback = function($block) { return $block; };
-            $markdown->code_block_content_func = $codeCallback;
-            $markdown->code_span_content_func = $codeCallback;
-
-            // Vanilla-flavored Markdown.
-            if ($flavored) {
-                $markdown->addAllFlavor();
+            if ($flavor) {
+                deprecated(
+                    __FUNCTION__ . ' param $flavor',
+                    'config `Garden.Format.UseVanillaMarkdownFlavor`'
+                );
             }
-
-            // Markdown parsing.
-            $mixed = $markdown->transform($mixed);
-
-            // Always filter after basic parsing.
-            $sanitized = Gdn_Format::htmlFilter($mixed);
-
-            // Vanilla magic parsing.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
+            return Gdn::formatService()->renderHTML($mixed, Formats\MarkdownFormat::FORMAT_KEY);
         }
-    }
-
-    /**
-     * Do Vanilla's "magic" text processing.
-     *
-     * Runs an HTML string through our custom links, mentions, emoji and spoilers formatters.
-     * Any thing done here is AFTER security filtering and must be extremely careful.
-     * This should always be done LAST, after any other input formatters.
-     *
-     * @param string $html An unparsed HTML string.
-     * @param bool $mentions Whether mentions are processed or not.
-     * @return string The formatted HTML string.
-     */
-    protected static function processHTML($html, $mentions = true) {
-        // Do event first so it doesn't have to deal with the other formatters.
-        $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
-
-        // Embed & auto-links.
-        $html = Gdn_Format::links($html, true);
-
-        // Mentions.
-        if ($mentions) {
-            $html = Gdn_Format::mentions($html);
-        }
-
-        // Emoji.
-        $html = Emoji::instance()->translateToHtml($html);
-
-        // Old Spoiler plugin markup handling.
-        $html = Gdn_Format::legacySpoilers($html);
-
-        return $html;
     }
 
     /**
@@ -1823,14 +1287,14 @@ EOT;
             }
 
             // Handle @mentions.
-            if (c('Garden.Format.Mentions')) {
+            if (c('Garden.Format.Mentions', true)) {
                 // Only format mentions that are not already in anchor tags or code tags.
                 $mixed = self::tagContent($mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
-            if (c('Garden.Format.Hashtags')) {
-                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+            if (c('Garden.Format.Hashtags', false)) {
+                $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
                     $mixed
@@ -1838,8 +1302,8 @@ EOT;
             }
 
             // Handle "/me does x" action statements
-            if (c('Garden.Format.MeActions')) {
-                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
+            if (c('Garden.Format.MeActions', false)) {
+                $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
                     $mixed
@@ -1860,49 +1324,16 @@ EOT;
     }
 
     /**
-     * Do a preg_replace, but don't affect things inside <code> tags.
-     *
-     * The three parameters are identical to the ones you'd pass
-     * preg_replace.
-     *
-     * @param mixed $search The value being searched for, just like in
-     *              preg_replace or preg_replace_callback.
-     * @param mixed $replace The replacement value, just like in
-     *              preg_replace or preg_replace_callback.
-     * @param mixed $subject The string being searched.
-     * @param bool $isCallback If true, do preg_replace_callback. Do
-     *             preg_replace otherwise.
-     * @return string
+     * @deprecated 2.9 Use Formatting\FormatUtil::replaceButProtectCodeBlocks
      */
     public static function replaceButProtectCodeBlocks($search, $replace, $subject, $isCallback = false) {
-        // Take the code blocks out, replace with a hash of the string, and
-        // keep track of what substring got replaced with what hash.
-        $codeBlockContents = [];
-        $codeBlockHashes = [];
-        $subject = preg_replace_callback(
-            '/<code.*?>.*?<\/code>/is',
-            function ($matches) use (&$codeBlockContents, &$codeBlockHashes) {
-                // Surrounded by whitespace to try to prevent the characters
-                // from being picked up by $Pattern.
-                $replacementString = ' '.sha1($matches[0]).' ';
-                $codeBlockContents[] = $matches[0];
-                $codeBlockHashes[] = $replacementString;
-                return $replacementString;
-            },
-            $subject
+        deprecated(__FUNCTION__, 'FormatUtil::replaceButProtectCodeBlocks');
+        return Formatting\FormatUtil::replaceButProtectCodeBlocks(
+            (string) $search,
+            (string) $replace,
+            (string) $subject,
+            (bool) $isCallback
         );
-
-        // Do the requested replacement.
-        if ($isCallback) {
-            $subject = preg_replace_callback($search, $replace, $subject);
-        } else {
-            $subject = preg_replace($search, $replace, $subject);
-        }
-
-        // Put back the code blocks.
-        $subject = str_replace($codeBlockHashes, $codeBlockContents, $subject);
-
-        return $subject;
     }
 
     /**
@@ -2001,29 +1432,20 @@ EOT;
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
+     * @param bool|null $addBreaks
      * @return string Sanitized HTML.
+     * @deprecated Formats\TextFormat::renderHtml()
      */
-    public static function text($mixed, $addBreaks = true) {
+    public static function text($mixed, $addBreaks = null) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Text');
         }
 
-        $result = html_entity_decode($mixed, ENT_QUOTES, 'UTF-8');
-        $result = preg_replace('`<br\s?/?>`', "\n", $result);
-        /**
-         * We need special handling for invalid markup here, because if we don't compensate
-         * things like <3, they'll lead to invalid markup and strip_tags will truncate the
-         * text.
-         */
-        $result = preg_replace('/<(?![a-z\/])/i', '&lt;', $result);
-        $result = strip_tags($result);
-        $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
-
-        if ($addBreaks && c('Garden.Format.ReplaceNewlines', true)) {
-            $result = nl2br(trim($result));
+        if ($addBreaks) {
+            deprecated(__FUNCTION__ . ' param $addBreaks', 'config `Garden.Format.ReplaceNewlines`');
         }
 
-        return $result;
+        return Gdn::formatService()->renderHTML((string) $mixed, Formats\TextFormat::FORMAT_KEY);
     }
 
     /**
@@ -2032,22 +1454,14 @@ EOT;
      * @param string $str
      * @return string Sanitized HTML.
      * @since 2.1
+     * @deprecated 3.2 FormatService::renderHtml($str, Formats\TextExFormat::FORMAT_KEY)
      */
     public static function textEx($str) {
         if (!is_string($str)) {
             return self::to($str, 'TextEx');
         }
 
-        // Basic text parsing.
-        $str = self::text($str);
-
-        // Always filter after basic parsing.
-        $sanitized = Gdn_Format::htmlFilter($str);
-
-        // Vanilla magic parsing. (this is the "Ex"tra)
-        $sanitized = Gdn_Format::processHTML($sanitized);
-
-        return $sanitized;
+        return Gdn::formatService()->renderHTML($str, Formats\TextExFormat::FORMAT_KEY);
     }
 
     /**
@@ -2056,6 +1470,7 @@ EOT;
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param string $formatMethod The method with which the variable should be formatted.
      * @return mixed
+     * @deprecated 3.2 FormatService::renderHtml
      */
     public static function to($mixed, $formatMethod) {
         // Process $Mixed based on its type.
@@ -2280,6 +1695,8 @@ EOT;
      *
      * @param $mixed
      * @return mixed|string
+     *
+     * @deprecated 3.2 FormatService::renderHtml($string, Formats\WysiwygFormat::FORMAT_KEY)
      */
     public static function wysiwyg($mixed) {
         static $customFormatter;
@@ -2290,24 +1707,13 @@ EOT;
         if (!is_string($mixed)) {
             return self::to($mixed, 'Wysiwyg');
         } elseif (is_callable($customFormatter)) {
+            deprecated(
+                'Garden.Format.WysiwygFunction',
+                'Replace WysiwygFormat using Garden\Container'
+            );
             return $customFormatter($mixed);
         } else {
-            // The text contains html and must be purified.
-            $formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($formatter)) {
-                // If there is no HtmlFormatter then make sure that script injections won't work.
-                return self::display($mixed);
-            }
-
-            // Always filter after basic parsing.
-            // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
-            $filterOptions = ['codeBlockEntities' => false];
-            $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
-
-            // Vanilla magic formatting.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
+            return Gdn::formatService()->renderHTML($mixed, Formats\WysiwygFormat::FORMAT_KEY);
         }
     }
 
@@ -2317,9 +1723,11 @@ EOT;
      * @param string $deltas A JSON encoded array of Quill deltas.
      *
      * @return string - The rendered HTML output.
+     * @deprecated 3.2 FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)
      */
     public static function rich(string $deltas): string {
-        return self::getRichFormatter()->renderHTML($deltas);
+        deprecated(__FUNCTION__, 'FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)');
+        return Gdn::formatService()->renderHTML($deltas, Formats\RichFormat::FORMAT_KEY);
     }
 
     /**
@@ -2329,24 +1737,12 @@ EOT;
      * @param string $format The initial format of the post.
      *
      * @return string
+     * @deprecated 3.2 FormatService::renderQuote($body, $format)
      */
     public static function quoteEmbed($body, string $format): string {
-        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            if (is_array($body)) {
-                $body = json_encode($body);
-            }
-            return self::getRichFormatter()->renderQuote($body);
-        }
-
-        $previousLinksValue = c('Garden.Format.Links');
-        saveToConfig('Garden.Format.Links', false, ['Save' => false]);
-        $value = self::to($body, $format);
-
-        // These breaks make the collapsing behaviour much more difficult in a rich quote.
-        // Replace them with starting and closing p tags.
-        $value = str_replace("<br>", "</p><p>", $value);
-        saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
-        return $value;
+        deprecated(__FUNCTION__, 'FormatService::renderQuote($body, $format)');
+        $body = is_array($body) ? json_encode($body) : $body;
+        return Gdn::formatService()->renderQuote($body, $format);
     }
 
     /**
@@ -2356,20 +1752,11 @@ EOT;
      * @param string $body The contents of a post body.
      *
      * @return string[]
+     * @deprecated 3.2 FormatService::parseMentions($body, Formats\RichFormat::FORMAT_KEY)
      */
     public static function getRichMentionUsernames(string $body): array {
-        return self::getRichFormatter()->parseMentions($body);
-    }
-
-    /**
-     * Get an instance of the rich post formatter.
-     *
-     * @return \Vanilla\Contracts\Formatting\FormatInterface
-     */
-    private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
-        /** @var \Vanilla\Formatting\FormatService $formatter */
-        $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatService::class);
-        return $formatter->getFormatter(\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        deprecated(__FUNCTION__, 'RichFormat::parseMentions($body)');
+        return Gdn::formatService()->parseMentions($body, Formats\RichFormat::FORMAT_KEY);
     }
 
     const SAFE_PROTOCOLS = [

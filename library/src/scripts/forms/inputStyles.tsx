@@ -11,6 +11,7 @@ import {
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
+    unit,
 } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { cssRule } from "typestyle";
@@ -24,7 +25,7 @@ export const inputVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         placeholder: globalVars.mixBgAndFg(0.5),
-        fg: globalVars.mixBgAndFg(0.8),
+        fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         state: {
             fg: globalVars.mainColors.primary,
@@ -53,6 +54,7 @@ export const inputClasses = useThemeCache(() => {
     const vars = inputVariables();
     const style = styleFactory("input");
     const formElementVars = formElementsVariables();
+    const globalVars = globalVariables();
 
     const textStyles = {
         ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
@@ -60,6 +62,7 @@ export const inputClasses = useThemeCache(() => {
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),
         outline: 0,
+        fontWeight: globalVars.fonts.weights.normal,
         $nest: {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
@@ -74,7 +77,16 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", textStyles as NestedCSSProperties);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(".inputText", textStyles as NestedCSSProperties);
+    const applyInputCSSRules = () => cssRule(" .inputText", textStyles as NestedCSSProperties);
 
-    return { text, applyInputCSSRules };
+    const inputText = style("inputText", {
+        marginBottom: 0,
+        $nest: {
+            "&&": {
+                marginTop: unit(globalVars.gutter.quarter),
+            },
+        },
+    });
+
+    return { text, inputText, applyInputCSSRules };
 });

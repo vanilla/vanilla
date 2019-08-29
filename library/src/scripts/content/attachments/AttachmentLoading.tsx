@@ -7,7 +7,6 @@
 import * as React from "react";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
-import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
@@ -16,6 +15,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 
 interface IProps extends IFileAttachment {
     className?: string;
@@ -57,7 +57,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                     )}
                 >
                     <div className={classNames("attachment-format", classes.format)}>
-                        {getAttachmentIcon(type, iconClasses.root)}
+                        <GetAttachmentIcon type={type} className={iconClasses.root} />
                     </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div className={classNames("attachment-title", classes.title)}>

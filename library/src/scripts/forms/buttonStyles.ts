@@ -428,33 +428,34 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = (buttonType: ButtonTypes) => {
+export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
     const buttonVars = buttonVariables();
-    let typeVars;
+    let spinnerColor;
 
     switch (buttonType) {
         case ButtonTypes.PRIMARY:
-            typeVars = buttonVars.primary;
+            spinnerColor = buttonVars.primary.spinnerColor;
             break;
         default:
-            typeVars = buttonVars.standard;
+            spinnerColor = globalVars.mainColors.primary;
             break;
     }
 
-    const root = style({
-        ...flexUtils.middle(),
-        padding: unit(4),
-        height: percent(100),
-        width: percent(100),
-        $nest: {
-            "&:after": spinnerLoader({
-                color: typeVars.spinnerColor || (globalVars.mainColors.primary as any),
-                dimensions: 20,
-            }),
-        },
-    });
+    const root = (alignment: "left" | "center" = "center") =>
+        style({
+            ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
+            padding: unit(4),
+            height: percent(100),
+            width: percent(100),
+            $nest: {
+                "&:after": spinnerLoader({
+                    color: spinnerColor,
+                    dimensions: 20,
+                }),
+            },
+        });
     return { root };
 };

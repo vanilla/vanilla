@@ -15,6 +15,7 @@ interface IProps {
     onChange: (newValue: IComboBoxOption) => void;
     value?: IComboBoxOption;
     className?: string;
+    disabled?: boolean;
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
@@ -33,6 +34,7 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 value={props.value}
                 onChange={props.onChange}
                 inputClassName={classes}
+                disabled={props.disabled}
             />
         </div>
     );

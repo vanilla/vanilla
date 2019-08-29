@@ -6,6 +6,7 @@
 import { slugify } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
+import { inputClasses } from "@library/forms/inputStyles";
 
 export enum InputStyle {
     DASHBOARD = "dashboard",
@@ -22,6 +23,7 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     value?: string; // A value if you want a controlled component. Be sure to use onChange too.
     validationFilter?: InputValidationFilter; // A live filter to apply.
     type?: never; // The type is controlled by the component and validationFilter.
+    inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 /**
@@ -51,11 +53,21 @@ export function TextInput(props: IProps) {
 
     // Input type is determined by strictly by the validation filter.
     const inputType = getInputType(validationFilter);
-    const classes = classNames(className, {
-        "form-control": props.inputStyle === InputStyle.DASHBOARD,
-    });
+    const classes = classNames(
+        className,
+        props.inputStyle === InputStyle.DASHBOARD ? "form-control" : inputClasses().text,
+    );
 
-    return <input {...rest} type={inputType} onChange={actualOnChange} value={actualValue} className={classes} />;
+    return (
+        <input
+            {...rest}
+            ref={props.inputRef}
+            type={inputType}
+            onChange={actualOnChange}
+            value={actualValue}
+            className={classes}
+        />
+    );
 }
 
 function getInputType(filterMode?: InputValidationFilter): string {

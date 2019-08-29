@@ -268,26 +268,20 @@ export const splashClasses = useThemeCache(styleOverwrite => {
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
     const outerBackground = (url?: string) => {
         const finalBackground = url ? { ...vars.outerBackground, image: url } : vars.outerBackground;
-        if (finalBackground === "none") {
-            return style("outerBackground", {
-                display: "none",
-            });
-        } else {
-            return style("outerBackground", {
-                ...centeredBackgroundProps(),
-                display: "block",
-                position: "absolute",
-                top: px(0),
-                left: px(0),
-                width: percent(100),
-                height: percent(100),
-                ...background(finalBackground),
-                opacity:
-                    (!url || url === splashFallbackBG) && vars.outerBackground.fallbackImage === splashFallbackBG
-                        ? 0.4
-                        : undefined,
-            });
-        }
+        return style("outerBackground", {
+            ...centeredBackgroundProps(),
+            display: "block",
+            position: "absolute",
+            top: px(0),
+            left: px(0),
+            width: percent(100),
+            height: percent(100),
+            ...background(finalBackground),
+            opacity:
+                (!url || url === splashFallbackBG) && vars.outerBackground.fallbackImage === splashFallbackBG
+                    ? 0.4
+                    : undefined,
+        });
     };
 
     const backgroundOverlay = style("backgroundOverlay", {

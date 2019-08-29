@@ -9,7 +9,6 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { t } from "@library/utility/appUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import NextPrevious from "@library/navigation/NextPrevious";
 
 const story = storiesOf("Site Nav", module);

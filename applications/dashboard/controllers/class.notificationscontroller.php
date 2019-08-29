@@ -96,7 +96,7 @@ class NotificationsController extends Gdn_Controller {
             $excerpt = '';
             $story = $activity['Story'] ?? null;
             $format = $activity['Format'] ?? HtmlFormat::FORMAT_KEY;
-            $excerpt = $story ? Gdn::formatService()->renderExcerpt($story, $format) : $excerpt;
+            $excerpt = htmlspecialchars($story ? Gdn::formatService()->renderExcerpt($story, $format) : $excerpt);
             $activityClass = ' Activity-'.$activity['ActivityType'];
 
             $sender->informMessage(

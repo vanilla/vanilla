@@ -27,21 +27,24 @@ export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
     return (
-        <Provider store={store}>
-            <LiveAnnouncer>
-                <ThemeProvider
-                    disabled={props.noTheme}
-                    errorComponent={props.errorComponent || null}
-                    themeKey={getMeta("ui.themeKey", "keystone")}
-                    variablesOnly={props.variablesOnly}
-                >
-                    <FontSizeCalculatorProvider>
-                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                            <DeviceProvider>{props.children}</DeviceProvider>
-                        </ScrollOffsetProvider>
-                    </FontSizeCalculatorProvider>
-                </ThemeProvider>
-            </LiveAnnouncer>
-        </Provider>
+        <div className="js-appContext">
+            {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
+            <Provider store={store}>
+                <LiveAnnouncer>
+                    <ThemeProvider
+                        disabled={props.noTheme}
+                        errorComponent={props.errorComponent || null}
+                        themeKey={getMeta("ui.themeKey", "keystone")}
+                        variablesOnly={props.variablesOnly}
+                    >
+                        <FontSizeCalculatorProvider>
+                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                <DeviceProvider>{props.children}</DeviceProvider>
+                            </ScrollOffsetProvider>
+                        </FontSizeCalculatorProvider>
+                    </ThemeProvider>
+                </LiveAnnouncer>
+            </Provider>
+        </div>
     );
 }

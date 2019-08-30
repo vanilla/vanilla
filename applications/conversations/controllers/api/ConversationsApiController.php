@@ -350,7 +350,13 @@ class ConversationsApiController extends AbstractApiController {
             )
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
-
+        $userID = $this->getSession()->UserID;
+        foreach ($conversations as $key => $value) {
+            $inConversation = $this->conversationModel->inConversation($value['conversationID'], $userID);
+            if (!$inConversation) {
+                unset($conversations[$key]);
+            }
+        }
         $result = $out->validate($conversations);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/conversations', $query, $in);

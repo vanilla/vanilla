@@ -24,6 +24,14 @@ class TwitterPlugin extends Gdn_Plugin {
     /** @var string */
     protected $_RedirectUri = null;
 
+    /** @var \Vanilla\Formatting\FormatService **/
+    private $formatService;
+
+    public function __construct(\Vanilla\Formatting\FormatService $formatService)
+    {
+        $this->formatService = $formatService;
+    }
+
     /**
      * Gets/sets the current oauth access token.
      *
@@ -329,73 +337,6 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $query = http_build_query($query);
         $this->authorize($query);
-    }
-
-    /**
-     * Post to Twitter.
-     *
-     * @param PostController $sender
-     * @param string $recordType
-     * @param int $iD
-     *
-     * @throws Gdn_UserException
-     */
-    public function postController_twitter_create($sender, $recordType, $iD) {
-        if (!$this->socialReactions()) {
-            throw permissionException();
-        }
-
-        $row = getRecord($recordType, $iD, true);
-        if ($row) {
-            // Grab the tweet message.
-            switch (strtolower($recordType)) {
-                case 'discussion':
-                    $message = Gdn_Format::plainText($row['Name'], 'Text');
-                    break;
-                case 'comment':
-                default:
-                    $message = Gdn_Format::plainText($row['Body'], $row['Format']);
-            }
-
-            // WHY ARE WE REPEATING THE `sliceTwitter()` FUNCTION BELOW?
-            // Dammit, fellas, ima hang y'uns out to DRY.
-            $elips = '...';
-            $message = preg_replace('`\s+`', ' ', $message);
-
-            $max = 140;
-            $linkLen = 22;
-            $max -= $linkLen;
-
-            $message = sliceParagraph($message, $max);
-            if (strlen($message) > $max) {
-                $message = substr($message, 0, $max - strlen($elips)).$elips;
-            }
-
-            if ($this->accessToken()) {
-                Gdn::controller()->setData('Message', $message);
-
-                $message .= ' '.$row['ShareUrl'];
-                $r = $this->api(
-                    '/statuses/update.json',
-                    [
-                    'status' => $message
-                    ],
-                    'POST'
-                );
-
-                $sender->setJson('R', $r);
-                $sender->informMessage(t('Thanks for sharing!'));
-            } else {
-                $get = [
-                    'text' => $message,
-                    'url' => $row['ShareUrl']
-                ];
-                $url = "https://twitter.com/share?".http_build_query($get);
-                redirectTo($url, 302, false);
-            }
-        }
-
-        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -889,14 +830,24 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param array $args
      */
     protected function addReactButton($sender, $args) {
-        if ($this->accessToken()) {
-            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
-            $cssClass = 'ReactButton Hijack';
-        } else {
-            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
-            $cssClass = 'ReactButton PopupWindow';
+        $recordType = $args['Type'];
+        if (!$recordType) {
+            return;
         }
-
+        $params = [];
+        switch (strtolower($recordType)) {
+            case 'discussion':
+                $params['url'] = discussionUrl($args['Discussion']);
+                $params['text']  = sliceTwitter($this->formatService->renderPlainText($args['Discussion']->Name, 'Text'));
+                break;
+            case 'comment':
+                $id = $args['Comment']->CommentID;
+                $params['url']  = url("/discussion/comment/{$id}#Comment_{$id}", true);
+                $params['text']  = sliceTwitter($this->formatService->renderPlainText($args['Comment']->Body, $args['Comment']->Format));
+                break;
+        }
+        $url = url("https://twitter.com/intent/tweet?".http_build_query($params), true);
+        $cssClass = 'ReactButton PopupWindow';
         echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow']);
     }
 

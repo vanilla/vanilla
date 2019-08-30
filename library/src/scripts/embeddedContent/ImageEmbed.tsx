@@ -24,19 +24,16 @@ interface IProps extends IBaseEmbedProps {
  * An embed class for quoted user content on the same site.
  */
 export function ImageEmbed(props: IProps) {
-    const [contentElement, setContentElement] = useState<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
     const [isFocused, setFocused] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    useFocusWatcher(contentElement, newFocusValue => {
+    useFocusWatcher(contentRef, newFocusValue => {
         setFocused(newFocusValue);
     });
 
     return (
         <DeviceProvider>
-            <div
-                ref={ref => setContentElement(ref)}
-                className={classNames("embedImage", embedMenuClasses().imageContainer)}
-            >
+            <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
                 <div className="embedImage-link">
                     <img
                         className={classNames("embedImage-img", FOCUS_CLASS)}

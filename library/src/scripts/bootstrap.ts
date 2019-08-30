@@ -5,14 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { onContent, getMeta, _executeReady, _mountComponents } from "@library/utility/appUtils";
+import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
 import { logDebug, logError, debug } from "@vanilla/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { History } from "history";
-import { blotCSS } from "@rich-editor/quill/components/blotStyles";
+import { _mountComponents } from "@library/utility/componentRegistry";
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -35,7 +35,6 @@ _executeReady()
         // Mount all data-react components.
         onContent(e => {
             _mountComponents(e.target as HTMLElement);
-            blotCSS(); // Load shared "cssRule" styles for blots
             mountInputs();
         });
 

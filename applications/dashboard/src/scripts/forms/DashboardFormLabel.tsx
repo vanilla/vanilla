@@ -8,7 +8,7 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 
 interface IProps {
     label: string;
-    description?: string;
+    description?: React.ReactNode;
     labelType?: DashboardLabelType;
 }
 

@@ -1,3 +1,4 @@
+
 <?php
 /* Gdn_Controller $this */
 $this->fireAs('dashboard')->fireEvent('render');
@@ -142,5 +143,6 @@ Gdn_Theme::assetEnd();
     <?php $this->renderAsset('DashboardUserDropDown'); ?>
 </aside>
 <?php $this->fireEvent('AfterBody'); ?>
+<div id="modals"></div>
 </body>
 </html>

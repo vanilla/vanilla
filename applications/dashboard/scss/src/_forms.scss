@@ -1066,6 +1066,8 @@ select + select {
 
 .iradio,
 .icheckbox {
+  border-radius: $border-radius;
+
   label {
     padding-left: 0;
     height: $spacer;

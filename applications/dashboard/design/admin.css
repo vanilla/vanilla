@@ -1504,7 +1504,7 @@ a.text-danger:focus, a.text-danger:hover {
   display: block;
   padding: 5px 1em;
   border: 1px solid transparent;
-  border-radius: 2px 2px 0 0;
+  border-radius: 4px 4px 0 0;
 }
 .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
   border-color: #f4f6fb #f4f6fb #ddd;
@@ -1544,7 +1544,7 @@ a.text-danger:focus, a.text-danger:hover {
   display: block;
   padding: 5px 1em;
   line-height: 20px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .nav-pills .nav-link.active, .nav-pills .nav-link.drop-enabled, .nav-pills select.nav-link:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose,
 .nav-pills .file-upload input:focus ~ .nav-link.file-upload-browse,
@@ -1662,7 +1662,7 @@ a.text-danger:focus, a.text-danger:hover {
   color: #fff;
   text-align: center;
   background-color: #000;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .tooltip-arrow {
@@ -1716,7 +1716,7 @@ a.text-danger:focus, a.text-danger:hover {
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .dropdown-divider {
@@ -1838,13 +1838,13 @@ a.text-danger:focus, a.text-danger:hover {
   border: 1px solid #ddd;
 }
 .list-group-item:first-child {
-  border-top-right-radius: 2px;
-  border-top-left-radius: 2px;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
 }
 .list-group-item:last-child {
   margin-bottom: 0;
-  border-bottom-right-radius: 2px;
-  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .list-group-flush .list-group-item {
@@ -2091,7 +2091,7 @@ button.list-group-item-danger.active:hover {
   background-color: #fff;
   background-image: none;
   border: 1px solid #ccc;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .form-control::-ms-expand, .ac_input::-ms-expand {
   background-color: transparent;
@@ -2181,14 +2181,14 @@ input[type=month].input-lg,
   padding: 4.4px 12px;
   font-size: 12px;
   line-height: 1.5;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .form-control-lg {
   padding: 12px 20px;
   font-size: 18px;
   line-height: 1.3333333333;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .form-group {
@@ -5425,7 +5425,7 @@ button::-moz-focus-inner {
   padding: 5px 16px;
   font-size: 14px;
   line-height: 24px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .btn, .Button, .file-upload-browse, .btn:hover {
   text-decoration: none;
@@ -5664,12 +5664,12 @@ fieldset[disabled] a.file-upload-browse {
   margin-right: -1px;
 }
 .btn-group .btn:first-child, .btn-group .Button:first-child, .btn-group .file-upload-browse:first-child {
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 .btn-group .btn:last-child, .btn-group .Button:last-child, .btn-group .file-upload-browse:last-child {
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .btn-group .btn + .btn, .btn-group .Button + .btn, .btn-group .btn + .Button, .btn-group .Button + .Button, .btn-group .file-upload-browse + .btn, .btn-group .file-upload-browse + .Button, .btn-group .btn + .file-upload-browse, .btn-group .Button + .file-upload-browse, .btn-group .file-upload-browse + .file-upload-browse,
 .btn-group .btn + .btn-group,
@@ -5783,7 +5783,7 @@ fieldset[disabled] a.file-upload-browse {
   display: block;
   background-color: #fff;
   border: 1px solid #e7e8e9;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .card .list-group-item {
   font-weight: 600;
@@ -6289,7 +6289,7 @@ select.nav-stats-users:focus .c3-event-rect:hover,
   width: 278px;
   color: inherit;
   background: #fff;
-  border-radius: 2px;
+  border-radius: 4px;
   margin-top: 1px;
   top: 100px;
   left: 20px;
@@ -6342,7 +6342,7 @@ select.nav-stats-users:focus .c3-event-rect:hover,
 .daterangepicker .calendar-table {
   margin-top: 9px;
   border: 1px solid #fff;
-  border-radius: 2px;
+  border-radius: 4px;
   background: #fff;
 }
 .daterangepicker table {
@@ -6354,7 +6354,7 @@ select.nav-stats-users:focus .c3-event-rect:hover,
   text-align: center;
   width: 18px;
   height: 18px;
-  border-radius: 2px;
+  border-radius: 4px;
   border: 1px solid transparent;
   white-space: nowrap;
   cursor: pointer;
@@ -6376,13 +6376,13 @@ select.nav-stats-users:focus .c3-event-rect:hover,
   border-radius: 0;
 }
 .daterangepicker td.start-date {
-  border-radius: 2px 0 0 2px;
+  border-radius: 4px 0 0 4px;
 }
 .daterangepicker td.start-date.end-date {
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .daterangepicker td.end-date {
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 4px 4px 0;
 }
 .daterangepicker td.active, .daterangepicker td.drop-enabled, .daterangepicker .file-upload input:focus ~ td.file-upload-choose, .file-upload .daterangepicker input:focus ~ td.file-upload-choose,
 .daterangepicker .file-upload input:focus ~ td.file-upload-browse,
@@ -6431,7 +6431,7 @@ select.nav-stats-users:focus .c3-event-rect:hover,
 .daterangepicker .file-upload input:hover ~ .input-mini.file-upload-browse,
 .file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse {
   border: 1px solid #08c;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .daterangepicker .daterangepicker_input {
   position: relative;
@@ -6939,7 +6939,7 @@ label,
   padding: 6.5px 13.5px;
   color: #555a62;
   border: 1px solid #ccc;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .file-upload-browse {
@@ -6980,7 +6980,7 @@ select.ac_input {
   background-image: none \9 ;
   background-size: 8px 10px;
   border: 1px solid #ccc;
-  border-radius: 2px;
+  border-radius: 4px;
   -moz-appearance: none;
   -webkit-appearance: none;
 }
@@ -7415,6 +7415,7 @@ select + select {
 
 .iradio,
 .icheckbox {
+  border-radius: 4px;
   background-color: #fff;
   display: inline-block;
   width: 18px;
@@ -7917,6 +7918,9 @@ label[id^=iCheck] {
 .modal-confirm .modal-body {
   padding: 18px;
 }
+.modal-full-height .modal-body {
+  height: calc(90vh - (2 * 48px));
+}
 
 .modal-backdrop {
   position: fixed;
@@ -7939,7 +7943,7 @@ label[id^=iCheck] {
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
+  border-radius: 4px;
   outline: 0;
 }
 
@@ -8140,7 +8144,7 @@ button.close {
   width: 36px;
   height: 36px;
   border: 1px solid #e7e8e9;
-  border-radius: 2px;
+  border-radius: 4px;
   margin-right: 18px;
 }
 .nav-adventure .nav-item-arrow {
@@ -8276,7 +8280,7 @@ button.close {
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose,
 .panel-nav .file-upload input:hover ~ .nav-link.file-upload-browse,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus {
-  border-radius: 2px 0 0 2px;
+  border-radius: 4px 0 0 4px;
 }
 .panel-nav .nav-link.active, .panel-nav .nav-link.drop-enabled, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose,
 .panel-nav .file-upload input:focus ~ .nav-link.file-upload-browse,
@@ -8646,7 +8650,7 @@ button.close {
   padding: 2px 12px;
   font-size: 11px;
   line-height: 1.5;
-  border-radius: 2px;
+  border-radius: 4px;
   color: #949aa2;
   background-color: #fff;
   border-color: #949aa2;
@@ -8729,7 +8733,7 @@ button.close {
   padding: 9px;
   font-size: 12px;
   border: 1px solid #e7e8e9 !important;
-  border-radius: 2px;
+  border-radius: 4px;
   background-color: transparent;
 }
 
@@ -9234,7 +9238,7 @@ button.close {
   border: 1px solid #000;
   opacity: 0.9;
   box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
-  border-radius: 2px;
+  border-radius: 4px;
 }
 @media (max-width: 767px) {
   .toaster, .InformMessages .InformMessage {

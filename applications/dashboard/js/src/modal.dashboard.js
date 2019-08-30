@@ -149,8 +149,12 @@ var DashboardModal = (function() {
         /**
          * Adds the modal to the DOM.
          */
-        addModalToDom: function() {
-            $('body').append(this.modalShell.replace('{id}', this.id));
+        addModalToDom: function () {
+            var newModalContainer = document.getElementById("modals");
+            // Make sure that we insert our modals before
+            var modal = document.createElement("div");
+            document.body.insertBefore(modal, newModalContainer);
+            modal.outerHTML = this.modalShell.replace('{id}', this.id);
         },
 
         /**

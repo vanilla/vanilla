@@ -6967,7 +6967,7 @@ select,
 select.form-control,
 select.ac_input {
   display: inline-block;
-  height: 36;
+  height: 36px;
   max-width: 100%;
   padding-right: 32px;
   padding-left: 12px;
@@ -7349,7 +7349,7 @@ select + select {
   display: block;
   top: 0;
   right: 0;
-  height: 36;
+  height: 36px;
   padding-top: 12px;
   padding-right: 9px;
   font-size: 12px;
@@ -8527,15 +8527,15 @@ button.close {
   position: absolute;
   display: block;
   width: 20px;
-  height: 36;
+  height: 36px;
   left: 36px;
 }
 
 .nestable-handle {
   position: absolute;
   display: block;
-  width: 36;
-  height: 36;
+  width: 36px;
+  height: 36px;
   cursor: move;
   cursor: -webkit-grab;
   cursor: grab;
@@ -8686,7 +8686,7 @@ button.close {
       -ms-flex-align: center;
           align-items: center;
   margin-bottom: 6px;
-  min-height: 36;
+  min-height: 36px;
   background-color: #fbfcfc;
   border: 1px solid #e7e8e9;
   border-radius: 2px;
@@ -10067,7 +10067,7 @@ strong,
 }
 
 .ac_input {
-  height: 36 !important;
+  height: 36px !important;
 }
 
 .ac_results {

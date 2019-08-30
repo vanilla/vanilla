@@ -15,6 +15,7 @@ import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import cloneDeep from "lodash/cloneDeep";
 
 export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -40,22 +41,22 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.hover.borders))
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.hover.borders))
             : {};
 
     const activeBorder =
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.active.borders))
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.active.borders))
             : {};
 
     const focusBorder =
         buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
             : defaultBorder;
 
     const focusAccessibleBorder =
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(defaultBorder, borders(buttonTypeVars.focusAccessible.borders))
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
             : {};
 
     const result: NestedCSSProperties = {

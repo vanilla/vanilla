@@ -498,7 +498,8 @@
      */
     $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
+        var fullHeight = $(this).hasClass('js-full-height-modal')
+        DashboardModal.activeModal = new DashboardModal($(this), { fullHeight: fullHeight });
     });
 
     /**

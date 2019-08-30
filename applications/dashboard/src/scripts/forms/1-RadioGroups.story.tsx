@@ -13,9 +13,12 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
+import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 
 const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCssDecorator);
 
+const longDescription =
+    "Here's some info text for this field. I'm giving a little description of what this field does and how it affects the user.";
 formsStory.add("RadioGroups", () =>
     (() => {
         const [group1, setGroup1] = useState("option1");
@@ -42,7 +45,7 @@ formsStory.add("RadioGroups", () =>
                         </DashboardFormGroup>
                         <DashboardFormGroup
                             label="Checkbox Group Vertical (default)"
-                            description="Here's some info text for this field. I'm giving a little description of what this field does and how it affects the user."
+                            description={longDescription}
                             labelType={DashboardLabelType.WIDE}
                         >
                             <DashboardCheckGroup>
@@ -57,6 +60,37 @@ formsStory.add("RadioGroups", () =>
                                 <DashboardCheckBox label="Option 2" />
                                 <DashboardCheckBox label="Option 3" disabled />
                             </DashboardCheckGroup>
+                        </DashboardFormGroup>
+                    </ul>
+                    <StoryHeading depth={1}>Toggles</StoryHeading>
+                    <ul>
+                        <DashboardFormGroup
+                            labelType={DashboardLabelType.WIDE}
+                            label="Toggle On"
+                            description={longDescription}
+                        >
+                            <DashboardToggle onChange={() => {}} checked={true} />
+                        </DashboardFormGroup>
+                        <DashboardFormGroup
+                            labelType={DashboardLabelType.WIDE}
+                            label="Toggle Off"
+                            description={longDescription}
+                        >
+                            <DashboardToggle onChange={() => {}} checked={false} />
+                        </DashboardFormGroup>
+                        <DashboardFormGroup
+                            labelType={DashboardLabelType.WIDE}
+                            label="Toggle On (in progress)"
+                            description={longDescription}
+                        >
+                            <DashboardToggle onChange={() => {}} checked={true} inProgress />
+                        </DashboardFormGroup>
+                        <DashboardFormGroup
+                            labelType={DashboardLabelType.WIDE}
+                            label="Toggle Off (in progress)"
+                            description={longDescription}
+                        >
+                            <DashboardToggle onChange={() => {}} checked={false} inProgress />
                         </DashboardFormGroup>
                     </ul>
                 </form>

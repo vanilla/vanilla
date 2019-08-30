@@ -258,6 +258,14 @@ var Modal = (function ($) {
 
         $(document).off(Event.FOCUSIN) // guard against infinite focus loop
         .on(Event.FOCUSIN, function (event) {
+
+
+          // Add exception for our new modal container which could be stacked on top.
+          // ID of the wrapper for the new modal system. Don't touch focus of anything in there.
+          var FOCUS_TRAP_WHITELIST_ID_ELEMENT = document.getElementById("modals");
+          if (FOCUS_TRAP_WHITELIST_ID_ELEMENT.contains(event.target)) {
+            return;
+          }
           if (_this3._element !== event.target && !$(_this3._element).has(event.target).length) {
             _this3._element.focus();
           }

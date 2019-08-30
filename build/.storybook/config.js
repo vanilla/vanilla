@@ -14,6 +14,7 @@ import { withKnobs } from '@storybook/addon-knobs';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
+import 'storybook-chromatic';
 
 /**
  * Utility for importing everything from a wepback require.context

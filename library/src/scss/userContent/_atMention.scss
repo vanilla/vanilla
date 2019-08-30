@@ -4,21 +4,21 @@
  * @license GPL-2.0-only
  */
 
-$atMention_width                     : 200px !default;
+//$atMention_width                     : 200px !default;
 
-$atMention-avatar_width              : 30px !default;
-$atMention-avatar_margin             : 10px !default;
+//$atMention-avatar_width              : 30px !default;
+//$atMention-avatar_margin             : 10px !default;
+//
+//$atMention-mark_weight               : 600 !default;
+//
+//$atMention-link_weight               : 600 !default;
 
-$atMention-mark_weight               : 600 !default;
+//$atMention-user_paddingHorizontal    : 6px !default;
+//$atMention-user_paddingVertical      : 3px !default;
 
-$atMention-link_weight               : 600 !default;
+//$atMention-selected_bg               : $global-color_bg !default;
 
-$atMention-user_paddingHorizontal    : 6px !default;
-$atMention-user_paddingVertical      : 3px !default;
-
-$atMention-selected_bg               : $global-color_bg !default;
-
-$atMention_maxHeight                 : ($atMention-avatar_width + $atMention-user_paddingVertical * 2) * 7.5;
+//$atMention_maxHeight                 : ($atMention-avatar_width + $atMention-user_paddingVertical * 2) * 7.5;
 
 .atMentionList {
     position: absolute;

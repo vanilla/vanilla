@@ -156,14 +156,15 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
         maxWidth: percent(100),
         ...paddings({
-            vertical: 55,
-            horizontal: 200,
+            vertical: 50,
+            horizontal: 55,
         }),
     });
 
     const containerInner = style("containerInner", {
         position: "relative",
         display: "block",
+        width: percent(100),
     });
 
     const content = style("content", {
@@ -171,6 +172,7 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
         maxWidth: percent(100),
         width: unit(672),
+        margin: "auto",
     });
 
     const smallContent = style("smallContent", {

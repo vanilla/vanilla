@@ -218,10 +218,6 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         });
     }
 
-    if (debug) {
-        window.console.log("border radius output: ", output);
-    }
-
     return output;
 };
 
@@ -258,10 +254,6 @@ const setAllBorders = (
     debug = false,
 ) => {
     const output = {};
-
-    if (debug) {
-        window.console.log("width 2: ", width);
-    }
 
     if (color !== undefined) {
         merge(output, {
@@ -323,8 +315,6 @@ export const borders = (
     debug = false,
 ): NestedCSSProperties => {
     const output: NestedCSSProperties = {};
-
-    debug && window.console.log("sanity check 0: output: ", output);
 
     const style = getValueIfItExists(detailedStyles, "style", fallbackBorderVariables.style);
     const color = getValueIfItExists(detailedStyles, "color", fallbackBorderVariables.color);

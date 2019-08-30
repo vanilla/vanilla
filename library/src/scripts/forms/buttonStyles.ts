@@ -84,9 +84,6 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.primary,
             },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
             fonts: {
                 color: globalVars.mainColors.bg,
             },
@@ -94,9 +91,6 @@ export const buttonVariables = useThemeCache(() => {
         active: {
             colors: {
                 bg: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -106,9 +100,6 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.primary,
             },
-            borders: {
-                color: globalVars.mainColors.primary,
-            },
             fonts: {
                 color: globalVars.mainColors.bg,
             },
@@ -116,9 +107,6 @@ export const buttonVariables = useThemeCache(() => {
         focusAccessible: {
             colors: {
                 bg: globalVars.mainColors.primary,
-            },
-            borders: {
-                color: globalVars.mainColors.primary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -135,7 +123,7 @@ export const buttonVariables = useThemeCache(() => {
             color: globalVars.mainColors.bg,
         },
         spinnerColor: globalVars.mainColors.bg,
-        border: {
+        borders: {
             color: globalVars.mainColors.primary,
             radius: globalVars.border.radius,
         },
@@ -182,8 +170,8 @@ export const buttonVariables = useThemeCache(() => {
         fonts: {
             color: globalVars.mainColors.bg,
         },
-        border: {
-            color: globalVars.mainColors.fg,
+        borders: {
+            color: globalVars.mainColors.bg,
             radius: globalVars.border.radius,
         },
         hover: {
@@ -217,7 +205,7 @@ export const buttonVariables = useThemeCache(() => {
             color: globalVars.mainColors.primary,
         },
         spinnerColor: globalVars.mainColors.bg,
-        border: {
+        borders: {
             color: globalVars.mainColors.bg,
             radius: globalVars.border.radius,
         },
@@ -225,32 +213,20 @@ export const buttonVariables = useThemeCache(() => {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
-                color: globalVars.mainColors.bg,
-            },
         },
         active: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
-            },
-            border: {
-                color: globalVars.mainColors.bg,
             },
         },
         focus: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
-            border: {
-                color: globalVars.mainColors.bg,
-            },
         },
         focusAccessible: {
             colors: {
                 bg: globalVars.mainColors.bg.fade(0.8),
-            },
-            border: {
-                color: globalVars.mainColors.bg,
             },
         },
     });

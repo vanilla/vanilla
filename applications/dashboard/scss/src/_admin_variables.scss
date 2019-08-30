@@ -21,6 +21,10 @@ $rem-base:                   16;
   @return ($px / $rem-base * 16px);
 }
 @function from-rem($rem) {
+  @if unit($rem) != 'rem' {
+    @warn "from-rem called with non-rem unit: #{unit($rem)}";
+  }
+
   @return (strip-unit($rem) * $rem-base * 1px);
 }
 

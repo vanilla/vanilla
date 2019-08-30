@@ -209,12 +209,14 @@
                                                 <div class="Profile-name">
                                                     <div class="Profile-row">
                                                         <h1 class="Profile-username">
-                                                            {$Profile.Name}
+                                                            {$Profile.Name|escape:'html'}
                                                         </h1>
                                                     </div>
                                                     <div class="Profile-row">
                                                         {if isset($Rank)}
-                                                            <span class="Profile-rank">{$Rank.Label}</span>
+                                                            <span class="Profile-rank">
+                                                                {$Rank.Label}
+                                                            </span>
                                                         {/if}
                                                     </div>
                                                 </div>

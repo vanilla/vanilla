@@ -11,8 +11,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
-import { notUserContent } from "@library/flyouts/dropDownStyles";
-import { cssRule } from "typestyle";
 
 export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");

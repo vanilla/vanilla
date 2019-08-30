@@ -72,6 +72,9 @@ storiesOf("User Content", module).add("Text", () => {
          <p class="spoiler-line">Some Spoiler content with formatting <strong>bold</strong> <em>italic </em><s>strike</s></p><p class="spoiler-line"><br></p><p class="spoiler-line"><br></p><p></p><p class="spoiler-line">Newlines above <a href="unsafe:test link" rel="nofollow">Link</a></p><p class="spoiler-line">Another line</p>
        </div>
        </div>
+       <h2>Block quote</h2>
+       <div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">asfasdfadsfa</p></div></div>
+       
        <h2>Inline operations</h2>
        <p>
          Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxy rise the sky calls to us! Descended from astronomers?</p><p>Some Text Here. <code class="code codeInline" spellcheck="false">Code Inline</code> Some More Text

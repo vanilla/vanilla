@@ -161,14 +161,11 @@ export const spoilerCSS = useThemeCache(() => {
                 opacity: globalVars.states.icon.opacity,
             },
             "& .spoiler-warningLabel": {
-                marginLeft: unit(6),
                 ...fonts({
                     size: globalVars.fonts.size.medium,
                     weight: globalVars.fonts.weights.semiBold,
                 }),
-                ...margins({
-                    all: 0,
-                }),
+                marginLeft: unit(6),
             },
             "& .spoiler-buttonContainer": {
                 whiteSpace: "normal",

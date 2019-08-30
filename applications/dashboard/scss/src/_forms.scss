@@ -841,7 +841,7 @@ select + select {
   position: relative;
 
   .form-control {
-    border-radius: $control-height / 2 * 16px;
+    border-radius: 36 / 2 * 16px;
     padding-left: $spacer * 2.5;
     padding-right: $spacer * 2.5;
 

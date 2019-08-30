@@ -37,7 +37,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     );
 
     // Remove debug and fallback
-    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border, buttonTypeVars.name === "spoiler");
+    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders

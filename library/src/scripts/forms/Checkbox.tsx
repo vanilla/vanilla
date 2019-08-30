@@ -27,7 +27,7 @@ export default function CheckBox(props: IProps) {
     const { isHorizontal } = props;
 
     return (
-        <label id={labelID} className={classNames(props.className, classes.root, { isHorizontal })}>
+        <label className={classNames(props.className, classes.root, { isHorizontal })}>
             <input
                 className={classes.input}
                 aria-labelledby={labelID}

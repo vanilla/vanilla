@@ -64,7 +64,6 @@ export const spoilerCSS = useThemeCache(() => {
         position: "relative",
         width: unit(globalVars.icon.sizes.default),
         height: unit(globalVars.icon.sizes.default),
-        marginRight: unit(6),
         color: colorOut(userContentVars.blocks.fg),
     });
     cssRule(".spoiler", {
@@ -161,9 +160,8 @@ export const spoilerCSS = useThemeCache(() => {
                 alignItems: "center",
                 opacity: globalVars.states.icon.opacity,
             },
-            "& .spoiler-warningBefore": {
-                margin: 0,
-                padding: 0,
+            "& .spoiler-warningLabel": {
+                marginLeft: unit(6),
                 ...fonts({
                     size: globalVars.fonts.size.medium,
                     weight: globalVars.fonts.weights.semiBold,

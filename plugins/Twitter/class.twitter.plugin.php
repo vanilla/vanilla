@@ -27,8 +27,11 @@ class TwitterPlugin extends Gdn_Plugin {
     /** @var \Vanilla\Formatting\FormatService **/
     private $formatService;
 
-    public function __construct(\Vanilla\Formatting\FormatService $formatService)
-    {
+    /**
+     * TwitterPlugin constructor.
+     * @param \Vanilla\Formatting\FormatService $formatService
+     */
+    public function __construct(\Vanilla\Formatting\FormatService $formatService) {
         $this->formatService = $formatService;
     }
 

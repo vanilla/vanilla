@@ -224,6 +224,10 @@
   .modal-confirm & {
     padding: $spacer;
   }
+
+  .modal-full-height & {
+    height: calc(90vh - (2 * #{$header-block-height}));
+  }
 }
 
 .modal-backdrop {

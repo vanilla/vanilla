@@ -9,7 +9,10 @@
 
 import { onContent, onReady } from "@library/utility/appUtils";
 import { initializeAtComplete } from "@dashboard/legacy/atwho";
+import { escapeHTML } from "@vanilla/dom-utils";
 
+// Expose some new module functions to our old javascript system.
+window.escapeHTML = escapeHTML;
 // Initialize legacy @mentions for all BodyBox elements.
 if ($.fn.atwho) {
     onReady(() => initializeAtComplete(".BodyBox,.js-bodybox"));

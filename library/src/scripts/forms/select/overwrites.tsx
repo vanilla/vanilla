@@ -165,7 +165,7 @@ export function ValueContainer(props: ValueContainerProps<any>) {
     return (
         <components.ValueContainer
             {...props}
-            className="suggestedTextInput-valueContainer inputBlock-inputText inputText"
+            className={classNames("suggestedTextInput-valueContainer inputBlock-inputText inputText", props.className)}
         />
     );
 }

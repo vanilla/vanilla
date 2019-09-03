@@ -42,7 +42,7 @@ export default class SiteNavNode extends React.Component<IProps> {
 
     public render() {
         const depthClass = `hasDepth-${this.props.depth + 1}`;
-        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType;
+        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
         const classes = siteNavNodeClasses();
 
         const { activeRecord } = this.props;
@@ -110,7 +110,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible && collapsible ? (
+                {collapsible ? (
                     <div
                         className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,

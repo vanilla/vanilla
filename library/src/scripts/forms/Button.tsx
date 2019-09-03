@@ -56,6 +56,14 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return classes.translucid;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
+            case ButtonTypes.DASHBOARD_STANDARD:
+                return "btn";
+            case ButtonTypes.DASHBOARD_PRIMARY:
+                return "btn btn-primary";
+            case ButtonTypes.DASHBOARD_SECONDARY:
+                return "btn btn-secondary";
+            case ButtonTypes.DASHBOARD_LINK:
+                return "btn btn-link";
             default:
                 return "";
         }

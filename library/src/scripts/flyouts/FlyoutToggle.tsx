@@ -145,7 +145,7 @@ export default function FlyoutToggle(props: IProps) {
     };
 
     // Focus handling
-    useFocusWatcher(controllerRef.current, handleFocusChange, props.openAsModal);
+    useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);
     useEscapeListener({
         root: controllerRef.current,
         returnElement: buttonRef.current,

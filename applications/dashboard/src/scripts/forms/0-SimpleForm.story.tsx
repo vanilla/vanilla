@@ -10,12 +10,16 @@ import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorato
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React from "react";
+import React, { useState } from "react";
+import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCssDecorator);
 
 formsStory.add("FormGroup", () =>
     (() => {
+        const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | undefined>(undefined);
+
         return (
             <StoryContent>
                 <StoryHeading depth={1}>Simple Form Elements</StoryHeading>
@@ -26,6 +30,34 @@ formsStory.add("FormGroup", () =>
                         </DashboardFormGroup>
                         <DashboardFormGroup label="Another (fake) Label">
                             <DashboardInput />
+                        </DashboardFormGroup>
+                        <DashboardFormGroup label="Select input">
+                            <DashboardSelect
+                                options={[
+                                    {
+                                        label: "Development",
+                                        value: 4,
+                                    },
+                                    {
+                                        label: "Information Security",
+                                        value: 7,
+                                    },
+                                    {
+                                        label: "Internal Testing",
+                                        value: 6,
+                                    },
+                                    {
+                                        label: "Success",
+                                        value: 5,
+                                    },
+                                    {
+                                        label: "Support",
+                                        value: 8,
+                                    },
+                                ]}
+                                value={dropdownValue}
+                                onChange={setDropdownValue}
+                            />
                         </DashboardFormGroup>
                     </ul>
                 </form>

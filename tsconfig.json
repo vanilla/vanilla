@@ -7,7 +7,8 @@
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
-            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"]
+            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
+            "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"]
         },
         "typeRoots": ["@types", "./node_modules/@types"]
     },

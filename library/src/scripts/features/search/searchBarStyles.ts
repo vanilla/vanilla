@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { borderRadii, borders, colorOut, unit, paddings } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
@@ -178,7 +178,10 @@ export const searchBarClasses = useThemeCache(() => {
             },
             ".suggestedTextInput-option": {
                 width: percent(100),
-                padding: px(12),
+                ...paddings({
+                    vertical: 9,
+                    horizontal: 12,
+                }),
                 textAlign: "left",
                 display: "block",
                 color: "inherit",
@@ -286,7 +289,7 @@ export const searchBarClasses = useThemeCache(() => {
         height: unit(vars.sizing.height),
         width: percent(100),
         $nest: {
-            [`&:not(.${splashClasses().content}).hasFocus .searchBar-valueContainer`]: {
+            [`&:not(.${splashClasses({}).content}).hasFocus .searchBar-valueContainer`]: {
                 borderColor: colorOut(globalVars.mainColors.primary),
             },
         },

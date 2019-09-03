@@ -20,6 +20,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { cssRule } from "typestyle";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -84,6 +85,12 @@ export const modalClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
     const titleBarVars = titleBarVariables();
+
+    cssRule("#modals", {
+        position: "relative",
+        zIndex: 1050, // Sorry it's so high. Our dashboard uses some bootstrap which specifies 1040 for the old modals.
+        // When nesting our modals on top we need to be higher.
+    });
 
     const overlay = style("overlay", {
         position: "fixed",

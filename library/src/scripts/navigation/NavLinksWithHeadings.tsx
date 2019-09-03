@@ -35,6 +35,8 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const classes = navLinksClasses();
         const ungroupedTitle = this.props.ungroupedTitle || t("Overview");
 
+        window.console.log("this.props", this.props);
+
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = (
                 <NavLinks

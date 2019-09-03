@@ -21,6 +21,10 @@ $rem-base:                   16;
   @return ($px / $rem-base * 16px);
 }
 @function from-rem($rem) {
+  @if unit($rem) != 'rem' {
+    @warn "from-rem called with non-rem unit: #{unit($rem)}";
+  }
+
   @return (strip-unit($rem) * $rem-base * 1px);
 }
 
@@ -128,9 +132,9 @@ $body-color:                 $gray-dark !default;
 $line-height-lg:         (4 / 3);
 $line-height-sm:         1.5;
 
-$border-radius:          to-rem(2);
-$border-radius-lg:       to-rem(4);
-$border-radius-sm:       to-rem(1);
+$border-radius:          to-rem(4);
+$border-radius-lg:       to-rem(6);
+$border-radius-sm:       to-rem(2);
 
 $caret-width:            .375em !default;
 $caret-width-lg:         $caret-width !default;
@@ -139,9 +143,8 @@ $caret-width-lg:         $caret-width !default;
 //
 // For each of Bootstrap's buttons, define text, background and border color.
 
-$control-height:                 36;
-$control-height-rem:             ($control-height / $rem-base * 16px);
-$control-padding-y:              ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+$control-height:                 36px;
+$control-padding-y:              ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
 
 $btn-min-width:                  $spacer * 6.75;
 $btn-padding-x:                  16px !default;
@@ -185,7 +188,7 @@ $footer-height:                             to-rem(60);
 
 // Checkbox toggles
 $toggle-border-width:                       $border-width;
-$toggle-height:                             $control-height-rem;
+$toggle-height:                             $control-height;
 $toggle-padding:                            to-rem(2);
 
 $toggle-height-sm: to-rem(24);

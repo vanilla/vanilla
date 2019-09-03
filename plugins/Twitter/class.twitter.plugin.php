@@ -695,8 +695,8 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-    public function socialReactions() {
-        return c('Plugins.Twitter.SocialReactions', true) && $this->isConfigured();
+    public function socialReactions():bool {
+        return (bool)c("Plugins.Twitter.SocialReactions", true);
     }
 
     /**
@@ -841,15 +841,13 @@ class TwitterPlugin extends Gdn_Plugin {
         switch (strtolower($recordType)) {
             case 'discussion':
                 $params['url'] = discussionUrl($args['Discussion']);
-                $params['text']  = sliceTwitter($this->formatService->renderPlainText($args['Discussion']->Name, 'Text'));
                 break;
             case 'comment':
                 $id = $args['Comment']->CommentID;
                 $params['url']  = url("/discussion/comment/{$id}#Comment_{$id}", true);
-                $params['text']  = sliceTwitter($this->formatService->renderPlainText($args['Comment']->Body, $args['Comment']->Format));
                 break;
         }
-        $url = url("https://twitter.com/intent/tweet?".http_build_query($params), true);
+        $url = url("https://twitter.com/share?".http_build_query($params), true);
         $cssClass = 'ReactButton PopupWindow';
         echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow']);
     }

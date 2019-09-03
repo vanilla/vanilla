@@ -22,7 +22,7 @@ interface IProps {
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
-    bottomCTA: React.ReactNode;
+    bottomCTA?: React.ReactNode;
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
@@ -37,19 +37,22 @@ export class SiteNav extends React.Component<IProps> {
         const { activeRecord, collapsible, onItemHover, children } = this.props;
         const hasChildren = children && children.length > 0;
         const classes = siteNavClasses();
+
         const content = hasChildren
             ? children.map((child, i) => {
                   return (
-                      <SiteNavNode
-                          {...child}
-                          collapsible={collapsible}
-                          activeRecord={activeRecord}
-                          key={child.recordType + child.recordID}
-                          titleID={this.titleID}
-                          depth={0}
-                          onItemHover={onItemHover}
-                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
-                      />
+                      <>
+                          <SiteNavNode
+                              {...child}
+                              collapsible={collapsible}
+                              activeRecord={activeRecord}
+                              key={child.recordType + child.recordID}
+                              titleID={this.titleID}
+                              depth={0}
+                              onItemHover={onItemHover}
+                              clickableCategoryLabels={!!this.props.clickableCategoryLabels}
+                          />
+                      </>
                   );
               })
             : null;

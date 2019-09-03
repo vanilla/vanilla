@@ -54,7 +54,7 @@ class ConversationsTest extends AbstractAPIv2Test {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
         $config->set('Garden.Email.Disabled', true, true, false);
-
+        $config->set('Conversations.Moderation.Allow', false, true, false);
         $session->end();
     }
 

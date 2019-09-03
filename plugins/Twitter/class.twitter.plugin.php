@@ -822,7 +822,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param array $args
      */
     protected function addReactButton($sender, $args) {
-        $recordType = $args['Type'];
+        $recordType = $args['Type'] ?? null;
         if (!$recordType) {
             return;
         }

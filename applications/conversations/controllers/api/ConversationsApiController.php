@@ -382,7 +382,7 @@ class ConversationsApiController extends AbstractApiController {
      */
     private function isConversationsModerator(): bool {
         $moderationEnbled = $this->config->get('Conversations.Moderation.Allow', false);
-        $isConversationModerator = $this->session()->getPermissions()->hasAny(["Conversations.Moderation.Manage"]);
+        $isConversationModerator = $this->getSession()->getPermissions()->hasAny(["Conversations.Moderation.Manage"]);
         return $moderationEnbled && $isConversationModerator;
     }
 

@@ -159,7 +159,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      * @expectedExceptionCode 403
      * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
-    public function testModerationEnabled() {
+    public function testSiteModeration  () {
         $this->api()->get($this->baseUrl, ['insertUserID' => self::$userIDs[0]]);
     }
 

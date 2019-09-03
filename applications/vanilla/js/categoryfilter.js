@@ -131,7 +131,7 @@
         var categoryTemplate = ' \
         <li class="plank js-category-item" data-id="{CategoryID}"> \
             <div class="plank-title"> \
-                {NameHTML} \
+                {escapeHTML(NameHTML)} \
             </div> \
             '+ categoryOptions + '\
         </li>';

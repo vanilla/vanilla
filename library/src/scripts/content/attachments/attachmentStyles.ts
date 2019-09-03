@@ -6,7 +6,7 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, allLinkStates, borders, margins, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, allLinkStates, borders, margins, negative, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 
@@ -87,7 +87,11 @@ export const attachmentClasses = useThemeCache(() => {
     });
 
     const metas = style("metas", {
-        marginBottom: px(0),
+        ...margins({
+            left: unit(negative(vars.padding.default / 2)),
+            right: unit(negative(vars.padding.default / 2)),
+            bottom: 0,
+        }),
         lineHeight: globalVars.lineHeights.condensed,
     });
 

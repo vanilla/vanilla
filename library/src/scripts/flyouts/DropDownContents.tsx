@@ -87,9 +87,5 @@ export default class DropDownContents extends React.Component<IProps> {
 
     private doNothing = (e: React.MouseEvent) => {
         e.stopPropagation();
-        e.preventDefault();
-        e.nativeEvent.stopImmediatePropagation();
-        e.nativeEvent.stopPropagation();
-        e.nativeEvent.preventDefault();
     };
 }

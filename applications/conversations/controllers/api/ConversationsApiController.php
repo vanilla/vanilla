@@ -350,7 +350,7 @@ class ConversationsApiController extends AbstractApiController {
             )
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
-        $isModerator = checkPermission('Garden.Moderation.Manage');
+        $isModerator = $this->isConversationsModerator();
         if (!$isModerator) {
             foreach ($conversations as $key => $value) {
                 $inConversation = $this->conversationModel->inConversation($value['conversationID'], $userID);
@@ -373,6 +373,17 @@ class ConversationsApiController extends AbstractApiController {
      */
     private function idParamSchema() {
         return $this->schema(['id:i' => 'The conversation ID.'], 'in');
+    }
+
+    /**
+     * Is the current user a conversations moderator?
+     *
+     * @return boolean
+     */
+    private function isConversationsModerator(): bool {
+        $moderationEnbled = $this->config->get('Conversations.Moderation.Allow', false);
+        $isConversationModerator = $this->session()->getPermissions()->hasAny(["Conversations.Moderation.Manage"]);
+        return $moderationEnbled && $isConversationModerator;
     }
 
     /**

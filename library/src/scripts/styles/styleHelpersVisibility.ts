@@ -34,6 +34,8 @@ export const visibility = useThemeCache(() => {
         });
     };
 
+    const visuallyHidden = style("srOnly", srOnly());
+
     const displayNone = style("displayNone", {
         display: important("none"),
     });
@@ -41,5 +43,6 @@ export const visibility = useThemeCache(() => {
     return {
         onEmpty,
         displayNone,
+        visuallyHidden,
     };
 });

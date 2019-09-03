@@ -24,17 +24,6 @@ class TwitterPlugin extends Gdn_Plugin {
     /** @var string */
     protected $_RedirectUri = null;
 
-    /** @var \Vanilla\Formatting\FormatService **/
-    private $formatService;
-
-    /**
-     * TwitterPlugin constructor.
-     * @param \Vanilla\Formatting\FormatService $formatService
-     */
-    public function __construct(\Vanilla\Formatting\FormatService $formatService) {
-        $this->formatService = $formatService;
-    }
-
     /**
      * Gets/sets the current oauth access token.
      *

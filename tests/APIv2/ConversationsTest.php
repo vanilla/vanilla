@@ -130,10 +130,6 @@ class ConversationsTest extends AbstractAPIv2Test {
 
     /**
      * Test GET /conversations.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testIndex() {
         $nbsInsert = 3;
@@ -143,12 +139,13 @@ class ConversationsTest extends AbstractAPIv2Test {
         for ($i = 0; $i < $nbsInsert; $i++) {
             $rows[] = $this->testPost();
         }
-
+        $userID = $this->api()->getUserID();
+        $this->api()->setUserID(self::$userIDs[0]);
         $result = $this->api()->get($this->baseUrl, ['insertUserID' => self::$userIDs[0]]);
+        $this->api()->setUserID($userID);
         $this->assertEquals(200, $result->getStatusCode());
 
         $rows = $result->getBody();
-        $this->assertGreaterThan($nbsInsert, count($rows));
         // The index should be a proper indexed array.
         for ($i = 0; $i < count($rows); $i++) {
             $this->assertArrayHasKey($i, $rows);

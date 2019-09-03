@@ -312,9 +312,9 @@ class ConversationsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-
+        $userID = $this->getSession()->UserID;
         if (!empty($query['insertUserID'])) {
-            if ($query['insertUserID'] !== $this->getSession()->UserID) {
+            if ($query['insertUserID'] !== $userID) {
                 $this->checkModerationPermission();
             }
 
@@ -332,9 +332,9 @@ class ConversationsApiController extends AbstractApiController {
                 ["Name", "Email", "Photo", "DateLastActive"]
             );
         } else {
-            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
+            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $userID;
 
-            if ($participantUserID !== $this->getSession()->UserID) {
+            if ($participantUserID !== $userID) {
                 $this->checkModerationPermission();
             }
 
@@ -350,11 +350,13 @@ class ConversationsApiController extends AbstractApiController {
             )
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
-        $userID = $this->getSession()->UserID;
-        foreach ($conversations as $key => $value) {
-            $inConversation = $this->conversationModel->inConversation($value['conversationID'], $userID);
-            if (!$inConversation) {
-                unset($conversations[$key]);
+        $isModerator = checkPermission('Garden.Moderation.Manage');
+        if (!$isModerator) {
+            foreach ($conversations as $key => $value) {
+                $inConversation = $this->conversationModel->inConversation($value['conversationID'], $userID);
+                if (!$inConversation) {
+                    unset($conversations[$key]);
+                }
             }
         }
         $result = $out->validate($conversations);

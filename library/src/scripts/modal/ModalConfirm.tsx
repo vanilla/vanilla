@@ -25,8 +25,8 @@ interface IProps {
     title: string; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
-    onCancel?: () => void;
-    onConfirm: () => void;
+    onCancel?: (e: Event) => void;
+    onConfirm: (e: Event) => void;
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
@@ -115,9 +115,9 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         );
     }
 
-    private handleCancel = () => {
+    private handleCancel = e => {
         this.setState({ cancelled: true });
-        this.props.onCancel && this.props.onCancel();
+        this.props.onCancel && this.props.onCancel(e);
     };
 
     public get titleID() {

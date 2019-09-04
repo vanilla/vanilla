@@ -10,7 +10,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
@@ -142,7 +142,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 <div className="selectBox-content">
                     <DropDown
                         id={this.state.id}
-                        className="selectBox-dropDown"
+                        className={classNames(
+                            "selectBox-dropDown",
+                            "dropDownItem-verticalPadding",
+                            classesDropDown.verticalPadding,
+                        )}
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
@@ -151,11 +155,10 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         renderAbove={this.props.renderAbove}
                         renderLeft={this.props.renderLeft}
                         openAsModal={this.props.openAsModal}
+                        flyoutType={FlyoutType.LIST}
                         selfPadded={true}
                     >
-                        <div className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}>
-                            {selectItems}
-                        </div>
+                        {selectItems}
                     </DropDown>
                 </div>
             </div>

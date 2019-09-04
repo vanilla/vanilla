@@ -8,6 +8,7 @@ import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { color } from "csx";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -45,10 +46,6 @@ export const formElementsVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
-    const miniInput = makeThemeVars("miniInput", {
-        width: 100,
-    });
-
     const colors = makeThemeVars("colors", {
         fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
@@ -61,7 +58,7 @@ export const formElementsVariables = useThemeCache(() => {
     });
 
     const placeholder = makeThemeVars("placeholder", {
-        color: mixBgAndFg(0.5),
+        color: mixBgAndFg(0.83),
     });
 
     const disabled = makeThemeVars("disabled", {
@@ -91,7 +88,6 @@ export const formElementsVariables = useThemeCache(() => {
         border,
         giantInput,
         largeInput,
-        miniInput,
         colors,
         placeholder,
         disabled,

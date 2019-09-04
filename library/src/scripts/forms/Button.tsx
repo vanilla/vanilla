@@ -33,7 +33,7 @@ interface IState {
     id?: string;
 }
 
-export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => {
+export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
@@ -56,6 +56,14 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
                 return classes.translucid;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
+            case ButtonTypes.DASHBOARD_STANDARD:
+                return "btn";
+            case ButtonTypes.DASHBOARD_PRIMARY:
+                return "btn btn-primary";
+            case ButtonTypes.DASHBOARD_SECONDARY:
+                return "btn btn-secondary";
+            case ButtonTypes.DASHBOARD_LINK:
+                return "btn btn-link";
             default:
                 return "";
         }
@@ -85,7 +93,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            getDynamicClassFromButtonType(this.props.baseClass),
+            getButtonStyleFromBaseClass(this.props.baseClass),
             { Button: this.props.legacyMode },
             this.props.className,
         );

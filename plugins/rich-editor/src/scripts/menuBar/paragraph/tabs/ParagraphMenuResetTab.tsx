@@ -7,7 +7,7 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { PilcrowIcon } from "@library/icons/editorIcons";

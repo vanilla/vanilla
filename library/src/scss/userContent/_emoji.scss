@@ -6,7 +6,7 @@
 
 .safeEmoji { // All emoji
     display: inline-flex;
-    font-family:  "Apple Color Emoji", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family:  "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
     vertical-align: middle;
     text-align: center;
     height: 1em;
@@ -15,7 +15,7 @@
 }
 
 .nativeEmoji { // Real Emojis
-    font-family: "Segoe UI Emoji", sans-serif; // Helps with IE
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
 .fallBackEmoji { // Image Emoji

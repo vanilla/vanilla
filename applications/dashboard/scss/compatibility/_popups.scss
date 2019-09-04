@@ -1,0 +1,18 @@
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.Popup .Content {
+    > h1, > h2, > h3 {
+        &:first-child {
+            // Target all first headings and treat them as titles.
+            // This is largely needed because the legacy popups have such diverse HTML content spread
+            // between a lot of plugins.
+            // For new popups, use `<Modal />` instead.
+            font-size: $global-smallTitle_fontSize;
+            margin-top: 0;
+            margin-bottom: $global-block_margin;
+        }
+    }
+}

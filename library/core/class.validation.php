@@ -93,6 +93,7 @@ class Gdn_Validation {
         $this->addRule('Time', 'function:ValidateTime', true);
         $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
+        $this->addRule('MinTextLength', 'function:validateMinTextLength');
         $this->addRule('Enum', 'function:ValidateEnum');
         $this->addRule('MinimumAge', 'function:ValidateMinimumAge');
         $this->addRule('Captcha', 'function:ValidateCaptcha');

@@ -371,7 +371,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {
-        Gdn::controller()->addJsFile('colorpicker.js');
+        Gdn::controller()->addJsFile('colorpicker.js', 'dashboard');
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
@@ -1739,6 +1739,21 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Returns the xhtml for a react rendered input component.
+     *
+     * @param string $fieldName The name of the field that is being hidden/posted with this input. It
+     * should related directly to a field name in $this->_DataArray.
+     * @param string $componentKey The key of the of the component registered in the frontend with addComponent.
+     * @return string
+     */
+    public function react(string $fieldName, string $componentKey) {
+        $value = $attributes['value'] ?? $this->getValue($fieldName);
+        $props = htmlspecialchars(json_encode(['initialValue' => $value]));
+
+        return "<div data-react='$componentKey' data-props='$props'></div>";
+    }
+
+    /**
      * Return a control for uploading images.
      *
      * @param string $fieldName
@@ -2977,7 +2992,10 @@ PASSWORDMETER;
 
             touchValue('Control', $row, 'TextBox');
 
-            if (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
+            if (strtolower($row['Control']) === 'react') {
+                $result .= $this->react($row['Name'], $row['Component']);
+                continue;
+            } elseif (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
             } else {
                 $defaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];

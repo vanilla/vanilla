@@ -25,6 +25,12 @@ echo $Form->errors();
 
     foreach ($Sf->schema() as $Row) {
 
+        if (strtolower($Row['Control']) === 'title') {
+            $title = htmlspecialchars($Row['Title']);
+            echo "<h2 class='subheading'>$title</h2>";
+            continue;
+        }
+
         if ((strtolower($Row['Control'])) !== 'imageupload') {
             if (val('no-grid', $Row['Options'])) {
                 echo "<li>\n  ";

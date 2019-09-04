@@ -11,16 +11,16 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { StoryTile } from "@library/storybook/StoryTile";
+
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
-import { CheckCompactIcon, CloseCompactIcon } from "@library/icons/common";
-import { ComposeIcon } from "@library/icons/titleBar";
-const reactionsStory = storiesOf("Components", module);
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 
-reactionsStory.add("Buttons", () => {
+const buttonStory = storiesOf("Components", module);
+
+buttonStory.add("Buttons", () => {
     const globalVars = globalVariables();
     const classesButtonUtility = buttonUtilityClasses();
     return (
@@ -43,33 +43,33 @@ reactionsStory.add("Buttons", () => {
                 .
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact title={"Most common button"}>
+                <StoryTileAndTextCompact text={"Most common button"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact title={"Call to action"}>
+                <StoryTileAndTextCompact text={"Call to action"}>
                     <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact type="titleBar" title={"For Title Bar (Sign in Button)"}>
+                <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Register)"}>
                     <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Simple text button"}>
                     <Button baseClass={ButtonTypes.TEXT}>Text</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Text with primary color"}>
                     <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    title={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
+                    text={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
                 >
                     <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
                         <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    title={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
+                    text={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
                         globalVars.icon.sizes.default,
                     )})`}
                 >
@@ -92,7 +92,7 @@ reactionsStory.add("Buttons", () => {
                     'a "compact" version of your icon that doesn\'t have as much padding that will look better.'}
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Icon and Text Example"}>
                     <Button baseClass={ButtonTypes.STANDARD}>
                         <ComposeIcon className={classesButtonUtility.buttonIconRightMargin} />
                         {"Icon and Text"}
@@ -101,12 +101,4 @@ reactionsStory.add("Buttons", () => {
             </StoryTiles>
         </StoryContent>
     );
-});
-
-reactionsStory.add("Modals", () => {
-    return <StoryHeading depth={1}>Modals</StoryHeading>;
-});
-
-reactionsStory.add("Examples", () => {
-    return <StoryHeading depth={1}>Modal Examples</StoryHeading>;
 });

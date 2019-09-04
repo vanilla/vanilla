@@ -8,7 +8,7 @@
 namespace Garden\Web;
 
 use Garden\ClassLocator;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Maps requests to controllers using RESTful URLs.

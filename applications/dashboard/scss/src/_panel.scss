@@ -33,14 +33,14 @@
     margin-top: 0;
     margin-bottom: $spacer / 2;
     border-bottom: $border-width dotted $grey-dark-border;
-    letter-spacing: to-rem(1);
+    letter-spacing: 1px;
     font-size: $font-size-base;
     text-transform: uppercase;
   }
 
   a {
     color: $brand-primary;
-    font-size: to-rem(13);
+    font-size: 13px;
     font-weight: $font-weight-helvetica-medium;
     border-bottom: $border-width dotted $brand-primary;
 
@@ -56,7 +56,7 @@
 
   li {
     margin-bottom: $spacer / 4;
-    font-size: to-rem(12);
+    font-size: 12px;
   }
 
   ol,
@@ -110,7 +110,7 @@
 // Styleguide 15.2.
 
 .control-panel {
-  font-size: to-rem(12);
+  font-size: 12px;
   color: $grey-light-text;
 
   .panel & {
@@ -118,7 +118,7 @@
   }
 
   .control-panel-list-item {
-    line-height: to-rem(18);
+    line-height: 18px;
     margin-bottom: 0;
 
     > * {
@@ -136,7 +136,7 @@
     padding-bottom: $spacer / 2;
     margin-top: 0;
     margin-bottom: $spacer / 2;
-    font-size: to-rem(16);
+    font-size: 16px;
     line-height: 1.5;
     font-weight: 600;
     color: $grey-dark;
@@ -154,13 +154,13 @@
   }
 
   .control-panel-list-item-label {
-    max-width: to-rem(102);
+    max-width: 102px;
     font-style: italic;
     @extend .truncate;
   }
 
   select {
-    height: to-rem(30);
+    height: 30px;
     width: 100%;
   }
 }

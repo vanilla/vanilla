@@ -20,7 +20,7 @@ import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -52,6 +52,10 @@ interface IState {
     hasFocus: boolean;
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
 }
+
+// With some effort we could probably calculate this value.
+// For now this is good enough.
+const APPROXIMATE_MAX_MENU_HEIGHT = 170;
 
 // Implements the paragraph menubar
 export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
@@ -280,7 +284,11 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            this.props.renderAbove || scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
+            this.props.renderAbove ||
+                (scrollBounds.height >= APPROXIMATE_MAX_MENU_HEIGHT &&
+                    scrollBounds.height - bounds.bottom <= APPROXIMATE_MAX_MENU_HEIGHT)
+                ? "isUp"
+                : "isDown",
         );
     }
 

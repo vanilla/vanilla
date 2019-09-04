@@ -7,6 +7,7 @@
 import React from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
+import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 
 interface IProps {
     className?: string;
@@ -20,25 +21,24 @@ interface IProps {
  */
 export default class Breadcrumb extends React.Component<IProps> {
     public render() {
+        const classes = breadcrumbsClasses();
         let ariaCurrent;
         if (this.props.lastElement) {
             ariaCurrent = `page`;
         }
 
         return (
-            <li className="breadcrumb">
+            <li className={classes.breadcrumb}>
                 <SmartLink
                     to={this.props.url}
                     title={this.props.name}
                     aria-current={ariaCurrent}
-                    className={classNames("breadcrumb-link", this.props.className, { isCurrent: ariaCurrent })}
+                    className={classNames(classes.link, this.props.className, { isCurrent: ariaCurrent })}
                     itemScope
                     itemType="http://schema.org/Thing"
                     itemProp="item"
                 >
-                    <span className="breadcrumb-label" itemProp="name">
-                        {this.props.name}
-                    </span>
+                    <span itemProp="name">{this.props.name}</span>
                 </SmartLink>
             </li>
         );

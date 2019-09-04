@@ -16,6 +16,9 @@ $popup_borderColor:                    rgba($popup_fg, 0.8) !default;
 $popup_border:                         1px solid $popup_borderColor !default;
 $popup_borderRadius:                   $global_borderRadius !default;
 $popup_boxShadow:                      0 1px 3px 0px rgba($global-color_black, 0.4) !default;
+$popup_paddingVertical:                12px;
+$popup_paddingHorizontal:              18px;
+
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -32,7 +35,7 @@ div.Popup {
     }
 
     .Body {
-        padding: 24px 18px;
+        padding: $popup_paddingVertical $popup_paddingHorizontal;
         background-color: $popup_bg;
         box-shadow: 0 1px 3px 0px rgba($global-color_black, 0.4);
         border-radius: $popup_borderRadius;
@@ -86,6 +89,8 @@ div.Popup {
     }
 
     a.Close {
+        top: 24px;
+        right: 28px;
         @include CloseButton($popup_fg);
     }
 

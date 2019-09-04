@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { userContentClasses } from "@library/content/userContentStyles";
 import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
@@ -20,6 +19,7 @@ import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
 import { IAutoHighlightResult } from "highlight.js";
+import { userContentClasses } from "@library/content/userContentStyles";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 

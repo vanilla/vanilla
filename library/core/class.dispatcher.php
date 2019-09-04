@@ -43,8 +43,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '#^plugin(/|$)#' => self::BLOCK_NEVER,
         '#^settings/analyticstick.json$#' => self::BLOCK_PERMISSION,
         '#^sso(/|$)#' => self::BLOCK_NEVER,
-        '#^user/emailavailable(/|$)#' => self::BLOCK_PERMISSION,
-        '#^user/usernameavailable(/|$)#' => self::BLOCK_PERMISSION,
+        '#^user/emailavailable(/|$|\.json)#' => self::BLOCK_PERMISSION,
+        '#^user/usernameavailable(/|$|\.json)#' => self::BLOCK_PERMISSION,
         '#^utility(/|$)#' => self::BLOCK_NEVER,
     ];
 

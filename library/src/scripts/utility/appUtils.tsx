@@ -9,8 +9,10 @@ import React, { ComponentClass } from "react";
 import ReactDOM from "react-dom";
 import gdn from "@library/gdn";
 import { RouteProps } from "react-router";
-import { logError, PromiseOrNormalCallback } from "@vanilla/utils";
+import { logError, PromiseOrNormalCallback, logWarning } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
+import { mountReact } from "@vanilla/react-utils";
+import { AppContext } from "@library/AppContext";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -171,90 +173,6 @@ export function assetUrl(path: string): string {
 export function themeAsset(path: string): string {
     const themeKey = getMeta("ui.themeKey");
     return assetUrl(`/themes/${themeKey}/${path}`);
-}
-
-/**
- * @type {Object} The currently registered Components.
- * @private
- */
-const _components = {};
-
-/**
- * Register a component in the Components registry.
- *
- * @param name The name of the component.
- * @param component The component to register.
- */
-export function addComponent(name: string, component: ComponentClass) {
-    _components[name.toLowerCase()] = component;
-}
-
-/**
- * Test to see if a component has been registered.
- *
- * @param name The name of the component to test.
- * @returns Returns **true** if the component has been registered or **false** otherwise.
- */
-export function componentExists(name: string): boolean {
-    return _components[name.toLowerCase()] !== undefined;
-}
-
-/**
- * Get a component from the component registry.
- *
- * @param name The name of the component.
- * @returns Returns the component or **undefined** if there is no registered component.
- */
-export function getComponent(name: string): ComponentClass | undefined {
-    return _components[name.toLowerCase()];
-}
-
-/**
- * Mount all declared Components on the dom.
- *
- * The page signifies that an element contains a component with the `data-react="<Component>"` attribute.
- *
- * @param parent - The parent element to search. This element is not included in the search.
- */
-export function _mountComponents(parent: Element) {
-    const nodes = parent.querySelectorAll("[data-react]").forEach(node => {
-        const name = node.getAttribute("data-react") || "";
-        const Component = getComponent(name);
-
-        if (Component) {
-            ReactDOM.render(<Component />, node);
-        } else {
-            logError("Could not find component %s.", name);
-        }
-    });
-}
-
-/**
- * @type {Array} The currently registered routes.
- * @private
- */
-const _routes: any[] = [];
-
-/**
- * Register one or more routes to the app component.
- *
- * @param routes An array of routes to add.
- */
-export function addRoutes(routes: Array<React.ReactElement<RouteProps>>) {
-    if (!Array.isArray(routes)) {
-        _routes.push(routes);
-    } else {
-        _routes.push(...routes);
-    }
-}
-
-/**
- * Get all of the currently registered routes.
- *
- * @returns Returns an array of routes.
- */
-export function getRoutes(): Array<React.ReactElement<RouteProps>> {
-    return _routes;
 }
 
 /**

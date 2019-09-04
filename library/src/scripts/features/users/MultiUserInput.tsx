@@ -19,6 +19,7 @@ interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
     onChange: (users: IComboBoxOption[]) => void;
     value: IComboBoxOption[];
+    className?: string;
 }
 
 /**
@@ -45,6 +46,7 @@ export class MultiUserInput extends React.Component<IProps> {
                 onChange={this.props.onChange}
                 value={this.props.value}
                 onInputChange={this.onInputChange}
+                className={this.props.className}
             />
         );
     }

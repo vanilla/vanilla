@@ -10,7 +10,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
 import { isFileImage } from "@vanilla/utils";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
 

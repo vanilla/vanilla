@@ -13,6 +13,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 interface IProps {
     className?: string;
     buttonType?: ButtonTypes;
+    alignLeft?: boolean;
 }
 
 /**
@@ -20,10 +21,13 @@ interface IProps {
  */
 export default class ButtonLoader extends React.Component<IProps> {
     public render() {
-        const classes = buttonLoaderClasses(this.props.buttonType ? this.props.buttonType : ButtonTypes.STANDARD);
+        const classes = buttonLoaderClasses(this.props.buttonType ? this.props.buttonType : undefined);
         return (
             <React.Fragment>
-                <div className={classNames(classes.root, this.props.className)} aria-hidden="true" />
+                <div
+                    className={classNames(classes.root(this.props.alignLeft ? "left" : "center"), this.props.className)}
+                    aria-hidden="true"
+                />
                 <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
             </React.Fragment>
         );

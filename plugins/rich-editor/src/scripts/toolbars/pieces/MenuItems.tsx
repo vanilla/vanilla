@@ -8,7 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import MenuItem, { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 interface IProps {
     menuItemData: IMenuItemData[];

@@ -30,11 +30,15 @@ export const embedContainerVariables = useThemeCache(() => {
         weight: globalVars.fonts.weights.bold,
     });
 
+    const dimensions = makeThemeVars("dimensions", {
+        maxEmbedWidth: 640,
+    });
+
     const spacing = makeThemeVars("padding", {
         padding: 12,
     });
 
-    return { border, spacing, colors, title };
+    return { border, spacing, colors, title, dimensions };
 });
 
 export const embedContainerClasses = useThemeCache(() => {
@@ -129,5 +133,9 @@ export const embedContentClasses = useThemeCache(() => {
         display: "inline-flex",
         width: "auto",
     });
-    return { small };
+
+    const root = style("root", {
+        position: "relative",
+    });
+    return { small, root };
 });

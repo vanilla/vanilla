@@ -44,6 +44,12 @@ if ($this->Data !== FALSE) {
                     $CountText = '';
                 }
 
+                if( $Category->PhotoUrl !== "" ){
+                    echo '<div class="Item-Icon PhotoWrap PhotoWrap-Category">';
+                    echo '<img src="' .$Category->PhotoUrl. '" class="CategoryPhoto" alt="' .$Category->Name. '">';
+                    echo '</div>';
+                }
+
                 if ($Category->DisplayAs === 'Heading') {
                     echo $CountText.' '.htmlspecialchars($Category->Name);
                 } else {

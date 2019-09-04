@@ -13,7 +13,7 @@ import NextPrevious from "@library/navigation/NextPrevious";
 import NavLinksWithHeadings from "@library/navigation/NavLinksWithHeadings";
 import { navLinksWithHeadingsData } from "@library/navigation/navLinksWithHeadings.storyData";
 
-const story = storiesOf("Site Nav", module);
+const story = storiesOf("Navigation", module);
 
 const data = navLinksWithHeadingsData;
 

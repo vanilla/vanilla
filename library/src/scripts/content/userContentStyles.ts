@@ -11,10 +11,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
-import { notUserContent } from "@library/flyouts/dropDownStyles";
-import { cssRule } from "typestyle";
 
-const userContentVariables = useThemeCache(() => {
+export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
     const globalVars = globalVariables();
     const { mainColors } = globalVars;
@@ -33,7 +31,7 @@ const userContentVariables = useThemeCache(() => {
 
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
-        bg: mainColors.fg.mix(mainColors.bg, 0.05),
+        bg: mainColors.fg.mix(mainColors.bg, 0.07),
         fg: mainColors.bg.lightness() > 0.5 ? mainColors.fg.darken(0.2) : mainColors.fg.lighten(0.2),
     });
 
@@ -290,19 +288,6 @@ export const userContentClasses = useThemeCache(() => {
     // They should be fully converted in the future but at the moment
     // Only the bare minimum is convverted in order to make the colors work.
     const spoilersAndQuotes: NestedCSSSelectors = {
-        "& .spoiler": {
-            background: colorOut(vars.blocks.bg),
-            color: colorOut(vars.blocks.fg),
-        },
-        "& .button-spoiler": {
-            background: colorOut(vars.blocks.bg),
-            color: colorOut(vars.blocks.fg),
-        },
-        "& .spoiler-icon": {
-            margin: 0,
-            background: colorOut(vars.blocks.bg),
-            color: colorOut(vars.blocks.fg),
-        },
         "& .embedExternal-content": {
             borderRadius: vars.embeds.borderRadius,
             $nest: {

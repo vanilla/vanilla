@@ -5,6 +5,7 @@
 
 import { Omit } from "@library/@types/utils";
 import { AxiosError, AxiosResponse } from "axios";
+import { IUserFragment } from "@library/@types/api/users";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -59,6 +60,18 @@ export interface INavigationItem {
     recordID: number;
     sort: number | null;
     recordType: string;
+}
+
+export interface IApiDateInfo {
+    insertUserID: number;
+    insertDate: string;
+    updateUserID: number;
+    updateDate: string;
+}
+
+export interface IApiDateInfoExpanded extends IApiDateInfo {
+    insertUser: IUserFragment;
+    updateUser: IUserFragment;
 }
 
 export interface INavigationTreeItem extends INavigationItem {

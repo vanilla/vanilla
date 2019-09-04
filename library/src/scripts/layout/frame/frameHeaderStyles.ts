@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { appearance, colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { appearance, colorOut, paddings, singleBorder, unit, margins, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, em, percent } from "csx";
@@ -39,6 +39,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
+    const rootMinimal = style("rootMinimal", {
+        display: "block",
+    });
+
     const backButton = style("backButton", {
         display: "flex",
         flexWrap: "nowrap",
@@ -58,6 +62,17 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexBasis: calc(`100% - ${formElVars.sizing.height}`),
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
+    });
+
+    const headingMinimal = style("headingMinimal", {
+        ...flexHelper().middle(),
+        ...paddings({ horizontal: 24 }),
+        $nest: {
+            "& *": {
+                textTransform: "uppercase",
+                fontSize: unit(globalVars.fonts.size.small),
+            },
+        },
     });
 
     const left = style("left", {
@@ -116,6 +131,14 @@ export const frameHeaderClasses = useThemeCache(() => {
         border: 0,
     });
 
+    const closeMinimal = style("closeMinimal", {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        ...margins({ vertical: "auto" }),
+        right: unit(6),
+    });
+
     const categoryIcon = style("categoryIcon", {
         flexBasis: unit(18),
         marginRight: ".6em",
@@ -123,7 +146,9 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     return {
+        closeMinimal,
         root,
+        rootMinimal,
         backButton,
         heading,
         left,
@@ -133,5 +158,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         backButtonIcon,
         close,
         categoryIcon,
+        headingMinimal,
     };
 });

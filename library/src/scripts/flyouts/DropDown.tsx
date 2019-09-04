@@ -41,6 +41,7 @@ export interface IProps extends IDeviceProps {
     title?: string;
     flyoutType: FlyoutType;
     selfPadded?: boolean;
+    isSmall?: boolean;
 }
 
 export enum FlyoutType {
@@ -117,7 +118,7 @@ class DropDown extends React.Component<IProps, IState> {
                                     : this.props.flyoutType === FlyoutType.FRAME
                             }
                             size={
-                                this.props.flyoutType === FlyoutType.FRAME
+                                this.props.flyoutType === FlyoutType.FRAME && !this.props.isSmall
                                     ? DropDownContentSize.MEDIUM
                                     : DropDownContentSize.SMALL
                             }
@@ -134,6 +135,7 @@ class DropDown extends React.Component<IProps, IState> {
                                     )}
                                     {openAsModal && (
                                         <SmartAlign>
+                                            (
                                             <Heading
                                                 title={title}
                                                 className={classNames(

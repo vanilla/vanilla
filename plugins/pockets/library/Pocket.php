@@ -236,9 +236,10 @@ class Pocket {
      *
      * @param string $repeat The repeat value.
      *
-     * @return [string, string[]] A tuple of the repeat value and frequency.
+     * @return array A tuple of the repeat value and frequency in the form `[string, string[]]`.
      */
     public static function parseRepeat($repeat) {
+        $repeatType = '';
         if (stringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
             $repeatType = Pocket::REPEAT_EVERY;
             $frequency = substr($repeat, strlen(Pocket::REPEAT_EVERY));

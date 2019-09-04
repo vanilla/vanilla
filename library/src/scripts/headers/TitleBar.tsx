@@ -55,6 +55,18 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class TitleBar extends React.Component<IProps, IState> {
+    /** Hold the extra mebox components before rendering. */
+    private static extraMeBoxComponents: React.ComponentType[] = [];
+
+    /**
+     * Register an extra component to be rendered before the mebox.
+     * This will only affect larger screen sizes.
+     *
+     * @param component The component class to be render.
+     */
+    public static registerBeforeMeBox(component: React.ComponentType) {
+        TitleBar.extraMeBoxComponents.push(component);
+    }
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
@@ -137,6 +149,13 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
                                 condition={!!showMobileDropDown}
                             >
+                                {!this.state.openSearch && (
+                                    <div className={classes.extraMeBoxIcons}>
+                                        {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                            return <ComponentName key={index} />;
+                                        })}
+                                    </div>
+                                )}
                                 <CompactSearch
                                     className={classNames("titleBar-compactSearch", classes.compactSearch, {
                                         isCentered: this.state.openSearch,

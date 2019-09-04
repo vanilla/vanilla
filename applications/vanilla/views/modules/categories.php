@@ -46,7 +46,7 @@ if ($this->Data !== FALSE) {
 
                 if( $Category->PhotoUrl !== "" ){
                     echo '<div class="Item-Icon PhotoWrap PhotoWrap-Category">';
-                    echo '<img src="' .$Category->PhotoUrl. '" class="CategoryPhoto" alt="' .$Category->Name. '">';
+                    echo '<img src="' .htmlspecialchars($Category->PhotoUrl). '" class="CategoryPhoto" alt="' .htmlspecialchars($Category->Name). '">';
                     echo '</div>';
                 }
 

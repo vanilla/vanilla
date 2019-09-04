@@ -12,7 +12,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 interface IProps {
     options: IComboBoxOption[];
-    onChange: (newValue: IComboBoxOption) => void;
+    onChange: (newValue: IComboBoxOption | null) => void;
     value?: IComboBoxOption;
     className?: string;
     disabled?: boolean;

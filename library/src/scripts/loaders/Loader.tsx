@@ -20,6 +20,7 @@ interface IProps {
     height?: number;
     width?: number;
     padding?: PaddingProperty<TLength>;
+    small?: boolean;
 }
 
 interface IState {
@@ -38,7 +39,9 @@ export default class Loader extends React.Component<IProps, IState> {
         if (this.props.minimumTime && this.props.minimumTime > 0 && !this.state.showLoader) {
             return null;
         }
-        const styleClass = this.props.loaderStyleClass || loaderClasses().fullPageLoader;
+        const styleClass = this.props.small
+            ? loaderClasses().smallLoader
+            : this.props.loaderStyleClass || loaderClasses().fullPageLoader;
 
         return (
             <React.Fragment>

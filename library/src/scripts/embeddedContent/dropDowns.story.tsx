@@ -13,11 +13,9 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryExampleDropDown } from "./StoryExampleDropDown";
 import { FlyoutType } from "@library/flyouts/DropDown";
-import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
-import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
-import { UserDropDown } from "@library/headers/mebox/pieces/UserDropdown";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import StoryExampleMessagesDropDown from "@library/embeddedContent/StoryExampleDropDownMessages";
+import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
 
 const story = storiesOf("Components", module);
 
@@ -110,6 +108,9 @@ story.add("Dropdowns", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact backgroundColor={toolBarColors.bg}>
                     <StoryExampleMessagesDropDown />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact backgroundColor={toolBarColors.bg}>
+                    <StorybookExampleNotificationsDropDown />
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

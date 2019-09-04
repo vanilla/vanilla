@@ -20,7 +20,7 @@ import { ComposeIcon } from "@library/icons/titleBar";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 
 interface IProps {
     buttonClassName?: string;
@@ -333,7 +333,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
                                 emptyMessage={t("You do not have any messages yet.")}
                                 className="headerDropDown-messages"
                                 type={MeBoxItemType.MESSAGE}
-                                data={messagesData}
+                                data={messagesData as IMeBoxMessageItem[]}
                             />
                         </FrameBody>
                     }

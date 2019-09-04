@@ -93,10 +93,3 @@ export enum PublishStatus {
     UNDELETED = "undeleted",
     PUBLISHED = "published",
 }
-
-export interface IApiDateInfo {
-    dateInserted: string;
-    insertUserID: number;
-    dateUpdated: string;
-    updateUserID: number;
-}

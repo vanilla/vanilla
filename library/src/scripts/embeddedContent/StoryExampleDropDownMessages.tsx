@@ -6,7 +6,7 @@
 
 import React from "react";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { t } from "@library/utility/appUtils";
+import { assetUrl, t } from "@library/utility/appUtils";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -34,7 +34,7 @@ interface IState {
     open: boolean;
 }
 
-import imageFile from "../../../../applications/dashboard/design/images/defaulticon.png";
+const imageFile = "https://us.v-cdn.net/5022541/uploads/172/DM61BXDW9K18.png";
 
 const messagesData = [
     {

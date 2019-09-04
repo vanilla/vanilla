@@ -248,36 +248,6 @@ class Emoji {
         }
 
         $eventManager->fire('Emoji_Init', $this, []); // Empty $argrs array needed for backwards compatibility.
-
-        // Add emoji to definition list for whole site. This used to be in the
-        // advanced editor plugin, but since moving atmentions to core, had to
-        // make sure they were still being added. This will make sure that
-        // emoji autosuggest works. Note: emoji will not be core yet, so the only
-        // way that this gets called is by the editor when it instantiates. Core
-        // does not instantiate this class anywhere, so there will not be any
-        // suggestions for emoji yet, but keep here for whenever Advanced Editor
-        // is running.
-        $c = Gdn::controller();
-        if ($c && $this->enabled) {
-            $emojis = $this->getEmoji();
-            $emojiAssetPath = $this->getAssetPath();
-            $emoji = [];
-
-            foreach ($emojis as $name => $data) {
-                $emoji[] = [
-                    "name" => "".$name."",
-                    "url" => asset($emojiAssetPath.'/'.$data, true)
-                ];
-            }
-
-            $emoji = [
-                'assetPath' => asset($this->getAssetPath(), true),
-                'format' => $this->getFormat(),
-                'emoji' => $this->getEmoji()
-            ];
-
-            $c->addDefinition('emoji', $emoji);
-        }
     }
 
     /**
@@ -336,6 +306,30 @@ class Emoji {
      */
     public function getArchive() {
         return $this->archive;
+    }
+
+    /**
+     * Get an emoji config array with essential information for rendering emoji in the browser.
+     *
+     * @return array
+     */
+    public function getWebConfig(): array {
+        $result = [
+            "assetPath" => asset($this->getAssetPath(), true),
+            "format" => $this->getFormat(),
+            "emoji" => $this->getEmoji()
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Are emoji enabled?
+     *
+     * @return boolean
+     */
+    public function isEnabled(): bool {
+        return (bool)$this->enabled;
     }
 
     /**

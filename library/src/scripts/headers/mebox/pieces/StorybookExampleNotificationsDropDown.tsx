@@ -48,7 +48,7 @@ const notificationsData = [
 /**
  * Implements Notifications menu for header
  */
-export default class StorybookExampleNotificationsDropDown extends React.Component<IState> {
+export default class StorybookExampleNotificationsDropDown extends React.Component<{}, IState> {
     private id = uniqueIDFromPrefix("notificationsDropDown");
 
     public state: IState = {

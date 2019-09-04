@@ -17,6 +17,7 @@ import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDr
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
 import { UserDropDown } from "@library/headers/mebox/pieces/UserDropdown";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import StoryExampleMessagesDropDown from "@library/embeddedContent/StoryExampleDropDownMessages";
 
 const story = storiesOf("Components", module);
 
@@ -108,13 +109,7 @@ story.add("Dropdowns", () => {
                     />
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact backgroundColor={toolBarColors.bg}>
-                    <NotificationsDropDown {...meBoxData} userSlug={"JoeSchmo"} countUnread={2} />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact backgroundColor={toolBarColors.bg}>
-                    <MessagesDropDown {...meBoxData} />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact backgroundColor={toolBarColors.bg}>
-                    <UserDropDown {...meBoxData} />
+                    <StoryExampleMessagesDropDown />
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

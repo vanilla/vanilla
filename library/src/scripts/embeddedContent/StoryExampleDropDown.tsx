@@ -23,7 +23,9 @@ import DropDownSection from "@library/flyouts/items/DropDownSection";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 
-interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
+interface IProps extends Omit<IStoryTileAndTextProps, "children"> {
+    flyoutType: FlyoutType;
+}
 
 export function StoryExampleDropDown(props: IProps) {
     const device = useDevice();
@@ -33,7 +35,7 @@ export function StoryExampleDropDown(props: IProps) {
             <DropDown
                 name={t("Article Options")}
                 renderLeft={true}
-                flyoutType={FlyoutType.LIST}
+                flyoutType={props.flyoutType}
                 openAsModal={device === Devices.MOBILE || device === Devices.XS}
             >
                 <InsertUpdateMetas

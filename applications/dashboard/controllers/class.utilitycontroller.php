@@ -362,6 +362,8 @@ class UtilityController extends DashboardController {
         Gdn_Theme::section('Utility');
 
         $this->setData('_isAdmin', Gdn::session()->checkPermission('Garden.Settings.Manager'));
+        $this->setData("form", $this->Form);
+        $this->setData("headerImage", asset("/applications/dashboard/design/images/vanilla_logo.png"));
         $this->render($this->View, 'utility', 'dashboard');
     }
 

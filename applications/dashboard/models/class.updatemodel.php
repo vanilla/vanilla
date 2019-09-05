@@ -779,7 +779,7 @@ class UpdateModel extends Gdn_Model {
      * @param string|null $message A message to go along with the status
      */
     private function saveStatus(string $status, string $message = null) {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('America/Toronto'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone("UTC"));
 
         try {
             Gdn::config()->saveToConfig([

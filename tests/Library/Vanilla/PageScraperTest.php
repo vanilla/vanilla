@@ -25,7 +25,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
      */
     private function pageScraper() {
         // Create the test instance. Register the metadata handlers.
-        $pageScraper = new LocalFilePageScraper(new HttpRequest());
+        $pageScraper = self::container()->get(LocalFilePageScraper::class);
         $pageScraper->setHtmlDir(self::HTML_DIR);
         $pageScraper->registerMetadataParser(new OpenGraphParser());
         $pageScraper->registerMetadataParser(new JsonLDParser());

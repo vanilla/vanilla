@@ -666,8 +666,7 @@ class UtilityController extends DashboardController {
             }
         } else {
             if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                // We are only allowing an update of 5 times every 24 hours.
-                throw permissionException();
+                throw permissionException("Garden.Settings.Manage");
             }
             if (!$this->Request->isAuthenticatedPostBack(false)) {
                 trigger_error("Invalid transient key on utility/update.", E_USER_WARNING);

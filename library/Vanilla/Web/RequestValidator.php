@@ -31,14 +31,15 @@ class RequestValidator {
      * Ensure the request is not of a particular type.
      *
      * @param string $requestMethod The method of the request, Eg. POST, PATCH, GET. See Gdn_Request constants.
-     * @param string|null $message The message to print in the exception.
+     * @param string $extraMessage Additional message content to add to the exception.
      *
      * @throws ClientException If the request method doesn't match.
      *
      */
-    public function blockRequestType(string $requestMethod, ?string $message = null) {
-        if ($message === null) {
-            $message = "Request method $requestMethod is not allowed.";
+    public function blockRequestType(string $requestMethod, string $extraMessage = "") {
+        $message = "Request method $requestMethod is not allowed.";
+        if ($extraMessage !== "") {
+            $message .= '\n' . $extraMessage;
         }
 
         if ($this->request->getMethod() === $requestMethod) {

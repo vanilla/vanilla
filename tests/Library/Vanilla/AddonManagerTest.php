@@ -12,11 +12,15 @@ use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
 use Test\OldApplication\Controllers\OldApiController;
+use Test\OldApplication\ArbitraryUppercase;
+use Test\OldApplication\arbitraryLowercase;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
 
-
+/**
+ * Tests for the AddonManager
+ */
 class AddonManagerTest extends SharedBootstrapTestCase {
 
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
@@ -470,17 +474,35 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Addons should be able to nest classes within specific directories.
+     *
+     * @param string $lookupClassName The classname to look for.
+     * @param string|null $addonKeyFound The addon key you expect the class to be assosciated with. Null if it shouldn't be found.
+     *
+     * @dataProvider provideClassLookups
      */
-    public function testClassDirectoryRecursion() {
+    public function testClassDirectoryRecursion(string $lookupClassName, ?string $addonKeyFound) {
         $am = $this->createTestManager();
 
-        $addon = $am->lookupByClassname(OldApiController::class, true);
-        $this->assertNotNull($addon);
-        $this->assertEquals('test-old-application', $addon->getKey());
+        $addon = $am->lookupByClassname($lookupClassName, true);
+        if ($addonKeyFound) {
+            $this->assertNotNull($addon);
+            $this->assertEquals($addonKeyFound, $addon->getKey());
+        } else {
+            $this->assertNull($addon);
+        }
+    }
 
-        $addon = $am->lookupByClassname(NewApiController::class, true);
-        $this->assertNotNull($addon);
-        $this->assertEquals('test-old-application', $addon->getKey());
+    /**
+     * Provide data for testClassDirectoryRecursion.
+     */
+    public function provideClassLookups(): array {
+        $oldApp = 'test-old-application';
+        return [
+            'Old Api Controller' => [ OldApiController::class, $oldApp],
+            'APIv2 Controller' => [ NewApiController::class, $oldApp],
+            'Nested Namespace uppercase' => [ ArbitraryUppercase\CustomDirNamespaceClass::class, $oldApp ],
+            'Nested Namespace lowercase' => [ arbitraryLowercase\CustomDirNamespaceClass::class, null ],
+        ];
     }
 
     /**

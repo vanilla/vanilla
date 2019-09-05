@@ -12,6 +12,7 @@ import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { humanFileSize } from "@library/utility/fileUtils";
 import { IApiError, IFieldError } from "@library/@types/api/core";
+import { IUserFragment } from "@library/@types/api/users";
 
 function fieldErrorTransformer(responseData) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {

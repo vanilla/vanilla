@@ -269,6 +269,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const separator = style("separator", {
+        listStyle: "none",
         height: unit(globalVars.separator.size),
         backgroundColor: colorOut(globalVars.separator.color),
         ...margins(vars.spacer.margin),

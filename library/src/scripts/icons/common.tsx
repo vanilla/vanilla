@@ -477,3 +477,49 @@ export function accessibleImageMenu(message?: string, className?: string) {
         </svg>
     );
 }
+
+export function EditIcon(props: { className?: string }) {
+    const classes = iconClasses();
+
+    return (
+        <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
+            <title>{t("Edit")}</title>
+            <g id="Edit-Icon" transform="translate(4.000000, 3.000000)">
+                <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
+                <path
+                    d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
+                    stroke="currentColor"
+                    fill="none"
+                />
+            </g>
+        </svg>
+    );
+}
+
+export function DeleteIcon(props: { className?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg viewBox="0 0 17 17" className={classNames(classes.deleteIcon, props.className)}>
+            <title>{t("Delete")}</title>
+            <g clipRule="evenodd" fillRule="evenodd" fill="currentColor">
+                <path
+                    d="M14,4v9c0,1.1-0.9,2-2,2H5c-1.1,0-2-0.9-2-2V4H2.3C2.1,4,2,3.9,2,3.7V3.3C2,3.1,2.1,3,2.3,3h3.2l0.3-1
+		C5.9,1.4,6.4,1,7,1h3c0.6,0,1.1,0.4,1.2,1l0.3,1h3.2C14.9,3,15,3.1,15,3.3v0.4C15,3.9,14.9,4,14.7,4H14z M7,2.2C7,2.1,7.1,2,7.2,2
+		h2.6C9.9,2,10,2.1,10,2.2L10.2,3H6.8L7,2.2z M4,4h9v9c0,0.5-0.4,1-1,1H5c-0.6,0-1-0.5-1-1V4z"
+                />
+                <path
+                    d="M8.5,5.5L8.5,5.5C8.8,5.5,9,5.7,9,6v6c0,0.3-0.2,0.5-0.5,0.5l0,0C8.2,12.5,8,12.3,8,12V6
+		C8,5.7,8.2,5.5,8.5,5.5z"
+                />
+                <path
+                    d="M10.5,5.5L10.5,5.5C10.8,5.5,11,5.7,11,6v6c0,0.3-0.2,0.5-0.5,0.5l0,0c-0.3,0-0.5-0.2-0.5-0.5V6
+		C10,5.7,10.2,5.5,10.5,5.5z"
+                />
+                <path
+                    d="M6.5,5.5L6.5,5.5C6.8,5.5,7,5.7,7,6v6c0,0.3-0.2,0.5-0.5,0.5l0,0C6.2,12.5,6,12.3,6,12V6
+		C6,5.7,6.2,5.5,6.5,5.5z"
+                />
+            </g>
+        </svg>
+    );
+}

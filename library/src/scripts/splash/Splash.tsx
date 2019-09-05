@@ -15,12 +15,27 @@ import { splashClasses, splashVariables } from "@library/splash/splashStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
+import { ColorValues } from "@library/styles/styleHelpersColors";
+import { url } from "csx";
+
+export interface ISplashStyleOverwrite {
+    colors?: {
+        bg?: ColorValues;
+        fg?: ColorValues;
+        borderColor?: ColorValues;
+    };
+    backgrounds?: {
+        useOverlay?: boolean;
+    };
+    outerBackgroundImage?: string;
+}
 
 interface IProps extends IDeviceProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
     outerBackgroundImage?: string;
+    styleOverwrite?: ISplashStyleOverwrite;
 }
 
 /**
@@ -28,14 +43,24 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const classes = splashClasses();
         const { action, className } = this.props;
+        const styleOverwrite = this.props.styleOverwrite ? this.props.styleOverwrite : ({} as ISplashStyleOverwrite);
+
+        const classes = splashClasses(styleOverwrite);
         const title = this.props.title;
+        const vars = splashVariables({});
 
         return (
             <div className={classNames(className, classes.root)}>
-                <div className={classNames(classes.outerBackground(this.props.outerBackgroundImage))} />
-                <div className={classes.backgroundOverlay} />
+                <div
+                    className={classNames(
+                        classes.outerBackground(
+                            styleOverwrite.outerBackgroundImage ? styleOverwrite.outerBackgroundImage : undefined,
+                        ),
+                    )}
+                />
+                {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) ||
+                    vars.backgrounds.useOverlay) && <div className={classes.backgroundOverlay} />}
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>

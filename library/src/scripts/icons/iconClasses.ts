@@ -117,6 +117,16 @@ export const iconVariables = useThemeCache(() => {
         height: 14,
     });
 
+    const deleteIcon = themeVars("deleteIcon", {
+        width: 24,
+        height: 24,
+    });
+
+    const editIcon = themeVars("editIcon", {
+        width: 24,
+        height: 24,
+    });
+
     const categoryIcon = themeVars("categoryIcon", {
         width: 18,
         height: 18,
@@ -146,6 +156,8 @@ export const iconVariables = useThemeCache(() => {
         chevronUp,
         plusCircle,
         categoryIcon,
+        deleteIcon,
+        editIcon,
     };
 });
 
@@ -268,6 +280,17 @@ export const iconClasses = useThemeCache(() => {
         width: unit(vars.categoryIcon.width),
         height: unit(vars.categoryIcon.height),
         opacity: vars.categoryIcon.opacity,
+        marginRight: unit(3),
+    });
+
+    const deleteIcon = style("deleteIcon", {
+        width: unit(vars.deleteIcon.width),
+        height: unit(vars.deleteIcon.height),
+    });
+
+    const editIcon = style("editIcon", {
+        width: unit(vars.editIcon.width),
+        height: unit(vars.editIcon.height),
     });
 
     return {
@@ -293,5 +316,7 @@ export const iconClasses = useThemeCache(() => {
         chevronUp,
         plusCircle,
         categoryIcon,
+        deleteIcon,
+        editIcon,
     };
 });

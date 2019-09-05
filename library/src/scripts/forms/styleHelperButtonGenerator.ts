@@ -15,11 +15,11 @@ import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import cloneDeep from "lodash/cloneDeep";
 
-const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
-    const style = styleFactory(`button-${buttonTypeVars.name}`);
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
@@ -35,26 +35,30 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         },
         buttonTypeVars,
     );
+
     // Remove debug and fallback
     const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
-    const hoverBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.hover && buttonTypeVars.hover.borders),
-    };
+    const hoverBorder =
+        buttonTypeVars.hover && buttonTypeVars.hover.borders
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.hover.borders))
+            : {};
 
-    const activeBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.active && buttonTypeVars.active.borders),
-    };
-    const focusBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.focus && buttonTypeVars.focus.borders),
-    };
-    const focusAccessibleBorder = {
-        ...defaultBorder,
-        ...borders(buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders),
-    };
+    const activeBorder =
+        buttonTypeVars.active && buttonTypeVars.active.borders
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.active.borders))
+            : {};
+
+    const focusBorder =
+        buttonTypeVars.focus && buttonTypeVars.focus.borders
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
+            : defaultBorder;
+
+    const focusAccessibleBorder =
+        buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
+            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
+            : {};
+
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
@@ -174,7 +178,11 @@ const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = fal
         },
     };
 
-    return style(result);
+    return result;
+};
+const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+    const style = styleFactory(`button-${buttonTypeVars.name}`);
+    return style(generateButtonStyleProperties(buttonTypeVars, setZIndexOnState));
 };
 
 export default generateButtonClass;

@@ -45,7 +45,7 @@ a.label {
   padding-left: .6em;
   // Use a higher than normal value to ensure completely rounded edges when
   // customizing padding or font-size on labels.
-  @include border-radius(10rem);
+  @include border-radius(160px);
 }
 
 // Colors

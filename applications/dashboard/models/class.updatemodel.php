@@ -698,8 +698,9 @@ class UpdateModel extends Gdn_Model {
                     include $addon->path($structure);
 
                     // Use the system user if specified.
-                    if ($addon->getGlobalKey() === 'dashboard' && $this->getUseSystemUser()) {
-                        Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false, false);
+                    $systemUserID = Gdn::userModel()->getSystemUserID();
+                    if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
+                        Gdn::session()->start($systemUserID, false, false);
                     }
                 } catch (\Throwable $ex) {
                     trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);

@@ -57,6 +57,7 @@ export const loaderClasses = useThemeCache(() => {
                 ...spinnerLoader(vars.fullPage),
             },
         },
+        zIndex: 1,
     });
     const mediumLoader = style("mediumLoader", {
         ...absolutePosition.fullSizeOfParent(),

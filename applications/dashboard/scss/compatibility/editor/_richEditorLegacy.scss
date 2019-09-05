@@ -41,6 +41,7 @@ $richEditor_innerPadding                          : 12px !default;
 }
 
 .userContent {
+    visibility: hidden;
     line-height: $global-base_lineHeight;
 
     &.Message {

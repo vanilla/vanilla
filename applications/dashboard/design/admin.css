@@ -11340,6 +11340,7 @@ label.checkbox input.checkbox-input {
 }
 
 .userContent {
+  visibility: hidden;
   line-height: 1.5;
 }
 .userContent.Message {
@@ -12594,113 +12595,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 .collapsableContent *:last-child {
   margin-bottom: 0;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.atMentionList {
-  position: absolute;
-  width: 200px;
-  -webkit-transform: translateY(6px);
-      -ms-transform: translateY(6px);
-          transform: translateY(6px);
-}
-
-.atMentionList-suggestion {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 100%;
-  position: relative;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border: 0;
-  padding: 0;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.atMentionList-items.atMentionList-items {
-  display: block;
-  padding: 3px 0;
-  overflow: auto;
-  max-height: 270px;
-}
-.atMentionList-items.isHidden {
-  display: none;
-}
-
-.atMentionList-item.atMentionList-item {
-  margin-bottom: 0;
-}
-.atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: #e1f2fb;
-}
-
-.atMentionList-suggestion {
-  width: 100%;
-  cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  line-height: 30px;
-  padding-top: 3px;
-  padding-right: 6px;
-  padding-bottom: 3px;
-  padding-left: 6px;
-}
-
-.atMentionList-photoWrap {
-  margin-right: 10px;
-}
-
-.atMentionList-photo {
-  width: 30px;
-  height: 30px;
-}
-
-.atMentionList-userName {
-  display: block;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 40px);
-}
-
-.atMentionList-mark {
-  padding: 0;
-  font-weight: 600;
-}
-
-.atMentionList-photo {
-  display: block;
-}
-
-.atMention {
-  color: inherit;
-  font-weight: 600;
-  -webkit-user-select: all;
-     -moz-user-select: all;
-      -ms-user-select: all;
-          user-select: all;
 }
 
 /**

@@ -10,7 +10,7 @@ import { blockQuoteCSS } from "@rich-editor/quill/components/blockQuoteStyles";
 import { emojiCSS } from "@rich-editor/quill/components/emojiStyles";
 import { spoilerCSS } from "@rich-editor/quill/components/spoilerStyles";
 import { codeBlockCSS } from "@rich-editor/quill/components/codeBlockStyles";
-import { userContentCSS } from "@rich-editor/quill/components/userContentStyles";
+import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 
 export const blotCSS = () => {
     accessibilityCSS();
@@ -19,5 +19,5 @@ export const blotCSS = () => {
     emojiCSS();
     spoilerCSS();
     codeBlockCSS();
-    userContentCSS();
+    loadedCSS();
 };

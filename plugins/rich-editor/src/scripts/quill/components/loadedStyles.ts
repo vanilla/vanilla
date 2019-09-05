@@ -8,9 +8,9 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { cssRule } from "typestyle";
 import { important } from "csx";
 
-export const userContentCSS = useThemeCache(() => {
+export const loadedCSS = useThemeCache(() => {
     // Avoid FOUT in Forum side
-    cssRule(".userContent", {
+    cssRule("body", {
         visibility: important("visible"),
     });
 });

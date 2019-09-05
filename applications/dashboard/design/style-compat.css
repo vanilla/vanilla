@@ -893,6 +893,10 @@ label.checkbox input.checkbox-input {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+body {
+  visibility: hidden;
+}
+
 .richEditor {
   color: #555a62;
 }
@@ -919,7 +923,6 @@ label.checkbox input.checkbox-input {
 }
 
 .userContent {
-  visibility: hidden;
   line-height: 1.5;
 }
 .userContent.Message {

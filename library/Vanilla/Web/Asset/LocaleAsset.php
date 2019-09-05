@@ -33,7 +33,7 @@ class LocaleAsset extends SiteAsset {
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return self::makeWebPath(
+        return self::makeAssetPath(
             '/api/v2/locales',
             $this->localeKey,
             'translations.js'

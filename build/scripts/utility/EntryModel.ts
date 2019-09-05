@@ -134,7 +134,7 @@ export default class EntryModel {
         names = names
             .filter(name => name.match(EntryModel.TS_REGEX))
             .map(name => name.replace(EntryModel.TS_REGEX, ""))
-            .filter(name => name !== "bootstrap");
+            .filter(name => name !== "bootstrap" && name !== "common");
 
         names = Array.from(new Set(names));
 

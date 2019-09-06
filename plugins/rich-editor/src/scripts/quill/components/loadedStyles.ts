@@ -9,7 +9,7 @@ import { cssRule } from "typestyle";
 import { important } from "csx";
 
 export const loadedCSS = useThemeCache(() => {
-    // Avoid FOUT in Forum side
+    // Avoid FOUC in Forum side
     cssRule("body", {
         visibility: important("visible"),
     });

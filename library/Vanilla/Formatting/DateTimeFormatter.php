@@ -221,13 +221,11 @@ class DateTimeFormatter {
      * @param mixed $fallback The value to return if the value couldn't be properly converted.
      * @return int A timestamp or now if it couldn't be parsed properly.
      */
-    public static function dateTimeToTimeStamp($dateTime = '', $fallback = null) {
+    public static function dateTimeToTimeStamp(string $dateTime = '', $fallback = null): int {
         if (($testTime = strtotime($dateTime)) !== false) {
             return $testTime;
         } else {
-            if ($fallback === null) {
-                $fallback = time();
-            }
+            $fallback = $fallback ?? time();
             trigger_error(__FUNCTION__ . 'called with bad input ' . $dateTime, E_USER_WARNING);
             return $fallback;
         }
@@ -243,9 +241,7 @@ class DateTimeFormatter {
      * @return int
      */
     public static function dateTimeToSecondsAgo($datetime, $from = null): int {
-        if ($from === null) {
-            $from = time();
-        }
+        $from = $from ?? time();
         return abs($from - self::dateTimeToTimeStamp($datetime));
     }
 

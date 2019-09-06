@@ -11,7 +11,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { t } from "@library/utility/appUtils";
 import NextPrevious from "@library/navigation/NextPrevious";
 
-const story = storiesOf("Site Nav", module);
+const story = storiesOf("Navigation", module);
 
 story.add("Next/Previous", () => {
     return (

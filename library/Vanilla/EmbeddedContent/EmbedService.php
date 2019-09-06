@@ -38,6 +38,7 @@ use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
+use Vanilla\Web\RequestValidator;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -56,6 +57,9 @@ class EmbedService implements EmbedCreatorInterface {
     /** @var EmbedCache Caching interface. */
     private $cache;
 
+    /** @var RequestValidator */
+    private $requestValidator;
+
     /** @var AbstractEmbedFactory */
     private $fallbackFactory;
 
@@ -69,9 +73,11 @@ class EmbedService implements EmbedCreatorInterface {
      * EmbedManager constructor.
      *
      * @param EmbedCache $cache
+     * @param RequestValidator $requestValidator
      */
-    public function __construct(EmbedCache $cache) {
+    public function __construct(EmbedCache $cache, RequestValidator $requestValidator) {
         $this->cache = $cache;
+        $this->requestValidator = $requestValidator;
     }
 
     /**
@@ -178,6 +184,13 @@ class EmbedService implements EmbedCreatorInterface {
      * @inheritdoc
      */
     public function createEmbedForUrl(string $url, bool $force = false): AbstractEmbed {
+        // Ensure that this function is never called during a GET request.
+        // This function makes some potentially very expensive calls
+        // It can also be used to force the site into an infinite loop (eg. GET page hits the scraper which hits the same page again).
+        // @see https://github.com/vanilla/dev-inter-ops/issues/23
+        // We've had some situations where the site gets in an infinite loop requesting itself.
+        $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+
         // Check the cache first.
         if (!$force) {
             $cachedEmbed = $this->cache->getCachedEmbed($url);

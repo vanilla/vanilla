@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
                 undefined,
                 null,
                 '',
-                '[{"insert":"\n"}]',
+                '[{\"insert\":\"\\n\"}]',
                 lastVal
             ];
             if (!defaultValues.includes(currentVal)) {

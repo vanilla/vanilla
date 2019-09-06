@@ -46,8 +46,6 @@ export class Splash extends React.Component<IProps> {
         const { action, className } = this.props;
         const styleOverwrite = this.props.styleOverwrite ? this.props.styleOverwrite : ({} as ISplashStyleOverwrite);
 
-        // window.console.log("styleOverwrite: ", styleOverwrite);
-
         const classes = splashClasses(styleOverwrite);
         const title = this.props.title;
         const vars = splashVariables({});

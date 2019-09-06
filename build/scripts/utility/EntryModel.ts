@@ -76,6 +76,12 @@ export default class EntryModel {
         const entries: IWebpackEntries = {};
 
         for (const entryDir of this.entryDirs) {
+            const commonEntry = await this.lookupEntry(entryDir, "common");
+            if (commonEntry !== null) {
+                const addonName = path.basename(commonEntry.addonPath);
+                entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
+            }
+
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 const addonName = path.basename(entry.addonPath);
@@ -99,6 +105,11 @@ export default class EntryModel {
         const entries: string[] = [];
 
         for (const entryDir of this.entryDirs) {
+            const commonEntry = await this.lookupEntry(entryDir, "common");
+            if (commonEntry !== null) {
+                entries.push(commonEntry.entryPath);
+            }
+
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 entries.push(entry.entryPath);

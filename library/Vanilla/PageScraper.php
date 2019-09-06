@@ -14,11 +14,15 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
 use Vanilla\Metadata\Parser\Parser;
+use Vanilla\Web\RequestValidator;
 
 class PageScraper {
 
     /** @var HttpRequest */
     private $httpRequest;
+
+    /** @var RequestValidator */
+    private $requestValidator;
 
     /** @var array */
     private $metadataParsers = [];
@@ -30,9 +34,11 @@ class PageScraper {
      * PageInfo constructor.
      *
      * @param HttpRequest $httpRequest
+     * @param RequestValidator $requestValidator
      */
-    public function __construct(HttpRequest $httpRequest) {
+    public function __construct(HttpRequest $httpRequest, RequestValidator $requestValidator) {
         $this->httpRequest = $httpRequest;
+        $this->requestValidator = $requestValidator;
     }
 
     /**
@@ -43,6 +49,13 @@ class PageScraper {
      * @throws Exception
      */
     public function pageInfo(string $url): array {
+        // Ensure that this function is never called during a GET request.
+        // This function makes some potentially very expensive calls
+        // It can also be used to force the site into an infinite loop (eg. GET page hits the scraper which hits the same page again).
+        // @see https://github.com/vanilla/dev-inter-ops/issues/23
+        // We've had some situations where the site gets in an infinite loop requesting itself.
+        $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+
         $response = $this->getUrl($url);
 
         if (!$response->isResponseClass('2xx')) {

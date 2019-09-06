@@ -26,6 +26,7 @@
             </nav>
             <div class="Header-flexSpacer"></div>
             <div class="Header-right">
+                <span data-react="subcommunity-chooser"></span>
                 <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}
                 </div>

@@ -221,7 +221,7 @@ class DateTimeFormatter {
      * @param mixed $fallback The value to return if the value couldn't be properly converted.
      * @return int A timestamp or now if it couldn't be parsed properly.
      */
-    public static function dateTimeToTimeStamp(string $dateTime = '', $fallback = null): int {
+    public static function dateTimeToTimeStamp(?string $dateTime = '', $fallback = null): int {
         if (($testTime = strtotime($dateTime)) !== false) {
             return $testTime;
         } else {

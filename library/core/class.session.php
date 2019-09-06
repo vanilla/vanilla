@@ -688,9 +688,16 @@ class Gdn_Session {
         }
 
         if (!isset($return)) {
+            /*
+             * Use hash_equals to do a time safe comparison.
+             * We are not doing `!empty()` first because that would skip hash_equals and would then enable a possible timing attack.
+             */
+            // Make sure we're testing a string.
+            $stringToTest = $this->_TransientKey ?: '';
+            $hashCheck = (hash_equals($stringToTest, $foreignKey) && !empty($this->_TransientKey));
+
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-            $return = ($forceValid && Gdn::request()->isPostBack()) ||
-                (hash_equals($this->_TransientKey, $foreignKey) && !empty($this->_TransientKey));
+            $return = ($forceValid && Gdn::request()->isPostBack()) || $hashCheck;
         }
 
         if (!$return && $forceValid !== true) {

@@ -608,6 +608,7 @@ class Gdn_Format {
      * @deprecated 3.2 FormatService::renderPlainText
      */
     public static function plainText($body, $format = 'Html') {
+        $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
         $plainText = Gdn::formatService()->renderPlainText((string) $body, (string) $format);
 
         // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)
@@ -635,6 +636,7 @@ class Gdn_Format {
      * @deprecated 3.2 FormatService::renderExcerpt
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
+        $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
         $plainText = Gdn::formatService()->renderExcerpt((string) $body, (string) $format);
 
         // Even though this shouldn't be sanitized here (it should be sanitized in the view layer)

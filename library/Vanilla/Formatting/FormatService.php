@@ -144,11 +144,16 @@ class FormatService {
     public function registerBuiltInFormats(Container $dic) {
         $this->registerFormat(Formats\RichFormat::FORMAT_KEY, $dic->get(Formats\RichFormat::class))
             ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, $dic->get(Formats\HtmlFormat::class))
-            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, $dic->get(Formats\WysiwygFormat::class))
             ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, $dic->get(Formats\BBCodeFormat::class))
             ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, $dic->get(Formats\MarkdownFormat::class))
             ->registerFormat(Formats\TextFormat::FORMAT_KEY, $dic->get(Formats\TextFormat::class))
             ->registerFormat(Formats\TextExFormat::FORMAT_KEY, $dic->get(Formats\TextExFormat::class))
+        ;
+
+        $wysiwyg = $dic->get(Formats\WysiwygFormat::class);
+        $this
+            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, $wysiwyg)
+            ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, $wysiwyg)
         ;
     }
 

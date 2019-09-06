@@ -8,9 +8,9 @@
 namespace VanillaTests\Fixtures;
 
 
-use Interop\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
-use Interop\Container\Exception\NotFoundException;
+use Psr\Container\ContainerInterface;
+use Psr\Container\Exception\ContainerException;
+use Psr\Container\Exception\NotFoundException;
 
 /**
  * A basic container for unit testing.

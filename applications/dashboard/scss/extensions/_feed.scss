@@ -8,7 +8,7 @@
 
 .FeedItem {
   position: relative;
-  padding: to-rem(12) 0;
+  padding: 12px 0;
   border-bottom: $table-border-width solid $table-border-color;
 
   &:hover {
@@ -21,15 +21,15 @@
 
   h2 {
     padding: 0;
-    margin-top: - to-rem(3);
+    margin-top: - 3px;
     margin-left: 0;
     margin-right: 0;
     border-top: 0;
     border-bottom: 0;
     font-weight: 400;
-    font-size: 0.8125rem;
+    font-size: 13px;
     text-overflow: ellipsis;
-    margin-bottom: to-rem(2);
+    margin-bottom: 2px;
     line-height: $line-height-lg;
 
     a {
@@ -39,7 +39,7 @@
 
   .FeedDescription {
     @extend .info;
-    margin-bottom: - to-rem(2);
+    margin-bottom: - 2px;
     font-weight: 300;
 
     strong {
@@ -63,7 +63,7 @@
 
     .read-less {
       display: block;
-      margin-top: to-rem(3);
+      margin-top: 3px;
     }
   }
 
@@ -71,17 +71,17 @@
   .FeedDescription,
   h2 {
     margin-right: 102px;
-    margin-left: to-rem(12);
+    margin-left: 12px;
   }
 
   .Date {
     @extend .info;
 
     position: absolute;
-    right: to-rem(12);
+    right: 12px;
     width: 102px;
     line-height: 1;
-    top: $spacer * .75 + (to-rem(30) / 2) - ($font-size-tables / 2);
+    top: $spacer * .75 + (30px / 2) - ($font-size-tables / 2);
     text-align: right;
     font-weight: 300;
   }

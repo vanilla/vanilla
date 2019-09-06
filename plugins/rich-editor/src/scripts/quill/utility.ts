@@ -13,6 +13,7 @@ import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbed
 import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { logDebug } from "@vanilla/utils";
+import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 
 interface IBoundary {
     start: number;
@@ -295,7 +296,10 @@ export function getMentionRange(quill: Quill, currentSelection: RangeStatic | nu
         return null;
     }
 
-    if (rangeContainsBlot(quill, CodeBlockBlot, currentSelection)) {
+    if (
+        rangeContainsBlot(quill, CodeBlockBlot, currentSelection) ||
+        rangeContainsBlot(quill, CodeBlot, currentSelection)
+    ) {
         return null;
     }
 

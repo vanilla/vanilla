@@ -87,6 +87,7 @@
                             </nav>
                             <div class="Header-flexSpacer"></div>
                             <div class="Header-right">
+                                <span data-react="subcommunity-chooser"></span>
                                 <div class="MeBox-header">
                                     {module name="MeModule" CssClass="FlyoutRight"}
                                 </div>
@@ -209,12 +210,14 @@
                                                 <div class="Profile-name">
                                                     <div class="Profile-row">
                                                         <h1 class="Profile-username">
-                                                            {$Profile.Name}
+                                                            {$Profile.Name|escape:'html'}
                                                         </h1>
                                                     </div>
                                                     <div class="Profile-row">
                                                         {if isset($Rank)}
-                                                            <span class="Profile-rank">{$Rank.Label}</span>
+                                                            <span class="Profile-rank">
+                                                                {$Rank.Label}
+                                                            </span>
                                                         {/if}
                                                     </div>
                                                 </div>

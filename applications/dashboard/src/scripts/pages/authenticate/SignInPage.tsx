@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import Or from "@dashboard/components/forms/Or";
+import Or from "@dashboard/forms/Or";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
 import { getUserAuthenticators } from "@dashboard/pages/authenticate/authenticatorsActions";
 import SSOMethods from "@dashboard/pages/authenticate/components/SSOMethods";

@@ -1,9 +1,8 @@
 <img src="https://user-images.githubusercontent.com/1770056/51494323-414e8980-1d86-11e9-933c-e647b5ea49f4.png" alt="Vanilla Repo Logo" width=500/>
 
 [![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/master/LICENSE)
-[![Build Status](https://travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
-![](https://img.shields.io/travis/php-v/vanilla/vanilla.svg)
-![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_3.1.svg)
+[![CircleCI](https://circleci.com/gh/vanilla/vanilla/tree/master.svg?style=svg)](https://circleci.com/gh/vanilla/vanilla/tree/master)
+![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_3.2.svg)
 
 ## Howdy, Stranger!
 
@@ -63,15 +62,15 @@ Please do not email non-security issues; use the [issue tracker](https://github.
 
 The `master` branch is considered a stable branch capable of being released at any time. Reviewed, stable changes land against `master` via pull-request.
 
-Our open source release branches are named by version number, e.g. `release/3.1`. All open source releases (included pre-releases) are tagged.
+Our open source release branches are named by version number, e.g. `release/3.2`. All open source releases (included pre-releases) are tagged.
 
 The `release/VERSION+BUILD` branches are production-ready branches for our cloud product but are not yet vetted for open source release (alternate platforms & configurations).
 
 |                     | Active Release |
 | ------------------- | -------------- |
-| **Version**         | `3.1`          |
-| **Initial Release** | 9 July 2019    |
-| **Last Updated**    | 9 July 2019    |
+| **Version**         | `3.2`          |
+| **Initial Release** | 29 August 2019 |
+| **Last Updated**    | 29 August 2019 |
 | **EOL**             | Next release   |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.

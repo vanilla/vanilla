@@ -6,8 +6,11 @@
 
 import React from "react";
 import { IStoryTileAndTextProps, StoryTileAndText } from "@library/storybook/StoryTileAndText";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 
-interface IProps extends IStoryTileAndTextProps {}
+interface IProps extends IStoryTileAndTextProps {
+    backgroundColor?: ColorValues;
+}
 
 /**
  * Separator, for react storybook.

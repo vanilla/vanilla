@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
@@ -508,6 +509,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @return string A plaintext email.
      */
     protected function plainTextEmail() {
+        $formatService = Gdn::formatService();
+
         $email = [
             'banner' => val('alt', $this->image).' '.val('link', $this->image),
             'title' => $this->getTitle(),
@@ -521,13 +524,19 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
             if (!$val) {
                 unset($email[$key]);
             } else {
+                // Add some additional padding, where necessary, to improve the appearance of plain-text messages.
                 if ($key == 'message') {
                     $email[$key] = "<br>$val<br>";
+                } elseif ($key == "banner") {
+                    $email["banner"] = "{$val}<br>";
                 }
             }
         }
 
-        return Gdn_Format::plainText(Gdn_Format::text(implode('<br>', $email), false));
+        $body = implode("<br>", $email);
+        // Treat the HTML as WYSIWYG for the format's preferred handling of breaks/newlines.
+        $result = $formatService->renderPlainText($body, WysiwygFormat::FORMAT_KEY);
+        return $result;
     }
 
     /**

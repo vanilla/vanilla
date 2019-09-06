@@ -104,7 +104,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
     /**
      * Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
      */
-    public componentWillUnount() {
+    public componentWillUnmount() {
         this.inputRef.current!.removeEventListener("change", this.onChange);
     }
 

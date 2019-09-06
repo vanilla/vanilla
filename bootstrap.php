@@ -34,9 +34,13 @@ if (!class_exists('Gdn')) {
 $dic = new Container();
 Gdn::setContainer($dic);
 
-$dic->setInstance('Garden\Container\Container', $dic)
-    ->rule('Interop\Container\ContainerInterface')
-    ->setAliasOf('Garden\Container\Container')
+$dic->setInstance(Garden\Container\Container::class, $dic)
+    ->rule(\Psr\Container\ContainerInterface::class)
+    ->setAliasOf(Garden\Container\Container::class)
+
+    ->rule(\Interop\Container\ContainerInterface::class)
+    ->setClass(\Vanilla\InteropContainer::class)
+    ->setShared(true)
 
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')

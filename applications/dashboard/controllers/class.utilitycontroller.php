@@ -249,28 +249,19 @@ class UtilityController extends DashboardController {
     }
 
     /**
-     * Run a structure update on the database.
-     *
-     * It should always be possible to call this method, even if no database tables exist yet.
-     * A working forum database should be built from scratch where none exists. Therefore,
-     * it can have no reliance on existing data calls, or they must be able to fail gracefully.
-     *
-     * @since 2.0.?
-     * @access public
+     * Legacy version of update.
      */
-    public function update() {
+    private function legacyUpdate() {
         // Check for permission or flood control.
         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
         $now = time();
         $lastTime = 0;
         $count = 0;
-
         try {
             $lastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
         } catch (Exception $ex) {
             // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
         }
-
         if ($lastTime + (60 * 60 * 24) > $now) {
             // Check for flood control.
             try {
@@ -287,14 +278,12 @@ class UtilityController extends DashboardController {
         } else {
             $count = 1;
         }
-
         try {
             Gdn::set('Garden.Update.LastTimestamp', $now);
             Gdn::set('Garden.Update.Count', $count);
         } catch (Exception $ex) {
             // What is a GDN_UserMeta table, really? Suffering.
         }
-
         try {
             // Run the structure.
             $updateModel = new UpdateModel();
@@ -307,74 +296,75 @@ class UtilityController extends DashboardController {
                 throw $ex;
             }
         }
-
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             saveToConfig('Garden.Version', APPLICATION_VERSION);
         }
-
         if ($target = $this->Request->get('Target')) {
             redirectTo($target);
         }
-
         $this->fireEvent('AfterUpdate');
-
         if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
             // Make sure that we do not disclose anything too sensitive here!
             $this->Data = array_filter($this->Data, function($key) {
                 return in_array(strtolower($key), ['success', 'error']);
             }, ARRAY_FILTER_USE_KEY);
         }
-
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
         Gdn_Theme::section('Utility');
-        $this->render('update', 'utility', 'dashboard');
+        $this->render('update-legacy', 'utility', 'dashboard');
     }
 
     /**
-     * Loads the files from resources/deletedfiles.txt into an array and returns it.
-     * Returns null if the deletedfiles.txt file is not found.
+     * Run a structure update on the database.
      *
-     * @return array|null
+     * @since 2.0.?
+     * @access public
      */
-    private function loadDeleted() {
-        $deletedFilesPath = PATH_ROOT.'/resources/upgrade/deletedfiles.txt';
-        $deletedFiles = file($deletedFilesPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        return $deletedFiles;
-    }
-
-
-    /**
-     * Checks if any deleted files exist in the vanilla file structure. Saves an array of the existing deleted files
-     * to the data array.
-     */
-    private function checkDeleted() {
-        $deletedFiles = $this->loadDeleted();
-        $okFiles = ['.htaccess'];
-
-        $existingFiles = [];
-        if ($deletedFiles !== null) {
-            foreach ($deletedFiles as $file) {
-                if (file_exists(PATH_ROOT.DS.$file) && !in_array($file, $okFiles)) {
-                    $file = htmlspecialchars($file);
-                    $existingFiles[] = $file;
-                }
-            }
-            $this->setData('DeletedFiles', $existingFiles);
+    public function update() {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled('updateTokens')) {
+            $this->updateWithToken();
+        } else {
+            $this->legacyUpdate();
         }
     }
 
     /**
-     * A special endpoint for users upgrading their Vanilla installation.
-     * Adds a special check for deleted files that may still exist post-upgrade.
+     * Run a structure update on the database.
      *
-     * @since 2.0.18
+     * It should always be possible to call this method, even if no database tables exist yet.
+     * A working forum database should be built from scratch where none exists. Therefore,
+     * it can have no reliance on existing data calls, or they must be able to fail gracefully.
+     *
+     * @since 2.0.?
      * @access public
      */
-    public function upgrade() {
-        $this->permission('Garden.Settings.Manage');
-        $this->checkDeleted();
-        $this->update();
+    public function updateWithToken() {
+        $this->ApplicationFolder = 'dashboard';
+        $this->MasterView = 'setup';
+
+        // Do some checks for backwards for behavior for CD.
+        if ($this->Request->isPostBack()) {
+            $success = $this->doUpdate();
+            $this->setData('Success', $success);
+        }
+
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // Make sure that we do not disclose anything too sensitive here!
+            $this->Data = array_filter($this->Data, function ($key) {
+                return in_array(strtolower($key), ['success', 'error']);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
+        $this->removeCssFile('admin.css');
+        $this->addCssFile('setup.css');
+        $this->addJsFile('jquery.js');
+        Gdn_Theme::section('Utility');
+
+        $this->setData('_isAdmin', Gdn::session()->checkPermission('Garden.Settings.Manager'));
+        $this->setData("form", $this->Form);
+        $this->setData("headerImage", asset("/applications/dashboard/design/images/vanilla_logo.png"));
+        $this->render($this->View, 'utility', 'dashboard');
     }
 
     /**
@@ -652,5 +642,61 @@ class UtilityController extends DashboardController {
         } else {
             throw new Exception('Touch icon not found.', 404);
         }
+    }
+
+    /**
+     * Do the actual update.
+     */
+    private function doUpdate(): bool {
+        if ($this->Request->hasHeader('Authorization') &&
+            preg_match('`Bearer\s+(.+)`i', $this->Request->getHeader('Authorization'), $m)) {
+            $token = $m[1];
+        } elseif ($this->Request->post('updateToken', '')) {
+            $token = $this->Request->post('updateToken');
+        }
+
+        $isTokenUpdate = false;
+        if (!empty($token)) {
+            $knownString = (string)Gdn::config()->get('Garden.UpdateToken', '');
+            if (!empty($knownString) && hash_equals($knownString, $token)) {
+                Gdn::session()->validateTransientKey(true);
+                $isTokenUpdate = true;
+            } else {
+                $this->Form->addError("Invalid update token", "updateToken");
+                trigger_error("utility/update invalid update token.", E_USER_WARNING);
+                return false;
+            }
+        } else {
+            if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                throw permissionException("Garden.Settings.Manage");
+            }
+            if (!$this->Request->isAuthenticatedPostBack(false)) {
+                trigger_error("Invalid transient key on utility/update.", E_USER_WARNING);
+                $this->Request->isAuthenticatedPostBack(true);
+            }
+        }
+
+        // Run the structure.
+        $updateModel = new UpdateModel();
+        try {
+            if (isset($isTokenUpdate)) {
+                $updateModel->setRunAsSystem(true);
+            }
+
+            $updateModel->runStructure();
+            $this->setData('Success', true);
+        } catch (Exception $ex) {
+            $this->setData('Success', false);
+            $this->setData('Error', $ex->getMessage());
+
+            if (debug()) {
+                throw $ex;
+            }
+        }
+        saveToConfig('Garden.Version', APPLICATION_VERSION);
+
+        $this->fireEvent('AfterUpdate');
+
+        return true;
     }
 }

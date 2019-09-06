@@ -125,7 +125,10 @@ class SetupController extends DashboardController {
                 if ($this->Form->errorCount() == 0) {
                     // Save a variable so that the application knows it has been installed.
                     // Now that the application is installed, select a more user friendly error page.
-                    $config = ['Garden.Installed' => true];
+                    $config = [
+                        'Garden.Installed' => true,
+                        'Garden.UpdateToken' => \Vanilla\Models\InstallModel::generateUpdateToken(),
+                        ];
                     saveToConfig($config);
                     $this->setData('Installed', true);
                     $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
@@ -320,6 +323,13 @@ class SetupController extends DashboardController {
             if (!extension_loaded($module)) {
                 $this->Form->addError($errorMessage);
             }
+        }
+
+        // Make sure we can generate a strong random token.
+        try {
+            \Vanilla\Models\InstallModel::generateUpdateToken();
+        } catch (\Exception $ex) {
+            $this->Form->addError("Your system cannot generate a cryptographically strong random number.");
         }
 
         // Make sure that the correct filesystem permissions are in place.

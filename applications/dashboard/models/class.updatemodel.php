@@ -13,23 +13,18 @@ use Vanilla\Addon;
  * Handles updating.
  */
 class UpdateModel extends Gdn_Model {
+    const STATUS_RUNNING = 'running';
+    const STATUS_SUCCESS = 'success';
+    const STATUS_ERROR = 'error';
 
     // TODO Remove when removing other deprecated functions!
     /** @var string URL to the addons site. */
     public $AddonSiteUrl = 'http://vanilla.local';
 
     /**
-     *
-     *
-     * @param $addon
-     * @param $addons
-     * @deprecated since 2.3
+     * @var bool
      */
-    private static function addAddon($addon, &$addons) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $slug = strtolower($addon['AddonKey']).'-'.strtolower($addon['AddonType']);
-        $addons[$slug] = $addon;
-    }
+    private $runAsSystem;
 
     /**
      * Find a list of filenames in a folder or zip.
@@ -655,9 +650,30 @@ class UpdateModel extends Gdn_Model {
      * The structure runs the addons in priority order so that higher priority addons override lower priority ones.
      *
      * @param bool $captureOnly Run the structure or just capture the SQL changes.
-     * @throws Exception Throws an exception if in debug mode and something goes wrong.
+     * @return array Returns an array of captured SQL.
+     * @throws Throwable Throws an exception if in debug mode and something goes wrong.
      */
     public function runStructure($captureOnly = false) {
+        $this->saveStatus(self::STATUS_RUNNING);
+
+        try {
+            $r = $this->runStructureInternal($captureOnly);
+            $this->saveStatus(self::STATUS_SUCCESS);
+            return $r;
+        } catch (\Throwable $ex) {
+            $this->saveStatus(self::STATUS_ERROR, $ex->getMessage());
+            throw $ex;
+        }
+    }
+
+    /**
+     * Run the structure update.
+     *
+     * @param bool $captureOnly If **true** will just capture SQL.
+     * @return array Returns an array of update SQL.
+     * @throws Exception Throws an exception if in debug mode.
+     */
+    private function runStructureInternal(bool $captureOnly): array {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
         // These variables are required for included structure files.
@@ -680,7 +696,14 @@ class UpdateModel extends Gdn_Model {
 
                 try {
                     include $addon->path($structure);
-                } catch (\Exception $ex) {
+
+                    // Use the system user if specified.
+                    $systemUserID = Gdn::userModel()->getSystemUserID();
+                    if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
+                        Gdn::session()->start($systemUserID, false, false);
+                    }
+                } catch (\Throwable $ex) {
+                    trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
                     if (debug()) {
                         throw $ex;
                     }
@@ -732,5 +755,41 @@ class UpdateModel extends Gdn_Model {
             return $Structure->Database->CapturedSql;
         }
         return [];
+    }
+
+    /**
+     * Whether or not to start the system user session.
+     *
+     * @param bool $system The new value.
+     */
+    public function setRunAsSystem(bool $system): void {
+        $this->runAsSystem = $system;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRunAsSystem(): bool {
+        return $this->runAsSystem;
+    }
+
+    /**
+     * Save an update status to the config to aid support.
+     *
+     * @param string $status One of the `STATUS_*` constants.
+     * @param string|null $message A message to go along with the status
+     */
+    private function saveStatus(string $status, string $message = null) {
+        $now = new \DateTimeImmutable('now', new \DateTimeZone("UTC"));
+
+        try {
+            Gdn::config()->saveToConfig([
+                'Garden.Update.LastUpdate' => $now->format(DateTime::RFC3339),
+                'Garden.Update.Status' => $status,
+                'Garden.Update.Message' => $message,
+            ], '', ['RemoveEmpty' => true]);
+        } catch (\Throwable $ex) {
+            // Don't do anything at this point.
+        }
     }
 }

@@ -38,7 +38,7 @@ class Gdn_Session {
     /** @var object Preferences of the current user. */
     protected $_Preferences;
 
-    /** @var object The current user's transient key. */
+    /** @var string The current user's transient key. */
     protected $_TransientKey;
 
     /** @var Permissions */
@@ -690,7 +690,7 @@ class Gdn_Session {
         if (!isset($return)) {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $return = ($forceValid && Gdn::request()->isPostBack()) ||
-                (hash_equals($this->_TransientKey, $foreignKey) && !empty($this->_TransientKey));
+                (!empty($this->_TransientKey) && is_string($foreignKey) && hash_equals((string)$this->_TransientKey, $foreignKey));
         }
 
         if (!$return && $forceValid !== true) {

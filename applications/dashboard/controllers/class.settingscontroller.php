@@ -247,7 +247,7 @@ class SettingsController extends DashboardController {
 
         $this->fireEvent('AvatarSettings');
 
-        if (!$this->Form->authenticatedPostBack()) {
+        if (!$this->Form->authenticatedPostBack(true)) {
             $this->Form->setData($configurationModel->Data);
         } else {
             if ($this->Form->save() !== false) {

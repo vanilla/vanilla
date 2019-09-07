@@ -316,16 +316,17 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $originalIndex = $this->api()->get($indexUrl);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
-        $rows = $this->generateIndexRows();
-
-        $newIndex = $this->api()->get($indexUrl);
-
         $originalRows = $originalIndex->getBody();
+        $rows = $this->generateIndexRows();
+        $newIndex = $this->api()->get($indexUrl, ['limit' => count($originalRows) + count($rows) + 1]);
+
         $newRows = $newIndex->getBody();
-        $this->assertEquals(count($originalRows)+count($rows), count($newRows));
+        $this->assertEquals(count($originalRows) + count($rows), count($newRows));
         // The index should be a proper indexed array.
-        for ($i = 0; $i < count($newRows); $i++) {
-            $this->assertArrayHasKey($i, $newRows);
+        $count = 0;
+        foreach ($newRows as $i => $row) {
+            $this->assertSame($count, $i);
+            $count++;
         }
 
         if ($this->testPagingOnIndex) {

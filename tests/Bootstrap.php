@@ -233,6 +233,7 @@ class Bootstrap {
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+            ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
             ->rule('@view-application/json')

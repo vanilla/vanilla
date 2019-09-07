@@ -50,9 +50,9 @@ class PrivateCommunityMiddleware {
      * @return mixed
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        if ($this->isPrivate) {
+        if ($this->isPrivate && !$this->session->isValid()) {
             $this->session->getPermissions()->addBan(
-                Permissions::BAN_CSRF,
+                Permissions::BAN_PRIVATE,
                 [
                     'msg' => $this->locale->translate('You must sign in to the private community.'),
                     'code' => 403
@@ -61,5 +61,23 @@ class PrivateCommunityMiddleware {
         }
 
         return $next($request);
+    }
+
+    /**
+     * Whether or not this is a private community.
+     *
+     * @return bool
+     */
+    public function isPrivate(): bool {
+        return $this->isPrivate;
+    }
+
+    /**
+     * Set whether or not this is a private community.
+     *
+     * @param bool $isPrivate
+     */
+    public function setIsPrivate(bool $isPrivate): void {
+        $this->isPrivate = $isPrivate;
     }
 }

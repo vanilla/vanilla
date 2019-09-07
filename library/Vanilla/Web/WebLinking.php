@@ -7,8 +7,6 @@
 
 namespace Vanilla\Web;
 
-use Garden\Web\Data;
-
 /**
  * Class WebLinking
  */
@@ -101,20 +99,5 @@ class WebLinking {
     public function clear() {
         $this->links = [];
         return $this;
-    }
-
-    /**
-     * A convenience function for setting a link heaer.
-     *
-     * @param Data $data
-     */
-    public function setHeader(Data $data) {
-        $link = $data->getHeader('Link');
-        if (empty($link)) {
-            $link = $this->getLinkHeaderValue();
-        } else {
-            $link .= ', '.$this->getLinkHeaderValue();
-        }
-        $data->setHeader('Link', $link);
     }
 }

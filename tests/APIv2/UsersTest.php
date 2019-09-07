@@ -477,7 +477,7 @@ class UsersTest extends AbstractResourceTest {
         $configuration->set('Garden.Email.Disabled', true);
 
         $fields = $this->registrationFields();
-        $invitation = $this->runWithAdminUser(function() use ($fields) {
+        $invitation = $this->runWithAdminUser(function () use ($fields) {
             return $this->api()->post('/invites', ['email' => $fields['email']])->getBody();
         });
         $fields['invitationCode'] = $invitation['code'];
@@ -495,7 +495,7 @@ class UsersTest extends AbstractResourceTest {
         static $i = 1;
 
         // Create a user first.
-        $user = $this->runWithAdminUser(function() use (&$i) {
+        $user = $this->runWithAdminUser(function () use (&$i) {
             $r = $this->api()->post('/users', [
                 'name' => 'testRequestPassword'.$i,
                 'email' => "userstest$i@example.com",
@@ -548,7 +548,7 @@ class UsersTest extends AbstractResourceTest {
     private function verifyRegistration(array $fields) {
         $registration = $this->api()->post('/users/register', $fields)->getBody();
 
-        $user = $this->runWithAdminUser(function() use ($registration) {
+        $user = $this->runWithAdminUser(function () use ($registration) {
             return $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
         });
         $registeredUser = array_intersect_key($registration, $user);

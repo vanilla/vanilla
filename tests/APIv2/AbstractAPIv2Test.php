@@ -178,16 +178,18 @@ abstract class AbstractAPIv2Test extends TestCase {
      * Assert that there is no session.
      *
      * @param bool $force End the session if there is one.
+     * @return int Returns the old user ID of the session.
      */
-    protected function assertNoSession(bool $force = false): void {
-        /* @var \Gdn_Session $session */
-        $session = static::container()->get(\Gdn_Session::class);
-
+    protected function assertNoSession(bool $force = false): int {
+        $userID = $this->api()->getUserID();
         if ($force) {
-            $session->end();
+            $this->api()->setUserID(0);
         }
 
+        /* @var \Gdn_Session $session */
+        $session = static::container()->get(\Gdn_Session::class);
         $this->assertFalse($session->isValid());
+        return $userID;
     }
 
     /**
@@ -202,12 +204,14 @@ abstract class AbstractAPIv2Test extends TestCase {
         $private = $middleware->isPrivate();
 
         try {
+            $userID = $this->api()->getUserID();
             $middleware->setIsPrivate(true);
             $this->assertNoSession(true);
 
             return $test();
         } finally {
             $middleware->setIsPrivate($private);
+            $this->api()->setUserID($userID);
         }
     }
 

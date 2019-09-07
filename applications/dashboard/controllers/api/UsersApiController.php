@@ -752,7 +752,7 @@ class UsersApiController extends AbstractApiController {
      * @throws Exception Throws all exceptions to the dispatcher.
      */
     public function post_requestPassword(array $body) {
-        $this->permission();
+        $this->permission(\Vanilla\Permissions::BAN_PRIVATE);
 
         $in = $this->schema([
             'email:s' => 'The email/username of the user.',

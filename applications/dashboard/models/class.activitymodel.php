@@ -1044,7 +1044,7 @@ class ActivityModel extends Gdn_Model {
         $subject = $options['EmailSubject'] ?: Gdn_Format::plainText($activity['Headline']);
 
         // Build the email to send.
-        $email = new Gdn_Email();
+        $email = Gdn::getContainer()->get(Gdn_Email::class);
         $email->subject(sprintf(
             t('[%1$s] %2$s'),
             c('Garden.Title'),

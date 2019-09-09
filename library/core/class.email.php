@@ -3,7 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 /**
  * Email layer abstraction
  *
@@ -14,7 +15,8 @@
  * @package Core
  * @since 2.0
  */
-class Gdn_Email extends Gdn_Pluggable {
+class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface{
+    use LoggerAwareTrait;
 
     /** Error: The email was not attempted to be sent.. */
     const ERR_SKIPPED = 1;
@@ -361,7 +363,30 @@ class Gdn_Email extends Gdn_Pluggable {
         if (!$this->PhpMailer->send()) {
             throw new Exception($this->PhpMailer->ErrorInfo);
         }
-
+        // Set $Configuration['PhpMailer']['Debug'] to true to activate phpmailer logs.
+        if (c('PhpMailer.Debug') === true) {
+            $payLoad = $this->PhpMailer->getSentMIMEMessage();
+            $this->logger->info(
+                'Email Payload',
+                ['event' => 'Debug email',
+                    'timestamp' => time(),
+                    'userid' => Gdn::session()->UserID,
+                    'username' => Gdn::session()->User->Name ?? 'anonymous',
+                    'ip' => Gdn::request()->ipAddress(),
+                    'method' => Gdn::request()->requestMethod(),
+                    'domain' => rtrim(url('/', true), '/'),
+                    'path' => Gdn::request()->path(),
+                    'Charset' => $this->PhpMailer->CharSet,
+                    'ContentType' => $this->PhpMailer->ContentType,
+                    'From' => $this->PhpMailer->From,
+                    'FromName' => $this->PhpMailer->FromName,
+                    'Sender' => $this->PhpMailer->Sender,
+                    'Subject' => $this->PhpMailer->Subject,
+                    'Body' => $this->PhpMailer->Body,
+                    'PayLoad' => $payLoad
+                ]
+            );
+        }
         return true;
     }
 

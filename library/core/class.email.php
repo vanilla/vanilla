@@ -365,7 +365,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface{
         }
         // Set $Configuration['PhpMailer']['Debug'] to true to activate phpmailer logs.
         if (c('PhpMailer.Debug') === true) {
-            $payLoad = $this->PhpMailer->getSentMIMEMessage();
+            $payload = $this->PhpMailer->getSentMIMEMessage();
             $this->logger->info(
                 'Email Payload',
                 ['event' => 'Debug email',
@@ -376,14 +376,14 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface{
                     'method' => Gdn::request()->requestMethod(),
                     'domain' => rtrim(url('/', true), '/'),
                     'path' => Gdn::request()->path(),
-                    'Charset' => $this->PhpMailer->CharSet,
-                    'ContentType' => $this->PhpMailer->ContentType,
-                    'From' => $this->PhpMailer->From,
-                    'FromName' => $this->PhpMailer->FromName,
-                    'Sender' => $this->PhpMailer->Sender,
-                    'Subject' => $this->PhpMailer->Subject,
-                    'Body' => $this->PhpMailer->Body,
-                    'PayLoad' => $payLoad
+                    'charset' => $this->PhpMailer->CharSet,
+                    'contentType' => $this->PhpMailer->ContentType,
+                    'from' => $this->PhpMailer->From,
+                    'fromName' => $this->PhpMailer->FromName,
+                    'sender' => $this->PhpMailer->Sender,
+                    'subject' => $this->PhpMailer->Subject,
+                    'body' => $this->PhpMailer->Body,
+                    'payload' => $payload
                 ]
             );
         }

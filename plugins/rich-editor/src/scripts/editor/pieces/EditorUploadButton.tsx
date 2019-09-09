@@ -13,9 +13,7 @@ import { isFileImage } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
-import {getMeta} from "@library/utility/appUtils";
-import {insertBlockBlotAt} from "@rich-editor/quill/utility";
-import Quill from "quill/core";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -105,12 +103,12 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
             this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files;
         const embedInsertion =
             this.props.quill && (this.props.quill.getModule("embed/insertion") as EmbedInsertionModule);
-        const limit = getMeta("upload.maxUploads", 20);
+        const maxUploads = getMeta("upload.maxUploads", 20);
 
         if (files && embedInsertion) {
-            const filesArray =Array.from(files);
-            if (filesArray.length >= limit) {
-                const error = new Error(`Can't upload more than ${limit} files at once.`);
+            const filesArray = Array.from(files);
+            if (filesArray.length >= maxUploads) {
+                const error = new Error(`Can't upload more than ${maxUploads} files at once.`);
                 embedInsertion.createErrorEmbed(error);
                 throw error;
             }

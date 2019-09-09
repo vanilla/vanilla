@@ -14,11 +14,15 @@ import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import ErrorBlot, {ErrorBlotType} from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import { getMeta } from "@library/utility/appUtils";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
+
+    private maxUploads = getMeta("upload.maxUploads", 20);
+
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
@@ -73,6 +77,12 @@ export default class EmbedInsertionModule extends Module {
             return;
         }
 
+        if (files.length >= this.maxUploads) {
+            const error = new Error(`Can't upload more than ${this.maxUploads} files at once.`);
+            this.createErrorEmbed(error);
+            throw error;
+        }
+
         files.forEach((file) => {
             if (isFileImage(file)) {
                 this.createImageEmbed(file);
@@ -88,8 +98,15 @@ export default class EmbedInsertionModule extends Module {
         if (!files) {
             return;
         }
+        const filesArray = Array.from(files);
 
-        [...files].forEach((file) => {
+        if (files.length >= this.maxUploads) {
+            const error = new Error(`Can't upload more than ${this.maxUploads} files at once.`);
+            this.createErrorEmbed(error);
+            throw error;
+        }
+
+        filesArray.forEach((file) => {
             if (isFileImage(file)) {
                 this.createImageEmbed(file);
             } else {

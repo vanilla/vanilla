@@ -90,14 +90,11 @@ export function removeAllDelegatedEvents() {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getDraggedFile(event: DragEvent): File | undefined {
+export function getDraggedFile(event: DragEvent): FileList | undefined {
     if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
         event.preventDefault();
-        const files = Array.from(event.dataTransfer.files);
 
-        // Currently only 1 file is supported.
-        const mainFile = files[0];
-        return mainFile;
+        return event.dataTransfer.files;
     }
 }
 
@@ -106,7 +103,7 @@ export function getDraggedFile(event: DragEvent): File | undefined {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getPastedFile(event: ClipboardEvent): File | undefined | null {
+export function getPastedFile(event: ClipboardEvent): Array<File> | undefined | null {
     if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
         const files = Array.from(event.clipboardData.items)
             .map((item: any) => (item.getAsFile ? item.getAsFile() : null))
@@ -114,9 +111,8 @@ export function getPastedFile(event: ClipboardEvent): File | undefined | null {
 
         if (files.length > 0) {
             event.preventDefault();
-            // Currently only 1 file is supported.
-            const mainFile = files[0];
-            return mainFile;
+
+            return files;
         }
     }
 }

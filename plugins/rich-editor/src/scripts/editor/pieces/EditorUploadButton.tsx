@@ -98,18 +98,19 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
      * Handle the change of the file upload input.
      */
     private onInputChange = () => {
-        // Grab the first file.
-        const file =
-            this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files[0];
+        const files =
+            this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files;
         const embedInsertion =
             this.props.quill && (this.props.quill.getModule("embed/insertion") as EmbedInsertionModule);
 
-        if (file && embedInsertion) {
-            if (this.props.type === "image" && isFileImage(file)) {
-                embedInsertion.createImageEmbed(file);
-            } else {
-                embedInsertion.createFileEmbed(file);
-            }
+        if (files && embedInsertion) {
+            Array.from(files).forEach((file) => {
+                if (this.props.type === "image" && isFileImage(file)) {
+                    embedInsertion.createImageEmbed(file);
+                } else {
+                    embedInsertion.createFileEmbed(file);
+                }
+            });
         }
     };
 }

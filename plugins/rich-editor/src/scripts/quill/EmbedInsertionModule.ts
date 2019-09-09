@@ -55,30 +55,34 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
-        const file = getPastedFile(event);
-        if (!file) {
+        const files = getPastedFile(event);
+        if (!files) {
             return;
         }
 
-        if (isFileImage(file)) {
-            this.createImageEmbed(file);
-        } else {
-            this.createFileEmbed(file);
-        }
+        [...files].forEach((file) => {
+            if (isFileImage(file)) {
+                this.createImageEmbed(file);
+            } else {
+                this.createFileEmbed(file);
+            }
+        });
     };
 
     private dragHandler = (event: DragEvent) => {
-        const file = getDraggedFile(event);
+        const files = getDraggedFile(event);
 
-        if (!file) {
+        if (!files) {
             return;
         }
 
-        if (isFileImage(file)) {
-            this.createImageEmbed(file);
-        } else {
-            this.createFileEmbed(file);
-        }
+        [...files].forEach((file) => {
+            if (isFileImage(file)) {
+                this.createImageEmbed(file);
+            } else {
+                this.createFileEmbed(file);
+            }
+        });
     };
 
     public createImageEmbed(file: File) {

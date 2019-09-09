@@ -44,8 +44,8 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                     ref={this.inputRef}
                     onChange={this.onInputChange}
                     className={classNames("richEditor-upload", classesRichEditor.upload)}
-                    type="file"
                     multiple
+                    type="file"
                     accept={this.inputAccepts}
                 />
             </button>

@@ -16,7 +16,7 @@ use Psr\Log\LoggerAwareTrait;
  * @package Core
  * @since 2.0
  */
-class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface{
+class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
 
     use LoggerAwareTrait;
 

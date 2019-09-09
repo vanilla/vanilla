@@ -13,6 +13,9 @@
  */
 class DashboardController extends Gdn_Controller {
 
+    /** @var bool Custom theming is not allowed in the dashboard. */
+    protected $allowCustomTheming = false;
+
     /**
      * Set PageName.
      *

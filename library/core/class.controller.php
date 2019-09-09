@@ -12,6 +12,7 @@
  * @abstract
  */
 
+use Vanilla\Models\ThemePreloadProvider;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
@@ -159,6 +160,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /** @var bool Indicate that the controller add the `defer` attribute to it's legacy scripts. */
     protected $useDeferredLegacyScripts;
+
+    /** @var bool Disable this to disabled custom theming for the page. */
+    protected $allowCustomTheming = true;
 
     /** @var array An array of CSS file names to search for in theme folders & include in the page. */
     protected $_CssFiles;
@@ -1915,9 +1919,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // Add inline content meta.
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                // Add preloaded redux actions.
-                $this->Head->addScript('', 'text/javascript', false, ['content' => $this->getReduxActionsAsJsVariable()]);
-
                 // Add legacy style scripts
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];
@@ -1956,6 +1957,15 @@ class Gdn_Controller extends Gdn_Pluggable {
                 }
 
                 $this->addWebpackAssets();
+                $this->addThemeAssets();
+
+                // Add preloaded redux actions.
+                $this->Head->addScript(
+                    '',
+                    'text/javascript',
+                    false,
+                    ['content' => $this->getReduxActionsAsJsVariable()]
+                );
             }
 
             // Add the favicon.
@@ -2037,6 +2047,24 @@ class Gdn_Controller extends Gdn_Pluggable {
             include($MasterViewPath);
         } else {
             $ViewHandler->render($MasterViewPath, $this);
+        }
+    }
+
+    /**
+     * Get theming assets for the page.
+     */
+    private function addThemeAssets() {
+        if (!$this->allowCustomTheming) {
+            return;
+        }
+
+        /** @var ThemePreloadProvider $themeProvider */
+        $themeProvider = Gdn::getContainer()->get(ThemePreloadProvider::class);
+
+        $this->registerReduxActionProvider($themeProvider);
+        $themeScript = $themeProvider->getThemeScript();
+        if ($themeScript !== null) {
+            $this->Head->addScript($themeScript->getWebPath());
         }
     }
 

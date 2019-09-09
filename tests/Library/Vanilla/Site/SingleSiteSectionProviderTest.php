@@ -14,9 +14,9 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for SingleSiteSectionProvider.
  */
-class SingleSiteSectionProviderTests extends MinimalContainerTestCase {
+class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
 
-    const LOCALE_KEY = 'AB-df';
+    const LOCALE_KEY = 'en_US';
 
     /** @var SingleSiteSectionProvider */
     private $provider;

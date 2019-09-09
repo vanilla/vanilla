@@ -60,7 +60,7 @@ export default class EmbedInsertionModule extends Module {
             return;
         }
 
-        [...files].forEach((file) => {
+        files.forEach((file) => {
             if (isFileImage(file)) {
                 this.createImageEmbed(file);
             } else {

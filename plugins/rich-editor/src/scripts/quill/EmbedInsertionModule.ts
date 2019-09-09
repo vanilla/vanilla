@@ -48,6 +48,9 @@ export default class EmbedInsertionModule extends Module {
         });
     }
 
+    /**
+     * Create an async error embed. The embed will be responsible for handling it's loading state and error states.
+     */
     public createErrorEmbed(error: Error) {
         const data = {
             error,
@@ -98,6 +101,7 @@ export default class EmbedInsertionModule extends Module {
         if (!files) {
             return;
         }
+
         const filesArray = Array.from(files);
 
         if (files.length >= this.maxUploads) {

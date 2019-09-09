@@ -12,7 +12,7 @@ namespace Vanilla\Contracts\Site;
  */
 class AttachedSectionRecordGroup implements \Countable, \JsonSerializable {
 
-    /** @var array */
+    /** @var int[] */
     private $attachedRecordIDs;
 
     /** @var string */
@@ -24,7 +24,7 @@ class AttachedSectionRecordGroup implements \Countable, \JsonSerializable {
     /**
      * Constructor.
      *
-     * @param array $attachedRecordIDs
+     * @param int[] $attachedRecordIDs
      * @param string $recordType
      * @param string $recordTypeDisplayName
      */
@@ -53,7 +53,7 @@ class AttachedSectionRecordGroup implements \Countable, \JsonSerializable {
     }
 
     /**
-     * @return array
+     * @return int[]
      */
     public function getAttachedRecordIDs(): array {
         return $this->attachedRecordIDs;

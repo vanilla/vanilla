@@ -16,7 +16,7 @@ use Vanilla\Contracts\Site\SiteSectionAttachmentProviderInterface;
  * This can be useful for performing bulk operations, or checking if it's possible
  * modify/delete a section.
  */
-class SiteSectionAttachmentModelInterface implements SiteSectionAttachmentProviderInterface {
+class SiteSectionAttachmentModel implements SiteSectionAttachmentProviderInterface {
 
     /** @var SiteSectionAttachmentProviderInterface */
     private $providers = [];

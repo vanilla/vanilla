@@ -63,5 +63,4 @@ class DefaultSiteSection implements SiteSectionInterface {
     public function getSectionID(): int {
         return self::DEFAULT_ID;
     }
-
 }

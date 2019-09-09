@@ -23,6 +23,9 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     /** Error: The email was not attempted to be sent.. */
     const ERR_SKIPPED = 1;
 
+    /** @var bool */
+    private $debug;
+
     /** @var PHPMailer */
     public $PhpMailer;
 
@@ -54,6 +57,12 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
         $this->setEmailTemplate(new EmailTemplate());
+
+        // Default debug status to the site config.
+        $this->setDebug((bool)c("Garden.Email.Debug"));
+
+        // This class is largely instantiated at the usage site, not the container, so we can't rely on it to wire up the dependency.
+        $this->setLogger(Logger::getLogger());
 
         $this->resolveFormat();
         parent::__construct();
@@ -365,8 +374,8 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
         if (!$this->PhpMailer->send()) {
             throw new Exception($this->PhpMailer->ErrorInfo);
         }
-        // Set $Configuration['PhpMailer']['Debug'] to true to activate phpmailer logs.
-        if (c('PhpMailer.Debug') === true) {
+
+        if ($this->isDebug() && $this->logger instanceof Psr\Log\LoggerInterface) {
             $payload = $this->PhpMailer->getSentMIMEMessage();
             $this->logger->info(
                 'Email Payload',
@@ -495,5 +504,23 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
             return $this;
         }
         return $this->PhpMailer->CharSet;
+    }
+
+    /**
+     * Should mailing be debugged?
+     *
+     * @param boolean $debug
+     */
+    public function setDebug(bool $debug) {
+        $this->debug = $debug;
+    }
+
+    /**
+     * Is mailing being debugged?
+     *
+     * @return boolean
+     */
+    public function isDebug(): bool {
+        return $this->debug;
     }
 }

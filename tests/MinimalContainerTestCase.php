@@ -45,7 +45,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Setup the container.
      */
-    public static function setUpBeforeClass() {
+    private function configureContainer() {
         \Gdn::setContainer(new Container());
         self::container()
             ->rule(FormatService::class)
@@ -65,12 +65,18 @@ class MinimalContainerTestCase extends TestCase {
             ->addAlias(\Gdn_Configuration::class)
             ->addAlias(\Gdn::AliasConfig)
             ->setShared(true)
+            ->rule(MockConfig::class)
+            ->setAliasOf(ConfigurationInterface::class)
+            ->setShared(true)
 
             // Locale
             ->rule(LocaleInterface::class)
             ->setClass(MockLocale::class)
             ->addAlias(\Gdn_Locale::class)
             ->addAlias(\Gdn::AliasLocale)
+            ->setShared(true)
+            ->rule(MockLocale::class)
+            ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
             // Prevent real HTTP requests.
@@ -98,11 +104,58 @@ class MinimalContainerTestCase extends TestCase {
     }
 
     /**
+     * Set some configuration key for the tests.
+     *
+     * @param string $key The config key.
+     * @param mixed $value The value to set.
+     */
+    public static function setConfig(string $key, $value) {
+        /** @var MockConfig $config */
+        $config = self::container()->get(ConfigurationInterface::class);
+        $config->set($key, $value);
+    }
+
+    /**
+     * Set multiple configuration keys for the tests.
+     *
+     * @param array $configs An array of $configKey => $value
+     */
+    public static function setConfigs(array $configs) {
+        /** @var MockConfig $config */
+        $config = self::container()->get(MockConfig::class);
+        $config->loadData($configs);
+    }
+
+    /**
+     * Set some translation key for the tests.
+     *
+     * @param string $key The translation key.
+     * @param mixed $value The value to set.
+     */
+    public static function setTranslation(string $key, $value) {
+        /** @var MockConfig $config */
+        $config = self::container()->get(MockLocale::class);
+        $config->set($key, $value);
+    }
+
+    /**
+     * Set multiple translation keys for the tests.
+     *
+     * @param array $configs An array of $translationKey => $value
+     */
+    public static function setTranslations(array $configs) {
+        /** @var MockConfig $config */
+        $config = self::container()->get(MockLocale::class);
+        $config->loadData($configs);
+    }
+
+    /**
      * Do some pre-test setup.
      */
     public function setUp() {
         parent::setUp();
         $this->setGlobals();
+        $this->configureContainer();
     }
 
     /**

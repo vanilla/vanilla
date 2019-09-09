@@ -5,6 +5,7 @@
  */
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+
 /**
  * Email layer abstraction
  *
@@ -16,6 +17,7 @@ use Psr\Log\LoggerAwareTrait;
  * @since 2.0
  */
 class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface{
+
     use LoggerAwareTrait;
 
     /** Error: The email was not attempted to be sent.. */

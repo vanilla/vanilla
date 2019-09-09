@@ -16,6 +16,8 @@ class DateTimeFormatter {
 
     use StaticCacheTranslationTrait;
 
+    const NULL_TIMESTAMP_DEFALT_VALUE = '-';
+
     const FORCE_FULL_FORMAT = 'force-full-datetime-format';
 
     /** @var DateConfig */
@@ -27,8 +29,6 @@ class DateTimeFormatter {
     public function __construct(DateConfig $dateConfig) {
         $this->dateConfig = $dateConfig;
     }
-
-    const NULL_TIMESTAMP_DEFALT_VALUE = '-';
 
     /**
      * Format a MySQL DateTime string in the specified format.
@@ -47,14 +47,13 @@ class DateTimeFormatter {
         }
 
         if ($timestamp === null) {
-            return self::t('Null Da' .
-                'te', self::NULL_TIMESTAMP_DEFALT_VALUE);
+            return self::t('Null Date', self::NULL_TIMESTAMP_DEFALT_VALUE);
         }
 
         $gmTimestamp = $timestamp;
         $timestamp = $this->adjustTimeStampForUser($timestamp);
 
-        if ($format == '') {
+        if ($format === '') {
             $format = $this->getDefaultFormatForTimestamp($timestamp);
         } elseif ($format === self::FORCE_FULL_FORMAT) {
             $format = $this->dateConfig->getDefaultDateTimeFormat();

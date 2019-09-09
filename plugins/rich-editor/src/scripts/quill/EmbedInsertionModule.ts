@@ -13,6 +13,7 @@ import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
+import ErrorBlot, {ErrorBlotType} from "@rich-editor/quill/blots/embeds/ErrorBlot";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -41,6 +42,18 @@ export default class EmbedInsertionModule extends Module {
             },
             dataPromise: scrapePromise,
         });
+    }
+
+    public createErrorEmbed(error: Error) {
+        const data = {
+            error,
+            type: ErrorBlotType.STANDARD,
+        };
+        const errorEmbed = new ErrorBlot(ErrorBlot.create(data), data);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, errorEmbed);
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(errorEmbed.offset(this.quill.scroll) + errorEmbed.length(), 0);
     }
 
     /**

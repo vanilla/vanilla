@@ -13,7 +13,9 @@ import { isFileImage } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
-import gdn from "@library/gdn";
+import {getMeta} from "@library/utility/appUtils";
+import {insertBlockBlotAt} from "@rich-editor/quill/utility";
+import Quill from "quill/core";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -103,14 +105,17 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
             this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files;
         const embedInsertion =
             this.props.quill && (this.props.quill.getModule("embed/insertion") as EmbedInsertionModule);
-        const limit = gdn.meta.upload.maxUploads;
+        const limit = getMeta("upload.maxUploads", 20);
 
         if (files && embedInsertion) {
-            const filesArray = [...files];
+            const filesArray =Array.from(files);
+            if (filesArray.length >= limit) {
+                const error = new Error(`Can't upload more than ${limit} files at once.`);
+                embedInsertion.createErrorEmbed(error);
+                throw error;
+            }
+
             filesArray.forEach((file) => {
-                if (filesArray.indexOf(file) >= limit) {
-                    console.log((filesArray).indexOf(file));
-                }
                 if (this.props.type === "image" && isFileImage(file)) {
                     embedInsertion.createImageEmbed(file);
                 } else {

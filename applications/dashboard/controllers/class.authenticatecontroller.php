@@ -9,6 +9,7 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
  * Create /authenticate endpoint.
@@ -162,9 +163,11 @@ class AuthenticateController extends Gdn_Controller {
             }
         }
 
-        $this->addClientApiAction(
-            'GET_USER_AUTHENTICATORS_SUCCESS',
-            Data::box($this->authenticateApiController->index_authenticators())
+        $this->addReduxAction(
+            new ReduxAction(
+                'GET_USER_AUTHENTICATORS_SUCCESS',
+                Data::box($this->authenticateApiController->index_authenticators())
+            )
         );
 
         $this->renderReact();

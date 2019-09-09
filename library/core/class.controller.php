@@ -16,6 +16,7 @@ use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
+use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 
 /**
  * Controller base class.
@@ -25,7 +26,7 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
  * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
 class Gdn_Controller extends Gdn_Pluggable {
-    use \Garden\MetaTrait, \Vanilla\Browser\ReduxTrait;
+    use \Garden\MetaTrait, ReduxActionPreloadTrait;
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
@@ -684,8 +685,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};'.
             'gdn.meta='.json_encode($this->_Definitions).";\n".
-            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).";\n".
-            $this->renderClientState()
+            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).";\n"
             ;
 
         if ($wrap) {
@@ -1912,7 +1912,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->EventArguments['Cdns'] = &$Cdns;
                 $this->fireEvent('AfterJsCdns');
 
+                // Add inline content meta.
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
+
+                // Add preloaded redux actions.
+                $this->Head->addScript('', 'text/javascript', false, ['content' => $this->getReduxActionsAsJsVariable()]);
 
                 // Add legacy style scripts
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

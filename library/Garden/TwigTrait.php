@@ -24,7 +24,9 @@ trait TwigTrait {
             $twigEnv = new \Twig\Environment($loader, ['debug' => true]);
             $twigEnv->addExtension(new \Twig\Extension\DebugExtension());
         } else {
-            $twigEnv = new \Twig\Environment($loader);
+            $twigEnv = new \Twig\Environment($loader, [
+                'cache' => PATH_CACHE . '/twig',
+            ]);
         }
         return $twigEnv;
     }

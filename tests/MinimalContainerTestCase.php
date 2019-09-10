@@ -18,6 +18,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
+use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
@@ -50,6 +51,11 @@ class MinimalContainerTestCase extends TestCase {
         self::container()
             ->rule(FormatService::class)
             ->addCall('registerBuiltInFormats', [self::container()])
+
+            // Site sections
+            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(SingleSiteSectionProvider::class)
+            ->setShared(true)
 
             // Mocks of interfaces.
             // Addons

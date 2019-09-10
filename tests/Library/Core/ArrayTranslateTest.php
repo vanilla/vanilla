@@ -15,10 +15,12 @@ use VanillaTests\SharedBootstrapTestCase;
 class ArrayTranslateTest extends SharedBootstrapTestCase {
 
     /**
-     * @param $testArray Array to be translated.
-     * @param $testMap The map of what the array keys will be.
-     * @param $addRemaining Add keys from the array map to the array even if they do not exist on the array.
-     * @param $expected
+     * Test  {@link arrayTranslate()} against several scenarios.
+     *
+     * @param array $testArray Array to be translated.
+     * @param array $testMap The map of what the array keys will be.
+     * @param array $addRemaining Add keys from the array map to the array even if they do not exist on the array.
+     * @param array $expected
      * @dataProvider provideTranslateableArrays
      */
     public function testArrayTranslate($testArray, $testMap, $addRemaining, $expected) {

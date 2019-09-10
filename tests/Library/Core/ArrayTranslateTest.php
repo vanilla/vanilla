@@ -2,17 +2,16 @@
 /**
  * @author Patrick Kelly <patrick.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Core;
-
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for arrayTranslate().
  */
-class ArrayTranslateTest extends SharedBootstrapTestCase {
+class ArrayTranslateTest extends TestCase {
 
     /**
      * Test  {@link arrayTranslate()} against several scenarios.
@@ -35,10 +34,29 @@ class ArrayTranslateTest extends SharedBootstrapTestCase {
      */
     public function provideTranslateableArrays() {
         $r = [
-            'simpleAssocAdd' => [['badKey' => 'a.b'], ['badKey' => 'fixedKey'], [0 => 1], ['fixedKey' => 'a.b']],
-            'longAssocAdd' => [['badKey' => 'a.b', 'anotherIndex' => 'b.c'], ['badKey' => 'fixedKey'], [0 => 1], ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c']],
-            'simpleAssocNoAdd' => [['badKey' => 'a.b'], ['badKey' => 'fixedKey'], [0 => 0], ['fixedKey' => 'a.b']],
-            'longAssocNoAdd' => [['badKey' => 'a.b', 'anotherIndex' => 'b.c'], ['badKey' => 'fixedKey'], [0 => 0], ['fixedKey' => 'a.b']],
+            'simpleAssocAdd' => [
+                ['badKey' => 'a.b'],
+                ['badKey' => 'fixedKey'],
+                [0 => 1],
+                ['fixedKey' => 'a.b']],
+            'longAssocAdd' => [
+                ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
+                ['badKey' => 'fixedKey'],
+                [0 => 1],
+                ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c']
+            ],
+            'simpleAssocNoAdd' => [
+                ['badKey' => 'a.b'],
+                ['badKey' => 'fixedKey'],
+                [0 => 0],
+                ['fixedKey' => 'a.b']
+            ],
+            'longAssocNoAdd' => [
+                ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
+                ['badKey' => 'fixedKey'],
+                [0 => 0],
+                ['fixedKey' => 'a.b']
+            ],
         ];
 
         return $r;

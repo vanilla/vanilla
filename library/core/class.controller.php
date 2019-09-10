@@ -2054,7 +2054,8 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Get theming assets for the page.
      */
     private function addThemeAssets() {
-        if (!$this->allowCustomTheming) {
+        if (!$this->allowCustomTheming || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+            // We only want to load theme data for full page loads & controllers that require theming data.
             return;
         }
 

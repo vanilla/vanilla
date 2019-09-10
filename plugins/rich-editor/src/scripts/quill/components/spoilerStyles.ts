@@ -62,6 +62,8 @@ export const spoilerCSS = useThemeCache(() => {
     const userContentVars = userContentVariables();
     cssRule(".spoiler-icon", {
         position: "relative",
+        display: "block",
+        margin: "auto",
         width: unit(globalVars.icon.sizes.default),
         height: unit(globalVars.icon.sizes.default),
         color: colorOut(userContentVars.blocks.fg),

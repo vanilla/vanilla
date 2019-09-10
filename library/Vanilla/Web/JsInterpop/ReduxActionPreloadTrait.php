@@ -12,7 +12,7 @@ namespace Vanilla\Web\JsInterpop;
  */
 trait ReduxActionPreloadTrait {
 
-    /** @var ReduxAction */
+    /** @var ReduxAction[] */
     private $reduxActions = [];
 
     /** @var ReduxActionProviderInterface[] */
@@ -47,7 +47,7 @@ trait ReduxActionPreloadTrait {
     protected function getReduxActionsAsJsVariable(): PhpAsJsVariable {
         // Apply all extra providers.
         foreach ($this->actionProviders as $provider) {
-            $this->reduxActions += $provider->createActions();
+            $this->reduxActions = array_merge($this->reduxActions, $provider->createActions());
         }
 
         return new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);

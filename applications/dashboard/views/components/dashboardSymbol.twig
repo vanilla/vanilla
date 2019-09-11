@@ -1,0 +1,14 @@
+{#
+    /**
+    * Render SVG icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
+    *
+    * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
+    * @param string $class If set, overrides any 'class' attribute in the $attr param.
+    * @param string $alt Alt text for the symbol The default 'alt' attribute will be set to $name.
+    */
+#}
+
+
+<svg class="{{ classNames('icon', 'icon-svg', params.class ?? null) }}" viewBox="0 0 17 17">
+    <use xlink:href="#{{ params.name }}" ></use>
+</svg>

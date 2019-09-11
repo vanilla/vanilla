@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
@@ -126,6 +127,7 @@ class Bootstrap {
                 ],
                 PATH_CACHE
             ])
+            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 

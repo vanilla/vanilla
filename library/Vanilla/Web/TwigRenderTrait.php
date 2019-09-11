@@ -44,6 +44,11 @@ trait TwigRenderTrait {
     }
 
     /**
+     * @var \Twig\Environment
+     */
+    private $twig;
+
+    /**
      * Render a given view using twig.
      *
      * @param string $path The view path.
@@ -52,13 +57,11 @@ trait TwigRenderTrait {
      * @return \Twig\Markup The rendered HTML in a twig wrapper. Casts to string to unwrap.
      */
     public function renderTwig(string $path, array $data): \Twig\Markup {
-        /** @var \Twig\Environment $twig */
-        static $twig;
-        if (!$twig) {
-            $twig = $this->prepareTwig();
+        if (!$this->twig) {
+            $this->twig = $this->prepareTwig();
         }
         // Ensure that we don't duplicate our root path in the path view.
         $path = str_replace(PATH_ROOT, '', $path);
-        return new \Twig\Markup($twig->render($path, $data), 'utf-8');
+        return new \Twig\Markup($this->twig->render($path, $data), 'utf-8');
     }
 }

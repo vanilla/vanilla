@@ -1,3 +1,3 @@
 <?php
 deprecated('addCategory', 'editCategory', 'October 2016');
-echo $this->fetchView('editcategory', 'vanillasettings', 'vanilla');
+include($this->fetchViewLocation('editcategory', 'vanillasettings', 'vanilla'));

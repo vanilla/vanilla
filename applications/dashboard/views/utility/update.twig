@@ -1,0 +1,37 @@
+{{ form.open() | raw }}
+<div class="Title">
+    <h1>
+        <img alt="Vanilla" src="{{ headerImage }}">
+        <p>Database Update</p>
+    </h1>
+</div>
+{% if Success %}
+    <div class="Container">
+        <div class="Notice">The update was successful.</div>
+    </div>
+{% else %}
+    <div class="Form">
+        {{ form.errors() | raw }}
+        <ul>
+            <li>
+                {{ form.label("Update Token") | raw }}
+
+                <div class="Description">Enter your
+                    <a href="https://docs.vanillaforums.com/developer/installation/self-hosting/#update-token">update token</a>
+                    below.
+
+                    {% if _isAdmin %}
+                        Since you are are an administrator you can leave this field blank.
+                    {% endif %}
+
+                </div>
+
+                {{ form.textBox("updateToken") | raw }}
+            </li>
+        </ul>
+        <div class="Button">
+            {{ form.button("Update") | raw }}
+        </div>
+    </div>
+{% endif %}
+{{ form.close() | raw }}

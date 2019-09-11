@@ -38,7 +38,7 @@ class Gdn_Session {
     /** @var object Preferences of the current user. */
     protected $_Preferences;
 
-    /** @var object The current user's transient key. */
+    /** @var string The current user's transient key. */
     protected $_TransientKey;
 
     /** @var Permissions */

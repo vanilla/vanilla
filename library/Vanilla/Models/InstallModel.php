@@ -52,6 +52,18 @@ class InstallModel {
     }
 
     /**
+     * Generate a new update token.
+     *
+     * Note: This token doesn't actually do anything in and of itself. It just generates a cryptographically secure
+     * token.
+     *
+     * @return string Returns a new random token.
+     */
+    public static function generateUpdateToken(): string {
+        return sha1(random_bytes(40));
+    }
+
+    /**
      * Install Vanilla.
      *
      * @see InstallModel::getSchema()
@@ -125,7 +137,8 @@ class InstallModel {
         // Save the installation information.
         $this->config->saveToConfig([
             'Garden.Installed' => true,
-            'Garden.Version' => APPLICATION_VERSION
+            'Garden.Version' => APPLICATION_VERSION,
+            'Garden.UpdateToken' => static::generateUpdateToken(),
         ]);
 
         $result = [
@@ -214,6 +227,13 @@ class InstallModel {
             }
         } else {
             $data['htaccess'] = 'ok';
+        }
+
+        // Make sure we can generate a strong random token.
+        try {
+            static::generateUpdateToken();
+        } catch (\Exception $ex) {
+            $validation->addError('', "Your system cannot generate a cryptographically strong random number.");
         }
 
         if (!$validation->isValid()) {

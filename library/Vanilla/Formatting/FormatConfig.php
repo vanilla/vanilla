@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting;
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class representing various configuration options for formatting.
@@ -20,6 +21,14 @@ class FormatConfig {
     /** @var bool */
     private $useVanillaMarkdownFlavor;
 
+    /** @var string */
+    private $defaultDesktopFormat;
+
+    /** @var string */
+    private $defaultMobileFormat;
+
+    private $defaultFormat;
+
     /**
      * DI.
      *
@@ -28,6 +37,30 @@ class FormatConfig {
     public function __construct(ConfigurationInterface $config) {
         $this->shouldReplaceNewLines = $config->get('Garden.Format.ReplaceNewlines', true);
         $this->useVanillaMarkdownFlavor = $config->get('Garden.Format.UseVanillaMarkdownFlavor', true);
+        $this->defaultDesktopFormat = $config->get('Garden.InputFormatter', RichFormat::FORMAT_KEY);
+        $this->defaultMobileFormat = $config->get('Garden.MobileInputFormatter', $this->defaultDesktopFormat);
+        $this->defaultFormat = isMobile() ? $this->defaultMobileFormat : $this->defaultDesktopFormat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultDesktopFormat(): string {
+        return $this->defaultDesktopFormat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultMobileFormat(): string {
+        return $this->defaultMobileFormat;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getDefaultFormat() {
+        return $this->defaultFormat;
     }
 
     /**

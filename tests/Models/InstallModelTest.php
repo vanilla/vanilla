@@ -51,5 +51,9 @@ class InstallTest extends TestCase {
 
         $this->assertArrayHasKey('version', $result);
         $this->assertGreaterThan(0, $result['adminUserID']);
+
+        /* @var \Gdn_Configuration $config */
+        $config = self::container()->get(\Gdn_Configuration::class);
+        $this->assertNotEmpty($config->get('Garden.UpdateToken'));
     }
 }

@@ -44,19 +44,6 @@ trait AssertsFixtureRenderingTrait {
     }
 
     /**
-     * Assert that two strings of HTML are roughly similar. This doesn't work for code blocks.
-     *
-     * @param string $expected
-     * @param string $actual
-     * @param string|null $message
-     */
-    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = null) {
-        $expected = $this->normalizeHtml($expected);
-        $actual = $this->normalizeHtml($actual);
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
      * Create a PHPUnit data provider value for a fixture.
      *
      * @param string $fixtureDir

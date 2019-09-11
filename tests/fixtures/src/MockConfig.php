@@ -20,7 +20,7 @@ class MockConfig implements Contracts\ConfigurationInterface {
     ];
 
     /** @var array A mapping of config key to value */
-    private $data = self::DEFAULT_CONFIG;
+    private $data;
 
     /**
      * Construct a mock configuration with some default values.
@@ -28,6 +28,7 @@ class MockConfig implements Contracts\ConfigurationInterface {
      * @param array $data
      */
     public function __construct(array $data = []) {
+        $this->data = static::DEFAULT_CONFIG;
         $this->data += $this->flattenArray($data);
     }
 
@@ -67,7 +68,7 @@ class MockConfig implements Contracts\ConfigurationInterface {
      * Clear all config data.
      */
     public function reset() {
-        $this->data = self::DEFAULT_CONFIG;
+        $this->data = static::DEFAULT_CONFIG;
     }
 
     /**

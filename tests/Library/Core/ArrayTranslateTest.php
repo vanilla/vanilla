@@ -50,7 +50,7 @@ class ArrayTranslateTest extends TestCase {
             'simpleAssocNoAdd' => [
                 ['badKey' => 'a.b'],
                 ['badKey' => 'fixedKey'],
-                0,
+                false,
                 ['fixedKey' => 'a.b']
             ],
             'longAssocNoAdd' => [

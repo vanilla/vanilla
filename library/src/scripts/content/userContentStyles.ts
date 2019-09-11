@@ -31,7 +31,6 @@ export const userContentVariables = useThemeCache(() => {
 
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
-        bg: globalVars.mixBgAndFg(0.05),
         fg: mainColors.fg,
     });
 
@@ -44,16 +43,16 @@ export const userContentVariables = useThemeCache(() => {
     const code = makeThemeVars("code", {
         fontSize: em(0.85),
         borderRadius: 2,
-        // bg target rgba(127, 127, 127, .15);
-        bg: blocks.bg,
-        fg: blocks.fg,
+        fg: mainColors.fg,
+        bg: globalVars.mixBgAndFg(0.05),
     });
 
     const codeInline = makeThemeVars("codeInline", {
         borderRadius: code.borderRadius,
         paddingVertical: em(0.2),
         paddingHorizontal: em(0.4),
-        bg: mainColors.fg.mix(mainColors.bg, 0.08),
+        fg: code.fg,
+        bg: code.bg,
     });
 
     const codeBlock = makeThemeVars("codeBlock", {
@@ -61,6 +60,8 @@ export const userContentVariables = useThemeCache(() => {
         paddingVertical: fonts.size,
         paddingHorizontal: fonts.size,
         lineHeight: 1.45,
+        fg: code.fg,
+        bg: code.bg,
     });
 
     const list = makeThemeVars("list", {
@@ -259,7 +260,8 @@ export const userContentClasses = useThemeCache(() => {
                 left: vars.codeInline.paddingHorizontal,
                 right: vars.codeInline.paddingHorizontal,
             }),
-            background: colorOut(vars.codeInline.bg),
+            color: colorOut(vars.codeInline.fg),
+            backgroundColor: colorOut(vars.codeInline.bg),
             borderRadius: vars.codeInline.borderRadius,
             // We CAN'T use display: `inline` & position: `relative` together.
             // This causes the cursor to disappear in a contenteditable.
@@ -274,6 +276,8 @@ export const userContentClasses = useThemeCache(() => {
             borderRadius: vars.codeBlock.borderRadius,
             flexShrink: 0, // Needed so code blocks don't collapse in the editor.
             whiteSpace: "pre",
+            color: colorOut(vars.codeBlock.fg),
+            backgroundColor: colorOut(vars.codeBlock.bg),
             ...paddings({
                 top: vars.codeBlock.paddingVertical,
                 bottom: vars.codeBlock.paddingVertical,

@@ -10,7 +10,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Exception;
-use Garden\Http\HttpRequest;
+use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
 use Vanilla\Metadata\Parser\Parser;
@@ -18,8 +18,8 @@ use Vanilla\Web\RequestValidator;
 
 class PageScraper {
 
-    /** @var HttpRequest */
-    private $httpRequest;
+    /** @var HttpClient */
+    private $httpClient;
 
     /** @var RequestValidator */
     private $requestValidator;
@@ -33,12 +33,14 @@ class PageScraper {
     /**
      * PageInfo constructor.
      *
-     * @param HttpRequest $httpRequest
+     * @param HttpClient $httpClient
      * @param RequestValidator $requestValidator
      */
-    public function __construct(HttpRequest $httpRequest, RequestValidator $requestValidator) {
-        $this->httpRequest = $httpRequest;
+    public function __construct(HttpClient $httpClient, RequestValidator $requestValidator) {
+        $this->httpClient = $httpClient;
         $this->requestValidator = $requestValidator;
+
+        $this->httpClient->setDefaultHeader("User-Agent", $this->userAgent());
     }
 
     /**
@@ -110,10 +112,7 @@ class PageScraper {
             throw new InvalidArgumentException('Unsupported URL scheme.');
         }
 
-        $this->httpRequest->setMethod(HttpRequest::METHOD_GET);
-        $this->httpRequest->setHeader('User-Agent', $this->userAgent());
-        $this->httpRequest->setUrl($url);
-        $result = $this->httpRequest->send();
+        $result = $this->httpClient->get($url);
         return $result;
     }
 

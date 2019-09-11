@@ -1,5 +1,5 @@
 
-{% from "@dashboard/components/header.twig" import header %}
+{% from "@dashboard/components/macros.twig" import heading %}
 
 {{ helpAsset(
     sprintf(t('About %s'), t('Categories')),
@@ -10,7 +10,7 @@
 ) }}
 
 {{
-  header({
+  heading({
     title: Title,
     returnUrl: '/vanilla/settings/categories'
   })
@@ -88,7 +88,7 @@
             {{ form.toggle('Archived', 'This category is archived.') }}
         </li>
     {% endif %}
-    {{ fireEchoEvent('vanillSettingsController_afterCategorySettings') }}
+    {{ firePluggableEchoEvent(pluggable, 'afterCategorySettings') }}
     {% if PermissionData|length > 0 %}
         <li id="Permissions" class="form-group">
             {{ form.toggle('CustomPermissions', 'This category has custom permissions.') }}

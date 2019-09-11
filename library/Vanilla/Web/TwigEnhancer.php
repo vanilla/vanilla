@@ -101,14 +101,36 @@ class TwigEnhancer {
      * @param string $eventName The name of the event.
      * @param array $args The arguments to pass in the event.
      *
-     * @return string The echoed HTML from the event. All content here should be sanitized already.
+     * @return \Twig\Markup The echoed HTML wrapped as twig markup. All content here should be sanitized already.
      */
-    public function fireEchoEvent(string $eventName, array &$args = []): string {
+    public function fireEchoEvent(string $eventName, array &$args = []): \Twig\Markup {
         ob_start();
         $this->eventManager->fire($eventName, $args);
         $echoedOutput = ob_get_contents();
         ob_end_clean();
-        return $echoedOutput;
+        return new \Twig\Markup($echoedOutput, 'utf-8');
+    }
+
+    /**
+     * Fire an event of a particular name from a pluggable. All echoed output dring the event will be captured and returned.
+     *
+     * @param \Gdn_Pluggable $pluggable The pluggable to fire the event as.
+     * @param string $eventName The name of the event.
+     * @param array $args The arguments to pass in the event.
+     * @param string $fireAs Fire the event from a different base name than the pluggable.
+     *
+     * @return \Twig\Markup The echoed HTML wrapped as twig markup. All content here should be sanitized already.
+     * @deprecated 3.3 Use `fireEchoEvent` instead. The name generated from the pluggable is quite complicated.
+     */
+    public function firePluggableEchoEvent(\Gdn_Pluggable $pluggable, string $eventName, array &$args = [], string $fireAs = ''): \Twig\Markup {
+        ob_start();
+        if ($fireAs  !== '') {
+            $pluggable->fireAs($fireAs);
+        }
+        $pluggable->fireEvent($eventName, $args);
+        $echoedOutput = ob_get_contents();
+        ob_end_clean();
+        return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
     private $configCache = [];
@@ -176,6 +198,7 @@ class TwigEnhancer {
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
+            'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             // Session
             'hasPermission' => [$this, 'hasPermission'],
             'inSection' => [\Gdn_Theme::class, 'inSection'],

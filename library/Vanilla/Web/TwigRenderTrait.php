@@ -17,7 +17,7 @@ trait TwigRenderTrait {
     /**
      * Initialize the twig environment.
      */
-    public function prepareTwig(): \Twig\Environment {
+    private function prepareTwig(): \Twig\Environment {
         $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
 
         $isDebug = \Gdn::config('Debug') === true;
@@ -49,9 +49,9 @@ trait TwigRenderTrait {
      * @param string $path The view path.
      * @param array $data The data to render.
      *
-     * @return string The rendered HTML.
+     * @return \Twig\Markup The rendered HTML in a twig wrapper. Casts to string to unwrap.
      */
-    protected function renderTwig(string $path, array $data): string {
+    public function renderTwig(string $path, array $data): \Twig\Markup {
         /** @var \Twig\Environment $twig */
         static $twig;
         if (!$twig) {
@@ -59,6 +59,6 @@ trait TwigRenderTrait {
         }
         // Ensure that we don't duplicate our root path in the path view.
         $path = str_replace(PATH_ROOT, '', $path);
-        return $twig->render($path, $data);
+        return new \Twig\Markup($twig->render($path, $data), 'utf-8');
     }
 }

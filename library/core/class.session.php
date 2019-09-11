@@ -694,10 +694,10 @@ class Gdn_Session {
              */
             // Make sure we're testing a string.
             $stringToTest = $this->_TransientKey ?: '';
-            $hashCheck = (hash_equals($stringToTest, $foreignKey) && !empty($this->_TransientKey));
+            $isCorrectHash = (hash_equals($stringToTest, $foreignKey) && !empty($this->_TransientKey));
 
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
-            $return = ($forceValid && Gdn::request()->isPostBack()) || $hashCheck;
+            $return = ($forceValid && Gdn::request()->isPostBack()) || $isCorrectHash;
         }
 
         if (!$return && $forceValid !== true) {

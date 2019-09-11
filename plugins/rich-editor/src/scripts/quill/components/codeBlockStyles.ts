@@ -31,12 +31,9 @@ export const codeBlockVariables = useThemeCache(() => {
 
     const variablesUserContent = userContentVariables();
 
-    const colors = makeThemeVars("colors", {
-        fg: variablesUserContent.blocks.fg,
-        bg: variablesUserContent.blocks.bg,
-    });
-
     const inline = makeThemeVars("inline", {
+        fg: variablesUserContent.codeInline.fg,
+        bg: variablesUserContent.codeInline.bg,
         border: {
             color: globalVars.mixBgAndFg(0.5),
             radius: 0,
@@ -48,6 +45,8 @@ export const codeBlockVariables = useThemeCache(() => {
     });
 
     const block = makeThemeVars("block", {
+        fg: variablesUserContent.codeBlock.fg,
+        bg: variablesUserContent.codeBlock.bg,
         border: {
             radius: borderRadius.default,
         },
@@ -59,7 +58,6 @@ export const codeBlockVariables = useThemeCache(() => {
     return {
         fonts,
         border,
-        colors,
         inline,
         block,
     };
@@ -79,8 +77,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 fontFamily: vars.fonts.families,
                 maxWidth: percent(100),
                 margin: 0,
-                color: colorOut(vars.colors.fg),
-                backgroundColor: colorOut(vars.colors.bg),
+                color: colorOut(vars.inline.fg),
+                backgroundColor: colorOut(vars.inline.bg),
                 border: 0,
                 overflowX: "auto",
                 flexShrink: 0,
@@ -90,6 +88,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 whiteSpace: "normal",
                 ...paddings(vars.inline.paddings),
                 borderRadius: vars.inline.border.radius,
+                color: colorOut(vars.inline.fg),
+                backgroundColor: colorOut(vars.inline.bg),
             },
             ".codeBlock": {
                 display: "block",
@@ -98,6 +98,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 whiteSpace: "pre",
                 ...paddings(vars.block.paddings),
                 borderRadius: vars.block.border.radius,
+                color: colorOut(vars.block.fg),
+                backgroundColor: colorOut(vars.block.bg),
             },
         },
     });

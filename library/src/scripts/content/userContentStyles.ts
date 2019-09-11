@@ -32,6 +32,7 @@ export const userContentVariables = useThemeCache(() => {
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
         fg: mainColors.fg,
+        bg: globalVars.mixBgAndFg(0.05),
     });
 
     const embeds = makeThemeVars("embeds", {
@@ -43,16 +44,14 @@ export const userContentVariables = useThemeCache(() => {
     const code = makeThemeVars("code", {
         fontSize: em(0.85),
         borderRadius: 2,
-        fg: mainColors.fg,
-        bg: globalVars.mixBgAndFg(0.05),
     });
 
     const codeInline = makeThemeVars("codeInline", {
         borderRadius: code.borderRadius,
         paddingVertical: em(0.2),
         paddingHorizontal: em(0.4),
-        fg: code.fg,
-        bg: code.bg,
+        fg: blocks.fg,
+        bg: blocks.bg,
     });
 
     const codeBlock = makeThemeVars("codeBlock", {
@@ -60,8 +59,8 @@ export const userContentVariables = useThemeCache(() => {
         paddingVertical: fonts.size,
         paddingHorizontal: fonts.size,
         lineHeight: 1.45,
-        fg: code.fg,
-        bg: code.bg,
+        fg: blocks.fg,
+        bg: blocks.bg,
     });
 
     const list = makeThemeVars("list", {
@@ -248,8 +247,8 @@ export const userContentClasses = useThemeCache(() => {
             maxWidth: percent(100),
             overflowX: "auto",
             margin: 0,
-            color: colorOut(vars.code.fg),
-            backgroundColor: colorOut(vars.code.bg),
+            color: colorOut(vars.blocks.fg),
+            backgroundColor: colorOut(vars.blocks.bg),
             border: "none",
         },
         "&& .codeInline": {

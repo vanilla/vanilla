@@ -194,21 +194,27 @@ class TwigEnhancer {
             'getTranslation' => [$this, 'getTranslation'],
             't' => [$this, 'getTranslation'],
             'sprintf',
+
             // Utility
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
+
+            // Application interaction.
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
+            'helpAsset',
+
             // Session
             'hasPermission' => [$this, 'hasPermission'],
             'inSection' => [\Gdn_Theme::class, 'inSection'],
+
             // Routing.
             'url',
+
             // User related.
             'userPhoto',
             'userPhotoUrl',
             'userUrl',
-            'helpAsset',
         ];
     }
 }

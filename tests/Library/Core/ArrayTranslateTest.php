@@ -6,6 +6,7 @@
  */
 
 namespace VanillaTests\Library\Core;
+
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,8 +23,8 @@ class ArrayTranslateTest extends TestCase {
      * @param array $expected
      * @dataProvider provideTranslateableArrays
      */
-    public function testArrayTranslate($testArray, $testMap, $addRemaining, $expected) {
-        $value = arrayTranslate($testArray, $testMap, $addRemaining[0]);
+    public function testArrayTranslate(array $testArray, array $testMap, bool $addRemaining, array $expected) {
+        $value = arrayTranslate($testArray, $testMap, $addRemaining);
         $this->assertSame($expected, $value);
     }
 
@@ -37,24 +38,24 @@ class ArrayTranslateTest extends TestCase {
             'simpleAssocAdd' => [
                 ['badKey' => 'a.b'],
                 ['badKey' => 'fixedKey'],
-                [0 => 1],
+                1,
                 ['fixedKey' => 'a.b']],
             'longAssocAdd' => [
                 ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
                 ['badKey' => 'fixedKey'],
-                [0 => 1],
+                1,
                 ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c']
             ],
             'simpleAssocNoAdd' => [
                 ['badKey' => 'a.b'],
                 ['badKey' => 'fixedKey'],
-                [0 => 0],
+                0,
                 ['fixedKey' => 'a.b']
             ],
             'longAssocNoAdd' => [
                 ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
                 ['badKey' => 'fixedKey'],
-                [0 => 0],
+                0,
                 ['fixedKey' => 'a.b']
             ],
         ];

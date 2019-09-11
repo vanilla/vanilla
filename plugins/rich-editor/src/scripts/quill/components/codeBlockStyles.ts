@@ -29,8 +29,8 @@ export const codeBlockVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("colors", {
-        bg: globalVars.mixBgAndFg(0.2),
-        fg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.2),
+        bg: globalVars.mixBgAndFg(0.05),
+        fg: globalVars.mainColors.fg,
     });
 
     const inline = makeThemeVars("inline", {

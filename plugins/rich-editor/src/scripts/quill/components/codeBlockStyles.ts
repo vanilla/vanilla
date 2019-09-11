@@ -10,6 +10,7 @@ import { cssRule } from "typestyle";
 import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { em, percent } from "csx";
 import { paddings } from "@library/styles/styleHelpersfPadding";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 export const codeBlockVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -28,9 +29,11 @@ export const codeBlockVariables = useThemeCache(() => {
         radius: borderRadius.default,
     });
 
+    const variablesUserContent = userContentVariables();
+
     const colors = makeThemeVars("colors", {
-        bg: globalVars.mixBgAndFg(0.05),
-        fg: globalVars.mainColors.fg,
+        fg: variablesUserContent.blocks.fg,
+        bg: variablesUserContent.blocks.bg,
     });
 
     const inline = makeThemeVars("inline", {

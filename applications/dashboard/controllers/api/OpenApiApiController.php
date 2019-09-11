@@ -40,7 +40,7 @@ class OpenApiApiController extends Controller {
     public function __construct(SwaggerModel $swaggerModel, OpenApiBuilder $openApiBuilder, ConfigurationInterface $config) {
         $this->swaggerModel = $swaggerModel;
         $this->openApiBuilder = $openApiBuilder;
-        $this->allowOpenApiAccess = $config->get('APIv2.OpenApi.AllowPublicAccess', false);
+        $this->allowOpenApiAccess = $config->get('OpenApi.AllowPublicAccess', false);
     }
 
     /**

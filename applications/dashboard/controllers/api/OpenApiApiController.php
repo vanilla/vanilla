@@ -68,7 +68,7 @@ class OpenApiApiController extends Controller {
      * @return array Returns the OpenAPI object as an array.
      */
     public function get_v3(array $query = []) {
-        $this->permission('');
+        $this->permission();
 
         $in = $this->schema([
             'disabled:b' => [

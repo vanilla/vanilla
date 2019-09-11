@@ -22,8 +22,16 @@ class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
      * @param \Gdn_Controller $controller
      */
     public function render($path, $controller) {
+        // Extra data to merge into the controllers data for every render.
+        $extraData = [
+            'form' => $controller->Form ? new TwigFormWrapper($controller->Form) : null,
+            'category' => $controller->Category ?? null,
+            'discussion' => $controller->Discussion ?? null,
+        ];
+
+        $data = array_merge($extraData, (array) $controller->Data);
         // We need to echo instead of return returning because \Gdn_Controller::fetchView()
         // uses only ob_start and ob_get_clean to gather the rendered result.
-        echo $this->renderTwig($path, (array) $controller->Data);
+        echo $this->renderTwig($path, $data);
     }
 }

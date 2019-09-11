@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4aef8f9abd445b614d1449a26952f624",
+    "content-hash": "394298a7601b960f9584bd6493e51178",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -818,20 +818,21 @@
         },
         {
             "name": "vanilla/garden-http",
-            "version": "v2.0.2",
+            "version": "v2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-http.git",
-                "reference": "d30b039a448c2978847fde45c6ee3bbd1c9afb08"
+                "reference": "4a64bb769d87f6021b024783bfd9c7e31c099e41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/d30b039a448c2978847fde45c6ee3bbd1c9afb08",
-                "reference": "d30b039a448c2978847fde45c6ee3bbd1c9afb08",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/4a64bb769d87f6021b024783bfd9c7e31c099e41",
+                "reference": "4a64bb769d87f6021b024783bfd9c7e31c099e41",
                 "shasum": ""
             },
             "require": {
-                "lib-curl": "*",
+                "ext-curl": "*",
+                "ext-json": "*",
                 "php": ">=7.0.0"
             },
             "require-dev": {
@@ -854,7 +855,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2019-06-11T19:09:49+00:00"
+            "time": "2019-08-18T02:08:03+00:00"
         },
         {
             "name": "vanilla/garden-password",
@@ -1126,6 +1127,59 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "time": "2019-03-15T04:17:08+00:00"
+        },
+        {
+            "name": "vanilla/safecurl",
+            "version": "v0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/safecurl.git",
+                "reference": "c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/safecurl/zipball/c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97",
+                "reference": "c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\SafeCurl\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Benoist",
+                    "email": "jeremy.benoist@gmail.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Jack W",
+                    "email": "jack@fin1te.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A drop-in replacement for 'curl_exec', designed to prevent SSRF attacks.",
+            "keywords": [
+                "curl",
+                "safe",
+                "safecurl",
+                "ssrf",
+                "websec"
+            ],
+            "time": "2019-09-11T03:24:55+00:00"
         },
         {
             "name": "vanilla/vanilla-connect",

@@ -75,24 +75,16 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
-        const files = getPastedFile(event);
-        if (!files) {
+        const file = getPastedFile(event);
+        if (!file) {
             return;
         }
 
-        if (files.length >= this.maxUploads) {
-            const error = new Error(`Can't upload more than ${this.maxUploads} files at once.`);
-            this.createErrorEmbed(error);
-            throw error;
+        if (isFileImage(file)) {
+            this.createImageEmbed(file);
+        } else {
+            this.createFileEmbed(file);
         }
-
-        files.forEach((file) => {
-            if (isFileImage(file)) {
-                this.createImageEmbed(file);
-            } else {
-                this.createFileEmbed(file);
-            }
-        });
     };
 
     private dragHandler = (event: DragEvent) => {

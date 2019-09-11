@@ -86,7 +86,7 @@ export function removeAllDelegatedEvents() {
 }
 
 /**
- * Handler for an file being dragged and dropped.
+ * Handler for files being dragged and dropped.
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
@@ -99,11 +99,11 @@ export function getDraggedFile(event: DragEvent): FileList | undefined {
 }
 
 /**
- * Handler for an file being pasted.
+ * Handler for files being pasted.
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getPastedFile(event: ClipboardEvent): Array<File> | undefined | null {
+export function getPastedFile(event: ClipboardEvent): File | undefined | null {
     if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
         const files = Array.from(event.clipboardData.items)
             .map((item: any) => (item.getAsFile ? item.getAsFile() : null))
@@ -111,8 +111,9 @@ export function getPastedFile(event: ClipboardEvent): Array<File> | undefined | 
 
         if (files.length > 0) {
             event.preventDefault();
-
-            return files;
+            // Currently only 1 file is supported.
+            const mainFile = files[0];
+            return mainFile;
         }
     }
 }

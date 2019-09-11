@@ -3087,7 +3087,7 @@ class UserModel extends Gdn_Model {
      * @throws Exception
      */
     public function insertForBasic($formPostValues, $checkCaptcha = true, $options = []) {
-        $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+        $roleIDs = RoleModel::getDefaulafterRegistertRoles(RoleModel::TYPE_MEMBER);
         if (!is_array($roleIDs) || count($roleIDs) == 0) {
             throw new Exception(t('The default role has not been configured.'), 400);
         }

@@ -11,15 +11,36 @@ namespace Vanilla\Web;
  * Class for rendering twig views with the vanilla environment configured.
  */
 trait TwigRenderTrait {
-    use \Garden\TwigTrait;
+    /** @var string The path to look for twig views in. */
+    protected static $twigDefaultFolder = PATH_ROOT;
 
     /**
      * Initialize the twig environment.
      */
     public function prepareTwig(): \Twig\Environment {
-        $twig = self::twigInit();
-        $this->enhanceTwig($twig);
-        return $twig;
+        $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
+
+        $isDebug = \Gdn::config('Debug') === true;
+        $envArgs = [
+            'cache' => PATH_CACHE . '/twig',
+            'debug' => $isDebug,
+            // Automatically controlled by the debug value.
+            // This causes twig to check the FS timestamp before going to cache.
+            // It will rebuild that file's cache if an update had occured.
+            // 'auto_reload' => $isDebug
+            'strict_variables' => $isDebug, // Surface template errors in debug mode.
+        ];
+        $environment = new \Twig\Environment($loader, $envArgs);
+
+        if ($isDebug) {
+            $environment->addExtension(new \Twig\Extension\DebugExtension());
+        }
+
+        /** @var TwigEnhancer $enhancer */
+        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
+        $enhancer->enhanceEnvironment($environment);
+        $enhancer->enhanceFileSystem($loader);
+        return $environment;
     }
 
     /**
@@ -38,20 +59,6 @@ trait TwigRenderTrait {
         }
         // Ensure that we don't duplicate our root path in the path view.
         $path = str_replace(PATH_ROOT, '', $path);
-
-        // We need to echo instead of return returning because \Gdn_Controller::fetchView()
-        // uses only ob_start and ob_get_clean to gather the rendered result.
         return $twig->render($path, $data);
-    }
-
-    /**
-     * Add a few required method into the twig environment.
-     *
-     * @param \Twig\Environment $twig The twig environment to enhance.
-     */
-    private function enhanceTwig(\Twig\Environment $twig) {
-        $twig->addFunction(new \Twig_Function('t', [\Gdn::class, 'translate']));
-        $twig->addFunction(new \Twig_Function('sanitizeUrl', [\Gdn_Format::class, 'sanitizeUrl']));
-        $twig->addFunction(new \Twig_Function('url', 'url'));
     }
 }

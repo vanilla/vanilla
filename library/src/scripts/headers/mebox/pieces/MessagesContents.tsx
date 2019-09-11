@@ -34,6 +34,7 @@ export class MessagesContents extends React.Component<IProps> {
     public render() {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
+
         return (
             <Frame
                 className={this.props.className}

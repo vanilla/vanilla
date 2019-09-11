@@ -11,7 +11,6 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
-use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
@@ -22,6 +21,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -73,8 +73,11 @@ class Bootstrap {
             ->setInstance('@baseUrl', $this->getBaseUrl())
             ->setInstance(Container::class, $container)
 
-            ->rule(ContainerInterface::class)
+            ->rule(\Psr\Container\ContainerInterface::class)
             ->setAliasOf(Container::class)
+
+            ->rule(\Interop\Container\ContainerInterface::class)
+            ->setClass(\Vanilla\InteropContainer::class)
 
             // Base classes that want to support DI without polluting their constructor implement this.
             ->rule(InjectableInterface::class)
@@ -106,6 +109,11 @@ class Bootstrap {
             ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
+
+            // Site sections
+            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(SingleSiteSectionProvider::class)
+            ->setShared(true)
 
             // AddonManager
             ->rule(AddonManager::class)

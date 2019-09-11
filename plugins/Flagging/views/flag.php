@@ -16,7 +16,7 @@ echo $this->Form->errors();
                 <?php echo t('FlagForReview', "You are about to flag this for moderator review. If you're sure you want to do this,
          please enter a brief reason below, then press 'Flag this!'."); ?>
             </div>
-            <?php echo t('FlagLinkContent', 'Link to content:').' '.anchor(t('FlagLinkFormat', "{$UcContext} #{$ElementID}"), $URL); ?> &ndash;
+            <?php echo t('FlagLinkContent', 'Link to content:').' '.anchor(t('FlagLinkFormat', "{$UcContext} #{$ElementID}"), $URL, "", ["WithDomain" => "/"]); ?> &ndash;
             <?php echo htmlspecialchars($this->data('Plugin.Flagging.Data.ElementAuthor')); ?>
         </li>
         <li>

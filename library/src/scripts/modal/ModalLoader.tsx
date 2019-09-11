@@ -38,4 +38,4 @@ class ModalLoader extends React.Component<IProps> {
     };
 }
 
-export default withRouter<IProps>(ModalLoader);
+export default withRouter(ModalLoader);

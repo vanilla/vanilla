@@ -6,7 +6,7 @@
 
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
+import { ColorValues, margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import classNames from "classnames";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -18,6 +18,7 @@ export interface IStoryTileAndTextProps extends IStoryTileProps {
     text?: string;
     title?: string;
     compact?: boolean;
+    backgroundColor?: ColorValues;
 }
 
 /**
@@ -29,15 +30,16 @@ export function StoryTileAndText(props: IStoryTileAndTextProps) {
         <li className={classNames(classes.tilesAndText, { [classes.compactTilesAndText]: props.compact })}>
             <StoryTile
                 tag={"div"}
-                mouseOverText={props.mouseOverText}
+                mouseOverText={props.title}
                 type={props.type}
                 scaleContents={props.scaleContents}
+                backgroundColor={props.backgroundColor}
             >
                 {props.children}
             </StoryTile>
             {(props.title || props.text) && (
                 <div className={classNames(classes.tileText, { [classes.tileTextPaddingLeft]: !props.compact })}>
-                    {props.title && <StoryHeading depth={3}>{props.title}</StoryHeading>}
+                    {props.title && <h3 className={classes.tileTitle}>{props.title}</h3>}
                     {props.text && <StoryParagraph>{props.text}</StoryParagraph>}
                 </div>
             )}

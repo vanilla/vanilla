@@ -6,7 +6,7 @@
 
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
+import { ColorValues, margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import classNames from "classnames";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -17,6 +17,7 @@ export interface IStoryTileProps {
     type?: string;
     scaleContents?: number;
     tag?: string;
+    backgroundColor?: ColorValues;
 }
 
 /**
@@ -30,6 +31,7 @@ export function StoryTile(props: IStoryTileProps) {
         <Tag
             title={props.mouseOverText}
             className={classNames(classes.tile, { [classes.setBackground(props.type!)]: props.type })}
+            style={props.backgroundColor ? { backgroundColor: props.backgroundColor } : undefined}
         >
             <ConditionalWrap
                 condition={props.scaleContents !== undefined}

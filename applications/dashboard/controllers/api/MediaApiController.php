@@ -9,6 +9,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use \Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -356,14 +357,17 @@ class MediaApiController extends AbstractApiController {
      * Return information from the media row along with a full URL to the file.
      *
      * @param array $body The request body.
-     * @return arrayx
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => $allowedExtensions,
+            UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
+            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled('validateContentTypes'),
+            UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => true,
+            UploadedFileSchema::OPTION_ALLOW_NON_STRICT_TYPES => true, // less strict because mime_content_type isn't super accurate
         ]);
 
         $in = $this->schema([

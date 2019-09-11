@@ -128,8 +128,11 @@ var colorPicker = {
     }
 }
 
-jQuery(document).ready(function($) {
+function startColorPicker() {
     $('.js-color-picker').each(function() {
         colorPicker.start($(this));
     });
-});
+}
+
+jQuery(document).ready(startColorPicker);
+$(document).on("contentLoad", startColorPicker)

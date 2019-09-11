@@ -12,7 +12,9 @@ use Vanilla\Contracts\LocaleInterface;
 /**
  * Mock locale object. Passes all strings through untouched.
  */
-class MockLocale implements LocaleInterface {
+class MockLocale extends MockConfig implements LocaleInterface {
+
+    const DEFAULT_CONFIG = [];
 
     /**
      * Return the value directly.
@@ -22,6 +24,13 @@ class MockLocale implements LocaleInterface {
      * @return string
      */
     public function translate($code, $default = false) {
-        return $default ?: $code;
+        $setValue = self::get($code, false);
+        if ($setValue) {
+            return $setValue;
+        } elseif ($default) {
+            return $default;
+        } else {
+            return $code;
+        }
     }
 }

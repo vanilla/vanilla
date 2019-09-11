@@ -41,8 +41,8 @@
   .icon-#{$icon-size} {
     &,
     svg {
-      height: to-rem($icon-size);
-      width: to-rem($icon-size);
+      height: #{$icon-size}px;
+      width: #{$icon-size}px;
     }
   }
 }

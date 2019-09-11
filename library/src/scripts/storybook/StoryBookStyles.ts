@@ -3,18 +3,29 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache, styleFactory, variableFactory, DEBUG_STYLES } from "@library/styles/styleUtils";
-import { borders, colorOut, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fonts,
+    importantUnit,
+    margins,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { border, calc, color, em, important, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
+import { iconVariables } from "@library/icons/iconClasses";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("storyBook");
 
     const spacing = makeThemeVars("spacing", {
+        extraLarge: 40,
         large: 24,
         default: 16,
         verticalTitle: 22,
@@ -82,15 +93,6 @@ export const storyBookClasses = useThemeCache(() => {
         transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
     });
 
-    const headingH1 = style("headingH1", {
-        ...fonts({
-            size: 24,
-            family: globalVars.fonts.families.body,
-            weight: globalVars.fonts.weights.bold,
-        }),
-        marginBottom: unit(16),
-    });
-
     const headingH2 = style("headingH2", {
         ...fonts({
             size: 18,
@@ -101,7 +103,7 @@ export const storyBookClasses = useThemeCache(() => {
             horizontal: unit(vars.spacing.tight / 2),
         }),
         ...margins({
-            top: vars.spacing.large,
+            top: vars.spacing.extraLarge,
             bottom: vars.spacing.tight,
         }),
 
@@ -109,8 +111,29 @@ export const storyBookClasses = useThemeCache(() => {
             width: 1,
             color: vars.colors.border,
         }),
-        width: calc(`100% + ${unit(vars.spacing.tight)}`),
+        width: calc(`100% + ${unit(vars.spacing.tight / 2)}`),
         transform: translateX(`-${unit(vars.spacing.tight / 2)}`),
+        $nest: {
+            [`& + *:not(.${paragraph})`]: {
+                marginTop: unit(32),
+            },
+        },
+    });
+
+    const headingH1 = style("headingH1", {
+        ...fonts({
+            size: 24,
+            family: globalVars.fonts.families.body,
+            weight: globalVars.fonts.weights.bold,
+        }),
+        marginBottom: unit(16),
+        $nest: {
+            [`& .${headingH2}`]: {
+                ...margins({
+                    top: vars.spacing.large,
+                }),
+            },
+        },
     });
 
     const headingH3 = style("headingH1", {
@@ -133,14 +156,15 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
         maxWidth: percent(100),
         ...paddings({
-            vertical: 55,
-            horizontal: 200,
+            vertical: 50,
+            horizontal: 55,
         }),
     });
 
     const containerInner = style("containerInner", {
         position: "relative",
         display: "block",
+        width: percent(100),
     });
 
     const content = style("content", {
@@ -148,6 +172,14 @@ export const storyBookClasses = useThemeCache(() => {
         display: "block",
         maxWidth: percent(100),
         width: unit(672),
+        margin: "auto",
+    });
+
+    const smallContent = style("smallContent", {
+        position: "relative",
+        display: "block",
+        maxWidth: percent(100),
+        width: unit(216),
     });
 
     const tiles = style("tiles", {
@@ -183,13 +215,14 @@ export const storyBookClasses = useThemeCache(() => {
         $nest: {
             [`.${tile}`]: {
                 margin: 0,
-                minWidth: unit(vars.tiles.wideWidth),
+                minWidth: unit(vars.tiles.width),
             },
         },
     });
 
     const tileTitle = style("tileTitle", {
         fontSize: unit(14),
+        marginTop: unit(10),
     });
     const tileText = style("tileText", {
         width: calc(`100% - ${unit(vars.tiles.width)}`),
@@ -252,6 +285,12 @@ export const storyBookClasses = useThemeCache(() => {
         },
     });
 
+    const iconVars = iconVariables();
+    const smallerLogo = style("smallerLogo", {
+        height: importantUnit(iconVars.vanillaLogo.height / 2),
+        width: importantUnit(iconVars.vanillaLogo.width / 2),
+    });
+
     return {
         heading,
         headingH1,
@@ -267,6 +306,7 @@ export const storyBookClasses = useThemeCache(() => {
         tiles,
         tile,
         content,
+        smallContent,
         scaleContents,
         setBackground,
         tilesAndText,
@@ -274,5 +314,6 @@ export const storyBookClasses = useThemeCache(() => {
         tileText,
         tileTextPaddingLeft,
         compactTilesAndText,
+        smallerLogo,
     };
 });

@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Garden\EventManager;
+use \Gdn_Request;
 use Gdn;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
@@ -37,6 +38,9 @@ class TwigEnhancer {
     /** @var LocaleInterface */
     private $locale;
 
+    /** @var Gdn_Request */
+    private $request;
+
     /**
      * DI.
      *
@@ -45,19 +49,22 @@ class TwigEnhancer {
      * @param \Gdn_Session $session
      * @param ConfigurationInterface $config
      * @param LocaleInterface $locale
+     * @param Gdn_Request $request
      */
     public function __construct(
         AddonProviderInterface $addonProvider,
         EventManager $eventManager,
         \Gdn_Session $session,
         ConfigurationInterface $config,
-        LocaleInterface $locale
+        LocaleInterface $locale,
+        Gdn_Request $request
     ) {
         $this->addonProvider = $addonProvider;
         $this->eventManager = $eventManager;
         $this->session = $session;
         $this->config = $config;
         $this->locale = $locale;
+        $this->request = $request;
     }
 
     /**
@@ -209,12 +216,7 @@ class TwigEnhancer {
             'inSection' => [\Gdn_Theme::class, 'inSection'],
 
             // Routing.
-            'url',
-
-            // User related.
-            'userPhoto',
-            'userPhotoUrl',
-            'userUrl',
+            'url' => [$this->request, 'url'],
         ];
     }
 }

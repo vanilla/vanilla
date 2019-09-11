@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Formatting\Formats;
+use Vanilla\Web\TwigStaticRenderer;
 
 if (!function_exists('alternate')) {
     /**
@@ -46,6 +47,10 @@ if (!function_exists('dashboardSymbol')) {
      * @param string $class If set, overrides any 'class' attribute in the $attr param.
      * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
      * @return string An HTML-formatted string to render svg icons.
+     *
+     * @deprecated 3.3 Use @dashboard/components/dashboardSymbol.twig or the dashboardSymbol mixin.
+     * This does not render out to the new twig symbol version because of it currently allows all attributes.
+     * We want to work with a whitelist going forward so we can't shim this to the new one and keep compatibility.
      */
     function dashboardSymbol($name, $class = '', array $attr = []) {
         if (empty($attr['alt'])) {
@@ -147,20 +152,14 @@ if (!function_exists('heading')) {
                 $buttonsString .= ' <a '.attribute($buttonAttributes).' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
             }
         }
-        $buttonsString = '<div class="btn-container">'.$buttonsString.'</div>';
 
-        $title = '<h1>'.$title.'</h1>';
-
-        if ($returnUrl !== '') {
-            $title = '<div class="title-block">
-                <a class="btn btn-icon btn-return" aria-label="Return" href="'.url($returnUrl).'">'.
-                    dashboardSymbol('chevron-left').'
-                </a>
-                '.$title.'
-            </div>';
-        }
-
-        return '<header class="header-block">'.$title.$buttonsString.'</header>';
+        return TwigStaticRenderer::renderTwig('@dashboard/components/heading.twig', [
+            'params' => [
+                'title' => $title,
+                'returnUrl' => $returnUrl,
+                'buttonHtml' => $buttonsString,
+            ]
+        ]);
     }
 }
 

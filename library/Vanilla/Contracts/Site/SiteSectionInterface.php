@@ -46,4 +46,13 @@ interface SiteSectionInterface {
      * @return int
      */
     public function getSectionID(): int;
+
+    /**
+     * Get the section group.
+     *
+     * @return string
+     */
+    public function getSectionGroup():string;
+
+
 }

@@ -39,25 +39,55 @@ class ArrayTranslateTest extends TestCase {
                 ['badKey' => 'a.b'],
                 ['badKey' => 'fixedKey'],
                 true,
-                ['fixedKey' => 'a.b']
+                ['fixedKey' => 'a.b'],
             ],
             'longAssocAdd' => [
                 ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
                 ['badKey' => 'fixedKey'],
                 true,
-                ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c']
+                ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c'],
             ],
             'simpleAssocNoAdd' => [
                 ['badKey' => 'a.b'],
                 ['badKey' => 'fixedKey'],
                 false,
-                ['fixedKey' => 'a.b']
+                ['fixedKey' => 'a.b'],
             ],
             'longAssocNoAdd' => [
                 ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
                 ['badKey' => 'fixedKey'],
                 false,
-                ['fixedKey' => 'a.b']
+                ['fixedKey' => 'a.b'],
+            ],
+            'arraySub' => [
+                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
+                ['twoKey'],
+                false,
+                ['twoKey' => 'b.c'],
+            ],
+            'emptyMap' => [
+                ['oneKey' => 'a.b'],
+                [],
+                true,
+                ['oneKey' => 'a.b'],
+            ],
+            'removeElements' => [
+                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
+                ['twoKey' => null],
+                true,
+                ['oneKey' => 'a.b'],
+            ],
+            'replaceEmptyKey' => [
+                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
+                ['threeKey'],
+                false,
+                ['threeKey' => null],
+            ],
+            'addEmptyKey' => [
+                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
+                ['threeKey'],
+                true,
+                ['threeKey' => null, 'oneKey' => 'a.b', 'twoKey' => 'b.c'],
             ],
         ];
 

@@ -8,7 +8,7 @@
 namespace Vanilla\Scheduler;
 
 use Garden\EventManager;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Driver\DriverInterface;
 use Vanilla\Scheduler\Job\JobInterface;

@@ -344,6 +344,13 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const extraMeBoxIcons = style("extraMeBoxIcons", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flex: 1,
+    });
+
     const topElement = style(
         "topElement",
         {
@@ -633,6 +640,7 @@ export const titleBarClasses = useThemeCache(() => {
         tabButton,
         dropDownContents,
         count,
+        extraMeBoxIcons,
         scroll,
         rightFlexBasis,
         leftFlexBasis,

@@ -21,6 +21,7 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
+use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
@@ -28,7 +29,7 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
-    use TwigRenderTrait;
+    use TwigRenderTrait, ReduxActionPreloadTrait;
 
     /** @var string */
     private $canonicalUrl;
@@ -62,9 +63,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var string[] */
     protected $inlineStyles = [];
-
-    /** @var ReduxAction[] */
-    private $reduxActions = [];
 
     /** @var bool */
     private $requiresSeo = true;
@@ -154,7 +152,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
             'meta' => $this->siteMeta,
         ]);
-        $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
+        $this->inlineScripts[] = $this->getReduxActionsAsJsVariable();
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
             'nonce' => $this->cspModel->getNonce(),
@@ -212,19 +210,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     public function blockRobots(): self {
         header('X-Robots-Tag: noindex', true);
         $this->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex']);
-
-        return $this;
-    }
-
-    /**
-     * Add a redux action for the frontend to handle.
-     *
-     * @param ReduxAction $action The action to add.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function addReduxAction(ReduxAction $action): self {
-        $this->reduxActions[] = $action;
 
         return $this;
     }

@@ -15,8 +15,7 @@ export default class SpoilerButton extends React.Component<{}> {
                     <span className="spoiler-warning">
                         <span className="spoiler-warningMain">
                             <SpoilerIcon className={"spoiler-icon"} />
-                            <strong className="spoiler-warningBefore">{t("Warning")}</strong>
-                            <span className="spoiler-warningAfter">{t("This is a spoiler")}</span>
+                            <span className="spoiler-warningLabel">{t("Spoiler Warning")}</span>
                         </span>
                     </span>
                 </button>

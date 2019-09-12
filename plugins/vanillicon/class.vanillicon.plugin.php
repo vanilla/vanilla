@@ -13,6 +13,9 @@
  */
 class VanilliconPlugin extends Gdn_Plugin {
 
+    /** Truncated length for forty-character SHA1 email hash. */
+    public const TRUNCATED_HASH_LENGTH = 32;
+
     /**
      * Set up the plugin.
      */
@@ -114,7 +117,7 @@ if (!function_exists('userPhotoDefaultUrl')) {
         if (!$email) {
             $email = val('UserID', $user, 100);
         }
-        $hash = md5($email);
+        $hash = substr(sha1($email), 0, VanilliconPlugin::TRUNCATED_HASH_LENGTH);
         $px = substr($hash, 0, 1);
 
         switch ($type) {

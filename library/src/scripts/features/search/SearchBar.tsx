@@ -280,6 +280,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 {
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
                                     isLarge: this.props.isBigInput,
+                                    noSearchButton: !!this.props.hideSearchButton,
                                 },
                             )}
                         >

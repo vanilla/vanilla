@@ -17,6 +17,9 @@
  */
 class GravatarPlugin extends Gdn_Plugin {
 
+    /** Truncated length for forty-character SHA1 email hash when using Vanillicon service. */
+    private const VANILLICON_TRUNCATED_HASH_LENGTH = 32;
+
     /**
      * Generate a Gravatar image URL based on the provided email address.
      *
@@ -47,7 +50,8 @@ class GravatarPlugin extends Gdn_Plugin {
                 $vanilliconSize = 200;
             }
 
-            $default = "{$vanilliconBaseUrl}/{$avatarID}_{$vanilliconSize}.png";
+            $vanilliconID = substr(sha1($email), 0, self::VANILLICON_TRUNCATED_HASH_LENGTH);
+            $default = "{$vanilliconBaseUrl}/{$vanilliconID}_{$vanilliconSize}.png";
         } else {
             $configuredDefaultAvatar = c('Garden.DefaultAvatar', false);
             if ($configuredDefaultAvatar) {

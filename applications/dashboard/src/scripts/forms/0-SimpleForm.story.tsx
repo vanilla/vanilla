@@ -18,7 +18,7 @@ const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCs
 
 formsStory.add("FormGroup", () =>
     (() => {
-        const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | undefined>(undefined);
+        const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
 
         return (
             <StoryContent>
@@ -55,7 +55,7 @@ formsStory.add("FormGroup", () =>
                                         value: 8,
                                     },
                                 ]}
-                                value={dropdownValue}
+                                value={dropdownValue!}
                                 onChange={setDropdownValue}
                             />
                         </DashboardFormGroup>

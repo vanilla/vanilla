@@ -43,7 +43,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
     public function test_SchedulerInjection_WithMissingLogger_Expect_MissingArgumentException() {
         $container = new Garden\Container\Container();
         $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
             ->rule(\Garden\EventManager::class)
             ->setShared(true)
@@ -67,7 +67,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         // The only condition for this test to fail is if vanilla/vanilla is not composed-in
         $container = new Garden\Container\Container();
         $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
             ->rule(\Psr\Log\LoggerInterface::class)
             ->setClass(\Vanilla\Logger::class)
@@ -90,7 +90,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
     public function test_SchedulerInjection_Expect_Pass() {
         $container = new Garden\Container\Container();
         $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
             ->rule(\Psr\Log\LoggerInterface::class)
             ->setClass(\Vanilla\Logger::class)

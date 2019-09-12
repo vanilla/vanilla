@@ -64,7 +64,7 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
     protected function getNewContainer() {
         $container = new \Garden\Container\Container();
         $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
             ->rule(\Psr\Log\LoggerInterface::class)
             ->setClass(\Vanilla\Logger::class)
@@ -82,7 +82,7 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
     protected function getNewLocalDriver() {
         $container = new \Garden\Container\Container();
         $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
             ->rule(\Psr\Log\LoggerInterface::class)
             ->setClass(\Vanilla\Logger::class)

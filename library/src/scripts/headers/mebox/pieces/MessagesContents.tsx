@@ -25,7 +25,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
-import { compose } from "@library/icons/header";
+import { ComposeIcon } from "@library/icons/titleBar";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -34,6 +34,7 @@ export class MessagesContents extends React.Component<IProps> {
     public render() {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
+
         return (
             <Frame
                 className={this.props.className}
@@ -46,7 +47,7 @@ export class MessagesContents extends React.Component<IProps> {
                             baseClass={ButtonTypes.ICON}
                             className={classNames(buttonUtils.pushRight)}
                         >
-                            {compose()}
+                            <ComposeIcon />
                         </LinkAsButton>
                     </FrameHeaderWithAction>
                 }

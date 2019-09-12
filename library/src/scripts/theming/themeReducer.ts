@@ -56,7 +56,7 @@ export const themeReducer = produce(
             return state;
         })
         .case(ThemeActions.getAssets.failed, (state, payload) => {
-            if (payload.error.response.status === 404) {
+            if (payload.error.response && payload.error.response.status === 404) {
                 // This theme just doesn't have variables. Use the defaults.
                 state.assets.data = {};
                 state.assets.status = LoadStatus.SUCCESS;

@@ -6,7 +6,7 @@
 
 import React from "react";
 import { HumanFileSize } from "@library/utility/fileUtils";
-import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/styles/metasStyles";
@@ -54,7 +54,7 @@ export default class Attachment extends React.Component<IProps> {
                     >
                         {type && (
                             <div className={classNames(classes.format)}>
-                                {getAttachmentIcon(type, iconClasses.root)}
+                                <GetAttachmentIcon type={type} className={iconClasses.root} />
                             </div>
                         )}
                         <div className={classNames(classes.main)}>

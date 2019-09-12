@@ -1,0 +1,9 @@
+<div class="SplashInfo">
+    {% if Success %}
+        <h1>{{ t("Success") }}</h1>
+        <p>{{ t("The update was successful.") }}</p>
+    {% else %}
+        <h1>{{ t("Failure") }}</h1>;
+        <p>{{ t("The update was not successful.") }}</p>
+    {% endif %}
+</div>

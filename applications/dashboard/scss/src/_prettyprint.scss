@@ -9,9 +9,9 @@
 
 // Make code blocks in forms look disabled.
 .input-wrap pre.prettyprint {
-  min-height: to-rem(36);
-  padding-top: .40625rem;
-  padding-bottom: .40625rem;
+  min-height: 36px;
+  padding-top: 6.5px;
+  padding-bottom: 6.5px;
   line-height: $font-size-root * 1.5;
   background-color: $input-bg-disabled;
 }

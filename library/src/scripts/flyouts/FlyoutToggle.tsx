@@ -33,6 +33,7 @@ export interface IFlyoutToggleProps {
     onClose?: () => void;
     buttonBaseClass: ButtonTypes;
     buttonClassName?: string;
+    isVisible?: boolean;
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
@@ -66,7 +67,16 @@ export default function FlyoutToggle(props: IProps) {
     const buttonRef = props.buttonRef || ownButtonRef;
 
     const controllerRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setVisibility] = useState(false);
+    const [ownIsVisible, ownSetVisibility] = useState(false);
+    const isVisible = props.isVisible !== undefined ? props.isVisible : ownIsVisible;
+    const setVisibility = useCallback(
+        (visibility: boolean) => {
+            ownSetVisibility(visibility);
+            onVisibilityChange && onVisibilityChange(visibility);
+        },
+        [ownSetVisibility, onVisibilityChange],
+    );
+
     useEffect(() => {
         if (isVisible && initialFocusElement) {
             // Focus the inital focusable element when we gain visibility.
@@ -74,22 +84,30 @@ export default function FlyoutToggle(props: IProps) {
                 initialFocusElement.focus();
             }
         }
-        onVisibilityChange && onVisibilityChange(isVisible);
-    }, [isVisible, initialFocusElement, onVisibilityChange]);
+    }, [isVisible, initialFocusElement]);
 
     /**
      * Toggle Menu menu
      */
     const buttonClickHandler = useCallback(
-        (e: React.MouseEvent) => {
+        (e: MouseEvent) => {
             e.stopPropagation();
             setVisibility(!isVisible);
-            if (onVisibilityChange) {
-                onVisibilityChange(isVisible);
-            }
         },
-        [isVisible, setVisibility, onVisibilityChange],
+        [isVisible, setVisibility],
     );
+
+    useEffect(() => {
+        const buttonElement = buttonRef.current;
+        if (!buttonElement) {
+            return;
+        }
+
+        buttonElement.addEventListener("click", buttonClickHandler);
+        return () => {
+            buttonElement.removeEventListener("click", buttonClickHandler);
+        };
+    }, [buttonRef, buttonClickHandler]);
 
     const closeMenuHandler = useCallback(
         event => {
@@ -109,11 +127,8 @@ export default function FlyoutToggle(props: IProps) {
                     buttonRef.current.classList.add("focus-visible");
                 }
             }
-            if (onVisibilityChange) {
-                onVisibilityChange(false);
-            }
         },
-        [onClose, controllerRef, buttonRef, onVisibilityChange],
+        [onClose, controllerRef, buttonRef, setVisibility],
     );
 
     /**
@@ -126,14 +141,11 @@ export default function FlyoutToggle(props: IProps) {
     const handleFocusChange = (hasFocus: boolean) => {
         if (!hasFocus) {
             setVisibility(false);
-            if (props.onVisibilityChange) {
-                props.onVisibilityChange(false);
-            }
         }
     };
 
     // Focus handling
-    useFocusWatcher(controllerRef.current, handleFocusChange, props.openAsModal);
+    useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);
     useEscapeListener({
         root: controllerRef.current,
         returnElement: buttonRef.current,
@@ -149,13 +161,12 @@ export default function FlyoutToggle(props: IProps) {
         forceRenderStyles();
     }, []);
 
-    const childrenData = {
+    const childrenData: IFlyoutToggleChildParameters = {
         id: contentID,
-        isVisible,
+        isVisible: !!isVisible,
         closeMenuHandler,
         renderAbove: props.renderAbove,
         renderLeft: props.renderLeft,
-        openAsModal: props.openAsModal,
     };
 
     const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
@@ -170,7 +181,6 @@ export default function FlyoutToggle(props: IProps) {
         >
             <Button
                 id={buttonID}
-                onClick={buttonClickHandler}
                 className={buttonClasses}
                 title={title}
                 aria-label={"name" in props ? props.name : undefined}

@@ -11,7 +11,7 @@ import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorFlyoutClasses } from "@rich-editor/flyouts/pieces/flyoutClasses";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IState {

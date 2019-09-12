@@ -4,13 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 
 interface IProps extends INotificationsProps {
     countUnread: number;
@@ -39,7 +40,6 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
     public render() {
         const { userSlug } = this.props;
         const classesHeader = titleBarClasses();
-
         return (
             <DropDown
                 id={this.id}
@@ -49,7 +49,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
-                selfPadded={true}
+                flyoutType={FlyoutType.FRAME}
             >
                 <NotificationsContents userSlug={userSlug} />
             </DropDown>

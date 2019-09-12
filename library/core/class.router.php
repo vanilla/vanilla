@@ -135,8 +135,8 @@ class Gdn_Router extends Gdn_Pluggable {
         foreach ($this->Routes as $route => $routeData) {
             // Check for wild-cards
             $route = str_replace(
-                [':alphanum', ':num'],
-                ['([0-9a-zA-Z-_]+)', '([0-9]+)'],
+                [':alphanum', ':num', '#'],
+                ['([0-9a-zA-Z-_]+)', '([0-9]+)', '\#'],
                 $route
             );
 

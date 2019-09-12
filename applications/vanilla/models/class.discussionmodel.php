@@ -1957,9 +1957,16 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
                 $this->Validation->applyRule('Body', 'Length');
+            }
+
+            // Add min length if body is required.
+            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                $this->Validation->applyRule('Body', 'MinTextLength');
             }
         }
 
@@ -2226,11 +2233,7 @@ class DiscussionModel extends Gdn_Model {
                     }
 
                     // Notify all of the users that were mentioned in the discussion.
-                    if ($fields['Format'] === "Rich") {
-                        $usernames = Gdn_Format::getRichMentionUsernames($fields['Body']);
-                    } else {
-                        $usernames = getMentions($discussionName.' '.$story);
-                    }
+                    $usernames = Gdn::formatService()->parseMentions($fields['Body'], $discussionName . ' ' . $story);
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $activity;

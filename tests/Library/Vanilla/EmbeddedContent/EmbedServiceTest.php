@@ -8,7 +8,7 @@
 namespace VanillaTests\Library\EmbeddedContent;
 
 use Vanilla\EmbeddedContent\EmbedService;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbedFactory;
 use VanillaTests\Fixtures\NullCache;
@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\NullCache;
 /**
  * Tests for the EmbedService class.
  */
-class EmbedServiceTest extends ContainerTestCase {
+class EmbedServiceTest extends MinimalContainerTestCase {
 
     /** @var EmbedService */
     private $embedService;

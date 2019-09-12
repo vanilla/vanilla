@@ -3,9 +3,13 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
@@ -31,9 +35,13 @@ if (!class_exists('Gdn')) {
 $dic = new Container();
 Gdn::setContainer($dic);
 
-$dic->setInstance('Garden\Container\Container', $dic)
-    ->rule('Interop\Container\ContainerInterface')
-    ->setAliasOf('Garden\Container\Container')
+$dic->setInstance(Garden\Container\Container::class, $dic)
+    ->rule(\Psr\Container\ContainerInterface::class)
+    ->setAliasOf(Garden\Container\Container::class)
+
+    ->rule(\Interop\Container\ContainerInterface::class)
+    ->setClass(\Vanilla\InteropContainer::class)
+    ->setShared(true)
 
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')
@@ -53,6 +61,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
+
+    // Site sections
+    ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+    ->setClass(SingleSiteSectionProvider::class)
+    ->setShared(true)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -113,6 +126,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
     ->addAlias('Locale')
+
+    ->rule(Contracts\LocaleInterface::class)
+    ->setAliasOf(Gdn_Locale::class)
+    ->setShared(true)
 
     // Request
     ->rule('Gdn_Request')
@@ -295,6 +312,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
+    ->rule(\Emoji::class)
+    ->setShared(true)
+
     ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
@@ -311,8 +331,20 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
+    ->rule(Garden\Http\HttpClient::class)
+    ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
+
     ->rule(Vanilla\Formatting\FormatService::class)
-    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
+    ->addCall('registerBuiltInFormats')
+    ->setShared(true)
+
+    ->rule(LegacyEmbedReplacer::class)
+    ->setShared(true)
+
+    ->rule(HtmlEnhancer::class)
+    ->setShared(true)
+
+    ->rule(HtmlSanitizer::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Analytics\Client::class)

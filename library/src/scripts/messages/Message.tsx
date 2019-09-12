@@ -10,8 +10,8 @@ import { t } from "@library/utility/appUtils";
 import { LiveMessage } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IMessageProps {
     className?: string;
@@ -27,10 +27,13 @@ export interface IMessageProps {
 
 export default function Message(props: IMessageProps) {
     const classes = messagesClasses();
+
+    // When fixed we need to apply an extra layer for padding.
+    const WrapperElement = props.isFixed ? Container : React.Fragment;
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
-                <Container>
+                <WrapperElement>
                     <div className={classNames(classes.wrap)}>
                         <div className={classes.message}>{props.contents || props.stringContents}</div>
                         {props.onConfirm && (
@@ -52,7 +55,7 @@ export default function Message(props: IMessageProps) {
                             </Button>
                         )}
                     </div>
-                </Container>
+                </WrapperElement>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />

@@ -483,6 +483,8 @@ class PostController extends VanillaController {
         $this->DiscussionID = $DiscussionID;
         $this->Discussion = $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
+        $isAuthenticatedPostback = $this->Form->authenticatedPostBack();
+
         // Is this an embedded comment being posted to a discussion that doesn't exist yet?
         if (c('Garden.Embed.Allow')) {
             $vanilla_type = $this->Form->getFormValue('vanilla_type', '');
@@ -508,7 +510,7 @@ class PostController extends VanillaController {
             }
 
             // If so, create it!
-            if (!$Discussion && $isEmbeddedComments) {
+            if (!$Discussion && $isEmbeddedComments && $isAuthenticatedPostback) {
                 // Add these values back to the form if they exist!
                 $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
                 $this->Form->addHidden('vanilla_type', $vanilla_type);
@@ -581,6 +583,9 @@ class PostController extends VanillaController {
                 } else {
                     $vanilla_category_id = $Category['CategoryID'];
                 }
+
+                // Ensure the user can comment in this category before creating a discussion in it.
+                $this->categoryPermission($vanilla_category_id, "Vanilla.Comments.Add");
 
                 $EmbedUserID = c('Garden.Embed.UserID');
                 if ($EmbedUserID) {
@@ -686,7 +691,7 @@ class PostController extends VanillaController {
             $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Add');
         }
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($isAuthenticatedPostback) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
 

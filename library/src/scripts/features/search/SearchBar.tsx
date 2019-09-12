@@ -13,7 +13,6 @@ import { ClearButton } from "@library/forms/select/ClearButton";
 import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { search } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
@@ -26,6 +25,7 @@ import { components } from "react-select";
 import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import AsyncCreatable from "react-select/lib/AsyncCreatable";
+import { SearchIcon } from "@library/icons/titleBar";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -280,6 +280,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 {
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
                                     isLarge: this.props.isBigInput,
+                                    noSearchButton: !!this.props.hideSearchButton,
                                 },
                             )}
                         >
@@ -322,7 +323,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 [classes.iconContainerBigInput]: this.props.isBigInput,
                             })}
                         >
-                            {search(classNames("searchBar-icon", classes.icon))}
+                            <SearchIcon className={classNames("searchBar-icon", classes.icon)} />
                         </div>
                     </div>
                 </form>

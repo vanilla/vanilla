@@ -207,11 +207,11 @@ $chart-bg-opacity: .15;
   background-color: $white;
   padding: $spacer / 2;
   font-weight: 600;
-  border-radius: to-rem(4);
+  border-radius: 4px;
   box-shadow: 0 0 5px rgba(0,0,0,.15);
 }
 
 .popover-single {
-  font-size: to-rem(18);
+  font-size: 18px;
 }
 

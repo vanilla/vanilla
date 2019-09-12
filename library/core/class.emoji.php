@@ -10,6 +10,9 @@
  * @since 2.2
  */
 
+use Garden\EventManager;
+use \Vanilla\Formatting\FormatUtil;
+
 /**
  * Interpreting Emoji emoticons.
  */
@@ -93,9 +96,9 @@ class Emoji {
     public $rdelim = ':';
 
     /**
-     *
+     * @param EventManager $eventManager
      */
-    protected function __construct() {
+    public function __construct(EventManager $eventManager) {
         $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)
@@ -244,37 +247,7 @@ class Emoji {
             $this->enabled = false;
         }
 
-        Gdn::pluginManager()->callEventHandlers($this, 'Emoji', 'Init', 'Handler');
-
-        // Add emoji to definition list for whole site. This used to be in the
-        // advanced editor plugin, but since moving atmentions to core, had to
-        // make sure they were still being added. This will make sure that
-        // emoji autosuggest works. Note: emoji will not be core yet, so the only
-        // way that this gets called is by the editor when it instantiates. Core
-        // does not instantiate this class anywhere, so there will not be any
-        // suggestions for emoji yet, but keep here for whenever Advanced Editor
-        // is running.
-        $c = Gdn::controller();
-        if ($c && $this->enabled) {
-            $emojis = $this->getEmoji();
-            $emojiAssetPath = $this->getAssetPath();
-            $emoji = [];
-
-            foreach ($emojis as $name => $data) {
-                $emoji[] = [
-                    "name" => "".$name."",
-                    "url" => asset($emojiAssetPath.'/'.$data, true)
-                ];
-            }
-
-            $emoji = [
-                'assetPath' => asset($this->getAssetPath(), true),
-                'format' => $this->getFormat(),
-                'emoji' => $this->getEmoji()
-            ];
-
-            $c->addDefinition('emoji', $emoji);
-        }
+        $eventManager->fire('Emoji_Init', $this, []); // Empty $argrs array needed for backwards compatibility.
     }
 
     /**
@@ -333,6 +306,30 @@ class Emoji {
      */
     public function getArchive() {
         return $this->archive;
+    }
+
+    /**
+     * Get an emoji config array with essential information for rendering emoji in the browser.
+     *
+     * @return array
+     */
+    public function getWebConfig(): array {
+        $result = [
+            "assetPath" => asset($this->getAssetPath(), true),
+            "format" => $this->getFormat(),
+            "emoji" => $this->getEmoji()
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Are emoji enabled?
+     *
+     * @return boolean
+     */
+    public function isEnabled(): bool {
+        return (bool)$this->enabled;
     }
 
     /**
@@ -590,7 +587,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::replaceButProtectCodeBlocks(
+                $text = FormatUtil::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text
@@ -603,7 +600,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = FormatUtil::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -622,7 +619,7 @@ class Emoji {
      */
     public static function instance() {
         if (Emoji::$instance === null) {
-            Emoji::$instance = new Emoji();
+            Emoji::$instance = Gdn::getContainer()->get(Emoji::class);
         }
 
         return Emoji::$instance;

@@ -70,6 +70,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param Gdn_Pluggable $sender The firing pluggable instance.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var NestedCollectionAdapter $menu */
         $menu = $sender->EventArguments['SideMenu'];
         $menu->addItem('Appearance', t('Appearance'));
         $menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
@@ -132,7 +133,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Main list for a pocket management.
      *
-     * @param Gdn_Controller $sender
+     * @param SettingsController $sender
      * @param array $args
      * @return mixed
      */
@@ -141,25 +142,29 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setHighlightRoute('settings/pockets');
         $sender->addJsFile('pockets.js', 'plugins/pockets');
 
-        $page = val(0, $args);
+        $args += [null, ''];
+        $page = $args[0];
         switch (strtolower($page)) {
             case 'add':
                 return $this->_add($sender);
                 break;
             case 'edit':
-                return $this->_edit($sender, val(1, $args));
+                return $this->_edit($sender, $args[1]);
                 break;
             case 'delete':
-                return $this->_delete($sender, val(1, $args));
+                return $this->_delete($sender, $args[1]);
                 break;
             case 'enable':
-                return $this->_enable($sender, val(1, $args));
+                return $this->_enable($sender, $args[1]);
                 break;
             case 'disable':
-                return $this->_disable($sender, val(1, $args));
+                return $this->_disable($sender, $args[1]);
+                break;
+            case 'toggle-locations':
+                return $this->toggleLocations($sender);
                 break;
             default:
-                return $this->_index($sender, $args);
+                return $this->_index($sender);
         }
     }
 
@@ -167,9 +172,8 @@ class PocketsPlugin extends Gdn_Plugin {
      * Render the /settings/pockets page.
      *
      * @param SettingsController $sender The controller instance.
-     * @param array $args Routing arguments.
      */
-    protected function _index($sender, $args) {
+    protected function _index($sender) {
         $sender->setData('Title', t('Pockets'));
 
         // Grab the pockets from the DB.
@@ -238,17 +242,6 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setData('PocketData', $pocketData);
 
         $form = new Gdn_Form();
-
-        // Save global options.
-        switch (val(0, $args)) {
-            case 'showlocations':
-                saveToConfig('Plugins.Pockets.ShowLocations', true);
-                break;
-            case 'hidelocations':
-                saveToConfig('Plugins.Pockets.ShowLocations', false, ['RemoveEmpty' => true]);
-                break;
-        }
-
         $sender->Form = $form;
         $sender->render('Index', '', 'plugins/pockets');
     }
@@ -271,15 +264,10 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param string $pocketID The ID of the pocket to modify.
      * @param string $disabledState Either Pocket::ENABLED or Pocket::DISABLED
-     *
-     * @throws Exception If the method is called without proper authentication.
      */
     private function setDisabled($sender, $pocketID, $disabledState) {
         $sender->permission('Plugins.Pockets.Manage');
-
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
+        Gdn::request()->isAuthenticatedPostBack(true);
 
         if (empty($pocketID)) {
             $sender->errorMessage('Must specify pocket ID.');
@@ -399,9 +387,11 @@ class PocketsPlugin extends Gdn_Plugin {
 
                 // Convert some of the pocket data into a format digestable by the form.
                 list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
+                $repeatFrequency += [1, 1];
+
                 $pocket['RepeatType'] = $repeatType;
-                $pocket['EveryFrequency'] = getValue(0, $repeatFrequency, 1);
-                $pocket['EveryBegin'] = getValue(1, $repeatFrequency, 1);
+                $pocket['EveryFrequency'] = $repeatFrequency[0];
+                $pocket['EveryBegin'] = $repeatFrequency[1];
                 $pocket['Indexes'] = implode(',', $repeatFrequency);
                 $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
                 $pocket['TestMode'] = Pocket::inTestMode($pocket);
@@ -704,6 +694,26 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Return the toggle UI for toggling pocket locations.
+     *
+     * @param bool $on Whether or not the toggle is currently on.
+     * @return string Returns an HTML string.
+     */
+    public static function locationsToggle(bool $on): string {
+        $r = wrap(
+            anchor(
+                '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                '/settings/pockets/toggle-locations'.($on ? '?hide=1' : ''),
+                'js-hijack'
+            ),
+            'span',
+            ['class' => "toggle-wrap toggle-wrap-".($on ? 'on' : 'off')]
+        );
+
+        return $r;
+    }
+
+    /**
      * Render debugging information for pockets.
      *
      * @param Gdn_Controller $sender
@@ -730,6 +740,22 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     protected static function _var($name, $value) {
         return '<li class="Var"><b>'.htmlspecialchars($name).'</b><span>'.htmlspecialchars($value).'</span></li>';
+    }
+
+    /**
+     * Toggle pocket locations.
+     *
+     * @param SettingsController $sender
+     */
+    private function toggleLocations(SettingsController $sender) {
+        $sender->Request->isAuthenticatedPostBack(true);
+
+        // Save global options.
+        $on = !$sender->Request->get('hide');
+        saveToConfig('Plugins.Pockets.ShowLocations', $on, ['RemoveEmpty' => true]);
+
+        $sender->jsonTarget('#pocket-locations-toggle', static::locationsToggle($on), 'Html');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 }
 

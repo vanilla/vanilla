@@ -95,6 +95,7 @@ export const richEditorVariables = useThemeCache(() => {
     });
 
     const embedButton = makeThemeVars("embedButton", {
+        display: "block",
         offset: -varsFormElements.border.width,
     });
 

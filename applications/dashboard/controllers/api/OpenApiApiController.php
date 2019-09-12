@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\Controller;
 use Vanilla\Dashboard\Models\SwaggerModel;
@@ -26,15 +27,20 @@ class OpenApiApiController extends Controller {
      */
     private $openApiBuilder;
 
+    /** @var bool */
+    private $allowOpenApiAccess;
+
     /**
      * Construct a {@link SwaggerApiController}.
      *
      * @param SwaggerModel $swaggerModel The swagger model dependency.
      * @param OpenAPIBuilder $openApiBuilder The OpenAPI generator.
+     * @param ConfigurationInterface $config
      */
-    public function __construct(SwaggerModel $swaggerModel, OpenApiBuilder $openApiBuilder) {
+    public function __construct(SwaggerModel $swaggerModel, OpenApiBuilder $openApiBuilder, ConfigurationInterface $config) {
         $this->swaggerModel = $swaggerModel;
         $this->openApiBuilder = $openApiBuilder;
+        $this->allowOpenApiAccess = $config->get('OpenApi.AllowPublicAccess', false);
     }
 
     /**
@@ -62,7 +68,7 @@ class OpenApiApiController extends Controller {
      * @return array Returns the OpenAPI object as an array.
      */
     public function get_v3(array $query = []) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission();
 
         $in = $this->schema([
             'disabled:b' => [
@@ -75,6 +81,10 @@ class OpenApiApiController extends Controller {
             ],
         ], 'in');
         $query = $in->validate($query);
+
+        if (!$this->allowOpenApiAccess || (isset($query['hidden']) && $query['hidden'])) {
+            $this->permission('Garden.Settings.Manage');
+        }
 
         $result = $this->openApiBuilder->getEnabledOpenAPI($query['disabled'], $query['hidden']);
         return $result;

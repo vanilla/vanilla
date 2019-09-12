@@ -2665,7 +2665,8 @@ div.Popup small {
   font-size: 11px;
 }
 
-div.Popup form p {
+div.Popup form p,
+div.Popup .userContent p {
   padding: 0;
 }
 
@@ -6193,24 +6194,24 @@ img.jcrop-preview {
 }
 
 .padded {
-  margin-top: 1.125rem;
-  margin-bottom: 1.125rem;
+  margin-top: 18px;
+  margin-bottom: 18px;
 }
 
 .padded-top {
-  margin-top: 1.125rem;
+  margin-top: 18px;
 }
 
 .padded-bottom {
-  margin-bottom: 1.125rem;
+  margin-bottom: 18px;
 }
 
 .padded-left {
-  margin-left: 1.125rem;
+  margin-left: 18px;
 }
 
 .padded-right {
-  margin-right: 1.125rem;
+  margin-right: 18px;
 }
 
 .flex {
@@ -6225,7 +6226,7 @@ img.jcrop-preview {
           align-items: center;
 }
 .flex > * {
-  margin-right: 0.28125rem;
+  margin-right: 4.5px;
 }
 .flex > *:last-child {
   margin-right: 0;

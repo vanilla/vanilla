@@ -13,7 +13,7 @@ import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 
 export interface IDropDownItemButton {
-    name: string;
+    name?: string;
     className?: string;
     buttonClassName?: string;
     children?: React.ReactNode;
@@ -23,6 +23,7 @@ export interface IDropDownItemButton {
     index?: number;
     current?: boolean;
     lang?: string;
+    buttonRef?: React.RefObject<HTMLButtonElement>;
 }
 
 /**
@@ -42,8 +43,9 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
             this.props.onClick(clickData, index);
         };
         return (
-            <DropDownItem className={classNames(this.props.className, classesDropDown.item)}>
+            <DropDownItem className={classNames(this.props.className)}>
                 <Button
+                    buttonRef={this.props.buttonRef}
                     title={this.props.name}
                     onClick={buttonClick}
                     className={classNames(this.props.buttonClassName, classesDropDown.action)}

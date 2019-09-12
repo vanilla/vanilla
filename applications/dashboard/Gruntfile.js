@@ -115,13 +115,7 @@ module.exports = function(grunt) {
                             "color-themes-for-google-code-prettify/dist/themes/tomorrow.css",
                         ],
                         dest: "design/vendors",
-                    },
-                    {
-                        expand: true,
-                        cwd: "bower_components",
-                        src: ["bootstrap/LICENSE", "bootstrap/scss/*.scss", "bootstrap/scss/mixins/*.scss"],
-                        dest: "scss/vendors",
-                    },
+                    }
                 ],
             },
             styleguide: {

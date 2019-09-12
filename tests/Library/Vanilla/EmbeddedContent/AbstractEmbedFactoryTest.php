@@ -7,14 +7,14 @@
 
 namespace VanillaTests\Library\EmbeddedContent;
 
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbedFactory;
 
 /**
  * Tests for the embed factory.
  */
-class AbstractEmbedFactoryTest extends ContainerTestCase {
+class AbstractEmbedFactoryTest extends MinimalContainerTestCase {
 
     /**
      * @inheritdoc

@@ -4,11 +4,13 @@
  * @license GPL-2.0-only
  */
 
+use Garden\SafeCurl\Exception\InvalidURLException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use \Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -109,27 +111,7 @@ class MediaApiController extends AbstractApiController {
 
         switch ($type) {
             case self::TYPE_IMAGE:
-                $imageSize = getimagesize($file);
-                if (is_array($imageSize)) {
-                    $media['ImageWidth'] = $imageSize[0];
-                    $media['ImageHeight'] = $imageSize[1];
-                }
-        }
-
-        // image dimensions are higher than limit, it needs resizing
-        if ($this->config->get("ImageUpload.Limits.Enabled")) {
-            if ($media['ImageWidth'] > $this->config->get("ImageUpload.Limits.Width") ||
-                $media['ImageHeight'] > $this->config->get("ImageUpload.Limits.Height")
-            ) {
-                $this->imageResizer->resize(
-                    $file,
-                    null,
-                    [
-                        "height" => $this->config->get("ImageUpload.Limits.Height"),
-                        "width" => $this->config->get("ImageUpload.Limits.Width"), "crop" => false
-                    ]
-                );
-            }
+                [$media['ImageWidth'], $media['ImageHeight']] = $this->preprocessImage($upload);
         }
 
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
@@ -376,19 +358,22 @@ class MediaApiController extends AbstractApiController {
      * Return information from the media row along with a full URL to the file.
      *
      * @param array $body The request body.
-     * @return arrayx
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => $allowedExtensions,
+            UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
+            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled('validateContentTypes'),
+            UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => true,
+            UploadedFileSchema::OPTION_ALLOW_NON_STRICT_TYPES => true, // less strict because mime_content_type isn't super accurate
         ]);
 
         $in = $this->schema([
             'file' => $uploadSchema,
-        ],'in')->setDescription('Add a media item.');
+        ], 'in')->setDescription('Add a media item.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
@@ -433,9 +418,51 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
+        try {
+            $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
+        } catch (InvalidURLException $e) {
+            throw new ClientException($e->getMessage());
+        }
 
         $result = $out->validate($pageInfo);
+        return $result;
+    }
+
+    /**
+     * Prepare an image to be saved. This includes optional resizing and re-orienting, based on EXIF data.
+     *
+     * @param UploadedFile $upload
+     * @return array
+     */
+    private function preprocessImage(UploadedFile $upload): array {
+        $file = $upload->getFile();
+        $size = getimagesize($file);
+
+        if (empty($size)) {
+            throw new ClientException("File is not a valid image.");
+        }
+
+        [$width, $height] = $size;
+        $options = [
+            "crop" => false,
+            "height" => $height ?? 0,
+            "width" => $width ?? 0,
+        ];
+
+        if ($this->config->get("ImageUpload.Limits.Enabled")) {
+            if ($newWidth = filter_var($this->config->get("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
+                $options["width"] = $newWidth;
+            }
+            if ($newHeight = filter_var($this->config->get("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT)) {
+                $options["height"] = $newHeight;
+            }
+        }
+
+        // Resize and re-orient the image as necessary.
+        $this->imageResizer->resize($file, null, $options);
+
+        // Get the new details, after resizing and re-orienting the image.
+        $result = getimagesize($file);
         return $result;
     }
 }

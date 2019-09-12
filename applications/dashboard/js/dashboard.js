@@ -472,8 +472,12 @@ var DashboardModal = (function() {
         /**
          * Adds the modal to the DOM.
          */
-        addModalToDom: function() {
-            $('body').append(this.modalShell.replace('{id}', this.id));
+        addModalToDom: function () {
+            var newModalContainer = document.getElementById("modals");
+            // Make sure that we insert our modals before
+            var modal = document.createElement("div");
+            document.body.insertBefore(modal, newModalContainer);
+            modal.outerHTML = this.modalShell.replace('{id}', this.id);
         },
 
         /**
@@ -579,8 +583,10 @@ var DashboardModal = (function() {
                 html = this.modalHtml;
             }
 
+            let cssClass = this.settings.fullHeight ? content.cssClass + " modal-full-height" : content.cssClass;
+
             html = html.replace('{body}', content.body);
-            html = html.replace('{cssClass}', content.cssClass);
+            html = html.replace('{cssClass}', cssClass);
             html = html.replace('{title}', content.title);
             html = html.replace('{closeIcon}', content.closeIcon);
             html = html.replace('{footer}', content.footer);
@@ -1255,7 +1261,8 @@ $(document).on('contentLoad', function(e) {
      */
     $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
+        var fullHeight = $(this).hasClass('js-full-height-modal')
+        DashboardModal.activeModal = new DashboardModal($(this), { fullHeight: fullHeight });
     });
 
     /**

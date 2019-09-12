@@ -143,7 +143,7 @@ class InvitationModel extends Gdn_Model {
             $fields = $this->Validation->schemaValidationFields();
 
             // Call the base model for saving
-            $invitationID = $this->insert($fields);
+            $invitationID = parent::save($fields);
 
             // Delete an old invitation.
             if ($invitationID && $deleteID) {

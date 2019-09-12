@@ -10,8 +10,7 @@ import UserSuggestionModel from "@library/features/users/suggestion/UserSuggesti
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import { expect } from "chai";
 import sinon from "sinon";
-import { Moment } from "moment";
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {
@@ -170,8 +169,8 @@ describe("UserSuggestionModel", () => {
         const sortProvider: SortProviderTuple[] = [
             [["c", "b", "a", "z"], "f", ["a", "b", "c", "z"]],
             [["c", "b", "a", "z"], "z", ["z", "a", "b", "c"]], // Exact results come first
-            [["stephane", "Stéphane", "z"], "ste", ["stephane", "Stéphane", "z"]], // Exact results come first
-            [["Stephane", "stéphane", "z"], "sté", ["stéphane", "Stephane", "z"]], // Exact results come first
+            [["Stéphane", "stephane", "z"], "ste", ["stephane", "Stéphane", "z"]], // Exact accent come first
+            [["Stephane", "stéphane", "z"], "Sté", ["stéphane", "Stephane", "z"]], // Exact accent come first
             [["testg", "testé", "testë", "testa", "teste"], "te", ["testa", "teste", "testé", "testë", "testg"]],
             [["testg", "testé", "testë", "testa", "teste"], "test", ["testa", "teste", "testé", "testë", "testg"]],
         ];
@@ -185,19 +184,19 @@ describe("UserSuggestionModel", () => {
         it("sorts users active in the last 90 days to the top with exact matches first", () => {
             const currentTime = moment();
             const data = [
-                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
+                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")),
             ];
 
             const expected = [
-                makeMentionSuggestion("start", currentTime.clone().subtract(1000, "day")),
-                makeMentionSuggestion("start-new1", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")), // Capitalization doesn't matter. It's "exact".
+                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")), // Even though the accents are different these users are newer.
+                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
+                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
             ];
 
             expect(UserSuggestionModel.sortSuggestions(data, "start")).deep.eq(expected);

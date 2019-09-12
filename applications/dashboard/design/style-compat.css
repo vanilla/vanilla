@@ -341,6 +341,16 @@ button.Close {
   opacity: 0.4;
 }
 
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .Content > h3:first-child {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -883,6 +893,10 @@ label.checkbox input.checkbox-input {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+body {
+  visibility: hidden;
+}
+
 .richEditor {
   color: #555a62;
 }
@@ -1027,84 +1041,128 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   display: flex;
 }
 
+.Popup.hasRichEditor .Border {
+  width: 100%;
+  box-sizing: border-box;
+}
+.Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
+.Popup.hasRichEditor .CommentForm .PreviewButton,
+.Popup.hasRichEditor #Form_Preview {
+  display: none !important;
+}
+
 @media (min-width: 700px) {
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm select,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
     max-width: 100%;
   }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
     padding-right: 0;
   }
-  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap,
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
     display: none;
   }
-  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper,
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
     padding-right: 0;
     padding-left: 0;
   }
-  body.hasRichEditor .CommentForm .richEditor {
+  .Popup.hasRichEditor .CommentForm .richEditor,
+body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor .CommentForm .richEditor .richEditor {
+  .Popup.hasRichEditor .CommentForm .richEditor .richEditor,
+body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
     padding-right: 0;
   }
-  body.hasRichEditor .CommentForm .Buttons {
+  .Popup.hasRichEditor .CommentForm .Buttons,
+body.hasRichEditor .CommentForm .Buttons {
     padding-right: 36px;
   }
-  body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+  .Popup.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+.Popup.hasRichEditor #GroupForm .Form-HeaderWrap,
+.Popup.hasRichEditor #MessageForm .Form-HeaderWrap,
+.Popup.hasRichEditor #ConversationForm .Form-HeaderWrap,
+body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
 body.hasRichEditor #GroupForm .Form-HeaderWrap,
 body.hasRichEditor #MessageForm .Form-HeaderWrap,
 body.hasRichEditor #ConversationForm .Form-HeaderWrap {
     display: none;
   }
-  body.hasRichEditor #EventAddEditForm .FormWrapper,
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper,
+.Popup.hasRichEditor #GroupForm .FormWrapper,
+.Popup.hasRichEditor #MessageForm .FormWrapper,
+.Popup.hasRichEditor #ConversationForm .FormWrapper,
+body.hasRichEditor #EventAddEditForm .FormWrapper,
 body.hasRichEditor #GroupForm .FormWrapper,
 body.hasRichEditor #MessageForm .FormWrapper,
 body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #GroupForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #MessageForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #ConversationForm .FormWrapper .richEditor,
+body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
 body.hasRichEditor #GroupForm .FormWrapper .richEditor,
 body.hasRichEditor #MessageForm .FormWrapper .richEditor,
 body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
     padding-right: 0;
     padding-left: 0;
   }
-  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
     padding-right: 36px;
     padding-left: 0;
   }
-  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
     padding-left: 36px;
   }
-  body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
+  .Popup.hasRichEditor.Section-Conversation .CommentForm .Buttons,
+body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
     padding-right: 0;
   }
-  body.hasRichEditor .Popup.hasRichEditor .Border {
+  .Popup.hasRichEditor .Popup.hasRichEditor .Border,
+body.hasRichEditor .Popup.hasRichEditor .Border {
     width: 100%;
     box-sizing: border-box;
   }
-  body.hasRichEditor .Popup.hasRichEditor .Content {
-    margin-top: 10px;
-  }
-  body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
+  .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
+body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
     padding-left: 36px;
   }
-  body.hasRichEditor .Popup.hasRichEditor .FormWrapper {
+  .Popup.hasRichEditor .Popup.hasRichEditor .FormWrapper,
+body.hasRichEditor .Popup.hasRichEditor .FormWrapper {
     background: none;
     padding-top: 3px;
     padding-left: 36px;
     padding-right: 36px;
   }
-  body.hasRichEditor .Popup.hasRichEditor .richEditor {
+  .Popup.hasRichEditor .Popup.hasRichEditor .richEditor,
+body.hasRichEditor .Popup.hasRichEditor .richEditor {
     padding-left: 0;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper,
+body.hasRichEditor .NoteForm.FormWrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper .richEditor,
+body.hasRichEditor .NoteForm.FormWrapper .richEditor {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 .richEditor-text {
@@ -1216,6 +1274,19 @@ body.isMobile .Popup.hasRichEditor .Border {
   min-height: 236px;
 }
 
+.richEditor-close.richEditor-close {
+  display: block;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .richEditorFlyout .richEditorFlyout-header.richEditorFlyout-header {
+    display: table;
+  }
+  .richEditorFlyout .richEditorFlyout-title.richEditorFlyout-title {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -1229,6 +1300,7 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @license GPL-2.0-only
  */
 .embedResponsive {
+  position: relative;
   text-align: center;
 }
 
@@ -1365,6 +1437,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedLinkLoader-link > * {
   pointer-events: none;
 }
+.richEditor .embedExternal-content > .u-excludeFromPointerEvents,
+.richEditor .embedLinkLoader-link > .u-excludeFromPointerEvents {
+  pointer-events: initial;
+}
 
 .embed-focusableElement {
   cursor: pointer;
@@ -1493,15 +1569,10 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.embedImage .embedExternal-content {
-  width: auto;
+.embedImage {
+  width: 100%;
   max-width: 640px;
   display: inline-block;
-}
-@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
-  .embedImage .embedExternal-content {
-    width: 100%;
-  }
 }
 
 .Message img .embedImage-img,
@@ -1511,7 +1582,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
-  width: 100%;
+  max-height: 400px;
+}
+
+.richEditor .embedImage-img:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
+}
+.richEditor .embedImage-img:focus {
+  box-shadow: 0 0 0 2px #0291db;
 }
 
 /*!
@@ -1718,7 +1796,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-title {
-  max-width: calc(100% - 36px);
+  padding-right: 36px;
 }
 
 .embedQuote-chevronUp,
@@ -1754,6 +1832,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-body {
   display: block;
   margin: 0;
+  padding: 0;
 }
 .embedQuote-body::before, .embedQuote-body::after {
   content: initial;
@@ -1978,6 +2057,97 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon.isSmall {
+  width: 16px;
+  height: 16px;
+}
+.icon.isLarge {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-close {
+  display: block;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+}
+
+.icon-triangleDown,
+.icon-triangleRight {
+  display: block;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+}
+
+.icon-help {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-search {
+  width: 18px;
+  height: 24px;
+}
+
+.icon-notifications {
+  width: 18px;
+  height: 24px;
+}
+
+.icon-messages {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-fake {
+  font-family: arial, sans-serif;
+}
+
+.icon-compose {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-settings {
+  width: 18px;
+  height: 20px;
+}
+
+.icon-user {
+  width: 20px;
+}
+
+.icon-noUserPhoto {
+  width: 100%;
+  height: auto;
+}
+
+.icon-chevronUp {
+  width: 51px;
+  height: 17px;
+}
+
+.icon-folderOpen {
+  width: 18.612px;
+  height: 14px;
+}
+
+.icon-folderClosed {
+  width: 16px;
+  height: 14px;
+}
+
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -2010,410 +2180,55 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.atMentionList {
-  position: absolute;
-  width: 200px;
-  -webkit-transform: translateY(6px);
-      -ms-transform: translateY(6px);
-          transform: translateY(6px);
+.userContent ul,
+.userContent ol {
+  margin: 1em 0 1em 2em;
 }
 
-.atMentionList-suggestion {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 100%;
-  position: relative;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border: 0;
-  padding: 0;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.atMentionList-items.atMentionList-items {
-  display: block;
-  padding: 3px 0;
-  overflow: auto;
-  max-height: 270px;
-}
-.atMentionList-items.isHidden {
-  display: none;
-}
-
-.atMentionList-item.atMentionList-item {
-  margin-bottom: 0;
-}
-.atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: #e1f2fb;
-}
-
-.atMentionList-suggestion {
-  width: 100%;
-  cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  line-height: 30px;
-  padding-top: 3px;
-  padding-right: 6px;
-  padding-bottom: 3px;
-  padding-left: 6px;
-}
-
-.atMentionList-photoWrap {
-  margin-right: 10px;
-}
-
-.atMentionList-photo {
-  width: 30px;
-  height: 30px;
-}
-
-.atMentionList-userName {
-  display: block;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 40px);
-}
-
-.atMentionList-mark {
-  padding: 0;
-  font-weight: 600;
-}
-
-.atMentionList-photo {
-  display: block;
-}
-
-.atMention {
-  color: inherit;
-  font-weight: 600;
-  -webkit-user-select: all;
-     -moz-user-select: all;
-      -ms-user-select: all;
-          user-select: all;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.blockquote {
-  display: block;
-  margin: 0;
-  padding-top: 0;
-  padding-left: 18px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding: 3px 3px 3px 18px;
-  border-left: solid #d8d9db 6px;
-  box-sizing: border-box;
-  width: 100%;
-  vertical-align: middle;
-  color: #888c91;
-}
-
-.blockquote-content > *:first-child {
-  margin-top: 0;
-}
-.blockquote-content > *:last-child {
-  margin-bottom: 0;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.richEditor-text ul,
-.richEditor-text ol {
-  margin: 1em 0 1em 3em;
-}
-
-.richEditor-text ol li {
+.userContent ol li {
   list-style: decimal !important;
 }
-
-.richEditor-text ul li {
-  list-style: disc !important;
+.userContent ol ol li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol li {
+  list-style: decimal !important;
+}
+.userContent ol ol ol ol ol li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol ol ol ol li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol ol ol ol li {
+  list-style: decimal !important;
+}
+.userContent ol ol,
+.userContent ol ul {
+  margin: 0 0 0 1em;
 }
 
-.richEditor-text li,
-.richEditor-text.richEditor-text ul li {
+.userContent ul li {
+  list-style: none !important;
+  position: relative;
+}
+.userContent ul li::before {
+  content: "•";
+  font-family: "Arial", serif !important;
+  position: absolute;
+  left: -1em;
+}
+.userContent ul ol,
+.userContent ul ul {
+  margin: 0 0 0 1em;
+}
+
+.userContent li,
+.userContent.userContent ul li {
   margin: 5px 0;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.accessibility-jumpTo {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
-.accessibility-jumpTo:focus {
-  opacity: 1;
-  outline: none;
-  position: absolute;
-  top: 50px;
-  left: 0;
-  text-align: left;
-  background-color: white;
-  color: black;
-  display: block;
-  font-size: 14px;
-  clip: auto;
-  margin: 0;
-  height: auto;
-  padding: 0 12px;
-  width: 100%;
-  z-index: 2;
-  -webkit-transform: translateY(-100%);
-      -ms-transform: translateY(-100%);
-          transform: translateY(-100%);
-}
-.accessibility-jumpTo:hover {
-  opacity: 1;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.spoiler {
-  border-radius: 6px;
-  background-color: #f7f7f7;
-}
-.spoiler .spoiler-chevronUp {
-  display: none;
-}
-.spoiler .spoiler-content {
-  display: none;
-}
-.spoiler.isShowingSpoiler .spoiler-content {
-  display: block;
-}
-.spoiler.isShowingSpoiler .spoiler-chevronUp {
-  display: inline-block;
-}
-.spoiler.isShowingSpoiler .spoiler-chevronDown {
-  display: none;
-}
-
-.spoiler-chevronUp,
-.spoiler-chevronDown {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  vertical-align: 0.2em;
-}
-
-.button-spoiler {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  width: 100%;
-  max-width: 100%;
-  font-size: 16px;
-  min-height: 48px;
-  padding: 0 14px;
-  outline: 0;
-  cursor: pointer;
-  text-align: center;
-}
-.button-spoiler {
-  border: 0;
-  border-radius: 0;
-  color: #555a62;
-  background-color: transparent;
-  text-align: left;
-}
-.button-spoiler:active .spoiler-chevron {
-  opacity: 1;
-}
-.button-spoiler:focus .spoiler-chevron {
-  opacity: 1;
-  outline: none;
-}
-.button-spoiler:hover .spoiler-chevron {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.spoiler-warningMain {
-  position: relative;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  box-sizing: border-box;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  padding: 0 24px;
-  width: 100%;
-  line-height: 1;
-}
-
-.spoiler-icon {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-}
-
-.spoiler-chevron {
-  position: absolute;
-  display: block;
-  top: 0;
-  right: 14px;
-  bottom: 0;
-  max-height: 100%;
-  max-width: 100%;
-  margin: auto 0;
-  width: 24px;
-  height: 24px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  opacity: 0.6;
-}
-
-.spoiler-warningAfter,
-.spoiler-warningBefore {
-  line-height: 24px;
-  margin: 0;
-  padding: 0;
-}
-
-.spoiler-warningBefore {
-  margin-right: 6px;
-}
-
-.spoiler-content {
-  padding: 0 14px 14px 14px;
-}
-.spoiler-content *:first-child {
-  margin-top: 0;
-}
-.spoiler-content *:last-child {
-  margin-bottom: 0;
-}
-
-.spoiler-buttonContainer {
-  white-space: normal;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.safeEmoji {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  font-family: "Apple Color Emoji", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-  vertical-align: middle;
-  text-align: center;
-  height: 1em;
-  max-width: 100%;
-  line-height: 1em;
-}
-
-.nativeEmoji {
-  font-family: "Segoe UI Emoji", sans-serif;
-}
-
-.fallBackEmoji {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  margin: 0 0.05em 0 0.1em;
-  vertical-align: -0.1em;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-.emojiGroup {
-  opacity: 0.6;
-}
-
-.emojiPicker {
-  position: relative;
-}
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.userContent .code {
-  position: relative;
-  display: inline;
-  vertical-align: middle;
-  line-height: inherit;
-  font-size: 0.85em;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  max-width: 100%;
-  margin: 0;
-  color: #26282b;
-  background-color: #f7f7f7;
-  border: 0;
-  overflow-x: auto;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
-}
-.userContent .codeInline {
-  display: inline;
-  white-space: normal;
-  padding: 0.2em 0.4em;
-  border-radius: 0;
-}
-.userContent .codeBlock {
-  display: block;
-  word-wrap: normal;
-  line-height: 1.45;
-  white-space: pre;
-  padding: 14px;
-  border-radius: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

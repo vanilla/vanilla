@@ -1,0 +1,10 @@
+Line 1
+
+notmention@gmail.com
+
+@mention1 @mention2 @!@#$%^&*( @@@inAts@@@ end of line
+
+^^ Buggy https://github.com/vanilla/vanilla/issues/9134
+
+@"quotedMenti'on!#$%^&*("
+

@@ -1,0 +1,17 @@
+[
+    {
+        "text": "h2 with ref\n",
+        "level": 2,
+        "ref": "h2-with-ref"
+    },
+    {
+        "text": "duplicated refs stay duplicated. no post processing\n",
+        "level": 5,
+        "ref": "duplicated-refs"
+    },
+    {
+        "text": "duplicated refs stay duplicated. no post processing\n",
+        "level": 5,
+        "ref": "duplicated-refs"
+    }
+]

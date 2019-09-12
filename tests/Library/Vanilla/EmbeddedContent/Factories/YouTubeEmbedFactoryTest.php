@@ -9,13 +9,13 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
 use Vanilla\EmbeddedContent\Factories\YouTubeEmbedFactory;
-use VanillaTests\ContainerTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class YouTubeEmbedFactoryTest extends ContainerTestCase {
+class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
 
     /** @var YouTubeEmbedFactory */
     private $factory;

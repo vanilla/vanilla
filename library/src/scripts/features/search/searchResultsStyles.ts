@@ -94,6 +94,7 @@ export const searchResultsClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        position: "relative",
         borderTop: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,

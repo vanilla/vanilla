@@ -48,7 +48,7 @@ interface SiteSectionInterface {
     public function getSectionID(): int;
 
     /**
-     * Get the section group.
+     * Get the section group that a section belongs.
      *
      * @return string
      */

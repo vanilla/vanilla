@@ -66,6 +66,9 @@ class DefaultSiteSection implements SiteSectionInterface {
         return self::DEFAULT_ID;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getSectionGroup(): string {
         return self::DEFAULT_SECTION_GROUP;
     }

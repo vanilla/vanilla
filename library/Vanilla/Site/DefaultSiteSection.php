@@ -66,6 +66,7 @@ class DefaultSiteSection implements SiteSectionInterface {
         return self::DEFAULT_ID;
     }
 
+
     /**
      * @inheritdoc
      */

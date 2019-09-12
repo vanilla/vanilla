@@ -33,5 +33,15 @@
             "Coral": "%s_coral",
             "Dusk": "%s_dusk"
         }
+    },
+    "assets": {
+        "variables_default": {
+            "type": "json",
+            "file": "variables_default.json"
+        },
+        "variables_classic": {
+            "type": "json",
+            "file": "variables_classic.json"
+        }
     }
 }

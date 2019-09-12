@@ -52,6 +52,6 @@ interface SiteSectionInterface {
      *
      * @return string
      */
-    public function getSectionGroup():string;
+    public function getSectionGroup(): string;
 
 }

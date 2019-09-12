@@ -12,6 +12,8 @@ import { getMeta } from "@library/utility/appUtils";
 import React, { useMemo } from "react";
 import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import classNames from "classnames";
 
 interface IProps {
     children: React.ReactNode;
@@ -27,7 +29,7 @@ export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
     return (
-        <div className="js-appContext">
+        <div className={classNames("js-appContext", inheritHeightClass())}>
             {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
             <Provider store={store}>
                 <LiveAnnouncer>

@@ -236,6 +236,14 @@
                                                 {searchbox}
                                             </div>
                                         {/if}
+                                        {literal}
+                                        <div class="Box BoxButtons">
+                                            <span
+                                                data-react="subcommunity-chooser"
+                                                data-props='{"buttonType": "primary", "fullWidth": true}'
+                                            ></span>
+                                        </div>
+                                        {/literal}
                                         {asset name="Panel"}
                                     </aside>
                                     <!---------- Main Panel END ---------->
@@ -257,6 +265,12 @@
                             <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
                         </div>
                         <div class="col">
+                                {literal}
+                                <span
+                                    data-react="subcommunity-chooser"
+                                    data-props='{"buttonType": "primary"}'
+                                ></span>
+                                {/literal}
                             <div class="Vanilla-logo">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.418 27" class="PoweredbyVanilla">
                                 <title>Powered By Vanilla</title>

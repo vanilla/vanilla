@@ -96,7 +96,7 @@ export default function titleBarNavClasses() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: unit(vars.item.size),
+        minHeight: unit(vars.item.size),
         textDecoration: "none",
         $nest: {
             "&.focus-visible": {

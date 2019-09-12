@@ -113,7 +113,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 throw error;
             }
 
-            filesArray.forEach((file) => {
+            filesArray.forEach(file => {
                 if (this.props.type === "image" && isFileImage(file)) {
                     embedInsertion.createImageEmbed(file);
                 } else {

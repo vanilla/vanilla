@@ -13,14 +13,13 @@ import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
-import ErrorBlot, {ErrorBlotType} from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import ErrorBlot, { ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import { getMeta } from "@library/utility/appUtils";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-
     private maxUploads = getMeta("upload.maxUploads", 20);
 
     constructor(public quill: Quill, options = {}) {
@@ -102,7 +101,7 @@ export default class EmbedInsertionModule extends Module {
             throw error;
         }
 
-        filesArray.forEach((file) => {
+        filesArray.forEach(file => {
             if (isFileImage(file)) {
                 this.createImageEmbed(file);
             } else {
@@ -132,6 +131,7 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Setup image upload listeners and handlers.
      */
+
     private setupImageUploads() {
         this.quill.root.addEventListener("drop", this.dragHandler, false);
         this.quill.root.addEventListener("paste", this.pasteHandler, false);

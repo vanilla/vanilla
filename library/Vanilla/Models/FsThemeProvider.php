@@ -177,6 +177,11 @@ class FsThemeProvider implements ThemeProviderInterface {
 
         $data = $this->getFileAsset($theme, $asset);
 
+        // Mix in addon variables to the variables asset.
+        if (preg_match('/^variables/', $key)) {
+            $data = $this->addAddonVariables($data);
+        }
+
         switch ($type) {
             case "data":
                 return $this->dataAsset($key, $data);
@@ -213,6 +218,8 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @param Addon $theme
      * @param array $asset
+     *
+     * @return string
      */
     private function getFileAsset(Addon $theme, array $asset): string {
         $filename = basename($asset['file']);
@@ -227,9 +234,6 @@ class FsThemeProvider implements ThemeProviderInterface {
             $assetContent = file_get_contents($fullFilename);
         } else {
             $assetContent = $asset['placeholder'];
-        }
-        if ($filename === 'variables.json') {
-            $assetContent = $this->addAddonVariables($assetContent);
         }
 
         return $assetContent;

@@ -10,6 +10,7 @@ import { cssRule } from "typestyle";
 import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { em, percent } from "csx";
 import { paddings } from "@library/styles/styleHelpersfPadding";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 export const codeBlockVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -28,12 +29,11 @@ export const codeBlockVariables = useThemeCache(() => {
         radius: borderRadius.default,
     });
 
-    const colors = makeThemeVars("colors", {
-        bg: globalVars.mixBgAndFg(0.2),
-        fg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.2),
-    });
+    const variablesUserContent = userContentVariables();
 
     const inline = makeThemeVars("inline", {
+        fg: variablesUserContent.codeInline.fg,
+        bg: variablesUserContent.codeInline.bg,
         border: {
             color: globalVars.mixBgAndFg(0.5),
             radius: 0,
@@ -45,6 +45,8 @@ export const codeBlockVariables = useThemeCache(() => {
     });
 
     const block = makeThemeVars("block", {
+        fg: variablesUserContent.codeBlock.fg,
+        bg: variablesUserContent.codeBlock.bg,
         border: {
             radius: borderRadius.default,
         },
@@ -56,7 +58,6 @@ export const codeBlockVariables = useThemeCache(() => {
     return {
         fonts,
         border,
-        colors,
         inline,
         block,
     };
@@ -76,8 +77,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 fontFamily: vars.fonts.families,
                 maxWidth: percent(100),
                 margin: 0,
-                color: colorOut(vars.colors.fg),
-                backgroundColor: colorOut(vars.colors.bg),
+                color: colorOut(vars.inline.fg),
+                backgroundColor: colorOut(vars.inline.bg),
                 border: 0,
                 overflowX: "auto",
                 flexShrink: 0,
@@ -87,6 +88,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 whiteSpace: "normal",
                 ...paddings(vars.inline.paddings),
                 borderRadius: vars.inline.border.radius,
+                color: colorOut(vars.inline.fg),
+                backgroundColor: colorOut(vars.inline.bg),
             },
             ".codeBlock": {
                 display: "block",
@@ -95,6 +98,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 whiteSpace: "pre",
                 ...paddings(vars.block.paddings),
                 borderRadius: vars.block.border.radius,
+                color: colorOut(vars.block.fg),
+                backgroundColor: colorOut(vars.block.bg),
             },
         },
     });

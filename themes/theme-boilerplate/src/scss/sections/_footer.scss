@@ -37,6 +37,34 @@
         @include maxWidth($theme-breakpoint_base) {
             width: 100%;
             text-align: center;
+            margin: 6px 0;
+
+            &:first-child {
+                margin-top: 0;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .col-copyRight {
+        justify-content: flex-start;
+    }
+
+    .col-logo {
+        justify-content: flex-end;
+    }
+
+
+    .col-copyRight,
+    .col-logo {
+        flex: 1;
+        display: flex;
+
+        @include maxWidth {
+            justify-content: center;
         }
     }
 }

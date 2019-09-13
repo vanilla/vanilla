@@ -87,7 +87,7 @@
                             </nav>
                             <div class="Header-flexSpacer"></div>
                             <div class="Header-right">
-                                {community_chooser buttonType='titleBarLink'}
+                                {community_chooser buttonType='titleBarLink' buttonClass='Header-desktopCommunityChooser'}
                                 <div class="MeBox-header">
                                     {module name="MeModule" CssClass="FlyoutRight"}
                                 </div>
@@ -122,6 +122,9 @@
                             {discussions_link format=$linkFormat}
                             {activity_link format=$linkFormat}
                             {custom_menu format=$linkFormat}
+                            <div class='Navigation-linkContainer'>
+                                {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
+                            </div>
                         </div>
                     </nav>
                     <nav class="mobileMebox js-mobileMebox needsInitialization">
@@ -256,11 +259,13 @@
             <footer class="Footer">
                 <div class="Container">
                     <div class="row">
-                        <div class="col">
+                        <div class="col col-copyRight">
                             <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
                         </div>
                         <div class="col">
                             {community_chooser}
+                        </div>
+                        <div class="col col-logo">
                             <div class="Vanilla-logo">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.418 27" class="PoweredbyVanilla">
                                 <title>Powered By Vanilla</title>

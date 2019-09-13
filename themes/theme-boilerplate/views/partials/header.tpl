@@ -26,7 +26,7 @@
             </nav>
             <div class="Header-flexSpacer"></div>
             <div class="Header-right">
-                <span data-react="subcommunity-chooser"></span>
+                {community_chooser buttonType='titleBarLink' buttonClass='Header-desktopCommunityChooser'}
                 <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}
                 </div>
@@ -59,6 +59,9 @@
             {discussions_link format=$linkFormat}
             {activity_link format=$linkFormat}
             {custom_menu format=$linkFormat}
+            <div class='Navigation-linkContainer'>
+                {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
+            </div>
         </div>
     </nav>
     <nav class="mobileMebox js-mobileMebox needsInitialization">

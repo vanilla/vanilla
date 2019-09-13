@@ -8,6 +8,7 @@ import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
 import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -54,6 +55,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return classes.transparent;
             case ButtonTypes.TRANSLUCID:
                 return classes.translucid;
+            case ButtonTypes.TITLEBAR_LINK:
+                return titleBarClasses().linkButton;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
             case ButtonTypes.DASHBOARD_STANDARD:

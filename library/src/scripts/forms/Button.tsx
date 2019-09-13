@@ -59,6 +59,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return titleBarClasses().linkButton;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
+            case ButtonTypes.RESET:
+                return buttonUtilityClasses().reset;
             case ButtonTypes.DASHBOARD_STANDARD:
                 return "btn";
             case ButtonTypes.DASHBOARD_PRIMARY:

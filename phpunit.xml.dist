@@ -45,6 +45,11 @@
             <directory suffix="Test.php">./applications/*/tests/APIv2</directory>
             <directory suffix="Test.php">./plugins/*/tests/APIv2</directory>
         </testsuite>
+        <testsuite name="Sphinx">
+            <directory suffix="Test.php">./tests/Sphinx</directory>
+            <directory suffix="Test.php">./applications/*/tests/Sphinx</directory>
+            <directory suffix="Test.php">./plugins/*/tests/Sphinx</directory>
+        </testsuite>
     </testsuites>
 
     <filter>

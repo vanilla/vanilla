@@ -26,11 +26,11 @@ use Gdn_Upload;
  * Handle custom themes.
  */
 class FsThemeProvider implements ThemeProviderInterface {
+
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
-    /**
-     * @var AddonManager
-     */
+
+    /** @var AddonManager */
     private $addonManager;
 
     /** @var Gdn_Request */
@@ -38,6 +38,9 @@ class FsThemeProvider implements ThemeProviderInterface {
 
     /** @var ConfigurationInterface */
     private $config;
+
+    /** @var string|null A theme option value if set in the form of '%s_optionName' */
+    private $themeOptionValue;
 
     /**
      * FsThemeProvider constructor.
@@ -54,6 +57,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->addonManager = $addonManager;
         $this->request = $request;
         $this->config = $config;
+        $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', null);
     }
 
     /**
@@ -69,7 +73,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeWithAssets($themeKey): array {
         $theme = $this->normalizeTheme(
             $this->getThemeByName($themeKey),
-            $this->getAssets($themeKey)
+            $this->getAllDefinedAssets($themeKey)
         );
         return $theme;
     }
@@ -107,12 +111,25 @@ class FsThemeProvider implements ThemeProviderInterface {
 
         $res["assets"] = [];
 
-        $primaryAssets = array_intersect_key(
-            $assets,
-            array_flip(["fonts", "footer", "header", "scripts", "variables"])
-        );
-        foreach ($primaryAssets as $assetKey => $asset) {
-            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
+//        $primaryAssets = array_intersect_key(
+//            $assets,
+//            array_flip(["fonts", "footer", "header", "scripts", "variables"])
+//        );
+        foreach ($assets as $assetKey => $asset) {
+            $finalAssetKey = $assetKey;
+            // We have some slightly special handling if we have theme options.
+            if ($this->themeOptionValue !== null) {
+                $themeOptionEnding = sprintf($this->themeOptionValue, '');
+                $isInThemeOption = preg_match("/$themeOptionEnding$/", $assetKey);
+
+                if (!$isInThemeOption) {
+                    continue;
+                } else {
+                    $finalAssetKey = str_replace($themeOptionEnding, '', $assetKey);
+                }
+            }
+
+            $res["assets"][$finalAssetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
 
         $secondaryAssets = array_intersect_key(
@@ -150,7 +167,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $type = $asset["type"] ?? null;
         if ($type === null) {
             throw new ServerException("Missing theme asset type.");
-        }        $filename = $asset["file"] ?? null;
+        }
         $type = strtolower($type);
 
         $filename = $asset["file"] ?? null;
@@ -159,6 +176,11 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         $data = $this->getFileAsset($theme, $asset);
+
+        // Mix in addon variables to the variables asset.
+        if (preg_match('/^variables/', $key)) {
+            $data = $this->addAddonVariables($data);
+        }
 
         switch ($type) {
             case "data":
@@ -196,6 +218,8 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @param Addon $theme
      * @param array $asset
+     *
+     * @return string
      */
     private function getFileAsset(Addon $theme, array $asset): string {
         $filename = basename($asset['file']);
@@ -211,9 +235,6 @@ class FsThemeProvider implements ThemeProviderInterface {
         } else {
             $assetContent = $asset['placeholder'];
         }
-        if ($filename === 'variables.json') {
-            $assetContent = $this->addAddonVariables($assetContent);
-        }
 
         return $assetContent;
     }
@@ -228,7 +249,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     public function getAssetData($themeKey, string $assetKey): string {
         $theme = $this->getThemeByName($themeKey);
-        $assets = $this->getAssets($themeKey);
+        $assets = $this->getAllDefinedAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
             return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
@@ -238,14 +259,15 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
-     * Get theme asset by assetKey.
+     * Get theme assets by by themeID.
      *
-     * @param string $id
+     * @param string $themeID
+     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
-    private function getAssets(string $id): array {
-        $theme = $this->getThemeByName($id);
+    private function getAllDefinedAssets(string $themeID): array {
+        $theme = $this->getThemeByName($themeID);
         $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, $this->getDefaultAssets());
         return $assets;
     }

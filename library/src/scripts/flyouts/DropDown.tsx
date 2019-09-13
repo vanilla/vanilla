@@ -54,6 +54,7 @@ export interface IProps extends IOpenDirectionProps {
     flyoutType: FlyoutType;
     selfPadded?: boolean;
     isSmall?: boolean;
+    id?: string;
 }
 
 export enum FlyoutType {
@@ -69,7 +70,8 @@ export interface IState {
  * Creates a drop down menu
  */
 export default function DropDown(props: IProps) {
-    const id = useUniqueID("dropDown");
+    const ownID = useUniqueID("dropDown");
+    const id = props.id || ownID;
     const device = useDevice();
 
     const { title } = props;

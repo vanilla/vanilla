@@ -30,7 +30,7 @@ const _components = {};
  * @param name The name of the component.
  * @param component The component to register.
  */
-export function addComponent(name: string, component: React.ComponentType) {
+export function addComponent(name: string, component: React.ComponentType<any>) {
     _components[name.toLowerCase()] = component;
 }
 

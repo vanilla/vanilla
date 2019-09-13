@@ -42,6 +42,22 @@
         "variables_classic": {
             "type": "json",
             "file": "variables_classic.json"
+        },
+        "variables_coral": {
+            "type": "json",
+            "file": "variables_coral.json"
+        },
+        "variables_dusk": {
+            "type": "json",
+            "file": "variables_dusk.json"
+        },
+        "variables_dark": {
+            "type": "json",
+            "file": "variables_dark.json"
+        },
+        "variables_cerulean": {
+            "type": "json",
+            "file": "variables_cerulean.json"
         }
     }
 }

@@ -239,9 +239,6 @@
                                                 {searchbox}
                                             </div>
                                         {/if}
-                                        <div class="Box BoxButtons">
-                                            {community_chooser buttonType='primary' fullWidth=true}
-                                        </div>
                                         {asset name="Panel"}
                                     </aside>
                                     <!---------- Main Panel END ---------->

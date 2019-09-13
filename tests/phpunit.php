@@ -1,6 +1,14 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use VanillaTests\NullContainer;
+
+// Use consistent timezone for all tests.
+date_default_timezone_set("UTC");
+
 error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [

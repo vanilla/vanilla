@@ -35,7 +35,7 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @throws \Exception
      */
     public function getGroupOpeningTag(): string {
-        $ref = $this->getReference();
+        $ref = htmlspecialchars($this->getReference());
         $idTag = $ref ? ' data-id="' . $ref . '"' : "";
         $level = $this->getHeadingLevel();
         return "<h$level$idTag>";

@@ -13,6 +13,7 @@ import { isFileImage } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -44,6 +45,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                     ref={this.inputRef}
                     onChange={this.onInputChange}
                     className={classNames("richEditor-upload", classesRichEditor.upload)}
+                    multiple
                     type="file"
                     accept={this.inputAccepts}
                 />
@@ -97,18 +99,27 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
      * Handle the change of the file upload input.
      */
     private onInputChange = () => {
-        // Grab the first file.
-        const file =
-            this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files[0];
+        const files =
+            this.inputRef && this.inputRef.current && this.inputRef.current.files && this.inputRef.current.files;
         const embedInsertion =
             this.props.quill && (this.props.quill.getModule("embed/insertion") as EmbedInsertionModule);
+        const maxUploads = getMeta("upload.maxUploads", 20);
 
-        if (file && embedInsertion) {
-            if (this.props.type === "image" && isFileImage(file)) {
-                embedInsertion.createImageEmbed(file);
-            } else {
-                embedInsertion.createFileEmbed(file);
+        if (files && embedInsertion) {
+            const filesArray = Array.from(files);
+            if (filesArray.length >= maxUploads) {
+                const error = new Error(`Can't upload more than ${maxUploads} files at once.`);
+                embedInsertion.createErrorEmbed(error);
+                throw error;
             }
+
+            filesArray.forEach(file => {
+                if (this.props.type === "image" && isFileImage(file)) {
+                    embedInsertion.createImageEmbed(file);
+                } else {
+                    embedInsertion.createFileEmbed(file);
+                }
+            });
         }
     };
 }

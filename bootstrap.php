@@ -13,6 +13,7 @@ use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
+use Vanilla\Web\TwigEnhancer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -307,6 +308,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule('ViewHandler.twig')
     ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
+    ->setShared(true)
+
+    ->rule(TwigEnhancer::class)
     ->setShared(true)
 
     ->rule('Gdn_Form')

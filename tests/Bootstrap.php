@@ -16,7 +16,9 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
@@ -126,6 +128,7 @@ class Bootstrap {
                 ],
                 PATH_CACHE
             ])
+            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -188,6 +191,7 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
             ->addAlias(Gdn::AliasLocale)
+            ->addAlias(LocaleInterface::class)
 
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')

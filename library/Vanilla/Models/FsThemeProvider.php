@@ -57,7 +57,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->addonManager = $addonManager;
         $this->request = $request;
         $this->config = $config;
-        $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', null);
+        $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
     }
 
     /**
@@ -73,7 +73,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeWithAssets($themeKey): array {
         $theme = $this->normalizeTheme(
             $this->getThemeByName($themeKey),
-            $this->getAllDefinedAssets($themeKey)
+            $this->getAssets($themeKey)
         );
         return $theme;
     }
@@ -115,7 +115,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         foreach ($assets as $assetKey => $asset) {
             $finalAssetKey = $assetKey;
             // We have some slightly special handling if we have theme options.
-            if ($this->themeOptionValue !== null) {
+            if (!empty($this->themeOptionValue)) {
                 $themeOptionEnding = sprintf($this->themeOptionValue, '');
                 $isInThemeOption = preg_match("/$themeOptionEnding$/", $assetKey);
 
@@ -248,7 +248,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     public function getAssetData($themeKey, string $assetKey): string {
         $theme = $this->getThemeByName($themeKey);
-        $assets = $this->getAllDefinedAssets($themeKey);
+        $assets = $this->getAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
             return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
@@ -265,7 +265,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
-    private function getAllDefinedAssets(string $themeID): array {
+    private function getAssets(string $themeID): array {
         $theme = $this->getThemeByName($themeID);
         $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, $this->getDefaultAssets());
         return $assets;

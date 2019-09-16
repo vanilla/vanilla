@@ -41,6 +41,14 @@ class TwigEnhancer {
     /** @var Gdn_Request */
     private $request;
 
+
+    /**
+     * Caches of various template functions
+     */
+    private $configCache = [];
+    private $translateCache = [];
+    private $permissionCache = [];
+
     /**
      * DI.
      *
@@ -140,8 +148,6 @@ class TwigEnhancer {
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
-    private $configCache = [];
-
     /**
      * Get a config key. The result will then be cached for the instance of the twig enhancer.
      *
@@ -157,8 +163,6 @@ class TwigEnhancer {
         return $this->configCache[$key];
     }
 
-    private $translateCache = [];
-
     /**
      * Get a translation. The result will then be cached for the instance of the twig enhancer.
      *
@@ -173,8 +177,6 @@ class TwigEnhancer {
         }
         return $this->translateCache[$key];
     }
-
-    private $permissionCache = [];
 
     /**
      * Check if a user has a permission or one of a group of permissions.

@@ -121,6 +121,12 @@
     }
 }
 
+.Header-desktopCommunityChooser.Header-desktopCommunityChooser {
+    @include maxWidth {
+        display: none;
+    }
+}
+
 .Header-flexSpacer {
     flex: 1;
 

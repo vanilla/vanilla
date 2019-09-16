@@ -26,11 +26,11 @@ use Gdn_Upload;
  * Handle custom themes.
  */
 class FsThemeProvider implements ThemeProviderInterface {
+
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
-    /**
-     * @var AddonManager
-     */
+
+    /** @var AddonManager */
     private $addonManager;
 
     /** @var Gdn_Request */
@@ -38,6 +38,9 @@ class FsThemeProvider implements ThemeProviderInterface {
 
     /** @var ConfigurationInterface */
     private $config;
+
+    /** @var string|null A theme option value if set in the form of '%s_optionName' */
+    private $themeOptionValue;
 
     /**
      * FsThemeProvider constructor.
@@ -54,6 +57,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->addonManager = $addonManager;
         $this->request = $request;
         $this->config = $config;
+        $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
     }
 
     /**
@@ -106,13 +110,25 @@ class FsThemeProvider implements ThemeProviderInterface {
         ];
 
         $res["assets"] = [];
+        $generatedAssetTypes = ["fonts", "footer", "header", "scripts", "variables"];
 
-        $primaryAssets = array_intersect_key(
-            $assets,
-            array_flip(["fonts", "footer", "header", "scripts", "variables"])
-        );
-        foreach ($primaryAssets as $assetKey => $asset) {
-            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
+        foreach ($assets as $assetKey => $asset) {
+            $finalAssetKey = $assetKey;
+            // We have some slightly special handling if we have theme options.
+            if (!empty($this->themeOptionValue)) {
+                $themeOptionEnding = sprintf($this->themeOptionValue, '');
+                $isInThemeOption = preg_match("/$themeOptionEnding$/", $assetKey);
+
+                if ($isInThemeOption) {
+                    $finalAssetKey = str_replace($themeOptionEnding, '', $assetKey);
+                }
+            }
+
+            if (!in_array($finalAssetKey, $generatedAssetTypes)) {
+                continue;
+            }
+
+            $res["assets"][$finalAssetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
 
         $secondaryAssets = array_intersect_key(
@@ -150,7 +166,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $type = $asset["type"] ?? null;
         if ($type === null) {
             throw new ServerException("Missing theme asset type.");
-        }        $filename = $asset["file"] ?? null;
+        }
         $type = strtolower($type);
 
         $filename = $asset["file"] ?? null;
@@ -159,6 +175,11 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         $data = $this->getFileAsset($theme, $asset);
+
+        // Mix in addon variables to the variables asset.
+        if (preg_match('/^variables/', $key)) {
+            $data = $this->addAddonVariables($data);
+        }
 
         switch ($type) {
             case "data":
@@ -196,6 +217,8 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @param Addon $theme
      * @param array $asset
+     *
+     * @return string
      */
     private function getFileAsset(Addon $theme, array $asset): string {
         $filename = basename($asset['file']);
@@ -210,9 +233,6 @@ class FsThemeProvider implements ThemeProviderInterface {
             $assetContent = file_get_contents($fullFilename);
         } else {
             $assetContent = $asset['placeholder'];
-        }
-        if ($filename === 'variables.json') {
-            $assetContent = $this->addAddonVariables($assetContent);
         }
 
         return $assetContent;
@@ -238,14 +258,15 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
-     * Get theme asset by assetKey.
+     * Get theme assets by by themeID.
      *
-     * @param string $id
+     * @param string $themeID
+     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
-    private function getAssets(string $id): array {
-        $theme = $this->getThemeByName($id);
+    private function getAssets(string $themeID): array {
+        $theme = $this->getThemeByName($themeID);
         $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, $this->getDefaultAssets());
         return $assets;
     }

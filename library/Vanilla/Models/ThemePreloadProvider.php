@@ -61,7 +61,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @return ThemeScriptAsset|null
      */
     public function getThemeScript(): ?ThemeScriptAsset {
-        if (!$this->getThemeData()['assets']['javascript']) {
+        if (!isset($this->getThemeData()['assets']['javascript'])) {
             return null;
         }
 
@@ -111,6 +111,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     private function getThemeInlineCss() {
         if (!$this->inlineStyles) {
+            $themeData = $this->getThemeData();
             $themeKey = $this->siteMeta->getActiveTheme()->getKey();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {

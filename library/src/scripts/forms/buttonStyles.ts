@@ -257,7 +257,6 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     background: "none",
     cursor: "pointer",
     color: "inherit",
-    font: "inherit",
 });
 
 export const overwriteButtonClass = (
@@ -277,10 +276,12 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
     TRANSLUCID = "translucid",
     CUSTOM = "custom",
+    RESET = "reset",
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
     ICON_COMPACT = "iconCompact",
+    TITLEBAR_LINK = "titleBarLink",
     DASHBOARD_STANDARD = "dashboardStandard",
     DASHBOARD_PRIMARY = "dashboardPrimary",
     DASHBOARD_SECONDARY = "dashboardSecondary",
@@ -392,6 +393,8 @@ export const buttonUtilityClasses = useThemeCache(() => {
         marginLeft: unit(6),
     });
 
+    const reset = style("reset", buttonResetMixin());
+
     return {
         pushLeft,
         buttonAsText,
@@ -401,6 +404,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         buttonIcon,
         buttonIconRightMargin,
         buttonIconLeftMargin,
+        reset,
     };
 });
 

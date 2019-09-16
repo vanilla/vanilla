@@ -24,6 +24,7 @@ import { calc, important, percent, quote, translateY } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: boolean) => {
     const globalVars = globalVariables();
@@ -224,6 +225,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const button = style("button", {
+        ...buttonResetMixin(),
         display: "block",
         ...userSelect(),
         ...appearance(),

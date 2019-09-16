@@ -34,7 +34,6 @@ interface IProps extends IDeviceProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
-    outerBackgroundImage?: string;
     styleOverwrite?: ISplashStyleOverwrite;
 }
 

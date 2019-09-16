@@ -4,28 +4,40 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useRef } from "react";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { getRequiredID } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import SmartAlign from "@library/layout/SmartAlign";
 import CloseButton from "@library/navigation/CloseButton";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
-import { IDeviceProps, withDevice, Devices } from "@library/layout/DeviceContext";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
+import { props } from "bluebird";
 
-export interface IProps extends IDeviceProps {
-    id?: string;
+export enum DropDownOpenDirection {
+    ABOVE_LEFT = "aboveLeft",
+    ABOVE_RIGHT = "aboveRight",
+    BELOW_LEFT = "belowLeft",
+    BELOW_RIGHT = "belowRight",
+    AUTO = "auto",
+}
+
+interface IOpenDirectionProps {
+    openDirection?: DropDownOpenDirection;
+    renderAbove?: boolean; // @deprecated
+    renderLeft?: boolean; // @deprecated
+}
+
+export interface IProps extends IOpenDirectionProps {
     name?: string;
     children: React.ReactNode;
     className?: string;
-    renderAbove?: boolean; // Adjusts the flyout position vertically
-    renderLeft?: boolean; // Adjusts the flyout position horizontally
     describedBy?: string;
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
@@ -42,6 +54,7 @@ export interface IProps extends IDeviceProps {
     flyoutType: FlyoutType;
     selfPadded?: boolean;
     isSmall?: boolean;
+    id?: string;
 }
 
 export enum FlyoutType {
@@ -56,98 +69,69 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-class DropDown extends React.Component<IProps, IState> {
-    private id;
-    public constructor(props) {
-        super(props);
-        this.id = getRequiredID(props, "dropDown");
-        this.state = {
-            selectedText: "",
-        };
-    }
+export default function DropDown(props: IProps) {
+    const ownID = useUniqueID("dropDown");
+    const id = props.id || ownID;
+    const device = useDevice();
 
-    public setSelectedText(selectedText) {
-        this.setState({
-            selectedText,
-        });
-    }
+    const { title } = props;
+    const classesDropDown = dropDownClasses();
+    const classesFrameHeader = frameHeaderClasses();
+    const classes = dropDownClasses();
+    const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
+    const openAsModal = props.openAsModal || device === Devices.MOBILE || device === Devices.XS;
+    const ownButtonRef = useRef<HTMLButtonElement>(null);
+    const openDirection = resolveOpenDirection(props, props.buttonRef || ownButtonRef);
 
-    public get selectedText(): string {
-        return this.state.selectedText;
-    }
-
-    public render() {
-        const { title } = this.props;
-        const classesDropDown = dropDownClasses();
-        const classesFrameHeader = frameHeaderClasses();
-        const classes = dropDownClasses();
-        const ContentTag = this.props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
-
-        const openAsModal =
-            this.props.openAsModal || this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
-        return (
-            <FlyoutToggle
-                id={this.id}
-                className={classNames(this.props.className)}
-                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.ICON}
-                name={this.props.name}
-                buttonContents={this.props.buttonContents || <DropDownMenuIcon />}
-                buttonClassName={this.props.buttonClassName}
-                selectedItemLabel={this.selectedText}
-                disabled={this.props.disabled}
-                buttonRef={this.props.buttonRef}
-                toggleButtonClassName={this.props.toggleButtonClassName}
-                isVisible={this.props.isVisible}
-                onVisibilityChange={this.props.onVisibilityChange}
-                openAsModal={openAsModal}
-                initialFocusElement={this.props.initialFocusElement}
-            >
-                {params => {
-                    return (
-                        <DropDownContents
-                            {...params}
-                            id={this.id + "-handle"}
-                            parentID={this.id}
-                            className={classNames(this.props.contentsClassName)}
-                            renderLeft={!!this.props.renderLeft}
-                            renderAbove={!!this.props.renderAbove}
-                            openAsModal={openAsModal}
-                            selfPadded={
-                                this.props.selfPadded !== undefined
-                                    ? this.props.selfPadded
-                                    : this.props.flyoutType === FlyoutType.FRAME
-                            }
-                            size={
-                                this.props.flyoutType === FlyoutType.FRAME && !this.props.isSmall
-                                    ? DropDownContentSize.MEDIUM
-                                    : DropDownContentSize.SMALL
-                            }
-                        >
-                            {title ? (
-                                <header className={classNames("frameHeader", classesFrameHeader.root)}>
-                                    {openAsModal && (
-                                        <FlexSpacer
-                                            className={classNames(
-                                                "frameHeader-leftSpacer",
-                                                classesFrameHeader.leftSpacer,
-                                            )}
-                                        />
-                                    )}
-                                    {openAsModal && (
-                                        <SmartAlign>
-                                            (
-                                            <Heading
-                                                title={title}
-                                                className={classNames(
-                                                    "dropDown-title",
-                                                    classesDropDown.title,
-                                                    classes.title,
-                                                )}
-                                            />
-                                        </SmartAlign>
-                                    )}
-
-                                    {!openAsModal && (
+    return (
+        <FlyoutToggle
+            id={id}
+            className={classNames(props.className)}
+            buttonBaseClass={props.buttonBaseClass || ButtonTypes.ICON}
+            name={props.name!}
+            buttonContents={props.buttonContents || <DropDownMenuIcon />}
+            buttonClassName={props.buttonClassName}
+            disabled={props.disabled}
+            buttonRef={props.buttonRef || ownButtonRef}
+            toggleButtonClassName={props.toggleButtonClassName}
+            isVisible={props.isVisible}
+            onVisibilityChange={props.onVisibilityChange}
+            openAsModal={openAsModal}
+            initialFocusElement={props.initialFocusElement}
+        >
+            {params => {
+                return (
+                    <DropDownContents
+                        {...params}
+                        id={id + "-handle"}
+                        parentID={id}
+                        className={classNames(props.contentsClassName)}
+                        renderLeft={[DropDownOpenDirection.ABOVE_LEFT, DropDownOpenDirection.BELOW_LEFT].includes(
+                            openDirection,
+                        )}
+                        renderAbove={[DropDownOpenDirection.ABOVE_RIGHT, DropDownOpenDirection.ABOVE_LEFT].includes(
+                            openDirection,
+                        )}
+                        openAsModal={openAsModal}
+                        selfPadded={
+                            props.selfPadded !== undefined ? props.selfPadded : props.flyoutType === FlyoutType.FRAME
+                        }
+                        size={
+                            props.flyoutType === FlyoutType.FRAME && !props.isSmall
+                                ? DropDownContentSize.MEDIUM
+                                : DropDownContentSize.SMALL
+                        }
+                    >
+                        {title ? (
+                            <header className={classNames("frameHeader", classesFrameHeader.root)}>
+                                {openAsModal && (
+                                    <FlexSpacer
+                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
+                                    />
+                                )}
+                                {openAsModal && (
+                                    <SmartAlign>
+                                        (
                                         <Heading
                                             title={title}
                                             className={classNames(
@@ -156,26 +140,60 @@ class DropDown extends React.Component<IProps, IState> {
                                                 classes.title,
                                             )}
                                         />
-                                    )}
+                                    </SmartAlign>
+                                )}
 
-                                    <CloseButton
-                                        className={classNames(
-                                            classesFrameHeader.action,
-                                            classesFrameHeader.categoryIcon,
-                                        )}
-                                        onClick={params.closeMenuHandler}
+                                {!openAsModal && (
+                                    <Heading
+                                        title={title}
+                                        className={classNames("dropDown-title", classesDropDown.title, classes.title)}
                                     />
-                                </header>
-                            ) : null}
-                            <ContentTag className={classNames("dropDownItems", classes.items)}>
-                                {this.props.children}
-                            </ContentTag>
-                        </DropDownContents>
-                    );
-                }}
-            </FlyoutToggle>
-        );
-    }
+                                )}
+
+                                <CloseButton
+                                    className={classNames(classesFrameHeader.action, classesFrameHeader.categoryIcon)}
+                                    onClick={params.closeMenuHandler}
+                                />
+                            </header>
+                        ) : null}
+                        <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
+                    </DropDownContents>
+                );
+            }}
+        </FlyoutToggle>
+    );
 }
 
-export default withDevice<IProps>(DropDown);
+function resolveOpenDirection(props: IOpenDirectionProps, ref: React.RefObject<HTMLElement>): DropDownOpenDirection {
+    let { renderAbove, renderLeft } = props;
+    if ((props.openDirection && renderAbove) || (props.openDirection && renderLeft)) {
+        throw new Error("`renderAbove` & `renderLeft` may not be used with `openDirection` in <DropDown />");
+    }
+
+    // Early bailout if we aren't auto.
+    if (ref.current && (props.openDirection === DropDownOpenDirection.AUTO || (!renderAbove && !renderLeft))) {
+        const documentWidth = document.body.clientWidth;
+        const documentHeight = document.body.clientHeight;
+
+        const rect = ref.current.getBoundingClientRect() as ClientRect;
+        const centerX = (rect.left + rect.right) / 2;
+        const centerY = (rect.top + rect.bottom) / 2;
+        renderAbove = centerY > documentHeight / 2;
+        renderLeft = centerX > documentWidth / 2;
+    } else if (props.openDirection) {
+        return props.openDirection;
+    }
+
+    if (renderAbove && renderLeft) {
+        return DropDownOpenDirection.ABOVE_LEFT;
+    } else if (renderAbove && !renderLeft) {
+        return DropDownOpenDirection.ABOVE_RIGHT;
+    } else if (!renderAbove && renderLeft) {
+        return DropDownOpenDirection.BELOW_LEFT;
+    } else if (!renderAbove && !renderLeft) {
+        return DropDownOpenDirection.BELOW_RIGHT;
+    }
+
+    // DEFAULT
+    return DropDownOpenDirection.BELOW_RIGHT;
+}

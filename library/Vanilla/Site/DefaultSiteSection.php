@@ -20,6 +20,8 @@ class DefaultSiteSection implements SiteSectionInterface {
 
     const EMPTY_BASE_PATH = "/";
 
+    const DEFAULT_SECTION_GROUP = "vanilla";
+
     /** @var string */
     private $configSiteName;
 
@@ -62,5 +64,12 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getSectionID(): int {
         return self::DEFAULT_ID;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSectionGroup(): string {
+        return self::DEFAULT_SECTION_GROUP;
     }
 }

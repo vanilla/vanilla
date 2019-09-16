@@ -603,6 +603,8 @@ if (!class_exists('HeadModule', false)) {
 
             // Add the HTML from the AssetPreloader
             $head .= "\n";
+            $head .= "  <noscript><style>body {visibility: visible !important;}</style></noscript>";
+            $head .= "\n";
             $head .= $this->assetPreloadModel->renderHtml();
 
             return $head;

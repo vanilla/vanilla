@@ -16,7 +16,7 @@ const story = storiesOf("Navigation", module);
 
 const data = siteNavStoryData;
 
-story.add("Site Nav", () => {
+story.add("Navigation", () => {
     return (
         <>
             <StoryHeading depth={1}>Navigation</StoryHeading>

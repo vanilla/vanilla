@@ -10,7 +10,7 @@ export function getThemeVariables() {
     const state = getDeferredStoreState<ICoreStoreState, null>(null);
     if (state !== null) {
         const assets = state.theme.assets.data || {};
-        const variables = assets.variables || {};
+        const variables = assets.variables ? assets.variables.data : {};
         return variables;
     } else {
         return {};

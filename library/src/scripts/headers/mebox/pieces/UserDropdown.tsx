@@ -22,7 +22,7 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 /**
  * Implements User Drop down for header
  */
-function UserDropDown(props: IProps) {
+export function UserDropDown(props: IProps) {
     const ID = useMemo(() => uniqueIDFromPrefix("userDropDown"), []);
     const [isOpen, setOpen] = useState(false);
     const { checkCountData } = props;

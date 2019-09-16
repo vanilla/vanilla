@@ -144,6 +144,11 @@ if (!$SystemUserID) {
     }
 }
 
+// Make sure there is an update token.
+if (empty(Gdn::config('Garden.UpdateToken'))) {
+    Gdn::config()->saveToConfig('Garden.UpdateToken', \Vanilla\Models\InstallModel::generateUpdateToken());
+}
+
 // UserIP Table
 $Construct->table('UserIP')
     ->column('UserID', 'int', false, 'primary')

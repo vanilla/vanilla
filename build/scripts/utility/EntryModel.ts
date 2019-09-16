@@ -40,7 +40,17 @@ interface IAddon {
  */
 export default class EntryModel {
     /** Regex to match typescript files. */
-    private static TS_REGEX = /\.tsx?$/;
+    private static readonly TS_REGEX = /\.tsx?$/;
+
+    /** Name of the section defined from having a "bootstrap.ts(x?) file in entries. " */
+    private static readonly BOOTSTRAP_SECTION_NAME = "bootstrap";
+
+    /** Name of the section defined from having a "common.ts(x?) file in entries. " */
+    private static readonly COMMON_SECTION_NAME = "common";
+
+    /**
+     * These 2 sections are special cases are included in all sections. They are not their own sections by themselves. */
+    private excludedSections = [EntryModel.BOOTSTRAP_SECTION_NAME, EntryModel.COMMON_SECTION_NAME];
 
     /** The addons that are being built. */
     private buildAddons: {
@@ -76,6 +86,12 @@ export default class EntryModel {
         const entries: IWebpackEntries = {};
 
         for (const entryDir of this.entryDirs) {
+            const commonEntry = await this.lookupEntry(entryDir, "common");
+            if (commonEntry !== null) {
+                const addonName = path.basename(commonEntry.addonPath);
+                entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
+            }
+
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 const addonName = path.basename(entry.addonPath);
@@ -99,6 +115,11 @@ export default class EntryModel {
         const entries: string[] = [];
 
         for (const entryDir of this.entryDirs) {
+            const commonEntry = await this.lookupEntry(entryDir, "common");
+            if (commonEntry !== null) {
+                entries.push(commonEntry.entryPath);
+            }
+
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 entries.push(entry.entryPath);
@@ -123,7 +144,8 @@ export default class EntryModel {
         names = names
             .filter(name => name.match(EntryModel.TS_REGEX))
             .map(name => name.replace(EntryModel.TS_REGEX, ""))
-            .filter(name => name !== "bootstrap");
+            // Filter out unwanted sections (special cases).
+            .filter(name => !this.excludedSections.includes(name));
 
         names = Array.from(new Set(names));
 

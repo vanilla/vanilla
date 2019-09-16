@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Garden\SafeCurl\Exception\InvalidURLException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
@@ -417,7 +418,11 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
+        try {
+            $pageInfo = $this->embedService->createEmbedForUrl($body['url'], $body['force']);
+        } catch (InvalidURLException $e) {
+            throw new ClientException($e->getMessage());
+        }
 
         $result = $out->validate($pageInfo);
         return $result;

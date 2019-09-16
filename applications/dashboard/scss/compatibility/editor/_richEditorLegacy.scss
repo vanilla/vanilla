@@ -7,8 +7,11 @@ $richEditor_horizontalPadding                     : 36px !default;
 $richEditor_verticalPadding                       : 12px !default;
 $richEditor_innerPadding                          : 12px !default;
 
+body {
+    visibility: hidden; // To prevent FOUC
+}
+
 .richEditor {
-    color: $global-color_fg;
 
     blockquote {
         display: block;

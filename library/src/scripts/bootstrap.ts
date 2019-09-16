@@ -13,6 +13,7 @@ import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
+import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -35,6 +36,7 @@ _executeReady()
         // Mount all data-react components.
         onContent(e => {
             _mountComponents(e.target as HTMLElement);
+            blotCSS();
             mountInputs();
         });
 

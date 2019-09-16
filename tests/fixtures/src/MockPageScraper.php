@@ -7,7 +7,8 @@
 namespace VanillaTests\Fixtures;
 
 use Exception;
-use Garden\Http\HttpRequest;
+use Garden\Http\HttpClient;
+use Vanilla\Web\RequestValidator;
 
 /**
  * A PageScraper class, limited to local files.
@@ -20,9 +21,10 @@ class MockPageScraper extends \Vanilla\PageScraper {
      * Stub out unnecessary param in constructor.
      */
     public function __construct() {
-        // Stub in an empty request. We won't need it.
-        $httpRequest = new HttpRequest();
-        parent::__construct($httpRequest);
+        // Stub in args. We won't need them.
+        $httpClient = \Gdn::getContainer()->get(HttpClient::class);
+        $validator = \Gdn::getContainer()->get(RequestValidator::class);
+        parent::__construct($httpClient, $validator);
     }
 
     /**

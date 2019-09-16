@@ -3,6 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * Email layer abstraction
@@ -14,10 +16,15 @@
  * @package Core
  * @since 2.0
  */
-class Gdn_Email extends Gdn_Pluggable {
+class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     /** Error: The email was not attempted to be sent.. */
     const ERR_SKIPPED = 1;
+
+    /** @var bool */
+    private $debug;
 
     /** @var PHPMailer */
     public $PhpMailer;
@@ -50,6 +57,12 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->addHeader('Precedence', 'list');
         $this->addHeader('X-Auto-Response-Suppress', 'All');
         $this->setEmailTemplate(new EmailTemplate());
+
+        // Default debug status to the site config.
+        $this->setDebug((bool)c("Garden.Email.Debug"));
+
+        // This class is largely instantiated at the usage site, not the container, so we can't rely on it to wire up the dependency.
+        $this->setLogger(Logger::getLogger());
 
         $this->resolveFormat();
         parent::__construct();
@@ -362,6 +375,29 @@ class Gdn_Email extends Gdn_Pluggable {
             throw new Exception($this->PhpMailer->ErrorInfo);
         }
 
+        if ($this->isDebug() && $this->logger instanceof Psr\Log\LoggerInterface) {
+            $payload = $this->PhpMailer->getSentMIMEMessage();
+            $this->logger->info(
+                'Email Payload',
+                ['event' => 'Debug email',
+                    'timestamp' => time(),
+                    'userid' => Gdn::session()->UserID,
+                    'username' => Gdn::session()->User->Name ?? 'anonymous',
+                    'ip' => Gdn::request()->ipAddress(),
+                    'method' => Gdn::request()->requestMethod(),
+                    'domain' => rtrim(url('/', true), '/'),
+                    'path' => Gdn::request()->path(),
+                    'charset' => $this->PhpMailer->CharSet,
+                    'contentType' => $this->PhpMailer->ContentType,
+                    'from' => $this->PhpMailer->From,
+                    'fromName' => $this->PhpMailer->FromName,
+                    'sender' => $this->PhpMailer->Sender,
+                    'subject' => $this->PhpMailer->Subject,
+                    'body' => $this->PhpMailer->Body,
+                    'payload' => $payload
+                ]
+            );
+        }
         return true;
     }
 
@@ -468,5 +504,23 @@ class Gdn_Email extends Gdn_Pluggable {
             return $this;
         }
         return $this->PhpMailer->CharSet;
+    }
+
+    /**
+     * Should mailing be debugged?
+     *
+     * @param boolean $debug
+     */
+    public function setDebug(bool $debug) {
+        $this->debug = $debug;
+    }
+
+    /**
+     * Is mailing being debugged?
+     *
+     * @return boolean
+     */
+    public function isDebug(): bool {
+        return $this->debug;
     }
 }

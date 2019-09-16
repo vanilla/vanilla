@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\Http\HttpHandlerInterface;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Dispatcher;
@@ -76,7 +77,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function send(): HttpResponse {
+    public function send(?HttpHandlerInterface $executor = null): HttpResponse {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
         $cookieStash = $_COOKIE;

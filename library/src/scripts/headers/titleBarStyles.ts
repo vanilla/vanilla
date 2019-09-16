@@ -26,6 +26,9 @@ import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
 enum TitleBarBorderType {
     BORDER = "border",
@@ -75,6 +78,41 @@ export const titleBarVariables = useThemeCache(() => {
             bg: emphasizeLightness(colors.bg, 0.04),
         },
     });
+
+    const linkButtonDefaults: IButtonType = {
+        name: ButtonTypes.TITLEBAR_LINK,
+        colors: {
+            bg: colors.bg,
+        },
+        fonts: {
+            color: colors.fg,
+        },
+        borders: {
+            style: "none",
+            color: "transparent",
+        },
+        hover: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        focus: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        active: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+    };
+    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
 
     const count = makeThemeVars("count", {
         size: 18,
@@ -147,6 +185,7 @@ export const titleBarVariables = useThemeCache(() => {
         resister,
         guest,
         button,
+        linkButton,
         count,
         dropDownContents,
         endElements,
@@ -344,6 +383,13 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const extraMeBoxIcons = style("extraMeBoxIcons", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flex: 1,
+    });
+
     const topElement = style(
         "topElement",
         {
@@ -436,6 +482,8 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const linkButton = generateButtonClass(vars.linkButton);
 
     const buttonOffset = style("buttonOffset", {
         transform: `translateX(6px)`,
@@ -629,10 +677,12 @@ export const titleBarClasses = useThemeCache(() => {
         languages,
         button,
         buttonOffset,
+        linkButton,
         searchCancel,
         tabButton,
         dropDownContents,
         count,
+        extraMeBoxIcons,
         scroll,
         rightFlexBasis,
         leftFlexBasis,

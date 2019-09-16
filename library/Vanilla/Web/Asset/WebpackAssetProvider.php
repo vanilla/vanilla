@@ -133,6 +133,22 @@ class WebpackAssetProvider {
 
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+
+            // See if we have a common bundle
+            $commonAsset = new WebpackAddonAsset(
+                $this->request,
+                WebpackAsset::SCRIPT_EXTENSION,
+                $section,
+                $addon,
+                $this->cacheBustingKey,
+                true
+            );
+            $commonAsset->setFsRoot($this->fsRoot);
+
+            if ($commonAsset->existsOnFs()) {
+                $scripts[] = $commonAsset;
+            }
+
             $asset = new WebpackAddonAsset(
                 $this->request,
                 WebpackAsset::SCRIPT_EXTENSION,

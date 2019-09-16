@@ -110,11 +110,8 @@ class FsThemeProvider implements ThemeProviderInterface {
         ];
 
         $res["assets"] = [];
+        $generatedAssetTypes = ["fonts", "footer", "header", "scripts", "variables"];
 
-//        $primaryAssets = array_intersect_key(
-//            $assets,
-//            array_flip(["fonts", "footer", "header", "scripts", "variables"])
-//        );
         foreach ($assets as $assetKey => $asset) {
             $finalAssetKey = $assetKey;
             // We have some slightly special handling if we have theme options.
@@ -122,11 +119,13 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $themeOptionEnding = sprintf($this->themeOptionValue, '');
                 $isInThemeOption = preg_match("/$themeOptionEnding$/", $assetKey);
 
-                if (!$isInThemeOption) {
-                    continue;
-                } else {
+                if ($isInThemeOption) {
                     $finalAssetKey = str_replace($themeOptionEnding, '', $assetKey);
                 }
+            }
+
+            if (!in_array($finalAssetKey, $generatedAssetTypes)) {
+                continue;
             }
 
             $res["assets"][$finalAssetKey] = $this->generateAsset($assetKey, $asset, $theme);

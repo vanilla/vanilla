@@ -897,9 +897,6 @@ body {
   visibility: hidden;
 }
 
-.richEditor {
-  color: #555a62;
-}
 .richEditor blockquote {
   display: block;
   margin: 0;

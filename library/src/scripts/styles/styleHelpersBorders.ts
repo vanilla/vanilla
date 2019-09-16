@@ -282,7 +282,7 @@ const setAllBorders = (
         });
     }
 
-    if (radius !== undefined) {
+    if (typeof radius === "object") {
         merge(output, radius);
     }
 

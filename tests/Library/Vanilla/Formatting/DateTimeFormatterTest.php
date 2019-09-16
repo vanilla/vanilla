@@ -35,8 +35,6 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
     /**
      * Test the HTML formatting.
      * This test needs a separate process because of the time zone setting.
-     *
-     * @runInSeparateProcess
      */
     public function testFormatDateHtml() {
         $actual = self::getFormatter()->formatDate(self::NOW, true);

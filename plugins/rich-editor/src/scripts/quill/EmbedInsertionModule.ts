@@ -13,11 +13,15 @@ import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
+import ErrorBlot, { ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import { getMeta } from "@library/utility/appUtils";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
+    private maxUploads = getMeta("upload.maxUploads", 20);
+
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
@@ -41,6 +45,21 @@ export default class EmbedInsertionModule extends Module {
             },
             dataPromise: scrapePromise,
         });
+    }
+
+    /**
+     * Create an async error embed. The embed will be responsible for handling it's loading state and error states.
+     */
+    public createErrorEmbed(error: Error) {
+        const data = {
+            error,
+            type: ErrorBlotType.STANDARD,
+        };
+        const errorEmbed = new ErrorBlot(ErrorBlot.create(data), data);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, errorEmbed);
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(errorEmbed.offset(this.quill.scroll) + errorEmbed.length(), 0);
     }
 
     /**
@@ -68,17 +87,27 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private dragHandler = (event: DragEvent) => {
-        const file = getDraggedFile(event);
+        const files = getDraggedFile(event);
 
-        if (!file) {
+        if (!files) {
             return;
         }
 
-        if (isFileImage(file)) {
-            this.createImageEmbed(file);
-        } else {
-            this.createFileEmbed(file);
+        const filesArray = Array.from(files);
+
+        if (files.length >= this.maxUploads) {
+            const error = new Error(`Can't upload more than ${this.maxUploads} files at once.`);
+            this.createErrorEmbed(error);
+            throw error;
         }
+
+        filesArray.forEach(file => {
+            if (isFileImage(file)) {
+                this.createImageEmbed(file);
+            } else {
+                this.createFileEmbed(file);
+            }
+        });
     };
 
     public createImageEmbed(file: File) {
@@ -102,6 +131,7 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Setup image upload listeners and handlers.
      */
+
     private setupImageUploads() {
         this.quill.root.addEventListener("drop", this.dragHandler, false);
         this.quill.root.addEventListener("paste", this.pasteHandler, false);

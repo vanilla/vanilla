@@ -271,7 +271,12 @@ function useQuoteButtonHandler() {
             event.preventDefault();
             const embedInserter: EmbedInsertionModule = quill.getModule("embed/insertion");
             const url = triggeringElement.getAttribute("data-scrape-url") || "";
-            void embedInserter.scrapeMedia(url);
+            embedInserter.scrapeMedia(url);
+
+            // Just in case the browser doesn't support this API.
+            if (quill.root.scrollIntoView) {
+                quill.root.scrollIntoView({ behavior: "smooth" });
+            }
         };
         const delegatedHandler = delegateEvent("click", ".js-quoteButton", handleQuoteButtonClick)!;
         return () => {

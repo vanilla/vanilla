@@ -16,11 +16,14 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -109,6 +112,11 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
+            // Site sections
+            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(SingleSiteSectionProvider::class)
+            ->setShared(true)
+
             // AddonManager
             ->rule(AddonManager::class)
             ->setShared(true)
@@ -120,6 +128,7 @@ class Bootstrap {
                 ],
                 PATH_CACHE
             ])
+            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -182,6 +191,7 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
             ->addAlias(Gdn::AliasLocale)
+            ->addAlias(LocaleInterface::class)
 
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')

@@ -24,7 +24,8 @@ export interface IFlyoutToggleChildParameters {
     renderLeft?: boolean;
 }
 
-export interface IFlyoutToggleProps {
+interface IProps {
+    name?: string;
     id: string;
     className?: string;
     buttonContents: React.ReactNode;
@@ -43,19 +44,8 @@ export interface IFlyoutToggleProps {
     initialFocusElement?: HTMLElement | null;
 }
 
-export interface IFlyoutTogglePropsWithIcon extends IFlyoutToggleProps {
-    name: string;
-}
-
-export interface IFlyoutTogglePropsWithTextLabel extends IFlyoutToggleProps {
-    selectedItemLabel: string;
-}
-
-type IProps = IFlyoutTogglePropsWithIcon | IFlyoutTogglePropsWithTextLabel;
-
 export default function FlyoutToggle(props: IProps) {
     const { initialFocusElement, onVisibilityChange, onClose } = props;
-    const title = "name" in props ? props.name : props.selectedItemLabel;
 
     // IDs unique to the component instance.
     const ID = useMemo(() => uniqueIDFromPrefix("flyout"), []);
@@ -73,6 +63,11 @@ export default function FlyoutToggle(props: IProps) {
         (visibility: boolean) => {
             ownSetVisibility(visibility);
             onVisibilityChange && onVisibilityChange(visibility);
+
+            // Kludge for interaction with old flyout system.
+            if (visibility === true && window.closeAllFlyouts) {
+                window.closeAllFlyouts();
+            }
         },
         [ownSetVisibility, onVisibilityChange],
     );
@@ -182,7 +177,7 @@ export default function FlyoutToggle(props: IProps) {
             <Button
                 id={buttonID}
                 className={buttonClasses}
-                title={title}
+                title={props.name}
                 aria-label={"name" in props ? props.name : undefined}
                 aria-controls={contentID}
                 aria-expanded={isVisible}

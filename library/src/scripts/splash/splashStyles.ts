@@ -277,10 +277,7 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
             width: percent(100),
             height: percent(100),
             ...background(finalBackground),
-            opacity:
-                (!url || url === splashFallbackBG) && vars.outerBackground.fallbackImage === splashFallbackBG
-                    ? 0.4
-                    : undefined,
+            opacity: finalBackground.image === splashFallbackBG ? 0.4 : undefined,
         });
     };
 

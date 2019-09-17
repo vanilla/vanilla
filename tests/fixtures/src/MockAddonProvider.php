@@ -24,7 +24,7 @@ class MockAddonProvider implements Contracts\AddonProviderInterface {
      *
      * @param array $addons Addons to initialize with.
      */
-    public function __construct(array $addons) {
+    public function __construct(array $addons = []) {
         $this->addons = $addons;
     }
 

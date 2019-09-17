@@ -23,15 +23,27 @@ class WebpackAddonAsset extends WebpackAsset {
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
      * @param Contracts\AddonInterface $addon The addon to get an asset for.
      * @param string $cacheBustingKey A string for busting the cache.
+     * @param bool $isCommonChunk Whether to check append common to the path.
      */
     public function __construct(
         RequestInterface $request,
         string $extension,
         string $section,
         Contracts\AddonInterface $addon,
-        $cacheBustingKey = ""
+        $cacheBustingKey = "",
+        bool $isCommonChunk = false
     ) {
-        parent::__construct($request, $extension, $section, $addon->getKey(), $cacheBustingKey);
+        $assetName = $addon->getKey();
+        if ($isCommonChunk) {
+            $assetName .= "-common";
+        }
+        parent::__construct(
+            $request,
+            $extension,
+            $section,
+            $assetName,
+            $cacheBustingKey
+        );
         $this->fileSubpath = $section . DS . 'addons';
         $this->webSubpath = $section . '/' . 'addons';
     }

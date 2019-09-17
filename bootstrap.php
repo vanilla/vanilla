@@ -9,9 +9,11 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
+use Vanilla\Web\TwigEnhancer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -60,6 +62,11 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
+
+    // Site sections
+    ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+    ->setClass(SingleSiteSectionProvider::class)
+    ->setShared(true)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -120,6 +127,10 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
     ->addAlias('Locale')
+
+    ->rule(Contracts\LocaleInterface::class)
+    ->setAliasOf(Gdn_Locale::class)
+    ->setShared(true)
 
     // Request
     ->rule('Gdn_Request')
@@ -303,6 +314,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
     ->setShared(true)
 
+    ->rule(TwigEnhancer::class)
+    ->setShared(true)
+
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
@@ -324,6 +338,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
+
+    ->rule(Garden\Http\HttpClient::class)
+    ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
 
     ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerBuiltInFormats')

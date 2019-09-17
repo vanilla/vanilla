@@ -19,7 +19,7 @@ const MENTION_INSERT = {
     mention: { name: "meadwayk", userID: 24562 },
 };
 
-describe.only("NewLineClickInsertionModule", () => {
+describe("NewLineClickInsertionModule", () => {
     let quill: Quill;
     let markdownModule: MarkdownModule;
 

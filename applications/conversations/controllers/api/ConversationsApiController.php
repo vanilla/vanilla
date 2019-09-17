@@ -312,9 +312,9 @@ class ConversationsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-
+        $userID = $this->getSession()->UserID;
         if (!empty($query['insertUserID'])) {
-            if ($query['insertUserID'] !== $this->getSession()->UserID) {
+            if ($query['insertUserID'] !== $userID) {
                 $this->checkModerationPermission();
             }
 
@@ -332,9 +332,9 @@ class ConversationsApiController extends AbstractApiController {
                 ["Name", "Email", "Photo", "DateLastActive"]
             );
         } else {
-            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
+            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $userID;
 
-            if ($participantUserID !== $this->getSession()->UserID) {
+            if ($participantUserID !== $userID) {
                 $this->checkModerationPermission();
             }
 
@@ -350,7 +350,15 @@ class ConversationsApiController extends AbstractApiController {
             )
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
-
+        $isModerator = $this->isConversationsModerator();
+        if (!$isModerator) {
+            foreach ($conversations as $key => $value) {
+                $inConversation = $this->conversationModel->inConversation($value['conversationID'], $userID);
+                if (!$inConversation) {
+                    unset($conversations[$key]);
+                }
+            }
+        }
         $result = $out->validate($conversations);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/conversations', $query, $in);
@@ -365,6 +373,17 @@ class ConversationsApiController extends AbstractApiController {
      */
     private function idParamSchema() {
         return $this->schema(['id:i' => 'The conversation ID.'], 'in');
+    }
+
+    /**
+     * Is the current user a conversations moderator?
+     *
+     * @return boolean
+     */
+    private function isConversationsModerator(): bool {
+        $moderationEnbled = $this->config->get('Conversations.Moderation.Allow', false);
+        $isConversationModerator = $this->getSession()->getPermissions()->hasAny(["Conversations.Moderation.Manage"]);
+        return $moderationEnbled && $isConversationModerator;
     }
 
     /**

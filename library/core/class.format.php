@@ -16,6 +16,7 @@ use \Vanilla\Formatting;
 use \Vanilla\Formatting\Formats;
 use \Vanilla\Formatting\FormatUtil;
 use \Vanilla\Formatting\Html;
+use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Output formatter.
@@ -23,7 +24,6 @@ use \Vanilla\Formatting\Html;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
-    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -266,6 +266,7 @@ class Gdn_Format {
      * Format a number by putting K/M/B suffix after it when appropriate.
      *
      * @param mixed $number The number to format. If a number isn't passed then it is returned as is.
+     * @param string $format
      * @return string The formatted number.
      * @todo Make this locale aware.
      */
@@ -332,90 +333,49 @@ class Gdn_Format {
         return round($bytes, $precision).$units[$pow];
     }
 
-    /** @var array Unicode to ascii conversion table. */
-    protected static $_CleanChars = [
-        '-' => ' ', '_' => ' ', '&lt;' => '', '&gt;' => '', '&#039;' => '', '&amp;' => '',
-        '&quot;' => '', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae',
-        '&Auml;' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae',
-        'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D',
-        'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E',
-        'Ę' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G',
-        'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I',
-        'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I',
-        'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K',
-        'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N',
-        'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O',
-        'Ö' => 'Oe', '&Ouml;' => 'Oe', 'Ø' => 'O', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O',
-        'Œ' => 'OE', 'Ŕ' => 'R', 'Ř' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S',
-        'Ş' => 'S', 'Ŝ' => 'S', 'Ș' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T',
-        'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U',
-        '&Uuml;' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U',
-        'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z',
-        'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a',
-        'ä' => 'ae', '&auml;' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a',
-        'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c',
-        'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e',
-        'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e',
-        'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h',
-        'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i',
-        'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j',
-        'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l',
-        'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n',
-        'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe',
-        '&ouml;' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe',
-        'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u',
-        'û' => 'u', 'ü' => 'ue', 'ū' => 'u', '&uuml;' => 'ue', 'ů' => 'u', 'ű' => 'u',
-        'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y',
-        'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss',
-        'ſ' => 'ss', 'ый' => 'iy', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G',
-        'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I',
-        'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M',
-        'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'Т' => 'T',
-        'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH',
-        'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU',
-        'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v',
-        'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z',
-        'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm',
-        'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't',
-        'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh',
-        'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'є' => 'ye',
-        'ю' => 'yu', 'я' => 'ya', 'ї' => 'yi'
-    ];
-
     /**
      * Convert certain unicode characters into their ascii equivalents.
      *
      * @param mixed $mixed The text to clean.
      * @return string
+     * @deprecated 3.2 FormatUtil::transliterate()
      */
-    public static function clean($mixed) {
+    public static function clean($mixed): string {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Clean');
         }
-        $mixed = strtr($mixed, self::$_CleanChars);
-        $mixed = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($mixed));
-        $mixed = preg_replace('/ +/', '-', trim($mixed));
-        return strtolower($mixed);
+        deprecated(__FUNCTION__, 'FormatUtil::transliterate()');
+        return FormatUtil::transliterate($mixed);
     }
 
+    /**
+     * @return DateTimeFormatter
+     */
+    private static function getDateTimeFormatter(): DateTimeFormatter {
+        return Gdn::getContainer()->get(DateTimeFormatter::class);
+    }
 
     /**
      * Formats a Mysql DateTime string in the specified format.
      *
      * For instructions on how the format string works:
-     * @link http://us.php.net/manual/en/function.strftime.php
      *
      * @param string $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
      * @param string $format The format string to use. Defaults to the application's default format.
      * @return string
+     * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp)
      */
     public static function date($timestamp = '', $format = '') {
-        // Was a mysqldatetime passed?
-        if ($timestamp !== null && !is_numeric($timestamp)) {
-            $timestamp = self::toTimestamp($timestamp);
-        }
+        if (function_exists('formatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
+            deprecated(
+                'FormatDateCustom',
+                'Extend ' . DateTimeFormatter::class . ' and replace it in Garden\Container'
+            );
+            // Was a mysqldatetime passed?
+            if ($timestamp !== null && !is_numeric($timestamp)) {
+                $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp, false);
+            }
 
-        if (function_exists('FormatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
             if (!$timestamp) {
                 $timestamp = time();
             }
@@ -423,64 +383,10 @@ class Gdn_Format {
             return formatDateCustom($timestamp, $format);
         }
 
-        if ($timestamp === null) {
-            return t('Null Date', '-');
-        }
+        $isHtml = strtolower($format) === 'html';
+        $format = $isHtml ? '' : $format;
 
-        if (!$timestamp) {
-            $timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        }        $gmTimestamp = $timestamp;
-
-        $now = time();
-
-        // Alter the timestamp based on the user's hour offset.
-        $hourOffset = Gdn::session()->hourOffset();
-
-        if ($hourOffset <> 0) {
-            $secondsOffset = $hourOffset * 3600;
-            $timestamp += $secondsOffset;
-            $now += $secondsOffset;
-        }
-
-        $html = false;
-        if (strcasecmp($format, 'html') == 0) {
-            $format = '';
-            $html = true;
-        }
-
-        if ($format == '') {
-            // If the timestamp was during the current day
-            if (date('Y m d', $timestamp) == date('Y m d', $now)) {
-                // Use the time format
-                $format = self::t('Date.DefaultTimeFormat', '%l:%M%p');
-            } elseif (date('Y', $timestamp) == date('Y', $now)) {
-                // If the timestamp is the same year, show the month and date
-                $format = self::t('Date.DefaultDayFormat', '%B %e');
-            } elseif (date('Y', $timestamp) != date('Y', $now)) {
-                // If the timestamp is not the same year, just show the year
-                $format = self::t('Date.DefaultYearFormat', '%B %Y');
-            } else {
-                // Otherwise, use the date format
-                $format = self::t('Date.DefaultFormat', '%B %e, %Y');
-            }
-        }
-
-        $fullFormat = self::t('Date.DefaultDateTimeFormat', '%c');
-
-        // Emulate %l and %e for Windows.
-        if (strpos($format, '%l') !== false) {
-            $format = str_replace('%l', ltrim(strftime('%I', $timestamp), '0'), $format);
-        }
-        if (strpos($format, '%e') !== false) {
-            $format = str_replace('%e', ltrim(strftime('%d', $timestamp), '0'), $format);
-        }
-
-        $result = strftime($format, $timestamp);
-
-        if ($html) {
-            $result = wrap($result, 'time', ['title' => strftime($fullFormat, $timestamp), 'datetime' => gmdate('c', $gmTimestamp)]);
-        }
-        return $result;
+        return self::getDateTimeFormatter()->formatDate($timestamp, $isHtml, $format);
     }
 
     /**
@@ -488,54 +394,12 @@ class Gdn_Format {
      *
      * @param int $timestamp
      * @param string $format
+     * @return string
      * @since 2.1
+     * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp, true)
      */
-    public static function dateFull($timestamp, $format = '') {
-        if ($timestamp === null) {
-            return t('Null Date', '-');
-        }
-
-        // Was a mysqldatetime passed?
-        if (!is_numeric($timestamp)) {
-            $timestamp = self::toTimestamp($timestamp);
-        }
-
-        if (!$timestamp) {
-            $timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        }        $gmTimestamp = $timestamp;
-
-        $now = time();
-
-        // Alter the timestamp based on the user's hour offset
-        $session = Gdn::session();
-        if ($session->UserID > 0) {
-            $secondsOffset = ($session->User->HourOffset * 3600);
-            $timestamp += $secondsOffset;
-            $now += $secondsOffset;
-        }
-
-        $html = false;
-        if (strcasecmp($format, 'html') == 0) {
-            $format = '';
-            $html = true;
-        }
-
-        $fullFormat = t('Date.DefaultDateTimeFormat', '%c');
-
-        // Emulate %l and %e for Windows.
-        if (strpos($fullFormat, '%l') !== false) {
-            $fullFormat = str_replace('%l', ltrim(strftime('%I', $timestamp), '0'), $fullFormat);
-        }
-        if (strpos($fullFormat, '%e') !== false) {
-            $fullFormat = str_replace('%e', ltrim(strftime('%d', $timestamp), '0'), $fullFormat);
-        }
-
-        $result = strftime($fullFormat, $timestamp);
-
-        if ($html) {
-            $result = wrap($result, 'time', ['title' => strftime($fullFormat, $timestamp), 'datetime' => gmdate('c', $gmTimestamp)]);
-        }
-        return $result;
+    public static function dateFull($timestamp, $format = DateTimeFormatter::FORCE_FULL_FORMAT) {
+        return self::date($timestamp, $format);
     }
 
     /**
@@ -560,14 +424,17 @@ class Gdn_Format {
     /**
      * Return the default input formatter.
      *
-     * @param bool|null $is_mobile Whether or not you want the format for mobile browsers.
+     * @param bool|null $forceMobile Whether or not you want the format for mobile browsers.
      * @return string
+     * @deprecated 3.2 FormatConfig::getDefaultFormat()
      */
-    public static function defaultFormat($is_mobile = null) {
-        if ($is_mobile === true || ($is_mobile === null && isMobile())) {
-            return c('Garden.MobileInputFormatter', c('Garden.InputFormatter', 'Html'));
+    public static function defaultFormat($forceMobile = false) {
+        /** @var Formatting\FormatConfig $formatConfig */
+        $formatConfig = Gdn::getContainer()->get(Formatting\FormatConfig::class);
+        if ($forceMobile) {
+            return $formatConfig->getDefaultMobileFormat();
         } else {
-            return c('Garden.InputFormatter', 'Html');
+            return $formatConfig->getDefaultFormat();
         }
     }
 
@@ -641,115 +508,16 @@ class Gdn_Format {
      *
      * Credit goes to: http://byteinn.com/res/426/Fuzzy_Time_function/
      *
-     * @param int optional $timestamp, otherwise time() is used
+     * @param int|string|null $timestamp otherwise time() is used
+     * @param bool $morePrecise
      * @return string
+     * @deprecated 3.2 DateTimeFormatter::formatRelativeTime
      */
-    public static function fuzzyTime($timestamp = null, $morePrecise = false) {
-        if (is_null($timestamp)) {
-            $timestamp = time();
-        } elseif (!is_numeric($timestamp))
-            $timestamp = self::toTimestamp($timestamp);
-
-        $time = $timestamp;
-
-        $nOW = time();
-        if (!defined('ONE_MINUTE')) {
-            define('ONE_MINUTE', 60);
+    public static function fuzzyTime($timestamp = null, $morePrecise = false): string {
+        if ($morePrecise) {
+            deprecated(__FUNCTION__ . ' param $morePrecise');
         }
-        if (!defined('ONE_HOUR')) {
-            define('ONE_HOUR', 3600);
-        }
-        if (!defined('ONE_DAY')) {
-            define('ONE_DAY', 86400);
-        }
-        if (!defined('ONE_WEEK')) {
-            define('ONE_WEEK', ONE_DAY * 7);
-        }
-        if (!defined('ONE_MONTH')) {
-            define('ONE_MONTH', ONE_WEEK * 4);
-        }
-        if (!defined('ONE_YEAR')) {
-            define('ONE_YEAR', ONE_MONTH * 12);
-        }
-
-        $secondsAgo = $nOW - $time;
-
-        // sod = start of day :)
-        $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
-        $sod_now = mktime(0, 0, 0, date('m', $nOW), date('d', $nOW), date('Y', $nOW));
-
-        // Used to convert numbers to strings
-        $convert = [0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven')];
-
-        // Today
-        if ($sod_now == $sod) {
-            if ($time > $nOW - (ONE_MINUTE * 3)) {
-                return t('just now');
-            } elseif ($time > $nOW - (ONE_MINUTE * 7)) {
-                return t('a few minutes ago');
-            } elseif ($time > $nOW - (ONE_HOUR)) {
-                if ($morePrecise) {
-                    $minutesAgo = ceil($secondsAgo / 60);
-                    return sprintf(t('%s minutes ago'), $minutesAgo);
-                }
-                return t('less than an hour ago');
-            }
-            return sprintf(t('today at %s'), date('g:ia', $time));
-        }
-
-        // Yesterday
-        if (($sod_now - $sod) <= ONE_DAY) {
-            if (date('i', $time) > (ONE_MINUTE + 30)) {
-                $time += ONE_HOUR / 2;
-            }
-            return sprintf(t('yesterday around %s'), date('ga', $time));
-        }
-
-        // Within the last 5 days.
-        if (($sod_now - $sod) <= (ONE_DAY * 5)) {
-            $str = date('l', $time);
-            $hour = date('G', $time);
-            if ($hour < 12) {
-                $str .= t(' morning');
-            } elseif ($hour < 17) {
-                $str .= t(' afternoon');
-            } elseif ($hour < 20) {
-                $str .= t(' evening');
-            } else {
-                $str .= t(' night');
-            }
-            return $str;
-        }
-
-        // Number of weeks (between 1 and 3).
-        if (($sod_now - $sod) < (ONE_WEEK * 3.5)) {
-            if (($sod_now - $sod) < (ONE_WEEK * 1.5)) {
-                return t('about a week ago');
-            } elseif (($sod_now - $sod) < (ONE_DAY * 2.5)) {
-                return t('about two weeks ago');
-            } else {
-                return t('about three weeks ago');
-            }
-        }
-
-        // Number of months (between 1 and 11).
-        if (($sod_now - $sod) < (ONE_MONTH * 11.5)) {
-            for ($i = (ONE_WEEK * 3.5), $m = 0; $i < ONE_YEAR; $i += ONE_MONTH, $m++) {
-                if (($sod_now - $sod) <= $i) {
-                    return sprintf(t('about %s month%s ago'), $convert[$m], (($m > 1) ? 's' : ''));
-                }
-            }
-        }
-
-        // Number of years.
-        for ($i = (ONE_MONTH * 11.5), $y = 0; $i < (ONE_YEAR * 10); $i += ONE_YEAR, $y++) {
-            if (($sod_now - $sod) <= $i) {
-                return sprintf(t('about %s year%s ago'), $convert[$y], (($y > 1) ? 's' : ''));
-            }
-        }
-
-        // More than ten years.
-        return t('more than ten years ago');
+        return self::getDateTimeFormatter()->formatRelativeTime($timestamp);
     }
 
     /**
@@ -1380,34 +1148,14 @@ class Gdn_Format {
      *
      * @param int $seconds
      * @return string
+     * @deprecated 3.2 DateTimeFormatter::formatSeconds()
      */
-    public static function seconds($seconds) {
+    public static function seconds($seconds): string {
+        $formatter = self::getDateTimeFormatter();
         if (!is_numeric($seconds)) {
-            $seconds = abs(time() - self::toTimestamp($seconds));
+            $seconds = $formatter::dateTimeToSecondsAgo($seconds);
         }
-
-        $minutes = round($seconds / 60);
-        $hours = round($seconds / 3600);
-        $days = round($seconds / 86400);
-        $weeks = round($seconds / 604800);
-        $months = round($seconds / 2629743.83);
-        $years = round($seconds / 31556926);
-
-        if ($seconds < 60) {
-            return sprintf(plural($seconds, '%s second', '%s seconds'), $seconds);
-        } elseif ($minutes < 60)
-            return sprintf(plural($minutes, '%s minute', '%s minutes'), $minutes);
-        elseif ($hours < 24)
-            return sprintf(plural($hours, '%s hour', '%s hours'), $hours);
-        elseif ($days < 7)
-            return sprintf(plural($days, '%s day', '%s days'), $days);
-        elseif ($weeks < 4)
-            return sprintf(plural($weeks, '%s week', '%s weeks'), $weeks);
-        elseif ($months < 12)
-            return sprintf(plural($months, '%s month', '%s months'), $months);
-        else {
-            return sprintf(plural($years, '%s year', '%s years'), $years);
-        }
+        return $formatter->formatSeconds($seconds);
     }
 
     /**
@@ -1500,30 +1248,33 @@ class Gdn_Format {
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $timestamp
+     * @param int|string $timestamp
+     *
      * @return string The formatted date.
+     * @deprecated 3.2 DateTimeFormatter::timeStampToDate()
      */
     public static function toDate($timestamp = '') {
         if ($timestamp == '') {
             $timestamp = time();
         } elseif (!is_numeric($timestamp)) {
-            $timestamp = self::toTimestamp($timestamp);
+            $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
         }
 
-        return date('Y-m-d', $timestamp);
+        return DateTimeFormatter::timeStampToDate($timestamp);
     }
 
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $timestamp
+     * @param int|string $timestamp
      * @return string The formatted date and time.
+     * @deprecated DateTimeFormatter::timeStampToDateTime()
      */
     public static function toDateTime($timestamp = '') {
         if ($timestamp == '') {
             $timestamp = time();
         }
-        return date('Y-m-d H:i:s', $timestamp);
+        return DateTimeFormatter::timeStampToDateTime((int) $timestamp);
     }
 
     /**
@@ -1532,28 +1283,13 @@ class Gdn_Format {
      * @param string $dateTime The Mysql-formatted datetime to convert to a timestamp. Should be in one
      * of the following formats: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
      * @return string|bool Returns FALSE upon failure.
+     * @deprecated 3.2 DateTimeFormatter::dateTimeToTimeStamp()
      */
     public static function toTimestamp($dateTime = '') {
-        if ($dateTime === '0000-00-00 00:00:00') {
-            return false;
-        } elseif (($testTime = strtotime($dateTime)) !== false) {
-            return $testTime;
-        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $dateTime, $matches)) {
-            $year = $matches[1];
-            $month = $matches[2];
-            $day = $matches[3];
-            $hour = val(4, $matches, 0);
-            $minute = val(5, $matches, 0);
-            $second = val(6, $matches, 0);
-            return mktime($hour, $minute, $second, $month, $day, $year);
-        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateTime, $matches)) {
-            $year = $matches[1];
-            $month = $matches[2];
-            $day = $matches[3];
-            return mktime(0, 0, 0, $month, $day, $year);
-        } else {
+        if (!is_string($dateTime)) {
             return false;
         }
+        return DateTimeFormatter::dateTimeToTimeStamp($dateTime, false);
     }
 
     /**
@@ -1561,32 +1297,22 @@ class Gdn_Format {
      *
      * @param int $timestamp The timestamp in gmt.
      * @return int The timestamp according to the user's timezone.
+     * @deprecated 3.2 DateTimeFormatter::adjustTimeStampForUser()
      */
     public static function toTimezone($timestamp) {
-        // Alter the timestamp based on the user's hour offset.
-        $hourOffset = Gdn::session()->hourOffset();
-
-        if ($hourOffset <> 0) {
-            $timestamp += $hourOffset * 3600;
-        }
-
-        return $timestamp;
+        return self::getDateTimeFormatter()->adjustTimeStampForUser((int) $timestamp);
     }
 
     /**
-     *
+     * Deprecated.
      *
      * @param int $timespan
      * @return string
+     * @deprecated 3.2 DateTimeFormatter::timeStampToTime()
      */
     public static function timespan($timespan) {
-        //$timespan -= 86400 * ($days = (int) floor($timespan / 86400));
-        $timespan -= 3600 * ($hours = (int)floor($timespan / 3600));
-        $timespan -= 60 * ($minutes = (int)floor($timespan / 60));
-        $seconds = $timespan;
-
-        $result = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-        return $result;
+        deprecated(__FUNCTION__, 'DateTimeFormatter::timeStampToTime()');
+        return DateTimeFormatter::timeStampToTime((int) $timespan);
     }
 
     /** @var array  */
@@ -1746,7 +1472,6 @@ class Gdn_Format {
     }
 
     /**
-     * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
      * Get the usernames mention in a rich post.
      *
      * @param string $body The contents of a post body.
@@ -1767,7 +1492,8 @@ class Gdn_Format {
     ];
 
     /**
-     * Encode special CSS characters as hex.
+     * Sanitize a URL to ensure that it matches a whitelist of approved url schemes.
+     * If the url does not match one of these schemes, prepend `unsafe:` before it.
      *
      * Allowed protocols
      * - "http:",

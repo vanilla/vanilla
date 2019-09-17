@@ -86,23 +86,20 @@ export function removeAllDelegatedEvents() {
 }
 
 /**
- * Handler for an file being dragged and dropped.
+ * Handler for files being dragged and dropped.
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getDraggedFile(event: DragEvent): File | undefined {
+export function getDraggedFile(event: DragEvent): FileList | undefined {
     if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
         event.preventDefault();
-        const files = Array.from(event.dataTransfer.files);
 
-        // Currently only 1 file is supported.
-        const mainFile = files[0];
-        return mainFile;
+        return event.dataTransfer.files;
     }
 }
 
 /**
- * Handler for an file being pasted.
+ * Handler for files being pasted.
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */

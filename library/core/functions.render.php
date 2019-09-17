@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Formatting\Formats;
+use Vanilla\Web\TwigStaticRenderer;
 
 if (!function_exists('alternate')) {
     /**
@@ -46,22 +47,32 @@ if (!function_exists('dashboardSymbol')) {
      * @param string $class If set, overrides any 'class' attribute in the $attr param.
      * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
      * @return string An HTML-formatted string to render svg icons.
+     *
+     * @deprecated 3.3 Use @dashboard/components/dashboardSymbol.twig or the dashboardSymbol mixin.
      */
     function dashboardSymbol($name, $class = '', array $attr = []) {
-        if (empty($attr['alt'])) {
-            $attr['alt'] = $name;
+        $alt = $attr['alt'] ?? $name;
+        $providedClass = $class ?: ($attr['class'] ?? null);
+
+        // Clear out attrs that have dedicated variables.
+        if (isset($attr['alt'])) {
+            unset($attr['alt']);
         }
 
-        if (!empty($class)) {
-            $attr['class'] = $class.' ';
-        } else {
-            $attr['class'] = isset($attr['class']) ? $attr['class'].' ' : '';
+        if (isset($attr['class'])) {
+            unset($attr['class']);
         }
 
-        $baseCssClass = 'icon icon-svg-'.$name;
-        $attr['class'] .= $baseCssClass;
+        $attrs = attribute($attr);
 
-        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
+        return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardSymbol.twig', [
+            'params' => [
+                'name' => $name,
+                'alt' => $alt,
+                'class' => $providedClass,
+                'dangerousAttributeString' => new \Twig\Markup(attribute($attr), 'utf-8'),
+            ]
+        ]);
     }
 }
 
@@ -112,6 +123,8 @@ if (!function_exists('heading')) {
      * @param string|array $buttonAttributes Can be string CSS class or an array of attributes. CSS class defaults to `btn btn-primary`.
      * @param string $returnUrl The url for the return chrevron button.
      * @return string The structured heading string.
+     *
+     * @deprecated 3.3 Use @dashboard/components/dashboardHeading.twig or the dashboardHeading mixin.
      */
     function heading($title, $buttonText = '', $buttonUrl = '', $buttonAttributes = [], $returnUrl = '') {
         if (is_array($buttonText)) {
@@ -147,20 +160,14 @@ if (!function_exists('heading')) {
                 $buttonsString .= ' <a '.attribute($buttonAttributes).' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
             }
         }
-        $buttonsString = '<div class="btn-container">'.$buttonsString.'</div>';
 
-        $title = '<h1>'.$title.'</h1>';
-
-        if ($returnUrl !== '') {
-            $title = '<div class="title-block">
-                <a class="btn btn-icon btn-return" aria-label="Return" href="'.url($returnUrl).'">'.
-                    dashboardSymbol('chevron-left').'
-                </a>
-                '.$title.'
-            </div>';
-        }
-
-        return '<header class="header-block">'.$title.$buttonsString.'</header>';
+        return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardHeading.twig', [
+            'params' => [
+                'title' => $title,
+                'returnUrl' => $returnUrl,
+                'buttonHtml' => new \Twig\Markup($buttonsString, 'utf-8'),
+            ]
+        ]);
     }
 }
 

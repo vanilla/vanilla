@@ -3863,7 +3863,7 @@ if (!function_exists('isTrustedDomain')) {
         }
 
         // Short circuit on our own domain.
-        if (urlMatch(Gdn::request()->host(), $url)) {
+        if (urlMatch(Gdn::request()->getScheme().'://'.Gdn::request()->getHostAndPort(), $url)) {
             return true;
         }
 

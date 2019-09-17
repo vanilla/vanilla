@@ -68,4 +68,11 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface {
             return [];
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentSiteSection(): SiteSectionInterface {
+        return $this->defaultSite;
+    }
 }

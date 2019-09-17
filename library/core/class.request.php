@@ -191,10 +191,6 @@ class Gdn_Request implements RequestInterface {
                     $value = !is_null($value) ? trim($value, '/') : $value;
                     break;
                 case 'HOST':
-                    //debug_print_backtrace();
-                    //die();
-//                    $hostParts = explode(':', $value);
-//                    $value = array_shift($hostParts);
                     break;
                 case 'METHOD':
                     $value = strtoupper($value);

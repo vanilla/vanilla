@@ -1,9 +1,15 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 
-
+/**
+ * Test {@link ConversationMessageModel}.
+ */
 class ConversationMessageModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         setupBeforeClass as baseSetupBeforeClass;

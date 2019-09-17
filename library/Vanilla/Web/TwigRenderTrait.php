@@ -11,18 +11,27 @@ namespace Vanilla\Web;
  * Class for rendering twig views with the vanilla environment configured.
  */
 trait TwigRenderTrait {
+
     /** @var string The path to look for twig views in. */
     protected static $twigDefaultFolder = PATH_ROOT;
+
+    /**
+     * @var \Twig\Environment
+     */
+    private $twig;
 
     /**
      * Initialize the twig environment.
      */
     private function prepareTwig(): \Twig\Environment {
+        /** @var TwigEnhancer $enhancer */
+        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
+
         $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
 
         $isDebug = \Gdn::config('Debug') === true;
         $envArgs = [
-            'cache' => PATH_CACHE . '/twig',
+            'cache' => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
             'debug' => $isDebug,
             // Automatically controlled by the debug value.
             // This causes twig to check the FS timestamp before going to cache.
@@ -36,17 +45,10 @@ trait TwigRenderTrait {
             $environment->addExtension(new \Twig\Extension\DebugExtension());
         }
 
-        /** @var TwigEnhancer $enhancer */
-        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
         $enhancer->enhanceEnvironment($environment);
         $enhancer->enhanceFileSystem($loader);
         return $environment;
     }
-
-    /**
-     * @var \Twig\Environment
-     */
-    private $twig;
 
     /**
      * Render a given view using twig.

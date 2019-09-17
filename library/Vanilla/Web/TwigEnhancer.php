@@ -41,6 +41,9 @@ class TwigEnhancer {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var string|null The directory to cache compiled twig templates in. */
+    private $compileCacheDirectory = null;
+
 
     /**
      * Caches of various template functions
@@ -73,6 +76,20 @@ class TwigEnhancer {
         $this->config = $config;
         $this->locale = $locale;
         $this->request = $request;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCompileCacheDirectory(): ?string {
+        return $this->compileCacheDirectory;
+    }
+
+    /**
+     * @param string|null $compileCacheDirectory
+     */
+    public function setCompileCacheDirectory(?string $compileCacheDirectory): void {
+        $this->compileCacheDirectory = $compileCacheDirectory;
     }
 
     /**

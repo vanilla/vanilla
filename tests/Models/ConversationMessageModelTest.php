@@ -36,6 +36,5 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
         $conversationMessagesModel->validate($conversation);
         $results = $conversationMessagesModel->Validation->resultsText();
         $this->assertEquals('Invalid conversation.', $results);
-
     }
 }

@@ -206,7 +206,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 $databaseTable = '`'.str_replace('.', '`.`', $matches[1]).'`';
                 $table = str_replace($matches[1], $databaseTable, $table);
             } else {
-                $table = '`'.str_replace('.', '`.`', $table).'`';
+                $table = str_replace('.', '`.`', $table);
+
+                if (!preg_match('#^`.+`$#', $table, $matches)) {
+                    $table = "`$table`";
+                }
             }
         }
         return $table;

@@ -219,6 +219,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
@@ -236,6 +237,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
         return $uid;
     })
+
+    ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+    ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

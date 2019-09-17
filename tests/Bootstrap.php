@@ -231,6 +231,7 @@ class Bootstrap {
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
             ->addAlias('HstsModel')
@@ -240,6 +241,10 @@ class Bootstrap {
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+
+            ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+            ->setShared(true)
+            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
             ->rule('@view-application/json')
             ->setClass(\Vanilla\Web\JsonView::class)

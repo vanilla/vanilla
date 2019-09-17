@@ -34,7 +34,9 @@ function loadStories() {
     importAll(storyFiles);
 }
 
-
+addParameters({
+    chromatic: { delay: 1000 } // Add a slight delay to ensure everything has rendered properly.
+})
 
 addDecorator(checkA11y);
 addDecorator(withA11y);

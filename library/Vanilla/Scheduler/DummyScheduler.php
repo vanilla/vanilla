@@ -154,9 +154,9 @@ class DummyScheduler implements SchedulerInterface {
             session_write_close();
 
             // we assume fastCgi. If that fails, go old-school
-            if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
+            if ((!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) && headers_sent() === false) {
                 // need to calculate content length *after* URL rewrite!
-                header("Content-length: ".ob_get_length());
+                header("Content-length: " . ob_get_length());
                 ob_end_flush();
             }
 

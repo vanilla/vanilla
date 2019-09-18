@@ -66,5 +66,4 @@ class NonDroveJob implements JobInterface {
     public function setDelay(int $seconds) {
         // void method.
     }
-
 }

@@ -68,5 +68,4 @@ class EchoJob implements LocalJobInterface {
     public function setDelay(int $seconds) {
         // void method. It doesn't make any sense set a delay for a LocalJob
     }
-
 }

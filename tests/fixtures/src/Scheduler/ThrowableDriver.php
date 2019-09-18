@@ -31,6 +31,7 @@ class ThrowableDriver implements DriverInterface {
 
     /**
      * Execute a driver job.
+     *
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */

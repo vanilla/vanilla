@@ -142,12 +142,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test dispatching with a single job in the queue.
-     *
-     * @runInSeparateProcess
      */
     public function testDispatchedWithOneJob() {
-        ob_start();
-
         /** @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -175,12 +171,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test dispatching a single job, resulting in failure.
-     *
-     * @runInSeparateProcess
      */
     public function testDispatchedWithOneFailedJob() {
-        ob_start();
-
         /** @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -209,12 +201,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test tracking slip is reference of tracking slips.
-     *
-     * @runInSeparateProcess
      */
     public function testTrackingSlipIsReferenceOfTrackingSlips() {
-        ob_start();
-
         /** @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -236,12 +224,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test driver not handling errors.
-     *
-     * @runInSeparateProcess
      */
     public function testDriverNotHandlingError() {
-        ob_start();
-
         /** @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 

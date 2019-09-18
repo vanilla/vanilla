@@ -7,14 +7,14 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
-use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends SharedBootstrapTestCase {
+class RenderFunctionsTest extends TestCase {
 
     use HtmlNormalizeTrait;
     use SiteTestTrait {

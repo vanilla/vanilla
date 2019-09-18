@@ -5,19 +5,22 @@
  * @license GPL-2.0-only
  */
 
-declare(strict_types=1);
+namespace VanillaTests\Vanilla\Library\Scheduler;
 
 /**
  * Class LocalDriverTest.
  */
 final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
 
-    public function test_Receive_Expect_Pass() {
+    /**
+     * Test receiving a valid job.
+     */
+    public function testValidReceive() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
         /* @var $echoJob \Vanilla\Scheduler\Test\EchoJob */
-        $echoJob = $container->get(Vanilla\Scheduler\Test\EchoJob::class);
+        $echoJob = $container->get(\VanillaTests\Fixtures\Scheduler\EchoJob::class);
 
         /* @var $localDriver \Vanilla\Scheduler\Driver\LocalDriver */
         $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
@@ -26,42 +29,47 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertNotNull($driverSlip);
     }
 
-    public function test_Receive_Expect_Exception() {
+    /**
+     * Test receiving an invalid job.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The job class 'VanillaTests\Fixtures\Scheduler\NonDroveJob' doesn't implement LocalJobInterface.
+     */
+    public function testInvalidReceive() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
         /* @var $nonDroveJob \Vanilla\Scheduler\Test\NonDroveJob */
-        $nonDroveJob = $container->get(Vanilla\Scheduler\Test\NonDroveJob::class);
+        $nonDroveJob = $container->get(\VanillaTests\Fixtures\Scheduler\NonDroveJob::class);
 
         /* @var $localDriver \Vanilla\Scheduler\Driver\LocalDriver */
         $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The job class \'Vanilla\Scheduler\Test\NonDroveJob\' doesn\'t implement LocalJobInterface.');
-
         $localDriver->receive($nonDroveJob);
     }
 
-    public function test_Execute_Expect_Exception() {
+    /**
+     * Test executing an invalid job.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriverSlip` doesn't implement LocalDriverSlip.
+     */
+    public function testExecute() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
-        /* @var $nonCompliantDriverSlip \Vanilla\Scheduler\Test\NonCompliantDriverSlip */
-        $nonCompliantDriverSlip = new \Vanilla\Scheduler\Test\NonCompliantDriverSlip();
+        $nonCompliantDriverSlip = new \VanillaTests\Fixtures\Scheduler\NonCompliantDriverSlip();
 
         /* @var $localDriver \Vanilla\Scheduler\Driver\LocalDriver */
         $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("The class `Vanilla\Scheduler\Test\NonCompliantDriverSlip` doesn't implement LocalDriverSlip.");
-
         $localDriver->execute($nonCompliantDriverSlip);
     }
 
     /**
+     * Get a new container instance.
+     *
      * @return \Garden\Container\Container
      */
-    protected function getNewContainer() {
+    private function getNewContainer() {
         $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
@@ -72,25 +80,5 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
         ;
 
         return $container;
-    }
-
-    /**
-     * @return mixed
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    protected function getNewLocalDriver() {
-        $container = new \Garden\Container\Container();
-        $container
-            ->setInstance(\Psr\Container\ContainerInterface::class, $container)
-            //
-            ->rule(\Psr\Log\LoggerInterface::class)
-            ->setClass(\Vanilla\Logger::class)
-            ->setShared(true)
-        ;
-
-        $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
-
-        return $localDriver;
     }
 }

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Vanilla\Scheduler\Driver\DriverInterface;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
@@ -20,6 +20,8 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
 class ThrowableDriver implements DriverInterface {
 
     /**
+     * Receive a job.
+     *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
@@ -28,6 +30,7 @@ class ThrowableDriver implements DriverInterface {
     }
 
     /**
+     * Execute a driver job.
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */
@@ -36,6 +39,8 @@ class ThrowableDriver implements DriverInterface {
     }
 
     /**
+     * Get supported job interfaces.
+     *
      * @return array
      */
     public function getSupportedInterfaces(): array {

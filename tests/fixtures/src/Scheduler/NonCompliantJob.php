@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Psr\Log\LoggerInterface;
 
@@ -15,14 +15,11 @@ use Psr\Log\LoggerInterface;
  * I look like a Job, but not implementing the JobInterface
  */
 class NonCompliantJob {
-    /**
-     * @var LoggerInterface
-     */
+
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $message;
 
     /**
@@ -35,6 +32,8 @@ class NonCompliantJob {
     }
 
     /**
+     * Set the message.
+     *
      * @param array $message
      */
     public function setMessage(array $message) {
@@ -42,7 +41,7 @@ class NonCompliantJob {
     }
 
     /**
-     *
+     * Run the job.
      */
     public function run() {
         $this->logger->info(get_class($this)." :: ".var_export($this->message, true));

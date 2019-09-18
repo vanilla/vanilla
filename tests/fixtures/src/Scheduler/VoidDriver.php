@@ -5,14 +5,13 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Vanilla\Scheduler\Driver\DriverInterface;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Driver\LocalDriverSlip;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobInterface;
-use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
  * Class VoidDriver
@@ -20,6 +19,8 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
 class VoidDriver implements DriverInterface {
 
     /**
+     * Receive a job.
+     *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
@@ -28,6 +29,8 @@ class VoidDriver implements DriverInterface {
     }
 
     /**
+     * Execute a driver job.
+     *
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */
@@ -36,6 +39,8 @@ class VoidDriver implements DriverInterface {
     }
 
     /**
+     * Get supported job interfaces.
+     *
      * @return array
      */
     public function getSupportedInterfaces(): array {

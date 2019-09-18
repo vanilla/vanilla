@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-declare(strict_types=1);
+namespace VanillaTests\Vanilla\Library\Scheduler;
 
 use \Vanilla\Scheduler\Job\JobExecutionStatus;
 
@@ -14,52 +14,88 @@ use \Vanilla\Scheduler\Job\JobExecutionStatus;
  */
 final class JobExecutionStatusTest extends \PHPUnit\Framework\TestCase {
 
-    public function test_StatusAbandoned_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "abandoned" status.
+     */
+    public function testStatusAbandoned() {
         $this->assertTrue(JobExecutionStatus::abandoned()->is(JobExecutionStatus::abandoned()));
     }
 
-    public function test_StatusComplete_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "complete" status.
+     */
+    public function testStatusComplete() {
         $this->assertTrue(JobExecutionStatus::complete()->is(JobExecutionStatus::complete()));
     }
 
-    public function test_StatusError_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "error" status.
+     */
+    public function testStatusError() {
         $this->assertTrue(JobExecutionStatus::error()->is(JobExecutionStatus::error()));
     }
 
-    public function test_StatusFailed_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "failed" status.
+     */
+    public function testStatusFailed() {
         $this->assertTrue(JobExecutionStatus::failed()->is(JobExecutionStatus::failed()));
     }
 
-    public function test_StatusInvalid_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "invalid" status.
+     */
+    public function testStatusInvalid() {
         $this->assertTrue(JobExecutionStatus::invalid()->is(JobExecutionStatus::invalid()));
     }
 
-    public function test_StatusMismatch_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "mismatch" status.
+     */
+    public function testStatusMismatch() {
         $this->assertTrue(JobExecutionStatus::mismatch()->is(JobExecutionStatus::mismatch()));
     }
 
-    public function test_StatusProgress_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "progress" status.
+     */
+    public function testStatusProgress() {
         $this->assertTrue(JobExecutionStatus::progress()->is(JobExecutionStatus::progress()));
     }
 
-    public function test_StatusReceived_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "received" status.
+     */
+    public function testStatusReceived() {
         $this->assertTrue(JobExecutionStatus::received()->is(JobExecutionStatus::received()));
     }
 
-    public function test_StatusRetry_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "retry" status.
+     */
+    public function testStatusRetry() {
         $this->assertTrue(JobExecutionStatus::retry()->is(JobExecutionStatus::retry()));
     }
 
-    public function test_StatusStackExecutionError_Expect_Pass() {
+    /**
+     * Verifying positive assertion of "execution error" status.
+     */
+    public function testStatusStackExecutionError() {
         $this->assertTrue(JobExecutionStatus::stackExecutionError()->is(JobExecutionStatus::stackExecutionError()));
     }
 
-    public function test_StatusLooseStatus_Expect_Pass() {
+    /**
+     * Verifying positive assertion of custom status.
+     */
+    public function testValidLooseStatusComparison() {
         $status = JobExecutionStatus::retry()->getStatus();
         $this->assertTrue(JobExecutionStatus::looseStatus($status)->is(JobExecutionStatus::retry()));
     }
 
-    public function test_Status_WithLooseStatus_Expect_Fail() {
+    /**
+     * Verifying negative assertion of custom status.
+     */
+    public function testInvalidLooseStatusComparison() {
         $status = JobExecutionStatus::retry()->getStatus();
         $this->assertFalse(JobExecutionStatus::looseStatus($status)->is(JobExecutionStatus::complete()));
     }

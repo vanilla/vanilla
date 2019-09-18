@@ -5,6 +5,8 @@
  * @license GPL-2.0-only
  */
 
+namespace VanillaTests\Vanilla\Library\Scheduler;
+
 /**
  * Class BootstrapTest
  */
@@ -17,7 +19,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      * @expectedExceptionMessage Class Vanilla\Scheduler\SchedulerInterface does not exist.
      */
     public function testSchedulerInjectionWithMissingRule() {
-        $container = new Garden\Container\Container();
+        $container = new \Garden\Container\Container();
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
@@ -28,7 +30,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      * @expectedExceptionMessage Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().
      */
     public function testSchedulerInjectionWithMissingDependencies() {
-        $container = (new Garden\Container\Container())
+        $container = (new \Garden\Container\Container())
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
             ->setShared(true)
@@ -47,7 +49,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      * @expectedExceptionMessage Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().
      */
     public function testSchedulerInjectionWithMissingLogger() {
-        $container = new Garden\Container\Container();
+        $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             ->rule(\Garden\EventManager::class)
@@ -70,7 +72,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         // This test will pass always because EventManager is a concrete class nor an interface
         // Container will inject a new class instance in case the class is not previously ruled inside the container
         // The only condition for this test to fail is if vanilla/vanilla is not composed-in
-        $container = new Garden\Container\Container();
+        $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             ->rule(\Psr\Log\LoggerInterface::class)
@@ -90,7 +92,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      * @return \Vanilla\Scheduler\DummyScheduler
      */
     public function testSchedulerInjection() {
-        $container = new Garden\Container\Container();
+        $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //

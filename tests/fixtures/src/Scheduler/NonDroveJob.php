@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Job\JobInterface;
@@ -17,14 +17,11 @@ use Vanilla\Scheduler\Job\JobPriority;
  * I look like a Job, but not extending any Driver interface
  */
 class NonDroveJob implements JobInterface {
-    /**
-     * @var LoggerInterface
-     */
+
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var
-     */
+    /** @var array */
     protected $message;
 
     /**
@@ -37,20 +34,35 @@ class NonDroveJob implements JobInterface {
     }
 
     /**
+     * Set the message.
+     *
      * @param array $message
      */
     public function setMessage(array $message) {
         $this->message = $message;
     }
 
+    /**
+     * Run the job.
+     */
     public function run() {
         $this->logger->info(get_class($this)." :: ".var_export($this->message, true));
     }
 
+    /**
+     * Set the priority.
+     *
+     * @param JobPriority $priority
+     */
     public function setPriority(JobPriority $priority) {
         // void method.
     }
 
+    /**
+     * Set the delay.
+     *
+     * @param integer $seconds
+     */
     public function setDelay(int $seconds) {
         // void method.
     }

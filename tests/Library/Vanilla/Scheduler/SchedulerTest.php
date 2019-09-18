@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-declare(strict_types=1);
+namespace VanillaTests\Vanilla\Library\Scheduler;
 
 /**
  * Class SchedulerTest
@@ -15,7 +15,10 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
     const DISPATCH_EVENT = 'dispatchEvent';
     const DISPATCHED_EVENT = 'dispatchedEvent';
 
-    public function test_GetFullyConfiguredSchedulerFromContainer_Expect_Pass() {
+    /**
+     * Test get fully-configured scheduler from container.
+     */
+    public function testGetFullyConfiguredSchedulerFromContainer() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
@@ -25,87 +28,108 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals(1, count($dummyScheduler->getDrivers()));
     }
 
-    public function test_AddUnknownDriver_Expect_Exception() {
+    /**
+     * Test adding unknown driver.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\UnknownDriver` cannot be found.
+     */
+    public function testAddUnknownDriver() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The class `Vanilla\Scheduler\Test\UnknownDriver` cannot be found.');
-
-        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\UnknownDriver::class);
+        $dummyScheduler->addDriver(\VanillaTests\Fixtures\Scheduler\UnknownDriver::class);
     }
 
-    public function test_AddNonCompliantDriver_Expect_Exception() {
+    /**
+     * Test adding a non-compliant driver.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriver` doesn't implement DriverInterface.
+     */
+    public function testAddNonCompliantDriver() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("The class `Vanilla\Scheduler\Test\NonCompliantDriver` doesn't implement DriverInterface.");
-
-        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\NonCompliantDriver::class);
+        $dummyScheduler->addDriver(\VanillaTests\Fixtures\Scheduler\NonCompliantDriver::class);
     }
 
-    public function test_AddVoidDriver_Expect_Exception() {
+    /**
+     * Test adding a driver that does not specify any supported job interfaces.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\VoidDriver` doesn't support any Job implementation.
+     */
+    public function testAddVoidDriver() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("The class `Vanilla\Scheduler\Test\VoidDriver` doesn't support any Job implementation.");
-
-        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\VoidDriver::class);
+        $dummyScheduler->addDriver(\VanillaTests\Fixtures\Scheduler\VoidDriver::class);
     }
 
-    public function test_AddEchoJob_Expect_Pass() {
+    /**
+     * Test adding a simple job.
+     */
+    public function testAddEchoJob() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\EchoJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\EchoJob::class);
 
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
     }
 
-    public function test_AddEchoAwareJob_Expect_Pass() {
+    /**
+     * Test adding a simple job that is aware of types.
+     */
+    public function testAddEchoAwareJob() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\EchoAwareJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\EchoAwareJob::class);
 
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
     }
 
-    public function test_AddUnknownJob_Expect_Exception() {
+    /**
+     * Test adding an unknown job.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\UnknownJob` cannot be found.
+     */
+    public function testAddUnknownJob() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The class `Vanilla\Scheduler\Test\UnknownJob` cannot be found.');
-
-        $dummyScheduler->addJob(\Vanilla\Scheduler\Test\UnknownJob::class);
+        $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\UnknownJob::class);
     }
 
-    public function test_AddNonCompliantJob_Expect_Exception() {
+    /**
+     * Test adding a job that does not adhere to the proper interface.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage The job class `VanillaTests\Fixtures\Scheduler\NonCompliantJob` doesn't implement JobInterface.
+     */
+    public function testAddNonCompliantJob() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("The job class `Vanilla\Scheduler\Test\NonCompliantJob` doesn't implement JobInterface.");
-
-        $dummyScheduler->addJob(\Vanilla\Scheduler\Test\NonCompliantJob::class);
+        $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\NonCompliantJob::class);
     }
 
-    public function test_AddNonDroveJob_Expect_Exception() {
+    /**
+     * Test adding a job that does not implement a job type interface.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage DummyScheduler couldn't find an appropriate driver to handle the job class `VanillaTests\Fixtures\Scheduler\NonDroveJob`.
+     */
+    public function testAddNonDroveJob() {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("DummyScheduler couldn't find an appropriate driver to handle the job class `Vanilla\Scheduler\Test\NonDroveJob`.");
-
-        $dummyScheduler->addJob(\Vanilla\Scheduler\Test\NonDroveJob::class);
+        $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\NonDroveJob::class);
     }
 
-    public function test_Dispatch_WithNoJob_Expect_EmptyArray() {
+    /**
+     * Test performing a dispatch with no queued jobs.
+     */
+    public function testDispatchWithNoJob() {
         /** @var $eventManager \Garden\EventManager */
         $eventManager = $this->getNewContainer()->get(\Garden\EventManager::class);
 
@@ -117,9 +141,11 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Test dispatching with a single job in the queue.
+     *
      * @runInSeparateProcess
      */
-    public function test_Dispatched_WithOneJob_Expect_OneSlip() {
+    public function testDispatchedWithOneJob() {
         ob_start();
 
         /** @var $container \Garden\Container\Container */
@@ -128,7 +154,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\EchoJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\EchoJob::class);
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
 
@@ -148,9 +174,11 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Test dispatching a single job, resulting in failure.
+     *
      * @runInSeparateProcess
      */
-    public function test_Dispatched_WithOneFailedJob_Expect_StackExecutionErrorStatus() {
+    public function testDispatchedWithOneFailedJob() {
         ob_start();
 
         /** @var $container \Garden\Container\Container */
@@ -159,7 +187,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\ThrowableEchoJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\ThrowableEchoJob::class);
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
 
@@ -179,11 +207,12 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $eventManager->fire(self::DISPATCH_EVENT);
     }
 
-
     /**
+     * Test tracking slip is reference of tracking slips.
+     *
      * @runInSeparateProcess
      */
-    public function test_TrackingSlipIsReferenceOfTrackingSlips_Expect_Pass() {
+    public function testTrackingSlipIsReferenceOfTrackingSlips() {
         ob_start();
 
         /** @var $container \Garden\Container\Container */
@@ -192,7 +221,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\EchoJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\EchoJob::class);
 
         /** @var $eventManager \Garden\EventManager */
         $eventManager = $container->get(\Garden\EventManager::class);
@@ -206,9 +235,11 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Test driver not handling errors.
+     *
      * @runInSeparateProcess
      */
-    public function test_DriverNotHandlingError_Expect_Exception() {
+    public function testDriverNotHandlingError() {
         ob_start();
 
         /** @var $container \Garden\Container\Container */
@@ -217,10 +248,10 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\ThrowableDriver::class);
+        $bool = $dummyScheduler->addDriver(\VanillaTests\Fixtures\Scheduler\ThrowableDriver::class);
         $this->assertTrue($bool);
 
-        $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\ThrowableEchoJob::class);
+        $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\ThrowableEchoJob::class);
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
 
@@ -243,15 +274,13 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $eventManager->fire(self::DISPATCH_EVENT);
     }
 
-
-
     /**
+     * Get a new, cleanly-configured container.
+     *
      * @return \Garden\Container\Container
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
-    protected function getNewContainer() {
-        $container = new Garden\Container\Container();
+    private function getNewContainer() {
+        $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
             //
@@ -282,5 +311,4 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
 
         return $container;
     }
-
 }

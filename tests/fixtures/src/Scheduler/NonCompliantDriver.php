@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
@@ -19,6 +19,8 @@ use Vanilla\Scheduler\Job\JobInterface;
 class NonCompliantDriver {
 
     /**
+     * Receive a job.
+     *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
@@ -26,6 +28,8 @@ class NonCompliantDriver {
     }
 
     /**
+     * Execute a driver job.
+     *
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Scheduler\Test;
+namespace VanillaTests\Fixtures\Scheduler;
 
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
@@ -14,7 +14,10 @@ use Vanilla\Scheduler\Job\JobExecutionStatus;
  * Class NonCompliantDriverSlip.
  */
 class NonCompliantDriverSlip implements DriverSlipInterface {
+
     /**
+     * Execute.
+     *
      * @return JobExecutionStatus
      */
     public function execute(): JobExecutionStatus {
@@ -22,6 +25,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
     }
 
     /**
+     * Get the ID.
+     *
      * @return string
      */
     public function getId(): string {
@@ -29,6 +34,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
     }
 
     /**
+     * Get the status.
+     *
      * @return JobExecutionStatus
      */
     public function getStatus(): JobExecutionStatus {
@@ -36,6 +43,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
     }
 
     /**
+     * Get extended status.
      * @return array
      */
     public function getExtendedStatus(): array {
@@ -43,6 +51,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
     }
 
     /**
+     * Set stack execution error message.
+     *
      * @param string $msg
      * @return bool
      */

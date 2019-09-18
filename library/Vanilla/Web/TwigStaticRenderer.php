@@ -24,9 +24,9 @@ class TwigStaticRenderer {
      *
      * @return \Twig\Markup HTML in twig markup wrapper. Casts to string to unwrap.
      */
-    public static function renderTwig(string $viewPath, array $viewData): \Twig\Markup {
+    public static function renderTwigStatic(string $viewPath, array $viewData): \Twig\Markup {
         /** @var TwigStaticRenderer $selfInstance */
         $selfInstance = \Gdn::getContainer()->get(TwigStaticRenderer::class);
-        return $selfInstance->renderTwig($viewPath, $viewData);
+        return new \Twig\Markup($selfInstance->renderTwig($viewPath, $viewData), 'utf-8');
     }
 }

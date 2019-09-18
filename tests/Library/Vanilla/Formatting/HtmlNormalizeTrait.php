@@ -13,8 +13,11 @@ use voku\helper\HtmlMin;
  * Trait for normalizing some HTML to make test assertions easier.
  */
 trait HtmlNormalizeTrait {
+
     /** @var HtmlMin */
     private $minifier;
+
+    protected $shouldReplaceSVGs = true;
 
     /**
      * Minify some HTML to help normalize it's shape.
@@ -48,7 +51,9 @@ trait HtmlNormalizeTrait {
         $html = $this->stripZeroWidthWhitespace($html);
         $html = $this->minifyHTML($html);
         // Stub out SVGs
-        $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
+        if ($this->shouldReplaceSVGs) {
+            $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
+        }
         $html = preg_replace("/\>\</", ">\n<", $html);
         $html = preg_replace("/ \</", "<", $html);
         return $html;

@@ -378,6 +378,7 @@ class Bootstrap {
     public function setGlobals(Container $container) {
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
+        $_SERVER['X_REWRITE'] = true;
         $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
         $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
         $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;

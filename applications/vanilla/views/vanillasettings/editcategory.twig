@@ -1,0 +1,118 @@
+
+{% from "@dashboard/components/macros.twig" import dashboardHeading %}
+
+{{ helpAsset(
+    sprintf(t('About %s'), t('Categories')),
+    t(
+        'Categories are used to organize discussions.',
+        'Categories allow you to organize your discussions.'
+    )
+) }}
+
+{{
+dashboardHeading({
+    title: Title,
+    returnUrl: '/vanilla/settings/categories'
+})
+}}
+{{ form.open({'enctype': 'multipart/form-data'})}}
+{{ form.errors()}}
+{{ form.hidden('ParentCategoryID')}}
+<ul>
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ form.label('Category', 'Name')}}
+        </div>
+        <div class="input-wrap">
+            {{ form.textBox('Name')}}
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <strong>{{ t('Category Url:') }}</strong>
+        </div>
+        <div id="UrlCode" class="input-wrap category-url-code">
+            <div class="category-url">
+                {{ url('/categories', true) }}
+                {{- '/' -}}
+                <span>{{ form.getValue('UrlCode') }}</span>
+            </div>
+            {{ form.textBox('UrlCode')}}
+            {{ form.getValue('UrlCode') ? '/' : '' }}
+            <a class="Edit btn btn-link" href="#">{{ t('edit') }}</a>
+            <a class="Save btn btn-primary" href="#">{{ t('OK') }}</a>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ form.label('Description', 'Description') }}
+        </div>
+        <div class="input-wrap">
+            {{ form.textBox('Description', {'MultiLine': true }) }}
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ form.label('Css Class', 'CssClass') }}
+        </div>
+        <div class="input-wrap">
+            {{ form.textBox('CssClass', {'MultiLine': false}) }}
+        </div>
+    </li>
+    {{ form.imageUploadPreview(
+        'Photo',
+        t('Photo'),
+        '',
+        'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID
+    ) }}
+
+    {#
+        // Extended fields may be defined through some addon.
+     #}
+    {% if _ExtendedFields is defined %}
+        {{ form.simple(_ExtendedFields, []) }}
+    {% endif %}
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ form.label('Display As', 'DisplayAs') }}
+        </div>
+        <div class="input-wrap">
+            {{ form.dropDown('DisplayAs', DisplayAsOptions, {'Wrap': true}) }}
+        </div>
+    </li>
+    <li class="form-group">
+        {{ form.toggle('HideAllDiscussions', 'Hide from the recent discussions page.') }}
+    </li>
+    {% if Operation is same as('Edit') %}
+        <li class="form-group">
+            {{ form.toggle('Archived', 'This category is archived.') }}
+        </li>
+    {% endif %}
+    {{ firePluggableEchoEvent(pluggable, 'afterCategorySettings') }}
+    {% if PermissionData|length > 0 %}
+        <li id="Permissions" class="form-group">
+            {{ form.toggle('CustomPermissions', 'This category has custom permissions.') }}
+        </li>
+    {% endif %}
+</ul>
+<div class="CategoryPermissions">
+
+    {% if DiscussionTypes|length > 1 %}
+        <div class="P DiscussionTypes form-group">
+            <div class="label-wrap">
+                {{ form.label('Discussion Types') }}
+            </div>
+            <div class="checkbox-list input-wrap">
+                {% for type, row in DiscussionTypes %}
+                    {{ form.checkBox('AllowedDiscussionTypes[]', row.Plural ?: type, {value: type}) }}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {{ form.simple(_PermissionFields, []) }}
+
+    <div class="padded">{{ t('Check all permissions that apply for each role') }}</div>
+    {{ form.checkBoxGridGroups(PermissionData, 'Permission') }}
+</div>
+{{ form.close('Save') }}

@@ -14,6 +14,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         setupBeforeClass as baseSetupBeforeClass;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -22,7 +23,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     *  Test ConversationMessageModel validate function.
+     * Test ConversationMessageModel validate function.
      */
     public function testInvalidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
@@ -33,7 +34,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     *  Test ConversationMessageModel validate function.
+     * Test ConversationMessageModel validate function.
      */
     public function testValidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
@@ -46,7 +47,8 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     *  Provide a conversation array.
+     * Provide a conversation array.
+     *
      * @return array
      */
     public function provideConversation() {

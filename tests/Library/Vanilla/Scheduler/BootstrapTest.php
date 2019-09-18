@@ -5,34 +5,34 @@
  * @license GPL-2.0-only
  */
 
-declare(strict_types=1);
-
 /**
  * Class BootstrapTest
  */
 final class BootstrapTest extends \PHPUnit\Framework\TestCase {
 
-    public function test_SchedulerInjection_WithMissingRule_Expect_NotFoundException() {
-
+    /**
+     * Test scheduler injection with missing rule throws NotFoundException.
+     *
+     * @expectedException \Garden\Container\NotFoundException
+     * @expectedExceptionMessage Class Vanilla\Scheduler\SchedulerInterface does not exist.
+     */
+    public function testSchedulerInjectionWithMissingRule() {
         $container = new Garden\Container\Container();
-
-        $this->assertTrue($container != null);
-
-        $this->expectException(\Garden\Container\NotFoundException::class);
-        $this->expectExceptionMessage('Class Vanilla\Scheduler\SchedulerInterface does not exist.');
-
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function test_SchedulerInjection_WithMissingDependencies_Expect_MissingArgumentException() {
-
+    /**
+     * Test scheduler injection with missing dependencies throws MissingArgumentException.
+     *
+     * @expectedException \Garden\Container\MissingArgumentException
+     * @expectedExceptionMessage Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().
+     */
+    public function testSchedulerInjectionWithMissingDependencies() {
         $container = (new Garden\Container\Container())
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
             ->setShared(true)
         ;
-
-        $this->assertTrue($container != null);
 
         $this->expectException(\Garden\Container\MissingArgumentException::class);
         $this->expectExceptionMessage('Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().');
@@ -40,20 +40,22 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function test_SchedulerInjection_WithMissingLogger_Expect_MissingArgumentException() {
+    /**
+     * Test scheduler injection wit missing logger throws MissingArgumentException.
+     *
+     * @expectedException \Garden\Container\MissingArgumentException
+     * @expectedExceptionMessage Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().
+     */
+    public function testSchedulerInjectionWithMissingLogger() {
         $container = new Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
-            //
             ->rule(\Garden\EventManager::class)
             ->setShared(true)
-            //
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
             ->setShared(true)
         ;
-
-        \PHPUnit\Framework\Assert::assertTrue($container != null);
 
         $this->expectException(\Garden\Container\MissingArgumentException::class);
         $this->expectExceptionMessage('Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().');
@@ -61,33 +63,33 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function test_SchedulerInjection_WithMissingEventManager_Expect_Pass() {
+    /**
+     * Test scheduler injection with missing event manager.
+     */
+    public function testSchedulerInjectionWithMissingEventManager() {
         // This test will pass always because EventManager is a concrete class nor an interface
         // Container will inject a new class instance in case the class is not previously ruled inside the container
         // The only condition for this test to fail is if vanilla/vanilla is not composed-in
         $container = new Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
-            //
             ->rule(\Psr\Log\LoggerInterface::class)
             ->setClass(\Vanilla\Logger::class)
             ->setShared(true)
-            //
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
             ->setShared(true)
         ;
 
-        $this->assertTrue($container != null);
         $this->assertNotNull($container->get(\Vanilla\Scheduler\SchedulerInterface::class));
     }
 
     /**
+     * Test scheduler injection.
+     *
      * @return \Vanilla\Scheduler\DummyScheduler
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
-    public function test_SchedulerInjection_Expect_Pass() {
+    public function testSchedulerInjection() {
         $container = new Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)
@@ -103,44 +105,40 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
             ->setShared(true)
         ;
 
-        $this->assertTrue($container != null);
-
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
-
         $this->assertTrue(get_class($dummyScheduler) == \Vanilla\Scheduler\DummyScheduler::class);
-
         return $dummyScheduler;
     }
 
     /**
-     * @depends test_SchedulerInjection_Expect_Pass
+     * Test addDriver.
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
+     * @depends testSchedulerInjection
      */
-    public function test_SetDriver_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
-
+    public function testSetDriver(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
         $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Driver\LocalDriver::class);
         $this->assertTrue($bool);
     }
 
     /**
-     * @depends test_SchedulerInjection_Expect_Pass
+     * Test setDispatchEventName.
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
+     * @depends testSchedulerInjection
      */
-    public function test_SetDispatchEventName_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
-
+    public function testSetDispatchEventName(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
         $bool = $dummyScheduler->setDispatchEventName('dispatchEvent');
         $this->assertTrue($bool);
     }
 
     /**
-     * @depends test_SchedulerInjection_Expect_Pass
+     * Test setDispatchedEventName.
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
+     * @depends testSchedulerInjection
      */
-    public function test_SetDispatchedEventName_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
-
+    public function testSetDispatchedEventName(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
         $bool = $dummyScheduler->setDispatchedEventName('dispatchedEvent');
         $this->assertTrue($bool);
     }

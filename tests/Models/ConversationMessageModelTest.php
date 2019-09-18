@@ -47,11 +47,11 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
 
     /**
      *  Provide a conversation array.
-     * 
      * @return array
      */
     public function provideConversation() {
         return $conversation = [
+            'ConversationID' => '1',
             'Format' => 'Text',
             'Body' => 'Creating conversation',
             'InsertUserID' => 1,

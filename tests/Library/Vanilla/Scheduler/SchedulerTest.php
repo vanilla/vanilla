@@ -279,8 +279,6 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             ->setShared(true)
         ;
 
-        $this->assertTrue($container != null);
-
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
         $this->assertTrue(get_class($dummyScheduler) == \Vanilla\Scheduler\DummyScheduler::class);
 

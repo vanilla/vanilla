@@ -63,8 +63,6 @@ if (!function_exists('dashboardSymbol')) {
             unset($attr['class']);
         }
 
-        $attrs = attribute($attr);
-
         return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardSymbol.twig', [
             'params' => [
                 'name' => $name,

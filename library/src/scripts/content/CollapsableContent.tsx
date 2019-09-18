@@ -143,12 +143,13 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
         const { height, needsCollapser } = this.getHeightInfo();
 
         let newHeight = needsCollapser && this.props.isCollapsed ? height! : this.selfRef.current!.scrollHeight;
+        this.props.setNeedsCollapser && this.props.setNeedsCollapser(needsCollapser);
+
         if (newHeight === 0) {
             // This is probably a mistake. Since we are hidden we don't want to actually re-render.
             return;
         }
 
         this.setState({ maxHeight: newHeight });
-        this.props.setNeedsCollapser && this.props.setNeedsCollapser(needsCollapser);
     };
 }

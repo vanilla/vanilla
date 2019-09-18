@@ -20,6 +20,7 @@ interface IProps extends IBaseEmbedProps {
     body: string;
     dateInserted: string;
     insertUser: IUserFragment;
+    expandByDefault: boolean;
 }
 
 /**
@@ -28,7 +29,8 @@ interface IProps extends IBaseEmbedProps {
  * This is not an editable quote. Instead it an expandable/collapsable snapshot of the quoted/embedded comment/discussion.
  */
 export function QuoteEmbed(props: IProps) {
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const { expandByDefault } = props;
+    const [isCollapsed, setIsCollapsed] = useState(!expandByDefault);
     const [needsCollapseButton, setNeedsCollapseButton] = useState(false);
     const toggleCollapseState = useCallback(
         (event: React.MouseEvent<any>) => {
@@ -73,21 +75,22 @@ export function QuoteEmbed(props: IProps) {
                             />
                         </SmartLink>
 
-                        {needsCollapseButton && (
-                            <button
-                                type="button"
-                                className="embedQuote-collapseButton"
-                                aria-label={t("Toggle Quote")}
-                                onClick={toggleCollapseState}
-                                aria-pressed={isCollapsed}
-                            >
-                                {isCollapsed ? (
-                                    <BottomChevronIcon className={"embedQuote-chevronDown"} />
-                                ) : (
-                                    <TopChevronIcon className={"embedQuote-chevronUp"} />
-                                )}
-                            </button>
-                        )}
+                        {needsCollapseButton ||
+                            (props.expandByDefault && (
+                                <button
+                                    type="button"
+                                    className="embedQuote-collapseButton"
+                                    aria-label={t("Toggle Quote")}
+                                    onClick={toggleCollapseState}
+                                    aria-pressed={isCollapsed}
+                                >
+                                    {isCollapsed ? (
+                                        <BottomChevronIcon className={"embedQuote-chevronDown"} />
+                                    ) : (
+                                        <TopChevronIcon className={"embedQuote-chevronUp"} />
+                                    )}
+                                </button>
+                            ))}
                     </div>
                     <div className="embedText-main embedQuote-main">
                         <div className="embedQuote-excerpt">

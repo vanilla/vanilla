@@ -104,7 +104,11 @@ class Filterer {
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);
+            if ($embedData['showFullContent'] ?? null) {
+                $embedData['body'] = \Gdn::formatService()->renderHTML($stringBodyRaw, $format);
+            } else {
+                $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);
+            }
         }
 
         return array_values($operations);

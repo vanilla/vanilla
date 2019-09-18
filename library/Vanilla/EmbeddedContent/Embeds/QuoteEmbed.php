@@ -52,11 +52,23 @@ class QuoteEmbed extends AbstractEmbed {
             $data['recordType'] = 'comment';
         }
 
+        if (!isset($data['renderFullContent'])) {
+            $data['renderFullContent'] = false;
+        }
+
+        if (!isset($data['expandByDefault'])) {
+            $data['expandByDefault'] = false;
+        }
+
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {
             $bodyRaw = $data['bodyRaw'];
             $bodyRaw = is_array($bodyRaw) ? json_encode($bodyRaw) : $bodyRaw;
-            $data['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $data['format']);
+            if ($data['showFullContent'] ?? null) {
+                $data['body'] = \Gdn::formatService()->renderHTML($bodyRaw, $data['format']);
+            } else {
+                $data['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $data['format']);
+            }
         }
 
         return $data;
@@ -84,6 +96,8 @@ class QuoteEmbed extends AbstractEmbed {
             'format:s',
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),
+            'renderFullContent:b',
+            'expandByDefault:b',
         ]);
     }
 }

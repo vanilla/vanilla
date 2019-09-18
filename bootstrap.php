@@ -359,6 +359,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Analytics\Client::class)
     ->setShared(true)
     ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
+
+    ->rule(Vanilla\Scheduler\SchedulerInterface::class)
+    ->setClass(Vanilla\Scheduler\DummyScheduler::class)
+    ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+    ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+    ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.
@@ -516,3 +523,8 @@ require_once PATH_LIBRARY_CORE.'/functions.render.php';
 if (!defined('CLIENT_NAME')) {
     define('CLIENT_NAME', 'vanilla');
 }
+
+register_shutdown_function(function () use ($dic) {
+    // Trigger SchedulerDispatch event
+    $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
+});

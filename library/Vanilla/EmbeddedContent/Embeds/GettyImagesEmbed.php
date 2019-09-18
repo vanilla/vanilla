@@ -37,7 +37,6 @@ class GettyImagesEmbed extends AbstractEmbed {
             "foreignID" => "attributes.id",
             "photoID" => "attributes.postID",
         ]);
-        $data['photoID'] = htmlspecialchars($data['photoID']);
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
     }

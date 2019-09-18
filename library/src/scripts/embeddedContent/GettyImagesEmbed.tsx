@@ -4,10 +4,12 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
+import { escapeHTML } from "@vanilla/dom-utils";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useLayoutEffect } from "react";
 import { useThrowError } from "@vanilla/react-utils";
+window.escapeHTML = escapeHTML;
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -55,7 +57,7 @@ async function convertGettyEmbeds() {
             const embedSignature = post.getAttribute("data-sig") || "";
             const height = Number(post.getAttribute("data-height")) || 1;
             const width = Number(post.getAttribute("data-width")) || 1;
-            const items = post.getAttribute("data-items") || "";
+            const items = window.escapeHTML(post.getAttribute("data-items")) || "";
             const data: IProps = {
                 embedType: "gettyimages",
                 url,

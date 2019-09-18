@@ -165,7 +165,7 @@ if (!function_exists('heading')) {
             'params' => [
                 'title' => $title,
                 'returnUrl' => $returnUrl,
-                'buttonHtml' => new \Twig\Markup($buttonsString, 'utf-8'),
+                'buttons' => new \Twig\Markup($buttonsString, 'utf-8'),
             ]
         ]);
     }

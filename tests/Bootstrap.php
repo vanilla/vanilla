@@ -38,6 +38,15 @@ class Bootstrap {
     private $baseUrl;
 
     /**
+     * @var array
+     */
+    private $addonManagerPaths = [
+        Addon::TYPE_ADDON => ['/applications', '/plugins'],
+        Addon::TYPE_THEME => '/themes',
+        Addon::TYPE_LOCALE => '/locales'
+    ];
+
+    /**
      * Bootstrap constructor.
      *
      * A different base URL affects
@@ -457,5 +466,19 @@ class Bootstrap {
         }
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
+    }
+
+    /**
+     * @return array
+     */
+    public function getAddonManagerPaths(): array {
+        return $this->addonManagerPaths;
+    }
+
+    /**
+     * @param array $addonManagerPaths
+     */
+    public function setAddonManagerPaths(array $addonManagerPaths): void {
+        $this->addonManagerPaths = $addonManagerPaths;
     }
 }

@@ -309,12 +309,13 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
      * initial request to log in to an authentication provider.
      *
-     * @param $sender
+     * @param Gdn_PluginManager $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
         $sender->registerCallback("entryController_{$this->providerKey}Redirect_create", [$this, 'entryRedirectEndpoint']);
         $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
         $sender->registerCallback("settingsController_{$this->providerKey}_create", [$this, 'settingsEndpoint']);
+        $sender->registerCallback("get{$this->providerKey}Instance", [$this, 'getInstance']);
     }
 
     /** ------------------- Settings Related Methods --------------------- */

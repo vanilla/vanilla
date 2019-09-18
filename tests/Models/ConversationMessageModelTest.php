@@ -22,19 +22,40 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     *  Test ConversationMessageModel validate function
+     *  Test ConversationMessageModel validate function.
      */
-    public function testConversationMessageModelValidate() {
-        $conversation = [
-            'ConversationID' => 1,
+    public function testInvalidConversationMessageModelValidate() {
+        $conversation = $this->provideConversation();
+        $conversationMessagesModel = new ConversationMessageModel();
+        $conversationMessagesModel->validate($conversation);
+        $results = $conversationMessagesModel->Validation->resultsText();
+        $this->assertEquals('Invalid conversation.', $results);
+    }
+
+    /**
+     *  Test ConversationMessageModel validate function.
+     */
+    public function testValidConversationMessageModelValidate() {
+        $conversation = $this->provideConversation();
+        $conversationModel = new ConversationModel();
+        $conversationModel->save($conversation);
+        $conversationMessagesModel = new ConversationMessageModel();
+        $conversationMessagesModel->validate($conversation);
+        $results = $conversationMessagesModel->Validation->resultsText();
+        $this->assertEquals('', $results);
+    }
+
+    /**
+     *  Provide a conversation array.
+     * 
+     * @return array
+     */
+    public function provideConversation() {
+        return $conversation = [
             'Format' => 'Text',
             'Body' => 'Creating conversation',
             'InsertUserID' => 1,
             'RecipientUserID' => [2]
         ];
-        $conversationMessagesModel = new ConversationMessageModel();
-        $conversationMessagesModel->validate($conversation);
-        $results = $conversationMessagesModel->Validation->resultsText();
-        $this->assertEquals('Invalid conversation.', $results);
     }
 }

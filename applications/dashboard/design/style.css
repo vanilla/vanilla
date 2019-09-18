@@ -2609,7 +2609,8 @@ div.Popup .Border {
   margin: 0 auto;
   text-align: left;
   position: relative;
-  max-width: 600px;
+  width: 600px;
+  max-width: 100vw;
   display: inline-block;
 }
 

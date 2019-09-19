@@ -23,7 +23,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * Test ConversationMessageModel validate function.
+     * Test ConversationMessageModel validate an invalid conversation.
      */
     public function testInvalidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
@@ -34,7 +34,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * Test ConversationMessageModel validate function.
+     * Test ConversationMessageModel validate a valid conversation.
      */
     public function testValidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
@@ -42,8 +42,8 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
         $conversationModel->save($conversation);
         $conversationMessagesModel = new ConversationMessageModel();
         $conversationMessagesModel->validate($conversation);
-        $results = $conversationMessagesModel->Validation->resultsText();
-        $this->assertEquals('', $results);
+        $results = $conversationMessagesModel->Validation->resultsArray();
+        $this->assertEmpty($results);
     }
 
     /**

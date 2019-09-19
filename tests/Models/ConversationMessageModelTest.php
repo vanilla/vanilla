@@ -16,6 +16,15 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * @var ConversationModel
+     */
+    protected $conversationModel;
+    /**
+     * @var ConversationMessageModel
+     */
+    protected $conversationMessageModel;
+
+    /**
      * {@inheritdoc}
      */
     public static function setupBeforeClass() {
@@ -23,41 +32,57 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * Test ConversationMessageModel validate an invalid conversation.
+     * Instantiate conversationModel & ConversationMessageModel.
+     */
+    protected function setup() {
+        $this->conversationModel = new ConversationModel();
+        $this->conversationMessageModel = new ConversationMessageModel();
+    }
+
+    /**
+     * Test ConversationMessageModel validate an invalid conversation message.
      */
     public function testInvalidConversationMessageModelValidate() {
-        $conversation = $this->provideConversation();
-        $conversationMessagesModel = new ConversationMessageModel();
-        $conversationMessagesModel->validate($conversation);
-        $results = $conversationMessagesModel->Validation->resultsText();
+        $conversationMessage = [
+            'ConversationID' => '9999',
+            'Format' => 'Text',
+            'Body' => 'This is a test message'
+        ];
+
+        $this->conversationMessageModel->validate($conversationMessage);
+        $results = $this->conversationMessageModel->Validation->resultsText();
         $this->assertEquals('Invalid conversation.', $results);
     }
 
     /**
-     * Test ConversationMessageModel validate a valid conversation.
+     * Test ConversationMessageModel validate a valid conversation message.
      */
     public function testValidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
-        $conversationModel = new ConversationModel();
-        $conversationModel->save($conversation);
-        $conversationMessagesModel = new ConversationMessageModel();
-        $conversationMessagesModel->validate($conversation);
-        $results = $conversationMessagesModel->Validation->resultsArray();
+        $conversationMessage = [
+            'ConversationID' => $conversation->ConversationID,
+            'Format' => 'Text',
+            'Body' => 'This is a test message'
+        ];
+        $this->conversationMessageModel->validate($conversationMessage);
+        $results = $this->conversationMessageModel->Validation->resultsArray();
         $this->assertEmpty($results);
     }
 
     /**
-     * Provide a conversation array.
+     * Provide a conversation object.
      *
-     * @return array
+     * @return object
      */
-    private function provideConversation(): array {
-        return [
-            'ConversationID' => '1',
+    private function provideConversation() {
+        $conversation = [
             'Format' => 'Text',
             'Body' => 'Creating conversation',
             'InsertUserID' => 1,
             'RecipientUserID' => [2]
         ];
+        $conversationID = $this->conversationModel->save($conversation);
+        $conversation = $this->conversationModel->getID($conversationID);
+        return $conversation;
     }
 }

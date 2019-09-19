@@ -259,9 +259,6 @@
                         <div class="col col-copyRight">
                             <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
                         </div>
-                        <div class="col">
-                            {community_chooser}
-                        </div>
                         <div class="col col-logo">
                             <div class="Vanilla-logo">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.418 27" class="PoweredbyVanilla">

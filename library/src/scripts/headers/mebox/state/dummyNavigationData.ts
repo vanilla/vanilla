@@ -4,19 +4,21 @@
  * @license GPL-2.0-only
  */
 
+import { t } from "@library/utility/appUtils";
+
 export const dummyNavigationData = {
     data: [
         {
             to: "/categories",
-            children: "Categories",
+            children: t("Categories"),
         },
         {
             to: "/discussions",
-            children: "Discussions",
+            children: t("Discussions"),
         },
         {
             to: "/kb",
-            children: "Help",
+            children: t("Help"),
         },
     ],
 };

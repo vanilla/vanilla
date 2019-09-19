@@ -56,7 +56,7 @@ async function convertGettyEmbeds() {
             const embedSignature = post.getAttribute("data-sig") || "";
             const height = Number(post.getAttribute("data-height")) || 1;
             const width = Number(post.getAttribute("data-width")) || 1;
-            const items = escapeHTML(post.getAttribute("data-items")) || "";
+            const items = escapeHTML(post.getAttribute("data-items") || "");
             const data: IProps = {
                 embedType: "gettyimages",
                 url,

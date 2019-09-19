@@ -51,7 +51,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function provideConversation() {
+    private function provideConversation(): array {
         return [
             'ConversationID' => '1',
             'Format' => 'Text',

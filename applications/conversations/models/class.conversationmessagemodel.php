@@ -23,9 +23,13 @@ class ConversationMessageModel extends ConversationsModel {
      * @since 2.0.0
      * @access public
      */
-    public function __construct() {
+    public function __construct(?ConversationModel $conversationModel = null) {
         parent::__construct('ConversationMessage');
         $this->PrimaryKey = 'MessageID';
+        if ($conversationModel === null) {
+            $conversationModel = GDN::getContainer()->get(ConversationModel::class);
+        }
+        $this->conversationModel = $conversationModel;
     }
 
     /**
@@ -391,7 +395,13 @@ class ConversationMessageModel extends ConversationsModel {
      */
     public function validate($formPostValues, $insert = false) {
         $valid = parent::validate($formPostValues, $insert);
-
+        if (isset($formPostValues['ConversationID'])) {
+            $conversation = $this->conversationModel->getID($formPostValues['ConversationID']);
+            if (!$conversation) {
+                $valid = false;
+                $this->Validation->addValidationResult('ConversationID', 'Invalid conversation.');
+            }
+        }
         $maxRecipients = ConversationModel::getMaxRecipients();
         if ($maxRecipients) {
             if (isset($formPostValues['RecipientUserID']) && count($formPostValues['RecipientUserID']) > $maxRecipients) {

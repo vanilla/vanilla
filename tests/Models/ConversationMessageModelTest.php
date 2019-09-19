@@ -60,7 +60,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     public function testValidConversationMessageModelValidate() {
         $conversation = $this->provideConversation();
         $conversationMessage = [
-            'ConversationID' => $conversation->ConversationID,
+            'ConversationID' => $conversation['ConversationID'],
             'Format' => 'Text',
             'Body' => 'This is a test message'
         ];
@@ -74,7 +74,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
      *
      * @return object
      */
-    private function provideConversation() {
+    private function provideConversation(): array {
         $conversation = [
             'Format' => 'Text',
             'Body' => 'Creating conversation',
@@ -82,7 +82,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
             'RecipientUserID' => [2]
         ];
         $conversationID = $this->conversationModel->save($conversation);
-        $conversation = $this->conversationModel->getID($conversationID);
+        $conversation = $this->conversationModel->getID($conversationID, DATASET_TYPE_ARRAY);
         return $conversation;
     }
 }

@@ -19,6 +19,7 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
      * @var ConversationModel
      */
     protected $conversationModel;
+
     /**
      * @var ConversationMessageModel
      */

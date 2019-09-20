@@ -27,7 +27,12 @@ export function CollapsableContent(props: IProps) {
     const previousExpanded = useLastValue(isExpanded);
 
     const ref = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const measurements = useMeasure(ref);
+
+    useLayoutEffect(() => {
+        scrollRef.current!.scrollTo({ top: 0 });
+    });
 
     const toggleCollapse = () => {
         if (isExpanded) {
@@ -51,6 +56,7 @@ export function CollapsableContent(props: IProps) {
     return (
         <div className={classes.root}>
             <animated.div
+                ref={scrollRef}
                 style={{
                     height: isExpanded && previousExpanded === isExpanded ? "auto" : height,
                 }}

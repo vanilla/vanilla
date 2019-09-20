@@ -90,18 +90,18 @@ class OpenAPIBuilder {
 
         // Reapply URL even after pulling from cache.
         // A site may be accessed from multiple URLs and share the same cache.
-        $result = $this->applyCorrectApiBaseUrl($result);
+        $result = $this->applyRequestBasedApiBasePath($result);
         return $result;
     }
 
 
     /**
-     * Apply the correct server root to the OpenAPI definition.
+     * Apply the request specific server root to the OpenAPI definition.
      *
      * @param array $openApi A built OpenAPI definition.
      * @return array The modified OpenAPI definition
      */
-    private function applyCorrectApiBaseUrl(array $openApi): array {
+    private function applyRequestBasedApiBasePath(array $openApi): array {
         // Fix the server URL.
         $openApi['servers'] = [
             [
@@ -202,7 +202,7 @@ class OpenAPIBuilder {
             ksort($result['components'][$key]);
         }
 
-        $result = $this->applyCorrectApiBaseUrl($result);
+        $result = $this->applyRequestBasedApiBasePath($result);
 
         return $result;
     }

@@ -9,6 +9,7 @@ import { Omit } from "@library/@types/utils";
 import Loadable, { LoadableComponent } from "react-loadable";
 import Loader from "@library/loaders/Loader";
 import { Hoverable } from "@vanilla/react-utils";
+import SmartLink from "@library/routing/links/SmartLink";
 
 type LoadFunction = () => Promise<any>;
 
@@ -49,7 +50,7 @@ export default class RouteHandler<GeneratorProps> {
     public Link = (props: Omit<NavLinkProps, "to"> & { data: GeneratorProps }) => {
         return (
             <Hoverable duration={50} onHover={this.preload}>
-                {provided => <NavLink {...provided} {...props} to={this.url(props.data)} />}
+                {provided => <SmartLink {...provided} {...props} to={this.url(props.data)} />}
             </Hoverable>
         );
     };

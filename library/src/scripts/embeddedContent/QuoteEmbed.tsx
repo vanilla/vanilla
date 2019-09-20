@@ -40,7 +40,7 @@ export function QuoteEmbed(props: IProps) {
     const classesMeta = metasClasses();
 
     return (
-        <EmbedContainer withPadding={false}>
+        <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
                 <blockquote className={classes.body}>
                     <div className={classes.header}>
@@ -64,7 +64,7 @@ export function QuoteEmbed(props: IProps) {
                     <CollapsableContent
                         className={classes.content}
                         maxHeight={200}
-                        isExpandedDefault={props.expandByDefault}
+                        isExpandedDefault={!!props.expandByDefault}
                     >
                         <UserContent content={body} />
                     </CollapsableContent>

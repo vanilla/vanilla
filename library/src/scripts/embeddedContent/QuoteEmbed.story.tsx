@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
@@ -64,7 +63,6 @@ story.add("QuoteEmbed", () => {
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
-                expandByDefault={true}
             />
 
             <StoryHeading>Very Small (No expander)</StoryHeading>
@@ -77,15 +75,6 @@ story.add("QuoteEmbed", () => {
                 url="#"
                 expandByDefault={true}
             />
-
-            <StoryHeading>Medium</StoryHeading>
-            <EmbedContainer size={EmbedContainerSize.MEDIUM}>{ipsum}</EmbedContainer>
-
-            <StoryHeading>Full Width</StoryHeading>
-            <EmbedContainer size={EmbedContainerSize.FULL_WIDTH}>{ipsum}</EmbedContainer>
-
-            <StoryHeading>Editor Mode (selection/pointer-events blocked)</StoryHeading>
-            <EmbedContainer inEditor={true}>{ipsum}</EmbedContainer>
         </>
     );
 });

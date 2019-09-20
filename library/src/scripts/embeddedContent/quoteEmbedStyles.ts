@@ -7,7 +7,7 @@ import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, paddings, margins, importantUnit, unit } from "@library/styles/styleHelpers";
-import { percent } from "csx";
+import { percent, important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const quoteEmbedClasses = useThemeCache(() => {
@@ -15,7 +15,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const embedVars = embedContainerVariables();
     const style = styleFactory("quoteEmbed");
 
-    const root = style({});
+    const root = style({
+        overflow: important("initial"), // Super important
+        // Having nested overflow: "hidden" prevents collapsableContent from working.
+    });
 
     const body = style("body", {
         display: "block",

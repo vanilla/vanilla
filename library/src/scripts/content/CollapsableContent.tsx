@@ -17,7 +17,7 @@ interface IProps {
     children: React.ReactNode;
     maxHeight: number;
     className?: string;
-    isExpandedDefault?: boolean;
+    isExpandedDefault: boolean;
 }
 
 export function CollapsableContent(props: IProps) {
@@ -40,27 +40,31 @@ export function CollapsableContent(props: IProps) {
             setIsExpanded(true);
         }
     };
+
+    const maxCollapsedHeight = measurements.height < props.maxHeight ? measurements.height : props.maxHeight;
     const { height } = useSpring({
-        height: isExpanded ? measurements.height : Math.min(measurements.height, props.maxHeight),
+        height: isExpanded ? measurements.height : maxCollapsedHeight,
     });
 
     const classes = collapsableContentClasses();
 
     return (
-        <animated.div
-            style={{
-                height: isExpanded && previousExpanded === isExpanded ? "auto" : height,
-            }}
-            className={classNames(classes.root)}
-        >
-            <div ref={ref} className={props.className}>
-                {props.children}
-            </div>
+        <div className={classes.root}>
+            <animated.div
+                style={{
+                    height: isExpanded && previousExpanded === isExpanded ? "auto" : height,
+                }}
+                className={classNames(classes.heightContainer)}
+            >
+                <div ref={ref} className={props.className}>
+                    {props.children}
+                </div>
+            </animated.div>
             {measurements.height > props.maxHeight && (
                 <Button className={classes.collapser} baseClass={ButtonTypes.ICON} onClick={toggleCollapse}>
                     <ChevronUpIcon className={classes.collapserIcon} rotate={isExpanded ? undefined : 180} />
                 </Button>
             )}
-        </animated.div>
+        </div>
     );
 }

@@ -3,11 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { linearGradient, percent, px } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const collapsableContentClasses = useThemeCache(() => {
     const vars = globalVariables();
@@ -16,7 +15,10 @@ export const collapsableContentClasses = useThemeCache(() => {
     const root = style({
         background: colorOut(vars.mainColors.bg),
         position: "relative",
-        willChange: "height",
+    });
+
+    const heightContainer = style("heightContainer", {
+        // willChange: "height",
         overflow: "hidden",
     });
 
@@ -47,5 +49,5 @@ export const collapsableContentClasses = useThemeCache(() => {
         },
     });
 
-    return { root, collapser, collapserIcon };
+    return { heightContainer, root, collapser, collapserIcon };
 });

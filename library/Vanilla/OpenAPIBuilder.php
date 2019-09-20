@@ -105,7 +105,7 @@ class OpenAPIBuilder {
         // Fix the server URL.
         $openApi['servers'] = [
             [
-                'url' => $this->request->urlDomain(true) . $this->request->getRoot() . '/api/v2',
+                'url' => $this->request->urlDomain(true) . $this->request->getAssetRoot() . '/api/v2',
             ]
         ];
 

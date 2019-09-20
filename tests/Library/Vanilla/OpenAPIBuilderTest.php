@@ -25,7 +25,7 @@ class OpenAPIBuilderTest extends TestCase {
     public function testApiPathGeneration() {
         $addonManager = new AddonManager();
         $request = new Request();
-        $request->setRoot('root');
+        $request->setAssetRoot('root');
         $request->setHost('testhost.com');
         $request->setScheme('https');
         $builder = new OpenAPIBuilder($addonManager, $request);

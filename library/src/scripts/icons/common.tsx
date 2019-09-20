@@ -416,13 +416,16 @@ export function SignInIcon(props: { className?: string }) {
     );
 }
 
-export function ChevronUpIcon(props: { className?: string }) {
+export function ChevronUpIcon(props: { className?: string; rotate?: number }) {
     const title = t("Chevron Up");
     const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 51 17"
+            style={{
+                transform: props.rotate ? `rotate(${props.rotate}deg)` : undefined,
+            }}
             className={classNames(classes.chevronUp, "icon-chevronUp", props.className)}
             aria-hidden="true"
         >

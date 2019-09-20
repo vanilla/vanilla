@@ -11,10 +11,14 @@ import classnames from "classnames";
 import { makeProfileUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import DateTime from "@library/content/DateTime";
-import CollapsableUserContent from "@library/content/CollapsableContent";
+import { CollapsableContent } from "@library/content/CollapsableContent";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
 import { BottomChevronIcon, TopChevronIcon } from "@library/icons/common";
+import UserContent from "@library/content/UserContent";
+import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
+import { metasClasses } from "@library/styles/metasStyles";
+import classNames from "classnames";
 
 interface IProps extends IBaseEmbedProps {
     body: string;
@@ -30,81 +34,41 @@ interface IProps extends IBaseEmbedProps {
  */
 export function QuoteEmbed(props: IProps) {
     const { expandByDefault } = props;
-    const [isCollapsed, setIsCollapsed] = useState(!expandByDefault);
-    const [needsCollapseButton, setNeedsCollapseButton] = useState(false);
-    const toggleCollapseState = useCallback(
-        (event: React.MouseEvent<any>) => {
-            event.preventDefault();
-            setIsCollapsed(!isCollapsed);
-        },
-        [setIsCollapsed, isCollapsed],
-    );
-
     const { body, insertUser, name, url, dateInserted } = props;
-    const id = useUniqueID("collapsableContent-");
 
-    const title = name ? (
-        <h2 className="embedText-title embedQuote-title">
-            <a href={url} className="embedText-titleLink">
-                {name}
-            </a>
-        </h2>
-    ) : null;
-
-    const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed });
+    const classes = quoteEmbedClasses();
     const userUrl = makeProfileUrl(insertUser.name);
-
-    const [readyToRenderContent, setReadyToRender] = useState(!props.inEditor);
-    useEffect(() => {
-        setReadyToRender(true);
-    }, [setReadyToRender]);
+    const classesMeta = metasClasses();
 
     return (
-        <EmbedContainer className="embedText embedQuote">
+        <EmbedContainer withPadding={false}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
-                <blockquote className={bodyClasses}>
-                    <div className="embedText-header embedQuote-header">
-                        {title}
-                        <SmartLink to={userUrl} className="embedQuote-userLink">
-                            <span className="embedQuote-userName">{insertUser.name}</span>
-                        </SmartLink>
-                        <SmartLink to={url} className="embedQuote-metaLink">
-                            <DateTime
-                                timestamp={dateInserted}
-                                className="embedText-dateTime embedQuote-dateTime meta"
-                            />
-                        </SmartLink>
-
-                        {needsCollapseButton ||
-                            (props.expandByDefault && (
-                                <button
-                                    type="button"
-                                    className="embedQuote-collapseButton"
-                                    aria-label={t("Toggle Quote")}
-                                    onClick={toggleCollapseState}
-                                    aria-pressed={isCollapsed}
-                                >
-                                    {isCollapsed ? (
-                                        <BottomChevronIcon className={"embedQuote-chevronDown"} />
-                                    ) : (
-                                        <TopChevronIcon className={"embedQuote-chevronUp"} />
-                                    )}
-                                </button>
-                            ))}
-                    </div>
-                    <div className="embedText-main embedQuote-main">
-                        <div className="embedQuote-excerpt">
-                            {readyToRenderContent && (
-                                <CollapsableUserContent
-                                    setNeedsCollapser={setNeedsCollapseButton}
-                                    isCollapsed={isCollapsed}
-                                    id={id}
-                                    preferredMaxHeight={100}
-                                    dangerouslySetInnerHTML={{ __html: body }}
-                                />
-                            )}
+                <blockquote className={classes.body}>
+                    <div className={classes.header}>
+                        {name && (
+                            <h2 className={classes.title}>
+                                <SmartLink to={url} className={classes.titleLink}>
+                                    {name}
+                                </SmartLink>
+                            </h2>
+                        )}
+                        <div className={classesMeta.root}>
+                            <SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>
+                                <span className="embedQuote-userName">{insertUser.name}</span>
+                            </SmartLink>
+                            <SmartLink to={url} className={classNames(classesMeta.meta)}>
+                                <DateTime timestamp={dateInserted} />
+                            </SmartLink>
                         </div>
                     </div>
+
+                    <CollapsableContent
+                        className={classes.content}
+                        maxHeight={200}
+                        isExpandedDefault={props.expandByDefault}
+                    >
+                        <UserContent content={body} />
+                    </CollapsableContent>
                 </blockquote>
             </EmbedContent>
         </EmbedContainer>

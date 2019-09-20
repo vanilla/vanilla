@@ -36,6 +36,48 @@ story.add("QuoteEmbed", () => {
             <StoryHeading>Standard</StoryHeading>
             <QuoteEmbed body={ipsum} insertUser={dummyUser} dateInserted={dummyDate} embedType="quote" url="#" />
 
+            <StoryHeading>Expanded by default</StoryHeading>
+            <QuoteEmbed
+                body={ipsum}
+                insertUser={dummyUser}
+                dateInserted={dummyDate}
+                embedType="quote"
+                url="#"
+                expandByDefault={true}
+            />
+
+            <StoryHeading>Expanded by default</StoryHeading>
+            <QuoteEmbed
+                body={ipsum}
+                insertUser={dummyUser}
+                dateInserted={dummyDate}
+                embedType="quote"
+                url="#"
+                expandByDefault={true}
+            />
+
+            <StoryHeading>With title</StoryHeading>
+            <QuoteEmbed
+                name="Test Title here"
+                body={ipsum}
+                insertUser={dummyUser}
+                dateInserted={dummyDate}
+                embedType="quote"
+                url="#"
+                expandByDefault={true}
+            />
+
+            <StoryHeading>Very Small (No expander)</StoryHeading>
+            <QuoteEmbed
+                name="Test Title here"
+                body={"<p>Hello World</p><p>Line 2</p>"}
+                insertUser={dummyUser}
+                dateInserted={dummyDate}
+                embedType="quote"
+                url="#"
+                expandByDefault={true}
+            />
+
             <StoryHeading>Medium</StoryHeading>
             <EmbedContainer size={EmbedContainerSize.MEDIUM}>{ipsum}</EmbedContainer>
 

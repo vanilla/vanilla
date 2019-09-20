@@ -24,7 +24,7 @@ interface IProps extends IBaseEmbedProps {
     body: string;
     dateInserted: string;
     insertUser: IUserFragment;
-    expandByDefault: boolean;
+    expandByDefault?: boolean;
 }
 
 /**
@@ -33,7 +33,6 @@ interface IProps extends IBaseEmbedProps {
  * This is not an editable quote. Instead it an expandable/collapsable snapshot of the quoted/embedded comment/discussion.
  */
 export function QuoteEmbed(props: IProps) {
-    const { expandByDefault } = props;
     const { body, insertUser, name, url, dateInserted } = props;
 
     const classes = quoteEmbedClasses();

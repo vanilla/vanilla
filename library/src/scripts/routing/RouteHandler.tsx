@@ -10,6 +10,7 @@ import Loadable, { LoadableComponent } from "react-loadable";
 import Loader from "@library/loaders/Loader";
 import { Hoverable } from "@vanilla/react-utils";
 import SmartLink from "@library/routing/links/SmartLink";
+import { formatUrl } from "@library/utility/appUtils";
 
 type LoadFunction = () => Promise<any>;
 
@@ -26,10 +27,12 @@ export default class RouteHandler<GeneratorProps> {
     /** Key to identify the route. Components with the same key share the same instance. */
     private key: string;
 
+    public url: (data: GeneratorProps) => string;
+
     public constructor(
         componentPromise: LoadFunction,
         public path: string | string[],
-        public url: (data: GeneratorProps) => string,
+        url: (data: GeneratorProps) => string,
         loadingComponent: React.ReactNode = Loader,
         key?: string,
     ) {
@@ -37,6 +40,7 @@ export default class RouteHandler<GeneratorProps> {
             loading: loadingComponent as any,
             loader: componentPromise,
         });
+        this.url = (data: GeneratorProps) => formatUrl(url(data), true);
         const finalPath = Array.isArray(path) ? path : [path];
         this.key = key || finalPath.join("-");
         this.route = <Route exact path={path} component={this.loadable} key={this.key} />;

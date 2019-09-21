@@ -41,18 +41,16 @@ export class SiteNav extends React.Component<IProps> {
         const content = hasChildren
             ? children.map((child, i) => {
                   return (
-                      <>
-                          <SiteNavNode
-                              {...child}
-                              collapsible={collapsible}
-                              activeRecord={activeRecord}
-                              key={child.recordType + child.recordID}
-                              titleID={this.titleID}
-                              depth={0}
-                              onItemHover={onItemHover}
-                              clickableCategoryLabels={!!this.props.clickableCategoryLabels}
-                          />
-                      </>
+                      <SiteNavNode
+                          {...child}
+                          collapsible={collapsible}
+                          activeRecord={activeRecord}
+                          key={child.recordType + child.recordID}
+                          titleID={this.titleID}
+                          depth={0}
+                          onItemHover={onItemHover}
+                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
+                      />
                   );
               })
             : null;

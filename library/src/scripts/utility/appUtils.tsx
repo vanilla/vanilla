@@ -234,5 +234,5 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
  */
 export function makeProfileUrl(username: string) {
     const userPath = `/profile/${encodeURIComponent(username)}`;
-    return formatUrl(userPath);
+    return formatUrl(userPath, true);
 }

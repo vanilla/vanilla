@@ -40,6 +40,7 @@
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
         "smarty/smarty": "~3.1",
+        "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
         "vanilla/garden-container": "^3.0.1",

@@ -45,4 +45,13 @@ class AttributesTest extends SharedBootstrapTestCase {
         $attr = new Attributes(['a' => new Attributes()]);
         $this->assertEquals('{"a":{}}', json_encode($attr));
     }
+
+    /**
+     * Dates should properly encode within attributes.
+     */
+    public function testDateEncoding() {
+        $attr = new Attributes(['dt' => new \DateTimeImmutable('2019-09-22', new \DateTimeZone('Z'))]);
+        $actual = json_encode($attr);
+        $this->assertSame('{"dt":"2019-09-22T00:00:00+00:00"}', $actual);
+    }
 }

@@ -7,7 +7,9 @@
 
 namespace Garden;
 
-
+/**
+ * Filters output before being JSON-encoded.
+ */
 trait JsonFilterTrait {
     /**
      * Prepare data for json_encode

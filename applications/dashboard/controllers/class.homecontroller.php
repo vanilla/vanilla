@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\UrlUtils;
+
 /**
  * Handles /home endpoint.
  */
@@ -117,8 +119,8 @@ class HomeController extends Gdn_Controller {
      */
     public function leaving($target = '') {
         $target = str_replace("\xE2\x80\xAE", '', $target);
-        idn_to_ascii($target, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
-        if ($idnaInfo['errors'] !== 0) {
+        $target = UrlUtils::punnyEncode($target);
+        if ($target === false) {
             throw new Gdn_UserException(t('This link has been blocked for containing illegal characters.'));
         }
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));

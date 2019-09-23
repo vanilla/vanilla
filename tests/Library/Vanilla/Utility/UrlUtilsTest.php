@@ -9,6 +9,11 @@ namespace VanillaTests\Library\Vanilla\Utility;
 use Vanilla\Utility\UrlUtils;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class UrlUtilsTest Tests punnyEncode() function.
+ *
+ * @package VanillaTests\Library\Vanilla\Utility
+ */
 class UrlUtilsTest extends TestCase {
     /**
      * Provide data for testing the testPunnyEncode function.
@@ -28,7 +33,7 @@ class UrlUtilsTest extends TestCase {
      * Test the punnyEncode() function.
      *
      * @param string $domain Test domain.
-     * @param string $punnyCoded Domain converted to IDNA ASCII.
+     * @param string $punnyEncoded Domain converted to IDNA ASCII.
      * @dataProvider provideDomains
      */
     public function testPunnyEncode($domain, $punnyEncoded) {

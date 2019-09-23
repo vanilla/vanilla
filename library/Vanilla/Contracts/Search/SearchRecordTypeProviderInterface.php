@@ -7,6 +7,10 @@
 
 namespace Vanilla\Contracts\Search;
 
+/**
+ * Interface SearchRecordTypeProviderInterface
+ * @package Vanilla\Contracts\Search
+ */
 interface SearchRecordTypeProviderInterface  {
     /**
      * Get all supported search record types
@@ -29,6 +33,4 @@ interface SearchRecordTypeProviderInterface  {
      * @return null|SearchRecordTypeInterface
      */
     public function getType(string $typeKey): ?SearchRecordTypeInterface;
-
-
 }

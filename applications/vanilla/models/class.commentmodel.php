@@ -687,7 +687,7 @@ class CommentModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param mixed Field name(s) to order results by. May be a string or array of strings.
+     * @param mixed $value Field name(s) to order results by. May be a string or array of strings.
      * @return array $this->_OrderBy (optionally).
      */
     public function orderBy($value = null) {

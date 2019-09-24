@@ -161,9 +161,9 @@ if (!function_exists('heading')) {
 
         return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardHeading.twig', [
             'params' => [
-                'title' => $title,
-                'returnUrl' => $returnUrl,
-                'buttons' => new \Twig\Markup($buttonsString, 'utf-8'),
+                'title' => new \Twig\Markup($title, 'utf-8'),
+                'returnUrl' => $returnUrl ?: null,
+                'buttons' => $buttonsString ? new \Twig\Markup($buttonsString, 'utf-8') : null,
             ]
         ]);
     }

@@ -16,8 +16,11 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const style = styleFactory("quoteEmbed");
 
     const root = style({
-        overflow: important("initial"), // Super important
-        // Having nested overflow: "hidden" prevents collapsableContent from working.
+        $nest: {
+            "&&": {
+                overflow: "visible",
+            },
+        },
     });
 
     const body = style("body", {
@@ -45,6 +48,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
 
     const content = style("content", {
         ...paddings({ all: embedVars.spacing.padding }),
+        width: percent(100),
     });
 
     const title = style("title", {

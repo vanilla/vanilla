@@ -12,6 +12,8 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useMeasure, useLastValue } from "@vanilla/react-utils";
 import { useSpring } from "react-spring";
 import { animated } from "react-spring";
+import { Transition } from "react-spring/renderprops-universal";
+import { nextTick } from "q";
 
 interface IProps {
     children: React.ReactNode;
@@ -24,14 +26,16 @@ export function CollapsableContent(props: IProps) {
     const { isExpandedDefault } = props;
     const [isExpanded, setIsExpanded] = useState(isExpandedDefault);
 
-    const previousExpanded = useLastValue(isExpanded);
+    // const previousExpanded = useLastValue(isExpanded);
 
     const ref = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const measurements = useMeasure(ref);
 
     useLayoutEffect(() => {
-        scrollRef.current!.scrollTo({ top: 0 });
+        nextTick(() => {
+            scrollRef.current!.scrollTo({ top: 0 });
+        });
     });
 
     const toggleCollapse = () => {
@@ -47,18 +51,23 @@ export function CollapsableContent(props: IProps) {
     };
 
     const maxCollapsedHeight = measurements.height < props.maxHeight ? measurements.height : props.maxHeight;
+    const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
+
     const { height } = useSpring({
-        height: isExpanded ? measurements.height : maxCollapsedHeight,
+        height: targetHeight,
     });
 
     const classes = collapsableContentClasses();
+
+    const hasOverflow = measurements.height > props.maxHeight;
 
     return (
         <div className={classes.root}>
             <animated.div
                 ref={scrollRef}
                 style={{
-                    height: isExpanded && previousExpanded === isExpanded ? "auto" : height,
+                    minHeight: hasOverflow ? maxCollapsedHeight : "auto",
+                    height: height,
                 }}
                 className={classNames(classes.heightContainer)}
             >
@@ -66,7 +75,8 @@ export function CollapsableContent(props: IProps) {
                     {props.children}
                 </div>
             </animated.div>
-            {measurements.height > props.maxHeight && (
+
+            {hasOverflow && (
                 <Button className={classes.collapser} baseClass={ButtonTypes.ICON} onClick={toggleCollapse}>
                     <ChevronUpIcon className={classes.collapserIcon} rotate={isExpanded ? undefined : 180} />
                 </Button>

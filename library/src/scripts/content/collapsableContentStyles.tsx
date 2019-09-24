@@ -18,7 +18,8 @@ export const collapsableContentClasses = useThemeCache(() => {
     });
 
     const heightContainer = style("heightContainer", {
-        // willChange: "height",
+        position: "relative",
+        display: "block",
         overflow: "hidden",
     });
 

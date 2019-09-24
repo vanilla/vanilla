@@ -7,6 +7,10 @@
 
 namespace Vanilla\Contracts\Search;
 
+/**
+ * Interface SearchRecordTypeInterface
+ * @package Vanilla\Contracts\Search
+ */
 interface SearchRecordTypeInterface {
 
     /**

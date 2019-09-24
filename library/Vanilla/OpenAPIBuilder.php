@@ -7,6 +7,7 @@
 
 namespace Vanilla;
 
+use Garden\Web\RequestInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -26,15 +27,20 @@ class OpenAPIBuilder {
      */
     private $cachePath;
 
+    /** @var RequestInterface */
+    private $request;
+
     /**
      * OpenAPIBuilder constructor.
      *
      * @param AddonManager $addonManager The addon manager used to get a list of addons to combine.
+     * @param RequestInterface $request The request to use for the URL base path.
      * @param string $cachePath The path to cache the built OpenAPI spec.
      */
-    public function __construct(AddonManager $addonManager, string $cachePath = '') {
+    public function __construct(AddonManager $addonManager, RequestInterface $request, string $cachePath = '') {
         $this->addonManager = $addonManager;
         $this->cachePath = $cachePath ?: PATH_CACHE.'/openapi.php';
+        $this->request = $request;
     }
 
     /**
@@ -81,7 +87,29 @@ class OpenAPIBuilder {
         }
 
         $result = require $this->cachePath;
+
+        // Reapply URL even after pulling from cache.
+        // A site may be accessed from multiple URLs and share the same cache.
+        $result = $this->applyRequestBasedApiBasePath($result);
         return $result;
+    }
+
+
+    /**
+     * Apply the request specific server root to the OpenAPI definition.
+     *
+     * @param array $openApi A built OpenAPI definition.
+     * @return array The modified OpenAPI definition
+     */
+    private function applyRequestBasedApiBasePath(array $openApi): array {
+        // Fix the server URL.
+        $openApi['servers'] = [
+            [
+                'url' => $this->request->urlDomain(true) . $this->request->getAssetRoot() . '/api/v2',
+            ]
+        ];
+
+        return $openApi;
     }
 
     /**
@@ -137,7 +165,9 @@ class OpenAPIBuilder {
 
         $result = [
             'openapi' => '3.0.2',
-            'info' => []
+            'info' => [],
+            'paths' => [],
+            'components' => [],
         ];
         $results = [];
 
@@ -171,6 +201,8 @@ class OpenAPIBuilder {
         foreach ($result['components'] as $key => $_) {
             ksort($result['components'][$key]);
         }
+
+        $result = $this->applyRequestBasedApiBasePath($result);
 
         return $result;
     }

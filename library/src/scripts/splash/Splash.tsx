@@ -34,7 +34,6 @@ interface IProps extends IDeviceProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
-    outerBackgroundImage?: string;
     styleOverwrite?: ISplashStyleOverwrite;
 }
 
@@ -43,12 +42,11 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const { action, className } = this.props;
-        const styleOverwrite = this.props.styleOverwrite ? this.props.styleOverwrite : ({} as ISplashStyleOverwrite);
+        const { action, className, title } = this.props;
+        const styleOverwrite = this.props.styleOverwrite || {};
 
         const classes = splashClasses(styleOverwrite);
-        const title = this.props.title;
-        const vars = splashVariables({});
+        const vars = splashVariables(styleOverwrite);
 
         return (
             <div className={classNames(className, classes.root)}>

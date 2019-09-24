@@ -16,28 +16,28 @@ use PHPUnit\Framework\TestCase;
  */
 class UrlUtilsTest extends TestCase {
     /**
-     * Provide data for testing the testPunyEncode function.
+     * Provide data for testing the domainAsAscii function.
      *
      * @return array of domains to test.
      */
-    public function provideDomains() {
+    public function provideUnicodeDomains(): array {
         $result = [
-            ['www.vanillaforums.com', 'www.vanillaforums.com'],
-            ['goοgle.com', 'xn--gogle-sce.com'],
-            ['//goo�gle.com/', false],
+            'Valid ASCII domain' => ['www.vanillaforums.com', 'www.vanillaforums.com'],
+            'Valid Unicode domain' => ['goοgle.com', 'xn--gogle-sce.com'],
+            'Invalid Unicode domain (contains illegal characters)' => ['//goo�gle.com/', false],
         ];
         return array_column($result, null, 0);
     }
 
     /**
-     * Test the punnyEncode() function.
+     * Test the domainAsAscii() function.
      *
      * @param string $domain Test domain.
      * @param string $punyEncoded Domain converted to IDNA ASCII.
-     * @dataProvider provideDomains
+     * @dataProvider provideUnicodeDomains
      */
-    public function testPunyEncode($domain, $punyEncoded) {
-        $result = UrlUtils::punyEncode($domain);
+    public function testDomainAsAscii($domain, $punyEncoded) {
+        $result = UrlUtils::domainAsAscii($domain);
         $this->assertEquals($result, $punyEncoded);
     }
 }

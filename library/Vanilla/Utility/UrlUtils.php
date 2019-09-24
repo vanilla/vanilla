@@ -14,13 +14,16 @@ class UrlUtils {
      * This function converts domain names to IDNA ASCII form.
      *
      * @param string $link The domain name to convert.
-     * @return mixed Returns the encoded domain name. or false on failure.
+     * @return mixed Returns the ASCII domain name or null on failure.
      */
-    public static function punyEncode(string $link) {
-        idn_to_ascii($link, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
-        $link = $idnaInfo['result'];
-        if ($idnaInfo['errors'] !== 0) {
-            $link = false;
+    public static function domainAsAscii(string $link): ?string {
+        $parsedLink = parse_url($link, PHP_URL_HOST);
+        idn_to_ascii($parsedLink, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
+        if ($idnaInfo['result'] !== $parsedLink) {
+            $link = $idnaInfo['result'];
+            if ($idnaInfo['errors'] !== 0) {
+                $link = null;
+            }
         }
         return $link;
     }

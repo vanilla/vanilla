@@ -8,10 +8,10 @@
  * @since 2.0
  */
 
- use Vanilla\Formatting\FormatService;
- use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\UpdateMediaTrait;
 
- /**
+/**
  * Manages discussion comments data.
  */
 class CommentModel extends Gdn_Model {
@@ -675,8 +675,10 @@ class CommentModel extends Gdn_Model {
         $this->EventArguments["ActivityModel"] = $activityModel;
         $this->fireEvent("BeforeNotification");
 
-        // Send all notifications.
-        $activityModel->saveQueue();
+        // Queue sending notifications.
+        /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+        $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+        $scheduler->addJob(ExecuteActivityQueue::class);
     }
 
     /**

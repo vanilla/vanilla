@@ -2330,8 +2330,10 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments["ActivityModel"] = $activityModel;
         $this->fireEvent("BeforeNotification");
 
-        // Send all notifications.
-        $activityModel->saveQueue();
+        // Queue sending notifications.
+        /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+        $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+        $scheduler->addJob(ExecuteActivityQueue::class);
     }
 
     /**

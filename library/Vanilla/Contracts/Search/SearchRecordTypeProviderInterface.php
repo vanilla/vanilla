@@ -33,4 +33,11 @@ interface SearchRecordTypeProviderInterface  {
      * @return null|SearchRecordTypeInterface
      */
     public function getType(string $typeKey): ?SearchRecordTypeInterface;
+
+    /**
+     * Add (activate) search provider group. Ex: advanced, sphinx, etc...
+     *
+     * @param string $providerGroup
+     */
+    public function addProviderGroup(string $providerGroup);
 }

@@ -29,4 +29,11 @@ interface SearchRecordTypeInterface {
      * @return mixed
      */
     public function getModel();
+
+    /**
+     * Get search provider group. Ex: advanced, sphinx, etc...
+     *
+     * @return string
+     */
+    public function getProviderGroup(): string;
 }

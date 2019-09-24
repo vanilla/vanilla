@@ -119,7 +119,7 @@ class HomeController extends Gdn_Controller {
      */
     public function leaving($target = '') {
         $target = str_replace("\xE2\x80\xAE", '', $target);
-        $target = UrlUtils::punnyEncode($target);
+        $target = UrlUtils::punyEncode($target);
         if ($target === false) {
             throw new Gdn_UserException(t('This link has been blocked for containing illegal characters.'));
         }

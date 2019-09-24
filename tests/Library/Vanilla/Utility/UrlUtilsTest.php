@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class UrlUtilsTest extends TestCase {
     /**
-     * Provide data for testing the testPunnyEncode function.
+     * Provide data for testing the testPunyEncode function.
      *
      * @return array of domains to test.
      */
@@ -33,11 +33,11 @@ class UrlUtilsTest extends TestCase {
      * Test the punnyEncode() function.
      *
      * @param string $domain Test domain.
-     * @param string $punnyEncoded Domain converted to IDNA ASCII.
+     * @param string $punyEncoded Domain converted to IDNA ASCII.
      * @dataProvider provideDomains
      */
-    public function testPunnyEncode($domain, $punnyEncoded) {
-        $result = UrlUtils::punnyEncode($domain);
-        $this->assertEquals($result, $punnyEncoded);
+    public function testPunyEncode($domain, $punyEncoded) {
+        $result = UrlUtils::punyEncode($domain);
+        $this->assertEquals($result, $punyEncoded);
     }
 }

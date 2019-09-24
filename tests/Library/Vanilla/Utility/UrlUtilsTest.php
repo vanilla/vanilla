@@ -24,7 +24,9 @@ class UrlUtilsTest extends TestCase {
         $result = [
             'Valid ASCII domain' => ['www.vanillaforums.com', 'www.vanillaforums.com'],
             'Valid Unicode domain' => ['goοgle.com', 'xn--gogle-sce.com'],
-            'Invalid Unicode domain (contains illegal characters)' => ['//goo�gle.com/', false],
+            'Invalid Unicode domain (contains illegal characters)' => ['//goo�gle.com/', null],
+            'Valid url' => ['http://www.vanillaforums.com', 'www.vanillaforums.com'],
+
         ];
         return array_column($result, null, 0);
     }

@@ -11,7 +11,7 @@ namespace Vanilla\Contracts\Search;
  * Interface SearchRecordTypeProviderInterface
  * @package Vanilla\Contracts\Search
  */
-interface SearchRecordTypeProviderInterface  {
+interface SearchRecordTypeProviderInterface {
     /**
      * Get all supported search record types
      * @return array

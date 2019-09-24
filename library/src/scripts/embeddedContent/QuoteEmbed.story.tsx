@@ -30,34 +30,11 @@ const dummyDate = "2019-02-10T23:54:14+00:00";
 story.add("QuoteEmbed", () => {
     return (
         <>
-            <StoryHeading depth={1}>COMPONENT: QuoteEmbed</StoryHeading>
+            {/*<StoryHeading depth={1}>COMPONENT: QuoteEmbed</StoryHeading>*/}
 
-            <StoryHeading>Standard</StoryHeading>
-            <QuoteEmbed body={ipsum} insertUser={dummyUser} dateInserted={dummyDate} embedType="quote" url="#" />
-
-            <StoryHeading>Expanded by default</StoryHeading>
+            {/*<StoryHeading>Standard</StoryHeading>*/}
             <QuoteEmbed
-                body={ipsum}
-                insertUser={dummyUser}
-                dateInserted={dummyDate}
-                embedType="quote"
-                url="#"
-                expandByDefault={true}
-            />
-
-            <StoryHeading>Expanded by default</StoryHeading>
-            <QuoteEmbed
-                body={ipsum}
-                insertUser={dummyUser}
-                dateInserted={dummyDate}
-                embedType="quote"
-                url="#"
-                expandByDefault={true}
-            />
-
-            <StoryHeading>With title</StoryHeading>
-            <QuoteEmbed
-                name="Test Title here"
+                name="Rearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list view"
                 body={ipsum}
                 insertUser={dummyUser}
                 dateInserted={dummyDate}
@@ -65,16 +42,48 @@ story.add("QuoteEmbed", () => {
                 url="#"
             />
 
-            <StoryHeading>Very Small (No expander)</StoryHeading>
-            <QuoteEmbed
-                name="Test Title here"
-                body={"<p>Hello World</p><p>Line 2</p>"}
-                insertUser={dummyUser}
-                dateInserted={dummyDate}
-                embedType="quote"
-                url="#"
-                expandByDefault={true}
-            />
+            {/*<QuoteEmbed body={ipsum} insertUser={dummyUser} dateInserted={dummyDate} embedType="quote" url="#" />*/}
+
+            {/*<StoryHeading>Expanded by default</StoryHeading>*/}
+            {/*<QuoteEmbed*/}
+            {/*    body={ipsum}*/}
+            {/*    insertUser={dummyUser}*/}
+            {/*    dateInserted={dummyDate}*/}
+            {/*    embedType="quote"*/}
+            {/*    url="#"*/}
+            {/*    expandByDefault={true}*/}
+            {/*/>*/}
+
+            {/*<StoryHeading>Expanded by default</StoryHeading>*/}
+            {/*<QuoteEmbed*/}
+            {/*    body={ipsum}*/}
+            {/*    insertUser={dummyUser}*/}
+            {/*    dateInserted={dummyDate}*/}
+            {/*    embedType="quote"*/}
+            {/*    url="#"*/}
+            {/*    expandByDefault={true}*/}
+            {/*/>*/}
+
+            {/*<StoryHeading>With title</StoryHeading>*/}
+            {/*<QuoteEmbed*/}
+            {/*    name="Test Title here"*/}
+            {/*    body={ipsum}*/}
+            {/*    insertUser={dummyUser}*/}
+            {/*    dateInserted={dummyDate}*/}
+            {/*    embedType="quote"*/}
+            {/*    url="#"*/}
+            {/*/>*/}
+
+            {/*<StoryHeading>Very Small (No expander)</StoryHeading>*/}
+            {/*<QuoteEmbed*/}
+            {/*    name="Test Title here"*/}
+            {/*    body={"<p>Hello World</p><p>Line 2</p>"}*/}
+            {/*    insertUser={dummyUser}*/}
+            {/*    dateInserted={dummyDate}*/}
+            {/*    embedType="quote"*/}
+            {/*    url="#"*/}
+            {/*    expandByDefault={true}*/}
+            {/*/>*/}
         </>
     );
 });

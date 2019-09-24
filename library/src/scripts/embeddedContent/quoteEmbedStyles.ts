@@ -51,6 +51,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
         width: percent(100),
     });
 
+    const footer = style("footer", {
+        display: "block",
+    });
+
     const title = style("title", {
         ...lineHeightAdjustment(),
         ...margins({
@@ -68,5 +72,14 @@ export const quoteEmbedClasses = useThemeCache(() => {
         fontWeight: vars.fonts.weights.bold,
     });
 
-    return { root, body, userName, title, titleLink, header, content };
+    return {
+        root,
+        body,
+        userName,
+        title,
+        titleLink,
+        header,
+        content,
+        footer,
+    };
 });

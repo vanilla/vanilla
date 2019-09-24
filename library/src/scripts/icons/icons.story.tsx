@@ -125,6 +125,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`DeleteIcon`}>
                     <CommonIcons.DeleteIcon />
                 </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`DiscussionIcon`}>
+                    <CommonIcons.DiscussionIcon />
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>

@@ -536,6 +536,150 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
+     * Notify users of a new comment.
+     *
+     * @param array $comment
+     * @param array $discussion
+     */
+    private function notifyNewComment(?array $comment, ?array $discussion) {
+        if ($comment === null || $discussion === null) {
+            return;
+        }
+
+        $commentID = $comment["CommentID"] ?? null;
+        $discussionID = $discussion["DiscussionID"] ?? null;
+        $categoryID = $discussion["CategoryID"] ?? null;
+
+        if ($commentID === null || $discussionID === null || $categoryID === null) {
+            return;
+        }
+
+        $category = CategoryModel::categories($categoryID);
+        if ($category === null) {
+            return;
+        }
+
+        $body = $comment["Body"] ?? null;
+        $discussionUserID = $discussion["InsertUserID"] ?? null;
+        $format = $comment["Format"] ?? null;
+
+        // Prepare the notification queue.
+        $data = [
+            "ActivityType" => "Comment",
+            "ActivityUserID" => $comment["InsertUserID"] ?? null,
+            "HeadlineFormat" => t(
+                "HeadlineFormat.Comment",
+                '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>'
+            ),
+            "RecordType" => "Comment",
+            "RecordID" => $commentID,
+            "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
+            "Data" => [
+                "Name" => $discussion["Name"] ?? null,
+                "Category" => $category["Name"] ?? null,
+            ]
+        ];
+
+        // Allow simple fulltext notifications
+        if (c("Vanilla.Activity.ShowCommentBody", false)) {
+            $data["Story"] = $comment["Body"] ?? null;
+            $data["Format"] = $comment["Format"] ?? null;
+        }
+
+        // Pass generic activity to events.
+        $this->EventArguments["Activity"] = $data;
+
+        /** @var ActivityModel $activityModel */
+        $activityModel = Gdn::getContainer()->get(ActivityModel::class);
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+
+        $notificationGroups = [
+            "bookmark" => [
+                "notifyUserIDs" => array_column(
+                    $discussionModel->getBookmarkUsers($discussionID)->resultArray(),
+                    "UserID"
+                ),
+                "options" => ['CheckRecord' => true],
+                "preference" => "BookmarkComment",
+            ],
+            "mention" => [
+                "headlineFormat" => t(
+                    "HeadlineFormat.Mention",
+                    '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>'
+                ),
+                "notifyUserIDs" => [],
+                "preference" => "Mention",
+            ],
+            "mine" => [
+                "notifyUserIDs" => [$discussionUserID],
+                "preference" => "DiscussionComment",
+            ],
+            "participated" => [
+                "notifyUserIDs" => array_column(
+                    $discussionModel->getParticipatedUsers($discussionID),
+                    "UserID"
+                ),                "options" => ['CheckRecord' => true],
+                "preference" => "ParticipateComment",
+            ],
+        ];
+
+        $mentions = [];
+        if (is_string($body) && is_string($format)) {
+            $mentions = Gdn::formatService()->parseMentions($body, $format);
+            /** @var UserModel $userModel */
+            $userModel = Gdn::getContainer()->get(UserModel::class);
+
+            foreach ($mentions as $mentionName) {
+                $mentionUser = $userModel->getByUsername($mentionName);
+                if ($mentionUser) {
+                    $notificationGroups["mention"]["notifyUserIDs"][] = $mentionUser->UserID ?? null;
+                }
+            }
+        }
+
+        foreach ($notificationGroups as $group => $groupData) {
+            $headlineFormat = $groupData["headlineFormat"] ?? $data["HeadlineFormat"];
+            $notifyUserIDs = $groupData["notifyUserIDs"] ?? [];
+            $preference = $groupData["preference"] ?? false;
+            $options = $groupData["options"] ?? [];
+
+            foreach ($notifyUserIDs as $notifyUserID) {
+                if ($notifyUserID === null) {
+                    continue;
+                }
+
+                // Check user can still see the discussion.
+                if (!$discussionModel->canView($discussion, $notifyUserID)) {
+                    continue;
+                }
+
+                $notification = $data;
+                $notification["HeadlineFormat"] = $headlineFormat;
+                $notification["NotifyUserID"] = $notifyUserID;
+                $notification["Data"]["Reason"] = $group;
+                $activityModel->queue($notification, $preference, $options);
+            }
+        }
+
+        // Record advanced notifications.
+        $advancedActivity = $data;
+        $advancedActivity["Data"]["Reason"] = "advanced";
+        $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
+
+        // Throw an event for users to add their own events.
+        $this->EventArguments["Comment"] = $comment;
+        $this->EventArguments["Discussion"] = $discussion;
+        $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
+        $this->EventArguments["MentionedUsers"] = $mentions;
+        $this->EventArguments["ActivityModel"] = $activityModel;
+        $this->fireEvent("BeforeNotification");
+
+        // Send all notifications.
+        $activityModel->saveQueue();
+    }
+
+    /**
      * Set the order of the comments or return current order.
      *
      * Getter/setter for $this->_OrderBy.
@@ -543,7 +687,7 @@ class CommentModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param mixed Field name(s) to order results by. May be a string or array of strings.
+     * @param mixed $value Field name(s) to order results by. May be a string or array of strings.
      * @return array $this->_OrderBy (optionally).
      */
     public function orderBy($value = null) {
@@ -1171,7 +1315,6 @@ class CommentModel extends Gdn_Model {
      */
     public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
         $Session = Gdn::session();
-        $discussionModel = new DiscussionModel();
 
         // Load comment data
         $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
@@ -1206,111 +1349,10 @@ class CommentModel extends Gdn_Model {
             if ($Discussion->CategoryID > 0) {
                 CategoryModel::instance()->incrementLastComment($Fields);
             }
-
-            // Prepare the notification queue.
-            $ActivityModel = new ActivityModel();
-            $HeadlineFormat = t('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
-            $Category = CategoryModel::categories($Discussion->CategoryID);
-            $Activity = [
-                'ActivityType' => 'Comment',
-                'ActivityUserID' => $Fields['InsertUserID'],
-                'HeadlineFormat' => $HeadlineFormat,
-                'RecordType' => 'Comment',
-                'RecordID' => $CommentID,
-                'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-                'Data' => [
-                    'Name' => $Discussion->Name,
-                    'Category' => val('Name', $Category),
-                ]
-            ];
-
-            // Allow simple fulltext notifications
-            if (c('Vanilla.Activity.ShowCommentBody', false)) {
-                $Activity['Story'] = val('Body', $Fields);
-                $Activity['Format'] = val('Format', $Fields);
-            }
-
-            // Pass generic activity to events.
-            $this->EventArguments['Activity'] = $Activity;
-
-
-            // Notify users who have bookmarked the discussion.
-            $BookmarkData = $DiscussionModel->getBookmarkUsers($DiscussionID);
-            foreach ($BookmarkData->result() as $Bookmark) {
-                // Check user can still see the discussion.
-                if (!$discussionModel->canView($Discussion, $Bookmark->UserID)) {
-                    continue;
-                }
-
-                $Activity['NotifyUserID'] = $Bookmark->UserID;
-                $Activity['Data']['Reason'] = 'bookmark';
-                $ActivityModel->queue($Activity, 'BookmarkComment', ['CheckRecord' => true]);
-            }
-
-            // Notify users who have participated in the discussion.
-            $ParticipatedData = $DiscussionModel->getParticipatedUsers($DiscussionID);
-            foreach ($ParticipatedData->result() as $UserRow) {
-                if (!$discussionModel->canView($Discussion, $UserRow->UserID)) {
-                    continue;
-                }
-
-                $Activity['NotifyUserID'] = $UserRow->UserID;
-                $Activity['Data']['Reason'] = 'participated';
-                $ActivityModel->queue($Activity, 'ParticipateComment', ['CheckRecord' => true]);
-            }
-
-            // Record user-comment activity.
-            if ($Discussion != false) {
-                $InsertUserID = val('InsertUserID', $Discussion);
-                // Check user can still see the discussion.
-                if ($discussionModel->canView($Discussion, $InsertUserID)) {
-                    $Activity['NotifyUserID'] = $InsertUserID;
-                    $Activity['Data']['Reason'] = 'mine';
-                    $ActivityModel->queue($Activity, 'DiscussionComment');
-                }
-            }
-
-            // Record advanced notifications.
-            if ($Discussion !== false) {
-                $Activity['Data']['Reason'] = 'advanced';
-                $this->recordAdvancedNotications($ActivityModel, $Activity, $Discussion);
-            }
-
-            // Notify any users who were mentioned in the comment.
-            $Usernames = Gdn::formatService()->parseMentions($Fields['Body'], $Fields['Format']);
-
-            $userModel = Gdn::userModel();
-            foreach ($Usernames as $i => $Username) {
-                $User = $userModel->getByUsername($Username);
-                if (!$User) {
-                    unset($Usernames[$i]);
-                    continue;
-                }
-
-                // Check user can still see the discussion.
-                if (!$discussionModel->canView($Discussion, $User->UserID)) {
-                    continue;
-                }
-
-                $HeadlineFormatBak = $Activity['HeadlineFormat'];
-                $Activity['HeadlineFormat'] = t('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
-                $Activity['NotifyUserID'] = $User->UserID;
-                $Activity['Data']['Reason'] = 'mention';
-                $ActivityModel->queue($Activity, 'Mention');
-                $Activity['HeadlineFormat'] = $HeadlineFormatBak;
-            }
-            unset($Activity['Data']['Reason']);
-
-            // Throw an event for users to add their own events.
-            $this->EventArguments['Comment'] = $Fields;
-            $this->EventArguments['Discussion'] = $Discussion;
-            $this->EventArguments['NotifiedUsers'] = array_keys(ActivityModel::$Queue);
-            $this->EventArguments['MentionedUsers'] = $Usernames;
-            $this->EventArguments['ActivityModel'] = $ActivityModel;
-            $this->fireEvent('BeforeNotification');
-
-            // Send all notifications.
-            $ActivityModel->saveQueue();
+            $this->notifyNewComment(
+                $Fields ? (array)$Fields : null,
+                $Discussion ? (array)$Discussion : null
+            );
         }
     }
 

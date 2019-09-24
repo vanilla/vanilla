@@ -11,14 +11,14 @@
 {% from "@dashboard/components/macros.twig" import dashboardSymbol %}
 <header class="header-block">
     <div class="title-block">
-        {% if params.returnUrl is defined %}
+        {% if params.returnUrl|default(false) %}
             <a href="{{ url(params.returnUrl) }}" class="btn btn-icon btn-return" aria-label="Return">
                 {{ dashboardSymbol({ name: 'chevron-left' }) }}
             </a>
         {% endif %}
         <h1>{{ params.title }}</h1>
     </div>
-    {% if params.buttons is defined %}
+    {% if params.buttons|default(false) %}
         <div class="btn-container">
             {{ params.buttons }}
         </div>

@@ -120,4 +120,66 @@ class RenderFunctionsTest extends TestCase {
             ],
         ];
     }
+
+    /**
+     * Tests for the heading function.
+     *
+     * @param array $params
+     * @param string $expectedHtml
+     *
+     * @dataProvider provideHeadingArgs
+     */
+    public function testDashboardHeading(array $params, string $expectedHtml) {
+        $actual = heading(...$params);
+        $this->assertHtmlStringEqualsHtmlString($expectedHtml, $actual);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideHeadingArgs(): array {
+        return [
+            'simple title' => [
+                ["Hello! <dont-escape-me></dont-escape-me> me once"],
+                "
+                <header class=header-block>
+                    <div class=title-block>
+                    <h1>Hello!<dont-escape-me></dont-escape-me> me once</h1></div>
+                </header>",
+            ],
+            'title with return' => [
+                [
+                    'Hello',
+                    '',
+                    '',
+                    '',
+                    'https://test.com/back',
+                ],
+                "<header class=header-block>
+                    <div class=title-block>
+                        <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
+                        <h1>Hello</h1>
+                    </div>
+                </header>"
+            ],
+            'with buttons' => [
+                [
+                    'Hello',
+                    'button',
+                    'http://test.com/button',
+                    ['data-test' => 'test'],
+                    'https://test.com/back',
+                ],
+                "<header class=header-block>
+                    <div class=title-block>
+                        <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
+                        <h1>Hello</h1>
+                    </div>
+                    <div class=btn-container>
+                        <a class='btn btn-primary' data-test=test href=http://test.com/button>button</a>
+                    </div>
+                </header>"
+            ]
+        ];
+    }
 }

@@ -1,31 +1,36 @@
 import React from "react";
-import { IUser, IUserFragment } from "@library/@types/api/users";
+import { IUser, IUserFragment, IUserFragmentAndRoles, IUserRoles } from "@library/@types/api/users";
 import SmartLink from "@library/routing/links/SmartLink";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import { userLabelClasses } from "@library/content/userLabelStyles";
 import { Roles } from "@library/content/Roles";
 import classNames from "classnames";
 import DateTime from "@library/content/DateTime";
+import { metasClasses } from "@library/styles/metasStyles";
 
 /**
  * Contains, user avatar, name, and optionnal meta data
  */
 
-interface IUserLabel {
-    user: IUser;
+interface IUserLabel extends IUserRoles {
+    user: IUserFragment | IUserFragmentAndRoles;
     date?: string;
     dateLink?: string;
+    category?: string;
+    categoryLink?: string;
     displayOptions?: {
         showRole?: boolean;
+        showCategory?: boolean;
     };
 }
 
 export function UserLabel(props: IUserLabel) {
-    const { user, date, dateLink, displayOptions = {} } = props;
-    const { showRole } = displayOptions;
+    const { user, date, dateLink, displayOptions = {}, category, categoryLink } = props;
+    const { showRole = true, showCategory = false } = displayOptions;
 
     const userUrl = makeProfileUrl(user.name);
     const classes = userLabelClasses();
+    const classesMeta = metasClasses();
     return (
         <article className={classes.root}>
             <SmartLink to={userUrl} className={classes.avatarLink}>
@@ -36,14 +41,23 @@ export function UserLabel(props: IUserLabel) {
                     <SmartLink to={userUrl} className={classes.userName}>
                         {user.name}
                     </SmartLink>
-                    {showRole && user.roles && <Roles roles={user.roles} wrapper={false} />}
+                    {showRole && "roles" in user && <Roles roles={user.roles} wrapper={false} />}
                 </div>
-                {date && dateLink && (
+                {date && (
                     <div className={classes.bottomRow}>
-                        <SmartLink to={dateLink} className={classes.dateLink}>
+                        {dateLink ? (
+                            <SmartLink to={dateLink} className={classes.dateLink}>
+                                <DateTime timestamp={date} className={classes.date} />
+                            </SmartLink>
+                        ) : (
                             <DateTime timestamp={date} className={classes.date} />
-                        </SmartLink>
+                        )}
                     </div>
+                )}
+                {showCategory && category && categoryLink && (
+                    <SmartLink to={categoryLink} className={classesMeta.meta}>
+                        {category}
+                    </SmartLink>
                 )}
             </div>
         </article>

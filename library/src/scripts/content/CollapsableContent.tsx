@@ -52,6 +52,7 @@ export function CollapsableContent(props: IProps) {
 
     const maxCollapsedHeight = measurements.height < props.maxHeight ? measurements.height : props.maxHeight;
     const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
+    const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
 
     const { height } = useSpring({
         height: targetHeight,
@@ -66,7 +67,7 @@ export function CollapsableContent(props: IProps) {
             <animated.div
                 ref={scrollRef}
                 style={{
-                    minHeight: targetHeight,
+                    minHeight: maxHeight,
                     height: height,
                 }}
                 className={classNames(classes.heightContainer)}

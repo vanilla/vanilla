@@ -9,6 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { IUserFragment } from "@library/@types/api/users";
+import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
 
 const story = storiesOf("Embeds", module);
 
@@ -40,6 +41,19 @@ story.add("QuoteEmbed", () => {
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
+                discussionLink={"#"}
+                postLink={"#"}
+                category={{
+                    categoryID: 1,
+                    name: "Cool Cats",
+                    url: "#",
+                }}
+                displayOptions={{
+                    showUserLabel: true,
+                    showDiscussionLink: true,
+                    showPostLink: true,
+                    showCategoryLink: true,
+                }}
             />
 
             {/*<QuoteEmbed body={ipsum} insertUser={dummyUser} dateInserted={dummyDate} embedType="quote" url="#" />*/}

@@ -1,5 +1,5 @@
 import React from "react";
-import { IUser } from "@library/@types/api/users";
+import { IUser, IUserRoles } from "@library/@types/api/users";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { metasClasses } from "@library/styles/metasStyles";
 import { rolesClasses } from "@library/content/rolesStyles";
@@ -9,15 +9,9 @@ import classNames from "classnames";
  * Display user role(s)
  */
 
-interface IProps {
+interface IProps extends IUserRoles {
     maxRoleCount?: number;
     wrapper?: boolean;
-    roles: [
-        {
-            roleID: number;
-            name: string;
-        }
-    ];
 }
 
 export function Roles(props: IProps) {

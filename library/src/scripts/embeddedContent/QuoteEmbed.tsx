@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { IUser, IUserFragment } from "@library/@types/api/users";
+import { IUser, IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
 import { useUniqueID } from "@library/utility/idUtils";
 import classnames from "classnames";
 import { makeProfileUrl, t } from "@library/utility/appUtils";
@@ -19,17 +19,18 @@ import UserContent from "@library/content/UserContent";
 import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategory, ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { UserLabel } from "@library/content/UserLabel";
 
 interface IProps extends IBaseEmbedProps {
     body: string;
     dateInserted: string;
-    insertUser: IUserFragment | IUser;
+    insertUser: IUserFragment | IUserFragmentAndRoles;
     expandByDefault?: boolean;
     discussionLink?: string;
     postLink?: string; // should always be there for citation reference
-    category?: ICategory;
+    category: ICategoryFragment;
     // For compatibility, new options are hidden by default
     displayOptions?: {
         showUserLabel?: boolean;
@@ -86,20 +87,22 @@ export function QuoteEmbed(props: IProps) {
             <EmbedContent type="Quote" inEditor={props.inEditor}>
                 <article className={classes.body}>
                     <header className={classes.header}>
-                        <SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>
-                            <span className="embedQuote-userName">{insertUser.name}</span>
-                        </SmartLink>
+                        {showUserLabel && <UserLabel user={insertUser} date={dateInserted} dateLink={postLink} />}
 
-                        <div className={classesMeta.root}>
-                            <SmartLink to={url} className={classNames(classesMeta.meta)}>
-                                <DateTime timestamp={dateInserted} />
-                            </SmartLink>
-                            {category && showCategoryLink && (
-                                <SmartLink to={category.url} className={classNames(classesMeta.meta)}>
-                                    {category.name}
-                                </SmartLink>
-                            )}
-                        </div>
+                        {/*<SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>*/}
+                        {/*    <span className="embedQuote-userName">{insertUser.name}</span>*/}
+                        {/*</SmartLink>*/}
+
+                        {/*<div className={classesMeta.root}>*/}
+                        {/*    <SmartLink to={url} className={classNames(classesMeta.meta)}>*/}
+                        {/*        <DateTime timestamp={dateInserted} />*/}
+                        {/*    </SmartLink>*/}
+                        {/*    {category && showCategoryLink && (*/}
+                        {/*        <SmartLink to={category.url} className={classNames(classesMeta.meta)}>*/}
+                        {/*            {category.name}*/}
+                        {/*        </SmartLink>*/}
+                        {/*    )}*/}
+                        {/*</div>*/}
 
                         {name && (
                             <h2 className={classes.title}>
@@ -118,8 +121,11 @@ export function QuoteEmbed(props: IProps) {
                             <UserContent content={body} />
                         </blockquote>
                     </CollapsableContent>
-                    {(linkToPost || (showDiscussionLink && discussionLink)) && (
-                        <footer className={classes.footer}>{linkToPost}</footer>
+                    {(linkToDiscussion || linkToPost) && (
+                        <footer className={classes.footer}>
+                            {linkToDiscussion}
+                            {linkToPost}
+                        </footer>
                     )}
                 </article>
             </EmbedContent>

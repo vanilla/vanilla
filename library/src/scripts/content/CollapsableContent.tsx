@@ -66,7 +66,7 @@ export function CollapsableContent(props: IProps) {
             <animated.div
                 ref={scrollRef}
                 style={{
-                    minHeight: hasOverflow ? maxCollapsedHeight : "auto",
+                    minHeight: targetHeight,
                     height: height,
                 }}
                 className={classNames(classes.heightContainer)}

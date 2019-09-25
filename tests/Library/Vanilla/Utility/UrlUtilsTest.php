@@ -50,7 +50,9 @@ class UrlUtilsTest extends TestCase {
             'Valid ASCII domain' => ['www.vanillaforums.com', 'http://www.vanillaforums.com'],
             'Valid Unicode domain' => ['http://www.goοgle.com/test', 'http://www.xn--gogle-sce.com/test'],
             'Valid ASCII domain with fragment' => ['https://www.google.com/path/to/page?query=string#fragment', 'https://www.google.com/path/to/page?query=string#fragment'],
-            'Valid Unicode domain with fragment' => ['https://www.goοgle.com/path/to/page?query=string#fragment', 'https://www.xn--gogle-sce.com/path/to/page?query=string#fragment'],
+            'Valid Unicode domain with fragment' => [
+                'https://www.goοgle.com/path/to/page?query=string#fragment', 'https://www.xn--gogle-sce.com/path/to/page?query=string#fragment'
+            ],
             'Valid url' => ['http://www.vanillaforums.com', 'http://www.vanillaforums.com'],
             'Valid punycoded url' => ['xn--gogle-sce.com', 'http://xn--gogle-sce.com'],
         ];

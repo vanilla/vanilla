@@ -62,7 +62,7 @@ export function CollapsableContent(props: IProps) {
     const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
 
     const { height } = useSpring({
-        height: targetHeight,
+        height: targetHeight > 0 ? targetHeight : "auto",
     });
 
     const gradientProps = useSpring({

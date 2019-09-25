@@ -116,11 +116,14 @@ class HomeController extends Gdn_Controller {
 
     /**
      * @param string $target
+     *
+     * @throws Gdn_UserException Throw an exception if the domain is invalid.
      */
     public function leaving($target = '') {
         $target = str_replace("\xE2\x80\xAE", '', $target);
-        $target = UrlUtils::domainAsAscii($target);
-        if (!$target) {
+        try {
+            $target = UrlUtils::domainAsAscii($target);
+        } catch (Exception $e) {
             throw new Gdn_UserException(t('Domain is invalid'));
         }
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));

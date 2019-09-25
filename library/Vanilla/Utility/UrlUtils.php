@@ -6,6 +6,8 @@
 
 namespace Vanilla\Utility;
 
+use InvalidArgumentException;
+
 /**
  * A collection of url utilities.
  */
@@ -16,22 +18,19 @@ class UrlUtils {
      * @param string $link The domain name to convert.
      * @return mixed Returns the ASCII domain name or null on failure.
      */
-    public static function domainAsAscii(string $link): ?string {
-        $protocols = [
-            'http://',
-            'https://',
-        ];
-        // Remove http:// and https:// before calling idn_to_ascii.
-        foreach($protocols as $protocol) {
-            if(strpos($link, $protocol) === 0) {
-                $link = str_replace($protocol, '', $link);
+    public static function domainAsAscii(string $url): ?string {
+        $parsedLink = parse_url($url);
+        if (!array_key_exists('host', $parsedLink)) {
+            $parsedLink = parse_url('http://'.$url);
+            if (!array_key_exists('host', $parsedLink)) {
+                throw new InvalidArgumentException('Url Invalid.');
             }
         }
-        idn_to_ascii($link, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
-        $link = $idnaInfo['result'];
+        $parsedLink['host'] = idn_to_ascii( $parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
         if ($idnaInfo['errors'] !== 0) {
-            $link = null;
+            throw new InvalidArgumentException('Domain Invalid.');
         }
-        return $link;
+        $buildUrl = http_build_url($parsedLink);
+        return $buildUrl;
     }
 }

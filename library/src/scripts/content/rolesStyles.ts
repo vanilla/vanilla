@@ -5,14 +5,24 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders } from "@library/styles/styleHelpers";
+import { borders, paddings, unit } from "@library/styles/styleHelpers";
 
 export const rolesClasses = useThemeCache(() => {
     const style = styleFactory("roles");
-    const vars = globalVariables().meta;
+    const globalVars = globalVariables();
+    const metaVars = globalVars.meta;
 
     const role = style({
-        ...borders({ color: vars.text.color, radius: 3 }),
+        ...borders({ color: metaVars.text.color, radius: 3 }),
+        ...paddings({
+            horizontal: 4,
+        }),
+        $nest: {
+            "&&": {
+                fontSize: metaVars.text.fontSize,
+                lineHeight: globalVars.lineHeights.condensed,
+            },
+        },
     });
 
     return { role };

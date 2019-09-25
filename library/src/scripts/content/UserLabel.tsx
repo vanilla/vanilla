@@ -43,12 +43,16 @@ export function UserLabel(props: IUserLabel) {
     );
 
     const categoryComponent =
-        showCategory && category ? <SmartLink to={category.url}>{category.name}</SmartLink> : null;
+        showCategory && category ? (
+            <SmartLink to={category.url} className={classesMeta.meta}>
+                {category.name}
+            </SmartLink>
+        ) : null;
 
     if (compact) {
         return (
             <div className={classesMeta.root}>
-                <SmartLink to={userUrl} className={classes.userName}>
+                <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
                     {user.name}
                 </SmartLink>
                 {dateComponent}
@@ -63,7 +67,7 @@ export function UserLabel(props: IUserLabel) {
                 </SmartLink>
                 <div className={classes.main}>
                     <div className={classNames(classes.row, classesMeta.root, "isFlexed", classes.topRow)}>
-                        <SmartLink to={userUrl} className={classNames(classes.userName)}>
+                        <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
                             {user.name}
                         </SmartLink>
                         {showRole && "roles" in user && <Roles roles={user.roles} wrapper={false} />}

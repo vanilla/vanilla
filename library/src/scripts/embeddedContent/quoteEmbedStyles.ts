@@ -3,16 +3,47 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, paddings, margins, importantUnit, unit } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    paddings,
+    margins,
+    importantUnit,
+    unit,
+    allLinkStates,
+    absolutePosition,
+} from "@library/styles/styleHelpers";
 import { percent, important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { MinHeightProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
+
+export const quoteEmbedVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("quoteEmbed");
+
+    const title = makeThemeVars("title", {
+        padding: 14,
+    });
+
+    const userContent = makeThemeVars("userContent", {
+        padding: 8,
+    });
+
+    const footer = makeThemeVars("footer", {
+        height: 44,
+    });
+
+    return { title, footer, userContent };
+});
 
 export const quoteEmbedClasses = useThemeCache(() => {
-    const vars = globalVariables();
+    const globalVars = globalVariables();
     const embedVars = embedContainerVariables();
+    const vars = quoteEmbedVariables();
+
     const style = styleFactory("quoteEmbed");
 
     const root = style({
@@ -36,7 +67,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const userName = style("userName", {
-        fontWeight: vars.fonts.weights.bold,
+        fontWeight: globalVars.fonts.weights.bold,
     });
 
     const header = style("header", {
@@ -47,18 +78,35 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const content = style("content", {
-        ...paddings({ all: embedVars.spacing.padding }),
+        ...paddings({
+            all: embedVars.spacing.padding,
+            top: vars.userContent.padding,
+        }),
         width: percent(100),
     });
 
     const footer = style("footer", {
-        display: "flex",
-        width: percent(100),
-        alignItems: "center",
-        justifyContent: "space-between",
+        position: "relative",
         ...paddings({
             horizontal: embedVars.spacing.padding,
         }),
+    });
+
+    const footerMain = style("footerMain", {
+        display: "flex",
+        position: "relative",
+        flexWrap: "wrap",
+        width: percent(100),
+        alignItems: "center",
+        justifyContent: "space-between",
+        minHeight: unit(vars.footer.height),
+    });
+
+    const footerSeparator = style("footerSeparator", {
+        display: "block",
+        width: percent(100),
+        height: unit(1),
+        backgroundColor: colorOut(globalVars.mixBgAndFg(0.2)),
     });
 
     const title = style("title", {
@@ -66,16 +114,82 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...margins({
             horizontal: importantUnit(0),
             top: importantUnit(0),
-            bottom: importantUnit(vars.meta.spacing.default),
+            bottom: importantUnit(globalVars.meta.spacing.default),
         }),
         display: "block",
         width: percent(100),
+        color: colorOut(globalVars.mainColors.fg),
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.bold,
+        lineHeight: globalVars.lineHeights.condensed,
     });
 
     const titleLink = style("titleLink", {
-        color: colorOut(vars.mainColors.fg),
-        fontSize: vars.fonts.size.medium,
-        fontWeight: vars.fonts.weights.bold,
+        display: "block",
+        position: "relative",
+        paddingTop: unit(vars.title.padding),
+    });
+
+    const postLink = style("postLink", {
+        display: "flex",
+        alignItems: "center",
+        ...allLinkStates({
+            allStates: {
+                textDecoration: "none",
+            },
+            noState: {
+                color: colorOut(globalVars.links.colors.default),
+            },
+            hover: {
+                color: colorOut(globalVars.links.colors.hover),
+            },
+            focus: {
+                color: colorOut(globalVars.links.colors.focus),
+            },
+            active: {
+                color: colorOut(globalVars.links.colors.active),
+            },
+        }),
+    });
+    const postLinkIcon = style("postLinkIcon", {
+        color: "inherit",
+    });
+
+    const discussionLink = style("discussionLink", {
+        height: unit(globalVars.icon.sizes.default),
+        width: unit(globalVars.icon.sizes.default),
+        ...allLinkStates({
+            allStates: {
+                textDecoration: "none",
+            },
+            noState: {
+                color: colorOut(globalVars.links.colors.default),
+            },
+            hover: {
+                color: colorOut(globalVars.links.colors.hover),
+            },
+            focus: {
+                color: colorOut(globalVars.links.colors.focus),
+            },
+            active: {
+                color: colorOut(globalVars.links.colors.active),
+            },
+        }),
+    });
+
+    const discussionIcon = style("discussionIcon", {
+        color: "inherit",
+    });
+
+    const blockquote = style("blockquote", {
+        margin: 0,
+        padding: 0,
+        $nest: {
+            ".userContent": {
+                ...lineHeightAdjustment(),
+                fontSize: unit(globalVars.fonts.size.medium),
+            },
+        },
     });
 
     return {
@@ -87,5 +201,12 @@ export const quoteEmbedClasses = useThemeCache(() => {
         header,
         content,
         footer,
+        footerMain,
+        footerSeparator,
+        postLink,
+        postLinkIcon,
+        discussionLink,
+        discussionIcon,
+        blockquote,
     };
 });

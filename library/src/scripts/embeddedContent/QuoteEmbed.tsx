@@ -73,17 +73,17 @@ export function QuoteEmbed(props: IProps) {
     const discussionTitle = t("View Original Discussion");
 
     const linkToDiscussion = showDiscussionLink && discussionLink && (
-        <SmartLink title={discussionTitle} to={discussionLink}>
-            <DiscussionIcon title={discussionTitle} />
+        <SmartLink title={discussionTitle} to={discussionLink} className={classes.discussionLink}>
+            <DiscussionIcon title={discussionTitle} className={classes.discussionIcon} />
             <ScreenReaderContent>{discussionTitle}</ScreenReaderContent>
         </SmartLink>
     );
 
     const postTitle = t("View Post");
     const linkToPost = showPostLink && postLink && (
-        <SmartLink to={postLink}>
+        <SmartLink to={postLink} className={classes.postLink}>
             {postTitle}
-            <RightChevronIcon title={postTitle} />
+            <RightChevronIcon title={postTitle} className={classes.postLinkIcon} />
         </SmartLink>
     );
 
@@ -122,11 +122,9 @@ export function QuoteEmbed(props: IProps) {
                             {/*</div>*/}
 
                             {name && (
-                                <h2 className={classes.title}>
-                                    <SmartLink to={url} className={classes.titleLink}>
-                                        {name}
-                                    </SmartLink>
-                                </h2>
+                                <SmartLink to={url} className={classes.titleLink}>
+                                    <h2 className={classes.title}>{name}</h2>
+                                </SmartLink>
                             )}
 
                             {!showUserLabel && showCompactUserInfo && (
@@ -146,14 +144,17 @@ export function QuoteEmbed(props: IProps) {
                         maxHeight={200}
                         isExpandedDefault={!!props.expandByDefault}
                     >
-                        <blockquote cite={postLink}>
+                        <blockquote className={classes.blockquote} cite={postLink}>
                             <UserContent content={body} />
                         </blockquote>
                     </CollapsableContent>
                     {(linkToDiscussion || linkToPost) && (
                         <footer className={classes.footer}>
-                            {linkToDiscussion}
-                            {linkToPost}
+                            <hr className={classes.footerSeparator} aria-hidden={true} />
+                            <div className={classes.footerMain}>
+                                {linkToDiscussion}
+                                {linkToPost}
+                            </div>
                         </footer>
                     )}
                 </article>

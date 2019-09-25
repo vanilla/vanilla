@@ -52,13 +52,13 @@ export const metasVariables = useThemeCache(() => {
 export const metasClasses = useThemeCache(() => {
     const vars = metasVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("frame");
+    const style = styleFactory("metas");
 
     const root = style({
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
         color: colorOut(vars.colors.fg),
-        width: calc(`100% + ${vars.spacing.default * 2}`),
+        width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
         overflow: "hidden",
         textAlign: "left",
         ...margins({

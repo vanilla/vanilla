@@ -41,6 +41,7 @@ export const userLabelClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "space-between",
         width: percent(100),
+        minHeight: unit(vars.avatar.size),
     });
 
     const main = style("main", {
@@ -72,7 +73,15 @@ export const userLabelClasses = useThemeCache(() => {
     });
     const topRow = style("topRow", {});
     const bottomRow = style("bottomRow", {});
-    const userName = style("userName", {});
+    const userName = style("userName", {
+        $nest: {
+            "&&": {
+                fontWeight: globalVars.fonts.weights.bold,
+                fontSize: globalVars.fonts.size.medium,
+                lineHeight: globalVars.lineHeights.condensed,
+            },
+        },
+    });
     const date = style("date", {});
     const dateLink = style("dateLink", {});
     const row = style("row", {});

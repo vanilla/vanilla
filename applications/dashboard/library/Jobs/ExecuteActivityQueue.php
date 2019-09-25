@@ -12,13 +12,23 @@ use Vanilla\Scheduler\Job\JobPriority;
  */
 class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
 
+    /** @var ActivityModel */
+    private $activityModel;
+
+    /**
+     * Initial job setup.
+     *
+     * @param ActivityModel $activityModel
+     */
+    public function __construct(ActivityModel $activityModel) {
+        $this->activityModel = $activityModel;
+    }
+
     /**
      * Execute all queued up items in the ActivityModel queue.
      */
     public function run(): JobExecutionStatus {
-        /** @var \ActivityModel $activityModel */
-        $activityModel = \Gdn::getContainer()->get(\ActivityModel::class);
-        $activityModel->saveQueue();
+        $this->activityModel->saveQueue();
         return JobExecutionStatus::complete();
     }
 

@@ -15,7 +15,7 @@ class UrlUtils {
     /**
      * This function converts domain names to IDNA ASCII form.
      *
-     * @param string $link The domain name to convert.
+     * @param string $url The domain name to convert.
      * @return mixed Returns the ASCII domain name or null on failure.
      */
     public static function domainAsAscii(string $url): ?string {
@@ -26,7 +26,7 @@ class UrlUtils {
                 throw new InvalidArgumentException('Url Invalid.');
             }
         }
-        $parsedLink['host'] = idn_to_ascii( $parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
+        $parsedLink['host'] = idn_to_ascii($parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
         if ($idnaInfo['errors'] !== 0) {
             throw new InvalidArgumentException('Domain Invalid.');
         }

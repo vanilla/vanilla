@@ -70,6 +70,33 @@ export const quoteEmbedClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.bold,
     });
 
+    const title = style("title", {
+        ...lineHeightAdjustment(),
+        ...margins({
+            horizontal: importantUnit(0),
+            top: importantUnit(0),
+            bottom: importantUnit(globalVars.meta.spacing.default),
+        }),
+        display: "block",
+        width: percent(100),
+        color: colorOut(globalVars.mainColors.fg),
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.bold,
+        lineHeight: globalVars.lineHeights.condensed,
+    });
+
+    const isPadded = style("isPadded", {});
+
+    const titleLink = style("titleLink", {
+        display: "block",
+        position: "relative",
+        $nest: {
+            [`&.${isPadded}`]: {
+                paddingTop: unit(vars.title.padding),
+            },
+        },
+    });
+
     const header = style("header", {
         ...paddings({
             all: embedVars.spacing.padding,
@@ -109,30 +136,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
         backgroundColor: colorOut(globalVars.mixBgAndFg(0.2)),
     });
 
-    const title = style("title", {
-        ...lineHeightAdjustment(),
-        ...margins({
-            horizontal: importantUnit(0),
-            top: importantUnit(0),
-            bottom: importantUnit(globalVars.meta.spacing.default),
-        }),
-        display: "block",
-        width: percent(100),
-        color: colorOut(globalVars.mainColors.fg),
-        fontSize: globalVars.fonts.size.medium,
-        fontWeight: globalVars.fonts.weights.bold,
-        lineHeight: globalVars.lineHeights.condensed,
-    });
-
-    const titleLink = style("titleLink", {
-        display: "block",
-        position: "relative",
-        paddingTop: unit(vars.title.padding),
-    });
-
     const postLink = style("postLink", {
         display: "flex",
         alignItems: "center",
+        marginLeft: "auto",
         ...allLinkStates({
             allStates: {
                 textDecoration: "none",
@@ -198,6 +205,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         userName,
         title,
         titleLink,
+        isPadded,
         header,
         content,
         footer,

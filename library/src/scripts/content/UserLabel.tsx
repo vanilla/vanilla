@@ -35,11 +35,11 @@ export function UserLabel(props: IUserLabel) {
     const classesMeta = metasClasses();
 
     const dateComponent = dateLink ? (
-        <SmartLink to={dateLink} className={classNames(classes.dateLink, classesMeta.meta)}>
-            <DateTime timestamp={date} className={classNames(classes.date, classesMeta.metaStyle)} />
+        <SmartLink to={dateLink} className={classNames(classesMeta.meta)}>
+            <DateTime timestamp={date} className={classNames(classesMeta.metaStyle)} />
         </SmartLink>
     ) : (
-        <DateTime timestamp={date} className={classNames(classes.date, classesMeta.meta)} />
+        <DateTime timestamp={date} className={classNames(classesMeta.meta)} />
     );
 
     const categoryComponent =
@@ -52,7 +52,7 @@ export function UserLabel(props: IUserLabel) {
     if (compact) {
         return (
             <div className={classesMeta.root}>
-                <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
+                <SmartLink to={userUrl} className={classNames(classes.userName, classes.isCompact, classesMeta.meta)}>
                     {user.name}
                 </SmartLink>
                 {dateComponent}

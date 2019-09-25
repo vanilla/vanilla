@@ -20,7 +20,8 @@ import { unit } from "@library/styles/styleHelpers";
 
 interface IProps {
     children: React.ReactNode;
-    maxHeight: number;
+    maxHeight?: number;
+    overshoot?: number;
     className?: string;
     isExpandedDefault: boolean;
 }
@@ -29,7 +30,10 @@ export function CollapsableContent(props: IProps) {
     const { isExpandedDefault } = props;
     const [isExpanded, setIsExpanded] = useState(isExpandedDefault);
 
-    // const previousExpanded = useLastValue(isExpanded);
+    const containerMaxHeight = props.maxHeight ? props.maxHeight : 100;
+    const containerOvershoot = props.overshoot ? props.overshoot : 50;
+
+    const heightLimit = containerMaxHeight + containerOvershoot;
 
     const ref = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -53,7 +57,7 @@ export function CollapsableContent(props: IProps) {
         }
     };
 
-    const maxCollapsedHeight = measurements.height < props.maxHeight ? measurements.height : props.maxHeight;
+    const maxCollapsedHeight = measurements.height < heightLimit ? measurements.height : containerMaxHeight;
     const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
     const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
 
@@ -62,12 +66,12 @@ export function CollapsableContent(props: IProps) {
     });
 
     const gradientProps = useSpring({
-        height: !isExpanded ? 100 : 0,
+        height: !isExpanded ? 75 : 0,
     });
 
     const classes = collapsableContentClasses();
 
-    const hasOverflow = measurements.height > props.maxHeight;
+    const hasOverflow = measurements.height > heightLimit;
 
     const title = isExpanded ? t("Collapse") : t("Expand");
 
@@ -85,7 +89,6 @@ export function CollapsableContent(props: IProps) {
                 }}
                 className={classNames(classes.heightContainer)}
                 aria-expanded={isExpanded}
-                aria-controlledBy={toggleID}
             >
                 <div ref={ref} className={props.className}>
                     {props.children}

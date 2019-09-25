@@ -30,7 +30,7 @@ interface IProps extends IBaseEmbedProps {
     expandByDefault?: boolean;
     discussionLink?: string;
     postLink?: string; // should always be there for citation reference
-    category: ICategoryFragment;
+    category?: ICategoryFragment;
     // For compatibility, new options are hidden by default
     displayOptions?: {
         showUserLabel?: boolean;
@@ -60,8 +60,6 @@ export function QuoteEmbed(props: IProps) {
     } = props;
 
     const classes = quoteEmbedClasses();
-    const userUrl = makeProfileUrl(insertUser.name);
-    const classesMeta = metasClasses();
     const {
         showUserLabel = false,
         showCompactUserInfo = false,
@@ -106,23 +104,11 @@ export function QuoteEmbed(props: IProps) {
                                 />
                             )}
 
-                            {/*<SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>*/}
-                            {/*    <span className="embedQuote-userName">{insertUser.name}</span>*/}
-                            {/*</SmartLink>*/}
-
-                            {/*<div className={classesMeta.root}>*/}
-                            {/*    <SmartLink to={url} className={classNames(classesMeta.meta)}>*/}
-                            {/*        <DateTime timestamp={dateInserted} />*/}
-                            {/*    </SmartLink>*/}
-                            {/*    {category && showCategoryLink && (*/}
-                            {/*        <SmartLink to={category.url} className={classNames(classesMeta.meta)}>*/}
-                            {/*            {category.name}*/}
-                            {/*        </SmartLink>*/}
-                            {/*    )}*/}
-                            {/*</div>*/}
-
                             {name && (
-                                <SmartLink to={url} className={classes.titleLink}>
+                                <SmartLink
+                                    to={url}
+                                    className={classNames(classes.titleLink, { [classes.isPadded]: showUserLabel })}
+                                >
                                     <h2 className={classes.title}>{name}</h2>
                                 </SmartLink>
                             )}
@@ -139,11 +125,7 @@ export function QuoteEmbed(props: IProps) {
                             )}
                         </header>
                     )}
-                    <CollapsableContent
-                        className={classes.content}
-                        maxHeight={200}
-                        isExpandedDefault={!!props.expandByDefault}
-                    >
+                    <CollapsableContent className={classes.content} isExpandedDefault={!!props.expandByDefault}>
                         <blockquote className={classes.blockquote} cite={postLink}>
                             <UserContent content={body} />
                         </blockquote>

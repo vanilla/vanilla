@@ -73,18 +73,19 @@ export const userLabelClasses = useThemeCache(() => {
     });
     const topRow = style("topRow", {});
     const bottomRow = style("bottomRow", {});
+    const isCompact = style("isCompact", {});
     const userName = style("userName", {
         $nest: {
             "&&": {
                 fontWeight: globalVars.fonts.weights.bold,
-                fontSize: globalVars.fonts.size.medium,
+                fontSize: unit(globalVars.fonts.size.medium),
                 lineHeight: globalVars.lineHeights.condensed,
+            },
+            [`&&.${isCompact}`]: {
+                fontSize: unit(globalVars.fonts.size.small),
             },
         },
     });
-    const date = style("date", {});
-    const dateLink = style("dateLink", {});
-    const row = style("row", {});
 
-    return { root, avatar, avatarLink, topRow, bottomRow, userName, main, date, dateLink, row };
+    return { root, avatar, avatarLink, topRow, bottomRow, userName, main, isCompact };
 });

@@ -51,6 +51,7 @@ export const collapsableContentClasses = useThemeCache(() => {
     const gradient = style("gradient", {
         ...absolutePosition.topLeft(),
         width: percent(100),
+        height: 75,
         background: linearGradient(
             "to bottom",
             colorOut(globalVars.mainColors.bg.fade(0))!,

@@ -3,20 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useRef, useLayoutEffect, useMemo } from "react";
 import { collapsableContentClasses } from "@library/content/collapsableContentStyles";
-import { DownTriangleIcon, ChevronUpIcon, BottomChevronIcon } from "@library/icons/common";
-import classNames from "classnames";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { useMeasure, useLastValue } from "@vanilla/react-utils";
-import { useSpring } from "react-spring";
-import { animated } from "react-spring";
-import { Transition } from "react-spring/renderprops-universal";
-import { nextTick } from "q";
-import { t } from "@library/utility/appUtils";
-import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { BottomChevronIcon } from "@library/icons/common";
 import { unit } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useMeasure } from "@vanilla/react-utils";
+import classNames from "classnames";
+import { nextTick } from "q";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { animated, useSpring } from "react-spring";
 
 interface IProps {
     children: React.ReactNode;
@@ -66,7 +64,7 @@ export function CollapsableContent(props: IProps) {
     });
 
     const gradientProps = useSpring({
-        height: !isExpanded ? 75 : 0,
+        opacity: isExpanded ? 0 : 1,
     });
 
     const classes = collapsableContentClasses();
@@ -97,12 +95,7 @@ export function CollapsableContent(props: IProps) {
 
             {hasOverflow && (
                 <div className={classes.footer}>
-                    <animated.div
-                        style={{
-                            height: unit(gradientProps.height),
-                        }}
-                        className={classNames(classes.gradient)}
-                    />
+                    <animated.div style={gradientProps} className={classNames(classes.gradient)} />
                     <Button
                         id={toggleID}
                         title={title}

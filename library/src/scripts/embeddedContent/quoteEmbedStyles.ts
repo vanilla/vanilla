@@ -3,22 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    colorOut,
-    paddings,
-    margins,
-    importantUnit,
-    unit,
-    allLinkStates,
-    absolutePosition,
-} from "@library/styles/styleHelpers";
-import { percent, important } from "csx";
+import { allLinkStates, colorOut, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { MinHeightProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { percent } from "csx";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();

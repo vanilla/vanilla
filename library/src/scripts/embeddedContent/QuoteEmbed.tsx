@@ -3,25 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { IUser, IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
-import { useUniqueID } from "@library/utility/idUtils";
-import classnames from "classnames";
-import { makeProfileUrl, t } from "@library/utility/appUtils";
-import SmartLink from "@library/routing/links/SmartLink";
-import DateTime from "@library/content/DateTime";
+import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
 import { CollapsableContent } from "@library/content/CollapsableContent";
+import UserContent from "@library/content/UserContent";
+import { UserLabel } from "@library/content/UserLabel";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { BottomChevronIcon, DiscussionIcon, RightChevronIcon, TopChevronIcon } from "@library/icons/common";
-import UserContent from "@library/content/UserContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
-import { metasClasses } from "@library/styles/metasStyles";
-import classNames from "classnames";
-import { ICategory, ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { DiscussionIcon, RightChevronIcon } from "@library/icons/common";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { UserLabel } from "@library/content/UserLabel";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@library/utility/appUtils";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps extends IBaseEmbedProps {
     body: string;

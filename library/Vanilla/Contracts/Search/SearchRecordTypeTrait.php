@@ -11,7 +11,7 @@ namespace Vanilla\Contracts\Search;
  * Trait SearchRecordTypeTrait
  * @package Vanilla\Contracts\Search
  */
-trait SearchRecordTypeTrait  {
+trait SearchRecordTypeTrait {
     /**
      * @inheritdoc
      */

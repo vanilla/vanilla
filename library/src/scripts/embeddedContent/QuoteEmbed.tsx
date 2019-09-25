@@ -34,6 +34,7 @@ interface IProps extends IBaseEmbedProps {
     // For compatibility, new options are hidden by default
     displayOptions?: {
         showUserLabel?: boolean;
+        showCompactUserInfo?: boolean;
         showDiscussionLink?: boolean;
         showPostLink?: boolean;
         showCategoryLink?: boolean;
@@ -63,22 +64,26 @@ export function QuoteEmbed(props: IProps) {
     const classesMeta = metasClasses();
     const {
         showUserLabel = false,
+        showCompactUserInfo = false,
         showDiscussionLink = false,
         showPostLink = false,
         showCategoryLink = false,
     } = displayOptions;
 
+    const discussionTitle = t("View Original Discussion");
+
     const linkToDiscussion = showDiscussionLink && discussionLink && (
-        <SmartLink title={t("View Original Discussion")} to={discussionLink}>
-            <DiscussionIcon />
-            <ScreenReaderContent>{t("View Original Discussion")}</ScreenReaderContent>
+        <SmartLink title={discussionTitle} to={discussionLink}>
+            <DiscussionIcon title={discussionTitle} />
+            <ScreenReaderContent>{discussionTitle}</ScreenReaderContent>
         </SmartLink>
     );
 
+    const postTitle = t("View Post");
     const linkToPost = showPostLink && postLink && (
         <SmartLink to={postLink}>
-            {t("View Post")}
-            <RightChevronIcon />
+            {postTitle}
+            <RightChevronIcon title={postTitle} />
         </SmartLink>
     );
 
@@ -86,32 +91,56 @@ export function QuoteEmbed(props: IProps) {
         <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
                 <article className={classes.body}>
-                    <header className={classes.header}>
-                        {showUserLabel && <UserLabel user={insertUser} date={dateInserted} dateLink={postLink} />}
+                    {(showUserLabel || name) && (
+                        <header className={classes.header}>
+                            {showUserLabel && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={postLink}
+                                    category={category}
+                                    displayOptions={{
+                                        showCategory: showCategoryLink,
+                                        showRole: true,
+                                    }}
+                                />
+                            )}
 
-                        {/*<SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>*/}
-                        {/*    <span className="embedQuote-userName">{insertUser.name}</span>*/}
-                        {/*</SmartLink>*/}
+                            {/*<SmartLink to={userUrl} className={classNames(classesMeta.meta, classes.userName)}>*/}
+                            {/*    <span className="embedQuote-userName">{insertUser.name}</span>*/}
+                            {/*</SmartLink>*/}
 
-                        {/*<div className={classesMeta.root}>*/}
-                        {/*    <SmartLink to={url} className={classNames(classesMeta.meta)}>*/}
-                        {/*        <DateTime timestamp={dateInserted} />*/}
-                        {/*    </SmartLink>*/}
-                        {/*    {category && showCategoryLink && (*/}
-                        {/*        <SmartLink to={category.url} className={classNames(classesMeta.meta)}>*/}
-                        {/*            {category.name}*/}
-                        {/*        </SmartLink>*/}
-                        {/*    )}*/}
-                        {/*</div>*/}
+                            {/*<div className={classesMeta.root}>*/}
+                            {/*    <SmartLink to={url} className={classNames(classesMeta.meta)}>*/}
+                            {/*        <DateTime timestamp={dateInserted} />*/}
+                            {/*    </SmartLink>*/}
+                            {/*    {category && showCategoryLink && (*/}
+                            {/*        <SmartLink to={category.url} className={classNames(classesMeta.meta)}>*/}
+                            {/*            {category.name}*/}
+                            {/*        </SmartLink>*/}
+                            {/*    )}*/}
+                            {/*</div>*/}
 
-                        {name && (
-                            <h2 className={classes.title}>
-                                <SmartLink to={url} className={classes.titleLink}>
-                                    {name}
-                                </SmartLink>
-                            </h2>
-                        )}
-                    </header>
+                            {name && (
+                                <h2 className={classes.title}>
+                                    <SmartLink to={url} className={classes.titleLink}>
+                                        {name}
+                                    </SmartLink>
+                                </h2>
+                            )}
+
+                            {!showUserLabel && showCompactUserInfo && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={postLink}
+                                    compact={true}
+                                    category={category}
+                                    displayOptions={{ showCategory: showCategoryLink }}
+                                />
+                            )}
+                        </header>
+                    )}
                     <CollapsableContent
                         className={classes.content}
                         maxHeight={200}

@@ -8,7 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
-import { IUserFragment } from "@library/@types/api/users";
+import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
 import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
 
 const story = storiesOf("Embeds", module);
@@ -26,6 +26,19 @@ const dummyUser: IUserFragment = {
     dateLastActive: "2019-02-10T23:54:14+00:00",
 };
 
+const dummyUserWithRoles: IUserFragmentAndRoles = {
+    name: "Adam Charron",
+    photoUrl: "https://us.v-cdn.net/5018160/uploads/userpics/809/nHZP3CA8JMR2H.jpg",
+    userID: 4,
+    dateLastActive: "2019-02-10T23:54:14+00:00",
+    roles: [
+        {
+            roleID: 1,
+            name: "Staff",
+        },
+    ],
+};
+
 const dummyDate = "2019-02-10T23:54:14+00:00";
 
 story.add("QuoteEmbed", () => {
@@ -37,7 +50,7 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list view"
                 body={ipsum}
-                insertUser={dummyUser}
+                insertUser={dummyUserWithRoles}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"

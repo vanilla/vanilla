@@ -12,6 +12,8 @@ import classNames from "classnames";
 interface IProps extends IUserRoles {
     maxRoleCount?: number;
     wrapper?: boolean;
+    classNane?: string;
+    roleClass?: string;
 }
 
 export function Roles(props: IProps) {
@@ -22,12 +24,16 @@ export function Roles(props: IProps) {
 
     const userRoles = roles.map((r, i) => {
         if (i < maxRoleCount) {
-            return <span className={classNames(classesMeta.meta, classes.role)}>{r.name}</span>;
+            return (
+                <span key={i} className={classNames(classesMeta.meta, classes.role)}>
+                    {r.name}
+                </span>
+            );
         }
     });
 
     return (
-        <ConditionalWrap condition={wrapper} className={classesMeta.root}>
+        <ConditionalWrap condition={wrapper} className={classNames(classesMeta.root, "isFlexed")}>
             {userRoles}
         </ConditionalWrap>
     );

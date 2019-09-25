@@ -52,7 +52,13 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const footer = style("footer", {
-        display: "block",
+        display: "flex",
+        width: percent(100),
+        alignItems: "center",
+        justifyContent: "space-between",
+        ...paddings({
+            horizontal: embedVars.spacing.padding,
+        }),
     });
 
     const title = style("title", {

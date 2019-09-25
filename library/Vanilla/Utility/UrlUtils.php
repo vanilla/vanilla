@@ -16,7 +16,9 @@ class UrlUtils {
      * This function converts domain names to IDNA ASCII form.
      *
      * @param string $url The domain name to convert.
-     * @return mixed Returns the ASCII domain name or null on failure.
+     * @throws InvalidArgumentException If the host cannot be retrieved from the URL.
+     * @throws InvalidargumentException If there was an error performing IDN translation of the domain.
+     * @return string Returns an absolute, well-formed URL with IDN translation on the domain.
      */
     public static function domainAsAscii(string $url): ?string {
         $parsedLink = parse_url($url);

@@ -124,7 +124,7 @@ class HomeController extends Gdn_Controller {
         try {
             $target = UrlUtils::domainAsAscii($target);
         } catch (Exception $e) {
-            throw new Gdn_UserException(t('Domain is invalid'));
+            throw new Gdn_UserException(t('Url is invalid.'));
         }
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));

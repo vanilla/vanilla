@@ -47,7 +47,11 @@ trait ReduxActionPreloadTrait {
     protected function getReduxActionsAsJsVariable(): PhpAsJsVariable {
         // Apply all extra providers.
         foreach ($this->actionProviders as $provider) {
-            $this->reduxActions = array_merge($this->reduxActions, $provider->createActions());
+            try {
+                $this->reduxActions = array_merge($this->reduxActions, $provider->createActions());
+            } catch (\Exception $e) {
+                $this->reduxActions[] = new ReduxErrorAction($e);
+            }
         }
 
         return new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);

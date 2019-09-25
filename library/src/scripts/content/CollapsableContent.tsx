@@ -5,7 +5,7 @@
 
 import React, { useState, useRef, useLayoutEffect, useMemo } from "react";
 import { collapsableContentClasses } from "@library/content/collapsableContentStyles";
-import { DownTriangleIcon, ChevronUpIcon } from "@library/icons/common";
+import { DownTriangleIcon, ChevronUpIcon, BottomChevronIcon } from "@library/icons/common";
 import classNames from "classnames";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -14,6 +14,9 @@ import { useSpring } from "react-spring";
 import { animated } from "react-spring";
 import { Transition } from "react-spring/renderprops-universal";
 import { nextTick } from "q";
+import { t } from "@library/utility/appUtils";
+import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { unit } from "@library/styles/styleHelpers";
 
 interface IProps {
     children: React.ReactNode;
@@ -58,19 +61,30 @@ export function CollapsableContent(props: IProps) {
         height: targetHeight,
     });
 
+    const gradientProps = useSpring({
+        height: !isExpanded ? 100 : 0,
+    });
+
     const classes = collapsableContentClasses();
 
     const hasOverflow = measurements.height > props.maxHeight;
 
+    const title = isExpanded ? t("Collapse") : t("Expand");
+
+    const toggleID = useMemo(() => uniqueIDFromPrefix("collapsableContent_toggle"), []);
+    const contentID = useMemo(() => uniqueIDFromPrefix("collapsableContent_content"), []);
+
     return (
         <div className={classes.root}>
             <animated.div
+                id={contentID}
                 ref={scrollRef}
                 style={{
                     minHeight: maxHeight,
                     height: height,
                 }}
                 className={classNames(classes.heightContainer)}
+                aria-expanded={isExpanded}
             >
                 <div ref={ref} className={props.className}>
                     {props.children}
@@ -78,9 +92,28 @@ export function CollapsableContent(props: IProps) {
             </animated.div>
 
             {hasOverflow && (
-                <Button className={classes.collapser} baseClass={ButtonTypes.ICON} onClick={toggleCollapse}>
-                    <ChevronUpIcon className={classes.collapserIcon} rotate={isExpanded ? undefined : 180} />
-                </Button>
+                <div className={classes.footer}>
+                    <animated.div
+                        style={{
+                            height: unit(gradientProps.height),
+                        }}
+                        className={classNames(classes.gradient)}
+                    />
+                    <Button
+                        id={toggleID}
+                        title={title}
+                        className={classes.collapser}
+                        baseClass={ButtonTypes.CUSTOM}
+                        onClick={toggleCollapse}
+                        aria-controls={contentID}
+                    >
+                        <BottomChevronIcon
+                            title={title}
+                            className={classes.collapserIcon}
+                            rotate={!isExpanded ? undefined : 180}
+                        />
+                    </Button>
+                </div>
             )}
         </div>
     );

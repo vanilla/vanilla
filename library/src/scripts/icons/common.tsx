@@ -98,8 +98,8 @@ export function TopChevronIcon(props: { className?: string }) {
     );
 }
 
-export function BottomChevronIcon(props: { className?: string }) {
-    const title = `↓`;
+export function BottomChevronIcon(props: { className?: string; rotate?: number; title?: string }) {
+    const title = props.title ? props.title : `↓`;
     const classes = iconClasses();
     return (
         <svg
@@ -107,6 +107,9 @@ export function BottomChevronIcon(props: { className?: string }) {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
+            style={{
+                transform: props.rotate ? `rotate(${props.rotate}deg)` : undefined,
+            }}
         >
             <title>{title}</title>
             <path

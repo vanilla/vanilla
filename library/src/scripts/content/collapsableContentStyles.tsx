@@ -4,16 +4,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, defaultTransition, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { linearGradient, percent, px } from "csx";
+import { linearGradient, percent, px, translateY } from "csx";
 
 export const collapsableContentClasses = useThemeCache(() => {
-    const vars = globalVariables();
+    const globalVars = globalVariables();
     const style = styleFactory("collapsableContent");
 
     const root = style({
-        background: colorOut(vars.mainColors.bg),
+        background: colorOut(globalVars.mainColors.bg),
         position: "relative",
     });
 
@@ -26,29 +26,38 @@ export const collapsableContentClasses = useThemeCache(() => {
     const collapser = style("collapser", {
         $nest: {
             "&&": {
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                left: 0,
-                height: 40,
+                "-webkit-appearance": "none",
+                "-moz-appearance": "none",
+                appearance: "none",
+                border: "none",
+                borderRadius: 0,
                 width: percent(100),
-                background: linearGradient(
-                    "to bottom",
-                    colorOut(vars.elementaryColors.white.fade(0))!,
-                    colorOut(vars.elementaryColors.white.fade(0.8))!,
-                    colorOut(vars.elementaryColors.white)!,
-                ),
+                height: unit(globalVars.icon.sizes.default),
+                padding: 0,
+                margin: 0,
             },
         },
+    });
+
+    const footer = style("footer", {
+        position: "relative",
+        height: unit(globalVars.icon.sizes.default),
     });
 
     const collapserIcon = style("collapserIcon", {
-        $nest: {
-            "&&": {
-                height: px(10),
-            },
-        },
+        ...defaultTransition("transform"),
     });
 
-    return { heightContainer, root, collapser, collapserIcon };
+    const gradient = style("gradient", {
+        ...absolutePosition.topLeft(),
+        width: percent(100),
+        background: linearGradient(
+            "to bottom",
+            colorOut(globalVars.mainColors.bg.fade(0))!,
+            colorOut(globalVars.mainColors.bg)!,
+        ),
+        transform: `translateY(-100%)`,
+    });
+
+    return { heightContainer, root, collapser, collapserIcon, footer, gradient };
 });

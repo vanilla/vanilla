@@ -13,7 +13,7 @@ use InvalidArgumentException;
  */
 class UrlUtils {
     /**
-     * This function converts domain names to IDNA ASCII form.
+     * Transform any unicode characters in the domain of a well-formed URL per IDNA encoding.
      *
      * @param string $url The domain name to convert.
      * @throws InvalidArgumentException If the host cannot be retrieved from the URL.

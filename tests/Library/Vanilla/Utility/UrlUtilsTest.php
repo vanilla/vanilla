@@ -53,7 +53,7 @@ class UrlUtilsTest extends TestCase {
             'Valid url' => ['http://www.vanillaforums.com', 'http://www.vanillaforums.com'],
             'Valid punycoded url' => ['xn--gogle-sce.com', 'http://xn--gogle-sce.com'],
         ];
-        return array_column($result, null, 0);
+        return $result;
     }
 
     /**

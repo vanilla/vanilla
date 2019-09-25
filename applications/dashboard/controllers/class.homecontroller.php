@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\UrlUtils;
+
 /**
  * Handles /home endpoint.
  */
@@ -114,9 +116,16 @@ class HomeController extends Gdn_Controller {
 
     /**
      * @param string $target
+     *
+     * @throws Gdn_UserException Throw an exception if the domain is invalid.
      */
     public function leaving($target = '') {
         $target = str_replace("\xE2\x80\xAE", '', $target);
+        try {
+            $target = UrlUtils::domainAsAscii($target);
+        } catch (Exception $e) {
+            throw new Gdn_UserException(t('Url is invalid.'));
+        }
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');

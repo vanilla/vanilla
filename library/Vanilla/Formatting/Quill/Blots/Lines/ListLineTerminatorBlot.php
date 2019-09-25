@@ -8,16 +8,23 @@
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Nesting\InvalidNestingException;
+use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
+use Vanilla\Formatting\Quill\Nesting\NestingParentInterface;
+use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
 
 /**
  * A blot to represent a list line terminator.
  */
-class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
+class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements NestingParentRendererInterface {
 
     const LIST_TYPE_BULLET = "bullet";
     const LIST_TYPE_ORDERED = "ordered";
     const LIST_TYPE_UNRECOGNIZED = "unrecognized list value";
     const LIST_TYPES = [self::LIST_TYPE_BULLET, self::LIST_TYPE_ORDERED];
+
+    /** @var array BlotGroup[] */
+    private $nestedGroups = [];
 
     /**
      * @inheritdoc
@@ -26,7 +33,6 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
         $value = self::normalizeValue($operation ?? []);
         return in_array($value['type'], self::LIST_TYPES, true);
     }
-
 
     /**
      * Get a normalized value from the blot.
@@ -54,6 +60,84 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function renderNestedGroups(): string {
+        $result = '';
+
+        // Prepend our nested groups before the terminators.
+        foreach ($this->nestedGroups as $group) {
+            $result .= $group->render();
+        }
+        return $result;
+    }
+
+    /**
+     * Get the target parent to nest in.
+     * This will either be this instance or own of the nested groups.
+     *
+     * @param NestableItemInterface $nestable
+     *
+     * @return NestingParentInterface
+     */
+    private function getTargetNestingParent(NestableItemInterface $nestable): ?NestingParentInterface {
+        if ($nestable->getNestingDepth() === $this->getNestingDepth() + 1) {
+            return $this;
+        } else {
+            $lastIndex = count($this->nestedGroups) - 1;
+            $lastNestedItem = $this->nestedGroups[$lastIndex] ?? null;
+            if ($lastNestedItem !== null && $nestable->getNestingDepth() === $lastNestedItem->getNestingDepth() + 1) {
+                return $lastNestedItem;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function nestGroup(BlotGroup $blotGroup): void {
+        if (!$this->canNest($blotGroup)) {
+            throw new InvalidNestingException();
+        }
+
+        $targetGroup = $this->getTargetNestingParent($blotGroup);
+        if ($targetGroup === null) {
+            throw new InvalidNestingException();
+        } elseif ($targetGroup === $this) {
+            // Protect against recursion.
+            $lastNestedIndex = count($this->nestedGroups) - 1;
+
+            /** @var BlotGroup|null $lastNestedGroup */
+            $lastNestedGroup = $this->nestedGroups[$lastNestedIndex] ?? null;
+
+            if ($lastNestedGroup && $lastNestedGroup->canMerge($blotGroup)) {
+                $lastNestedGroup->pushBlots($blotGroup->getBlotsAndGroups());
+            } else {
+                $this->nestedGroups[] = $blotGroup;
+            }
+        } else {
+            $targetGroup->nestGroup($blotGroup);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canNest(BlotGroup $blotGroup): bool {
+        $mainBlot = $blotGroup->getMainBlot();
+        $targetNestingParent = $this->getTargetNestingParent($blotGroup);
+        return $targetNestingParent && $targetNestingParent->getNestingDepth() + 1 === $mainBlot->getNestingDepth();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNestedGroups(): array {
+        return $this->nestedGroups;
+    }
 
     /**
      * @inheritdoc

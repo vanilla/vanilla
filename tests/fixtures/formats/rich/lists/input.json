@@ -1,50 +1,179 @@
 [
-    { "insert": "Bulleted 1" },
-    { "attributes": { "list": "bullet" }, "insert": "\n" },
-    { "insert": "Bulleted 2" },
-    { "attributes": { "list": {
-        "type":"bullet",
-        "depth": 0
-    }}, "insert": "\n" },    { "insert": "Bulleted 2.1 (indented 1)" },
-    { "attributes": { "list": {
-        "type":"bullet",
-        "depth": 1
-    }}, "insert": "\n" },
-    { "insert": "Bulleted 2.1.1 (indented 2)" },
-    { "attributes": { "list": {
-        "type":"bullet",
-        "depth": 2
-    }}, "insert": "\n" },
-    { "insert": "Bulleted 2.2 (indented 1)" },
-    { "attributes": { "list": {
-        "type":"bullet",
-        "depth": 1
-    }}, "insert": "\n" },
-    { "insert": "Bulleted 3" },
-    { "attributes": { "list": {
-        "type":"bullet",
-        "depth": 0
-    }}, "insert": "\n" },
-
-
-    { "insert": "\nNumbered 1" },
-    { "attributes": { "list": {
-        "type":"ordered",
-        "depth": 0
-    }}, "insert": "\n" },
-    { "insert": "Numbered 2" },
-    { "attributes": { "list": {
-        "type":"ordered",
-        "depth": 0
-    }}, "insert": "\n" },
-    { "insert": "Numbered 2.1 (indented 1)" },
-    { "attributes": { "list": {
-        "type":"ordered",
-        "depth": 1
-    }}, "insert": "\n" },
-    { "insert": "Numbered 2.1.1 (indented 2)" },
-    { "attributes": { "list": {
-        "type":"ordered",
-        "depth": 2
-    }}, "insert": "\n" }
+    {
+        "insert": "Bulleted 1"
+    },
+    {
+        "attributes": {
+            "list": "bullet"
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Bulleted 2"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Bulleted 2.1 (indented 1)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 1
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Bulleted 2.1.1 (indented 2)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 2
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Bulleted 2.2 (indented 1)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 1
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Bulleted 3"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "\nNumbered 1"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Numbered 2"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Numbered 2.1 (indented 1)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 1
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Numbered 2.1.1 (indented 2)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 2
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "\nMixed 1"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Mixed 2"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Mixed 2.1 (indented 1)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 1
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Mixed 2.2 (indented 1)"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "bullet",
+                "depth": 1
+            }
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Mixed 3"
+    },
+    {
+        "attributes": {
+            "list": {
+                "type": "ordered",
+                "depth": 0
+            }
+        },
+        "insert": "\n"
+    }
 ]

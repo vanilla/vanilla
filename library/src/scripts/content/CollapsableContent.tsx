@@ -85,6 +85,7 @@ export function CollapsableContent(props: IProps) {
                 }}
                 className={classNames(classes.heightContainer)}
                 aria-expanded={isExpanded}
+                aria-controlledBy={toggleID}
             >
                 <div ref={ref} className={props.className}>
                     {props.children}
@@ -105,7 +106,7 @@ export function CollapsableContent(props: IProps) {
                         className={classes.collapser}
                         baseClass={ButtonTypes.CUSTOM}
                         onClick={toggleCollapse}
-                        aria-controls={contentID}
+                        controls={contentID}
                     >
                         <BottomChevronIcon
                             title={title}

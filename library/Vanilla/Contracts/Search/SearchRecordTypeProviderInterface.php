@@ -35,6 +35,14 @@ interface SearchRecordTypeProviderInterface {
     public function getType(string $typeKey): ?SearchRecordTypeInterface;
 
     /**
+     * Get search record type by sphinx dtype value
+     *
+     * @param int $dtype
+     * @return null|SearchRecordTypeInterface
+     */
+    public function getByDType(int $dtype): ?SearchRecordTypeInterface;
+
+    /**
      * Add (activate) search provider group. Ex: advanced, sphinx, etc...
      *
      * @param string $providerGroup

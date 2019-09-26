@@ -130,12 +130,11 @@ story.add("QuoteEmbed", () => {
 
             <QuoteEmbed
                 body={shortIpsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 displayOptions={{
                     showUserLabel: false,
                     showDiscussionLink: false,

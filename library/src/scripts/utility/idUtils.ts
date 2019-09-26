@@ -17,13 +17,6 @@ export interface IRequiredComponentID {
     id: string;
 }
 
-/**
- * React hook for useUniqueIDFromPrefix
- */
-export function useUniqueID(prefix?: string) {
-    return useMemo(() => uniqueIDFromPrefix(prefix), [prefix]);
-}
-
 const DEFAULT_PREFIX = "";
 
 // Cache of ID's by their prefix.
@@ -34,11 +27,18 @@ export function uniqueIDFromPrefix(prefix: string = DEFAULT_PREFIX) {
     let count = 0;
 
     if (prefix in idCache) {
-        let count = idCache[prefix] + 1;
+        count = idCache[prefix] + 1;
     }
     idCache[prefix] = count;
 
     return prefix + "-" + idCache[prefix];
+}
+
+/**
+ * React hook for useUniqueIDFromPrefix
+ */
+export function useUniqueID(prefix?: string) {
+    return useMemo(() => uniqueIDFromPrefix(prefix), [prefix]);
 }
 
 /**

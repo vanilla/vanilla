@@ -24,10 +24,11 @@ interface IUserLabel {
         showCategory?: boolean;
     };
     compact?: boolean;
+    fixLineHeight?: boolean;
 }
 
 export function UserLabel(props: IUserLabel) {
-    const { user, date, dateLink, displayOptions = {}, category, compact = false } = props;
+    const { user, date, dateLink, displayOptions = {}, category, compact = false, fixLineHeight = false } = props;
     const { showRole = true, showCategory = false } = displayOptions;
 
     const userUrl = makeProfileUrl(user.name);
@@ -51,7 +52,7 @@ export function UserLabel(props: IUserLabel) {
 
     if (compact) {
         return (
-            <div className={classesMeta.root}>
+            <div className={classNames(classes.compact, classesMeta.root, { [classes.fixLineHeight]: fixLineHeight })}>
                 <SmartLink to={userUrl} className={classNames(classes.userName, classes.isCompact, classesMeta.meta)}>
                     {user.name}
                 </SmartLink>

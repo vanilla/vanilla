@@ -7,6 +7,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const userLabelVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userLabel");
@@ -44,6 +46,14 @@ export const userLabelClasses = useThemeCache(() => {
         minHeight: unit(vars.avatar.size),
     });
 
+    const fixLineHeight = style("fixLineHeight", {});
+
+    const compact = style("compact", {
+        $nest: {
+            [`&.${fixLineHeight}`]: lineHeightAdjustment() as NestedCSSProperties,
+        },
+    });
+
     const main = style("main", {
         display: "flex",
         flexDirection: "column",
@@ -74,6 +84,7 @@ export const userLabelClasses = useThemeCache(() => {
     const topRow = style("topRow", {});
     const bottomRow = style("bottomRow", {});
     const isCompact = style("isCompact", {});
+
     const userName = style("userName", {
         $nest: {
             "&&": {
@@ -87,5 +98,5 @@ export const userLabelClasses = useThemeCache(() => {
         },
     });
 
-    return { root, avatar, avatarLink, topRow, bottomRow, userName, main, isCompact };
+    return { root, avatar, avatarLink, topRow, bottomRow, userName, main, compact, isCompact, fixLineHeight };
 });

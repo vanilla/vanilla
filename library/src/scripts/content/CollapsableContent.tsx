@@ -21,11 +21,12 @@ interface IProps {
     maxHeight?: number;
     overshoot?: number;
     className?: string;
-    isExpandedDefault: boolean;
+    isExpandedDefault?: boolean;
+    firstChild?: boolean;
 }
 
 export function CollapsableContent(props: IProps) {
-    const { isExpandedDefault } = props;
+    const { isExpandedDefault = false, firstChild = false } = props;
     const [isExpanded, setIsExpanded] = useState(isExpandedDefault);
 
     const containerMaxHeight = props.maxHeight ? props.maxHeight : 100;
@@ -77,7 +78,7 @@ export function CollapsableContent(props: IProps) {
     const contentID = useMemo(() => uniqueIDFromPrefix("collapsableContent_content"), []);
 
     return (
-        <div className={classes.root}>
+        <div className={classNames(classes.root)}>
             <animated.div
                 id={contentID}
                 ref={scrollRef}

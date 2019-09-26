@@ -126,6 +126,25 @@ story.add("QuoteEmbed", () => {
                 }}
             />
 
+            <StoryHeading>Bare Bones</StoryHeading>
+
+            <QuoteEmbed
+                body={shortIpsum}
+                insertUser={dummyUserWithRoles}
+                dateInserted={dummyDate}
+                embedType="quote"
+                url="#"
+                discussionLink={"#"}
+                postLink={"#"}
+                displayOptions={{
+                    showUserLabel: false,
+                    showDiscussionLink: false,
+                    showPostLink: false,
+                    showCategoryLink: false,
+                    showCompactUserInfo: true,
+                }}
+            />
+
             <StoryHeading>Minimal, Category, with Discussion link</StoryHeading>
 
             <QuoteEmbed

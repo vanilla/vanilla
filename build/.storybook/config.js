@@ -35,7 +35,7 @@ function loadStories() {
 }
 
 addParameters({
-    chromatic: { delay: 1000 } // Add a slight delay to ensure everything has rendered properly.
+    chromatic: { delay: 2000 } // Add a slight delay to ensure everything has rendered properly.
 })
 
 addDecorator(checkA11y);

@@ -66,19 +66,16 @@ export function UserLabel(props: IUserLabel) {
                     <img src={user.photoUrl} alt={user.name} className={classes.avatar} />
                 </SmartLink>
                 <div className={classes.main}>
-                    <div className={classNames(classes.row, classesMeta.root, "isFlexed", classes.topRow)}>
+                    <div className={classNames(classesMeta.root, "isFlexed", classes.topRow)}>
                         <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
                             {user.name}
                         </SmartLink>
                         {showRole && "roles" in user && <Roles roles={user.roles} wrapper={false} />}
                     </div>
-                    <ConditionalWrap
-                        condition={!!date && !!categoryComponent}
-                        className={classNames(classes.row, classesMeta.root, "isFlexed", classes.bottomRow)}
-                    >
+                    <div className={classNames(classesMeta.root, "isFlexed", classes.bottomRow)}>
                         {dateComponent}
                         {categoryComponent}
-                    </ConditionalWrap>
+                    </div>
                 </div>
             </article>
         );

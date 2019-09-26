@@ -11,6 +11,7 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * Fallback scraped link embed.
@@ -52,19 +53,20 @@ class QuoteEmbed extends AbstractEmbed {
             $data['recordType'] = 'comment';
         }
 
-        if (!isset($data['renderFullContent'])) {
-            $data['renderFullContent'] = false;
+        if (!isset($data['displayOptions'])) {
+            $hasTitle = isset($data['name']);
+            $data['displayOptions'] = QuoteEmbedDisplayOptions::minimal($hasTitle);
+        } elseif (is_array($data['displayOptions'])) {
+            $data['displayOptions'] = QuoteEmbedDisplayOptions::from($data['displayOptions']);
         }
 
-        if (!isset($data['expandByDefault'])) {
-            $data['expandByDefault'] = false;
-        }
+        $showFullContent = $data['displayOptions']->isRenderFullContent();
 
         // Format the body.
         if (!isset($data['body']) && isset($data['bodyRaw'])) {
             $bodyRaw = $data['bodyRaw'];
-            $bodyRaw = is_array($bodyRaw) ? json_encode($bodyRaw) : $bodyRaw;
-            if ($data['showFullContent'] ?? null) {
+            $bodyRaw = is_array($bodyRaw) ? json_encode($bodyRaw, JSON_UNESCAPED_UNICODE) : $bodyRaw;
+            if ($showFullContent) {
                 $data['body'] = \Gdn::formatService()->renderHTML($bodyRaw, $data['format']);
             } else {
                 $data['body'] = \Gdn::formatService()->renderQuote($bodyRaw, $data['format']);
@@ -96,8 +98,15 @@ class QuoteEmbed extends AbstractEmbed {
             'format:s',
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),
-            'renderFullContent:b',
-            'expandByDefault:b',
+            'displayOptions' => new InstanceValidatorSchema(QuoteEmbedDisplayOptions::class),
+            'discussionLink:s?',
+
+            // Optional properties
+            'category:o?' => [
+                'categoryID',
+                'name',
+                'url',
+            ],
         ]);
     }
 }

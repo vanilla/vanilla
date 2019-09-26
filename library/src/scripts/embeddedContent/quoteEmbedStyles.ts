@@ -120,7 +120,13 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const footerSeparator = style("footerSeparator", {
+        // Reset
+        border: 0,
+        borderStyle: "solid",
+        margin: 0,
         display: "block",
+
+        // Styling
         width: percent(100),
         height: unit(1),
         backgroundColor: colorOut(globalVars.mixBgAndFg(0.2)),

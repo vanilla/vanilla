@@ -100,11 +100,18 @@ class Filterer {
                         }
                     }
                 }
-                $stringBodyRaw = json_encode($bodyRaw);
+                $stringBodyRaw = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
+            }
+
+            // Fix improperly encoded unicode:
+            if (strstr($stringBodyRaw, "\\u") !== false) {
+                $decoded = json_decode($stringBodyRaw);
+                $stringBodyRaw = json_encode($decoded, JSON_UNESCAPED_UNICODE);
+                $embedData['bodyRaw'] = $stringBodyRaw;
             }
 
             // Finally render the new body to overwrite the previous HTML body.
-            if ($embedData['renderFullContent'] ?? null) {
+            if ($embedData['displayOptions']['renderFullContent'] ?? null) {
                 $embedData['body'] = \Gdn::formatService()->renderHTML($stringBodyRaw, $format);
             } else {
                 $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);

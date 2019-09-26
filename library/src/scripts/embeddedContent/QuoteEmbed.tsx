@@ -22,10 +22,8 @@ import React from "react";
 interface IProps extends IBaseEmbedProps {
     body: string;
     dateInserted: string;
-    insertUser: IUserFragment | IUserFragmentAndRoles;
-    expandByDefault?: boolean;
+    insertUser: IUserFragment;
     discussionLink?: string;
-    postLink?: string; // should always be there for citation reference
     category?: ICategoryFragment;
     // For compatibility, new options are hidden by default
     displayOptions?: {
@@ -34,6 +32,7 @@ interface IProps extends IBaseEmbedProps {
         showDiscussionLink?: boolean;
         showPostLink?: boolean;
         showCategoryLink?: boolean;
+        expandByDefault?: boolean;
     };
 }
 
@@ -43,25 +42,16 @@ interface IProps extends IBaseEmbedProps {
  * This is not an editable quote. Instead it an expandable/collapsable snapshot of the quoted/embedded comment/discussion.
  */
 export function QuoteEmbed(props: IProps) {
-    const {
-        body,
-        insertUser,
-        name,
-        url,
-        dateInserted,
-        discussionLink,
-        postLink,
-        category,
-        displayOptions = {},
-    } = props;
+    const { body, insertUser, name, url, dateInserted, discussionLink, category, displayOptions = {} } = props;
 
     const classes = quoteEmbedClasses();
     const {
         showUserLabel = false,
-        showCompactUserInfo = false,
-        showDiscussionLink = false,
+        showCompactUserInfo = true,
+        showDiscussionLink = true,
         showPostLink = false,
         showCategoryLink = false,
+        expandByDefault = false,
     } = displayOptions;
 
     const discussionTitle = t("View Original Discussion");
@@ -74,8 +64,8 @@ export function QuoteEmbed(props: IProps) {
     );
 
     const postTitle = t("View Post");
-    const linkToPost = showPostLink && postLink && (
-        <SmartLink to={postLink} className={classes.postLink}>
+    const linkToPost = showPostLink && url && (
+        <SmartLink to={url} className={classes.postLink}>
             {postTitle}
             <RightChevronIcon title={postTitle} className={classes.postLinkIcon} />
         </SmartLink>
@@ -85,13 +75,13 @@ export function QuoteEmbed(props: IProps) {
         <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
                 <article className={classes.body}>
-                    {(showUserLabel || name) && (
+                    {(showUserLabel || showCompactUserInfo || name) && (
                         <header className={classes.header}>
                             {showUserLabel && (
                                 <UserLabel
                                     user={insertUser}
                                     date={dateInserted}
-                                    dateLink={postLink}
+                                    dateLink={url}
                                     category={category}
                                     displayOptions={{
                                         showCategory: showCategoryLink,
@@ -113,7 +103,7 @@ export function QuoteEmbed(props: IProps) {
                                 <UserLabel
                                     user={insertUser}
                                     date={dateInserted}
-                                    dateLink={postLink}
+                                    dateLink={url}
                                     compact={true}
                                     category={category}
                                     displayOptions={{ showCategory: showCategoryLink }}
@@ -121,8 +111,8 @@ export function QuoteEmbed(props: IProps) {
                             )}
                         </header>
                     )}
-                    <CollapsableContent className={classes.content} isExpandedDefault={!!props.expandByDefault}>
-                        <blockquote className={classes.blockquote} cite={postLink}>
+                    <CollapsableContent className={classes.content} isExpandedDefault={!!expandByDefault}>
+                        <blockquote className={classes.blockquote} cite={url}>
                             <UserContent content={body} />
                         </blockquote>
                     </CollapsableContent>

@@ -29,19 +29,7 @@ const dummyUser: IUserFragment = {
     photoUrl: "https://us.v-cdn.net/5018160/uploads/userpics/809/nHZP3CA8JMR2H.jpg",
     userID: 4,
     dateLastActive: "2019-02-10T23:54:14+00:00",
-};
-
-const dummyUserWithRoles: IUserFragmentAndRoles = {
-    name: "Adam Charron",
-    photoUrl: "https://us.v-cdn.net/5018160/uploads/userpics/809/nHZP3CA8JMR2H.jpg",
-    userID: 4,
-    dateLastActive: "2019-02-10T23:54:14+00:00",
-    roles: [
-        {
-            roleID: 1,
-            name: "Staff",
-        },
-    ],
+    title: "Staff",
 };
 
 const dummyDate = "2019-02-10T23:54:14+00:00";
@@ -55,12 +43,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list viewRearrange order of span elements on discussion list view"
                 body={ipsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 category={{
                     categoryID: 1,
                     name: "Cool Cats",
@@ -79,12 +66,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list view"
                 body={shortIpsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 category={{
                     categoryID: 1,
                     name: "Cool Cats",
@@ -102,13 +88,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list view"
                 body={ipsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
-                expandByDefault={true}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 category={{
                     categoryID: 1,
                     name: "Cool Cats",
@@ -119,6 +103,7 @@ story.add("QuoteEmbed", () => {
                     showDiscussionLink: true,
                     showPostLink: true,
                     showCategoryLink: true,
+                    expandByDefault: true,
                 }}
             />
 
@@ -127,12 +112,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list view"
                 body={shortIpsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 displayOptions={{
                     showUserLabel: false,
                     showDiscussionLink: false,
@@ -147,12 +131,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="Rearrange order of span elements on discussion list view"
                 body={shortIpsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 category={{
                     categoryID: 1,
                     name: "Cool Cats",
@@ -171,12 +154,11 @@ story.add("QuoteEmbed", () => {
             <QuoteEmbed
                 name="RearrangeorderofspanelementsondiscussionlistviewRearrangeorderofspanelementsondiscussionlistviewRearrangeorderofspanelementsondiscussionlistview"
                 body={ipsum}
-                insertUser={dummyUserWithRoles}
+                insertUser={dummyUser}
                 dateInserted={dummyDate}
                 embedType="quote"
                 url="#"
                 discussionLink={"#"}
-                postLink={"#"}
                 displayOptions={{
                     showUserLabel: true,
                     showDiscussionLink: false,

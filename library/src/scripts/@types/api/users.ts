@@ -8,6 +8,7 @@ export interface IUserFragment {
     name: string;
     photoUrl: string;
     dateLastActive: string | null;
+    title?: string | null;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}

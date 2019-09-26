@@ -15,7 +15,7 @@ import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories"
  */
 
 interface IUserLabel {
-    user: IUserFragment | IUserFragmentAndRoles;
+    user: IUserFragment;
     date?: string;
     dateLink?: string;
     category?: ICategoryFragment;
@@ -70,7 +70,7 @@ export function UserLabel(props: IUserLabel) {
                         <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
                             {user.name}
                         </SmartLink>
-                        {showRole && "roles" in user && <Roles roles={user.roles} wrapper={false} />}
+                        {showRole && user.title && <Roles roles={[{ roleID: 0, name: user.title }]} wrapper={false} />}
                     </div>
                     <div className={classNames(classesMeta.root, "isFlexed", classes.bottomRow)}>
                         {dateComponent}

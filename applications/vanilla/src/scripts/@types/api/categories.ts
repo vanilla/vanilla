@@ -3,15 +3,18 @@
  * @license GPL-2.0-only
  */
 
-export interface ICategory {
+export interface ICategoryFragment {
     categoryID: number;
     name: string;
+    url: string;
+}
+
+export interface ICategory extends ICategoryFragment {
     description: string;
     parentCategoryID: number | null;
     customPermissions: false;
     isArchived: false;
     urlcode: string;
-    url: string;
     displayAs: CategoryDisplayAs;
     countCategories: number;
     countDiscussions: number;

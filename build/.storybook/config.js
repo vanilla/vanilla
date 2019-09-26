@@ -35,7 +35,12 @@ function loadStories() {
 }
 
 addParameters({
-    chromatic: { delay: 2000 } // Add a slight delay to ensure everything has rendered properly.
+    chromatic: {
+        delay: 1500, // Add a slight delay to ensure everything has rendered properly.
+        diffThreshold: 0.2, // Default is 0.67. Lower numbers are more accurate.
+                            // Set to prevent diffs like this https://www.chromaticqa.com/snapshot?appId=5d5eba16c782b600204ba187&id=5d8cef8dbc622e00202a6edd
+                            // From triggering
+    }
 })
 
 addDecorator(checkA11y);

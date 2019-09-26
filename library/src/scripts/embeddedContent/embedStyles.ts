@@ -35,7 +35,7 @@ export const embedContainerVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("padding", {
-        padding: 12,
+        padding: 18,
     });
 
     return { border, spacing, colors, title, dimensions };

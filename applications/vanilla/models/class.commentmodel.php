@@ -901,7 +901,7 @@ class CommentModel extends Gdn_Model {
             return;
         }
         $wheres = ['CategoryID' => $categoryID];
-        $dateMarkedRead = $category->DateMarkedRead;
+        $dateMarkedRead = $category->DateMarkedRead ?? null;
         if ($dateMarkedRead) {
             $wheres['DateLastComment>'] = $dateMarkedRead;
         }

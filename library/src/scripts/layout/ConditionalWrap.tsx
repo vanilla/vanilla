@@ -22,7 +22,7 @@ export default class ConditionalWrap extends React.Component<IProps> {
         if (condition) {
             return <Tag className={className}>{children}</Tag>;
         } else {
-            return <React.Fragment>{children}</React.Fragment>;
+            return <>{children}</>;
         }
     }
 }

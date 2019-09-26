@@ -24,6 +24,7 @@ class UserFragmentSchema extends Schema {
             'name:s', // The username of the user.
             'photoUrl:s', // The URL of the user\'s avatar picture.
             'dateLastActive:dt|n', // Time the user was last active.
+            'title:s?'
         ]));
     }
 

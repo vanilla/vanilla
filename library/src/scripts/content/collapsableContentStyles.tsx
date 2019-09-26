@@ -12,6 +12,8 @@ export const collapsableContentClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("collapsableContent");
 
+    const paddingAdjustment = style("paddingAdjustment", {});
+
     const root = style({
         background: colorOut(globalVars.mainColors.bg),
         position: "relative",
@@ -60,5 +62,5 @@ export const collapsableContentClasses = useThemeCache(() => {
         transform: `translateY(-100%)`,
     });
 
-    return { heightContainer, root, collapser, collapserIcon, footer, gradient };
+    return { heightContainer, root, collapser, collapserIcon, footer, gradient, paddingAdjustment };
 });

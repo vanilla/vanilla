@@ -81,11 +81,13 @@ export function QuoteEmbed(props: IProps) {
         </SmartLink>
     );
 
+    const showHeader = showUserLabel || name || showCompactUserInfo;
+
     return (
         <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
                 <article className={classes.body}>
-                    {(showUserLabel || name) && (
+                    {showHeader && (
                         <header className={classes.header}>
                             {showUserLabel && (
                                 <UserLabel
@@ -117,11 +119,16 @@ export function QuoteEmbed(props: IProps) {
                                     compact={true}
                                     category={category}
                                     displayOptions={{ showCategory: showCategoryLink }}
+                                    fixLineHeight={!showUserLabel && !name}
                                 />
                             )}
                         </header>
                     )}
-                    <CollapsableContent className={classes.content} isExpandedDefault={!!props.expandByDefault}>
+                    <CollapsableContent
+                        className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
+                        isExpandedDefault={!!props.expandByDefault}
+                        firstChild={!showUserLabel && !name && !showCompactUserInfo}
+                    >
                         <blockquote className={classes.blockquote} cite={postLink}>
                             <UserContent content={body} />
                         </blockquote>

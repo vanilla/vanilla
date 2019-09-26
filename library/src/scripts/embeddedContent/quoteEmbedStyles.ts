@@ -76,6 +76,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const isPadded = style("isPadded", {});
+    const fixLineHeight = style("fixLineHeight", {});
 
     const titleLink = style("titleLink", {
         display: "block",
@@ -94,12 +95,21 @@ export const quoteEmbedClasses = useThemeCache(() => {
         }),
     });
 
+    const paddingAdjustment = style("paddingAdjustment", {});
+
     const content = style("content", {
         ...paddings({
             all: embedVars.spacing.padding,
-            top: vars.userContent.padding,
         }),
         width: percent(100),
+        $nest: {
+            [`&.${paddingAdjustment}`]: {
+                ...paddings({
+                    all: embedVars.spacing.padding,
+                    top: vars.userContent.padding,
+                }),
+            },
+        },
     });
 
     const footer = style("footer", {
@@ -198,6 +208,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         isPadded,
         header,
         content,
+        fixLineHeight,
         footer,
         footerMain,
         footerSeparator,
@@ -206,5 +217,6 @@ export const quoteEmbedClasses = useThemeCache(() => {
         discussionLink,
         discussionIcon,
         blockquote,
+        paddingAdjustment,
     };
 });

@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { StoryDecorator } from "@storybook/react";
 import React, { useEffect } from "react";
 
 /**
@@ -12,7 +11,7 @@ import React, { useEffect } from "react";
  *
  * story.addDecorator(dashboardCssDecorator)
  */
-export const dashboardCssDecorator: StoryDecorator = (getStory: () => any) => {
+export const dashboardCssDecorator = (getStory: () => any) => {
     require("./_adminStylesNested.scss");
     const AdminStyles = () => {
         return <div className="storybookDashboardStyles">{getStory()}</div>;

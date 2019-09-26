@@ -5,7 +5,6 @@
  * @license GPL-2.0-only
  */
 
-import uniqueId from "lodash/uniqueId";
 import { useMemo } from "react";
 
 // Optional ID
@@ -18,6 +17,23 @@ export interface IRequiredComponentID {
     id: string;
 }
 
+const DEFAULT_PREFIX = "";
+
+// Cache of ID's by their prefix.
+let idCache: { [key: string]: number } = {};
+
+// Generates unique ID from suffix
+export function uniqueIDFromPrefix(prefix: string = DEFAULT_PREFIX) {
+    let count = 0;
+
+    if (prefix in idCache) {
+        count = idCache[prefix] + 1;
+    }
+    idCache[prefix] = count;
+
+    return prefix + "-" + idCache[prefix];
+}
+
 /**
  * React hook for useUniqueIDFromPrefix
  */
@@ -25,9 +41,11 @@ export function useUniqueID(prefix?: string) {
     return useMemo(() => uniqueIDFromPrefix(prefix), [prefix]);
 }
 
-// Generates unique ID from suffix
-export function uniqueIDFromPrefix(prefix?: string) {
-    return (prefix + uniqueId()) as string;
+/**
+ * Clear the cache of unique IDs. Useful for testing particularly.
+ */
+export function clearUniqueIDCache() {
+    idCache = {};
 }
 
 // Get required ID, will either return ID given through props or generate unique ID from suffix

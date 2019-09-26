@@ -7,6 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, defaultTransition, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { linearGradient, percent, px, translateY } from "csx";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const collapsableContentClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -28,10 +29,7 @@ export const collapsableContentClasses = useThemeCache(() => {
     const collapser = style("collapser", {
         $nest: {
             "&&": {
-                "-webkit-appearance": "none",
-                "-moz-appearance": "none",
-                appearance: "none",
-                border: "none",
+                ...buttonResetMixin(),
                 borderRadius: 0,
                 width: percent(100),
                 height: unit(globalVars.icon.sizes.default),

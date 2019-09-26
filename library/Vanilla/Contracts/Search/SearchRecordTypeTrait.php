@@ -22,6 +22,13 @@ trait SearchRecordTypeTrait {
     /**
      * @inheritdoc
      */
+    public function getApiTypeKey(): string {
+        return self::API_TYPE_KEY;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDType(): int {
         return self::SPHINX_DTYPE;
     }

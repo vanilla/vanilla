@@ -20,6 +20,13 @@ interface SearchRecordTypeInterface {
     public function getKey(): string;
 
     /**
+     * Get search api type key. Ex: discussion, poll, question, etc...
+     *
+     * @return string
+     */
+    public function getApiTypeKey(): string;
+
+    /**
      * Get sphinx index filter dtype value
      *
      * @return string

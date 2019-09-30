@@ -7,6 +7,7 @@
 
 use Firebase\JWT\JWT;
 use Garden\Web\Cookie;
+use Vanilla\Logger;
 
 /**
  * Class SsoUtils
@@ -36,14 +37,17 @@ class SsoUtils {
     /** @var string */
     private $stateToken;
 
+    private $logger;
+
     /**
      * SsoUtils constructor.
      */
-    public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session) {
+    public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, Logger $logger) {
         $this->cookie = $cookie;
         $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-ssostatetoken';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
         $this->session = $session;
+        $this->logger = $logger;
 
         if (!$this->cookieSalt) {
             throw new Gdn_UserException('Cookie salt is empty.');
@@ -104,7 +108,7 @@ class SsoUtils {
 
         if (!$storedStateTokenData) {
             $storedStateTokenData = $this->session->stash("{$context}StateToken", '', false);
-            $isStateTokenValid = $this->isStateTokenValid($storedStateTokenData, $stateToken);
+            $isStateTokenValid = $this->isStateTokenValid($storedStateTokenData, $stateToken, 'stash');
         }
 
         if (!$isStateTokenValid) {
@@ -131,7 +135,7 @@ class SsoUtils {
         if (!$stateTokenData || empty($stateTokenData['stateToken'])) {
             throw new Exception(t('The state token could not be validated or is expired.'));
         }
-        if (!$this->isStateTokenValid($stateTokenData, $stateToken)) {
+        if (!$this->isStateTokenValid($stateTokenData, $stateToken, 'cookie')) {
             throw new Exception('The state token is invalid.');
         }
 
@@ -145,21 +149,62 @@ class SsoUtils {
      *
      * @param array $stateTokenData
      * @param string $stateToken
+     * @param string $source For logging purposes, optionally pass which token is being validated.
      * @return bool true if the data is valid and false otherwise.
      */
-    protected function isStateTokenValid($stateTokenData, $stateToken) {
+    protected function isStateTokenValid($stateTokenData, $stateToken, $source = '') {
         // Validate expected data.
-        if (!is_array($stateTokenData) || empty($stateTokenData['stateToken']) || empty($stateTokenData['exp'])) {
+        if (!is_array($stateTokenData)) {
+            $this->logger->event(
+                'state_token',
+                $this->logger::ERROR,
+                'Missing stateTokenData',
+                ['source' => $source, 'stateTokenData' => $stateTokenData ?? []]
+            );
+            return false;
+        }
+
+        // Validate it contains a stateToken.
+        if (empty($stateTokenData['stateToken'])) {
+            $this->logger->event(
+                'state_token',
+                $this->logger::ERROR,
+                'Missing stateToken from stateToken Array',
+                ['source' => $source, 'stateTokenData' => $stateTokenData]
+            );
+            return false;
+        }
+
+        // Validate if exp exists.
+        if (empty($stateTokenData['exp'])) {
+            $this->logger->event(
+                'state_token',
+                $this->logger::ERROR,
+                'Missing Expiry from stateTokenArray',
+                ['source' => $source, 'stateTokenData' => $stateTokenData]
+            );
             return false;
         }
 
         // Check for expiration.
         if ($stateTokenData['exp'] < time()) {
+            $this->logger->event(
+                'state_token',
+                $this->logger::ERROR,
+                'StateToken Expired',
+                ['source' => $source, 'stateTokenExp' => $stateTokenData['exp'], 'time' => time()]
+            );
             return false;
         }
 
         // Check the token.
         if ($stateToken !== $stateTokenData['stateToken']) {
+            $this->logger->event(
+                'state_token',
+                $this->logger::ERROR,
+                'StateTokens do not match.',
+                ['source' => $source, 'stateToken' => $stateToken, 'time' => time()]
+            );
             return false;
         }
 

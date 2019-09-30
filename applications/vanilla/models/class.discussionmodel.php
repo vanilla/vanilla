@@ -3381,4 +3381,19 @@ class DiscussionModel extends Gdn_Model {
             }
         }
     }
+
+    /**
+     * Method to prevent encoding data twice.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function fixRows(array $data):array {
+
+        if (array_key_exists('Name', $data)) {
+            $data['Name'] = htmlspecialchars_decode($data['Name']);
+        }
+
+        return $data;
+    }
 }

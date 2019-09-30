@@ -74,7 +74,7 @@ echo $this->Form->errors(); ?>
     <div class="label-wrap">
         <?php echo $this->Form->label('Invitation target', 'Garden.Registration.InviteTarget'); ?>
         <div class="info">
-            <?php echo t('Users will be redirected to this URL after accepting an invitation. It can be a full URL or a path to redirect within the site.'); ?>
+            <?php echo t('Users will be redirected to this URL after accepting an invitation.', "Users will be redirected to this URL after accepting an invitation. It can be a full URL or a path to redirect within the site."); ?>
         </div>
     </div>
     <div class="input-wrap invite-url-code">

@@ -96,7 +96,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
                 // Our error handling page uses the theme when possible.
                 // As a result we absolutely CANNOT ever allow the this function to bubble up an error.
                 // If it did then we we get cascading OOM errors.
-                trigger_error('Could not load data for theme key $themeKey.');
+                trigger_error("Could not load data for theme key $themeKey.");
                 $this->themeFetchError = $e;
                 $this->themeData = null;
             }

@@ -73,9 +73,12 @@ echo $this->Form->errors(); ?>
 <div id="InvitationTarget" class="form-group">
     <div class="label-wrap">
         <?php echo $this->Form->label('Invitation target', 'Garden.Registration.InviteTarget'); ?>
+        <div class="info">
+            <?php echo t('Users will be redirected to this URL after accepting an invitation. It can be a full URL or a path to redirect within the site.'); ?>
+        </div>
     </div>
     <div class="input-wrap invite-url-code">
-        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget]); ?>
+        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget, 'placeholder' => 'https://']); ?>
     </div>
 </div>
 <div id="InvitationExpiration" class="form-group">

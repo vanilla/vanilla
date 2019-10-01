@@ -1,10 +1,10 @@
 {
     "name": "@vanilla/polyfill",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "main": "index.js",
     "module": "index.js",
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.2.10",
+        "@webcomponents/webcomponentsjs": "^2.3.0",
         "core-js": "^3.1.2"
     },
     "publishConfig": {

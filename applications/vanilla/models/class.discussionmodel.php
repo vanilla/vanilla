@@ -3381,4 +3381,22 @@ class DiscussionModel extends Gdn_Model {
             }
         }
     }
+
+    /**
+     * Method to prevent encoding data twice.
+     *
+     * DiscussionModel::calculate applies htmlspecialchars to discussion name which could conflict when
+     * data is encoded on the view.  As result characters will display in their entity codes.  Removing the
+     * htmlspecialchars in the calculate method could result in several XSS vulnerabilities in Vanilla.  This
+     * method is a utility method to avoid encoding data where it's not necessary.
+     *
+     * @param array $row The discussion record to fix.
+     * @return array
+     */
+    public function fixRow(array $row): array {
+        if (array_key_exists('Name', $row)) {
+            $row['Name'] = htmlspecialchars_decode($row['Name']);
+        }
+        return $row;
+    }
 }

@@ -6,21 +6,66 @@
 
 // Rich editor needs to force styling of list elements.
 
-.richEditor-text ul,
-.richEditor-text ol {
-    margin: 1em 0 1em 3em;
+$nestedList-margin: 0 0 0 1em;
+
+
+.userContent ul,
+.userContent ol {
+    margin: 1em 0 1em 2em;
 }
 
-.richEditor-text ol li {
-    list-style: decimal !important;
+.userContent {
+    ol {
+        li {
+            list-style: decimal !important;
+        }
+        ol li {
+            list-style: lower-alpha !important;
+        }
+        ol ol li {
+            list-style: lower-roman !important;
+        }
+        ol ol ol li {
+            list-style: decimal !important;
+        }
+        ol ol ol ol li {
+            list-style: lower-alpha !important;
+        }
+        ol ol ol ol ol li {
+            list-style: lower-roman !important;
+        }
+        ol ol ol ol ol ol li {
+            list-style: decimal !important;
+        }
+        ol,
+        ul {
+            margin: $nestedList-margin;
+        }
+    }
 }
 
-.richEditor-text ul li {
-    list-style: disc !important;
+.userContent {
+    ul {
+        li {
+            list-style: none !important;
+            position: relative;
+
+            &::before {
+                content: "•";
+                font-family: 'Arial', serif !important;
+                position: absolute;
+                left: -1em;
+            }
+        }
+        ol,
+        ul {
+            margin: $nestedList-margin;
+        }
+    }
 }
 
 // Too overcome bootstrap 3's hideous selector "form ul:not(.List) li"
-.richEditor-text li,
-.richEditor-text.richEditor-text ul li {
+.userContent li,
+.userContent.userContent ul li {
   margin: 5px 0;
 }

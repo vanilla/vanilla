@@ -13,11 +13,11 @@ import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbed
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 const stubEmbedData: IEmbedValue = {
     data: {
-        type: "stub",
+        embedType: "stub",
         url: "",
         attributes: [],
     },

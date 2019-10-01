@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, setAllLinkColors } from "@library/styles/styleHelpers";
+import { borders, colorOut, fonts, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -12,7 +12,7 @@ import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 
-const userContentVariables = useThemeCache(() => {
+export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
     const globalVars = globalVariables();
     const { mainColors } = globalVars;
@@ -31,8 +31,8 @@ const userContentVariables = useThemeCache(() => {
 
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
-        bg: mainColors.fg.mix(mainColors.bg, 0.05),
-        fg: mainColors.bg.lightness() > 0.5 ? mainColors.fg.darken(0.2) : mainColors.fg.lighten(0.2),
+        fg: mainColors.fg,
+        bg: globalVars.mixBgAndFg(0.05),
     });
 
     const embeds = makeThemeVars("embeds", {
@@ -44,16 +44,14 @@ const userContentVariables = useThemeCache(() => {
     const code = makeThemeVars("code", {
         fontSize: em(0.85),
         borderRadius: 2,
-        // bg target rgba(127, 127, 127, .15);
-        bg: blocks.bg,
-        fg: blocks.fg,
     });
 
     const codeInline = makeThemeVars("codeInline", {
         borderRadius: code.borderRadius,
         paddingVertical: em(0.2),
         paddingHorizontal: em(0.4),
-        bg: mainColors.fg.mix(mainColors.bg, 0.08),
+        fg: blocks.fg,
+        bg: blocks.bg,
     });
 
     const codeBlock = makeThemeVars("codeBlock", {
@@ -61,6 +59,8 @@ const userContentVariables = useThemeCache(() => {
         paddingVertical: fonts.size,
         paddingHorizontal: fonts.size,
         lineHeight: 1.45,
+        fg: blocks.fg,
+        bg: blocks.bg,
     });
 
     const list = makeThemeVars("list", {
@@ -71,9 +71,25 @@ const userContentVariables = useThemeCache(() => {
         listDecoration: {
             minWidth: em(2),
         },
+        nestedList: {
+            margin: "0 0 0 1em",
+        },
     });
 
-    return { fonts, list, blocks, code, codeInline, codeBlock, embeds };
+    const spacing = makeThemeVars("spacing", {
+        base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
+    });
+
+    return {
+        fonts,
+        list,
+        blocks,
+        code,
+        codeInline,
+        codeBlock,
+        embeds,
+        spacing,
+    };
 });
 
 /**
@@ -103,36 +119,89 @@ export const userContentClasses = useThemeCache(() => {
 
     const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): NestedCSSProperties => {
         return {
-            marginTop: globalVars.spacer.size,
+            marginTop: unit(vars.spacing.base),
             fontSize,
             $nest: lineHeightAdjustment(),
         };
     };
+
     const headings: NestedCSSSelectors = {
-        "& h1": headingStyle("h1", vars.fonts.headings.h1),
-        "& h2": headingStyle("h2", vars.fonts.headings.h2),
-        "& h3": headingStyle("h3", vars.fonts.headings.h3),
-        "& h4": headingStyle("h4", vars.fonts.headings.h4),
-        "& h5": headingStyle("h5", vars.fonts.headings.h5),
-        "& h6": headingStyle("h6", vars.fonts.headings.h6),
+        "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h1),
+        "& h2:not(.heading)": headingStyle("h2", vars.fonts.headings.h2),
+        "& h3:not(.heading)": headingStyle("h3", vars.fonts.headings.h3),
+        "& h4:not(.heading)": headingStyle("h4", vars.fonts.headings.h4),
+        "& h5:not(.heading)": headingStyle("h5", vars.fonts.headings.h5),
+        "& h6:not(.heading)": headingStyle("h6", vars.fonts.headings.h6),
     };
 
     const lists: NestedCSSSelectors = {
-        "& ol": {
+        ["& ol"]: {
             listStylePosition: "inside",
+            margin: `0 0 1em 3em`,
+            padding: 0,
+            $nest: {
+                [`& li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol ol ol ol li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol ol ol ol li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol ol ol ol li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol, & ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
+            },
         },
-        "& ol li": {
-            ...listItem,
-            listStyle: "decimal",
+        ["& ul"]: {
+            listStylePosition: "inside",
+            listStyle: "disc",
+            margin: `1em 0 1em 2em`,
+            padding: 0,
+            $nest: {
+                [`& li`]: {
+                    listStyle: "none",
+                    position: "relative",
+                },
+                [`& li::before`]: {
+                    fontFamily: `'Arial', serif`,
+                    content: `"•"`,
+                    position: "absolute",
+                    left: em(-1),
+                },
+                [`& ol, & ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
+            },
         },
-        "& ul li": {
-            ...listItem,
-            listStyle: "initial",
+        [`& li`]: {
+            margin: `5px 0`,
+            $nest: {
+                [`&, & *:first-child`]: {
+                    marginTop: 0,
+                },
+                [`&, & *:last-child`]: {
+                    marginBottom: 0,
+                },
+            },
         },
     };
 
     const paragraphSpacing: NestedCSSSelectors = {
-        "& p": {
+        "& > p": {
             marginTop: 0,
             marginBottom: 0,
             $nest: {
@@ -150,7 +219,14 @@ export const userContentClasses = useThemeCache(() => {
         },
 
         "&& > *:first-child": {
+            $unique: true, // Required to prevent collapsing in with some other variable.
             marginTop: 0,
+
+            $nest: {
+                "&::before": {
+                    marginTop: 0,
+                },
+            },
         },
     };
 
@@ -179,8 +255,8 @@ export const userContentClasses = useThemeCache(() => {
             maxWidth: percent(100),
             overflowX: "auto",
             margin: 0,
-            color: colorOut(vars.code.fg),
-            backgroundColor: colorOut(vars.code.bg),
+            color: colorOut(vars.blocks.fg),
+            backgroundColor: colorOut(vars.blocks.bg),
             border: "none",
         },
         "&& .codeInline": {
@@ -191,7 +267,8 @@ export const userContentClasses = useThemeCache(() => {
                 left: vars.codeInline.paddingHorizontal,
                 right: vars.codeInline.paddingHorizontal,
             }),
-            background: colorOut(vars.codeInline.bg),
+            color: colorOut(vars.codeInline.fg),
+            backgroundColor: colorOut(vars.codeInline.bg),
             borderRadius: vars.codeInline.borderRadius,
             // We CAN'T use display: `inline` & position: `relative` together.
             // This causes the cursor to disappear in a contenteditable.
@@ -206,6 +283,8 @@ export const userContentClasses = useThemeCache(() => {
             borderRadius: vars.codeBlock.borderRadius,
             flexShrink: 0, // Needed so code blocks don't collapse in the editor.
             whiteSpace: "pre",
+            color: colorOut(vars.codeBlock.fg),
+            backgroundColor: colorOut(vars.codeBlock.bg),
             ...paddings({
                 top: vars.codeBlock.paddingVertical,
                 bottom: vars.codeBlock.paddingVertical,
@@ -220,15 +299,6 @@ export const userContentClasses = useThemeCache(() => {
     // They should be fully converted in the future but at the moment
     // Only the bare minimum is convverted in order to make the colors work.
     const spoilersAndQuotes: NestedCSSSelectors = {
-        [`& .spoiler,
-          & .button-spoiler,
-          & .spoiler-icon`]: {
-            background: colorOut(vars.blocks.bg),
-            color: colorOut(vars.blocks.fg),
-        },
-        "& .spoiler-icon": {
-            margin: 0,
-        },
         "& .embedExternal-content": {
             borderRadius: vars.embeds.borderRadius,
             $nest: {
@@ -274,6 +344,10 @@ export const userContentClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.base,
         fontSize: vars.fonts.size,
         $nest: {
+            // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+            "&::before": {
+                marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+            },
             ...headings,
             ...lists,
             ...paragraphSpacing,

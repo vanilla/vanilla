@@ -6,9 +6,9 @@
 
 import * as path from "path";
 import webpack from "webpack";
-import { VANILLA_ROOT, PRETTIER_FILE } from "../env";
+import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
-import { getOptions, BuildMode } from "../options";
+import { BuildMode, getOptions } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -25,8 +25,8 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 
     const modulePaths = [
         "node_modules",
-        path.join(VANILLA_ROOT, "node_modules"),
         ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
+        path.join(VANILLA_ROOT, "node_modules"),
     ];
 
     const aliases = Object.keys(entryModel.aliases).join(", ");
@@ -43,7 +43,9 @@ ${chalk.green(aliases)}`;
         hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
     }
 
-    const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    // Leaving this out until we get the docs actually generating. Huge slowdown.
+    // const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+    const storybookLoaders: never[] = [];
 
     const config: any = {
         context: VANILLA_ROOT,
@@ -52,20 +54,28 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
-                        const modulesRequiringTranspilation = ["quill", "p-debounce"];
-                        const exlusionRegex = new RegExp(
-                            `node_modules\/(${modulesRequiringTranspilation.join("|")})\/`,
-                        );
+                        const modulesRequiringTranspilation = [
+                            "quill",
+                            "p-debounce",
+                            "@vanilla/.*",
+                            "react-redux",
+                            "react-spring",
+                        ];
+                        const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
+
+                        if (modulePath.includes("core-js")) {
+                            return true;
+                        }
 
                         // We need to transpile quill's ES6 because we are building from source.
-                        return /node_modules/.test(modulePath) && !exlusionRegex.test(modulePath);
+                        return /node_modules/.test(modulePath) && !exclusionRegex.test(modulePath);
                     },
                     use: [
                         ...hotLoaders,
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: [require.resolve("@vanillaforums/babel-preset")],
+                                presets: [require.resolve("@vanilla/babel-preset")],
                                 plugins: babelPlugins,
                                 cacheDirectory: true,
                             },
@@ -91,15 +101,20 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        [BuildMode.DEVELOPMENT, BuildMode.TEST, BuildMode.TEST_DEBUG, BuildMode.TEST_WATCH].includes(
-                            options.mode,
-                        )
+                        [
+                            BuildMode.DEVELOPMENT,
+                            BuildMode.TEST,
+                            BuildMode.TEST_DEBUG,
+                            BuildMode.TEST_WATCH,
+                            BuildMode.DEVELOPMENT,
+                        ].includes(options.mode) || section === "storybook"
                             ? "style-loader"
                             : MiniCssExtractPlugin.loader,
                         {
                             loader: "css-loader",
                             options: {
                                 sourceMap: true,
+                                url: false,
                             },
                         },
                         {
@@ -124,6 +139,7 @@ ${chalk.green(aliases)}`;
         },
         performance: { hints: false },
         plugins: [
+            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
             new webpack.DefinePlugin({
                 __BUILD__SECTION__: JSON.stringify(section),
             }),

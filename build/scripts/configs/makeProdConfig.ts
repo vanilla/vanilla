@@ -9,6 +9,7 @@ import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
+import { SourceMapDevToolPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import TerserWebpackPlugin from "terser-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
@@ -37,11 +38,10 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
-    baseConfig.devtool = "cheap-source-map";
     baseConfig.optimization = {
         noEmitOnErrors: true,
-        namedModules: false,
-        namedChunks: false,
+        namedModules: options.debug,
+        namedChunks: options.debug,
         // Create a single runtime chunk per section.
         runtimeChunk: {
             name: `runtime`,
@@ -80,21 +80,38 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 },
             },
         },
-        minimizer: [
-            new TerserWebpackPlugin({
-                cache: true,
-                // Exclude swagger-ui from minification which is a large bundle and costly to minify.
-                exclude: /swagger-ui/,
-                terserOptions: {
-                    warnings: false,
-                    ie8: false,
-                },
-                parallel: true,
-                sourceMap: true, // set to true if you want JS source maps
-            }),
-            new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
-        ],
+        minimize: !options.debug,
+        minimizer: options.debug
+            ? []
+            : [
+                  new TerserWebpackPlugin({
+                      cache: true,
+                      // Exclude swagger-ui from minification which is a large bundle and costly to minify.
+                      exclude: /swagger-ui/,
+                      terserOptions: {
+                          warnings: false,
+                          ie8: false,
+                      },
+                      parallel: true,
+                      sourceMap: true, // set to true if you want JS source maps
+                  }),
+                  new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
+              ],
     };
+
+    baseConfig.plugins!.push(
+        new SourceMapDevToolPlugin({
+            namespace: `vanilla-${section}`,
+            filename: `sourcemaps/`.concat(
+                Math.random()
+                    .toString(36)
+                    .slice(-5),
+                "/",
+                "[chunkhash]",
+            ),
+            publicPath: `/api/v2/sourcemaps/${section}/`, // PHP-FPM will serve these files with some permission checks in SourcemapsApiController.
+        } as any),
+    );
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

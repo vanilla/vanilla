@@ -13,6 +13,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -47,15 +48,20 @@ export default class Tokens extends React.Component<IProps, IState> {
     public render() {
         const { className, disabled, options, isLoading } = this.props;
         const classes = tokensClasses();
+        const classesInputBlock = inputBlockClasses();
 
         return (
-            <div className={classNames("tokens", "inputBlock", this.props.className, classes.root)}>
-                <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
-                    <span className="inputBlock-labelText">{this.props.label}</span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
+            <div className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root)}>
+                <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
+                    <span className={classesInputBlock.labelText}>{this.props.label}</span>
+                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                 </label>
 
-                <div className={classNames("inputBlock-inputWrap", classes.inputWrap, { hasFocus: this.state.focus })}>
+                <div
+                    className={classNames(classesInputBlock.inputWrap, classes.inputWrap, {
+                        hasFocus: this.state.focus,
+                    })}
+                >
                     <Select
                         id={this.id}
                         inputId={this.inputID}

@@ -25,6 +25,8 @@
 
     {if $ThemeOptions.Options.hasFeatureSearchbox}
         ThemeOptions-hasFeatureSearchbox
+    {else}
+        hideHomepageTitle
     {/if}
 
     {if $ThemeOptions.Options.panelToLeft}
@@ -83,12 +85,15 @@
                             </nav>
                             <div class="Header-flexSpacer"></div>
                             <div class="Header-right">
+                                {community_chooser buttonType='titleBarLink' buttonClass='Header-desktopCommunityChooser'}
                                 <div class="MeBox-header">
                                     {module name="MeModule" CssClass="FlyoutRight"}
                                 </div>
                                 {if $User.SignedIn}
                                     <button class="mobileMeBox-button">
-                                        {module name="UserPhotoModule"}
+                                        <span class="Photo PhotoWrap">
+                                            <img src="{$User.Photo|escape:'html'}" class="ProfilePhotoSmall" alt="{t c='Avatar'}">
+                                        </span>
                                     </button>
                                 {/if}
                             </div>
@@ -115,6 +120,9 @@
                             {discussions_link format=$linkFormat}
                             {activity_link format=$linkFormat}
                             {custom_menu format=$linkFormat}
+                            <div class='Navigation-linkContainer'>
+                                {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
+                            </div>
                         </div>
                     </nav>
                     <nav class="mobileMebox js-mobileMebox needsInitialization">
@@ -150,7 +158,7 @@
                                 </div>
                             {else}
                                 {if $Category}
-                                    <h2 class="H HomepageTitle">{$Category.Name}</h2>
+                                    <h2 class="H HomepageTitle">{$Category.Name}{follow_button}</h2>
                                     <p class="P PageDescription">{$Category.Description}</p>
                                 {else}
                                     {if {homepage_title} !== ""}
@@ -180,7 +188,11 @@
                                 <div class="Frame-row SearchBoxMobile">
                                     {if !$SectionGroups && !inSection(["SearchResults"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {module name="AdvancedSearchModule"}
+                                            {if $hasAdvancedSearch === true}
+                                                {module name="AdvancedSearchModule"}
+                                            {else}
+                                                {searchbox}
+                                            {/if}
                                         </div>
                                     {/if}
                                 </div>
@@ -192,24 +204,21 @@
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">
-                                                    <div class="PhotoLarge"
-                                                        {if $Profile.PhotoUrl}
-                                                            style="background: url('{$Profile.PhotoUrl}') center/cover no-repeat;"
-                                                        {else}
-                                                            style="background: url('{$Profile.Photo}') center/cover no-repeat;"
-                                                        {/if}>
+                                                    <div class="PhotoLarge">
+                                                        {module name="UserPhotoModule"}
                                                     </div>
-                                                    {module name="UserPhotoModule"}
                                                 </div>
                                                 <div class="Profile-name">
                                                     <div class="Profile-row">
                                                         <h1 class="Profile-username">
-                                                            {$Profile.Name}
+                                                            {$Profile.Name|escape:'html'}
                                                         </h1>
                                                     </div>
                                                     <div class="Profile-row">
                                                         {if isset($Rank)}
-                                                            <span class="Profile-rank">{$Rank.Label}</span>
+                                                            <span class="Profile-rank">
+                                                                {$Rank.Label}
+                                                            </span>
                                                         {/if}
                                                     </div>
                                                 </div>
@@ -218,7 +227,6 @@
                                         <!---------- Profile Page Header END ---------->
 
                                         {asset name="Content"}
-                                        {event name="AfterBody"}
                                     </main>
                                     <!---------- Main Content END ---------->
 
@@ -246,10 +254,10 @@
             <footer class="Footer">
                 <div class="Container">
                     <div class="row">
-                        <div class="col">
+                        <div class="col col-copyRight">
                             <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
                         </div>
-                        <div class="col">
+                        <div class="col col-logo">
                             <div class="Vanilla-logo">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.418 27" class="PoweredbyVanilla">
                                 <title>Powered By Vanilla</title>
@@ -267,6 +275,7 @@
         </div>
     </div>
     <div id="modals"></div>
+    {event name="AfterBody"}
 </body>
 
 </html>

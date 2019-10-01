@@ -9,6 +9,7 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
 import { appearance, colorOut, unit } from "@library/styles/styleHelpers";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -20,6 +21,7 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     });
 
     const checkRadio = style("checkRadio", {
+        ...buttonResetMixin(),
         ...appearance(),
         border: 0,
         display: "flex",

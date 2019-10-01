@@ -9,6 +9,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Handles user data.
@@ -100,6 +101,22 @@ class UserModel extends Gdn_Model {
 
         $this->nameUnique = (bool)c('Garden.Registration.NameUnique', true);
         $this->emailUnique = (bool)c('Garden.Registration.EmailUnique', true);
+    }
+
+    /**
+     * Should guest users be allowed to search existing users by name and email?
+     *
+     * @return bool
+     */
+    public function allowGuestUserSearch(): bool {
+        $config = Gdn::getContainer()->get(ConfigurationInterface::class);
+        $isPrivateCommunity = (bool)$config->get("Garden.PrivateCommunity", false);
+
+        $registrationMethod = $config->get("Garden.Registration.Method", "");
+        $isBasicRegistration = is_string($registrationMethod) ? strtolower($registrationMethod) === "basic" : false;
+
+        $result = !$isPrivateCommunity || $isBasicRegistration;
+        return $result;
     }
 
     /**
@@ -2880,6 +2897,11 @@ class UserModel extends Gdn_Model {
             return false;
         }
 
+        if (!empty($invitation->AcceptedUserID)) {
+            $this->Validation->addValidationResult('InvitationCode', 'Invitation has been used.');
+            return false;
+        }
+
         // Get expiration date in timestamp. If nothing set, grab config default.
         $inviteExpiration = $invitation->DateExpires;
         if ($inviteExpiration != null) {
@@ -3438,6 +3460,8 @@ class UserModel extends Gdn_Model {
 
         $userData = $dataSet->firstRow();
 
+        self::rateLimit($userData);
+
         $passwordHash = new Gdn_PasswordHash();
         $hashMethod = val('HashMethod', $userData);
         if (!$passwordHash->checkPassword($password, $userData->Password, $hashMethod, $userData->Name)) {
@@ -3791,6 +3815,11 @@ class UserModel extends Gdn_Model {
      * @return int
      */
     public function getInvitationCount($userID) {
+        if (Gdn::config('Garden.Registration.Method') !== 'Invitation') {
+            // If registration method has been changed
+            return 0;
+        }
+
         // If this user is master admin, they should have unlimited invites.
         if ($this->SQL
                 ->select('UserID')
@@ -3856,20 +3885,23 @@ class UserModel extends Gdn_Model {
             ->firstRow();
 
         // If CountInvitations is null (ie. never been set before) or it is a new month since the DateSetInvitations
-        if ($user->CountInvitations == '' || is_null($user->DateSetInvitations) || Gdn_Format::date($user->DateSetInvitations, '%m %Y') != Gdn_Format::date('', '%m %Y')) {
+        if ((empty($user->CountInvitations) && $user->CountInvitations !== 0 )
+            || is_null($user->DateSetInvitations)
+            || date("m Y", strtotime($user->DateSetInvitations)) !== date('m Y')) {
             // Reset CountInvitations and DateSetInvitations
             $this->SQL->put(
                 $this->Name,
                 [
                     'CountInvitations' => $inviteCount,
-                    'DateSetInvitations' => Gdn_Format::date('', '%Y-%m-01') // The first day of this month
+                    'DateSetInvitations' => date('Y-m-01') // The first day of this month
                 ],
                 ['UserID' => $userID]
             );
             return $inviteCount;
         } else {
             // Otherwise return CountInvitations
-            return $user->CountInvitations;
+            // or inviteCount if it was recently downsized for the User's Role
+            return min($inviteCount, $user->CountInvitations);
         }
     }
 
@@ -4724,9 +4756,8 @@ class UserModel extends Gdn_Model {
      * Check and apply login rate limiting
      *
      * @param array $user
-     * @param bool $passwordOK
      */
-    public static function rateLimit($user, $passwordOK) {
+    public static function rateLimit($user) {
         if (Gdn::cache()->activeEnabled()) {
             // Rate limit using Gdn_Cache.
             $userRateKey = formatString(self::LOGIN_RATE_KEY, ['Source' => $user->UserID]);

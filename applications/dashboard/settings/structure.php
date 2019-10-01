@@ -144,6 +144,11 @@ if (!$SystemUserID) {
     }
 }
 
+// Make sure there is an update token.
+if (empty(Gdn::config('Garden.UpdateToken'))) {
+    Gdn::config()->saveToConfig('Garden.UpdateToken', \Vanilla\Models\InstallModel::generateUpdateToken());
+}
+
 // UserIP Table
 $Construct->table('UserIP')
     ->column('UserID', 'int', false, 'primary')
@@ -287,7 +292,7 @@ $Construct
     ->column('DateInserted', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
     ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
-    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
+    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 
@@ -1002,6 +1007,7 @@ if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
 Gdn::router()->setRoute("robots.txt", "/robots", "Internal");
 Gdn::router()->setRoute("utility/robots", "/robots", "Internal");
+Gdn::router()->setRoute("container.html", 'staticcontent/container', "Internal");
 
 // Migrate rules from Sitemaps addon.
 if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules")) {

@@ -8,7 +8,7 @@ echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.
 echo $this->Form->open();
 echo heading($this->data('Title'));
 ?>
-<div class="toolbar flex-wrap">
+<div class="toolbar flex-wrap js-toolbar-sticky">
     <div class="toolbar-buttons">
         <?php
         echo anchor(t('Approve'), '#', ['class' => 'RestoreButton btn btn-primary']);

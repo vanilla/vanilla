@@ -41,7 +41,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
-        bg: globalVars.mainColors.bg.fade(0.9),
+        bg: globalVars.mainColors.primary,
         bottomSpace: 1,
     });
 
@@ -96,7 +96,7 @@ export default function titleBarNavClasses() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: unit(vars.item.size),
+        minHeight: unit(vars.item.size),
         textDecoration: "none",
         $nest: {
             "&.focus-visible": {

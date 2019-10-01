@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { getDynamicClassFromButtonType } from "@library/forms/Button";
+import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
@@ -27,13 +27,12 @@ interface IProps extends IOptionalComponentID, LinkProps {
  */
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
-        baseClass: ButtonTypes.STANDARD,
         tabIndex: 0,
     };
 
     public render() {
         const { baseClass, className, title, ariaLabel, to, children, tabIndex, ...restProps } = this.props;
-        const componentClasses = classNames(getDynamicClassFromButtonType(baseClass), className);
+        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass || ButtonTypes.STANDARD), className);
         return (
             <SmartLink
                 className={componentClasses}

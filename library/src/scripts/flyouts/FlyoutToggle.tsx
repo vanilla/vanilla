@@ -4,18 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useMemo, useState, useCallback, useEffect, useLayoutEffect } from "react";
-import FocusWatcher, { useFocusWatcher } from "@library/dom/FocusWatcher";
-import EscapeListener, { useEscapeListener } from "@library/dom/EscapeListener";
-import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
-import Button from "@library/forms/Button";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import classNames from "classnames";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { forceRenderStyles } from "typestyle";
+import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -25,7 +24,8 @@ export interface IFlyoutToggleChildParameters {
     renderLeft?: boolean;
 }
 
-export interface IFlyoutToggleProps {
+interface IProps {
+    name?: string;
     id: string;
     className?: string;
     buttonContents: React.ReactNode;
@@ -34,6 +34,7 @@ export interface IFlyoutToggleProps {
     onClose?: () => void;
     buttonBaseClass: ButtonTypes;
     buttonClassName?: string;
+    isVisible?: boolean;
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
@@ -43,19 +44,8 @@ export interface IFlyoutToggleProps {
     initialFocusElement?: HTMLElement | null;
 }
 
-export interface IFlyoutTogglePropsWithIcon extends IFlyoutToggleProps {
-    name: string;
-}
-
-export interface IFlyoutTogglePropsWithTextLabel extends IFlyoutToggleProps {
-    selectedItemLabel: string;
-}
-
-type IProps = IFlyoutTogglePropsWithIcon | IFlyoutTogglePropsWithTextLabel;
-
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement } = props;
-    const title = "name" in props ? props.name : props.selectedItemLabel;
+    const { initialFocusElement, onVisibilityChange, onClose } = props;
 
     // IDs unique to the component instance.
     const ID = useMemo(() => uniqueIDFromPrefix("flyout"), []);
@@ -67,7 +57,21 @@ export default function FlyoutToggle(props: IProps) {
     const buttonRef = props.buttonRef || ownButtonRef;
 
     const controllerRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setVisibility] = useState(false);
+    const [ownIsVisible, ownSetVisibility] = useState(false);
+    const isVisible = props.isVisible !== undefined ? props.isVisible : ownIsVisible;
+    const setVisibility = useCallback(
+        (visibility: boolean) => {
+            ownSetVisibility(visibility);
+            onVisibilityChange && onVisibilityChange(visibility);
+
+            // Kludge for interaction with old flyout system.
+            if (visibility === true && window.closeAllFlyouts) {
+                window.closeAllFlyouts();
+            }
+        },
+        [ownSetVisibility, onVisibilityChange],
+    );
+
     useEffect(() => {
         if (isVisible && initialFocusElement) {
             // Focus the inital focusable element when we gain visibility.
@@ -75,29 +79,37 @@ export default function FlyoutToggle(props: IProps) {
                 initialFocusElement.focus();
             }
         }
-        props.onVisibilityChange && props.onVisibilityChange(isVisible);
-    }, [isVisible, initialFocusElement, props.onVisibilityChange]);
+    }, [isVisible, initialFocusElement]);
 
     /**
      * Toggle Menu menu
      */
     const buttonClickHandler = useCallback(
-        (e: React.MouseEvent) => {
+        (e: MouseEvent) => {
             e.stopPropagation();
             setVisibility(!isVisible);
-            if (props.onVisibilityChange) {
-                props.onVisibilityChange(isVisible);
-            }
         },
-        [isVisible, setVisibility, props.onVisibilityChange],
+        [isVisible, setVisibility],
     );
+
+    useEffect(() => {
+        const buttonElement = buttonRef.current;
+        if (!buttonElement) {
+            return;
+        }
+
+        buttonElement.addEventListener("click", buttonClickHandler);
+        return () => {
+            buttonElement.removeEventListener("click", buttonClickHandler);
+        };
+    }, [buttonRef, buttonClickHandler]);
 
     const closeMenuHandler = useCallback(
         event => {
             event.stopPropagation();
             event.preventDefault();
 
-            props.onClose && props.onClose();
+            onClose && onClose();
 
             const { activeElement } = document;
             const parentElement = controllerRef.current;
@@ -110,11 +122,8 @@ export default function FlyoutToggle(props: IProps) {
                     buttonRef.current.classList.add("focus-visible");
                 }
             }
-            if (props.onVisibilityChange) {
-                props.onVisibilityChange(false);
-            }
         },
-        [props.onClose, controllerRef.current, buttonRef.current, props.onVisibilityChange],
+        [onClose, controllerRef, buttonRef, setVisibility],
     );
 
     /**
@@ -127,14 +136,11 @@ export default function FlyoutToggle(props: IProps) {
     const handleFocusChange = (hasFocus: boolean) => {
         if (!hasFocus) {
             setVisibility(false);
-            if (props.onVisibilityChange) {
-                props.onVisibilityChange(false);
-            }
         }
     };
 
     // Focus handling
-    useFocusWatcher(controllerRef.current, handleFocusChange, props.openAsModal);
+    useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);
     useEscapeListener({
         root: controllerRef.current,
         returnElement: buttonRef.current,
@@ -145,16 +151,17 @@ export default function FlyoutToggle(props: IProps) {
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });
-    // Prevent flashing of content sometimes.
-    forceRenderStyles();
+    useEffect(() => {
+        // Prevent flashing on the first render
+        forceRenderStyles();
+    }, []);
 
-    const childrenData = {
+    const childrenData: IFlyoutToggleChildParameters = {
         id: contentID,
-        isVisible,
+        isVisible: !!isVisible,
         closeMenuHandler,
         renderAbove: props.renderAbove,
         renderLeft: props.renderLeft,
-        openAsModal: props.openAsModal,
     };
 
     const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
@@ -169,10 +176,8 @@ export default function FlyoutToggle(props: IProps) {
         >
             <Button
                 id={buttonID}
-                onClick={buttonClickHandler}
                 className={buttonClasses}
-                type="button"
-                title={title}
+                title={props.name}
                 aria-label={"name" in props ? props.name : undefined}
                 aria-controls={contentID}
                 aria-expanded={isVisible}

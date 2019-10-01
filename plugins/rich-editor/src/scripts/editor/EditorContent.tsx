@@ -4,25 +4,28 @@
  * @license GPL-2.0-only
  */
 
-import { userContentClasses } from "@library/content/userContentStyles";
-import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
-import { useLastValue } from "@library/dom/hookUtils";
-import { debug } from "@library/utility/utils";
+import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
+import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { resetQuillContent, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import classNames from "classnames";
-import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useMemo } from "react";
+import { useLastValue } from "@vanilla/react-utils";
+import { IAutoHighlightResult } from "highlight.js";
+import { userContentClasses } from "@library/content/userContentStyles";
+
+const DEFAULT_CONTENT = [{ insert: "\n" }];
 
 interface IProps {
-    legacyTextArea?: HTMLInputElement;
+    legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
+    placeholder?: string;
 }
 
 /**
@@ -35,7 +38,7 @@ export default function EditorContent(props: IProps) {
     useQuillInstance(quillMountRef);
     useLegacyTextAreaSync(props.legacyTextArea);
     useDebugPasteListener(props.legacyTextArea);
-    useCssClassSetup();
+    useQuillAttributeSync(props.placeholder);
     useLoadStatus();
     useInitialValue();
     useOperationsQueue();
@@ -46,12 +49,35 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
+let highLightJs: any;
+
+/**
+ * Use a dynamically imported highlight.js to highlight text synchronously.
+ *
+ * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
+ * but until then we need this hack.60FPS
+ *
+ * - If highLightJs is loaded, run it.
+ * - Otherwise return the text back and start loading highLightJs.
+ */
+function highLightText(text: string): IAutoHighlightResult | string {
+    if (!highLightJs) {
+        void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
+            highLightJs = imported.default;
+            highLightJs.highlightAuto(text).value;
+        });
+        return text;
+    } else {
+        return highLightJs.highlightAuto(text).value;
+    }
+}
+
 /**
  * Manage and construct a quill instance ot some ref.
  *
  * @param mountRef The ref to mount quill onto.
  */
-export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
+export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extraOptions?: QuillOptionsStatic) {
     const ref = useRef<Quill>();
     const { setQuillInstance } = useEditor();
 
@@ -61,12 +87,13 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
             theme: "vanilla",
             modules: {
                 syntax: {
-                    highlight: text => hljs.highlightAuto(text).value,
+                    highlight: highLightText,
                 },
             },
         };
         if (mountRef.current) {
             const quill = new Quill(mountRef.current, options);
+            quill.setContents(DEFAULT_CONTENT);
             setQuillInstance(quill);
             ref.current = quill;
 
@@ -77,28 +104,41 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
                 window.quill = null;
             };
         }
-    }, [mountRef.current]);
+        // Causes an infinite loops if we specify mountRef.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [extraOptions, setQuillInstance]);
     return ref.current;
 }
 
 /**
- * Apply our CSS classes/styles to quill's root. (Not a react component).
+ * Apply our CSS classes/styles and other attributes to quill's root. (Not a react component).
  */
-function useCssClassSetup() {
+function useQuillAttributeSync(placeholder?: string) {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
-    const quillRootClasses = classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
-        // These classes shouln't be applied until the forum is converted to the new styles.
-        [classesUserContent.root]: !legacyMode,
-    });
+    const quillRootClasses = useMemo(
+        () =>
+            classNames("richEditor-text", "userContent", classesRichEditor.text, {
+                // These classes shouln't be applied until the forum is converted to the new styles.
+                [classesUserContent.root]: !legacyMode,
+            }),
+        [classesRichEditor.text, classesUserContent.root, legacyMode],
+    );
 
     useEffect(() => {
         if (quill) {
-            // Initialize some CSS classes onto the quill root.
-            quill.root.classList.value = quillRootClasses;
+            // Initialize some CSS classes onto the quill root.quillRootClasses
+            // quill && quill.root.classList.value,
+            quill.root.classList.value += " " + quillRootClasses;
         }
     }, [quill, quillRootClasses]);
+
+    useEffect(() => {
+        if (quill && placeholder) {
+            quill.root.setAttribute("placeholder", placeholder);
+        }
+    }, [quill, placeholder]);
 
     return quillRootClasses;
 }
@@ -117,7 +157,7 @@ function useLoadStatus() {
                 quill.enable();
             }
         }
-    }, [isLoading, quill]);
+    }, [isLoading, quill, prevLoading]);
 }
 
 /**
@@ -129,12 +169,12 @@ function useInitialValue() {
     const prevReinitialize = useLastValue(reinitialize);
 
     useEffect(() => {
-        if (quill && initialValue) {
+        if (quill && initialValue && initialValue.length > 0) {
             if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
                 quill.setContents(initialValue);
             }
         }
-    }, [quill, initialValue, reinitialize]);
+    }, [quill, initialValue, reinitialize, prevInitialValue, prevReinitialize]);
 }
 
 /**
@@ -143,7 +183,7 @@ function useInitialValue() {
 function useOperationsQueue() {
     const { operationsQueue, quill, clearOperationsQueue } = useEditor();
     useEffect(() => {
-        if (!operationsQueue || !quill) {
+        if (!operationsQueue || !quill || operationsQueue.length === 0) {
             return;
         }
         operationsQueue.forEach(operation => {
@@ -151,15 +191,17 @@ function useOperationsQueue() {
 
             if (typeof operation === "string") {
                 quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+                // Trim starting whitespace if we have it.
+                if (quill.getText(0, 1) === "\n") {
+                    quill.updateContents([{ delete: 1 }]);
+                }
             } else {
                 const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
                 quill.updateContents([offsetOperations, ...operation]);
             }
         });
-        if (clearOperationsQueue) {
-            clearOperationsQueue();
-        }
-    }, [operationsQueue, clearOperationsQueue]);
+        clearOperationsQueue && clearOperationsQueue();
+    }, [quill, operationsQueue, clearOperationsQueue]);
 }
 
 /**
@@ -167,7 +209,7 @@ function useOperationsQueue() {
  *
  * Once we rewrite the post page, this should no longer be necessary.
  */
-function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
+function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
 
     useEffect(() => {
@@ -178,16 +220,19 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
         if (initialValue) {
             resetQuillContent(quill, JSON.parse(initialValue));
         }
-    }, [textArea]);
+    }, [legacyMode, textArea, quill]);
 
     useEffect(() => {
         if (!legacyMode || !textArea || !quill) {
             return;
         }
         // Sync the text areas together.
-        const handleChange = () => {
-            textArea.value = JSON.stringify(quill.getContents().ops);
-        };
+        // Throttled to keep performance up on slower devices.
+        const handleChange = throttle(() => {
+            requestAnimationFrame(() => {
+                textArea.value = JSON.stringify(quill.getContents().ops);
+            });
+        }, 1000 / 60); // 60FPS
         quill.on(Quill.events.TEXT_CHANGE, handleChange);
 
         // Listen for the legacy form event if applicable and clear the form.
@@ -204,7 +249,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
             quill.off(Quill.events.TEXT_CHANGE, handleChange);
             form && form.removeEventListener("X-ClearCommentForm", handleFormClear);
         };
-    });
+    }, [legacyMode, textArea, quill]);
 }
 
 /**
@@ -226,7 +271,12 @@ function useQuoteButtonHandler() {
             event.preventDefault();
             const embedInserter: EmbedInsertionModule = quill.getModule("embed/insertion");
             const url = triggeringElement.getAttribute("data-scrape-url") || "";
-            void embedInserter.scrapeMedia(url);
+            embedInserter.scrapeMedia(url);
+
+            // Just in case the browser doesn't support this API.
+            if (quill.root.scrollIntoView) {
+                quill.root.scrollIntoView({ behavior: "smooth" });
+            }
         };
         const delegatedHandler = delegateEvent("click", ".js-quoteButton", handleQuoteButtonClick)!;
         return () => {
@@ -241,9 +291,9 @@ function useQuoteButtonHandler() {
 function useGlobalSelectionHandler() {
     const updateHandler = useUpdateHandler();
 
-    const handleGlobalSelectionUpdate = () => {
+    const handleGlobalSelectionUpdate = useCallback(() => {
         updateHandler(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-    };
+    }, [updateHandler]);
 
     useEffect(() => {
         document.addEventListener(SELECTION_UPDATE, handleGlobalSelectionUpdate);
@@ -259,7 +309,7 @@ function useGlobalSelectionHandler() {
  * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
  * This only works for PASTE. Not editing the contents.
  */
-function useDebugPasteListener(textArea?: HTMLInputElement) {
+function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement) {
     const { legacyMode, quill } = useEditor();
     useEffect(() => {
         if (!legacyMode || !textArea || !debug() || !quill) {
@@ -280,7 +330,7 @@ function useDebugPasteListener(textArea?: HTMLInputElement) {
         return () => {
             textArea.addEventListener("paste", pasteHandler);
         };
-    }, [legacyMode, quill]);
+    }, [legacyMode, quill, textArea]);
 }
 
 /**
@@ -350,9 +400,12 @@ function useSynchronization() {
             return;
         }
 
+        // Call intially with the value.
+        updateHandler(Quill.events.TEXT_CHANGE, null, null, Quill.sources.API);
+
         quill.on(Quill.events.EDITOR_CHANGE, updateHandler);
         return () => {
             quill.off(Quill.events.EDITOR_CHANGE, updateHandler);
         };
-    });
+    }, [quill, updateHandler]);
 }

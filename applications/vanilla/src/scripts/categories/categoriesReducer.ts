@@ -5,10 +5,10 @@
 
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { produce } from "immer";
-import CategorySuggestionActions from "@vanilla/categories/CategorySuggestionActions";
+import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/CategorySuggestionActions";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import clone from "lodash/clone";
-import { ICategory } from "@vanilla/@types/api/categories";
+import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
 
 export interface ICategoriesState {
     suggestions: ILoadable<ICategory[]>;

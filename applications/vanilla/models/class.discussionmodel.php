@@ -118,6 +118,11 @@ class DiscussionModel extends Gdn_Model {
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+
+        $this->addFilterField([
+            'Sink',
+            'Score',
+        ]);
     }
 
     /**
@@ -1952,9 +1957,16 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
                 $this->Validation->applyRule('Body', 'Length');
+            }
+
+            // Add min length if body is required.
+            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                $this->Validation->applyRule('Body', 'MinTextLength');
             }
         }
 
@@ -1963,9 +1975,7 @@ class DiscussionModel extends Gdn_Model {
         if ($categoryID !== false) {
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
-            if (!$category) {
-                $this->Validation->addValidationResult('CategoryID', "@Category {$categoryID} does not exist.");
-            } elseif ($checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
+            if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }
@@ -2188,87 +2198,8 @@ class DiscussionModel extends Gdn_Model {
                     $formPostValues['IsNewDiscussion'] = true;
                     $formPostValues['DiscussionID'] = $discussionID;
 
-                    // Do data prep.
-                    $discussionName = val('Name', $fields, '');
-                    $story = val('Body', $fields, '');
-                    $notifiedUsers = [];
-
-                    $userModel = Gdn::userModel();
-                    $activityModel = new ActivityModel();
-
-                    if (val('Type', $formPostValues)) {
-                        $code = 'HeadlineFormat.Discussion.'.$formPostValues['Type'];
-                    } else {
-                        $code = 'HeadlineFormat.Discussion';
-                    }
-
-                    $headlineFormat = t($code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
-                    $category = CategoryModel::categories(val('CategoryID', $fields));
-                    $activity = [
-                        'ActivityType' => 'Discussion',
-                        'ActivityUserID' => $fields['InsertUserID'],
-                        'HeadlineFormat' => $headlineFormat,
-                        'RecordType' => 'Discussion',
-                        'RecordID' => $discussionID,
-                        'Route' => discussionUrl($fields, '', '/'),
-                        'Data' => [
-                            'Name' => $discussionName,
-                            'Category' => val('Name', $category)
-                        ]
-                    ];
-
-                    // Allow simple fulltext notifications
-                    if (c('Vanilla.Activity.ShowDiscussionBody', false)) {
-                        $activity['Story'] = $story;
-                    }
-
-                    // Notify all of the users that were mentioned in the discussion.
-                    if ($fields['Format'] === "Rich") {
-                        $usernames = Gdn_Format::getRichMentionUsernames($fields['Body']);
-                    } else {
-                        $usernames = getMentions($discussionName.' '.$story);
-                    }
-
-                    // Use our generic Activity for events, not mentions
-                    $this->EventArguments['Activity'] = $activity;
-
-                    // Notify everyone that has advanced notifications.
-                    if (!c('Vanilla.QueueNotifications')) {
-                        try {
-                            $fields['DiscussionID'] = $discussionID;
-                            $this->notifyNewDiscussion($fields, $activityModel, $activity);
-                        } catch (Exception $ex) {
-                            throw $ex;
-                        }
-                    }
-
-                    // Notifications for mentions
-                    foreach ($usernames as $username) {
-                        $user = $userModel->getByUsername($username);
-                        if (!$user) {
-                            continue;
-                        }
-
-                        // Check user can still see the discussion.
-                        if (!$this->canView($fields, $user->UserID)) {
-                            continue;
-                        }
-
-                        $activity['HeadlineFormat'] = t('HeadlineFormat.Mention', '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>');
-
-                        $activity['NotifyUserID'] = val('UserID', $user);
-                        $activityModel->queue($activity, 'Mention');
-                    }
-
-                    // Throw an event for users to add their own events.
-                    $this->EventArguments['Discussion'] = $fields;
-                    $this->EventArguments['NotifiedUsers'] = $notifiedUsers;
-                    $this->EventArguments['MentionedUsers'] = $usernames;
-                    $this->EventArguments['ActivityModel'] = $activityModel;
-                    $this->fireEvent('BeforeNotification');
-
-                    // Send all notifications.
-                    $activityModel->saveQueue();
+                    $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                    $this->notifyNewDiscussion($discussion);
                 }
 
                 // Get CategoryID of this discussion
@@ -2302,62 +2233,176 @@ class DiscussionModel extends Gdn_Model {
      * @param ActivityModel $activityModel
      * @param array $activity
      */
-    public function notifyNewDiscussion($discussion, $activityModel, $activity) {
+    public function notifyNewDiscussion($discussion, $activityModel = null, $activity = []) {
         if (is_numeric($discussion)) {
-            $discussion = $this->getID($discussion);
+            $discussion = $this->getID($discussion, DATASET_TYPE_ARRAY);
         }
 
-        $categoryID = val('CategoryID', $discussion);
-
-        // Figure out the category that governs this notification preference.
-        $i = 0;
-        $category = CategoryModel::categories($categoryID);
-        if (!$category) {
+        if (!is_array($discussion)) {
             return;
         }
+        $body = $discussion["Body"] ?? null;
+        $categoryID = $discussion["CategoryID"] ?? null;
+        $discussionID = $discussion["DiscussionID"] ?? null;
+        $format = $discussion["Format"] ?? null;
+        $insertUserID = $discussion["InsertUserID"] ?? null;
+        $name = $discussion["Name"] ?? null;
+        $type = $discussion["Type"] ?? null;
 
-        while ($category['Depth'] > 2 && $i < 20) {
-            if (!$category || $category['Archived']) {
+        $discussionCategory = CategoryModel::categories($categoryID);
+        if ($discussionCategory === null) {
+            return;
+        }
+        $categoryName = $discussionCategory["Name"] ?? null;
+
+        /** @var ActivityModel $activityModel */
+        $activityModel = Gdn::getContainer()->get(ActivityModel::class);
+
+        if ($type) {
+            $code = "HeadlineFormat.Discussion.{$type}";
+        } else {
+            $code = "HeadlineFormat.Discussion";
+        }
+
+        $data = [
+            "ActivityType" => "Discussion",
+            "ActivityUserID" => $insertUserID,
+            "HeadlineFormat" => t(
+                $code,
+                '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
+            ),
+            "RecordType" => "Discussion",
+            "RecordID" => $discussionID,
+            "Route" => discussionUrl($discussion, "", "/"),
+            "Data" => [
+                "Name" => $name,
+                "Category" => $categoryName,
+            ]
+        ];
+
+        // Allow simple fulltext notifications
+        if (c("Vanilla.Activity.ShowDiscussionBody", false)) {
+            $data["Story"] = $body;
+            $data["Format"] = $format;
+        }
+
+        // Notify all of the users that were mentioned in the discussion.
+        $mentions = [];
+        if (is_string($body) && is_string($format)) {
+            $mentions = Gdn::formatService()->parseMentions($body, $format);
+            /** @var UserModel $userModel */
+            $userModel = Gdn::getContainer()->get(UserModel::class);
+
+            foreach ($mentions as $mentionName) {
+                $mentionUser = $userModel->getByUsername($mentionName);
+                if (!$mentionUser) {
+                    continue;
+                }
+
+                // Check user can still see the discussion.
+                if (!$this->canView($discussion, $mentionUser->UserID)) {
+                    continue;
+                }
+
+                $activity = $data;
+                $activity["HeadlineFormat"] = t(
+                    "HeadlineFormat.Mention",
+                    '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>'
+                );
+                $activity["NotifyUserID"] = $mentionUser->UserID;
+                $activityModel->queue($activity, "Mention");
+            }
+        }
+
+        $this->EventArguments["Activity"] = $data;
+
+        // Notify everyone that has advanced notifications.
+        if (!c("Vanilla.QueueNotifications")) {
+            $advancedActivity = $data;
+            $advancedActivity["Data"]["Reason"] = "advanced";
+            $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
+        }
+
+        // Throw an event for users to add their own events.
+        $this->EventArguments["Discussion"] = $discussion;
+        $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
+        $this->EventArguments["MentionedUsers"] = $mentions;
+        $this->EventArguments["ActivityModel"] = $activityModel;
+        $this->fireEvent("BeforeNotification");
+
+        if (\Vanilla\FeatureFlagHelper::featureEnabled("deferredNotifications")) {
+            // Queue sending notifications.
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob(ExecuteActivityQueue::class);
+        } else {
+            // Send all notifications.
+            $activityModel->saveQueue();
+        }
+    }
+
+    /**
+     * Record advanced notifications for users.
+     *
+     * @param ActivityModel $activityModel
+     * @param array $activity
+     * @param array $discussion
+     */
+    private function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
+        $categoryID = $discussion["CategoryID"] ?? null;
+        $insertUserID = $discussion["InsertUserID"] ?? null;
+
+        // Figure out the category that governs this notification preference.
+        $category = CategoryModel::categories($categoryID);
+        if ($category === null) {
+            return;
+        }
+        $i = 0;
+        while ($category["Depth"] > 2 && $i < 20) {
+            if (!$category || $category["Archived"]) {
                 return;
             }
             $i++;
-            $category = CategoryModel::categories($category['ParentCategoryID']);
+            $category = CategoryModel::categories($category["ParentCategoryID"]);
         }
 
         // Grab all of the users that need to be notified.
         $data = $this->SQL
-            ->whereIn('Name', ['Preferences.Email.NewDiscussion.'.$category['CategoryID'], 'Preferences.Popup.NewDiscussion.'.$category['CategoryID']])
-            ->get('UserMeta')->resultArray();
+            ->whereIn("Name", [
+                "Preferences.Email.NewDiscussion.{$category['CategoryID']}",
+                "Preferences.Popup.NewDiscussion.{$category['CategoryID']}",
+            ])
+            ->get("UserMeta")
+            ->resultArray();
 
         $notifyUsers = [];
         foreach ($data as $row) {
-            if (!$row['Value']) {
+            if (!$row["Value"]) {
                 continue;
             }
 
-            $userID = $row['UserID'];
+            $userID = $row["UserID"];
             // Check user can still see the discussion.
             if (!$this->canView($discussion, $userID)) {
                 continue;
             }
 
-            $name = $row['Name'];
-            if (strpos($name, '.Email.') !== false) {
-                $notifyUsers[$userID]['Emailed'] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, '.Popup.') !== false) {
-                $notifyUsers[$userID]['Notified'] = ActivityModel::SENT_PENDING;
+            $name = $row["Name"];
+            if (strpos($name, ".Email.") !== false) {
+                $notifyUsers[$userID]["Emailed"] = ActivityModel::SENT_PENDING;
+            } elseif (strpos($name, ".Popup.") !== false) {
+                $notifyUsers[$userID]["Notified"] = ActivityModel::SENT_PENDING;
             }
         }
 
-        $insertUserID = val('InsertUserID', $discussion);
         foreach ($notifyUsers as $userID => $prefs) {
             if ($userID == $insertUserID) {
                 continue;
             }
 
-            $activity['NotifyUserID'] = $userID;
-            $activity['Emailed'] = val('Emailed', $prefs, false);
-            $activity['Notified'] = val('Notified', $prefs, false);
+            $activity["NotifyUserID"] = $userID;
+            $activity["Emailed"] = $prefs["Emailed"] ?? false;
+            $activity["Notified"] = $prefs["Notified"] ?? false;
             $activityModel->queue($activity);
         }
     }
@@ -3335,5 +3380,23 @@ class DiscussionModel extends Gdn_Model {
                 }
             }
         }
+    }
+
+    /**
+     * Method to prevent encoding data twice.
+     *
+     * DiscussionModel::calculate applies htmlspecialchars to discussion name which could conflict when
+     * data is encoded on the view.  As result characters will display in their entity codes.  Removing the
+     * htmlspecialchars in the calculate method could result in several XSS vulnerabilities in Vanilla.  This
+     * method is a utility method to avoid encoding data where it's not necessary.
+     *
+     * @param array $row The discussion record to fix.
+     * @return array
+     */
+    public function fixRow(array $row): array {
+        if (array_key_exists('Name', $row)) {
+            $row['Name'] = htmlspecialchars_decode($row['Name']);
+        }
+        return $row;
     }
 }

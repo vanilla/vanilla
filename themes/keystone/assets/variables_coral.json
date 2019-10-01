@@ -1,0 +1,14 @@
+{
+    "global": {
+        "mainColors": {
+            "primary": "#E14658",
+            "secondary": "#22252C"
+        }
+    },
+    "titleBar": {
+        "colors": {
+            "bg": "#22252C",
+            "fg": "#fff"
+        }
+    }
+}

@@ -14,7 +14,7 @@ import React from "react";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
-    name: string;
+    name?: string;
     isModalLink?: boolean;
     children?: React.ReactNode;
     className?: string;

@@ -7,7 +7,7 @@
 
 namespace Garden;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains methods for binding and firing to events.

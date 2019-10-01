@@ -5,7 +5,6 @@ body {
     padding: 0px;
     text-align: center;
     color: #076C8E;
-    text-shadow: 0 1px 0 #FFFFFF;
 }
 
 a,
@@ -53,6 +52,13 @@ h1 {
     margin: 0 auto;
     padding: 0;
     font-size: 180%;
+}
+
+.Container {
+    width: 100%;
+    max-width: 532px;
+    margin: 0 auto;
+    padding: 0 16px;
 }
 
 div.Form {
@@ -178,7 +184,7 @@ form ul li label {
     font-family: Arial, Helvetica, Verdana;
     font-weight: bold;
     display: block;
-    padding: 8px 0 0;
+    padding: 8px 0 4px;
     font-size: 110%;
     color: #02455B;
 }
@@ -274,4 +280,18 @@ div.Info li {
     padding: 1px 0;
     margin: 0;
     text-shadow: none;
+}
+
+.Notice {
+    text-align: center;
+}
+
+.Description {
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.Description a {
+    color: #076C8E;
+    text-decoration: underline;
 }

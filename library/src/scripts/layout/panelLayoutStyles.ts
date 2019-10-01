@@ -170,6 +170,7 @@ export const layoutVariables = useThemeCache(() => {
         contentSizes,
         mediaQueries,
         panelLayoutSpacing,
+        panelLayoutBreakPoints,
     };
 });
 
@@ -305,7 +306,6 @@ export const panelLayoutClasses = useThemeCache(() => {
             ...sticky(),
             top: titleBarVars.sizing.height * 2,
             height: percent(100),
-            overflow: "auto",
         },
         mediaQueries.oneColumnDown({
             position: "relative",

@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
+import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -43,7 +43,7 @@ export default class AttachmentIcon extends React.Component<IProps> {
                             <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
                         </Paragraph>
                     </span>
-                    {getAttachmentIcon(this.props.type, classes.root)}
+                    <GetAttachmentIcon type={this.props.type} className={classes.root} />
                 </div>
             </li>
         );

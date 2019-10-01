@@ -29,7 +29,7 @@
 !/plugins/ButtonBar/
 !/plugins/Debugger/
 !/plugins/editor/
-!/plugins/EmojiExtender/
+!/plugins/emojiextender/
 !/plugins/Facebook/
 !/plugins/Flagging/
 !/plugins/GettingStarted/
@@ -93,5 +93,6 @@ npm-debug.log
 /cgi-bin/
 phpunit.xml
 yarn-error.log
+lerna-debug.log
 git-diff.txt
 phpcs-diff.json

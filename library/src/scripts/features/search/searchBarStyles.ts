@@ -7,12 +7,15 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { inputVariables } from "@library/forms/inputStyles";
+import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -36,8 +39,8 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const border = themeVars("border", {
-        radius: globalVars.border.radius,
         width: globalVars.border.width,
+        radius: globalVars.border.radius,
     });
 
     const input = themeVars("input", {
@@ -48,7 +51,7 @@ export const searchBarVariables = useThemeCache(() => {
     const searchIcon = themeVars("searchIcon", {
         gap: 32,
         height: 13,
-        width: 13,
+        width: 14,
         fg: input.fg.fade(0.7),
     });
 
@@ -79,27 +82,26 @@ export const searchBarClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
+    const classesInputBlock = inputBlockClasses();
 
     const root = style(
         {
             cursor: "pointer",
             $nest: {
                 "& .searchBar__placeholder": {
-                    color: colorOut(globalVars.mixBgAndFg(0.5)),
+                    color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",
                 },
 
                 "& .suggestedTextInput-valueContainer": {
                     $nest: {
-                        ".inputBlock-inputText": {
+                        [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
                         },
                     },
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    borderTopLeftRadius: important(0),
-                    borderBottomLeftRadius: important(0),
                     marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
@@ -132,6 +134,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__value-container": {
                     overflow: "auto",
+                    cursor: "text",
                     $nest: {
                         "& > div": {
                             width: percent(100),
@@ -140,6 +143,12 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__indicators": {
                     display: "none",
+                },
+                "& .searchBar__input": {
+                    width: percent(100),
+                },
+                "& .searchBar__input input": {
+                    width: important(`100%`),
                 },
             },
         },
@@ -153,11 +162,13 @@ export const searchBarClasses = useThemeCache(() => {
     );
 
     const results = style("results", {
+        position: "absolute",
+        width: percent(100),
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
         $nest: {
             "&:empty": {
-                display: "none",
+                display: important("none"),
             },
             ".suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),
@@ -167,7 +178,10 @@ export const searchBarClasses = useThemeCache(() => {
             },
             ".suggestedTextInput-option": {
                 width: percent(100),
-                padding: px(12),
+                ...paddings({
+                    vertical: 9,
+                    horizontal: 12,
+                }),
                 textAlign: "left",
                 display: "block",
                 color: "inherit",
@@ -194,7 +208,7 @@ export const searchBarClasses = useThemeCache(() => {
         left: 0,
         overflow: "hidden",
         ...borders({
-            radius: unit(vars.results.borderRadius),
+            radius: vars.results.borderRadius,
         }),
         ...shadow.dropDown(),
         zIndex: 1,
@@ -203,7 +217,6 @@ export const searchBarClasses = useThemeCache(() => {
     const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
-        borderRight: 0,
         paddingTop: 0,
         paddingBottom: 0,
         paddingRight: 0,
@@ -223,6 +236,11 @@ export const searchBarClasses = useThemeCache(() => {
                 justifyContent: "flex-start",
                 paddingLeft: unit(vars.searchIcon.gap),
             },
+            "&.noSearchButton": {
+                ...borderRadii({
+                    right: importantUnit(vars.border.radius),
+                }),
+            },
         },
     });
 
@@ -235,8 +253,8 @@ export const searchBarClasses = useThemeCache(() => {
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
         ...borderRadii({
-            left: 0,
-            right: vars.border.radius,
+            left: important("0"),
+            right: important(vars.border.radius),
         }),
     });
 
@@ -267,16 +285,22 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
-    const form = style("form", {
-        display: "block",
-    });
-
     const content = style("content", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
         position: "relative",
         height: unit(vars.sizing.height),
+        width: percent(100),
+        $nest: {
+            [`&:not(.${splashClasses({}).content}).hasFocus .searchBar-valueContainer`]: {
+                borderColor: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    const form = style("form", {
+        display: "block",
     });
 
     // special selector
@@ -286,6 +310,10 @@ export const searchBarClasses = useThemeCache(() => {
                 marginBottom: unit(vars.heading.margin),
             },
         },
+    });
+
+    const icon = style("icon", {
+        color: colorOut(vars.searchIcon.fg),
     });
 
     const iconContainer = style("iconContainer", {
@@ -299,11 +327,21 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
+        cursor: "text",
+        $nest: {
+            [`.${icon}`]: {
+                width: unit(vars.searchIcon.width),
+                height: unit(vars.searchIcon.height),
+            },
+        },
     });
-    const icon = style("icon", {
-        width: unit(vars.searchIcon.width),
-        height: unit(vars.searchIcon.height),
-        color: colorOut(vars.searchIcon.fg),
+
+    const iconContainerBigInput = style("iconContainerBig", {
+        $nest: {
+            "&&": {
+                height: unit(vars.sizing.height),
+            },
+        },
     });
 
     const menu = style("menu", {
@@ -338,6 +376,9 @@ export const searchBarClasses = useThemeCache(() => {
                 marginTop: unit(-formElementVars.border.width),
                 marginBottom: unit(-formElementVars.border.width),
             },
+            "&:empty": {
+                display: "none",
+            },
         },
     });
 
@@ -352,6 +393,7 @@ export const searchBarClasses = useThemeCache(() => {
         content,
         heading,
         iconContainer,
+        iconContainerBigInput,
         icon,
         results,
         resultsAsModal,

@@ -5,8 +5,8 @@
 
 import React from "react";
 import { TextInput, InputValidationFilter } from "@library/forms/TextInput";
-import { mountReact } from "@library/dom/domUtils";
-import { log } from "@library/utility/utils";
+import { mountReact } from "@vanilla/react-utils";
+import { logDebug } from "@vanilla/utils";
 
 /**
  * Mount <TextInput /> components on top of <input data-react-input/> elements.
@@ -16,7 +16,7 @@ import { log } from "@library/utility/utils";
  */
 export function mountInputs() {
     const inputs = document.querySelectorAll("[data-react-input]");
-    log(`Mounting React inputs over ${inputs.length} existing inputs.`);
+    logDebug(`Mounting React inputs over ${inputs.length} existing inputs.`);
     inputs.forEach(input => {
         if (input instanceof HTMLInputElement) {
             const validationFilter = input.getAttribute("data-validation-filter") as InputValidationFilter;

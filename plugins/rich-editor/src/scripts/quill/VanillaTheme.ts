@@ -8,8 +8,9 @@
 import Quill, { QuillOptionsStatic, RangeStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
+import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */
@@ -48,6 +49,9 @@ export default class VanillaTheme extends ThemeBase {
         // Attaches the markdown keyboard listener.
         const markdownModule = new MarkdownModule(this.quill);
         markdownModule.registerHandler();
+
+        // Create the newline insertion module.
+        void new NewLineClickInsertionModule(this.quill);
     }
 
     /**
@@ -62,9 +66,10 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         // Track user selection events.
-        this.quill.on("selection-change", (range, oldRange, source) => {
-            if (range && source !== Quill.sources.SILENT) {
-                this.lastGoodSelection = range;
+        this.quill.on(Quill.events.EDITOR_CHANGE, (type, value, oldValue, source) => {
+            const selection = this.quill.getSelection();
+            if (selection && source !== Quill.sources.SILENT) {
+                this.lastGoodSelection = selection;
             }
         });
 

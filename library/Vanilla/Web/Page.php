@@ -16,10 +16,12 @@ use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
+use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
@@ -27,7 +29,7 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
-    use TwigRenderTrait;
+    use TwigRenderTrait, ReduxActionPreloadTrait;
 
     /** @var string */
     private $canonicalUrl;
@@ -61,9 +63,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var string[] */
     protected $inlineStyles = [];
-
-    /** @var ReduxAction[] */
-    private $reduxActions = [];
 
     /** @var bool */
     private $requiresSeo = true;
@@ -99,10 +98,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var string */
     protected $footerHtml = '';
 
-    /**
-     * @var ContentSecurityPolicyModel
-     */
+    /** @var ContentSecurityPolicyModel */
     protected $cspModel;
+
+    /** @var AssetPreloadModel */
+    protected $preloadModel;
 
     /**
      * Dependendency Injection.
@@ -113,6 +113,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
      * @param ContentSecurityPolicyModel $cspModel
+     * @param AssetPreloadModel $preloadModel
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -120,7 +121,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel
+        ContentSecurityPolicyModel $cspModel,
+        AssetPreloadModel $preloadModel
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
@@ -128,6 +130,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
+        $this->preloadModel = $preloadModel;
 
         if ($favIcon = $this->siteMeta->getFavIcon()) {
             $this->setFavIcon($favIcon);
@@ -149,7 +152,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
             'meta' => $this->siteMeta,
         ]);
-        $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
+        $this->inlineScripts[] = $this->getReduxActionsAsJsVariable();
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
             'nonce' => $this->cspModel->getNonce(),
@@ -166,6 +169,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'metaTags' => $this->metaTags,
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
+            'preloadModel' => $this->preloadModel,
             'cssClasses' => ['isLoading'],
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
@@ -206,19 +210,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     public function blockRobots(): self {
         header('X-Robots-Tag: noindex', true);
         $this->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex']);
-
-        return $this;
-    }
-
-    /**
-     * Add a redux action for the frontend to handle.
-     *
-     * @param ReduxAction $action The action to add.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function addReduxAction(ReduxAction $action): self {
-        $this->reduxActions[] = $action;
 
         return $this;
     }
@@ -372,7 +363,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->addReduxAction(new ReduxErrorAction($e))
             ->setSeoTitle($e->getMessage())
             ->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex'])
-            ->setSeoContent('resources/views/error.twig', ['error' => $e])
+            ->setSeoContent('resources/views/error.twig', [
+                'errorMessage' => $e->getMessage(),
+                'errorCode' => $e->getCode()
+            ])
         ;
 
         return $this->render();

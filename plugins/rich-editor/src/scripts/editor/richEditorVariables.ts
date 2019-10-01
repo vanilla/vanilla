@@ -10,8 +10,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
-
-
 export const richEditorVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
@@ -97,11 +95,15 @@ export const richEditorVariables = useThemeCache(() => {
     });
 
     const embedButton = makeThemeVars("embedButton", {
+        display: "block",
         offset: -varsFormElements.border.width,
     });
 
     const text = makeThemeVars("text", {
         offset: 0,
+        placeholder: {
+            color: globalVars.mixBgAndFg(0.5),
+        },
     });
 
     const title = makeThemeVars("titleInput", {
@@ -149,6 +151,11 @@ export const richEditorVariables = useThemeCache(() => {
 
     const richEditorWidth = 8 * sizing.emojiSize;
 
+    const modernFrame = makeThemeVars("modernFrame", {
+        padding: 16,
+        margin: 16,
+    });
+
     return {
         colors,
         spacing,
@@ -172,5 +179,6 @@ export const richEditorVariables = useThemeCache(() => {
         emojiFooter,
         iconWrap,
         richEditorWidth,
+        modernFrame,
     };
 });

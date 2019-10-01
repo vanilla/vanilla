@@ -19,7 +19,7 @@ export function loadThemeFonts() {
         const assets = state.theme.assets.data || {};
         const { fonts } = assets;
 
-        if (fonts) {
+        if (fonts && fonts.length > 0) {
             const webFontConfig: WebFont.Config = {
                 custom: {
                     families: fonts.map(font => font.name),

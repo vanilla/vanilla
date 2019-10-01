@@ -8,16 +8,20 @@ import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
-import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
+import { getPastedFile, getDraggedFile } from "@vanilla/dom-utils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
-import { isFileImage } from "@library/utility/utils";
+import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
+import ErrorBlot, { ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import { getMeta } from "@library/utility/appUtils";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
+    private maxUploads = getMeta("upload.maxUploads", 20);
+
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
@@ -44,13 +48,29 @@ export default class EmbedInsertionModule extends Module {
     }
 
     /**
+     * Create an async error embed. The embed will be responsible for handling it's loading state and error states.
+     */
+    public createErrorEmbed(error: Error) {
+        const data = {
+            error,
+            type: ErrorBlotType.STANDARD,
+        };
+        const errorEmbed = new ErrorBlot(ErrorBlot.create(data), data);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, errorEmbed);
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(errorEmbed.offset(this.quill.scroll) + errorEmbed.length(), 0);
+    }
+
+    /**
      * Create an async embed. The embed will be responsible for handling it's loading state and error states.
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        insertBlockBlotAt(this.quill, this.quill.getLastGoodSelection().index, externalEmbed);
+        const embedPosition = this.quill.getLastGoodSelection().index;
+        insertBlockBlotAt(this.quill, embedPosition, externalEmbed);
         this.quill.update(Quill.sources.USER);
-        externalEmbed.focus();
+        this.quill.setSelection(externalEmbed.offset(this.quill.scroll) + externalEmbed.length(), 0);
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
@@ -67,22 +87,32 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private dragHandler = (event: DragEvent) => {
-        const file = getDraggedFile(event);
+        const files = getDraggedFile(event);
 
-        if (!file) {
+        if (!files) {
             return;
         }
 
-        if (isFileImage(file)) {
-            this.createImageEmbed(file);
-        } else {
-            this.createFileEmbed(file);
+        const filesArray = Array.from(files);
+
+        if (files.length >= this.maxUploads) {
+            const error = new Error(`Can't upload more than ${this.maxUploads} files at once.`);
+            this.createErrorEmbed(error);
+            throw error;
         }
+
+        filesArray.forEach(file => {
+            if (isFileImage(file)) {
+                this.createImageEmbed(file);
+            } else {
+                this.createFileEmbed(file);
+            }
+        });
     };
 
     public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then(data => {
-            data.type = "image";
+            data.embedType = "image";
             return data;
         });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
@@ -92,11 +122,8 @@ export default class EmbedInsertionModule extends Module {
         const progressEventEmitter = new ProgressEventEmitter();
 
         const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
-            return {
-                url: data.url,
-                type: "file",
-                attributes: data,
-            };
+            data.embedType = "file";
+            return data;
         });
         this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
     }
@@ -104,6 +131,7 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Setup image upload listeners and handlers.
      */
+
     private setupImageUploads() {
         this.quill.root.addEventListener("drop", this.dragHandler, false);
         this.quill.root.addEventListener("paste", this.pasteHandler, false);

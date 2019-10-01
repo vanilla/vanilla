@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { DeltaOperation, DeltaStatic } from "quill/core";
 import CodeBlock from "quill/formats/code";
 import BaseHistoryModule from "quill/modules/history";

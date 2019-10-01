@@ -80,6 +80,7 @@ export const frameClasses = useThemeCache(() => {
         position: "relative",
         display: "flex",
         flexDirection: "column",
+        minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
         $nest: {
             [`.${bodyWrap}`]: {
                 flex: 1,

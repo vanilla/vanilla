@@ -6,8 +6,6 @@
 
  .icon {
     display: inline-block;
-    width: $icon-default_size;
-    height: $icon-default_size;
     vertical-align: middle;
 
     &.isSmall {
@@ -21,6 +19,7 @@
     }
 }
 
+// When refactored, update insertLinkClasses.ts to use variable instead of hard coded value.
 .icon-close {
     display: block;
     margin: auto;

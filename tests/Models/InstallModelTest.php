@@ -15,7 +15,17 @@ use VanillaTests\TestInstallModel;
  * Test basic Vanilla installation.
  */
 class InstallTest extends TestCase {
-    use BootstrapTrait;
+    use BootstrapTrait {
+        setupBeforeClass as private bootstrapBeforeClass;
+        teardownAfterClass as private bootstrapAfterClass;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function setUpBeforeClass() {
+        self::bootstrapBeforeClass();
+    }
 
     /**
      * @inheritdoc
@@ -25,7 +35,7 @@ class InstallTest extends TestCase {
         $installer = self::container()->get(TestInstallModel::class);
         $installer->uninstall();
 
-        BootstrapTrait::tearDownAfterClass();
+        self::bootstrapAfterClass();
     }
 
     /**
@@ -41,5 +51,9 @@ class InstallTest extends TestCase {
 
         $this->assertArrayHasKey('version', $result);
         $this->assertGreaterThan(0, $result['adminUserID']);
+
+        /* @var \Gdn_Configuration $config */
+        $config = self::container()->get(\Gdn_Configuration::class);
+        $this->assertNotEmpty($config->get('Garden.UpdateToken'));
     }
 }

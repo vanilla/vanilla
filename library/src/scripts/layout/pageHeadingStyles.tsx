@@ -47,8 +47,9 @@ export const pageHeadingClasses = useThemeCache(() => {
     });
 
     const main = style("main", {
-        position: "relative",
         display: "flex",
+        flexWrap: "nowrap",
+        position: "relative",
         width: percent(100),
         flexGrow: 1,
     });
@@ -59,12 +60,25 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const actions = style("actions", {
-        display: "flex",
-        marginLeft: unit(vars.cta.margin),
-        position: "relative",
-        alignSelf: "flex-start",
-    });
+    const actions = (fontSize?: number | null) => {
+        return style(
+            "actions",
+            {
+                display: "flex",
+                marginLeft: unit(vars.cta.margin),
+                position: "relative",
+                alignSelf: "flex-start",
+                zIndex: 1,
+            },
+            fontSize
+                ? {
+                      top: ".5em",
+                      fontSize: unit(fontSize),
+                      transform: `translateY(-50%)`,
+                  }
+                : {},
+        );
+    };
 
     const link = style("link", {
         display: "block",

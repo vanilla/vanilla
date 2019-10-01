@@ -210,8 +210,8 @@ pre {
 // Styleguide 1.5.2.
 
 .header-menu {
-  $header-menu-border-width: to-rem(3);
-  $header-menu-font-size: to-rem(18);
+  $header-menu-border-width: 3px;
+  $header-menu-font-size: 18px;
   $header-menu-height: $header-block-height;
   $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
 
@@ -259,7 +259,7 @@ pre {
   padding-top: $spacer;
   padding-bottom: $spacer / 2;
   margin-bottom: 0;
-  font-size: to-rem(16);
+  font-size: 16px;
   line-height: $line-height;
   font-weight: 600;
   border-top: $border-width solid #e7e8e9;
@@ -292,7 +292,7 @@ pre {
   .subheading-title {
     margin-top: 0;
     margin-bottom: 0;
-    font-size: to-rem(16);
+    font-size: 16px;
     line-height: 1.5;
     font-weight: 600;
   }
@@ -308,10 +308,10 @@ pre {
 // Styleguide 1.8.
 
 .flag {
-  $flag-height: to-rem(18);
+  $flag-height: 18px;
   display: inline-block;
-  padding-left: .125rem;
-  padding-right: .75rem;
+  padding-left: 2px;
+  padding-right: 12px;
   line-height: 0;
   font-size: $font-size-xs;
   color: $white;
@@ -362,10 +362,10 @@ pre {
   font-size: $font-size-xs;
   background-color: rgba(0,0,0,.1875);
   color: $white;
-  border-radius: .25rem;
+  border-radius: 4px;
 
   .btn-group & {
-    margin-top: - to-rem(2);
+    margin-top: - 2px;
   }
 
   &.badge-outline {
@@ -423,7 +423,7 @@ pre {
 
 .spacer {
   display: inline-block;
-  padding: 0 .25rem;
+  padding: 0 4px;
 }
 
 
@@ -469,6 +469,15 @@ strong,
   font-size: $font-size-sm;
   line-height: $line-height-lg;
   color: $grey;
+}
+
+.info-inline {
+  display: inline-block;
+  margin-left: $meta-margin;
+}
+
+.info-item + .info-item {
+  margin-left: $meta-margin;
 }
 
 // List Reset

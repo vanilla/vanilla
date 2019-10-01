@@ -1,4 +1,4 @@
-/* tslint:disable */
+/* eslint-disable */
 
 interface Element {
     setAttribute(name: string, value: boolean): void;

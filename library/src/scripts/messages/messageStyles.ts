@@ -39,10 +39,10 @@ export const messagesVariables = useThemeCache(() => {
     });
 
     const colors = themeVars("colors", {
-        fg: globalVars.feedbackColors.warning.fg,
-        bg: globalVars.feedbackColors.warning.bg,
+        fg: globalVars.messageColors.warning.fg,
+        bg: globalVars.messageColors.warning.bg,
         states: {
-            fg: globalVars.feedbackColors.warning.state,
+            fg: globalVars.messageColors.warning.state,
         },
     });
 

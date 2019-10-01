@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api/users";
-import { capitalizeFirstLetter } from "@library/utility/utils";
+import { capitalizeFirstLetter } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 import { PublishStatus } from "@library/@types/api/core";
 import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";
@@ -30,22 +30,21 @@ export class ResultMeta extends React.Component<IProps> {
         const classesMetas = metasClasses();
         return (
             <React.Fragment>
-                {updateUser &&
-                    updateUser.name && (
-                        <span className={classNames(classesMetas.meta)}>
-                            {isDeleted ? (
-                                <span className={classNames("meta-inline", "isDeleted")}>
-                                    <Translate source="Deleted <0/>" c0={type} />
-                                </span>
-                            ) : (
-                                <Translate
-                                    source="<0/> by <1/>"
-                                    c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                                    c1={updateUser.name}
-                                />
-                            )}
-                        </span>
-                    )}
+                {updateUser && updateUser.name && (
+                    <span className={classNames(classesMetas.meta)}>
+                        {isDeleted ? (
+                            <span className={classNames("meta-inline", "isDeleted")}>
+                                <Translate source="Deleted <0/>" c0={type} />
+                            </span>
+                        ) : (
+                            <Translate
+                                source="<0/> by <1/>"
+                                c0={type ? t(capitalizeFirstLetter(type)) : undefined}
+                                c1={updateUser.name}
+                            />
+                        )}
+                    </span>
+                )}
 
                 <span className={classesMetas.meta}>
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />

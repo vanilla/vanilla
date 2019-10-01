@@ -1,20 +1,18 @@
-
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import {absolutePosition, colorOut, debugHelper, unit} from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, ColorValues, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
-import {ColorValues} from "@library/forms/buttonStyles";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const countVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = variableFactory("count");
 
-    const font = themeVars("font",{
+    const font = themeVars("font", {
         size: 10,
     });
 
@@ -23,7 +21,7 @@ export const countVariables = useThemeCache(() => {
     });
 
     const notifications = themeVars("notifications", {
-        bg: globalVars.feedbackColors.deleted.bg,
+        bg: globalVars.messageColors.deleted.bg,
     });
 
     return {
@@ -58,7 +56,7 @@ export const countClasses = useThemeCache(() => {
         return style("text", {
             display: "block",
             textAlign: "center",
-            color: !!countFg ? colorOut(countFg) : "inherit",
+            color: countFg ? colorOut(countFg) : "inherit",
         });
     };
 

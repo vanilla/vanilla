@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { useMeasure } from "@library/dom/hookUtils";
 import ModalSizes from "@library/modal/ModalSizes";
 import { modalClasses } from "@library/modal/modalStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React, { CSSProperties, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { forceRenderStyles } from "typestyle";
 

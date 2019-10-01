@@ -32,8 +32,8 @@ import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { signIn } from "@library/icons/common";
 import SmartLink from "@library/routing/links/SmartLink";
+import { SignInIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -55,6 +55,18 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class TitleBar extends React.Component<IProps, IState> {
+    /** Hold the extra mebox components before rendering. */
+    private static extraMeBoxComponents: React.ComponentType[] = [];
+
+    /**
+     * Register an extra component to be rendered before the mebox.
+     * This will only affect larger screen sizes.
+     *
+     * @param component The component class to be render.
+     */
+    public static registerBeforeMeBox(component: React.ComponentType) {
+        TitleBar.extraMeBoxComponents.push(component);
+    }
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
@@ -137,6 +149,13 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
                                 condition={!!showMobileDropDown}
                             >
+                                {!this.state.openSearch && (
+                                    <div className={classes.extraMeBoxIcons}>
+                                        {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                            return <ComponentName key={index} />;
+                                        })}
+                                    </div>
+                                )}
                                 <CompactSearch
                                     className={classNames("titleBar-compactSearch", classes.compactSearch, {
                                         isCentered: this.state.openSearch,
@@ -194,7 +213,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                     className={classNames(classes.centeredButtonClass, classes.button)}
                     to={`/entry/signin?target=${window.location.pathname}`}
                 >
-                    {signIn("titleBar-signInIcon")}
+                    <SignInIcon className={"titleBar-signInIcon"} />
                 </SmartLink>
             );
         } else {
@@ -213,14 +232,14 @@ export class TitleBar extends React.Component<IProps, IState> {
             return (
                 <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
                     <TitleBarNavItem
-                        buttonType={ButtonTypes.TRANSLUCID}
+                        buttonType={ButtonTypes.TRANSPARENT}
                         linkClassName={classNames(classes.signIn, classes.guestButton)}
                         to={`/entry/signin?target=${window.location.pathname}`}
                     >
                         {t("Sign In")}
                     </TitleBarNavItem>
                     <TitleBarNavItem
-                        buttonType={ButtonTypes.INVERTED}
+                        buttonType={ButtonTypes.TRANSLUCID}
                         linkClassName={classNames(classes.register, classes.guestButton)}
                         to={`/entry/register?target=${window.location.pathname}`}
                     >

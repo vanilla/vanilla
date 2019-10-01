@@ -6,7 +6,7 @@
 
 import apiv2 from "@library/apiv2";
 import UserActions from "@library/features/users/UserActions";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
@@ -22,15 +22,16 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 /**
  * Implements User Drop down for header
  */
-function UserDropDown(props: IProps) {
+export function UserDropDown(props: IProps) {
     const ID = useMemo(() => uniqueIDFromPrefix("userDropDown"), []);
     const [isOpen, setOpen] = useState(false);
+    const { checkCountData } = props;
 
     useEffect(() => {
         if (isOpen) {
-            props.checkCountData();
+            checkCountData();
         }
-    }, [isOpen, props.checkCountData]);
+    }, [isOpen, checkCountData]);
 
     const { userInfo } = props;
     if (!userInfo) {
@@ -57,7 +58,7 @@ function UserDropDown(props: IProps) {
                     />
                 </MeBoxIcon>
             }
-            selfPadded={true}
+            flyoutType={FlyoutType.FRAME}
             onVisibilityChange={setOpen}
         >
             <UserDropDownContents />

@@ -53,7 +53,11 @@
                                 <div class="Frame-row SearchBoxMobile">
                                     {if !$SectionGroups && !inSection(["SearchResults"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {module name="AdvancedSearchModule"}
+                                            {if $hasAdvancedSearch === true}
+                                                {module name="AdvancedSearchModule"}
+                                            {else}
+                                                {searchbox}
+                                            {/if}
                                         </div>
                                     {/if}
                                 </div>
@@ -77,7 +81,6 @@
                                             </div>
                                         {/if}
                                         {asset name="Content"}
-                                        {event name="AfterBody"}
                                     </main>
                                     <aside class="Panel Panel-main">
                                         {if !$SectionGroups}
@@ -99,6 +102,7 @@
         </div>
     </div>
     <div id="modals"></div>
+    {event name="AfterBody"}
 </body>
 
 </html>

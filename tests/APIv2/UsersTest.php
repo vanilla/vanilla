@@ -6,6 +6,9 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
+use PHPUnit\Framework\AssertionFailedError;
+use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\Uploader;
 
 /**
@@ -22,6 +25,11 @@ class UsersTest extends AbstractResourceTest {
 
     /** {@inheritdoc} */
     protected $patchFields = ['name', 'email', 'photo', 'emailConfirmed', 'bypassSpam'];
+
+    /**
+     * @var \Gdn_Configuration
+     */
+    private $configuration;
 
     /**
      * {@inheritdoc}
@@ -42,9 +50,12 @@ class UsersTest extends AbstractResourceTest {
     public function setUp() {
         parent::setUp();
 
-        /** @var \Gdn_Configuration $configuration */
-        $configuration = static::container()->get('Config');
-        $configuration->set('Garden.Email.Disabled', true);
+        $this->configuration = static::container()->get('Config');
+        $this->configuration->set('Garden.Email.Disabled', true);
+
+        /* @var PrivateCommunityMiddleware $middleware */
+        $middleware = static::container()->get(PrivateCommunityMiddleware::class);
+        $middleware->setIsPrivate(false);
     }
 
     /**
@@ -448,6 +459,13 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * I should be able to invoke basic registration on a private community.
+     */
+    public function testRegisterBasicPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testRegisterBasic']);
+    }
+
+    /**
      * Register with an invitation code.
      */
     public function testRegisterInvitation() {
@@ -459,39 +477,67 @@ class UsersTest extends AbstractResourceTest {
         $configuration->set('Garden.Email.Disabled', true);
 
         $fields = $this->registrationFields();
-        $invitation = $this->api()->post('/invites', ['email' => $fields['email']])->getBody();
+        $invitation = $this->runWithAdminUser(function () use ($fields) {
+            return $this->api()->post('/invites', ['email' => $fields['email']])->getBody();
+        });
         $fields['invitationCode'] = $invitation['code'];
         $this->verifyRegistration($fields);
     }
 
-    public function testRequestPassword() {
-        // Create a user first.
-        $user = $this->api()->post('/users', [
-            'name' => 'testRequestPassword',
-            'email' => 'userstest@example.com',
-            'password' => '123Test234Test',
-        ])->getBody();
+    /**
+     * Users should be able to register an invitation with private community turned on.
+     */
+    public function testRegisterInvitationPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testRegisterInvitation']);
+    }
 
+    public function testRequestPassword() {
+        static $i = 1;
+
+        // Create a user first.
+        $user = $this->runWithAdminUser(function () use (&$i) {
+            $r = $this->api()->post('/users', [
+                'name' => 'testRequestPassword'.$i,
+                'email' => "userstest$i@example.com",
+                'password' => '123Test234Test',
+            ])->getBody();
+
+            $i++;
+
+            return $r;
+        });
         $r = $this->api()->post('/users/request-password', ['email' => $user['email']]);
 
         $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
 
         try {
-            $this->logger->clear();
-            $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
+            $this->runWithConfig([
+                'Garden.Registration.NameUnique' => true,
+                'Garden.Registration.EmailUnique' => true,
+            ], function () use ($user) {
+                $this->logger->clear();
+                $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
+            });
             $this->fail('You shouldn\'t be able to reset a password with a username.');
-        } catch (\Exception $ex) {
+        } catch (ClientException $ex) {
             $this->assertEquals(400, $ex->getCode());
         }
 
-        /* @var \Gdn_Configuration $config */
-        $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->set('Garden.Registration.NameUnique', true);
-        $config->set('Garden.Registration.EmailUnique', false);
+        $this->runWithConfig([
+            'Garden.Registration.NameUnique' => true,
+            'Garden.Registration.EmailUnique' => false,
+        ], function () use ($user) {
+            $this->logger->clear();
+            $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
+            $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+        });
+    }
 
-        $this->logger->clear();
-        $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
-        $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+    /**
+     * Users should be able to request their passwords with private community on.
+     */
+    public function testRequestPasswordPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testRequestPassword']);
     }
 
     /**
@@ -501,10 +547,14 @@ class UsersTest extends AbstractResourceTest {
      */
     private function verifyRegistration(array $fields) {
         $registration = $this->api()->post('/users/register', $fields)->getBody();
-        $user = $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
+
+        $user = $this->runWithAdminUser(function () use ($registration) {
+            return $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
+        });
         $registeredUser = array_intersect_key($registration, $user);
         ksort($registration);
         ksort($registeredUser);
         $this->assertEquals($registration, $registeredUser);
     }
+
 }

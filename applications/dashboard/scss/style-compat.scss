@@ -18,6 +18,7 @@
 @import "compatibility/buttons";
 @import "compatibility/categories";
 @import "compatibility/groups";
+@import "compatibility/popups";
 
 // This should always be added after style.css and not be overridden.
 @import "new-components/authenticateUser";
@@ -36,14 +37,10 @@
 
 // Embeds
 @import "../../../library/src/scss/embeds/embeds";
+@import "../../../library/src/scss/utility/icons";
 
 // User content
 @import "../../../library/src/scss/userContent/animations";
-@import "../../../library/src/scss/userContent/atMention";
-@import "../../../library/src/scss/userContent/blockquote";
 @import "../../../library/src/scss/userContent/lists";
-@import "../../../library/src/scss/userContent/accessibility";
-@import "../../../library/src/scss/userContent/spoiler";
-@import "../../../library/src/scss/userContent/emoji";
-@import "../../../library/src/scss/userContent/codeBlocks";
+
 

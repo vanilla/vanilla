@@ -35,7 +35,8 @@ yargs
         alias: "i",
         default: false,
         boolean: true,
-    });
+    })
+    .options("debug", { default: false, boolean: true });
 
 export interface IBuildOptions {
     mode: BuildMode;
@@ -47,6 +48,7 @@ export interface IBuildOptions {
     configFile: string;
     phpConfig: any;
     devIp: string;
+    debug: boolean;
 }
 
 /**
@@ -91,5 +93,6 @@ export async function getOptions(): Promise<IBuildOptions> {
         phpConfig: config as string,
         install: yargs.argv.install as boolean,
         devIp,
+        debug: yargs.argv.debug as boolean,
     };
 }

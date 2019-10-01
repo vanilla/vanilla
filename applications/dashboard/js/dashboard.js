@@ -472,8 +472,12 @@ var DashboardModal = (function() {
         /**
          * Adds the modal to the DOM.
          */
-        addModalToDom: function() {
-            $('body').append(this.modalShell.replace('{id}', this.id));
+        addModalToDom: function () {
+            var newModalContainer = document.getElementById("modals");
+            // Make sure that we insert our modals before
+            var modal = document.createElement("div");
+            document.body.insertBefore(modal, newModalContainer);
+            modal.outerHTML = this.modalShell.replace('{id}', this.id);
         },
 
         /**
@@ -579,8 +583,10 @@ var DashboardModal = (function() {
                 html = this.modalHtml;
             }
 
+            let cssClass = this.settings.fullHeight ? content.cssClass + " modal-full-height" : content.cssClass;
+
             html = html.replace('{body}', content.body);
-            html = html.replace('{cssClass}', content.cssClass);
+            html = html.replace('{cssClass}', cssClass);
             html = html.replace('{title}', content.title);
             html = html.replace('{closeIcon}', content.closeIcon);
             html = html.replace('{footer}', content.footer);
@@ -850,34 +856,6 @@ $(document).on('contentLoad', function(e) {
         });
         $('pre', element).addClass('prettyprint lang-html');
         prettyPrint();
-    }
-
-    /**
-     * Add a CSS class to the navbar based on it scroll position.
-     *
-     * @param element - The scope of the function.
-     */
-    function navbarHeightInit(element) {
-        var $navbar = $('.js-navbar', element);
-
-        $navbar.addClass('navbar-short');
-        var navShortHeight = $navbar.outerHeight(true);
-        $navbar.removeClass('navbar-short');
-        var navHeight = $navbar.outerHeight(true);
-        var navOffset = navHeight - navShortHeight;
-
-        // If we load in the middle of the page, we should have a short navbar.
-        if ($(window).scrollTop() > navOffset) {
-            $navbar.addClass('navbar-short');
-        }
-
-        $(window).on('scroll', function() {
-            if ($(window).scrollTop() > navOffset) {
-                $navbar.addClass('navbar-short');
-            } else {
-                $navbar.removeClass('navbar-short');
-            }
-        });
     }
 
     /**
@@ -1161,7 +1139,6 @@ $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        navbarHeightInit(e.target); // navbar height settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -1284,7 +1261,8 @@ $(document).on('contentLoad', function(e) {
      */
     $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
+        var fullHeight = $(this).hasClass('js-full-height-modal')
+        DashboardModal.activeModal = new DashboardModal($(this), { fullHeight: fullHeight });
     });
 
     /**
@@ -1426,6 +1404,31 @@ $(document).on('contentLoad', function(e) {
             data: ajaxData,
             dataType: 'json'
         });
+    });
+
+    /**
+     * Turn a toolbar with the .js-toolbar-sticky class into a sticky toolbar.
+     *
+     * This is an opt-in class because it may not work or be appropriate on all pages.
+     */
+    $(window).scroll(function () {
+        var $toolbar = $('.js-toolbar-sticky');
+        var cssClass = 'is-stuck';
+
+        if ($(this).scrollTop() > $('header.navbar').height()) {
+            $toolbar
+                .addClass(cssClass)
+                .outerWidth($('.main').outerWidth() - 2)
+                .next('*')
+                .css('margin-top', $toolbar.outerHeight());
+        } else {
+            $toolbar.removeClass(cssClass).outerWidth('').next('*').css('margin-top', '');
+        }
+    });
+    $(window).resize(function () {
+        var $toolbar = $('.js-toolbar-sticky.is-stuck');
+
+        $toolbar.outerWidth($('.main').outerWidth() - 2);
     });
 })(jQuery);
 

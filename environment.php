@@ -16,7 +16,9 @@ if (!defined('APPLICATION')) {
     define('APPLICATION', 'Vanilla');
 }
 if (!defined('APPLICATION_VERSION')) {
-    define('APPLICATION_VERSION', '2.8.1+2019.006');
+    // Rules for the versioning
+    // {OSS version}-{Cloud release version}-{? SNAPSHOT if it's a dev build}
+    define('APPLICATION_VERSION', '3.2-2019.012-SNAPSHOT');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

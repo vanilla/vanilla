@@ -164,7 +164,21 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                allOf:
+                  - $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  - type: object
+                    properties:
+                      isAdmin:
+                        description: Whether or not the user is a global admin.
+                        type: boolean
+                      permissions:
+                        description: Global permissions available to the current user.
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - isAdmin
+                      - permissions
           description: Success
       tags:
       - Users

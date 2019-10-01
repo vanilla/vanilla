@@ -495,17 +495,30 @@ class Addon implements Contracts\AddonInterface {
      * @return \Traversable Returns a list of paths to PHP files.
      */
     private function scanClassPaths() {
-        $dirs = [
+        $dirsToScan = [
             '',
-            '/[Cc]ontrollers',
+            '/controllers',
             '/library',
             '/src',
-            '/[Mm]odels',
-            '/[Mm]odules',
+            '/models',
+            '/modules',
             '/settings/class.hooks.php'
         ];
 
-        foreach ($dirs as $dir) {
+        // Get all the uppercase top level directories (likely namespaces)
+        // and add them to the list.
+        $rootDir = $this->path('', Addon::PATH_FULL);
+        $subDirs = glob($rootDir . '/*', GLOB_ONLYDIR);
+        foreach ($subDirs as $subDir) {
+            $trimmedDir = basename($subDir);
+            $isUppercaseDirName = strlen($trimmedDir) > 0 && ctype_upper($trimmedDir[0]);
+            if ($isUppercaseDirName) {
+                $dirsToScan[] = "/" . $trimmedDir;
+            }
+        }
+
+
+        foreach ($dirsToScan as $dir) {
             foreach ($this->scanDirPhp($dir) as $path) {
                 yield $path;
             }
@@ -744,7 +757,7 @@ class Addon implements Contracts\AddonInterface {
             && in_array($this->getType(), [static::TYPE_LOCALE, static::TYPE_THEME])
         ) {
 
-            $issues['key-subdir-mismatch'] = "The addon key must match it's subdirectory name ($rawKey vs. $subdir).";
+            $issues['key-subdir-mismatch'] = "The addon key must match its subdirectory name ($rawKey vs. $subdir).";
         }
 
         if ($this->getType() === static::TYPE_ADDON) {
@@ -756,7 +769,7 @@ class Addon implements Contracts\AddonInterface {
             }
 
             if (strcasecmp($key, basename($this->getSubdir())) !== 0) {
-                $issues['key-subdir-mismatch-case'] = "The addon key must match it's subdirectory name ($key vs. $subdir).";
+                $issues['key-subdir-mismatch-case'] = "The addon key must match its subdirectory name ($key vs. $subdir).";
             }
         }
 

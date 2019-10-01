@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 
 export const smartAlignClasses = useThemeCache(() => {
@@ -17,7 +17,7 @@ export const smartAlignClasses = useThemeCache(() => {
         width: percent(100),
     });
 
-    const inner = style("inner",{
+    const inner = style("inner", {
         textAlign: "left",
     });
 

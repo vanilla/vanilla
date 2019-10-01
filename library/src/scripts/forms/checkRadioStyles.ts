@@ -15,25 +15,26 @@ import {
     srOnly,
     unit,
     userSelect,
+    margins,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("checkRadio");
+    const themeVars = variableFactory("checkRadio");
 
-    const border = {
+    const border = themeVars("border", {
         width: formElementVars.border.width,
         radius: 2,
         color: globalVars.mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const main = {
+    const main = themeVars("check", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.bg,
         checked: {
@@ -42,15 +43,14 @@ export const checkRadioVariables = useThemeCache(() => {
         },
         hover: {
             border: {
-                color: globalVars.mixPrimaryAndBg(0.682),
+                color: globalVars.mainColors.primary,
             },
-            bg: globalVars.states.hover.color,
+            bg: globalVars.mainColors.primary.fade(0.1),
             opacity: 0.8,
         },
-        ...themeVars.subComponentStyles("check"),
-    };
+    });
 
-    const checkBox = {
+    const checkBox = themeVars("checkBox", {
         check: {
             width: 10,
             height: 10,
@@ -59,26 +59,32 @@ export const checkRadioVariables = useThemeCache(() => {
             width: 6,
             height: 6,
         },
-    };
+    });
 
-    const radioButton = {
+    const radioButton = themeVars("radioButton", {
         icon: {
             width: 6,
             height: 6,
         },
-    };
+    });
 
-    const labelNote = {
+    const labelNote = themeVars("labelNote", {
         fontSize: ".8em",
         opacity: 0.7,
-        ...themeVars.subComponentStyles("labelNote"),
-    };
+    });
 
-    const sizing = {
+    const sizing = themeVars("sizing", {
         width: 16,
-    };
+    });
 
-    return { border, main, checkBox, radioButton, labelNote, sizing };
+    return {
+        border,
+        main,
+        checkBox,
+        radioButton,
+        labelNote,
+        sizing,
+    };
 });
 
 export const checkRadioClasses = useThemeCache(() => {
@@ -86,38 +92,6 @@ export const checkRadioClasses = useThemeCache(() => {
     const vars = checkRadioVariables();
     const style = styleFactory("checkRadio");
     const flexes = flexHelper();
-
-    //.radioButton,
-    //.checkbox
-    const root = style({
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        whiteSpace: "nowrap",
-        outline: 0,
-        $nest: {
-            "&.focus-accessible": {},
-            "&:hover": {
-                $nest: {
-                    "& .radioButton-input:not([disabled]), & .checkbox-input:not([disabled])": {
-                        $nest: {
-                            "& + .radioButton-disk, & + .checkbox-box": {
-                                borderColor: vars.main.hover.border.color.toString(),
-                                opacity: vars.main.hover.opacity,
-                                backgroundColor: vars.main.hover.bg.toString(),
-                            },
-                        },
-                    },
-                    "& .radioButton-disk, & .checkbox-box": {
-                        backgroundColor: vars.main.hover.bg.toString(),
-                    },
-                },
-            },
-            "& + .radioButton, & + .checkbox": {
-                marginTop: px(12),
-            },
-        },
-    });
 
     //.radioButton-label,
     // .checkbox-label
@@ -148,7 +122,7 @@ export const checkRadioClasses = useThemeCache(() => {
         cursor: "pointer",
         backgroundColor: colorOut(vars.main.bg),
         ...borders(vars.border),
-    });
+    } as NestedCSSProperties);
 
     const radioIcon = style("radioIcon", {
         ...absolutePosition.middleLeftOfParent(),
@@ -175,10 +149,14 @@ export const checkRadioClasses = useThemeCache(() => {
     // .checkbox-state
     const state = style("state", {
         ...absolutePosition.fullSizeOfParent(),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         color: vars.main.checked.fg.toString(),
     });
 
     const diskIcon = style({
+        display: "none",
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,
     });
@@ -188,39 +166,86 @@ export const checkRadioClasses = useThemeCache(() => {
     const input = style("input", {
         ...srOnly(),
         $nest: {
-            "&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible ": {
+            [`&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible`]: {
                 $nest: {
-                    "& + .radioButton-disk, & + .checkbox-box": {
+                    [`& + .${checkIcon}`]: {
                         borderColor: vars.main.hover.border.color.toString(),
                         opacity: vars.main.hover.opacity,
                         backgroundColor: vars.main.hover.bg.toString(),
                     },
                 },
             },
-            "&:checked + .radioButton-disk, &:checked + .checkbox-box": {
+            [`&:checked + .${iconContainer}`]: {
                 backgroundColor: important(vars.main.checked.bg.toString()),
                 borderColor: vars.main.checked.fg.toString(),
                 $nest: {
-                    "& .radioButton-diskIcon, & .checkbox-checkIcon": {
+                    [`& .${checkIcon}`]: {
+                        display: "block",
+                    },
+                    [`& .${diskIcon}`]: {
                         display: "block",
                     },
                 },
             },
-            "&.isDisabled, &[disabled]": {
+            [`&.isDisabled, &[disabled]`]: {
                 $nest: {
                     "&:not(:checked)": {
                         $nest: {
-                            "& + .radioButton-disk, & + .checkbox-box": {
+                            [`& + .${checkIcon}`]: {
                                 backgroundColor: vars.main.bg.toString(),
                             },
                         },
                     },
-                    "& ~ .radioButton-label, & ~ .checkbox-label, & + .radioButton-disk, & + .checkbox-box": {
+                    [`& ~ .${label}, & + .${checkIcon}`]: {
                         ...disabledInput(),
                     },
                 },
             },
         },
+    });
+
+    //.radioButton,
+    //.checkbox
+    const root = style({
+        display: important("flex"),
+        flexWrap: "wrap",
+        alignItems: "center",
+        whiteSpace: "nowrap",
+        outline: 0,
+        cursor: "pointer",
+        $nest: {
+            [`&:hover .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`&.focus-accessible .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`&:focus .${input}:not([disabled]) + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`.${input}:not([disabled]):hover + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`.${input}:not([disabled]):focus + .${iconContainer}`]: {
+                borderColor: colorOut(vars.main.hover.border.color),
+                backgroundColor: colorOut(vars.main.hover.bg),
+            },
+            [`& + &`]: {
+                marginTop: px(globalVars.spacer.size / 2),
+            },
+            [`&.isHorizontal.isHorizontal.isHorizontal`]: margins({
+                all: 0,
+                right: px(globalVars.spacer.size / 2),
+            }),
+        },
+    });
+
+    const group = style("group", {
+        marginTop: unit(globalVars.spacer.size / 2),
     });
 
     return {
@@ -234,5 +259,6 @@ export const checkRadioClasses = useThemeCache(() => {
         state,
         diskIcon,
         input,
+        group,
     };
 });

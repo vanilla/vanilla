@@ -21,7 +21,10 @@ export const subcommunityListVariables = useThemeCache(() => {
         columnsWidth: 912,
     });
 
-    return { spacing, sizing };
+    return {
+        spacing,
+        sizing,
+    };
 });
 
 export const subcommunityListClasses = useThemeCache(() => {
@@ -35,6 +38,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             maxWidth: unit(vars.sizing.columnsWidth),
             padding: unit(vars.spacing.padding),
             margin: "auto",
+            width: percent(100),
         },
         mediaQueries.oneColumnDown({
             padding: 0,

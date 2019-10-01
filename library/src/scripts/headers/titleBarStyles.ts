@@ -18,11 +18,23 @@ import {
     userSelect,
     absolutePosition,
     pointerEvents,
+    singleBorder,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { iconClasses } from "@library/icons/iconClasses";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
+
+enum TitleBarBorderType {
+    BORDER = "border",
+    NONE = "none",
+    SHADOW = "shadow",
+}
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -47,7 +59,11 @@ export const titleBarVariables = useThemeCache(() => {
         spacer: 8,
     });
 
-    const buttonSize = formElementVars.sizing.height;
+    const border = makeThemeVars("border", {
+        type: TitleBarBorderType.NONE,
+    });
+
+    const buttonSize = globalVars.buttonIcon.size;
     const button = makeThemeVars("button", {
         borderRadius: globalVars.border.radius,
         size: buttonSize,
@@ -62,6 +78,41 @@ export const titleBarVariables = useThemeCache(() => {
             bg: emphasizeLightness(colors.bg, 0.04),
         },
     });
+
+    const linkButtonDefaults: IButtonType = {
+        name: ButtonTypes.TITLEBAR_LINK,
+        colors: {
+            bg: colors.bg,
+        },
+        fonts: {
+            color: colors.fg,
+        },
+        borders: {
+            style: "none",
+            color: "transparent",
+        },
+        hover: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        focus: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+        active: {
+            colors: {
+                bg: button.state.bg,
+            },
+        },
+    };
+    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
 
     const count = makeThemeVars("count", {
         size: 18,
@@ -127,12 +178,14 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     return {
+        border,
         sizing,
         colors,
         signIn,
         resister,
         guest,
         button,
+        linkButton,
         count,
         dropDownContents,
         endElements,
@@ -153,10 +206,27 @@ export const titleBarClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("titleBar");
 
+    const getBorderVars = (): NestedCSSProperties => {
+        switch (vars.border.type) {
+            case TitleBarBorderType.BORDER:
+                return {
+                    borderBottom: singleBorder(),
+                };
+            case TitleBarBorderType.SHADOW:
+                return {
+                    boxShadow: shadowHelper().makeShadow(),
+                };
+            case TitleBarBorderType.NONE:
+            default:
+                return {};
+        }
+    };
+
     const root = style({
         maxWidth: percent(100),
         backgroundColor: headerColors.bg.toString(),
         color: headerColors.fg.toString(),
+        ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {
                 color: vars.colors.fg.toString(),
@@ -313,6 +383,13 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const extraMeBoxIcons = style("extraMeBoxIcons", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flex: 1,
+    });
+
     const topElement = style(
         "topElement",
         {
@@ -344,7 +421,7 @@ export const titleBarClasses = useThemeCache(() => {
         "button",
         {
             color: vars.colors.fg.toString(),
-            height: px(vars.sizing.height),
+            height: px(vars.button.size),
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
@@ -405,6 +482,8 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const linkButton = generateButtonClass(vars.linkButton);
 
     const buttonOffset = style("buttonOffset", {
         transform: `translateX(6px)`,
@@ -547,19 +626,17 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const compactSearchResults = style(
-        "compactSearchResults",
-        {
-            position: "absolute",
-            top: unit(formElementVars.sizing.height),
-            // top: unit(vars.sizing.height + (vars.sizing.height - formElementVars.sizing.height) / 2),
-            maxWidth: px(vars.compactSearch.maxWidth),
-            width: percent(100),
+    const compactSearchResults = style("compactSearchResults", {
+        position: "absolute",
+        top: unit(formElementVars.sizing.height),
+        maxWidth: px(vars.compactSearch.maxWidth),
+        width: percent(100),
+        $nest: {
+            "&:empty": {
+                display: "none",
+            },
         },
-        // mediaQueries.oneColumnDown({
-        //     top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-        // }),
-    );
+    });
 
     const clearButtonClass = style("clearButtonClass", {
         opacity: 0.7,
@@ -600,10 +677,12 @@ export const titleBarClasses = useThemeCache(() => {
         languages,
         button,
         buttonOffset,
+        linkButton,
         searchCancel,
         tabButton,
         dropDownContents,
         count,
+        extraMeBoxIcons,
         scroll,
         rightFlexBasis,
         leftFlexBasis,
@@ -622,14 +701,19 @@ export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
     const logoFrame = style("logoFrame", { display: "inline-flex" });
+    const logoHeight = px(vars.sizing.height - 18);
 
     const logo = style("logo", {
         display: "block",
-        height: px(vars.sizing.height - 18),
+        height: logoHeight,
         width: "auto",
         $nest: {
             "&.isCentred": {
                 margin: "auto",
+            },
+            [`.${iconClasses().vanillaLogo}`]: {
+                height: logoHeight,
+                width: "auto",
             },
         },
     });

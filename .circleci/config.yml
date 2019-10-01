@@ -1,0 +1,267 @@
+version: 2.1
+orbs:
+    core: vanilla/core@2.1.0
+    chromatic: wave/chromatic@1.0.1
+aliases:
+    - &run_yarn
+        run:
+            name: Install Yarn Packages
+            command: |
+                cd ~/workspace/repo
+                yarn install --pure-lockfile
+                yarn install-all
+    - &attach_workspace
+        attach_workspace:
+            at: ~/workspace
+    - &run_composer
+        run:
+            name: Install Composer Packages
+            command: |
+                cd ~/workspace/repo
+                VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+    - &run_php_lint
+        run:
+            name: Linting PHP
+            command: |
+                cd ~/workspace/repo
+                # Validate syntax in all the files
+                .circleci/scripts/php-lint.sh ./applications
+                .circleci/scripts/php-lint.sh ./conf
+                .circleci/scripts/php-lint.sh ./library
+                .circleci/scripts/php-lint.sh ./plugins
+                .circleci/scripts/php-lint.sh ./themes
+
+                # Run code sniffer on the diffed files.
+                ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+jobs:
+    frontend_setup:
+        executor: core/node
+        steps:
+            - run:
+                name: Versions
+                command: |
+                    node --version
+                    yarn --version
+            - core/checkout
+            - run:
+                # Makes workspace persisting much faster if not needed.
+                name: Cleaning up git directory
+                command: |
+                    cd ~/workspace/repo
+                    rm -rf .git
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_yarn
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                    - repo
+                    - ci-scripts
+    frontend_build:
+        executor: core/node
+        resource_class: large
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/repo
+                    yarn build
+    frontend_test:
+        executor: core/node
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/repo
+                    yarn test
+    frontend_validate_es5:
+        executor: core/node
+        steps:
+            - *attach_workspace
+            - run: |
+                npx es-check es5 ./dist/polyfills.min.js
+                npx es-check es5 ./dist/forum/vendors.min.js
+                npx es-check es5 ./dist/forum/shared.min.js
+    frontend_lint:
+        executor: core/node
+        steps:
+            - *attach_workspace
+            - run: |
+                cd ~/workspace/repo
+                yarn lint
+                yarn prettier --check "**/src/scripts/**/*"
+    frontend_typechecker:
+        executor: core/node
+        resource_class: large
+        steps:
+            - *attach_workspace
+            - run: |
+                cd ~/workspace/repo
+                yarn check-types
+    php_setup:
+        executor: core/php72
+        steps:
+            - run:
+                name: Versions
+                command: |
+                    php --version
+                    composer --version
+            - core/checkout
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_composer
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                    - repo
+                    - ci-scripts
+    php_72_lint:
+        executor: core/php72
+        steps: &php_lint_steps
+            - core/checkout
+            - *run_composer
+            - *run_php_lint
+    php_72_tests:
+        executor: core/php72
+        steps: &php_unit_test_steps
+            - *attach_workspace
+            - run:
+                name: Test setup
+                command: |
+                    cd ~/workspace/repo
+                    cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+            - core/prepare_php_tests
+            - run:
+                name: Library Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+            - run:
+                name: APIv2 Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+    php_72_integration:
+        executor: core/php72
+        steps: &php_integration_test_steps
+            - *attach_workspace
+            - core/prepare_php_tests
+            - core/prepare_nginx
+            - run:
+                name: APIv0 Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
+            - run:
+                name: Models Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+    php_73_lint:
+        executor: core/php73
+        steps: *php_lint_steps
+    php_73_tests:
+        executor: core/php73
+        steps: *php_unit_test_steps
+    php_73_integration:
+        executor: core/php73
+        steps: *php_integration_test_steps
+    php_71_lint:
+        executor: core/php71
+        steps: *php_lint_steps
+    php_71_tests:
+        executor: core/php71
+        steps: *php_unit_test_steps
+    php_71_integration:
+        executor: core/php71
+        steps: *php_integration_test_steps
+    dependency_audit:
+        executor: core/php72
+        steps:
+            - core/checkout
+            - run: yarn audit
+
+workflows:
+    version: 2
+    commit:
+        jobs:
+            - chromatic/test:
+                filters:
+                    branches:
+                        ignore: master
+            - chromatic/run-and-accept-all:
+                filters:
+                    branches:
+                        only: master
+            # PHP 7.2 jobs are only nightly until we move upwards on infra.
+            - php_setup
+            - php_72_lint
+            - php_72_integration:
+                requires:
+                    - php_setup
+            - php_72_tests:
+                requires:
+                    - php_setup
+            # JS and browsers
+            - frontend_setup
+            - frontend_lint:
+                requires:
+                    - frontend_setup
+            - frontend_typechecker:
+                requires:
+                    - frontend_setup
+            - frontend_build:
+                requires:
+                    - frontend_setup
+            - frontend_test:
+                requires:
+                    - frontend_setup
+    nightly:
+        triggers:
+            - schedule:
+                cron: "0 0 * * *" # Once a day.
+                filters:
+                    branches:
+                        only:
+                            - master
+        jobs:
+            - dependency_audit
+            # PHP and serverside
+            - php_setup
+            - php_71_lint
+            - php_72_lint
+            - php_73_lint
+            - php_71_integration:
+                requires:
+                    - php_setup
+            - php_72_integration:
+                requires:
+                    - php_setup
+            - php_73_integration:
+                requires:
+                    - php_setup
+            - php_71_tests:
+                requires:
+                    - php_setup
+            - php_72_tests:
+                requires:
+                    - php_setup
+            - php_73_tests:
+                requires:
+                    - php_setup
+            ## JS & browsers
+            - frontend_setup
+            - frontend_lint:
+                requires:
+                    - frontend_setup
+            - frontend_typechecker:
+                requires:
+                    - frontend_setup
+            - frontend_build:
+                requires:
+                    - frontend_setup
+            - frontend_test:
+                requires:
+                    - frontend_setup

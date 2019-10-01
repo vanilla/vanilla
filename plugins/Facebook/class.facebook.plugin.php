@@ -162,20 +162,39 @@ class FacebookPlugin extends Gdn_Plugin {
             return;
         }
 
+        if (!is_array($args) || empty($args)) {
+            return;
+        }
+
+        $recordType = $args["RecordType"] ?? null;
+        if (!is_string($recordType)) {
+            return;
+        }
+
+        if (strtolower($recordType) === "comment" && array_key_exists("Comment", $args)) {
+            $url = commentUrl($args["Comment"]);
+        } elseif (strtolower($recordType) === "discussion" && array_key_exists("Discussion", $args)) {
+            $url = discussionUrl($args["Discussion"]);
+        } else {
+            return;
+        }
+
         echo Gdn_Theme::bulletItem('Share');
-        $this->addReactButton($sender, $args);
+        $this->addReactButton($url);
     }
 
     /**
      * Output Quote link to share via Facebook.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args
+     * @param string $url
      */
-    protected function addReactButton($sender, $args) {
+    private function addReactButton(string $url) {
+        $query = http_build_query(["u" => $url]);
+        $sharingUrl = "https://www.facebook.com/sharer/sharer.php?{$query}";
+
         echo anchor(
             sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')),
-            url("post/facebook/{$args['RecordType']}?id={$args['RecordID']}", true),
+            url($sharingUrl, true),
             'ReactButton PopupWindow',
             ['rel' => 'nofollow']
         );
@@ -243,46 +262,6 @@ class FacebookPlugin extends Gdn_Plugin {
                 'Photo' => "//graph.facebook.com/{$profile['id']}/picture?width=200&height=200"
             ]
         ];
-    }
-
-    /**
-     * Endpoint to share via Facebook.
-     *
-     * @param PostController $sender
-     * @param string $recordType
-     * @param int $iD
-     *
-     * @throws Gdn_UserException
-     */
-    public function postController_facebook_create($sender, $recordType, $iD) {
-        if (!$this->socialReactions()) {
-            throw permissionException();
-        }
-
-        $row = getRecord($recordType, $iD, true);
-        if ($row) {
-            if ($this->accessToken() && $sender->Request->isPostBack()) {
-                $r = $this->api('/me/feed', ['link' => $row['ShareUrl']]);
-
-                $sender->setJson('R', $r);
-                $sender->informMessage(t('Thanks for sharing!'));
-            } else {
-                $get = [
-                    'app_id' => c('Plugins.Facebook.ApplicationID'),
-                    'link' => $row['ShareUrl'],
-                ];
-
-                // Do not redirect if we are in a popup (It will close itself :D)
-                if ($sender->Request->get('display') !== 'popup') {
-                    $get['redirect_uri'] = url('/post/shared/facebook', true);
-                }
-
-                $url = 'http://www.facebook.com/dialog/feed?'.http_build_query($get);
-                redirectTo($url, 302, false);
-            }
-        }
-
-        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -649,8 +628,8 @@ class FacebookPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-    public function socialReactions() {
-        return c('Plugins.Facebook.SocialReactions', true) && $this->isConfigured();
+    public function socialReactions(): bool {
+        return (bool)c('Plugins.Facebook.SocialReactions', true);
     }
 
     /**

@@ -6,7 +6,7 @@
 
 import { IApiError, IApiResponse } from "@library/@types/api/core";
 import { AxiosResponse, AxiosInstance } from "axios";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { ThunkDispatch, ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AsyncActionCreators } from "typescript-fsa";
@@ -237,7 +237,7 @@ type ThunkActionCreator<Params, Result, State, Extra> = (
 export const bindThunkAction = <Params, Succ, Err, State, Extra = any>(
     actionCreators: AsyncActionCreators<Params, Succ, Err>,
     asyncWorker: AsyncWorker<Params, Succ, State, Extra>,
-): ThunkActionCreator<Params, Promise<Succ>, State, Extra> => params => async (dispatch, getState, extra) => {
+): ThunkActionCreator<Params, Promise<Succ>, State, Extra> => (params: Params) => async (dispatch, getState, extra) => {
     try {
         dispatch(actionCreators.started(params!));
         const result = await asyncWorker(params!, dispatch, getState, extra);

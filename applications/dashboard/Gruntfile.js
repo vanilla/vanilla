@@ -27,7 +27,7 @@ module.exports = function(grunt) {
                 files: ["Gruntfile.js"],
             },
             sass: {
-                files: ["scss/**/*.scss"],
+                files: ["scss/**/*.scss", "../../**/scss/**/*.scss"],
                 tasks: ["sass_globbing", "sass", "autoprefixer"],
             },
             livereload: {
@@ -115,13 +115,7 @@ module.exports = function(grunt) {
                             "color-themes-for-google-code-prettify/dist/themes/tomorrow.css",
                         ],
                         dest: "design/vendors",
-                    },
-                    {
-                        expand: true,
-                        cwd: "bower_components",
-                        src: ["bootstrap/LICENSE", "bootstrap/scss/*.scss", "bootstrap/scss/mixins/*.scss"],
-                        dest: "scss/vendors",
-                    },
+                    }
                 ],
             },
             styleguide: {
@@ -208,19 +202,6 @@ module.exports = function(grunt) {
             },
         },
 
-        imagemin: {
-            dist: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: "design/images",
-                        src: "**/*.{gif,jpeg,jpg,png,svg}",
-                        dest: "design/images",
-                    },
-                ],
-            },
-        },
-
         sass_globbing: {
             vendors: {
                 files: {
@@ -260,5 +241,5 @@ module.exports = function(grunt) {
 
     grunt.registerTask("wiredep", ["copy:main"]);
 
-    grunt.registerTask("default", ["sass_globbing", "sass", "autoprefixer", "concat:dist", "imagemin"]);
+    grunt.registerTask("default", ["sass_globbing", "sass", "autoprefixer", "concat:dist"]);
 };

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 
@@ -15,17 +15,21 @@ interface IProps {
 /**
  * A class for handling an ILoadable and display error, loading, or children.
  */
-export default class PageLoader extends React.PureComponent<IProps, {}> {
-    public render(): React.ReactNode {
-        switch (this.props.status) {
-            case LoadStatus.SUCCESS:
-                document.body.classList.remove("isLoading");
-                return this.props.children;
-            case LoadStatus.LOADING:
-                document.body.classList.add("isLoading");
-                return <Loader />;
-            default:
-                return null;
+const PageLoader: React.FC<IProps> = (props: IProps) => {
+    const { status } = props;
+    useLayoutEffect(() => {
+        if (status === LoadStatus.LOADING) {
+            document.body.classList.add("isLoading");
+        } else {
+            document.body.classList.remove("isLoading");
         }
+    }, [status]);
+
+    if (status === LoadStatus.LOADING) {
+        return <Loader />;
+    } else {
+        return <>{props.children}</>;
     }
-}
+};
+
+export default PageLoader;

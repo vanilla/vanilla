@@ -19,13 +19,13 @@ import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownIt
 import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
-import { compose } from "redux";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
+import { ComposeIcon } from "@library/icons/titleBar";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -34,6 +34,7 @@ export class MessagesContents extends React.Component<IProps> {
     public render() {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
+
         return (
             <Frame
                 className={this.props.className}
@@ -46,7 +47,7 @@ export class MessagesContents extends React.Component<IProps> {
                             baseClass={ButtonTypes.ICON}
                             className={classNames(buttonUtils.pushRight)}
                         >
-                            {compose()}
+                            <ComposeIcon />
                         </LinkAsButton>
                     </FrameHeaderWithAction>
                 }
@@ -56,7 +57,7 @@ export class MessagesContents extends React.Component<IProps> {
                         <LinkAsButton
                             className={classNames(buttonUtils.pushLeft)}
                             to={"/messages/inbox"}
-                            baseClass={ButtonTypes.TEXT}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
                         >
                             {t("All Messages")}
                         </LinkAsButton>
@@ -111,7 +112,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
  * @param state Current Redux store state.
  */
 function mapStateToProps(state: IConversationsStoreState) {
-    let countUnread: number = 0;
+    let countUnread = 0;
     const data: IMeBoxMessageItem[] = [];
     const { conversationsByID } = state.conversations;
 

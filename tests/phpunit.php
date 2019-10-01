@@ -1,7 +1,15 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use VanillaTests\NullContainer;
 
+// Use consistent timezone for all tests.
+date_default_timezone_set("UTC");
+
+error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
     'PHPUnit\\Framework\\TestCase' => 'PHPUnit_Framework_TestCase', // See https://github.com/php-fig/log/pull/52
@@ -15,6 +23,7 @@ foreach ($classCompatibility as $class => $legacyClass) {
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
+define("PATH_FIXTURES", PATH_ROOT . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "fixtures");
 
 // Copy the cgi-bin files.
 $dir = PATH_ROOT.'/cgi-bin';
@@ -22,10 +31,11 @@ if (!file_exists($dir)) {
     mkdir($dir);
 }
 
-$files = glob(__DIR__."/travis/templates/vanilla/cgi-bin/*.php");
+$files = glob(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
 foreach ($files as $file) {
     $dest = $dir.'/'.basename($file);
     $r = copy($file, $dest);
+    echo "Copy $file to $dest";
 }
 
 // ===========================================================================

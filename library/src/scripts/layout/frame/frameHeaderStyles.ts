@@ -5,10 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { appearance, colorOut, paddings, singleBorder, unit, margins, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent } from "csx";
+import { calc, em, percent } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const frameHeaderClasses = useThemeCache(() => {
@@ -39,13 +39,17 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
+    const rootMinimal = style("rootMinimal", {
+        display: "block",
+    });
+
     const backButton = style("backButton", {
         display: "flex",
         flexWrap: "nowrap",
         justifyContent: "center",
         alignItems: "flex-end",
         flexShrink: 1,
-        transform: `translateX(-5px) translateY(-1px)`,
+        transform: `translateX(-6px) translateY(-1px)`,
     });
 
     const heading = style("heading", {
@@ -54,8 +58,21 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexGrow: 1,
         margin: 0,
         textOverflow: "ellipsis",
+        width: calc(`100% - ${formElVars.sizing.height}`),
+        flexBasis: calc(`100% - ${formElVars.sizing.height}`),
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
+    });
+
+    const headingMinimal = style("headingMinimal", {
+        ...flexHelper().middle(),
+        ...paddings({ horizontal: 24 }),
+        $nest: {
+            "& *": {
+                textTransform: "uppercase",
+                fontSize: unit(globalVars.fonts.size.small),
+            },
+        },
     });
 
     const left = style("left", {
@@ -86,8 +103,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         position: "relative",
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
-        width: unit(spacerWidth),
+        width: unit(formElVars.sizing.height),
+        flexBasis: unit(formElVars.sizing.height),
         color: colorOut(vars.colors.fg),
+        transform: `translateX(10px)`,
         $nest: {
             "&:not(.focus-visible)": {
                 outline: 0,
@@ -102,8 +121,34 @@ export const frameHeaderClasses = useThemeCache(() => {
         display: "block",
     });
 
+    const close = style("close", {
+        ...appearance(),
+        cursor: "pointer",
+        height: unit(formElVars.sizing.height),
+        width: unit(formElVars.sizing.height),
+        flexBasis: unit(formElVars.sizing.height),
+        padding: 0,
+        border: 0,
+    });
+
+    const closeMinimal = style("closeMinimal", {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        ...margins({ vertical: "auto" }),
+        right: unit(6),
+    });
+
+    const categoryIcon = style("categoryIcon", {
+        flexBasis: unit(18),
+        marginRight: ".6em",
+        opacity: 0.8,
+    });
+
     return {
+        closeMinimal,
         root,
+        rootMinimal,
         backButton,
         heading,
         left,
@@ -111,5 +156,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         leftSpacer,
         action,
         backButtonIcon,
+        close,
+        categoryIcon,
+        headingMinimal,
     };
 });

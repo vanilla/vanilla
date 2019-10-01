@@ -8,8 +8,8 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { clear } from "@library/icons/common";
 import classNames from "classnames";
+import { ClearIcon } from "@library/icons/common";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;
@@ -24,12 +24,11 @@ export function ClearButton(props: IProps) {
         <Button
             baseClass={ButtonTypes.ICON}
             className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
-            type="button"
             onClick={props.onClick}
             title={t("Clear")}
             aria-label={t("Clear")}
         >
-            {clear()}
+            <ClearIcon />
         </Button>
     );
 }

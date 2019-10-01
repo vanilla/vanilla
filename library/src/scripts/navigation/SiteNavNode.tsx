@@ -7,15 +7,15 @@
 import React from "react";
 import classNames from "classnames";
 import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
-import { downTriangle, rightTriangle } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import Hoverable from "@library/dom/Hoverable";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SiteNavContext } from "@library/navigation/SiteNavContext";
-import TabHandler from "@library/dom/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api/core";
+import { Hoverable } from "@vanilla/react-utils";
+import { TabHandler } from "@vanilla/dom-utils";
+import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -42,7 +42,7 @@ export default class SiteNavNode extends React.Component<IProps> {
 
     public render() {
         const depthClass = `hasDepth-${this.props.depth + 1}`;
-        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType;
+        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
         const classes = siteNavNodeClasses();
 
         const { activeRecord } = this.props;
@@ -110,7 +110,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible && collapsible ? (
+                {collapsible ? (
                     <div
                         className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,
@@ -125,7 +125,11 @@ export default class SiteNavNode extends React.Component<IProps> {
                             baseClass={ButtonTypes.CUSTOM}
                             className={classNames("siteNavNode-toggle", classes.toggle)}
                         >
-                            {this.isOpen ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
+                            {this.isOpen ? (
+                                <DownTriangleIcon title={t("Expand")} />
+                            ) : (
+                                <RightTriangleIcon title={t("Collapse")} />
+                            )}
                         </Button>
                     </div>
                 ) : null}

@@ -16,18 +16,6 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     private $baseUrl = '/authenticate';
 
     /**
-     * Assert that there is not currently a user in the session.
-     *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    public function assertNoSession() {
-        /* @var \Gdn_Session $session */
-        $session = $this->container()->get(\Gdn_Session::class);
-        $this->assertEquals(0, $session->UserID);
-    }
-
-    /**
      * Assert that a given user has a session.
      *
      * @param int|null $expected The expected user or **null** for the current user.

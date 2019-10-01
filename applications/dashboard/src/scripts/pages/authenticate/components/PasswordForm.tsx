@@ -17,6 +17,8 @@ import { connect } from "react-redux";
 import { LoadStatus } from "@library/@types/api/core";
 import { postAuthenticatePassword } from "@dashboard/pages/authenticate/passwordActions";
 import { IAuthenticatePasswordParams } from "@dashboard/@types/api/authenticate";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import classNames from "classnames";
 
 interface IProps {
     passwordState: IPasswordState;
@@ -52,6 +54,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
     public render() {
         let formDescribedBy;
         const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState.error, ["username", "password"]);
+        const classes = inputBlockClasses();
         if (globalErrorMessage) {
             formDescribedBy = this.formDescriptionID;
         }
@@ -65,12 +68,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 onSubmit={this.handleSubmit}
                 noValidate
             >
-                <Paragraph
-                    id={this.formDescriptionID}
-                    className="authenticateUser-paragraph"
-                    children={globalErrorMessage}
-                    isError={true}
-                />
+                <Paragraph id={this.formDescriptionID} className="authenticateUser-paragraph" isError={true}>
+                    globalErrorMessage
+                </Paragraph>
                 <InputTextBlock
                     label={t("Email/Username")}
                     errors={getFieldErrors(this.props.passwordState.error, "username")}
@@ -95,7 +95,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                         value: this.state.password,
                     }}
                 />
-                <div className="inputBlock inputBlock-tighter">
+                <div className={classNames(classes.root)}>
                     <div className="rememberMeAndForgot">
                         <span className="rememberMeAndForgot-rememberMe">
                             <Checkbox

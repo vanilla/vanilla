@@ -12,7 +12,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
-import { log, logWarning } from "@library/utility/utils";
+import { logDebug, logWarning } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
@@ -55,7 +55,7 @@ export function styleFactory(componentName: string) {
 
         if (shouldLogDebug) {
             logWarning(`Debugging component ${debugName}`);
-            log(styleObjs);
+            logDebug(styleObjs);
         }
 
         return style({ $debugName: debugName }, ...styleObjs);
@@ -70,12 +70,12 @@ export function styleFactory(componentName: string) {
  * @param callback The function to wrap.
  */
 export function useThemeCache<Cb>(callback: Cb): Cb {
-    const makeCacheKey = () => {
+    const makeCacheKey = (...args) => {
         const storeState = getDeferredStoreState<ICoreStoreState, null>(null);
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState ? storeState.theme.assets.status : "not loaded yet";
         const cacheKey = themeKey + status;
-        return cacheKey;
+        return cacheKey + JSON.stringify(args);
     };
     return memoize(callback as any, makeCacheKey);
 }

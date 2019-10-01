@@ -659,7 +659,7 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function post_register(array $body) {
-        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+        $this->permission([\Vanilla\Permissions::BAN_CSRF, \Vanilla\Permissions::BAN_PRIVATE]);
 
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);
@@ -752,7 +752,7 @@ class UsersApiController extends AbstractApiController {
      * @throws Exception Throws all exceptions to the dispatcher.
      */
     public function post_requestPassword(array $body) {
-        $this->permission();
+        $this->permission(\Vanilla\Permissions::BAN_PRIVATE);
 
         $in = $this->schema([
             'email:s' => 'The email/username of the user.',

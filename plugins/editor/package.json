@@ -1,5 +1,6 @@
 {
     "name": "advanced-editor",
+    "version": "3.0.1",
     "private": true,
     "devDependencies": {
         "fibers": "4.0.1",
@@ -14,11 +15,8 @@
         "sass": "1.20.1",
         "time-grunt": "2.0.0"
     },
-    "engines": {
-        "node": ">=10.0.0"
-    },
     "scripts": {
-        "install": "bower install",
+        "install": "bower install --allow-root",
         "build": "grunt",
         "watch": "grunt watch"
     }

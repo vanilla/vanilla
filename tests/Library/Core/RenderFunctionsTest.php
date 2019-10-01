@@ -7,19 +7,37 @@
 
 namespace VanillaTests\Library\Core;
 
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
+use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends SharedBootstrapTestCase {
+class RenderFunctionsTest extends TestCase {
+
+    use HtmlNormalizeTrait;
+    use SiteTestTrait {
+        setupBeforeClass as siteTestBeforeClass;
+    }
+
     /**
      * Make sure the render functions are included.
      */
     public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
+        self::$addons = ['dashboard']; // Needed for render paths.
+        self::siteTestBeforeClass();
         require_once PATH_ROOT.'/library/core/functions.render.php';
     }
+
+    /**
+     * Cleanup the html normalize trait.
+     */
+    public function tearDown() {
+        parent::tearDown();
+        $this->shouldReplaceSVGs = true;
+    }
+
 
     /**
      * Test a basic {@link userBuilder()}.
@@ -55,5 +73,113 @@ class RenderFunctionsTest extends SharedBootstrapTestCase {
         $user = userBuilder($userRow, ['Blarg', 'First']);
         $this->assertSame(234, $user->UserID);
         $this->assertSame('Barry', $user->Name);
+    }
+
+    /**
+     * Test the dashboardSymbol() function.
+     *
+     * @param array $params
+     * @param string $expectedHtml
+     *
+     * @dataProvider provideSymbolArgs
+     */
+    public function testDashboardSymbol(array $params, string $expectedHtml) {
+        $actual = dashboardSymbol(...$params);
+        $this->shouldReplaceSVGs = false;
+        $this->assertHtmlStringEqualsHtmlString($expectedHtml, $actual);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideSymbolArgs(): array {
+        return [
+            'simple' => [
+                ['testName', 'testClass'],
+                '<svg alt="testName" class="icon icon-svg testClass" viewbox="0 0 17 17">
+                    <use xlink:href="#testName"></use>
+                </svg>',
+            ],
+            'compat attributes' => [
+                ['testName', '', ['class' => 'testClass', 'alt' => 'testAlt']],
+                '<svg alt="testAlt" class="icon icon-svg testClass" viewbox="0 0 17 17">
+                    <use xlink:href="#testName"></use>
+                </svg>',
+            ],
+            'arbitrary attributes' => [
+                ['testName', '', ['data-test' => 'test', 'data-xss' => "\"><script>alert('hi')</script>"]],
+                '<svg
+                    alt="testName"
+                    class="icon icon-svg"
+                    viewbox="0 0 17 17"
+                    data-test="test"
+                    data-xss="&quot;&gt;&lt;script&gt;alert(\'hi\')&lt;/script&gt;"
+                >
+                    <use xlink:href="#testName"></use>
+                </svg>',
+            ],
+        ];
+    }
+
+    /**
+     * Tests for the heading function.
+     *
+     * @param array $params
+     * @param string $expectedHtml
+     *
+     * @dataProvider provideHeadingArgs
+     */
+    public function testDashboardHeading(array $params, string $expectedHtml) {
+        $actual = heading(...$params);
+        $this->assertHtmlStringEqualsHtmlString($expectedHtml, $actual);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideHeadingArgs(): array {
+        return [
+            'simple title' => [
+                ["Hello! <dont-escape-me></dont-escape-me> me once"],
+                "
+                <header class=header-block>
+                    <div class=title-block>
+                    <h1>Hello!<dont-escape-me></dont-escape-me> me once</h1></div>
+                </header>",
+            ],
+            'title with return' => [
+                [
+                    'Hello',
+                    '',
+                    '',
+                    '',
+                    'https://test.com/back',
+                ],
+                "<header class=header-block>
+                    <div class=title-block>
+                        <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
+                        <h1>Hello</h1>
+                    </div>
+                </header>"
+            ],
+            'with buttons' => [
+                [
+                    'Hello',
+                    'button',
+                    'http://test.com/button',
+                    ['data-test' => 'test'],
+                    'https://test.com/back',
+                ],
+                "<header class=header-block>
+                    <div class=title-block>
+                        <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
+                        <h1>Hello</h1>
+                    </div>
+                    <div class=btn-container>
+                        <a class='btn btn-primary' data-test=test href=http://test.com/button>button</a>
+                    </div>
+                </header>"
+            ]
+        ];
     }
 }

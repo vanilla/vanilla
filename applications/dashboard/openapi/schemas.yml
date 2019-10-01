@@ -19,33 +19,24 @@ components:
     UserFragment:
       type: object
       properties:
+        userID:
+          description: The ID of the user.
+          type: integer
+        name:
+          description: The username of the user.
+          minLength: 1
+          type: string
+        photoUrl:
+          description: The URL of the user's avatar picture.
+          minLength: 1
+          type: string
         dateLastActive:
           description: Time the user was last active.
           format: date-time
           nullable: true
           type: string
-        isAdmin:
-          type: boolean
-        name:
-          description: The username of the user.
-          minLength: 1
-          type: string
-        permissions:
-          description: Global permissions available to the current user.
-          items:
-            type: string
-          type: array
-        photoUrl:
-          description: The URL of the user's avatar picture.
-          minLength: 1
-          type: string
-        userID:
-          description: The ID of the user.
-          type: integer
       required:
       - userID
       - name
       - photoUrl
       - dateLastActive
-      - isAdmin
-      - permissions

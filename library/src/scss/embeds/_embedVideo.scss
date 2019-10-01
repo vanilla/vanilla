@@ -88,6 +88,7 @@ $embedVideo_width: $embed_width;
     @include absolute-fullSizeOfParent;
     cursor: pointer;
     overflow: hidden;
+    border: none;
 }
 
 .embedVideo-playIcon {

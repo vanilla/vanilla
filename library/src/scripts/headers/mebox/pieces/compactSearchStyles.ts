@@ -22,7 +22,7 @@ export const compactSearchVariables = useThemeCache(() => {
     const colors = makeVars("colors", {
         bg: baseColor.fade(0.8),
         fg: titleBarVars.colors.fg,
-        placeholder: globalVars.mainColors.bg,
+        placeholder: titleBarVars.colors.fg.fade(0.8),
         active: {
             bg: baseColor,
         },
@@ -45,6 +45,7 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             "& .searchBar__input": {
                 color: colorOut(vars.colors.fg),
+                width: percent(100),
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),

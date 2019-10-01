@@ -8,10 +8,10 @@ import React from "react";
 import { paragraphMenuCheckRadioClasses } from "../paragraphMenuBarStyles";
 import classNames from "classnames";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-import { check } from "@library/icons/common";
 import { style } from "typestyle";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { CheckIcon } from "@library/icons/common";
 
 export interface IMenuCheckRadio {
     checked: boolean;
@@ -58,14 +58,16 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
                 aria-checked={checked}
                 type="button"
                 onClick={onClick}
-                disabled={!!this.props.disabled}
-                tabIndex={!!this.props.disabled ? -1 : 0}
+                disabled={this.props.disabled}
+                tabIndex={this.props.disabled ? -1 : 0}
                 data-firstletter={text.toLowerCase().substr(0, 1)}
             >
                 <span className={classes.icon}>{icon}</span>
                 <span className={classes.checkRadioLabel}>{text}</span>
                 {checked && (
-                    <span className={classes.checkRadioSelected}>{check(classNames(checkStyle, iconStyle))}</span>
+                    <span className={classes.checkRadioSelected}>
+                        {<CheckIcon className={classNames(checkStyle, iconStyle)} />}
+                    </span>
                 )}
             </button>
         );

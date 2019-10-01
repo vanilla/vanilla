@@ -28,19 +28,36 @@ class DashboardHooks extends Gdn_Plugin {
     /** @var \Vanilla\AddonManager */
     private $addonManager;
 
+    /** @var Emoji */
+    private $emoji;
+
     /**
      * Constructor for DI.
      *
      * @param \Vanilla\AddonManager $addonManager
      * @param Contracts\ConfigurationInterface $config
+     * @param Emoji $emoji
      */
-    public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config) {
+    public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config, Emoji $emoji) {
         parent::__construct();
         $this->addonManager = $addonManager;
         $this->mobileThemeKey = $config->get('Garden.MobileTheme');
         $this->desktopThemeKey = $config->get('Garden.Theme');
+        $this->emoji = $emoji;
     }
 
+    /**
+     * Add emoji config to a controller's JavaScript definitions object.
+     *
+     * @param Gdn_Controller $controller
+     */
+    private function addEmojiDefinitions(Gdn_Controller $controller) {
+        if ($this->emoji->isEnabled() === false) {
+            return;
+        }
+
+        $controller->addDefinition("emoji", $this->emoji->getWebConfig());
+    }
 
     /**
      * Install the formatter to the container.
@@ -204,12 +221,6 @@ class DashboardHooks extends Gdn_Plugin {
         if ($embed = c('Garden.Embed.Allow')) {
             // Record the remote url where the forum is being embedded.
             $remoteUrl = c('Garden.Embed.RemoteUrl');
-            if (!$remoteUrl) {
-                $remoteUrl = getIncomingValue('remote');
-                if ($remoteUrl) {
-                    saveToConfig('Garden.Embed.RemoteUrl', $remoteUrl);
-                }
-            }
             if ($remoteUrl) {
                 $sender->addDefinition('RemoteUrl', $remoteUrl);
             }
@@ -261,12 +272,13 @@ class DashboardHooks extends Gdn_Plugin {
             $sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
         }
 
-
-
         // Add symbols.
         if ($sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
             $sender->addAsset('Symbols', $sender->fetchView('symbols', '', 'Dashboard'));
         }
+
+        // Add emoji.
+        $this->addEmojiDefinitions($sender);
     }
 
     /**
@@ -351,7 +363,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
 
             ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
-            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'site-settings.locales', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/settings/locales', 'site-settings.locales', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)

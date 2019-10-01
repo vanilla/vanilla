@@ -3,9 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut, IBackground, emphasizeLightness } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    ColorValues,
+    emphasizeLightness,
+    IBackground,
+    IBorderRadiusOutput,
+    modifyColorBasedOnLightness,
+    radiusValue,
+} from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, ColorHelper, percent, viewHeight } from "csx";
+import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { color, ColorHelper, percent } from "csx";
+import { TLength } from "typestyle/lib/types";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -19,9 +30,8 @@ export const globalVariables = useThemeCache(() => {
 
     const elementaryColors = {
         black: color("#000"),
-        grey: color("#555a62"),
         white: color("#fff"),
-        transparent: `transparent`,
+        transparent: "transparent" as ColorValues,
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
@@ -34,7 +44,7 @@ export const globalVariables = useThemeCache(() => {
     colorPrimary = initialMainColors.primary;
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.05),
+        secondary: emphasizeLightness(colorPrimary, 0.065),
     });
 
     const mainColors = {
@@ -54,7 +64,7 @@ export const globalVariables = useThemeCache(() => {
         return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const feedbackColors = makeThemeVars("feedbackColors", {
+    const messageColors = makeThemeVars("messageColors", {
         warning: {
             fg: color("#4b5057"),
             bg: color("#fff1ce"),
@@ -71,13 +81,15 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
+    const linkColorDefault = mainColors.secondary;
+    const linkColorState = emphasizeLightness(colorPrimary, 0.09);
     const links = makeThemeVars("links", {
         colors: {
-            default: mainColors.primary,
-            hover: mainColors.secondary,
-            focus: mainColors.secondary,
-            accessibleFocus: mainColors.secondary,
-            active: mainColors.secondary,
+            default: linkColorDefault,
+            hover: linkColorState,
+            focus: linkColorState,
+            accessibleFocus: linkColorState,
+            active: linkColorState,
             visited: undefined,
         },
     });
@@ -110,7 +122,7 @@ export const globalVariables = useThemeCache(() => {
         base: 1.5,
         condensed: 1.25,
         code: 1.45,
-        excerpt: 1.45,
+        excerpt: 1.4,
         meta: 1.5,
     });
 
@@ -158,7 +170,8 @@ export const globalVariables = useThemeCache(() => {
             headings: {
                 capitalLetterRatio: 0.715, // Calibrated for Open Sans
                 verticalOffset: 1, // Calibrated for Open Sans
-                horizontal: -0.082, // Calibrated for Open Sans
+                horizontal: -0.03, // Calibrated for Open Sans
+                verticalOffsetForAdjacentElements: "-.13em", // Calibrated for Open Sans
             },
         },
     });
@@ -184,7 +197,7 @@ export const globalVariables = useThemeCache(() => {
 
     const embed = makeThemeVars("embed", {
         error: {
-            bg: feedbackColors.error,
+            bg: messageColors.error,
         },
         focus: {
             color: mainColors.primary,
@@ -303,11 +316,46 @@ export const globalVariables = useThemeCache(() => {
         hyphenationZone: "6em",
     });
 
+    // This function should not be used in production, but is helpful for development.
+    // Helps to find the right "mix" of bg and fg for a target hex color
+
+    const findColorMatch = (hexCode: string) => {
+        if (process.env.NODE_ENV === "development") {
+            logWarning("Don't use 'findColorMatch' in production");
+            const globalVars = globalVariables();
+            const colorToMatch = color(hexCode.replace("#", ""));
+            const max = 100;
+            const lightnessPrecision = 3;
+            const targetLightness = colorToMatch.lightness().toFixed(lightnessPrecision);
+            for (let i = 0; i <= max; i++) {
+                const mix = i / max;
+                const currentColor = globalVars.mixBgAndFg(mix);
+                if (currentColor.toHexString() === colorToMatch.toHexString()) {
+                    logDebug("---exact match");
+                    logDebug("real grey: " + colorToMatch.toHexString());
+                    logDebug("target grey: " + currentColor.toHexString());
+                    logDebug("mix: " + mix);
+                    logDebug("---");
+                    i = max;
+                    return;
+                }
+                if (currentColor.lightness().toFixed(lightnessPrecision) === targetLightness) {
+                    logDebug("---lightness match: " + mix);
+                    i = max;
+                    return;
+                }
+            }
+        } else if (process.env.NODE_ENV === "test") {
+            throw new Error("Don't use 'findColorMatch' in production");
+        }
+        logError("The function 'findColorMatch' is not meant for production");
+    };
+
     return {
         utility,
         elementaryColors,
         mainColors,
-        feedbackColors,
+        messageColors,
         body,
         border,
         meta,
@@ -330,8 +378,16 @@ export const globalVariables = useThemeCache(() => {
         mixPrimaryAndBg,
         separator,
         userContentHyphenation,
+        findColorMatch,
     };
 });
+
+export interface IGlobalBorderStyles extends IBorderRadiusOutput {
+    color: ColorValues;
+    width: BorderWidthProperty<TLength> | number;
+    style: BorderStyleProperty;
+    radius?: radiusValue;
+}
 
 export enum IIconSizes {
     SMALL = "small",

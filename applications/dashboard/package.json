@@ -1,7 +1,15 @@
 {
-    "name": "dashboard3",
+    "name": "@vanilla/addon-dashboard",
+    "version": "3.0.1",
     "private": true,
+    "workspaces": {
+        "nohoist": [
+            "grunt*"
+        ]
+    },
     "devDependencies": {
+        "@vanilla/library": "^3.0.1",
+        "@vanilla/utils": "^3.0.1",
         "bower": "1.8.8",
         "fibers": "4.0.1",
         "grunt": "1.0.4",
@@ -19,11 +27,8 @@
         "sass": "1.20.1",
         "time-grunt": "2.0.0"
     },
-    "engines": {
-        "node": ">=10.0.0"
-    },
     "scripts": {
-        "install": "bower install",
+        "install": "bower install --allow-root",
         "build": "grunt",
         "watch": "grunt watch"
     }

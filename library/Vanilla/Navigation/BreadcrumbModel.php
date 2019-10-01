@@ -70,4 +70,22 @@ class BreadcrumbModel {
 
         return json_encode($data);
     }
+
+    /**
+     * Convert an array of breadcrumbs into
+     *
+     * @param array Breadcrumb[] $crumbs The array of breadcrumbs to convert to JSON-LD.
+     *
+     * @return array Breadcrumb data as array of structure ['Name'=>'', 'Url'=>'//'].
+     */
+    public function crumbsAsArray(array $crumbs): array {
+        $crumbList = [];
+        foreach ($crumbs as $index => $crumb) {
+            $crumbList[] = [
+                'Name' => $crumb->getName(),
+                'Url' => $crumb->getUrl(),
+            ];
+        }
+        return $crumbList;
+    }
 }

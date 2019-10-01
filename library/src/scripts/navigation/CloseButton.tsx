@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
-import { close, closeCompact } from "@library/icons/common";
+import { CloseCompactIcon, CloseIcon } from "@library/icons/common";
 
 interface IProps {
     className?: string;
@@ -24,7 +24,7 @@ interface IProps {
  */
 export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
-        baseClass: ButtonTypes.CUSTOM,
+        baseClass: ButtonTypes.ICON,
         compact: false,
     };
 
@@ -37,13 +37,12 @@ export default class CloseButton extends React.PureComponent<IProps> {
         return (
             <Button
                 disabled={this.props.disabled}
-                type="button"
                 className={componentClasses}
                 title={closeLabel}
                 onClick={this.props.onClick}
                 baseClass={this.props.baseClass}
             >
-                {this.props.compact ? closeCompact() : close()}
+                {this.props.compact ? <CloseCompactIcon /> : <CloseIcon />}
             </Button>
         );
     }

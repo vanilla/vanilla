@@ -61,7 +61,7 @@
   }
 
   .flag {
-    margin-top: -.0625rem;
+    margin-top: -1px;
     margin-bottom: $spacer / 2;
   }
 
@@ -73,7 +73,7 @@
   }
 
   .media-image {
-    height: 10rem;
+    height: 160px;
     border: $border-width solid $border-color;
   }
 
@@ -245,7 +245,7 @@
   // For the theme info popups, make the image half the width of the container, and make sure it doesn't get too tall.
   .modal & .media-left {
     @extend .col-xs-12;
-    max-height: to-rem(180);
+    max-height: 180px;
     overflow: hidden;
   }
 }
@@ -280,22 +280,22 @@
 
   .media-left {
     padding-right: $spacer / 2;
-    height: to-rem(30);
+    height: 30px;
   }
 
   .media-image-wrap {
     display: inline-block;
-    @include image-wrap(to-rem(30), to-rem(30), .0625rem);
+    @include image-wrap(30px, 30px, 1px);
   }
 
   .media-image-wrap-no-border {
     display: inline-block;
-    @include image-wrap(to-rem(30), to-rem(30), .0625rem, false, transparent);
+    @include image-wrap(30px, 30px, 1px, false, transparent);
     margin-right: $spacer / 2;
   }
 
   .media-title {
-    margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+    margin-bottom: 30px - $font-size-tables - $font-size-sm;
     font-size: $font-size-tables;
     line-height: 1;
 

@@ -1740,7 +1740,11 @@ if (!function_exists('getAllMentions')) {
                 $parts2 = preg_split('`([\s.,;?!:])`', $part, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
             }
-            $mentions[] = $mention;
+
+            // Filter empty mentions
+            if ($mention) {
+                $mentions[] = $mention;
+            }
         }
 
         return $mentions;
@@ -3047,7 +3051,19 @@ if (!function_exists('redirectTo')) {
         // Encode backslashes because most modern browsers convert backslashes to slashes.
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
-        safeHeader('Location: '.$url, true, $statusCode);
+
+        if (Gdn::controller() !== null
+            && in_array(Gdn::controller()->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)
+            && Gdn::controller()->deliveryMethod() === DELIVERY_METHOD_JSON) {
+            // This is a bit of a kludge, but it solves a perpetual gotcha when we switch full page forms to AJAX forms and forget about redirects.
+            echo json_encode([
+                'FormSaved' => true,
+                'RedirectUrl' => $url,
+                'RedirectTo' => $url,
+            ]);
+        } else {
+            safeHeader('Location: ' . $url, true, $statusCode);
+        }
         exit();
     }
 }

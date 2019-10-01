@@ -182,7 +182,8 @@ class Gdn_Database {
             } catch (Exception $ex) {
                 if ($ex instanceof PDOException &&
                     microtime(true) < $timeoutAt &&
-                    ($ex->getCode() === 1203 || $ex->getCode() === 1040 || $ex->getCode() === 1226)) {
+                    in_array($ex->getCode(), [1203, 1040, 1226])
+                ) {
                     /*
                      * https://dev.mysql.com/doc/refman/5.7/en/server-error-reference.html
                      * ---

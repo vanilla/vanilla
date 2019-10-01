@@ -76,6 +76,14 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     yarn test
+    frontend_validate_es5:
+        executor: core/node
+        steps:
+            - *attach_workspace
+            - run: |
+                npx es-check es5 ./dist/polyfills.min.js
+                npx es-check es5 ./dist/forum/vendors.min.js
+                npx es-check es5 ./dist/forum/shared.min.js
     frontend_lint:
         executor: core/node
         steps:

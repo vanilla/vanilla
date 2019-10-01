@@ -60,7 +60,7 @@
         "webfontloader": "1.6.28"
     },
     "devDependencies": {
-        "@babel/core": "^7.4.0",
+        "@babel/core": "^7.6.2",
         "@emotion/core": "^10.0.7",
         "@hot-loader/react-dom": "^16.8.6",
         "@storybook/addon-a11y": "^5.2.1",

@@ -23,7 +23,7 @@ const runtimePlugins =
           ];
 
 if ((process.env.NODE_ENV = "production" || process.env.DEV_COMPAT === "compat")) {
-    envOptions.targets = "ie > 10, last 4 versions";
+    envOptions.targets = "ie > 10, last 4 versions, not dead, safari 8";
 }
 
 const preset = {

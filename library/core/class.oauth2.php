@@ -7,6 +7,7 @@
  * @since 2.0
  */
 
+use SessionModel;
 
 /**
  * Class Gdn_OAuth2
@@ -59,6 +60,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     private $ssoUtils;
 
+    private $sessionModel;
+
     /**
      * Set up OAuth2 access properties.
      *
@@ -68,6 +71,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
         $this->provider = $this->provider();
+        $this->sessionModel = new SessionModel();
         if ($accessToken) {
             // We passed in a connection
             $this->accessToken = $accessToken;
@@ -564,8 +568,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             throw new Gdn_UserException('The code parameter is either not set or empty.');
         }
 
-        Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
-
         $response = $this->requestAccessToken($code);
         if (!$response) {
             throw new Gdn_UserException('The OAuth server did not return a valid response.');
@@ -621,19 +623,22 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
+                $this->modifyCacheHeaders($sender);
                 redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is base_ConnectData_Handler() in this class.
-                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => val('access_token', $response), 'RefreshToken' => val('refresh_token', $response), 'Profile' => $profile]);
+                $sessionModel = new SessionModel();
+                // Save the access token and the profile to the session table, set expiry to 3 minutes.
+                $stashID = $sessionModel->insert(['Attributes' => ['AccessToken' => $response['access_token'] , 'RefreshToken' => $response['refresh_token'], 'Profile' => $profile], 'DateExpires' => date(MYSQL_DATE_FORMAT, time() + 3*60)]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
-                //pass the target if there is one so that the user will be redirected to where the request originated.
-                if ($target = val('target', $state)) {
-                    $url .= '?Target='.urlencode($target);
-                }
+                // Pass the "sessionID" to in the query so that it can be retrieved.
+                $url .= '?'.http_build_query(array_filter(['Target' => urlencode($state['target']) ?? '', 'stashID' => $stashID]));
+                // Pass no-cache headers.
+                $this->modifyCacheHeaders($sender);
+                // Redirect to the connect script.
                 redirectTo($url);
                 break;
         }
@@ -651,12 +656,31 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             return;
         }
 
-        // Retrieve the profile that was saved to the session in the entry controller.
-        $savedProfile = Gdn::session()->stash($this->getProviderKey(), '', false);
-        if (Gdn::session()->stash($this->getProviderKey(), '', false)) {
-            $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile]);
+        /* @var Gdn_Form $form */
+        $form = $sender->Form; //new gdn_Form();
+
+        if ($form->isPostBack()) {
+            $stashID = $form->getFormValue('stashID');
+        } else {
+            $stashID = $sender->Request->get('stashID');
         }
-        $profile = val('Profile', $savedProfile);
+
+        if (!$stashID) {
+            $this->log('Missing stashID', ['POST' => $sender->Request->post(),'GET' => $sender->Request->get()]);
+            throw new Gdn_UserException('Missing session, please go back and log in again.');
+        }
+
+        if ($stashID) {
+            $sessionModel = new SessionModel();
+            $savedProfile = $sessionModel->getActiveSession($stashID);
+            if ($savedProfile['Attributes']) {
+                $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile['Attributes']]);
+            } else {
+                $this->log('Base Connect Data Profile Not Found in Session', []);
+            }
+        }
+        // Retrieve the profile that was saved to the session in the entryEndPoint.
+        $profile = val('Profile', $savedProfile['Attributes']);
         $accessToken = val('AccessToken', $savedProfile);
         $refreshToken = val('RefreshToken', $savedProfile);
 
@@ -664,8 +688,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         trace($accessToken, 'Access Token');
         trace($refreshToken, 'Refresh Token');
 
-        /* @var Gdn_Form $form */
-        $form = $sender->Form; //new gdn_Form();
 
         // Create a form and populate it with values from the profile.
         $originaFormValues = $form->formValues();
@@ -681,7 +703,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'Profile' => $profile
         ];
         $form->setFormValue('Attributes', $attributes);
-
+        $form->addHidden('stashID', $stashID);
         $sender->EventArguments['Profile'] = $profile;
         $sender->EventArguments['Form'] = $form;
 
@@ -1019,5 +1041,15 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 return [];
             }
         }
+    }
+
+    /**
+     * A convenience method to send nocache and vary headers with requests.
+     *
+     * @param EntryController $sender
+     */
+    protected function modifyCacheHeaders($sender) {
+        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $sender->setHeader('Vary', \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE);
     }
 }

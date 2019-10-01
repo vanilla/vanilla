@@ -28,8 +28,15 @@ class SessionModel extends Gdn_Model {
         if (!isset($fields['DateInserted'])) {
             $fields['DateInserted'] = date(MYSQL_DATE_FORMAT);
         }
+        if (!isset($fields['SessionID'])) {
+            $fields['SessionID'] = betterRandomString(12);
+        }
 
-        return parent::insert($fields);
+        $r = parent::insert($fields);
+        if ($r !== false) {
+            $r = $fields['SessionID'];
+        }
+        return $r;
     }
 
     /**
@@ -58,11 +65,33 @@ class SessionModel extends Gdn_Model {
             return true;
         }
 
+        // If the date expires is null then it never expires.
+        if ($session['DateExpires'] === null) {
+            return false;
+        }
+
         $time = strtotime($session['DateExpires']);
         if ($time && $time < time()) {
             return true;
         }
 
         return false;
+    }
+
+
+    /**
+     * Get a row from the sessions table that has not expired.
+     *
+     * @param int $id
+     * @return array|object
+     * @throws Gdn_UserException
+     */
+    public function getActiveSession($id) {
+        $row = $this->getID($id, DATASET_TYPE_ARRAY);
+
+        if ($this->isExpired($row)) {
+            throw new Gdn_UserException('Session expired, please try again.');
+        }
+        return $row;
     }
 }

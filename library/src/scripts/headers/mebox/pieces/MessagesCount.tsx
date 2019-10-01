@@ -4,39 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
+import { MessagesIcon } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
-import { messages } from "@library/icons/header";
-import Count from "@library/content/Count";
-import classNames from "classnames";
+import React from "react";
 
 interface IProps {
-    countClass?: string;
-    open: boolean;
-    className?: string;
+    open?: boolean;
+    compact: boolean;
 }
 
 /**
  * Implements Messages Drop down for header
  */
-export default class MessagesCount extends React.PureComponent<IProps> {
-    public state = {
-        open: false,
-    };
+export default function MessagesCount(props: IProps) {
+    const { open, compact } = props;
 
-    public render() {
-        const count = 0;
-        return (
-            <div className={classNames(this.props.className, "messagesToggle")}>
-                {messages(this.props.open)}
-                {count > 0 && (
-                    <Count
-                        className={classNames("vanillaHeader-count", this.props.countClass)}
-                        label={t("Messages: ")}
-                        count={count}
-                    />
-                )}
-            </div>
-        );
-    }
+    return (
+        <MeBoxIcon count={0} countLabel={t("Messages") + ": "} compact={compact}>
+            <MessagesIcon filled={!!open} />
+        </MeBoxIcon>
+    );
 }

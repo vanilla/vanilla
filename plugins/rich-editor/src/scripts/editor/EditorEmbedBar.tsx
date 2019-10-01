@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
@@ -44,7 +44,7 @@ export function EditorEmbedBar(props: IProps) {
             >
                 {isMobile && (
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <ParagraphMenusBarToggle disabled={isLoading} mobile={true} />
+                        <ParagraphMenusBarToggle renderAbove={legacyMode} disabled={isLoading} mobile={true} />
                     </li>
                 )}
                 {!isMobile && (
@@ -66,7 +66,7 @@ export function EditorEmbedBar(props: IProps) {
                 </Permission>
 
                 <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                    <EmbedFlyout disabled={isLoading} />
+                    <EmbedFlyout disabled={isLoading} renderAbove={legacyMode} />
                 </li>
 
                 <Permission permission="uploads.add">

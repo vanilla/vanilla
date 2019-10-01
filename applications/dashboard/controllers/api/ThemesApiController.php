@@ -4,85 +4,28 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Schema\Schema;
 use Garden\Web\Data;
-use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\AddonManager;
-use Vanilla\Addon;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\ThemeModel;
-use Vanilla\Theme\Asset;
-use Vanilla\Theme\FontsAsset;
-use Vanilla\Theme\HtmlAsset;
-use Vanilla\Theme\JsonAsset;
-use Vanilla\Utility\InstanceValidatorSchema;
-use Vanilla\Theme\ScriptsAsset;
-use Vanilla\Theme\ImageAsset;
 
 /**
  * API Controller for the `/themes` resource.
  */
 class ThemesApiController extends AbstractApiController {
+    use ThemesApiSchemes;
 
     // Theming
     const GET_THEME_ACTION = "@@themes/GET_DONE";
     const GET_THEME_VARIABLES_ACTION = "@@themes/GET_VARIABLES_DONE";
 
-    const ASSET_TYPES = ['html', 'js', 'json', 'css'];
-
-    const ASSET_LIST = [
-        "header" => [
-            "type" => "html",
-            "file" => "header.html"
-        ],
-        "footer" => [
-            "type" => "html",
-            "file" => "footer.html"
-        ],
-        "variables" => [
-            "type" => "json",
-            "file" => "variables.json"
-        ],
-        "fonts" => [
-            "type" => "json",
-            "file" => "fonts.json"
-        ],
-        "scripts" => [
-            "type" => "json",
-            "file" => "scripts.json"
-        ],
-        "styles" => [
-            "type" => "css",
-            "file" => "styles.css"
-        ],
-        "javascript" => [
-            "type" => "js",
-            "file" => "javascript.js"
-        ],
-    ];
-
-    const ASSET_KEY = "assets";
-
-    /** @var AddonManager */
-    private $addonManager;
-
-    /** @var ConfigurationInterface */
-    private $config;
-
     /** @var ThemeModel */
     private $themeModel;
 
-    /** @var Gdn_Request */
-    private $request;
-
     /**
-     * @inheritdoc
+     * ThemesApiController constructor.
+     * @param ThemeModel $themeModel
      */
-    public function __construct(AddonManager $addonManager, ThemeModel $themeModel, Gdn_Request $request, ConfigurationInterface $config) {
-        $this->addonManager = $addonManager;
-        $this->config = $config;
-        $this->request = $request;
+    public function __construct(ThemeModel $themeModel) {
         $this->themeModel = $themeModel;
     }
 
@@ -117,15 +60,163 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get(string $themeKey): array {
         $this->permission();
+        $out = $this->themeResultSchema('out');
+
+        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey);
+        $result = $out->validate($themeWithAssets);
+        return $result;
+    }
+
+    /**
+     * Create new theme.
+     *
+     * @param array $body Array of incoming params.
+     *        fields: name (required)
+     * @return array
+     */
+    public function post(array $body): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->themePostSchema('in');
 
         $out = $this->themeResultSchema('out');
 
-        $normalizedTheme = $this->normalizeTheme(
-            $this->getThemeByName($themeKey),
-            $this->getAssets($themeKey)
-        );
-        $result = $out->validate($normalizedTheme);
-        return $result;
+        $body = $in->validate($body);
+
+        $normalizedTheme = $this->themeModel->postTheme($body);
+
+        $theme = $out->validate($normalizedTheme);
+        return $theme;
+    }
+
+
+    /**
+     * Update theme name by ID.
+     *
+     * @param int $themeID Theme ID
+     * @param array $body Array of incoming params.
+     *        fields: name (required)
+     * @return array
+     */
+    public function patch(int $themeID, array $body): array {
+        $this->permission("Garden.Settings.Manage");
+        $in = $this->themePostSchema('in');
+        $out = $this->themeResultSchema('out');
+        $body = $in->validate($body);
+
+        $normalizedTheme = $this->themeModel->patchTheme($themeID, $body);
+
+        $theme = $out->validate($normalizedTheme);
+        return $theme;
+    }
+
+    /**
+     * Delete theme by ID.
+     *
+     * @param int $themeID Theme ID
+     */
+    public function delete(int $themeID) {
+        $this->permission("Garden.Settings.Manage");
+        $this->themeModel->deleteTheme($themeID);
+    }
+
+    /**
+     * Set theme as "current" theme.
+     *
+     * @param array $body Array of incoming params.
+     *        fields: themeID (required)
+     * @return array
+     */
+    public function put_current(array $body): array {
+        $this->permission("Garden.Settings.Manage");
+        $in = $this->themePutCurrentSchema('in');
+        $out = $this->themeResultSchema('out');
+        $body = $in->validate($body);
+
+        $theme = $this->themeModel->setCurrentTheme($body['themeID']);
+        $theme = $out->validate($theme);
+        return $theme;
+    }
+
+    /**
+     * Get "current" theme.
+     *
+     * @return array
+     */
+    public function get_current(): ?array {
+        $this->permission();
+        $in = $this->schema([], 'in');
+        $out = $this->themeResultSchema('out');
+
+        $theme = $this->themeModel->getCurrentTheme();
+
+        return $out->validate($theme);
+    }
+
+    /**
+     * PUT theme asset (update existing or create new if asset does not exist).
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
+     * @param array $body Array of incoming params.
+     *              Should have 'data' key with content for asset.
+     *
+     * @return array
+     */
+    public function put_assets(int $themeID, string $assetKey, array $body): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema($this->assetsPutSchema(), 'in');
+        $out = $this->schema($this->assetsSchema(), 'out');
+
+        $body = $in->validate($body);
+        $this->validateAssetKey($assetKey);
+
+        $asset = $this->themeModel->setAsset($themeID, $assetKey, $body['data']);
+
+        return $out->validate($asset);
+    }
+
+    /**
+     * PATCH theme asset variables.json.
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Asset key.
+     *        Note: only 'variables.json' allowed.
+     * @param array $body Array of incoming params.
+     *              Should have 'data' key with content for asset.
+     *
+     * @return array
+     */
+    public function patch_assets(int $themeID, string $assetKey, array $body): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema($this->assetsPutSchema(), 'in');
+        $out = $this->schema($this->assetsSchema(), 'out');
+
+        $body = $in->validate($body);
+        $this->validateAssetKey($assetKey);
+        if ($assetKey !== 'variables') {
+            throw new ClientException('Asset "'.$assetKey.'" does not support PATCH method.', 501);
+        }
+
+        $asset = $this->themeModel->sparseAsset($themeID, $assetKey, $body['data']);
+
+        return $out->validate($asset);
+    }
+
+    /**
+     * DELETE theme asset.
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
+     */
+    public function delete_assets(int $themeID, string $assetKey) {
+        $this->permission("Garden.Settings.Manage");
+
+        $this->validateAssetKey($assetKey);
+
+        $this->themeModel->deleteAsset($themeID, $assetKey);
     }
 
     /**
@@ -141,233 +232,31 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get_assets(string $id, string $assetKey) {
         $this->permission();
-
-        $content = $this->getAssetData($id, $assetKey);
+        $this->validateAssetKey($assetKey);
+        $content = $this->themeModel->getAssetData($id, $assetKey);
         $contentType = $this->contentTypeByAsset($assetKey);
         $result = new Data($content);
         return $result->setHeader("Content-Type", $contentType);
     }
 
     /**
-     * Result theme schema
+     * Validate asset filename to ba part of allowed ASSET_LIST
      *
-     * @param string $type
-     * @return Schema
-     */
-    private function themeResultSchema(string $type = 'out'): Schema {
-        $schema = $this->schema(
-            Schema::parse([
-                'type:s',
-                'themeID:s',
-                'assets?' => $this->assetsSchema()
-            ]),
-            $type
-        );
-        return $schema;
-    }
-
-    /**
-     * Get 'assets' schema
-     *
-     * @return Schema
-     */
-    private function assetsSchema(): Schema {
-        $schema = Schema::parse([
-            "header?" => new InstanceValidatorSchema(HtmlAsset::class),
-            "footer?" => new InstanceValidatorSchema(HtmlAsset::class),
-            "variables?" => new InstanceValidatorSchema(JsonAsset::class),
-            "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
-            "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
-            "styles:s?",
-            "javascript:s?",
-            "logo?" => new InstanceValidatorSchema(ImageAsset::class),
-            "mobileLogo?" => new InstanceValidatorSchema(ImageAsset::class),
-        ])->setID('themeAssetsSchema');
-        return $schema;
-    }
-
-    /**
-     * Generate a new data theme asset.
-     *
-     * @param string $key
-     * @param string $content
-     * @return Asset
-     */
-    private function dataAsset(string $key, string $content): Asset {
-        $key = strtolower($key);
-        switch ($key) {
-            case "fonts":
-                return new FontsAsset(json_decode($content, true));
-            case "scripts":
-                return new ScriptsAsset(json_decode($content, true));
-            default:
-                throw new ServerException("Unrecognized data asset: {$key}");
-        }
-    }
-
-    /**
-     * Get theme by name
-     *
-     * @param string $themeName
-     * @return Addon Returns theme addon
-     *
-     * @throws NotFoundException Throws an exception when themeName not found.
-     */
-    public function getThemeByName(string $themeName): Addon {
-        $theme = $this->addonManager->lookupTheme($themeName);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
-        return $theme;
-    }
-
-    /**
-     * Get list of all available themes
-     *
-     * @return array List of all available themes
-     */
-    public function getAllThemes(): array {
-        $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
-        $result = [];
-        foreach ($themes as $theme) {
-            $result[] = $theme->getKey();
-        }
-        return $result;
-    }
-
-    /**
-     * Get all theme assets
-     *
-     * @param Addon $theme
-     * @param array $assets
-     * @return array
-     */
-    private function normalizeTheme(Addon $theme, array $assets): array {
-        $res = [
-            "assets" => $assets,
-            'themeID' => $theme->getInfoValue('key'),
-            'type' => 'themeFile',
-            'version' => $theme->getInfoValue('version'),
-        ];
-
-        $res["assets"] = [];
-
-        $primaryAssets = array_intersect_key(
-            $assets,
-            array_flip(["fonts", "footer", "header", "scripts", "variables"])
-        );
-        foreach ($primaryAssets as $assetKey => $asset) {
-            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
-        }
-
-        $secondaryAssets = array_intersect_key(
-            $assets,
-            array_flip(["javascript", "styles"])
-        );
-        foreach ($secondaryAssets as $assetKey => $asset) {
-            $path = $theme->path("/assets/{$asset['file']}", Addon::PATH_ADDON);
-            $res["assets"][$assetKey] = $this->request->url($path, true);
-        }
-
-        $logos = [
-            "logo" => "Garden.Logo",
-            "mobileLogo" => "Garden.MobileLogo",
-        ];
-        foreach ($logos as $logoName => $logoConfig) {
-            if ($logo = $this->config->get($logoConfig)) {
-                $logoUrl = Gdn_Upload::url($logo);
-                $res["assets"][$logoName] = new ImageAsset($logoUrl);
-            }
-        }
-
-        return $res;
-    }
-
-    /**
-     * Generate an asset object, given an asset array.
-     *
-     * @param string $key
-     * @param array $asset
-     * @param Addon $theme
-     * @return Asset
-     */
-    private function generateAsset(string $key, array $asset, Addon $theme): Asset {
-        $type = $asset["type"] ?? null;
-        if ($type === null) {
-            throw new ServerException("Missing theme asset type.");
-        }        $filename = $asset["file"] ?? null;
-        $type = strtolower($type);
-
-        $filename = $asset["file"] ?? null;
-        if ($filename === null) {
-            throw new ServerException("File key missing for theme asset.");
-        }
-        $data = $this->getFileAsset($theme, $filename);
-
-        switch ($type) {
-            case "data":
-                return $this->dataAsset($key, $data);
-            case "html":
-                return new HtmlAsset($data);
-            case "json":
-                return new JsonAsset($data);
-            default:
-                throw new ServerException("Unrecognized type: {$type}");
-        }
-    }
-
-    /**
-     * Cast themeAssetModel data to out schema data by calculating and casting required fields.
-     *
-     * @param Addon $theme
-     * @param string $filename
-     */
-    private function getFileAsset(Addon $theme, string $filename): string {
-        $filename = basename($filename);
-        $fullFilename = $theme->path("/assets/{$filename}");
-        if (!file_exists($fullFilename)) {
-            throw new ServerException("Theme asset file does not exist: {$fullFilename}");
-        }
-        if (!is_readable($fullFilename)) {
-            throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-        }
-        return file_get_contents($fullFilename);
-    }
-
-    /**
-     * Get the raw data of an asset.
-     *
-     * @param string $id
      * @param string $assetKey
+     * @throws \Garden\Schema\ValidationException If assetKey is invalid throw validation exception.
      */
-    private function getAssetData(string $id, string $assetKey): string {
-        $theme = $this->getThemeByName($id);
-        $assets = $this->getAssets($id);
-        $files = array_column($assets, "file");
-
-        if (array_key_exists($assetKey, $assets)) {
-            $asset = $assets[$assetKey];
-            if (!is_array($asset) || !array_key_exists("data", $asset)) {
-                throw new ServerException("Asset does not have a data key.");
+    private function validateAssetKey(string &$assetKey) {
+        $pathInfo = pathinfo($assetKey);
+        if (isset(ThemeModel::ASSET_LIST[$pathInfo['filename']])) {
+            if ($pathInfo['basename'] === ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']) {
+                $assetKey = $pathInfo['filename'];
+            } else {
+                throw new \Garden\Schema\ValidationException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
+                    'Try: '.ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']);
             }
-            return $assets[$assetKey]["data"];
-        } elseif (in_array($assetKey, $files)) {
-            return $this->getFileAsset($theme, $assetKey);
         } else {
-            throw new NotFoundException("Asset");
+            throw new \Garden\Schema\ValidationException('Unknown asset "'.$pathInfo['filename'].'" field.'.
+                'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
         }
-    }
-
-    /**
-     * Get theme asset by assetKey.
-     *
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundException Throws an exception if asset not found.
-     */
-    private function getAssets(string $id): array {
-        $theme = $this->getThemeByName($id);
-        $assets  = $theme->getInfoValue(self::ASSET_KEY, []);
-        return $assets;
     }
 }

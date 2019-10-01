@@ -9,23 +9,26 @@ import Backgrounds from "@library/layout/Backgrounds";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
-import { ensureScript } from "@library/dom/domUtils";
+import { ensureScript } from "@vanilla/dom-utils";
 import "../scss/_base.scss";
+import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
 const Error = () => <p>{errorMessage}</p>;
 const styleDecorator = storyFn => {
-    const style = {
-        padding: 24,
-    };
+    const classes = storyBookClasses();
+    blotCSS();
     return (
         <>
             <Provider store={getStore()}>
                 <ThemeProvider errorComponent={<Error />} themeKey="theme-variables-dark">
-                    <div style={style}>
-                        <Backgrounds />
-                        {storyFn()}
+                    <div className={classes.containerOuter}>
+                        <div className={classes.containerInner}>
+                            <Backgrounds />
+                            {storyFn()}
+                        </div>
                     </div>
                 </ThemeProvider>
             </Provider>
@@ -34,11 +37,3 @@ const styleDecorator = storyFn => {
 };
 
 addDecorator(styleDecorator);
-
-void ensureScript("https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js").then(() => {
-    window.WebFont.load({
-        google: {
-            families: ["Open Sans:400,400italic,600,700"], // Will be dynamic at some point
-        },
-    });
-});

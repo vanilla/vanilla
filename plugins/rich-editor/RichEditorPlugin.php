@@ -27,13 +27,13 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function setup() {
         saveToConfig('Garden.InputFormatter', self::FORMAT_NAME);
         saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
-        saveToConfig('RichEditor.Quotes.Enable', true);
+        saveToConfig(self::QUOTE_CONFIG_ENABLE, true);
         saveToConfig('EnabledPlugins.Quotes', false);
     }
 
     public function onDisable() {
-        removeFromConfig('Garden.InputFormatter');
-        removeFromConfig('Garden.MobileInputFormatter');
+        Gdn::config()->saveToConfig('Garden.InputFormatter', 'Markdown');
+        Gdn::config()->saveToConfig('Garden.MobileInputFormatter', 'Markdown');
     }
 
     /**
@@ -119,9 +119,12 @@ class RichEditorPlugin extends Gdn_Plugin {
     protected function addQuoteButton($sender, $args) {
         // There are some case were Discussion is not set as an event argument so we use the sender data instead.
         $discussion = $sender->data('Discussion');
+        $discussion = (is_array($discussion)) ? (object)$discussion : $discussion;
+
         if (!$discussion) {
             return;
         }
+
 
         if (!Gdn::session()->UserID) {
             return;

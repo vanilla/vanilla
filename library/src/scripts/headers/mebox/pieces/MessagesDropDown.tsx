@@ -5,12 +5,12 @@
  */
 
 import React from "react";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import classNames from "classnames";
 
 interface IProps {
@@ -41,18 +41,17 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
      * @returns A DropDown component, configured to display notifications.
      */
     public render() {
-        const classesHeader = vanillaHeaderClasses();
+        const classesHeader = titleBarClasses();
         return (
             <DropDown
                 id={this.id}
                 name={t("Messages")}
-                buttonClassName={classNames("vanillaHeader-messages", this.props.buttonClassName)}
                 renderLeft={true}
-                contentsClassName={classNames(this.props.contentsClassName, classesHeader.dropDownContents)}
-                toggleButtonClassName="vanillaHeader-button"
-                buttonContents={<MessagesCount open={this.state.open} className={this.props.toggleContentClassName} />}
+                buttonClassName={classesHeader.button}
+                contentsClassName={classesHeader.dropDownContents}
+                buttonContents={<MessagesCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
-                selfPadded={true}
+                flyoutType={FlyoutType.FRAME}
             >
                 <MessagesContents countClass={this.props.countClass} />
             </DropDown>

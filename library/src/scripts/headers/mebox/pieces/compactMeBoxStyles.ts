@@ -4,21 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, flexHelper, unit, sticky, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { calc, percent } from "csx";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, percent, viewHeight } from "csx";
 
 export const compactMeBoxVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("compactMeBox");
+    const themeVars = variableFactory("compactMeBox");
+    const globalVars = globalVariables();
 
-    const tab = {
+    const tab = themeVars("tab", {
         height: 44,
         width: 44,
-        ...themeVars.subComponentStyles("something"),
-    };
+    });
 
-    return { tab };
+    const colors = themeVars("colors", {
+        bg: globalVars.mainColors.bg,
+    });
+
+    return { tab, colors };
 });
 
 export const compactMeBoxClasses = useThemeCache(() => {
@@ -36,8 +40,6 @@ export const compactMeBoxClasses = useThemeCache(() => {
 
     const contents = style("contents", {
         position: "relative",
-        display: "flex",
-        flexDirection: "column",
         height: percent(100),
     });
 
@@ -51,8 +53,11 @@ export const compactMeBoxClasses = useThemeCache(() => {
         },
     });
 
-    const tabList = style("tabList", {
-        marginRight: unit(vars.tab.width),
+    const tabList = style("tabList", sticky(), {
+        top: 0,
+        background: colorOut(vars.colors.bg),
+        zIndex: 2,
+        paddingRight: unit(vars.tab.width),
         height: unit(vars.tab.height),
         flexBasis: unit(vars.tab.width),
         color: globalVars.mainColors.fg.toString(),
@@ -66,8 +71,8 @@ export const compactMeBoxClasses = useThemeCache(() => {
     });
 
     const tabPanels = style("tabPanels", {
-        height: calc(`100vh - ${vars.tab.height}`),
-        borderTop: `1px solid ${globalVars.overlay.border.color.toString()}`,
+        height: calc(`100% - ${vars.tab.height}px`),
+        position: "relative",
     });
 
     const tabButton = style("tabButton", {
@@ -75,13 +80,17 @@ export const compactMeBoxClasses = useThemeCache(() => {
     });
 
     const panel = style("panel", {
-        flexGrow: 1,
+        maxHeight: percent(100),
         borderTop: 0,
         borderRadius: 0,
     });
 
     const body = style("body", {
         flexGrow: 1,
+    });
+
+    const scrollContainer = style("scrollContainer", {
+        overflow: "auto",
     });
 
     return {
@@ -95,5 +104,6 @@ export const compactMeBoxClasses = useThemeCache(() => {
         tabButtonContent,
         panel,
         body,
+        scrollContainer,
     };
 });

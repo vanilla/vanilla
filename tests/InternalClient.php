@@ -64,7 +64,7 @@ class InternalClient extends HttpClient {
     /**
      * {@inheritdoc}
      */
-    public function createRequest($method, $uri, $body, array $headers = [], array $options = []) {
+    public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = []) {
         if (strpos($uri, '//') === false) {
             $uri = $this->baseUrl.'/'.ltrim($uri, '/');
         }
@@ -196,8 +196,27 @@ class InternalClient extends HttpClient {
 
         /* @var \Gdn_Session $session */
         $session = $this->container->get(\Gdn_Session::class);
-        $session->start($userID, false, false);
+        if ($userID === 0) {
+            $session->end();
+        } else {
+            $session->start($userID, false, false);
+        }
 
         return $this;
+    }
+
+    /**
+     * Set a permission for the current session.
+     *
+     * @param string $permission The name of the permission to set.
+     * @param bool $value The new value.
+     * @return bool Returns the previous value.
+     */
+    public function setPermission(string $permission, bool $value): bool {
+        /* @var \Gdn_Session $session */
+        $session = $this->container->get(\Gdn_Session::class);
+        $previous = $session->getPermissions()->has($permission);
+        $session->getPermissions()->set($permission, $value);
+        return $previous;
     }
 }

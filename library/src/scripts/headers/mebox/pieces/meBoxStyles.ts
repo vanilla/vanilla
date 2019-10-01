@@ -6,39 +6,50 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { style } from "typestyle";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formVars = formElementsVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const debug = debugHelper("meBox");
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
+    const style = styleFactory("meBox");
 
     const root = style(
         {
             ...debug.name(),
             display: "flex",
             alignItems: "center",
-            height: unit(vanillaHeaderVars.sizing.height),
+            height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
-            height: unit(vanillaHeaderVars.sizing.mobile.height),
+        mediaQueries.oneColumnDown({
+            height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const buttonContent = style({
+    const buttonContent = style("buttonContent", {
         ...flex.middle(),
         width: unit(formVars.sizing.height),
         maxWidth: unit(formVars.sizing.height),
         flexBasis: unit(formVars.sizing.height),
-        height: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
+        height: unit(titleBarVars.meBox.sizing.buttonContents),
+        borderRadius: unit(globalVars.border.radius),
     });
 
-    return { root, buttonContent };
+    const rootFlexClass = (count: number) => {
+        return style("footFlexClass", {
+            flexBasis: unit(count * formElementsVariables().sizing.height),
+        });
+    };
+
+    return {
+        root,
+        buttonContent,
+        rootFlexClass,
+    };
 });

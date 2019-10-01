@@ -6,13 +6,13 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import * as icons from "@library/icons/editorIcons";
 import { IFormats, RangeStatic } from "quill/core";
 import classNames from "classnames";
 import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
 import { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
 import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 import Formatter from "@rich-editor/quill/Formatter";
+import { BoldIcon, ItalicIcon, LinkIcon, StrikeIcon, CodeIcon } from "@library/icons/editorIcons";
 
 interface IProps {
     formatter: Formatter;
@@ -44,31 +44,31 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
         return [
             {
                 label: t("Format as Bold"),
-                icon: icons.bold(),
+                icon: <BoldIcon />,
                 isActive: activeFormats.bold === true,
                 onClick: this.formatBold,
             },
             {
                 label: t("Format as Italic"),
-                icon: icons.italic(),
+                icon: <ItalicIcon />,
                 isActive: activeFormats.italic === true,
                 onClick: this.formatItalic,
             },
             {
                 label: t("Format as Strikethrough"),
-                icon: icons.strike(),
+                icon: <StrikeIcon />,
                 isActive: activeFormats.strike === true,
                 onClick: this.formatStrike,
             },
             {
                 label: t("Format as Inline Code"),
-                icon: icons.code(),
+                icon: <CodeIcon />,
                 isActive: activeFormats.code === true,
                 onClick: this.formatCode,
             },
             {
                 label: t("Format as Link"),
-                icon: icons.link(),
+                icon: <LinkIcon />,
                 isActive: typeof activeFormats.link === "string",
                 onClick: onLinkClick,
             },

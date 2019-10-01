@@ -9,7 +9,10 @@ import shave from "shave";
 import throttle from "lodash/throttle";
 
 interface IProps {
+    tag?: string;
+    className?: string;
     children: React.ReactNode;
+    useMaxHeight?: boolean;
     lines?: number;
     expand?: boolean;
 }
@@ -23,10 +26,12 @@ export default class TruncatedText extends React.PureComponent<IProps> {
     };
 
     public render() {
+        const Tag = (this.props.tag || "span") as "span";
+
         return (
-            <span className="truncatedText" ref={this.ref}>
+            <Tag className={this.props.className} ref={this.ref}>
                 {this.props.children}
-            </span>
+            </Tag>
         );
     }
 
@@ -47,16 +52,37 @@ export default class TruncatedText extends React.PureComponent<IProps> {
         this.truncate();
     }, 250);
 
+    private truncate() {
+        if (this.props.useMaxHeight) {
+            this.truncateTextBasedOnMaxHeight();
+        } else {
+            this.truncateBasedOnLines();
+        }
+    }
+
+    /**
+     * Truncate element text based on a certain number of lines.
+     *
+     * @param excerpt - The excerpt to truncate.
+     */
+    private truncateBasedOnLines() {
+        const lineHeight = this.calculateLineHeight();
+        if (lineHeight !== null) {
+            const maxHeight = this.props.lines! * lineHeight;
+            shave(this.ref.current!, maxHeight);
+        }
+    }
+
     /**
      * Truncate element text based on max-height
      *
      * @param excerpt - The excerpt to truncate.
      */
-    private truncate() {
-        const lineHeight = this.calculateLineHeight();
-        if (lineHeight !== null) {
-            const maxHeight = this.props.lines! * lineHeight;
-            shave(this.ref.current!, maxHeight);
+    private truncateTextBasedOnMaxHeight() {
+        const element = this.ref.current!;
+        const maxHeight = parseInt(getComputedStyle(element)["max-height"], 10);
+        if (maxHeight && maxHeight > 0) {
+            shave(element, maxHeight);
         }
     }
 

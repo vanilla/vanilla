@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { percent, px } from "csx";
 
 export const insertMediaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -19,9 +20,9 @@ export const insertMediaClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-end",
         ...paddings({
-            left: vars.flyout.padding.left,
-            right: vars.flyout.padding.left,
-            bottom: vars.flyout.padding.bottom,
+            left: vars.flyout.padding.horizontal,
+            right: vars.flyout.padding.horizontal,
+            bottom: vars.flyout.padding.vertical,
         }),
     });
 
@@ -31,8 +32,18 @@ export const insertMediaClasses = useThemeCache(() => {
     });
 
     const insert = style("insert", {
-        width: "auto",
+        $nest: {
+            "&&": {
+                // Nest deeper to override margins from the forum.
+                width: percent(100),
+                position: "relative",
+                marginBottom: px(10),
+            },
+        },
+    });
+    const button = style("button", {
         position: "relative",
+        marginLeft: "auto",
     });
 
     const footer = style("footer", {
@@ -42,5 +53,5 @@ export const insertMediaClasses = useThemeCache(() => {
         padding: 0,
     });
 
-    return { root, help, insert, footer };
+    return { root, help, insert, footer, button };
 });

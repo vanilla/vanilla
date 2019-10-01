@@ -7,7 +7,7 @@
 import React from "react";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import SmartLink from "@library/routing/links/SmartLink";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
 import { classNames } from "react-select/lib/utils";
@@ -47,5 +47,5 @@ export class DropDownUserCard extends React.Component<IProps> {
         );
     }
 }
-const withRedux = connect(UsersModel.mapStateToProps);
+const withRedux = connect(mapUsersStoreState);
 export default withRedux(DropDownUserCard);

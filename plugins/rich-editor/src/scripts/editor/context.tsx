@@ -4,16 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useContext } from "react";
-import Quill, { IFormats, DeltaOperation } from "quill/core";
-import { IEditorInstance, IStoreState } from "@rich-editor/@types/store";
-import { Omit } from "@library/@types/utils";
-import { connect } from "react-redux";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
-import uniqueId from "lodash/uniqueId";
-import { getIDForQuill } from "@rich-editor/quill/utility";
+import { IEditorInstance } from "@rich-editor/@types/store";
+import Quill, { DeltaOperation, IFormats } from "quill/core";
+import React, { useContext } from "react";
 
-interface IEditorProps {
+export interface IEditorProps {
     isPrimaryEditor: boolean;
     isLoading: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
@@ -25,14 +20,12 @@ interface IEditorProps {
     legacyMode: boolean;
     children: React.ReactNode;
 }
-
 export type EditorQueueItem = DeltaOperation[] | string;
 
 interface IContextProps extends IEditorProps {
     quill: Quill | null;
     isMobile: boolean;
-    setQuillInstance: (quill: Quill) => void;
-    quillID: string;
+    setQuillInstance: (quill: Quill | null) => void;
 }
 
 interface IEditorReduxValue extends IEditorInstance {
@@ -41,7 +34,7 @@ interface IEditorReduxValue extends IEditorInstance {
 
 export interface IWithEditorProps extends IEditorReduxValue, IContextProps {}
 
-const EditorContext = React.createContext<IContextProps>({} as any);
+export const EditorContext = React.createContext<IContextProps>({} as any);
 
 /**
  * Hook for using the editor context.
@@ -49,79 +42,4 @@ const EditorContext = React.createContext<IContextProps>({} as any);
 export function useEditor() {
     const editorContext = useContext(EditorContext);
     return editorContext;
-}
-
-/**
- * The editor root.
- *
- * This doesn't actually render any HTML instead.
- * It maintains the context for the rest of the editor pieces.
- * @see EditorContent, EditorInlineMenus, EditorParagraphMenu, etc.
- */
-export const Editor = (props: IEditorProps) => {
-    const [quill, setQuillInstance] = useState<Quill | null>(null);
-    const quillID = quill ? getIDForQuill(quill) : null;
-    const device = useDevice();
-    const isMobile = device === Devices.MOBILE;
-    const ID = uniqueId("editor");
-    const descriptionID = ID + "-description";
-
-    return (
-        <EditorContext.Provider
-            value={{
-                ...props,
-                quill,
-                setQuillInstance,
-                isMobile,
-                editorID: ID,
-                descriptionID,
-                quillID,
-            }}
-        >
-            {props.children}
-        </EditorContext.Provider>
-    );
-};
-
-/**
- * Map in the instance state of the current editor.
- */
-function mapStateToProps(state: IStoreState, ownProps: IContextProps): IEditorReduxValue {
-    const { quillID, quill } = ownProps;
-    if (quill) {
-        const instanceState = state.editor.instances[quillID];
-        const { lastGoodSelection } = instanceState;
-        const activeFormats = lastGoodSelection && quill ? quill.getFormat(lastGoodSelection) : {};
-        return {
-            ...instanceState,
-            activeFormats,
-        };
-    } else {
-        return {
-            activeFormats: {},
-            currentSelection: null,
-            lastGoodSelection: { index: 0, length: 0 },
-            mentionSelection: null,
-        };
-    }
-}
-const withRedux = connect(mapStateToProps);
-
-/**
- * Map a quill context to props.
- *
- * @param WrappedComponent - The component to map.
- *
- * @returns A component with a quill context injected as props.
- */
-export function withEditor<T extends IWithEditorProps = IWithEditorProps>(WrappedComponent: React.ComponentType<T>) {
-    const ReduxedComponent = withRedux(WrappedComponent as any);
-    type Omitted = Omit<T, keyof IWithEditorProps>;
-    function ComponentWithEditor(props: Omitted) {
-        const context = useEditor();
-        return <ReduxedComponent {...context} {...props as T} />;
-    }
-
-    ComponentWithEditor.displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    return ComponentWithEditor as React.ComponentType<Omitted>;
 }

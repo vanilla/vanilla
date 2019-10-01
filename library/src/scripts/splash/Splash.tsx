@@ -4,20 +4,37 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import Heading from "@library/layout/Heading";
-import { t } from "@library/utility/appUtils";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { splashStyles } from "@library/splash/splashStyles";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import Heading from "@library/layout/Heading";
+import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { splashClasses, splashVariables } from "@library/splash/splashStyles";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
+import { ColorValues } from "@library/styles/styleHelpersColors";
+import { url } from "csx";
+
+export interface ISplashStyleOverwrite {
+    colors?: {
+        bg?: ColorValues;
+        fg?: ColorValues;
+        borderColor?: ColorValues;
+    };
+    backgrounds?: {
+        useOverlay?: boolean;
+    };
+    outerBackgroundImage?: string;
+}
 
 interface IProps extends IDeviceProps {
-    title: string; // Often the message to display isn't the real H1
+    action?: React.ReactNode;
+    title?: string; // Often the message to display isn't the real H1
     className?: string;
+    styleOverwrite?: ISplashStyleOverwrite;
 }
 
 /**
@@ -25,27 +42,45 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const classes = splashStyles();
-        const buttons = buttonClasses();
-        const { title, className } = this.props;
+        const { action, className, title } = this.props;
+        const styleOverwrite = this.props.styleOverwrite || {};
+
+        const classes = splashClasses(styleOverwrite);
+        const vars = splashVariables(styleOverwrite);
+
         return (
             <div className={classNames(className, classes.root)}>
-                <div className={classes.outerBackground} />
+                <div
+                    className={classNames(
+                        classes.outerBackground(
+                            styleOverwrite.outerBackgroundImage ? styleOverwrite.outerBackgroundImage : undefined,
+                        ),
+                    )}
+                />
+                {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) ||
+                    vars.backgrounds.useOverlay) && <div className={classes.backgroundOverlay} />}
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
-                            {title && <Heading title={title} className={classes.title} />}
+                            <div className={classes.titleWrap}>
+                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                {title && <Heading title={title} className={classes.title} />}
+                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                            </div>
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
-                                    className={classes.searchContainer}
                                     buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.TRANSPARENT}
+                                    buttonBaseClass={ButtonTypes.CUSTOM}
                                     isLarge={true}
-                                    placeholder={t("Search Articles")}
+                                    placeholder={t("Search")}
                                     inputClass={classes.input}
                                     iconClass={classes.icon}
                                     buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={this.props.device === Devices.MOBILE}
+                                    hideSearchButton={
+                                        this.props.device === Devices.MOBILE || this.props.device === Devices.XS
+                                    }
+                                    contentClass={classes.content}
+                                    valueContainerClasses={classes.valueContainer}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

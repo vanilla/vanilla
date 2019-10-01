@@ -7,12 +7,15 @@
 import * as React from "react";
 import classNames from "classnames";
 import { countClasses } from "@library/content/countStyles";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 
 export interface IProps {
     className?: string;
     count?: number;
     label: string; // For accessibility, should be in the style of: "Notifications: "
     max?: number;
+    countBg?: ColorValues;
+    countFg?: ColorValues;
 }
 
 /**
@@ -26,12 +29,12 @@ export default class Count extends React.Component<IProps> {
         const classes = countClasses();
 
         return (
-            <div className={classNames("count", this.props.className, classes.root)}>
+            <div className={classNames("count", this.props.className, classes.root(this.props.countBg))}>
                 <span className="sr-only" aria-live="polite">
                     {hasCount ? this.props.label + ` ${this.props.count}` : ""}
                 </span>
                 {hasCount && (
-                    <div className={classNames("count-text", classes.text)} aria-hidden={true}>
+                    <div className={classNames("count-text", classes.text(this.props.countFg))} aria-hidden={true}>
                         {visibleCount}
                     </div>
                 )}

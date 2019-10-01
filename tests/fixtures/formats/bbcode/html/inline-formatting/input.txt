@@ -1,2 +1,0 @@
-[b]Bold[/b][i]italic[/i][s]strike[/s][u]underline[/u][b][i][s][u]all inline :)[/u][/s][/i][/b] :)  :(  :/
-https://autolink.com

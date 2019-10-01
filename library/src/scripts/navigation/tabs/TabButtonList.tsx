@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 import TabButton from "@library/navigation/tabs/TabButton";
-import TabHandler from "@library/dom/TabHandler";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;
@@ -26,6 +26,7 @@ interface IProps {
     getTabButtonID: (index: number) => string;
     getTabPanelID: (index: number) => string;
     buttonClass?: string;
+    extraContent?: React.ReactNode;
 }
 
 interface IState {
@@ -52,8 +53,8 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaControls={getTabPanelID(index)}
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
-                    baseClass={ButtonTypes.TAB}
-                    className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass, classes.button)}
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}
                     setTab={this.props.setTab}
@@ -72,6 +73,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                 ref={this.tabButtons}
             >
                 {content}
+                {this.props.extraContent}
             </div>
         );
     }
@@ -91,34 +93,38 @@ export default class TabButtonList extends React.Component<IProps, IState> {
             () => {
                 const tabHandler = new TabHandler(this.tabButtons.current!);
                 switch (event.key) {
-                    case "ArrowRight":
+                    case "ArrowRight": {
                         event.stopPropagation();
                         const nextElement = tabHandler.getNext(currentEl, false, true);
                         if (nextElement) {
                             nextElement.focus();
                         }
                         break;
-                    case "ArrowLeft":
+                    }
+                    case "ArrowLeft": {
                         event.stopPropagation();
                         const prevElement = tabHandler.getNext(currentEl, true, true);
                         if (prevElement) {
                             prevElement.focus();
                         }
                         break;
-                    case "Home":
+                    }
+                    case "Home": {
                         event.stopPropagation();
                         const firstElement = tabHandler.getInitial();
                         if (firstElement) {
                             firstElement.focus();
                         }
                         break;
-                    case "End":
+                    }
+                    case "End": {
                         event.stopPropagation();
                         const lastElement = tabHandler.getLast();
                         if (lastElement) {
                             lastElement.focus();
                         }
                         break;
+                    }
                 }
                 this.setState({
                     setAllTabIndexes: false,

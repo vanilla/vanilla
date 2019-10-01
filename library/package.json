@@ -1,0 +1,10 @@
+{
+    "name": "@vanilla/library",
+    "version": "3.0.0",
+    "private": true,
+    "dependencies": {
+        "@vanilla/utils": "*",
+        "@vanilla/dom-utils": "*",
+        "@vanilla/react-utils": "*"
+    }
+}

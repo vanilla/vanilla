@@ -1,10 +1,12 @@
 .forceWysiwyg {
   opacity: 1;
-  transition: all 0.3s ease; }
+  transition: all 0.3s ease;
+}
 
 .forceWysiwygDisabled {
   opacity: 0;
   height: 0;
   pointer-events: none;
   overflow: hidden;
-  padding: 0 !important; }
+  padding: 0 !important;
+}

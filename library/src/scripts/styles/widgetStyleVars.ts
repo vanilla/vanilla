@@ -5,7 +5,6 @@
 
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { transparentColor } from "@library/forms/buttonStyles";
 
 export const widgetVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -23,7 +22,7 @@ export const widgetVariables = useThemeCache(() => {
     });
 
     const color = makeThemeVars("color", {
-        bg: transparentColor,
+        bg: globalVars.elementaryColors.transparent,
         fg: globalVars.mainColors.fg,
     });
 

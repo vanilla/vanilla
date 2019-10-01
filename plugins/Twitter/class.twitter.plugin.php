@@ -274,7 +274,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $redirectUri .= (strpos($redirectUri, '?') === false ? '?' : '&').$query;
         }
 
-        $params = ['callback_url' => $redirectUri];
+        $params = ['oauth_callback' => $redirectUri];
 
         $url = 'https://api.twitter.com/oauth/request_token';
         $request = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
@@ -301,7 +301,8 @@ class TwitterPlugin extends Gdn_Plugin {
                 $this->setOAuthToken($data['oauth_token'], $data['oauth_token_secret'], 'request');
 
                 // Redirect to twitter's authorization page.
-                $url = "https://api.twitter.com/oauth/authenticate?oauth_token={$data['oauth_token']}";
+                $params['oauth_token'] = $data['oauth_token'];
+                $url = 'https://api.twitter.com/oauth/authenticate?'.http_build_query($params);
                 redirectTo($url, 302, false);
             }
         }
@@ -320,81 +321,14 @@ class TwitterPlugin extends Gdn_Plugin {
      */
     public function entryController_twauthorize_create($sender, $dir = '') {
         $query = arrayTranslate($sender->Request->get(), ['display', 'Target']);
-        $query = http_build_query($query);
 
         if ($dir == 'profile') {
             // This is a profile connection.
-            $this->redirectUri(self::profileConnecUrl());
+            $this->redirectUri(self::profileConnectUrl());
         }
 
+        $query = http_build_query($query);
         $this->authorize($query);
-    }
-
-    /**
-     * Post to Twitter.
-     *
-     * @param PostController $sender
-     * @param string $recordType
-     * @param int $iD
-     *
-     * @throws Gdn_UserException
-     */
-    public function postController_twitter_create($sender, $recordType, $iD) {
-        if (!$this->socialReactions()) {
-            throw permissionException();
-        }
-
-        $row = getRecord($recordType, $iD, true);
-        if ($row) {
-            // Grab the tweet message.
-            switch (strtolower($recordType)) {
-                case 'discussion':
-                    $message = Gdn_Format::plainText($row['Name'], 'Text');
-                    break;
-                case 'comment':
-                default:
-                    $message = Gdn_Format::plainText($row['Body'], $row['Format']);
-            }
-
-            // WHY ARE WE REPEATING THE `sliceTwitter()` FUNCTION BELOW?
-            // Dammit, fellas, ima hang y'uns out to DRY.
-            $elips = '...';
-            $message = preg_replace('`\s+`', ' ', $message);
-
-            $max = 140;
-            $linkLen = 22;
-            $max -= $linkLen;
-
-            $message = sliceParagraph($message, $max);
-            if (strlen($message) > $max) {
-                $message = substr($message, 0, $max - strlen($elips)).$elips;
-            }
-
-            if ($this->accessToken()) {
-                Gdn::controller()->setData('Message', $message);
-
-                $message .= ' '.$row['ShareUrl'];
-                $r = $this->api(
-                    '/statuses/update.json',
-                    [
-                    'status' => $message
-                    ],
-                    'POST'
-                );
-
-                $sender->setJson('R', $r);
-                $sender->informMessage(t('Thanks for sharing!'));
-            } else {
-                $get = [
-                    'text' => $message,
-                    'url' => $row['ShareUrl']
-                ];
-                $url = "https://twitter.com/share?".http_build_query($get);
-                redirectTo($url, 302, false);
-            }
-        }
-
-        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -415,7 +349,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
         // Get the access token.
         trace('GetAccessToken()');
-        $accessToken = $this->getAccessToken($oauth_token, $oauth_verifier);
+        $accessToken = $this->getAccessToken($oauth_token, $oauth_verifier, true);
         $this->accessToken($accessToken);
 
         // Get the profile.
@@ -447,17 +381,18 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @param string $requestToken
      * @param string $verifier
+     * @param bool $mustSession Whether or not the OAuth token must be connected to the current user's session.
      *
      * @return string OAuthToken
      * @throws Gdn_UserException
      */
-    public function getAccessToken($requestToken, $verifier) {
+    public function getAccessToken($requestToken, $verifier, bool $mustSession = false) {
         if ((!$requestToken || !$verifier) && Gdn::request()->get('denied')) {
             throw new Gdn_UserException(t('Looks like you denied our request.'), 401);
         }
 
         // Get the request secret.
-        $requestToken = $this->getOAuthToken($requestToken);
+        $requestToken = $this->getOAuthToken($requestToken, $mustSession);
         if (!$requestToken) {
             throw new Gdn_UserException('Token was not found or is invalid for the current action.');
         }
@@ -699,10 +634,11 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Retrieve our stored OAuth token.
      *
-     * @param $token
+     * @param string $token
+     * @param bool $mustSession Whether or not the token must have a session that matches.
      * @return null|OAuthToken
      */
-    public function getOAuthToken($token) {
+    public function getOAuthToken($token, bool $mustSession = false) {
         $uatModel = new UserAuthenticationTokenModel();
         $result = null;
         $row = $uatModel->getWhere([
@@ -711,11 +647,8 @@ class TwitterPlugin extends Gdn_Plugin {
         ])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($row) {
-            $canUseToken = false;
-            if (!empty($row['ForeignUserKey'])) {
-                if (Gdn::session()->isValid() && $row['ForeignUserKey'] == Gdn::session()->UserID) {
-                    $canUseToken = true;
-                }
+            if (!empty($row['ForeignUserKey']) || $mustSession) {
+                $canUseToken = Gdn::session()->isValid() && (int)$row['ForeignUserKey'] === (int)Gdn::session()->UserID;
             } else {
                 $canUseToken = true;
             }
@@ -751,8 +684,8 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-    public function socialReactions() {
-        return c('Plugins.Twitter.SocialReactions', true) && $this->isConfigured();
+    public function socialReactions():bool {
+        return (bool)c("Plugins.Twitter.SocialReactions", true);
     }
 
     /**
@@ -846,8 +779,8 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public static function profileConnecUrl() {
-        return url(userUrl(Gdn::session()->User, false, 'twitterconnect'), true);
+    public static function profileConnectUrl() {
+        return url('/profile/twitterconnect', true);
     }
 
     /**
@@ -889,14 +822,22 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param array $args
      */
     protected function addReactButton($sender, $args) {
-        if ($this->accessToken()) {
-            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
-            $cssClass = 'ReactButton Hijack';
-        } else {
-            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
-            $cssClass = 'ReactButton PopupWindow';
+        $recordType = $args['Type'] ?? null;
+        if (!$recordType) {
+            return;
         }
-
+        $params = [];
+        switch (strtolower($recordType)) {
+            case 'discussion':
+                $params['url'] = discussionUrl($args['Discussion']);
+                break;
+            case 'comment':
+                $id = $args['Comment']->CommentID;
+                $params['url']  = url("/discussion/comment/{$id}#Comment_{$id}", true);
+                break;
+        }
+        $url = url("https://twitter.com/share?".http_build_query($params), true);
+        $cssClass = 'ReactButton PopupWindow';
         echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow']);
     }
 

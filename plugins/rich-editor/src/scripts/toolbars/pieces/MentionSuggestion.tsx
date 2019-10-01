@@ -7,8 +7,8 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { splitStringLoosely } from "@library/utility/utils";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { splitStringLoosely } from "@vanilla/utils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IUserFragment } from "@library/@types/api/users";
 
 export interface IMentionSuggestionData extends IUserFragment {
@@ -38,7 +38,7 @@ export interface IMentionLoadingProps extends IGenericMentionProps {
 export default function MentionSuggestion(props: IMentionProps) {
     const { isActive, matchedString, mentionData, onClick, onMouseEnter } = props;
     const { photoUrl, name, domID } = mentionData;
-    const classesRichEditor = richEditorClasses(this.props.legacyMode);
+    const classesRichEditor = richEditorClasses(false);
 
     const classes = classNames("richEditor-menuItem", "atMentionList-item", classesRichEditor.menuItem, {
         isActive,

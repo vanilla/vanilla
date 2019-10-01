@@ -3,11 +3,17 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
+use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
+use Vanilla\Web\TwigEnhancer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -30,9 +36,13 @@ if (!class_exists('Gdn')) {
 $dic = new Container();
 Gdn::setContainer($dic);
 
-$dic->setInstance('Garden\Container\Container', $dic)
-    ->rule('Interop\Container\ContainerInterface')
-    ->setAliasOf('Garden\Container\Container')
+$dic->setInstance(Garden\Container\Container::class, $dic)
+    ->rule(\Psr\Container\ContainerInterface::class)
+    ->setAliasOf(Garden\Container\Container::class)
+
+    ->rule(\Interop\Container\ContainerInterface::class)
+    ->setClass(\Vanilla\InteropContainer::class)
+    ->setShared(true)
 
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')
@@ -52,6 +62,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
+
+    // Site sections
+    ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+    ->setClass(SingleSiteSectionProvider::class)
+    ->setShared(true)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -90,6 +105,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ThemeManager')
 
+    // File base theme api provider
+    ->rule(\Vanilla\Models\ThemeModel::class)
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
+
     // Logger
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
@@ -107,6 +127,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
     ->addAlias('Locale')
+
+    ->rule(Contracts\LocaleInterface::class)
+    ->setAliasOf(Gdn_Locale::class)
+    ->setShared(true)
 
     // Request
     ->rule('Gdn_Request')
@@ -160,6 +184,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
         'deploymentTime' => ContainerUtils::config('Garden.Deployed')
     ])
 
+    ->rule(\Vanilla\Web\Asset\AssetPreloadModel::class)
+    ->setShared(true)
+
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
     ->addCall('setHotReloadEnabled', [
         ContainerUtils::config('HotReload.Enabled'),
@@ -167,6 +194,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ])
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+
+    ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
+    ->addAlias('HstsModel')
 
     ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
     ->setShared(true)
@@ -188,6 +218,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
@@ -206,10 +237,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
         return $uid;
     })
 
+    ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+    ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
+
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
 
     ->rule('@view-application/json')
     ->setClass(\Vanilla\Web\JsonView::class)
@@ -279,10 +314,21 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
     ->setShared(true)
 
+    ->rule(TwigEnhancer::class)
+    ->addCall('setCompileCacheDirectory', [PATH_CONF . '/twig'])
+    ->setShared(true)
+
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
+    ->rule(\Emoji::class)
+    ->setShared(true)
+
     ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
+    ->addCall('addCoreEmbeds')
+    ->setShared(true)
+
+    ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
 
@@ -294,8 +340,31 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
+    ->rule(Garden\Http\HttpClient::class)
+    ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
+
     ->rule(Vanilla\Formatting\FormatService::class)
-    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
+    ->addCall('registerBuiltInFormats')
+    ->setShared(true)
+
+    ->rule(LegacyEmbedReplacer::class)
+    ->setShared(true)
+
+    ->rule(HtmlEnhancer::class)
+    ->setShared(true)
+
+    ->rule(HtmlSanitizer::class)
+    ->setShared(true)
+
+    ->rule(\Vanilla\Analytics\Client::class)
+    ->setShared(true)
+    ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
+
+    ->rule(Vanilla\Scheduler\SchedulerInterface::class)
+    ->setClass(Vanilla\Scheduler\DummyScheduler::class)
+    ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+    ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+    ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
     ->setShared(true)
 ;
 
@@ -454,3 +523,8 @@ require_once PATH_LIBRARY_CORE.'/functions.render.php';
 if (!defined('CLIENT_NAME')) {
     define('CLIENT_NAME', 'vanilla');
 }
+
+register_shutdown_function(function () use ($dic) {
+    // Trigger SchedulerDispatch event
+    $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
+});

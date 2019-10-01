@@ -9,8 +9,8 @@
 
 import { onReady } from "@library/utility/appUtils";
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
-import UsersModel, { IUsersStoreState } from "@library/features/users/UsersModel";
-import { logError } from "@library/utility/utils";
+import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
+import { logError } from "@vanilla/utils";
 import { Reducer, ReducersMapObject } from "redux";
 
 let haveGot = false;
@@ -45,7 +45,7 @@ export function getReducers(): ReducersMapObject<any, any> {
     }
 
     return {
-        users: new UsersModel().reducer,
+        users: usersReducer,
         theme: themeReducer,
         ...reducers,
     };

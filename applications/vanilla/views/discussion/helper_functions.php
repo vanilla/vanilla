@@ -66,6 +66,8 @@ if (!function_exists('writeComment')) :
         // Whether to order the name & photo with the latter first.
         static $userPhotoFirst = null;
 
+        $comment = (is_array($comment)) ? (object)$comment: $comment;
+
         if ($userPhotoFirst === null) {
             $userPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
         }
@@ -604,10 +606,11 @@ if (!function_exists('writeEmbedCommentForm')) :
             <h2><?php echo t('Leave a comment'); ?></h2>
             <div class="MessageForm CommentForm EmbedCommentForm">
                 <?php
+                echo '<div class="FormWrapper">';
                 echo $controller->Form->open(['id' => 'Form_Comment']);
                 echo $controller->Form->errors();
                 echo $controller->Form->hidden('Name');
-                echo wrap($controller->Form->textBox('Body', ['MultiLine' => true]), 'div', ['class' => 'TextBoxWrapper']);
+                echo wrap($controller->Form->bodyBox('Body'));
                 echo "<div class=\"Buttons\">\n";
 
                 $allowSigninPopup = c('Garden.SignIn.Popup');
@@ -641,6 +644,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                 }
                 echo "</div>\n";
                 echo $controller->Form->close();
+                echo '</div> ';
                 ?>
             </div>
         <?php

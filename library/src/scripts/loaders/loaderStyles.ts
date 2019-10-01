@@ -44,17 +44,20 @@ export const loaderClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("loader");
     const fullPageLoader = style("fullPageLoader", {
-        ...flex.middle(),
         position: "fixed",
         top: 0,
         left: 0,
-        height: percent(100),
-        width: percent(100),
+        right: 0,
+        bottom: 0,
+        margin: "auto",
+        height: unit(vars.fullPage.size),
+        width: unit(vars.fullPage.size),
         $nest: {
             "&:after": {
                 ...spinnerLoader(vars.fullPage),
             },
         },
+        zIndex: 1,
     });
     const mediumLoader = style("mediumLoader", {
         ...absolutePosition.fullSizeOfParent(),

@@ -6,12 +6,21 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, userSelect, colorOut, paddings, borders, fonts, allButtonStates } from "@library/styles/styleHelpers";
+import {
+    unit,
+    userSelect,
+    colorOut,
+    paddings,
+    borders,
+    fonts,
+    allButtonStates,
+    margins,
+} from "@library/styles/styleHelpers";
 import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -30,10 +39,10 @@ export const messagesVariables = useThemeCache(() => {
     });
 
     const colors = themeVars("colors", {
-        fg: globalVars.feedbackColors.warning.fg,
-        bg: globalVars.feedbackColors.warning.bg,
+        fg: globalVars.messageColors.warning.fg,
+        bg: globalVars.messageColors.warning.bg,
         states: {
-            fg: globalVars.feedbackColors.warning.state,
+            fg: globalVars.messageColors.warning.state,
         },
     });
 
@@ -70,7 +79,7 @@ export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
     const style = styleFactory("messages");
-    const headerVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
 
@@ -78,18 +87,19 @@ export const messagesClasses = useThemeCache(() => {
     const fixed = style("fixed", {
         position: "fixed",
         left: 0,
-        top: unit(headerVars.sizing.height - 8),
+        top: unit(titleBarVars.sizing.height - 8),
         minHeight: unit(vars.sizing.minHeight),
         width: percent(100),
         maxWidth: viewWidth(100),
         zIndex: 20,
     });
 
-    const root = style({
-        position: "relative",
-        margin: "auto",
-        width: percent(100),
-    });
+    const root = style(
+        {
+            width: percent(100),
+        },
+        margins({ horizontal: "auto" }),
+    );
 
     const wrap = style(
         "wrap",
@@ -123,7 +133,7 @@ export const messagesClasses = useThemeCache(() => {
     const message = style("message", {
         ...userSelect(),
         ...fonts(vars.text.font),
-        flexGrow: 1,
+        flex: 1,
     });
 
     const setWidth = style("setWidth", {

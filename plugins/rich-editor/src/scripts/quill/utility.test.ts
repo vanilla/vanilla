@@ -17,6 +17,7 @@ import {
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { _executeReady } from "@library/utility/appUtils";
+import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 
@@ -83,11 +84,12 @@ describe("getMentionRange", () => {
     let quill: Quill;
     let button: HTMLButtonElement;
     beforeEach(() => {
-        document.body.innerHTML = `
-            <div id="quill"></div>
-            <button id="button"></button>
-        `;
-        quill = new Quill(document.getElementById("quill")!);
+        quill = setupTestQuill(`
+            <form class="FormWrapper">
+                <div id='quill' class="richEditor"></div>
+                <button id="button"></button>
+            </form
+        `);
         button = document.getElementById("button") as HTMLButtonElement;
         quill.focus();
     });
@@ -160,7 +162,7 @@ describe("getMentionRange", () => {
         });
     });
 
-    it("Returns null when quill is not focused.", () => {
+    it("Returns even when quill is not focused.", () => {
         // Sanity check that this would otherwise be a valid mention.
         quill.setContents([{ insert: "@Somebody" }]);
         const selection = { index: 3, length: 0 };
@@ -169,7 +171,7 @@ describe("getMentionRange", () => {
 
         // Actual check.
         button.focus();
-        expect(getMentionRange(quill, selection)).to.eq(null);
+        expect(getMentionRange(quill, selection)).not.to.eq(null);
     });
 
     it("Returns null when the selection length is greater than 0", () => {
@@ -196,20 +198,20 @@ describe("getMentionRange", () => {
 
 describe("getIDForQuill()", () => {
     it("can generate an ID", () => {
-        const quill = new Quill(document.createElement("div"));
+        const quill = setupTestQuill();
         expect(getIDForQuill(quill)).to.be.a("string");
     });
 
     it("generates uniqueIds", () => {
-        const quill1 = new Quill(document.createElement("div"));
-        const quill2 = new Quill(document.createElement("div"));
+        const quill1 = setupTestQuill();
+        const quill2 = setupTestQuill();
         const id1 = getIDForQuill(quill1);
         const id2 = getIDForQuill(quill2);
         expect(id1).not.to.equal(id2);
     });
 
     it("generates id's consistently", () => {
-        const quill1 = new Quill(document.createElement("div"));
+        const quill1 = setupTestQuill();
         const id1 = getIDForQuill(quill1);
         const id2 = getIDForQuill(quill1);
         expect(id1).to.equal(id2);

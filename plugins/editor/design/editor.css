@@ -1,5 +1,7 @@
+@charset "UTF-8";
 .bodybox-wrap {
-  position: relative; }
+  position: relative;
+}
 
 .editor-upload-progress {
   position: absolute;
@@ -12,16 +14,19 @@
   border: 1px solid #38ABE3;
   opacity: 0;
   box-shadow: 0 1px 2px -1px #fff;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 .editor-upload-progress.fade-out {
   opacity: 0 !important;
-  transition: opacity 0.7s ease; }
+  transition: opacity 0.7s ease;
+}
 
 .editor-drop-cue .BodyBox,
 .editor-drop-cue iframe.wysihtml5-sandbox {
   border: 2px dashed rgba(0, 0, 0, 0.25) !important;
-  border-radius: 2px !important; }
+  border-radius: 2px !important;
+}
 
 .editor-upload-attention {
   display: none;
@@ -39,17 +44,20 @@
   border-radius: 2px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
   pointer-events: none;
-  z-index: 500; }
+  z-index: 500;
+}
 
 .editor-drop-cue .editor-upload-attention {
-  display: block; }
+  display: block;
+}
 
 /* If editor is fullpage */
 #editor-fullpage-candidate .editor-upload-progress {
-  margin: 0; }
-
+  margin: 0;
+}
 #editor-fullpage-candidate .editor-upload-attention {
-  top: 60px; }
+  top: 60px;
+}
 
 .editor-upload-previews,
 .editor-upload-saved {
@@ -57,7 +65,8 @@
   padding: 5px;
   margin: 0 -10px;
   box-sizing: border-box;
-  position: relative; }
+  position: relative;
+}
 
 .editor-file-preview {
   position: relative;
@@ -84,96 +93,115 @@
   animation-name: editor-file-preview;
   animation-fill-mode: both;
   animation-duration: 0.4s;
-  /* File permissions */ }
-  .editor-file-preview .file-preview {
-    display: block;
-    float: left;
-    width: 30px;
-    height: 30px; }
-    .editor-file-preview .file-preview.img {
-      padding: 0;
-      background-position: center;
-      background-size: 50px auto; }
-    .editor-file-preview .file-preview.icon-file {
-      font-size: 18px;
-      line-height: 30px;
-      text-align: center; }
-  .editor-file-preview .file-data {
-    float: left;
-    width: 158px;
-    padding: 2px 0;
-    margin: 0 0 0 5px;
-    line-height: 13px; }
-    .editor-file-preview .file-data .filename {
-      display: block;
-      width: 100%;
-      overflow: hidden;
-      color: rgba(0, 0, 0, 0.75);
-      white-space: nowrap;
-      text-overflow: ellipsis; }
-    .editor-file-preview .file-data .meta {
-      display: block;
-      margin: 0;
-      font-size: 10px; }
-      .editor-file-preview .file-data .meta em {
-        font-style: italic; }
-  .editor-file-preview .editor-file-remove {
-    float: right;
-    height: 30px;
-    cursor: pointer;
-    background-color: #fff;
-    box-shadow: inset 2px 0 2px -3px #000; }
-  .editor-file-preview .editor-file-remove:after {
-    display: block;
-    width: 24px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    line-height: 30px;
-    text-align: center;
-    content: "\00D7"; }
-  .editor-file-preview .editor-file-remove:hover:after {
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.6); }
-  .editor-file-preview .editor-file-reattach {
-    display: none; }
-  .editor-file-preview.file-readonly .file-data {
-    width: 178px; }
-  .editor-file-preview.file-readonly .editor-file-remove,
-  .editor-file-preview.file-readonly .editor-file-reattach {
-    display: none; }
+  /* File permissions */
+}
+.editor-file-preview .file-preview {
+  display: block;
+  float: left;
+  width: 30px;
+  height: 30px;
+}
+.editor-file-preview .file-preview.img {
+  padding: 0;
+  background-position: center;
+  background-size: 50px auto;
+}
+.editor-file-preview .file-preview.icon-file {
+  font-size: 18px;
+  line-height: 30px;
+  text-align: center;
+}
+.editor-file-preview .file-data {
+  float: left;
+  width: 158px;
+  padding: 2px 0;
+  margin: 0 0 0 5px;
+  line-height: 13px;
+}
+.editor-file-preview .file-data .filename {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.editor-file-preview .file-data .meta {
+  display: block;
+  margin: 0;
+  font-size: 10px;
+}
+.editor-file-preview .file-data .meta em {
+  font-style: italic;
+}
+.editor-file-preview .editor-file-remove {
+  float: right;
+  height: 30px;
+  cursor: pointer;
+  background-color: #fff;
+  box-shadow: inset 2px 0 2px -3px #000;
+}
+.editor-file-preview .editor-file-remove:after {
+  display: block;
+  width: 24px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 30px;
+  text-align: center;
+  content: "×";
+}
+.editor-file-preview .editor-file-remove:hover:after {
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.6);
+}
+.editor-file-preview .editor-file-reattach {
+  display: none;
+}
+.editor-file-preview.file-readonly .file-data {
+  width: 178px;
+}
+.editor-file-preview.file-readonly .editor-file-remove,
+.editor-file-preview.file-readonly .editor-file-reattach {
+  display: none;
+}
 
 /* Any files in this wrapper have no delete options. Only when moved into
 .editor-upload-previews will the options be activated */
 .editor-upload-readonly .file-data {
-  width: 178px; }
-
+  width: 178px;
+}
 .editor-upload-readonly .editor-file-remove,
 .editor-upload-readonly .editor-file-reattach,
 .editor-upload-readonly .in-body {
-  display: none; }
+  display: none;
+}
 
 .editor-file-removed {
   width: 32px;
   height: 32px;
-  opacity: 0.25 !important; }
-  .editor-file-removed .editor-file-reattach {
-    display: block;
-    height: 100%;
-    width: 100%;
-    opacity: 0;
-    position: relative;
-    z-index: 10;
-    cursor: pointer; }
+  opacity: 0.25 !important;
+}
+.editor-file-removed .editor-file-reattach {
+  display: block;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
 
 @keyframes editor-file-preview {
   0% {
     opacity: 0;
-    transform: scale(1.1); }
+    transform: scale(1.1);
+  }
   100% {
     opacity: 1;
-    transform: scale(1); } }
-
+    transform: scale(1);
+  }
+}
 /**
  * Editor toolbar
  */
@@ -185,35 +213,42 @@
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
-          user-select: none; }
-  .editor-active .editor {
-    display: block; }
-  .editor .icon {
-    display: inline-block;
-    padding: 2px 6px;
-    margin: 0 1px;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent; }
-  .editor .editor-sep {
-    margin: 0 5px;
-    border-left: 1px solid;
-    border-left-color: #999;
-    border-left-color: rgba(0, 0, 0, 0.1); }
-  .editor .editor-dropdown {
-    display: inline-block;
-    position: relative; }
-  .editor .icon-caret-down {
-    position: relative;
-    top: -2px;
-    right: -2px;
-    min-width: 0 !important;
-    padding: 0 0 0 5px;
-    font-size: 75%;
-    pointer-events: none; }
+          user-select: none;
+}
+.editor-active .editor {
+  display: block;
+}
+.editor .icon {
+  display: inline-block;
+  padding: 2px 6px;
+  margin: 0 1px;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+}
+.editor .editor-sep {
+  margin: 0 5px;
+  border-left: 1px solid;
+  border-left-color: #999;
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+.editor .editor-dropdown {
+  display: inline-block;
+  position: relative;
+}
+.editor .icon-caret-down {
+  position: relative;
+  top: -2px;
+  right: -2px;
+  min-width: 0 !important;
+  padding: 0 0 0 5px;
+  font-size: 75%;
+  pointer-events: none;
+}
 
 .editor-help-text {
-  font-size: 11px; }
+  font-size: 11px;
+}
 
 /* State of icons */
 .editor .icon:hover,
@@ -223,7 +258,8 @@
 .editor-dropdown-open > .editor-action {
   background-color: #999;
   background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 2px; }
+  border-radius: 2px;
+}
 
 /**
  * Dropdowns
@@ -234,38 +270,47 @@
   display: none;
   padding: 5px;
   margin: 5px 0 0 0;
-  width: 300px; }
+  width: 300px;
+}
 
 .editor-dropdown-open .editor-insert-dialog {
-  display: block; }
+  display: block;
+}
 
 .MenuButtons {
   margin-top: 5px;
-  text-align: right; }
-  .MenuButtons .Button {
-    min-width: 55px; }
+  text-align: right;
+}
+.MenuButtons .Button {
+  min-width: 55px;
+}
 
 .editor-dropdown-open .editor-insert-dialog label {
-  display: inline !important; }
+  display: inline !important;
+}
 
 .editor-insert-dialog input.InputBox {
   width: 100%;
   margin: 0;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 .dd-separator {
   background-color: rgba(0, 0, 0, 0.1);
   height: 1px;
-  margin: 5px 0; }
+  margin: 5px 0;
+}
 
 /**
  * Colors dropdown
  */
 .editor-dropdown-color .editor-insert-dialog {
-  width: 56px; }
+  width: 56px;
+}
 
 .editor-dropdown-color.color-has-highlight .editor-insert-dialog {
-  width: 134px; }
+  width: 134px;
+}
 
 .editor-dropdown-color .editor-insert-dialog .color {
   width: 24px;
@@ -275,7 +320,8 @@
   border: 1px solid #fff;
   box-shadow: inset 0 0 0 1px #fff;
   transition: transform 0.2s ease;
-  margin: 1px; }
+  margin: 1px;
+}
 
 .editor-dropdown-color .editor-insert-dialog .color:hover,
 .editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
@@ -284,22 +330,26 @@
   position: relative;
   z-index: 10;
   border: 1px solid transparent;
-  border-radius: 2px; }
+  border-radius: 2px;
+}
 
 .editor-dropdown-color .editor-insert-dialog .color-group {
   width: 56px;
-  display: inline-block; }
+  display: inline-block;
+}
 
 .editor-dropdown-color .editor-insert-dialog .color-group .icon {
   display: block;
   padding: 5px 0 5px 2px;
   background: 0;
-  cursor: default; }
+  cursor: default;
+}
 
 .editor-dropdown-color .editor-insert-dialog .highlight-color {
   border-left: 1px solid #EFEFEF;
   padding-left: 10px;
-  margin-left: 10px; }
+  margin-left: 10px;
+}
 
 /**
  * Headers dropdown
@@ -308,170 +358,208 @@
   padding: 5px 0;
   width: auto;
   /*
-    max-height: 230px;
-    overflow-y: auto;
-    */ }
-  .editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
-    border-radius: 0; }
+  max-height: 230px;
+  overflow-y: auto;
+  */
+}
+.editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
+  border-radius: 0;
+}
 
 /**
  * Emoji drop down
  */
 .editor-dd-emoji + .editor-insert-dialog {
   width: 136px;
-  box-sizing: content-box; }
-  .editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
-    line-height: 34px;
-    width: 34px;
-    overflow: hidden;
-    text-align: center;
-    float: left; }
-    .editor-dd-emoji + .editor-insert-dialog .emoji-wrap:hover {
-      cursor: pointer;
-      background-color: rgba(0, 0, 0, 0.1);
-      border-radius: 2px; }
-  .editor-dd-emoji + .editor-insert-dialog .emoji {
-    line-height: 34px;
-    display: inline-block;
-    vertical-align: middle; }
+  box-sizing: content-box;
+}
+.editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
+  line-height: 34px;
+  width: 34px;
+  overflow: hidden;
+  text-align: center;
+  float: left;
+}
+.editor-dd-emoji + .editor-insert-dialog .emoji-wrap:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+.editor-dd-emoji + .editor-insert-dialog .emoji {
+  line-height: 34px;
+  display: inline-block;
+  vertical-align: middle;
+}
 
 /**
  * File and image dropdown
  */
 .editor-file-image {
-  padding: 0; }
-  .editor-file-image .file-title {
-    padding: 10px;
-    font-weight: 700; }
-    .editor-file-image .file-title .info {
-      font-size: 80%;
-      font-weight: 400; }
-  .editor-file-image .file-input {
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 10px; }
-    .editor-file-image .file-input input[type=file] {
-      visibility: visible !important; }
-  .editor-file-image .image-input {
-    padding: 10px; }
-  .editor-file-image .dd-separator {
-    margin: 0; }
-  .editor-file-image.drag-passthrough {
-    opacity: 0;
-    pointer-events: none;
-    transition: all 200ms ease;
-    transform: scale(0); }
+  padding: 0;
+}
+.editor-file-image .file-title {
+  padding: 10px;
+  font-weight: 700;
+}
+.editor-file-image .file-title .info {
+  font-size: 80%;
+  font-weight: 400;
+}
+.editor-file-image .file-input {
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10px;
+}
+.editor-file-image .file-input input[type=file] {
+  visibility: visible !important;
+}
+.editor-file-image .image-input {
+  padding: 10px;
+}
+.editor-file-image .dd-separator {
+  margin: 0;
+}
+.editor-file-image.drag-passthrough {
+  opacity: 0;
+  pointer-events: none;
+  transition: all 200ms ease;
+  transform: scale(0);
+}
 
 .editor-dropdown-image .editor-file-image .image-input {
-  border-top: 0; }
+  border-top: 0;
+}
 
 /**
  * Going full page
  */
 .editor-toggle-fullpage-button {
-  float: right; }
+  float: right;
+}
 
 /* Added to body class with JS, so force specificity for everything
    below; this makes editing very easy */
 .editor-fullpage {
-  overflow: hidden !important; }
-  .editor-fullpage .TextBoxWrapper {
-    padding: 0; }
-    .editor-fullpage .TextBoxWrapper .BodyBox,
-    .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-      width: 100% !important;
-      color: #000;
-      box-sizing: border-box !important;
-      transition: background-color 400ms ease, color 400ms ease; }
-    .editor-fullpage .TextBoxWrapper .BodyBox {
-      min-height: 400px; }
-    .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-      height: 400px !important; }
-  .editor-fullpage #editor-fullpage-candidate {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100000;
-    /* So high because a client actually had 99999 in a theme */
-    height: 100%;
-    width: 100%;
-    padding: 0;
-    overflow-y: auto;
-    background-color: #fff;
-    transition: background-color 400ms ease; }
-    .editor-fullpage #editor-fullpage-candidate input {
-      box-sizing: border-box !important; }
-    .editor-fullpage #editor-fullpage-candidate .editor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100001;
-      /* So high because a client actually had 99999 in a theme */
-      margin: 0 auto;
-      background-color: rgba(255, 255, 255, 0.95);
-      border: 1px solid transparent;
-      box-shadow: 0 2px 5px -5px #000;
-      transition: all 400ms ease; }
-    .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
-      padding: 50px 0 10px 0;
-      margin: 0 auto; }
-    .editor-fullpage #editor-fullpage-candidate .editor,
-    .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
-    .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
-      max-width: 800px;
-      animation-duration: 800ms;
-      animation-name: editor-anim-editor; }
-    .editor-fullpage #editor-fullpage-candidate .editor-help-text {
-      display: none; }
-    .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
-      margin: 0 auto; }
+  overflow: hidden !important;
+}
+.editor-fullpage .TextBoxWrapper {
+  padding: 0;
+}
+.editor-fullpage .TextBoxWrapper .BodyBox,
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+  width: 100% !important;
+  color: #000;
+  box-sizing: border-box !important;
+  transition: background-color 400ms ease, color 400ms ease;
+}
+.editor-fullpage .TextBoxWrapper .BodyBox {
+  min-height: 400px;
+}
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+  height: 400px !important;
+}
+.editor-fullpage #editor-fullpage-candidate {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100000;
+  /* So high because a client actually had 99999 in a theme */
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  overflow-y: auto;
+  background-color: #fff;
+  transition: background-color 400ms ease;
+}
+.editor-fullpage #editor-fullpage-candidate input {
+  box-sizing: border-box !important;
+}
+.editor-fullpage #editor-fullpage-candidate .editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100001;
+  /* So high because a client actually had 99999 in a theme */
+  margin: 0 auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid transparent;
+  box-shadow: 0 2px 5px -5px #000;
+  transition: all 400ms ease;
+}
+.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
+  padding: 50px 0 10px 0;
+  margin: 0 auto;
+}
+.editor-fullpage #editor-fullpage-candidate .editor,
+.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
+.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+  max-width: 800px;
+  animation-duration: 800ms;
+  animation-name: editor-anim-editor;
+}
+.editor-fullpage #editor-fullpage-candidate .editor-help-text {
+  display: none;
+}
+.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+  margin: 0 auto;
+}
 
 /**
  * Experimental toggle lights on/off.
  */
 .editor-toggle-lights-button {
-  display: none !important; }
+  display: none !important;
+}
 
 .editor-fullpage .editor-toggle-lights-button {
   float: right;
-  /*display: inline-block !important;*/ }
+  /*display: inline-block !important;*/
+}
 
 .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
-  background-color: #000; }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor {
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 5px 5px -5px #999; }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover,
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active,
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active,
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
-    background-color: rgba(255, 255, 255, 0.25); }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .editor-sep {
-    border-left: 1px solid rgba(255, 255, 255, 0.25); }
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .BodyBox,
-  .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .wysihtml5-sandbox {
-    color: #999 !important;
-    background-color: #000 !important;
-    border-color: #222 !important; }
+  background-color: #000;
+}
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 5px 5px -5px #999;
+}
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover,
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active,
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active,
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .editor-sep {
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+}
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .BodyBox,
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .TextBoxWrapper .wysihtml5-sandbox {
+  color: #999 !important;
+  background-color: #000 !important;
+  border-color: #222 !important;
+}
 
 /* This should match the above values, and needs to be added as a class name
 directly on the iframe's bodybox contenteditable. */
 .iframe-bodybox-lightsoff {
   background-color: transparent !important;
-  color: #999999 !important; }
+  color: #999999 !important;
+}
 
 .iframe-bodybox-lightson {
   background-color: transparent !important;
-  color: #000 !important; }
+  color: #000 !important;
+}
 
 @keyframes editor-anim-editor {
   0% {
-    opacity: 0; } }
-
+    opacity: 0;
+  }
+}
 /**
  * Hide some actions per editor view.
  *
@@ -496,7 +584,8 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-bbcode .editor-action-separator {
   /* Defined as important, because some themes have overriden with their own
      !important values. */
-  display: none !important; }
+  display: none !important;
+}
 
 .editor-format-text .editor-sep,
 .editor-format-text .icon-bold,
@@ -524,11 +613,13 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-textex .icon-align-right,
 .editor-format-textex .editor-toggle-source,
 .editor-format-textex .editor-toggle-fullpage-button {
-  display: none !important; }
+  display: none !important;
+}
 
 .editor-format-text .editor-dropdown-image,
 .editor-format-text .editor-dropdown-upload {
-  display: none !important; }
+  display: none !important;
+}
 
 /**
  * When wysiwyg editor switches to code view, disable functionality and visibly
@@ -538,12 +629,13 @@ directly on the iframe's bodybox contenteditable. */
  */
 .wysihtml5-commands-disabled .editor-action {
   opacity: 0.25;
-  pointer-events: none; }
-
+  pointer-events: none;
+}
 .wysihtml5-commands-disabled .editor-toggle-source,
 .wysihtml5-commands-disabled .editor-toggle-fullpage-button {
   opacity: 1;
-  pointer-events: auto; }
+  pointer-events: auto;
+}
 
 /**
  * Brute force hide other editors enabled after this one.
@@ -554,71 +646,85 @@ directly on the iframe's bodybox contenteditable. */
  * are enabled.
  */
 .editor-active .cleditorMain iframe {
-  display: none !important; }
+  display: none !important;
+}
 
 .editor-active .cleditorMain .wysihtml5-sandbox {
-  display: block !important; }
+  display: block !important;
+}
 
 .editor-active .cleditorToolbar,
 .editor-active .ButtonBar,
 .editor-active .ButtonBarMarkupHint {
-  display: none !important; }
+  display: none !important;
+}
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
   .editor-optional-button {
-    display: none !important; }
+    display: none !important;
+  }
+
   .editor-fullpage .TextBoxWrapper .BodyBox,
-  .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-    height: auto !important; }
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    height: auto !important;
+  }
+
   /* This is not necessary or very specific, but on mobile, apple products
      add rounded corners */
   textarea {
-    border-radius: 0; } }
-
+    border-radius: 0;
+  }
+}
 /**
  * Mobile tweaks, specifically for Lithe Mobile
  */
 .editor-mobile .editor-dropdown-upload,
 .editor-mobile .editor-dropdown-image {
-  position: static; }
-  .editor-mobile .editor-dropdown-upload .editor-insert-dialog,
-  .editor-mobile .editor-dropdown-image .editor-insert-dialog {
-    left: 0;
-    right: 0;
-    top: auto;
-    width: auto; }
-
+  position: static;
+}
+.editor-mobile .editor-dropdown-upload .editor-insert-dialog,
+.editor-mobile .editor-dropdown-image .editor-insert-dialog {
+  left: 0;
+  right: 0;
+  top: auto;
+  width: auto;
+}
 .editor-mobile .editor-dropdown-default .editor-dd-emoji + .editor-insert-dialog {
   min-width: 132px;
-  padding: 5px; }
-
+  padding: 5px;
+}
 .editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog {
   right: auto;
-  left: 0; }
-  .editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog a {
-    display: block;
-    padding: 5px 10px;
-    cursor: pointer; }
-
+  left: 0;
+}
+.editor-mobile .editor-dropdown-default .editor-dd-format + .editor-insert-dialog a {
+  display: block;
+  padding: 5px 10px;
+  cursor: pointer;
+}
 .editor-mobile .editor-dropdown-link .editor-insert-dialog {
-  padding: 5px; }
-
+  padding: 5px;
+}
 .editor-mobile #drop-cue-dropdown,
 .editor-mobile .file-input .file-or {
-  display: none !important; }
-
+  display: none !important;
+}
 .editor-mobile .FileBox {
-  overflow: hidden; }
-  .editor-mobile .FileBox label,
-  .editor-mobile .FileBox input {
-    float: left;
-    width: auto; }
-  .editor-mobile .FileBox label {
-    padding-top: 5px;
-    padding-bottom: 5px; }
-  .editor-mobile .FileBox label .icon:hover {
-    background-color: inherit; }
+  overflow: hidden;
+}
+.editor-mobile .FileBox label,
+.editor-mobile .FileBox input {
+  float: left;
+  width: auto;
+}
+.editor-mobile .FileBox label {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.editor-mobile .FileBox label .icon:hover {
+  background-color: inherit;
+}
 
 /**
  * Modify this file to change the styling of the content
@@ -628,33 +734,42 @@ directly on the iframe's bodybox contenteditable. */
  * Editor action styles within editor and post
  */
 .post-font-size-smaller {
-  font-size: smaller; }
+  font-size: smaller;
+}
 
 .post-font-size-larger {
-  font-size: larger; }
+  font-size: larger;
+}
 
 .post-font-size-xx-large {
-  font-size: xx-large; }
+  font-size: xx-large;
+}
 
 .post-font-size-x-large {
-  font-size: x-large; }
+  font-size: x-large;
+}
 
 .post-font-size-large {
-  font-size: 18px; }
+  font-size: 18px;
+}
 
 .post-font-size-medium,
 .post-font-size-normal,
 .post-font-size-default {
-  font-size: 13px; }
+  font-size: 13px;
+}
 
 .post-font-size-small {
-  font-size: 11px; }
+  font-size: 11px;
+}
 
 .post-font-size-x-small {
-  font-size: x-small; }
+  font-size: x-small;
+}
 
 .post-font-size-xx-small {
-  font-size: xx-small; }
+  font-size: xx-small;
+}
 
 /**
  * These two are not actually inserted into the editor. They are only used for
@@ -663,189 +778,242 @@ directly on the iframe's bodybox contenteditable. */
 .post-font-size-h1 {
   font-size: 21px;
   font-weight: bold;
-  line-height: 31px !important; }
+  line-height: 31px !important;
+}
 
 .post-font-size-h2 {
   font-size: 18px;
   font-weight: bold;
-  line-height: 26px !important; }
+  line-height: 26px !important;
+}
 
 /* Colours based on http://clrs.cc/
 cell-* are used for the dropdown */
 .post-color-black {
-  color: #111111; }
+  color: #111111;
+}
 
 .cell-color-black,
 .post-highlightcolor-black {
-  background-color: #111111; }
+  background-color: #111111;
+}
 
 .post-color-silver {
-  color: #dddddd; }
+  color: #dddddd;
+}
 
 .cell-color-silver,
 .post-highlightcolor-silver {
-  background-color: #dddddd; }
+  background-color: #dddddd;
+}
 
 .post-color-gray {
-  color: #aaaaaa; }
+  color: #aaaaaa;
+}
 
 .cell-color-gray,
 .post-highlightcolor-gray {
-  background-color: #aaaaaa; }
+  background-color: #aaaaaa;
+}
 
 .post-color-white {
-  color: #ffffff; }
+  color: #ffffff;
+}
 
 .cell-color-white,
 .post-highlightcolor-white {
-  background-color: #ffffff; }
+  background-color: #ffffff;
+}
 
 .post-color-maroon {
-  color: #85144b; }
+  color: #85144b;
+}
 
 .cell-color-maroon,
 .post-highlightcolor-maroon {
-  background-color: #85144b; }
+  background-color: #85144b;
+}
 
 .post-color-red {
-  color: #ff4136; }
+  color: #ff4136;
+}
 
 .cell-color-red,
 .post-highlightcolor-red {
-  background-color: #ff4136; }
+  background-color: #ff4136;
+}
 
 .post-color-purple {
-  color: #7b11d0; }
+  color: #7b11d0;
+}
 
 .cell-color-purple,
 .post-highlightcolor-purple {
-  background-color: #7b11d0; }
+  background-color: #7b11d0;
+}
 
 .post-color-fuchsia {
-  color: #f012be; }
+  color: #f012be;
+}
 
 .cell-color-fuchsia,
 .post-highlightcolor-fuchsia {
-  background-color: #f012be; }
+  background-color: #f012be;
+}
 
 .post-color-green {
-  color: #2ecc40; }
+  color: #2ecc40;
+}
 
 .cell-color-green,
 .post-highlightcolor-green {
-  background-color: #2ecc40; }
+  background-color: #2ecc40;
+}
 
 .post-color-lime {
-  color: #01ff70; }
+  color: #01ff70;
+}
 
 .cell-color-lime,
 .post-highlightcolor-lime {
-  background-color: #01ff70; }
+  background-color: #01ff70;
+}
 
 .post-color-olive {
-  color: #3d9970; }
+  color: #3d9970;
+}
 
 .cell-color-olive,
 .post-highlightcolor-olive {
-  background-color: #3d9970; }
+  background-color: #3d9970;
+}
 
 .post-color-yellow {
-  color: #ffdc00; }
+  color: #ffdc00;
+}
 
 .cell-color-yellow,
 .post-highlightcolor-yellow {
-  background-color: #ffdc00; }
+  background-color: #ffdc00;
+}
 
 .post-color-navy {
-  color: #001f3f; }
+  color: #001f3f;
+}
 
 .cell-color-navy,
 .post-highlightcolor-navy {
-  background-color: #001f3f; }
+  background-color: #001f3f;
+}
 
 .post-color-blue {
-  color: #0074d9; }
+  color: #0074d9;
+}
 
 .cell-color-blue,
 .post-highlightcolor-blue {
-  background-color: #0074d9; }
+  background-color: #0074d9;
+}
 
 .post-color-teal {
-  color: #39cccc; }
+  color: #39cccc;
+}
 
 .cell-color-teal,
 .post-highlightcolor-teal {
-  background-color: #39cccc; }
+  background-color: #39cccc;
+}
 
 .post-color-aqua {
-  color: #7fdbff; }
+  color: #7fdbff;
+}
 
 .cell-color-aqua,
 .post-highlightcolor-aqua {
-  background-color: #7fdbff; }
+  background-color: #7fdbff;
+}
 
 .post-color-orange {
-  color: #ffa500; }
+  color: #ffa500;
+}
 
 .cell-color-orange,
 .post-highlightcolor-orange {
-  background-color: #ffa500; }
+  background-color: #ffa500;
+}
 
 .post-text-align-right {
-  text-align: right; }
+  text-align: right;
+}
 
 .post-text-align-center {
-  text-align: center; }
+  text-align: center;
+}
 
 .post-text-align-left {
-  text-align: left; }
+  text-align: left;
+}
 
 .post-text-align-justify {
-  text-align: justify; }
+  text-align: justify;
+}
 
 .post-float-left {
   float: left;
-  margin: 0 8px 8px 0; }
+  margin: 0 8px 8px 0;
+}
 
 .post-float-right {
   float: right;
-  margin: 0 0 8px 8px; }
+  margin: 0 0 8px 8px;
+}
 
 .post-clear-right {
-  clear: right; }
+  clear: right;
+}
 
 .post-clear-left {
-  clear: left; }
+  clear: left;
+}
 
 /**
  * Font families
  */
 .post-fontfamily-default {
-  font-family: inherit; }
+  font-family: inherit;
+}
 
 .post-fontfamily-arial {
-  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; }
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
 
 .post-fontfamily-comicsansms {
-  font-family: 'Comic Sans MS', cursive !important; }
+  font-family: "Comic Sans MS", cursive !important;
+}
 
 .post-fontfamily-couriernew {
-  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace; }
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
 
 .post-fontfamily-georgia {
-  font-family: Georgia, Times, 'Times New Roman', serif; }
+  font-family: Georgia, Times, "Times New Roman", serif;
+}
 
 .post-fontfamily-impact {
-  font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif; }
+  font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans-serif;
+}
 
 .post-fontfamily-timesnewroman {
-  font-family: 'Times New Roman', Times, Baskerville, Georgia, serif; }
+  font-family: "Times New Roman", Times, Baskerville, Georgia, serif;
+}
 
 .post-fontfamily-trebuchetms {
-  font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; }
+  font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+}
 
 .post-fontfamily-verdana {
-  font-family: Verdana, Geneva, sans-serif; }
+  font-family: Verdana, Geneva, sans-serif;
+}
 
 /* Custom classes */
 blockquote.Quote,
@@ -855,19 +1023,23 @@ div.Quote {
   margin: 1em;
   padding: 1ex 10px;
   min-width: 200px;
-  overflow-y: auto; }
+  overflow-y: auto;
+}
 
 .bbcode_left,
 .AlignLeft {
-  text-align: left; }
+  text-align: left;
+}
 
 .bbcode_center,
 .AlignCenter {
-  text-align: center; }
+  text-align: center;
+}
 
 .bbcode_right,
 .AlignRight {
-  text-align: right; }
+  text-align: right;
+}
 
 /**
  * Target iframe and actual body within editor iframe. Do not use body to set
@@ -884,49 +1056,57 @@ div.Quote {
   border: 0;
   padding: inherit;
   font: inherit;
-  outline: none; }
-  .editor-composer img {
-    max-width: 100%; }
-  .editor-composer div.Spoiler {
-    padding: 10px 10px;
-    margin: 4px 10px 4px 0;
-    background-color: #e6e6e6;
-    border-radius: 3px; }
-  .editor-composer div.Spoiler p {
-    padding: 3px 0 3px 5px;
-    margin: 0;
-    border-left: 1px solid #818181;
-    border-left: 1px solid rgba(0, 0, 0, 0.2); }
-  .editor-composer pre {
-    display: block;
-    padding: 4px 8px;
-    margin: 1em 0;
-    font-size: 13px;
-    word-break: break-all;
-    word-wrap: break-word;
-    background: #ff9;
-    border-radius: 2px;
-    border: 1px solid #eec; }
-  .editor-composer pre code {
-    padding: 0;
-    font-size: inherit;
-    color: inherit;
-    white-space: pre-wrap;
-    background-color: transparent;
-    border: 0;
-    border-radius: 0; }
+  outline: none;
+}
+.editor-composer img {
+  max-width: 100%;
+}
+.editor-composer div.Spoiler {
+  padding: 10px 10px;
+  margin: 4px 10px 4px 0;
+  background-color: #e6e6e6;
+  border-radius: 3px;
+}
+.editor-composer div.Spoiler p {
+  padding: 3px 0 3px 5px;
+  margin: 0;
+  border-left: 1px solid #818181;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+.editor-composer pre {
+  display: block;
+  padding: 4px 8px;
+  margin: 1em 0;
+  font-size: 13px;
+  word-break: break-all;
+  word-wrap: break-word;
+  background: #ff9;
+  border-radius: 2px;
+  border: 1px solid #eec;
+}
+.editor-composer pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre-wrap;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+}
 
 /**
  * Adjust some styles explicitly within the editor composer. These match the
  * styles in styles.css. These rules match the font sizes for post-font-size-h*
  */
 .editor-composer h1 {
-  font-size: 21px; }
-
+  font-size: 21px;
+}
 .editor-composer h2 {
-  font-size: 18px; }
+  font-size: 18px;
+}
 
 /* Keep here to address iframe/body padding text creep issue, see autogrow js
 for more information about the issue */
 .wysihtml5-sandbox {
-  padding: 0 !important; }
+  padding: 0 !important;
+}

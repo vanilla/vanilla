@@ -126,7 +126,7 @@ class QuotesPlugin extends Gdn_Plugin {
         ]);
 
         // Form submission handling.
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack(true)) {
             $newFoldingLevel = $sender->Form->getValue('QuoteFolding', '1');
             if ($newFoldingLevel != $quoteFolding) {
                 Gdn::userModel()->savePreference($userID, 'Quotes.Folding', $newFoldingLevel);
@@ -458,13 +458,9 @@ BLOCKQUOTE;
             $newBody = $data->Body;
             if ($quoteFormat != $newFormat) {
                 if (in_array($newFormat, ['Html', 'Wysiwyg'])) {
-                    $newBody = Gdn_Format::to($newBody, $quoteFormat);
-                } elseif ($quoteFormat == 'Html' && $newFormat == 'BBCode') {
-                    $newBody = Gdn_Format::text($newBody, false);
-                } elseif ($quoteFormat == 'Text' && $newFormat == 'BBCode') {
-                    $newBody = Gdn_Format::text($newBody, false);
+                    $newBody = Gdn::formatService()->renderHtml($newBody, $quoteFormat);
                 } else {
-                    $newBody = Gdn_Format::plainText($newBody, $quoteFormat);
+                    $newBody = Gdn::formatService()->renderPlainText($newBody, $quoteFormat);
                 }
 
                 if (!in_array($newFormat, ['Html', 'Wysiwyg'])) {

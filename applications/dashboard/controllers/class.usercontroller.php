@@ -8,16 +8,36 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Handles /user endpoint.
  */
 class UserController extends DashboardController {
+
+    /** @var ConfigurationInterface */
+    private $config;
 
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Database', 'Form'];
 
     /** @var Gdn_Form */
     public $Form;
+
+    /** @var UserModel */
+    public $userModel;
+
+    /**
+     * Configure the controller.
+     *
+     * @param ConfigurationInterface $config
+     * @param Gdn_UserModel $userModel
+     */
+    public function __construct(ConfigurationInterface $config = null, UserModel $userModel = null) {
+        $this->config = $config instanceof ConfigurationInterface ? $config : Gdn::getContainer()->get(ConfigurationInterface::class);
+        $this->userModel = $userModel instanceof UserModel ? $userModel : Gdn::getContainer()->get(UserModel::class);
+        parent::__construct();
+    }
 
     /**
      * Highlight menu path. Automatically run on every use.
@@ -223,6 +243,20 @@ class UserController extends DashboardController {
     }
 
     /**
+     * Should guest users be allowed to search existing users by name and email?
+     *
+     * @param bool $throw Throw an exception if the action is not allowed?
+     * @return boolean
+     */
+    private function verifyGuestSearchAllowed(bool $throw): bool {
+        $result = $this->userModel->allowGuestUserSearch();
+        if (!$result && $throw) {
+            throw new Gdn_UserException("This action is not allowed for private communities.");
+        }
+        return $result;
+    }
+
+    /**
      * Show how many applicants are in the queue.
      *
      * @since 2.0.0
@@ -314,7 +348,7 @@ class UserController extends DashboardController {
             $passwordChecked = $passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user));
 
             // Rate limiting
-            Gdn::userModel()->rateLimit($user, $passwordChecked);
+            Gdn::userModel()->rateLimit($user);
 
             if ($passwordChecked) {
                 $this->setData('User', arrayTranslate((array)$user, ['UserID', 'Name', 'Email', 'PhotoUrl']));
@@ -779,6 +813,8 @@ class UserController extends DashboardController {
      * @param string $email Email address to be checked.
      */
     public function emailAvailable($email = '') {
+        $this->verifyGuestSearchAllowed(true);
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $available = true;
 
@@ -1150,6 +1186,8 @@ class UserController extends DashboardController {
      * @param string $name Username to be checked.
      */
     public function usernameAvailable($name = '') {
+        $this->verifyGuestSearchAllowed(true);
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $available = true;
         if (c('Garden.Registration.NameUnique', true) && $name != '') {
@@ -1186,7 +1224,9 @@ class UserController extends DashboardController {
 
         // First, set the field value.
         Gdn::userModel()->setField($UserID, 'Verified', $Verified);
-
+        // Send the current $verified value to userVerified.
+        $User = (object)$User;
+        $User->Verified = $Verified;
         // Send back the verified button.
         require_once $this->fetchViewLocation('helper_functions', 'Profile', 'Dashboard');
         $this->jsonTarget('.User-Verified', userVerified($User), 'ReplaceWith');

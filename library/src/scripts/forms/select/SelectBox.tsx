@@ -5,18 +5,16 @@
  */
 
 import React from "react";
-import { downTriangle, checkCompact } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
-import Frame from "@library/layout/frame/Frame";
-import FrameBody from "@library/layout/frame/FrameBody";
+import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 
 export interface ISelectBoxItem {
     name: string;
@@ -112,7 +110,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     )}
                 >
                     <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
-                        {selected && checkCompact("selectBox-selectedIcon")}
+                        {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
                         {!selected && (
                             <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
                                 {` `}
@@ -132,7 +130,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
             this.state.selectedItem && this.state.selectedItem.name ? (
                 <React.Fragment>
                     {this.state.selectedItem.name}
-                    {downTriangle("selectBox-buttonIcon", classes.buttonIcon)}
+                    <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
                 </React.Fragment>
             ) : null;
         return (
@@ -144,7 +142,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 <div className="selectBox-content">
                     <DropDown
                         id={this.state.id}
-                        className="selectBox-dropDown"
+                        className={classNames(
+                            "selectBox-dropDown",
+                            "dropDownItem-verticalPadding",
+                            classesDropDown.verticalPadding,
+                        )}
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
@@ -153,15 +155,10 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         renderAbove={this.props.renderAbove}
                         renderLeft={this.props.renderLeft}
                         openAsModal={this.props.openAsModal}
+                        flyoutType={FlyoutType.LIST}
                         selfPadded={true}
                     >
-                        <Frame>
-                            <FrameBody
-                                className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}
-                            >
-                                {selectItems}
-                            </FrameBody>
-                        </Frame>
+                        {selectItems}
                     </DropDown>
                 </div>
             </div>

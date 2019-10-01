@@ -8,7 +8,7 @@ import React from "react";
 import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");
@@ -21,7 +21,10 @@ export const subcommunityListVariables = useThemeCache(() => {
         columnsWidth: 912,
     });
 
-    return { spacing, sizing };
+    return {
+        spacing,
+        sizing,
+    };
 });
 
 export const subcommunityListClasses = useThemeCache(() => {
@@ -35,8 +38,9 @@ export const subcommunityListClasses = useThemeCache(() => {
             maxWidth: unit(vars.sizing.columnsWidth),
             padding: unit(vars.spacing.padding),
             margin: "auto",
+            width: percent(100),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             padding: 0,
         }),
     );
@@ -50,7 +54,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             alignItems: "stretch",
             justifyContent: "space-between",
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             display: "block",
         }),
     );
@@ -64,7 +68,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             justifyContent: "stretch",
             width: unit(vars.sizing.columnWidth),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             display: "block",
             width: percent(100),
         }),

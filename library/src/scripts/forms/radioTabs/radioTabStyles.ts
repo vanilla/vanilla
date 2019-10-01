@@ -18,7 +18,7 @@ import {
     borderRadii,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 
@@ -49,12 +49,12 @@ export const radioTabsVariables = useThemeCache(() => {
     const font: IFont = makeVars("font", {
         size: globalVars.fonts.size.small,
         align: "center",
-        lineHeight: sizing.height,
+        lineHeight: unit(sizing.height),
     });
 
     const spacing = makeVars("spacing", {
         paddings: {
-            horizontal: 6,
+            horizontal: 8,
         },
     });
 
@@ -71,12 +71,14 @@ export const radioTabsVariables = useThemeCache(() => {
     const leftTab = makeVars("leftTab", {
         radii: {
             left: 3,
+            right: 0,
         },
     });
 
     const rightTab = makeVars("rightTab", {
         radii: {
             right: 3,
+            left: 0,
         },
     });
 
@@ -125,12 +127,12 @@ export const radioTabClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             flexGrow: 0,
             $nest: {
                 label: {
-                    minHeight: formElementVariables.sizing.height,
-                    lineHeight: formElementVariables.sizing.height,
+                    minHeight: unit(formElementVariables.sizing.height),
+                    lineHeight: unit(formElementVariables.sizing.height),
                 },
             },
         }),
@@ -147,7 +149,6 @@ export const radioTabClasses = useThemeCache(() => {
         textAlign: "center",
         width: percent(100),
         minHeight: unit(vars.sizing.height),
-        lineHeight: unit(vars.sizing.height),
         minWidth: unit(vars.sizing.minWidth),
         backgroundColor: colorOut(vars.colors.bg),
         ...fonts(vars.font),

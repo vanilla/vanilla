@@ -9,17 +9,20 @@ import { AutoSizer, Grid } from "react-virtualized";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/flyouts/pieces/emojiData";
 import { emojiGroupsClasses } from "@rich-editor/flyouts/pieces/insertEmojiGroupClasses";
 import { insertEmojiClasses } from "@rich-editor/flyouts/pieces/insertEmojiClasses";
 import { EmojiGroupButton } from "@rich-editor/flyouts/pieces/EmojiGroupButton";
 import EmojiButton from "@rich-editor/flyouts/pieces/EmojiButton";
 import Flyout from "@rich-editor/flyouts/pieces/Flyout";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
-const BUTTON_SIZE = 36;
-const COL_SIZE = 7;
-const ROW_SIZE = 7;
+const BUTTON_SIZE = richEditorVariables().sizing.emojiSize;
+const COL_SIZE = 8;
+const ROW_SIZE = 8;
 const rowIndexesByGroupId = {};
 const cellIndexesByGroupId = {};
 
@@ -41,6 +44,7 @@ interface IProps extends IWithEditorProps, IFlyoutToggleChildParameters {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
+    titleRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface IState {
@@ -85,6 +89,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const description = [t("Insert an emoji in your message."), t("richEditor.emoji.pagingInstructions")].join(" ");
         const emojiClasses = emojiGroupsClasses();
         const classesInsertEmoji = insertEmojiClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
 
         const extraHeadingContent = (
             <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
@@ -152,7 +157,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 descriptionID={this.descriptionID}
                 titleID={this.titleID}
                 title={this.state.title}
-                titleRef={this.props.initialFocusRef}
+                titleRef={this.props.titleRef}
                 accessibleDescription={description}
                 alertMessage={this.state.alertMessage}
                 additionalHeaderContent={extraHeadingContent}
@@ -164,6 +169,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 bodyClass={classesInsertEmoji.body}
+                className={!this.props.legacyMode ? classesRichEditor.flyoutOffset : ""}
             />
         );
     }
@@ -225,7 +231,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 activeIndex={this.state.activeIndex}
                 style={style}
                 closeMenuHandler={this.props.closeMenuHandler}
-                key={"emoji-" + emojiData.emoji}
+                key={`emoji-${pos}-${emojiData.emoji}`}
                 emojiData={emojiData}
                 index={pos}
                 onKeyUp={this.jumpRowUp}

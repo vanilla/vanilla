@@ -5,31 +5,33 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache } from "@library/styles/styleUtils";
-import { debugHelper, defaultTransition } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { colorOut, defaultTransition } from "@library/styles/styleHelpers";
+import { countClasses } from "@library/content/countStyles";
+import { compactMeBoxVariables } from "@library/headers/mebox/pieces/compactMeBoxStyles";
 
 export const tabButtonListClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const debug = debugHelper("tabButtonList");
+    const style = styleFactory("tabButtonList");
+    const classesCount = countClasses();
+    const compactMeBoxVars = compactMeBoxVariables();
 
     const root = style({
         display: "flex",
         alignItems: "center",
         justifyContent: "stretch",
-        ...debug.name(),
     });
 
-    const button = style({
+    const button = style("button", {
         flexGrow: 1,
-        color: globalVars.mainColors.fg.toString(),
+        color: colorOut(globalVars.mainColors.fg),
         $nest: {
             ".icon": {
                 ...defaultTransition("opacity"),
                 opacity: 0.8,
             },
             "&:hover": {
-                color: globalVars.mainColors.primary.toString(),
+                color: colorOut(globalVars.mainColors.primary),
                 $nest: {
                     ".icon": {
                         opacity: 1,
@@ -37,10 +39,12 @@ export const tabButtonListClasses = useThemeCache(() => {
                 },
             },
             "&:focus, &:active, &.focus-visible": {
-                color: globalVars.mainColors.primary.toString(),
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            [`& .${classesCount.text()}`]: {
+                color: colorOut(compactMeBoxVars.colors.bg),
             },
         },
-        ...debug.name("button"),
     });
 
     return { root, button };

@@ -5,10 +5,12 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, colorOut, longWordEllipsis, paddings, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, longWordEllipsis, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { important } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const richEditorFlyoutClasses = useThemeCache(() => {
     const vars = richEditorVariables();
@@ -19,29 +21,33 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     const root = style({
         ...shadows.dropDown(),
         position: "absolute",
-        left: 0,
-        width: unit(vars.flyout.padding.left + vars.flyout.padding.right + 7 * vars.menuButton.size),
+        left: unit(0),
+        width: unit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
         zIndex: 6,
         overflow: "hidden",
         backgroundColor: colorOut(vars.colors.bg),
         ...borders(),
-    });
+
+        $nest: {
+            "&& .ReactVirtualized__Grid": {
+                width: important(unit(vars.richEditorWidth) as string),
+            },
+        },
+    } as NestedCSSProperties);
 
     const header = style("header", {
         position: "relative",
-        ...paddings({
-            top: unit(vars.flyout.padding.top / 2),
-            right: unit(vars.flyout.padding.right),
-            bottom: unit(vars.flyout.padding.bottom / 2),
-            left: unit(vars.flyout.padding.left),
-        }),
+        borderBottom: singleBorder(),
+        ...paddings(vars.emojiHeader.padding),
     });
 
     const title = style("title", {
+        display: "flex",
+        alignItems: "center",
         ...longWordEllipsis(),
         margin: 0,
         maxWidth: calc(`100% - ${unit(vars.menuButton.size)}`),
-        minHeight: vars.menuButton.size - vars.flyout.padding.top,
+        minHeight: vars.menuButton.size - vars.emojiBody.padding.horizontal,
         fontSize: percent(100),
         lineHeight: "inherit",
         color: colorOut(globalVars.mainColors.fg),
@@ -53,22 +59,12 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     });
 
     const body = style("body", {
-        paddingLeft: unit(vars.flyout.padding.left),
-        paddingRight: unit(vars.flyout.padding.right),
+        ...paddings(vars.emojiBody.padding),
+        width: unit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
     });
 
     const footer = style("footer", {
-        ...paddings({
-            top: unit(vars.flyout.padding.top),
-            right: unit(vars.flyout.padding.right),
-            bottom: unit(vars.flyout.padding.bottom),
-            left: unit(vars.flyout.padding.left),
-        }),
-        $nest: {
-            "&.insertEmoji-footer": {
-                padding: 0,
-            },
-        },
+        borderTop: singleBorder(),
     });
 
     return { root, header, body, footer, title };

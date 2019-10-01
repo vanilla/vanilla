@@ -7,7 +7,7 @@
 import React from "react";
 import { Permission } from "@library/features/users/Permission";
 import { mount, shallow } from "enzyme";
-import UsersActions from "@library/features/users/UsersActions";
+import UserActions from "@library/features/users/UserActions";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
 import sinon from "sinon";
@@ -21,7 +21,7 @@ const noop = () => {
 
 describe("<Permission />", () => {
     let user: ILoadable<IMe>;
-    let actions: UsersActions;
+    let actions: UserActions;
 
     const makeMockUser = (withPermissions: string[] = [], isAdmin: boolean = false): IMe => {
         return {
@@ -82,7 +82,7 @@ describe("<Permission />", () => {
                 status: LoadStatus.SUCCESS,
                 data: makeMockUser(["perm1", "perm2", "perm3"]),
             };
-            actions = new UsersActions(sinon.fake(), sinon.fake() as any);
+            actions = new UserActions(sinon.fake(), sinon.fake() as any);
         });
 
         it("renders children if the user has one of the given permissions", () => {

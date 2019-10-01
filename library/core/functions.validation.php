@@ -599,16 +599,17 @@ if (!function_exists('validateMinTextLength')) {
      * @param mixed $value The value to validate.
      * @param object $field The field meta information.
      * @param array $post The full posted data.
-     * @return bool|string Returns true if teh value is valid or an error string otherwise.
+     * @return bool|string Returns true if the value is valid or an error string otherwise.
      */
     function validateMinTextLength($value, $field, $post) {
         if (isset($post['Format'])) {
-            $value = Gdn_Format::to($value, $post['Format']);
+            $value = Gdn::formatService()->renderPlainText($value, $post['Format']);
         }
 
         $value = html_entity_decode(trim(strip_tags($value)));
-        $minLength = getValue('MinLength', $field, 0);
 
+        // We need to check both values for backwards compatibility.
+        $minLength = $field->MinLength ?? $field->MinTextLength ?? 0;
         if (function_exists('mb_strlen')) {
             $diff = $minLength - mb_strlen($value, 'UTF-8');
         } else {

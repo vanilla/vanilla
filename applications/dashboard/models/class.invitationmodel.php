@@ -143,7 +143,7 @@ class InvitationModel extends Gdn_Model {
             $fields = $this->Validation->schemaValidationFields();
 
             // Call the base model for saving
-            $invitationID = $this->insert($fields);
+            $invitationID = parent::save($fields);
 
             // Delete an old invitation.
             if ($invitationID && $deleteID) {
@@ -189,7 +189,10 @@ class InvitationModel extends Gdn_Model {
             throw new Exception(t('InviteErrorPermission', t('ErrorPermission')));
         } else {
             // Some information for the email
-            $registrationUrl = externalUrl("entry/registerinvitation/{$invitation->Code}");
+            $registrationUrl = externalUrl("entry/registerinvitation/{$invitation->Code}".(
+                c("Garden.Registration.InviteTarget", '') ?
+                "?Target=".c("Garden.Registration.InviteTarget", '') :
+                ""));
 
             $appTitle = Gdn::config('Garden.Title');
             $email = new Gdn_Email();

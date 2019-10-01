@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { appearance, unit } from "@library/styles/styleHelpers";
+import { appearance, buttonStates, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
@@ -26,20 +26,39 @@ export const insertEmojiClasses = useThemeCache(() => {
         border: 0,
         opacity: globalVars.states.text.opacity,
         cursor: "pointer",
+        borderRadius: unit(3),
         $nest: {
-            ".fallBackEmoji": {
-                display: "block",
-                margin: "auto",
-            },
-            "&:hover, &:focus, &:active, &.focus-visible": {
-                opacity: 1,
-            },
-            ".safeEmoji": {
-                display: "block",
-                height: unit(globalVars.icon.sizes.default),
-                width: unit(globalVars.icon.sizes.default),
-                margin: "auto",
-            },
+            ...buttonStates(
+                {
+                    allStates: {
+                        outline: 0,
+                    },
+                    hover: {
+                        opacity: 1,
+                    },
+                    focus: {
+                        opacity: 1,
+                    },
+                    active: {
+                        opacity: 1,
+                    },
+                    accessibleFocus: {
+                        backgroundColor: colorOut(globalVars.states.hover.color),
+                    },
+                },
+                {
+                    ".fallBackEmoji": {
+                        display: "block",
+                        margin: "auto",
+                    },
+                    ".safeEmoji": {
+                        display: "block",
+                        height: unit(globalVars.icon.sizes.default),
+                        width: unit(globalVars.icon.sizes.default),
+                        margin: "auto",
+                    },
+                },
+            ),
         },
     });
 

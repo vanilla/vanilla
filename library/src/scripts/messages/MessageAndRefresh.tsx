@@ -4,51 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
+import Message from "@library/messages/Message";
 import { t } from "@library/utility/appUtils";
-import { LiveMessage, LiveMessenger } from "react-aria-live";
-import { messagesClasses } from "@library/messages/messageStyles";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import React from "react";
 
-export interface IMessageAndRefreshProps {
+interface IProps {
     className?: string;
-    message: string;
-    clearOnUnmount?: boolean; // reannounces the message if the page gets rerendered. This is an important message, so we want this by default.
+    isFixed?: boolean;
 }
 
 /**
  * Message with refresh button
  */
-export default class MessageAndRefresh extends React.PureComponent<IMessageAndRefreshProps> {
-    public static defaultProps: Partial<IMessageAndRefreshProps> = {
-        message: t("The application has been updated. Refresh to get the latest version."),
-        clearOnUnmount: true,
+export default function MessageAndRefresh(props: IProps) {
+    const contents = t("The application has been updated. Refresh to get the latest version.");
+    const refresh = () => {
+        const currentUrl = window.location.href;
+        window.location.href = currentUrl;
     };
-
-    public render() {
-        const classes = messagesClasses();
-        const refresh = () => {
-            window.location.href = window.location.href;
-        };
-        return (
-            <>
-                <div className={classNames(this.props.className, classes.root)}>
-                    <div className={classNames(classes.wrap)}>
-                        <div className={classes.message}>{this.props.message}</div>
-                        <Button baseClass={ButtonTypes.TEXT} onClick={refresh} className={classes.actionButton}>
-                            {t("Refresh")}
-                        </Button>
-                    </div>
-                </div>
-                {/* Does not visually render, but sends message to screen reader users*/}
-                <LiveMessage
-                    clearOnUnmount={!!this.props.clearOnUnmount}
-                    message={this.props.message}
-                    aria-live="assertive"
-                />
-            </>
-        );
-    }
+    return (
+        <Message
+            confirmText={t("Refresh")}
+            onConfirm={refresh}
+            contents={contents}
+            stringContents={contents}
+            className={props.className}
+            isFixed={props.isFixed}
+        />
+    );
 }

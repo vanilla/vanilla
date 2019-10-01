@@ -4,19 +4,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import path from "path";
-import * as del from "del";
-import webpack, { Stats, Configuration } from "webpack";
-import { makeProdConfig } from "./configs/makeProdConfig";
-import { makeDevConfig } from "./configs/makeDevConfig";
-import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
-import { installNodeModulesInDir } from "./utility/moduleUtils";
-import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { print, fail } from "./utility/utils";
-import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
-import EntryModel from "./utility/EntryModel";
+import * as del from "del";
+import path from "path";
+import webpack, { Configuration, Stats } from "webpack";
 import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import { makeDevConfig } from "./configs/makeDevConfig";
+import { makePolyfillConfig } from "./configs/makePolyfillConfig";
+import { makeProdConfig } from "./configs/makeProdConfig";
+import { DIST_DIRECTORY } from "./env";
+import { BuildMode, getOptions, IBuildOptions } from "./options";
+import EntryModel from "./utility/EntryModel";
+import { installLerna } from "./utility/moduleUtils";
+import { fail, print } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -40,11 +40,19 @@ export default class Builder {
     }
 
     /**
+     * Run just the install step of the build.
+     */
+    public async installOnly() {
+        await this.entryModel.init();
+        await installLerna();
+    }
+
+    /**
      * Run the build based on the provided options.
      */
     public async build() {
         await this.entryModel.init();
-        await this.installNodeModules();
+        await installLerna();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -52,23 +60,6 @@ export default class Builder {
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
         }
-    }
-
-    /**
-     * Install node modules for all addons providing source files.
-     */
-    private async installNodeModules() {
-        // Make an exception for the old dashboard node_modules. We don't want to install these.
-        // Eventually they will be untangled but for now they trigger bower component installation.
-        // That does not work in CI.
-        const dashboardPath = path.resolve(VANILLA_APPS, "dashboard");
-        const installableAddons = this.entryModel.addonDirs.filter(addonDir => addonDir !== dashboardPath);
-
-        const originalDir = process.cwd();
-        // Install the node modules.
-        return await Promise.all(installableAddons.map(installNodeModulesInDir)).then(() => {
-            process.chdir(originalDir);
-        });
     }
 
     /**
@@ -138,7 +129,7 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             host: this.options.devIp,
             port: 3030,
             hot: true,
-            open: true,
+            open: false,
             https: false,
             disableHostCheck: true,
             headers: {

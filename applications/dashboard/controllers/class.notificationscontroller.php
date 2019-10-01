@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
+
 /**
  * Handle /notifications endpoint.
  */
@@ -90,7 +92,11 @@ class NotificationsController extends Gdn_Controller {
             } else {
                 $userPhoto = '';
             }
-            $excerpt = Gdn_Format::excerpt($activity['Story'], $activity['Format']);
+
+            $excerpt = '';
+            $story = $activity['Story'] ?? null;
+            $format = $activity['Format'] ?? HtmlFormat::FORMAT_KEY;
+            $excerpt = htmlspecialchars($story ? Gdn::formatService()->renderExcerpt($story, $format) : $excerpt);
             $activityClass = ' Activity-'.$activity['ActivityType'];
 
             $sender->informMessage(

@@ -70,6 +70,14 @@ echo $this->Form->errors(); ?>
 
 <?php $this->fireEvent('RegistrationView'); ?>
 
+<div id="InvitationTarget" class="form-group">
+    <div class="label-wrap">
+        <?php echo $this->Form->label('Invitation target', 'Garden.Registration.InviteTarget'); ?>
+    </div>
+    <div class="input-wrap invite-url-code">
+        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget]); ?>
+    </div>
+</div>
 <div id="InvitationExpiration" class="form-group">
     <div class="label-wrap">
     <?php echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration'); ?>

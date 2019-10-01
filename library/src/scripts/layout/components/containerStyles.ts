@@ -5,11 +5,10 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { percent } from "csx";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -18,13 +17,13 @@ export const containerVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         padding: {
-            horizontal: vars.gutter.halfSize,
+            horizontal: vars.gutter.size,
         },
     });
 
     const sizing = makeThemeVars("sizes", {
         full: vars.contentSizes.full,
-        widgets: vars.contentSizes.widgets,
+        narrowContentSize: vars.contentSizes.narrow,
     });
 
     const colors = makeThemeVars("colors", {
@@ -41,20 +40,27 @@ export const containerVariables = useThemeCache(() => {
 export const containerClasses = useThemeCache(() => {
     const style = styleFactory("container");
     const globalVars = globalVariables();
+    const vars = containerVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style({
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-        boxSizing: "border-box",
-        width: percent(100),
-        maxWidth: globalVars.content.width,
-        marginLeft: "auto",
-        marginRight: "auto",
-        ...paddings({
-            horizontal: globalVars.gutter.half,
+    const root = style(
+        {
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+            boxSizing: "border-box",
+            width: percent(100),
+            maxWidth: globalVars.content.width,
+            marginLeft: "auto",
+            marginRight: "auto",
+            ...paddings(vars.spacing.padding),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                horizontal: 8,
+            }),
         }),
-    });
+    );
 
     return { root };
 });

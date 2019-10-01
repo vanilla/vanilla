@@ -9,8 +9,7 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent } from "@library/dom/domUtils";
-import TabHandler from "@library/dom/TabHandler";
+import { delegateEvent, TabHandler } from "@vanilla/dom-utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import {
     insertNewLineAtEndOfScroll,
@@ -20,6 +19,8 @@ import {
     forceSelectionUpdate,
 } from "@rich-editor/quill/utility";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
+import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -72,7 +73,6 @@ export default class EmbedFocusModule extends Module {
         });
 
         this.setupEmbedClickHandler();
-        this.setupMobileHandler();
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.formWrapper.addEventListener("keydown", this.tabListener);
@@ -341,7 +341,7 @@ export default class EmbedFocusModule extends Module {
                 return currentBlot.next as Blot;
             case KeyboardModule.keys.UP:
                 return currentBlot.prev as Blot;
-            case KeyboardModule.keys.RIGHT:
+            case KeyboardModule.keys.RIGHT: {
                 // -1 needed for because end of blot is non-inclusive.
                 const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
                 if (this.lastSelection.index === endOfBlot) {
@@ -349,6 +349,7 @@ export default class EmbedFocusModule extends Module {
                     return currentBlot.next as Blot;
                 }
                 break;
+            }
             case KeyboardModule.keys.LEFT:
                 if (this.lastSelection.index === currentBlot.offset()) {
                     // If we're at the start of the line.
@@ -366,16 +367,21 @@ export default class EmbedFocusModule extends Module {
             "click",
             "a",
             (event, clickedElement) => {
+                if (isEditorWalledEvent(event)) {
+                    return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
             },
             this.quill.container,
         );
-
         delegateEvent(
             "click",
             ".js-embed",
             (event, clickedElement) => {
+                if (isEditorWalledEvent(event)) {
+                    return;
+                }
                 const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {
                     embed.focus();
@@ -385,36 +391,14 @@ export default class EmbedFocusModule extends Module {
         );
     }
 
-    private setupMobileHandler() {
-        delegateEvent(
-            "click",
-            ".js-richText .richEditor-text",
-            (event, clickedElement) => {
-                this.editorRoot.classList.toggle("isFocused", true);
-            },
-            this.quill.container,
-        );
-
-        delegateEvent(
-            "click",
-            ".js-richEditor-next",
-            (event, clickedElement) => {
-                const tabHandler = new TabHandler(this.formWrapper);
-                const nextEl = tabHandler.getNext(clickedElement);
-
-                if (nextEl) {
-                    nextEl.focus();
-                    this.editorRoot.classList.toggle("isFocused", false);
-                }
-            },
-            this.editorRoot,
-        );
-    }
-
     /**
      * Keydown listener on the current quill instance.
      */
     private keyDownListener = (event: KeyboardEvent) => {
+        if (isEditorWalledEvent(event)) {
+            return;
+        }
+
         if (!this.editorRoot.contains(document.activeElement)) {
             return;
         }

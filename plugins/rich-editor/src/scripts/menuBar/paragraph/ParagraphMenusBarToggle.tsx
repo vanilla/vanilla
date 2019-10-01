@@ -4,24 +4,23 @@
  * @license GPL-2.0-only
  */
 
-import FocusWatcher from "@library/dom/FocusWatcher";
-import TabHandler from "@library/dom/TabHandler";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import {
-    blockquote,
-    codeBlock,
-    heading2,
-    heading3,
-    heading4,
-    heading5,
-    listOrdered,
-    listUnordered,
-    spoiler,
+    BlockquoteIcon,
+    CodeBlockIcon,
+    Heading2Icon,
+    Heading3Icon,
+    ListOrderedIcon,
+    ListUnorderedIcon,
+    SpoilerIcon,
+    Heading4Icon,
+    Heading5Icon,
 } from "@library/icons/editorIcons";
 import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -32,6 +31,9 @@ import Quill, { RangeStatic } from "quill/core";
 import React from "react";
 import { style } from "typestyle";
 import uniqueId from "lodash/uniqueId";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -43,12 +45,17 @@ interface IProps extends IWithEditorProps {
     disabled?: boolean;
     mobile?: boolean;
     lastGoodSelection: RangeStatic;
+    renderAbove?: boolean;
 }
 
 interface IState {
     hasFocus: boolean;
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
 }
+
+// With some effort we could probably calculate this value.
+// For now this is good enough.
+const APPROXIMATE_MAX_MENU_HEIGHT = 170;
 
 // Implements the paragraph menubar
 export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
@@ -129,9 +136,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 style={this.pilcrowStyles}
                 className={classNames(
                     { isMenuInset: !this.props.legacyMode },
-                    !!this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
-                    !!this.props.mobile ? classes.menuItem : "",
-                    !!this.props.mobile ? classes.button : "",
+                    this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
                 )}
                 onKeyDown={this.handleMenuBarKeyDown}
                 ref={this.selfRef}
@@ -144,12 +149,15 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     aria-controls={this.menuID}
                     aria-expanded={this.isMenuVisible}
                     disabled={this.props.disabled}
-                    className={pilcrowClasses}
+                    className={classNames(pilcrowClasses, {
+                        [classes.button]: this.props.mobile,
+                        [classes.menuItem]: this.props.mobile,
+                    })}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handleEscape}
                 >
-                    <ActiveFormatIcon activeFormats={menuActiveFormats} />
+                    <IconForButtonWrap icon={<ActiveFormatIcon activeFormats={menuActiveFormats} />} />
                 </button>
                 <div
                     id={this.menuID}
@@ -189,25 +197,25 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     }
 
     private topLevelIcons = menuActiveFormats => {
-        let headingMenuIcon = heading2();
+        let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
-            headingMenuIcon = heading3();
+            headingMenuIcon = <Heading3Icon />;
         } else if (menuActiveFormats.headings.heading4) {
-            headingMenuIcon = heading4();
+            headingMenuIcon = <Heading4Icon />;
         } else if (menuActiveFormats.headings.heading5) {
-            headingMenuIcon = heading5();
+            headingMenuIcon = <Heading5Icon />;
         }
 
-        let specialBlockMenuIcon = blockquote();
+        let specialBlockMenuIcon = <BlockquoteIcon />;
         if (menuActiveFormats.specialFormats.codeBlock) {
-            specialBlockMenuIcon = codeBlock();
+            specialBlockMenuIcon = <CodeBlockIcon />;
         } else if (menuActiveFormats.specialFormats.spoiler) {
-            specialBlockMenuIcon = spoiler();
+            specialBlockMenuIcon = <SpoilerIcon />;
         }
 
-        let listMenuIcon = listUnordered();
+        let listMenuIcon = <ListUnorderedIcon />;
         if (menuActiveFormats.lists.ordered) {
-            listMenuIcon = listOrdered();
+            listMenuIcon = <ListOrderedIcon />;
         }
 
         return {
@@ -251,15 +259,13 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         };
     }
 
-    private static readonly DEFAULT_OFFSET = 2;
-    private static readonly LEGACY_EXTRA_OFFSET = 2;
+    private static readonly DEFAULT_OFFSET = -1;
+    private static readonly LEGACY_EXTRA_OFFSET = -1;
 
     private get verticalOffset(): number {
-        const calculatedOffset =
-            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) ||
-            ParagraphMenusBarToggle.DEFAULT_OFFSET;
-        const extraOffset = this.props.legacyMode ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET : 0;
-        return calculatedOffset + extraOffset;
+        return this.props.legacyMode
+            ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET
+            : richEditorVariables().modernFrame.padding * -1 + ParagraphMenusBarToggle.DEFAULT_OFFSET;
     }
 
     /**
@@ -278,7 +284,11 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
+            this.props.renderAbove ||
+                (scrollBounds.height >= APPROXIMATE_MAX_MENU_HEIGHT &&
+                    scrollBounds.height - bounds.bottom <= APPROXIMATE_MAX_MENU_HEIGHT)
+                ? "isUp"
+                : "isDown",
         );
     }
 

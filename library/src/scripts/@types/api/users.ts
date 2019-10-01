@@ -8,7 +8,10 @@ export interface IUserFragment {
     name: string;
     photoUrl: string;
     dateLastActive: string | null;
+    title?: string | null;
 }
+
+export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
 
 export interface IMe extends IUserFragment {
     permissions: string[];
@@ -16,7 +19,23 @@ export interface IMe extends IUserFragment {
     isAdmin: boolean;
 }
 
-export interface IUser extends IUserFragment {
+export interface ICount {
+    name: string;
+    count: number;
+}
+
+export type IMeCounts = ICount[];
+
+export interface IUserRoles {
+    roles: [
+        {
+            roleID: number;
+            name: string;
+        }
+    ];
+}
+
+export interface IUser extends IUserFragment, IUserRoles {
     email: string;
     emailConfirmed: boolean;
     showEmail: boolean;
@@ -24,12 +43,6 @@ export interface IUser extends IUserFragment {
     banned: number;
     dateInserted: string;
     dateUpdated: string | null;
-    roles: [
-        {
-            roleID: number;
-            name: string;
-        }
-    ];
     hidden: boolean;
     rankID?: number | null;
     rank?: {

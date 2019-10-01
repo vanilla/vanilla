@@ -13,8 +13,11 @@ use voku\helper\HtmlMin;
  * Trait for normalizing some HTML to make test assertions easier.
  */
 trait HtmlNormalizeTrait {
+
     /** @var HtmlMin */
     private $minifier;
+
+    protected $shouldReplaceSVGs = true;
 
     /**
      * Minify some HTML to help normalize it's shape.
@@ -48,7 +51,9 @@ trait HtmlNormalizeTrait {
         $html = $this->stripZeroWidthWhitespace($html);
         $html = $this->minifyHTML($html);
         // Stub out SVGs
-        $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
+        if ($this->shouldReplaceSVGs) {
+            $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
+        }
         $html = preg_replace("/\>\</", ">\n<", $html);
         $html = preg_replace("/ \</", "<", $html);
         return $html;
@@ -68,5 +73,18 @@ trait HtmlNormalizeTrait {
      */
     private function stripZeroWidthWhitespace(string $text): string {
         return preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text);
+    }
+
+    /**
+     * Assert that two strings of HTML are roughly similar. This doesn't work for code blocks.
+     *
+     * @param string $expected
+     * @param string $actual
+     * @param string|null $message
+     */
+    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = null) {
+        $expected = $this->normalizeHtml($expected);
+        $actual = $this->normalizeHtml($actual);
+        $this->assertEquals($expected, $actual, $message);
     }
 }

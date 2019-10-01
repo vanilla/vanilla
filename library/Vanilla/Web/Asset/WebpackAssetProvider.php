@@ -118,7 +118,8 @@ class WebpackAssetProvider {
 
         // Return early with the hot build if that flag is enabled.
         if ($this->hotReloadEnabled) {
-            return [new HotBuildAsset($section, $this->hotReloadIP)];
+            $scripts[] = new HotBuildAsset($section, $this->hotReloadIP);
+            return $scripts;
         }
 
         // A couple of required assets.
@@ -133,6 +134,21 @@ class WebpackAssetProvider {
 
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+            // See if we have a common bundle
+            $commonAsset = new WebpackAddonAsset(
+                $this->request,
+                WebpackAsset::SCRIPT_EXTENSION,
+                $section,
+                $addon,
+                $this->cacheBustingKey,
+                true
+            );
+            $commonAsset->setFsRoot($this->fsRoot);
+
+            if ($commonAsset->existsOnFs()) {
+                $scripts[] = $commonAsset;
+            }
+
             $asset = new WebpackAddonAsset(
                 $this->request,
                 WebpackAsset::SCRIPT_EXTENSION,

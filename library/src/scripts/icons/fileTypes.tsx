@@ -8,18 +8,20 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const currentColorFill = {
     fill: "currentColor",
 };
 
-export function fileGeneric(className?: string, fileType?: string) {
-    const title = !!fileType ? fileType : t("File");
+export function FileTypeGenericIcon(props: { className?: string; fileType?: string }) {
+    const title = props.fileType ? props.fileType : t("File");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-fileGeneric", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileGeneric", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={title}
         >
@@ -33,14 +35,14 @@ export function fileGeneric(className?: string, fileType?: string) {
     );
 }
 
-export function fileWord(className?: string) {
-    const textFill = "#fff";
+export function FileTypeWordIcon(props: { className?: string }) {
     const title = t("Word");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-fileWord", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileWord", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.WORD)}
         >
@@ -55,13 +57,14 @@ export function fileWord(className?: string) {
     );
 }
 
-export function fileExcel(className?: string) {
+export function FileTypeExcelIcon(props: { className?: string }) {
     const title = t("Excel");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-fileExcel", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileExcel", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.EXCEL)}
         >
@@ -75,15 +78,14 @@ export function fileExcel(className?: string) {
     );
 }
 
-export function filePDF(className?: string) {
-    const textFill = "#fff";
-    const title = t("PDF");
+export function FileTypePDFIcon(props: { className?: string }) {
     const unabbreviatedType = t(AttachmentType.PDF);
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-filePDF", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-filePDF", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.PDF)}
         >
@@ -103,13 +105,14 @@ export function filePDF(className?: string) {
     );
 }
 
-export function fileImage(className?: string) {
+export function FileTypeImageIcon(props: { className?: string }) {
     const title = t("Image");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-fileImage", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileImage", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.IMAGE)}
         >
@@ -124,15 +127,16 @@ export function fileImage(className?: string) {
     );
 }
 
-export function filePowerPoint(className?: string) {
+export function FileTypePowerPointIcon(props: { className?: string }) {
     const textFill = "#fff";
     const title = t("PPT");
     const unabbreviatedType = t(AttachmentType.PPT);
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-filePowerPoint", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-filePowerPoint", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.IMAGE)}
         >
@@ -147,15 +151,16 @@ export function filePowerPoint(className?: string) {
     );
 }
 
-export function fileZip(className?: string) {
+export function FileTypeZipIcon(props: { className?: string }) {
     const title = t("Zip");
     const unabbreviatedType = t(AttachmentType.ARCHIVE);
     const barStyle = { fill: "#fff", fillOpacity: 0.9 };
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("attachmentIcon-fileZip", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileZip", "attachmentIcon", classes.fileType, props.className)}
             role="img"
             aria-label={t(AttachmentType.IMAGE)}
         >
@@ -178,13 +183,14 @@ export function fileZip(className?: string) {
     );
 }
 
-export function fileUploadError(className?: string) {
+export function AttachmentErrorIcon(props: { className?: string }) {
     const title = t("Error");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 18"
-            className={classNames("attachmentIcon-error", className)}
+            className={classNames("attachmentIcon-error", classes.attachmentError, props.className)}
             role="img"
             aria-label={title}
         >

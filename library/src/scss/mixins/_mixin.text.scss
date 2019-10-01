@@ -25,20 +25,6 @@
   }
 }
 
-@mixin headingFontStyle() {
-  display: block;
-  font-family: $global-heading_fontFamily;
-  font-weight: $global-heading_fontWeight;
-  font-size: $global-medium_fontSize;
-  line-height: $global-condensed_lineHeight;
-  margin: 0;
-}
-
-@mixin bodyFontStyle() {
-  font-family: $global-body_fontFamily;
-  font-weight: $global-body_fontWeight;
-}
-
 @mixin allLinkStates {
   &,
   &:hover,

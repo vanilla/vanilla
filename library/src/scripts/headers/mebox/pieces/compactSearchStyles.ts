@@ -6,44 +6,63 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { searchBarVariables } from "@library/features/search/searchBarStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+export const compactSearchVariables = useThemeCache(() => {
+    const makeVars = variableFactory("compactSearch");
+    const titleBarVars = titleBarVariables();
+    const globalVars = globalVariables();
+
+    const baseColor = titleBarVars.colors.bg.darken(0.05);
+    const colors = makeVars("colors", {
+        bg: baseColor.fade(0.8),
+        fg: titleBarVars.colors.fg,
+        placeholder: titleBarVars.colors.fg.fade(0.8),
+        active: {
+            bg: baseColor,
+        },
+    });
+
+    return { colors };
+});
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const formElementsVars = formElementsVariables();
+    const titleBarVars = titleBarVariables();
+    const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         $nest: {
             ".searchBar": {
                 flexGrow: 1,
             },
-            ".searchBar-valueContainer.suggestedTextInput-inputText": {
-                height: unit(searchBarVariables().sizing.height),
-                backgroundColor: colorOut(vanillaHeaderVars.colors.bg.darken(0.05)),
+            "& .searchBar__input": {
+                color: colorOut(vars.colors.fg),
+                width: percent(100),
+            },
+            ".searchBar-valueContainer": {
+                height: unit(formElementsVars.sizing.height),
+                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
             },
+            ".hasFocus .searchBar-valueContainer": {
+                backgroundColor: colorOut(vars.colors.active.bg),
+            },
             ".searchBar__placeholder": {
-                color: globalVars.mainColors.bg.toString(),
+                color: colorOut(vars.colors.placeholder),
             },
             ".searchBar-icon": {
-                color: colorOut(vanillaHeaderVars.colors.fg),
-            },
-            ".searchBar__control": {
-                opacity: 0.8,
-                $nest: {
-                    "&.searchBar__control--isFocused": {
-                        opacity: 1,
-                    },
-                },
+                color: colorOut(vars.colors.placeholder),
             },
             "&.isOpen": {
-                width: percent(100),
+                maxWidth: percent(100),
             },
             "&.isCentered": {
                 margin: "auto",
@@ -55,11 +74,21 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style("contents", {
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "nowrap",
-    });
+    const contents = style(
+        "contents",
+        {
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "nowrap",
+            minHeight: unit(formElementsVars.sizing.height),
+            justifyContent: "center",
+            width: percent(100),
+            position: "relative",
+        },
+        mediaQueries.oneColumnDown({
+            height: unit(titleBarVars.sizing.mobile.height),
+        }),
+    );
 
     const close = style("close", {
         color: "inherit",
@@ -70,5 +99,20 @@ export const compactSearchClasses = useThemeCache(() => {
     const cancelContents = style("cancelContents", {
         padding: px(4),
     });
-    return { root, contents, close, cancelContents };
+
+    const searchAndResults = style("searchAndResults", {
+        position: "relative",
+        width: percent(100),
+        height: unit(formElementsVars.sizing.height),
+        display: "flex",
+        flexWrap: "nowrap",
+    });
+
+    return {
+        root,
+        contents,
+        close,
+        cancelContents,
+        searchAndResults,
+    };
 });

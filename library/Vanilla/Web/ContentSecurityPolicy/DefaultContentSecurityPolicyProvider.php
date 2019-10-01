@@ -31,6 +31,10 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
         $policies = [];
         $policies = array_merge($policies, $this->getScriptSources());
 
+        if ($this->config->get("Garden.Embed.Allow")) {
+            $policies = array_merge($policies, $this->getFrameAncestors());
+        }
+
         return $policies;
     }
 
@@ -43,6 +47,25 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, implode(' ', $whitelist));
         }
 
+        return $scriptSrcPolicies;
+    }
+
+    /**
+    * @return Policy[]
+    */
+    private function getFrameAncestors(): array {
+        $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, '\'self\'');
+        $whitelist = $this->config->get('Garden.TrustedDomains', false);
+        $trusteddDomains = is_string($whitelist) ? array_filter(explode("\n", $whitelist)) : [];
+        if (count($trusteddDomains) > 0) {
+            $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, implode(' ', $trusteddDomains));
+        } else {
+            $remoteUrl = $this->config->get("Garden.Embed.RemoteUrl", false);
+            $remoteDomain = is_string($remoteUrl) ? parse_url($remoteUrl, PHP_URL_HOST) : false;
+            if (is_string($remoteDomain)) {
+                $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, $remoteDomain);
+            }
+        }
         return $scriptSrcPolicies;
     }
 }

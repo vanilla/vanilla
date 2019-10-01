@@ -176,8 +176,9 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public static parentName = [UnorderedListGroup.blotName, OrderedListGroup.blotName];
 
     /**
-     * @override
-     * To sync the element values into the items domNode.
+     * Create the dom node for th item and
+     *
+     * @param value
      */
     public static create(value: IListObjectValue) {
         const element = super.create(value) as HTMLElement;
@@ -187,20 +188,76 @@ export class ListItemWrapper extends withWrapper(Container as any) {
 
     /**
      * @override
+     */
+    public split(index: number, force?: boolean) {
+        if (!force && (index === this.length() - 1 || index === 0)) {
+            return this;
+        }
+        const ownItem = this.getListContent();
+        const ownGroup = this.getListGroup();
+        if (ownItem && index < ownItem.length()) {
+            const after = ownItem.split(index, force) as ListItem;
+            if (after instanceof ListItem) {
+                const wrapper = Parchment.create(ListItemWrapper.blotName, this.getValue()) as ListItemWrapper;
+                after.insertInto(wrapper);
+                wrapper.insertInto(this.parent, this.next);
+                if (ownGroup) {
+                    ownGroup.insertInto(wrapper);
+                }
+                return wrapper;
+            }
+            return this;
+        } else {
+            return super.split(index, force);
+        }
+    }
+
+    /**
+     * @override
      * Ensure line breaks are properly inserted and can separate the list wrapper properly.
      */
-    public insertAt(index, value, def) {
-        if (value === "\n" && index < this.getListContent()!.length()) {
-            const originalListItem = this.getListContent()!;
-            const newWrapper = Parchment.create(ListItemWrapper.blotName, this.getValue()) as ListItemWrapper;
-            const secondHalfListItem = originalListItem.split(index);
-            secondHalfListItem.insertInto(newWrapper);
-            newWrapper.insertInto(this.parent, this.next);
+    public insertAt(index, value: string, def) {
+        const isInListContent = this.getListContent() && index < this.getListContent()!.length();
 
-            const nestedGroup = this.getListGroup();
-            if (nestedGroup) {
-                nestedGroup.insertInto(newWrapper);
+        // validate new line insertion position
+        if (value.includes("\n") && isInListContent) {
+            const after = this.split(index, true);
+            const targetNext = after === this ? this.next : after;
+            const isEndOfLine = index === this.length() - 1;
+
+            // Break the insert up on it's newlines.
+            const inserts = value === "\n" ? [""] : value.split("\n");
+
+            // condition to filter for the position of the cursor in the string.
+            // eg end of line
+            // offset
+
+            // If we split the blot, we need to remove the first newline.
+            if (this.next && targetNext === this.next && inserts[0] === "") {
+                inserts.shift();
             }
+
+            // If the first part of the insert is not a newline, insert it into the content and pop it off.
+            if (inserts[0] && inserts[0] !== "") {
+                this.getListContent()!.insertAt(index, inserts.shift()!);
+            }
+
+            // Each of the rest of the inserts will get inserted on their own list
+            const listItems = inserts.map((insert, inc) => {
+                const item = Parchment.create(ListItem.blotName, this.getValue()) as ListItem;
+                if (insert !== "") {
+                    item.insertAt(0, insert, undefined);
+                }
+                return item;
+            });
+
+            // includes conditions for the new line inserts blot
+            // if the last element of the <ul> and the last charectrer in the string
+            listItems.forEach(item => {
+                const clone = this.clone() as ListItemWrapper; // Clone the <li/> tag.
+                clone.appendChild(item); // Insert the <p> tag in inside of the <li/>
+                this.parent.insertBefore(clone, targetNext); // Insert the <li> inside of the <ul> or <ol>
+            });
         } else {
             super.insertAt(index, value, def);
         }
@@ -372,6 +429,31 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     }
 
     /**
+     * Lower the indentation level of the blot and all of it's children.
+     */
+    public flattenSelfAndSiblings(targetGroup = this.parent, ref?: any) {
+        const content = this.getListContent();
+        const sibling = this.next;
+        if (content && content.getValue().depth > 0) {
+            content.updateIndentValue(0);
+            this.insertInto(targetGroup, ref);
+        }
+        const group = this.getListGroup();
+        if (group) {
+            group.children.forEach(child => {
+                if (child instanceof ListItemWrapper) {
+                    child.flattenSelfAndSiblings(targetGroup, ref);
+                }
+            });
+            group.remove();
+        }
+
+        if (sibling instanceof ListItemWrapper) {
+            sibling.flattenSelfAndSiblings(targetGroup, ref);
+        }
+    }
+
+    /**
      * Utility for getting the content blot from this blot's children.
      *
      * This _should_ be in the first position.
@@ -424,6 +506,7 @@ export class ListItem extends LineBlot {
      *
      * @param listElement The HTML element to check.
      */
+
     private static getListDepth(listElement: HTMLElement): number {
         let depth = 0;
         let parent = listElement.parentElement;
@@ -579,28 +662,14 @@ export class ListItem extends LineBlot {
      * Overridden to safely handle list values changing.
      */
     public replaceWith(formatName, value?: any) {
-        const ensureDepth0 = () => {
-            const ownValue = this.getValue();
-            if (ownValue.depth > 0) {
-                // Force an update to our nesting.
-                this.updateIndentValue(0);
-                const quill = this.quill;
-                if (quill) {
-                    quill.update(Quill.sources.SILENT);
-                }
-            }
-        };
         if (formatName !== ListItem.blotName) {
-            ensureDepth0();
             this.breakUpGroupAndMoveToScroll(formatName, value);
         } else {
             if (!value) {
-                ensureDepth0();
                 return this.breakUpGroupAndMoveToScroll();
             }
 
             if (typeof value === "object" && (value as IListObjectValue).type !== this.getValue().type) {
-                ensureDepth0();
                 return this.breakUpGroupAndMoveToScroll(formatName, value);
             }
 
@@ -609,19 +678,72 @@ export class ListItem extends LineBlot {
     }
 
     /**
+     * Flatten the item and all of it's sibling list items into the top level scroll.
+     *
+     * @example
+     * Before
+     * - Item 1
+     *   - Item 1.1
+     *   - Item 1.2
+     *     - Item 1.2.1
+     *     - Item 1.2.2
+     *   - Item 1.3
+     * - Item 2
+     *
+     * Call this method on Item 1.1
+     *
+     * After
+     * - Item 1
+     *   - Item 1.1
+     * - Item 1.2
+     * - Item 1.2.1
+     * - Item 1.2.2
+     * - Item 1.3
+     * - Item 2
+     *
+     */
+    private flattenSelfAndSiblings = () => {
+        if (this.parent instanceof ListItemWrapper) {
+            let parent: any = this.parent;
+            let topListWrapper: ListItemWrapper | undefined;
+            let topListGroup: ListGroup | undefined;
+            while (parent !== this.scroll) {
+                if (parent instanceof ListGroup) {
+                    topListGroup = parent;
+                }
+
+                if (parent instanceof ListItemWrapper) {
+                    topListWrapper = parent;
+                }
+                parent = parent.parent;
+            }
+            const ref = topListWrapper ? topListWrapper.next : undefined;
+            this.parent.flattenSelfAndSiblings(topListGroup, ref);
+        }
+    };
+
+    /**
      * Break up the blot group and move it up into the scroll scroll container.
      *
      * @param formatName The new block format to use.
      * @param value The value for the new block format.
      */
     public breakUpGroupAndMoveToScroll(formatName = "block", value: any = "") {
-        const parentWrapper = this.parent as ListItemWrapper;
-        const parentGroup = parentWrapper.parent as ListGroup;
         const newBlock =
             typeof formatName === "string"
                 ? (Parchment.create(formatName, value) as Container)
                 : (formatName as Container);
-        this.moveChildren(newBlock);
+        // Clone the children.
+        this.children.forEach(blot => {
+            newBlock.appendChild(blot.clone());
+        });
+        let parentWrapper = this.parent as ListItemWrapper;
+
+        this.flattenSelfAndSiblings();
+
+        parentWrapper = this.parent as ListItemWrapper;
+        const parentGroup = parentWrapper.parent as ListGroup;
+
         if (parentWrapper.prev === null) {
             this.scroll.insertBefore(newBlock, parentGroup);
             const listGroup = parentWrapper.getListGroup();
@@ -630,9 +752,9 @@ export class ListItem extends LineBlot {
             }
             parentWrapper.remove();
         } else {
-            const after = parentGroup.split(this.offset(parentGroup)) as ListGroup;
+            const after = parentGroup.split(parentWrapper.offset(parentGroup)) as ListGroup;
             this.scroll.insertBefore(newBlock, after);
-            this.remove();
+            parentWrapper.getListContent()!.remove();
         }
 
         return newBlock;
@@ -643,19 +765,6 @@ export class ListItem extends LineBlot {
      */
     public getValue(): IListObjectValue {
         return getValueFromElement(this.domNode);
-    }
-
-    /**
-     * Get the attached quill instance.
-     *
-     * This will _NOT_ work before attach() is called.
-     */
-    protected get quill(): Quill | null {
-        if (!this.scroll || !this.scroll.domNode.parentNode) {
-            return null;
-        }
-
-        return Quill.find(this.scroll.domNode.parentNode!);
     }
 }
 

@@ -7,12 +7,12 @@
 import ClipboardBase from "quill/modules/clipboard";
 import Delta from "quill-delta";
 import Quill, { DeltaStatic } from "quill/core";
-import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
-import getStore from "@library/redux/getStore";
-import { IStoreState } from "@rich-editor/@types/store";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+
+export const EDITOR_SCROLL_CONTAINER_CLASS = "js-richEditorScrollContainer";
 
 export default class ClipboardModule extends ClipboardBase {
     /**
@@ -68,7 +68,7 @@ export default class ClipboardModule extends ClipboardBase {
             return;
         }
         const range = this.quill.getSelection();
-        const container = this.options.scrollingContainer;
+        const container = this.quill.root.closest(`.${EDITOR_SCROLL_CONTAINER_CLASS}`);
 
         // Get our scroll positions
         const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;
@@ -102,14 +102,14 @@ export default class ClipboardModule extends ClipboardBase {
      */
     public imageMatcher = (node: HTMLImageElement, delta: DeltaStatic) => {
         const src = node.getAttribute("src");
-        const alt = node.getAttribute("alt");
+        const alt = node.getAttribute("alt") || "";
         if (src) {
             const imageData: IEmbedValue = {
                 loaderData: {
                     type: "image",
                 },
                 data: {
-                    type: "image",
+                    embedType: "image",
                     url: src,
                     name: alt,
                     attributes: {},
@@ -143,13 +143,7 @@ export default class ClipboardModule extends ClipboardBase {
      * Determine if we are in a code formatted item or not.
      */
     private get inCodeFormat() {
-        const instance = getStore<IStoreState>().getState().editor.instances[getIDForQuill(this.quill)];
-        if (!instance || !instance.lastGoodSelection) {
-            return false;
-        }
-        return (
-            rangeContainsBlot(this.quill, CodeBlockBlot, instance.lastGoodSelection) ||
-            rangeContainsBlot(this.quill, CodeBlot, instance.lastGoodSelection)
-        );
+        const range = this.quill.getLastGoodSelection();
+        return rangeContainsBlot(this.quill, CodeBlockBlot, range) || rangeContainsBlot(this.quill, CodeBlot, range);
     }
 }

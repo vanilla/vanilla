@@ -7,7 +7,10 @@
 
 use Garden\Schema\Schema;
 
-abstract class AbstractApiController extends \Vanilla\Web\Controller {
+/**
+ * Base API controller for APIv2.
+ */
+abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface {
 
     /** @var Schema */
     private $categoryFragmentSchema;
@@ -44,7 +47,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function formatField(array &$row, $field, $format) {
         if (array_key_exists($field, $row)) {
-            $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
+            $row[$field] = \Gdn::formatService()->renderHTML($row[$field], $format) ?: '<!-- empty -->';
         }
     }
 
@@ -71,12 +74,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function getUserFragmentSchema() {
         if ($this->userFragmentSchema === null) {
-            $this->userFragmentSchema = $this->schema([
-                'userID:i' => 'The ID of the user.',
-                'name:s' => 'The username of the user.',
-                'photoUrl:s' => 'The URL of the user\'s avatar picture.',
-                'dateLastActive:dt|n' => 'Time the user was last active.',
-            ], 'UserFragment');
+            $this->userFragmentSchema = $this->schema(new \Vanilla\Models\UserFragmentSchema(), 'UserFragment');
         }
         return $this->userFragmentSchema;
     }

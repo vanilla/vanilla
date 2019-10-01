@@ -1,0 +1,4 @@
+alert('xss')
+
+This is allowed <script>console.log('hello')</script>
+

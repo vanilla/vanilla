@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
-import { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState } from "@library/features/users/userModel";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
 
 export interface IMeBoxProps extends IInjectableUserState {
@@ -25,36 +25,16 @@ export interface IMeBoxProps extends IInjectableUserState {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const { buttonClassName, contentClassName, countsClass } = this.props;
         const userInfo = this.props.currentUser.data;
         if (!userInfo) {
             return null;
         }
         const classes = meBoxClasses();
-
         return (
-            <div className={classNames("meBox", this.props.className, classes.root)}>
-                <NotificationsDropDown
-                    userSlug={userInfo.name}
-                    countClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    countUnread={userInfo.countUnreadNotifications}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
-                <MessagesDropDown
-                    countClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
-                <UserDropdown
-                    className="meBox-userDropdown"
-                    countsClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
+            <div className={classNames("meBox", this.props.className, classes.root, classes.rootFlexClass(3))}>
+                <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
+                <MessagesDropDown />
+                <UserDropdown />
             </div>
         );
     }

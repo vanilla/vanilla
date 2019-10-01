@@ -7,78 +7,65 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, componentThemeVariables } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
 export const richEditorVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
-    const themeVars = componentThemeVariables("richEditor");
+    const makeThemeVars = variableFactory("richEditor");
     const animations = standardAnimations();
 
-    const colors = {
+    const colors = makeThemeVars("colors", {
         bg: globalVars.mainColors.bg,
         outline: globalVars.mainColors.primary.fade(0.6),
-        ...themeVars.subComponentStyles("colors"),
-    };
+    });
 
-    const spacing = {
+    const spacing = makeThemeVars("spacing", {
         paddingLeft: 36,
         paddingRight: 36,
         paddingTop: 12,
         paddingBottom: 12,
         embedMenu: 0,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         minHeight: 200,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+        emojiSize: 40,
+    });
 
-    const menuButton = {
+    const menuButton = makeThemeVars("menuButton", {
         size: 42,
-        ...themeVars.subComponentStyles("menuButton"),
-    };
+    });
 
-    const paragraphMenu = {
-        ...themeVars.subComponentStyles("paragraphMenu"),
-    };
-    const paragraphMenuHandle = {
+    const paragraphMenuHandle = makeThemeVars("paragraphMenuHandle", {
         size: 28,
         offset: -varsFormElements.border.width + 1,
-        ...themeVars.subComponentStyles("paragraphMenuHandle"),
-    };
+    });
 
-    const insertLink = {
+    const insertLink = makeThemeVars("insertLink", {
         width: 287,
-        ...themeVars.subComponentStyles("insertLink"),
-    };
+    });
 
-    const flyout = {
+    const flyout = makeThemeVars("flyout", {
         padding: {
-            top: 12,
-            right: 12,
-            bottom: 12,
-            left: 12,
+            vertical: 12,
+            horizontal: 12,
         },
         maxHeight: viewHeight(100),
         height: menuButton.size,
-        ...themeVars.subComponentStyles("flyout"),
-    };
+    });
 
-    const nub = {
+    const nub = makeThemeVars("nub", {
         width: 12,
-        ...themeVars.subComponentStyles("nub"),
-    };
+    });
 
-    const menu = {
+    const menu = makeThemeVars("menu", {
         borderWidth: 1,
         offset: nub.width * 2,
-        ...themeVars.subComponentStyles("menu"),
-    };
+    });
 
-    const pilcrow = {
+    const pilcrow = makeThemeVars("pilcrow", {
         offset: 9,
         fontSize: 14,
         animation: {
@@ -87,16 +74,14 @@ export const richEditorVariables = useThemeCache(() => {
             timing: "ease-out",
             iterationCount: 1,
         },
-        ...themeVars.subComponentStyles("pilcrow"),
-    };
+    });
 
-    const emojiGroup = {
+    const emojiGroup = makeThemeVars("emojiGroup", {
         paddingLeft: 3,
         offset: -(varsFormElements.border.width + menu.borderWidth * 2),
-        ...themeVars.subComponentStyles("emojiGroup"),
-    };
+    });
 
-    const embedMenu = {
+    const embedMenu = makeThemeVars("embedMenu", {
         padding: 0,
         mobile: {
             border: {
@@ -107,43 +92,75 @@ export const richEditorVariables = useThemeCache(() => {
                 timing: "ease-out",
             },
         },
-        ...themeVars.subComponentStyles("embedMenu"),
-    };
+    });
 
-    const embedButton = {
+    const embedButton = makeThemeVars("embedButton", {
+        display: "block",
         offset: -varsFormElements.border.width,
-        ...themeVars.subComponentStyles("embedButton"),
-    };
+    });
 
-    const text = {
+    const text = makeThemeVars("text", {
         offset: 0,
-        ...themeVars.subComponentStyles("text"),
-    };
+        placeholder: {
+            color: globalVars.mixBgAndFg(0.5),
+        },
+    });
 
-    const title = {
+    const title = makeThemeVars("titleInput", {
         height: globalVars.fonts.size.title + globalVars.gutter.half,
         fontSize: globalVars.fonts.size.title,
         placeholder: {
             color: globalVars.mixBgAndFg(0.5),
         },
-        ...themeVars.subComponentStyles("titleInput"),
-    };
+    });
 
-    const scrollContainer = {
+    const scrollContainer = makeThemeVars("scrollContainer", {
         overshoot: 48,
-        ...themeVars.subComponentStyles("scrollContainer"),
-    };
+    });
 
-    const emojiBody = {
+    const emojiBody = makeThemeVars("emojiBody", {
         height: 252,
-    };
+        padding: {
+            horizontal: 3,
+            top: 3,
+            bottom: 0,
+        },
+    });
+
+    const emojiHeader = makeThemeVars("emojiHeader", {
+        padding: {
+            horizontal: 12,
+            vertical: 4,
+        },
+    });
+
+    const emojiFooter = makeThemeVars("emojiFooter", {
+        height: menuButton.size,
+    });
+
+    const buttonContents = makeThemeVars("buttonContents", {
+        state: {
+            bg: globalVars.mainColors.primary.fade(0.1),
+        },
+    });
+
+    const iconWrap = makeThemeVars("iconWrap", {
+        width: 32,
+        height: 32,
+    });
+
+    const richEditorWidth = 8 * sizing.emojiSize;
+
+    const modernFrame = makeThemeVars("modernFrame", {
+        padding: 16,
+        margin: 16,
+    });
 
     return {
         colors,
         spacing,
         sizing,
         menuButton,
-        paragraphMenu,
         paragraphMenuHandle,
         insertLink,
         flyout,
@@ -157,5 +174,11 @@ export const richEditorVariables = useThemeCache(() => {
         embedMenu,
         scrollContainer,
         emojiBody,
+        buttonContents,
+        emojiHeader,
+        emojiFooter,
+        iconWrap,
+        richEditorWidth,
+        modernFrame,
     };
 });

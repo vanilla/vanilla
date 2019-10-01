@@ -35,7 +35,7 @@ $daterangepicker-unselected-bg-color:        #fff !default;
 
 //
 // daterangepicker
-$daterangepicker-width:          to-rem(278);
+$daterangepicker-width:          278px;
 $daterangepicker-z-index:        3000 !default;
 
 $daterangepicker-border-size:    $border-width;
@@ -54,7 +54,7 @@ $daterangepicker-calendar-border-radius:       $daterangepicker-border-radius !d
 
 //
 // Calendar Cells
-$daterangepicker-cell-size:           to-rem(18);
+$daterangepicker-cell-size:           18px;
 $daterangepicker-cell-width:          $daterangepicker-cell-size !default;
 $daterangepicker-cell-height:         $daterangepicker-cell-size !default;
 
@@ -67,7 +67,7 @@ $daterangepicker-dropdown-z-index: $daterangepicker-z-index + 1 !default;
 
 //
 // Controls
-$daterangepicker-control-height:               to-rem(36);
+$daterangepicker-control-height:               36px;
 $daterangepicker-control-line-height:          $daterangepicker-control-height !default;
 $daterangepicker-control-color:                #555 !default;
 
@@ -341,7 +341,7 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
 .filter-date {
   position: relative;
-  min-width: to-rem(210);
+  min-width: 210px;
 
   &::after {
     position: absolute;

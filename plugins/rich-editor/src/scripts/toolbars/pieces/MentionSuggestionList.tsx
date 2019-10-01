@@ -15,7 +15,8 @@ import MentionSuggestion, {
     MentionSuggestionSpacer,
 } from "@rich-editor/toolbars/pieces/MentionSuggestion";
 import ToolbarPositioner from "@rich-editor/toolbars/pieces/ToolbarPositioner";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -93,7 +94,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         return (
                             <MentionSuggestion
                                 mentionData={mentionProp.mentionData}
-                                key={mentionProp.mentionData.name}
+                                key={mentionProp.mentionData.domID}
                                 onMouseEnter={mentionProp.onMouseEnter}
                                 onClick={onItemClick}
                                 isActive={isActive}

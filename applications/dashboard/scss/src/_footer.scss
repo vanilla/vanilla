@@ -10,8 +10,8 @@
   background-color: $body-bg;
 
   .vanilla-logo {
-    width: 4rem;
-    height: 2rem;
+    width: 64px;
+    height: 32px;
   }
 }
 
@@ -35,7 +35,7 @@
 
 .footer-logo-powered-text {
   background-color: $body-bg;
-  font-size: .425rem;
+  font-size: 6.8px;
   line-height: $line-height-lg;
   text-transform: uppercase;
   text-align: center;
@@ -44,12 +44,12 @@
 
 .footer-logo-powered {
   position: relative;
-  top: -.5rem;
+  top: -8px;
   display: block;
 }
 
 .footer-logo {
-  padding-top: .5rem;
+  padding-top: 8px;
   opacity: .3;
 }
 

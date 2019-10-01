@@ -71,7 +71,10 @@ class CategoryController extends VanillaController {
         $form = new Gdn_Form();
         $categoryID = $form->getFormValue('CategoryID', $categoryID);
         $followed = $form->getFormValue('Followed', null);
-
+        $hasPermission = $categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View');
+        if (!$hasPermission) {
+            throw permissionException('Vanilla.Discussion.View');
+        }
         $result = $categoryModel->follow($userID, $categoryID, $followed);
 
         // Set the new value for api calls and json targets.

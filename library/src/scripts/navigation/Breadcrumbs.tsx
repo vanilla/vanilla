@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import Breadcrumb from "@library/navigation/Breadcrumb";
 import { style } from "typestyle";
 import classNames from "classnames";
+import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 
 export interface ICrumb {
     name: string;
@@ -29,6 +30,7 @@ export default class Breadcrumbs extends React.Component<IProps> {
     public render() {
         const minimumCrumbCount = this.props.minimumCrumbCount || 1;
         const crumbCount = this.props.children.length;
+        const classes = breadcrumbsClasses();
         if (crumbCount < minimumCrumbCount && !this.props.forceDisplay) {
             return null;
         }
@@ -42,8 +44,8 @@ export default class Breadcrumbs extends React.Component<IProps> {
                 <React.Fragment key={`breadcrumb-${index}`}>
                     <Breadcrumb lastElement={lastElement} name={crumb.name} url={crumb.url} />
                     {!lastElement && (
-                        <li aria-hidden={true} className="breadcrumb-item breadcrumbs-separator">
-                            <span className="breadcrumbs-separatorIcon">{crumbSeparator}</span>
+                        <li aria-hidden={true} className={classNames(classes.separator)}>
+                            <span className={classes.separatorIcon}>{crumbSeparator}</span>
                         </li>
                     )}
                 </React.Fragment>
@@ -62,10 +64,10 @@ export default class Breadcrumbs extends React.Component<IProps> {
         return (
             <nav
                 aria-label={t("Breadcrumb")}
-                className={classNames("breadcrumbs", this.props.className)}
+                className={classNames(classes.root, this.props.className)}
                 aria-hidden={hasForcedCrumb}
             >
-                <ol className="breadcrumbs-list">{content}</ol>
+                <ol className={classes.list}>{content}</ol>
             </nav>
         );
     }

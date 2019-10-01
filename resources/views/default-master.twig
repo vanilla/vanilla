@@ -35,6 +35,8 @@
             <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
         {% endfor -%}
 
+        {{ preloadModel.renderHtml()|raw }}
+
         {%- if canonicalUrl -%}
             <link rel="canonical" href="{{ canonicalUrl }}"/>
         {%- endif -%}
@@ -53,7 +55,7 @@
                     {{ header|raw }}
                 </noscript>
             {%- endif -%}
-            <header id="vanillaHeader"></header>
+            <header id="titleBar"></header>
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
                 <noscript>
@@ -77,13 +79,5 @@
             {%- endif -%}
         </div>
         <div id="modals"></div>
-        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-        <script nonce="{{ nonce }}">
-            WebFont.load({
-                google: {
-                    families: ['Open Sans:400,400italic,600,700'] // Will be dynamic at some point
-                }
-            });
-        </script>
     </body>
 </html>

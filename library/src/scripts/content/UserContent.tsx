@@ -4,15 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import className from "classnames";
-import { initAllUserContent } from "@library/content";
+import { useHashScrolling } from "@library/content/hashScrolling";
 import { userContentClasses } from "@library/content/userContentStyles";
+import className from "classnames";
+import React from "react";
 
 interface IProps {
     className?: string;
-    scrollToOffset?: number;
     content: string;
+    ignoreHashScrolling?: boolean;
 }
 
 /**
@@ -20,56 +20,15 @@ interface IProps {
  *
  * This will ensure that all embeds/etc are initialized.
  */
-export default class UserContent extends React.PureComponent<IProps> {
-    public static defaultProps: Partial<IProps> = {
-        scrollToOffset: 0,
-    };
+export default function UserContent(props: IProps) {
+    const classes = userContentClasses();
 
-    public render() {
-        const classes = userContentClasses();
+    useHashScrolling(props.ignoreHashScrolling);
 
-        return (
-            <div
-                className={className("userContent", this.props.className, classes.root)}
-                dangerouslySetInnerHTML={{ __html: this.props.content }}
-            />
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentDidMount() {
-        initAllUserContent();
-        this.scrollToHash();
-        window.addEventListener("hashchange", this.scrollToHash);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentDidUpdate() {
-        initAllUserContent();
-        this.scrollToHash();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentWillUnmount() {
-        window.removeEventListener("hashchange", this.scrollToHash);
-    }
-
-    /**
-     * Scroll to the window's current hash value.
-     */
-    private scrollToHash = (event?: HashChangeEvent) => {
-        event && event.preventDefault();
-        const id = window.location.hash.replace("#", "");
-        const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
-        if (element) {
-            const top = window.pageYOffset + element.getBoundingClientRect().top + this.props.scrollToOffset!;
-            window.scrollTo({ top, behavior: "smooth" });
-        }
-    };
+    return (
+        <div
+            className={className("userContent", props.className, classes.root)}
+            dangerouslySetInnerHTML={{ __html: props.content }}
+        />
+    );
 }

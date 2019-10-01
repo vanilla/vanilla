@@ -4,10 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { createRef, useContext, useEffect, useRef } from "react";
 import classNames from "classnames";
 import BackLink from "@library/routing/links/BackLink";
 import Heading from "@library/layout/Heading";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
+import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadingContext";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 interface IPageHeading {
     title: string;
@@ -22,21 +26,30 @@ interface IPageHeading {
  * A component representing a top level page heading.
  * Can be configured with an options menu and a backlink.
  */
-export default class PageHeading extends React.Component<IPageHeading> {
-    public static defaultProps = {
-        includeBackLink: true,
-    };
-    public render() {
-        return (
-            <div className={classNames("pageHeading", this.props.className)}>
-                <div className="pageHeading-main">
-                    {this.props.includeBackLink && <BackLink className="pageHeading-backLink" fallbackElement={null} />}
-                    <Heading depth={1} title={this.props.title} className={this.props.headingClassName}>
-                        {this.props.children}
+// export class PageHeading extends React.Component<IPageHeading> {
+
+export function PageHeading(props: IPageHeading) {
+    const { includeBackLink = true, actions, children, headingClassName, title, className } = props;
+
+    // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
+    // public titleRef: React.RefObject<HTMLHeadingElement>;
+    const ref = useRef<HTMLHeadingElement>(null);
+    const { fontSize } = useFontSizeCalculator();
+
+    const classes = pageHeadingClasses();
+    const linkClasses = backLinkClasses();
+
+    return (
+        <div className={classNames(classes.root, className)}>
+            <div className={classes.main}>
+                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(fontSize)} />}
+                <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
+                    <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
+                        {children}
                     </Heading>
-                </div>
-                {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
+                </ConditionalWrap>
             </div>
-        );
-    }
+            {actions && <div className={classes.actions(fontSize)}>{actions}</div>}
+        </div>
+    );
 }

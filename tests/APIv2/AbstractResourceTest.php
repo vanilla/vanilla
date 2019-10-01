@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Formatting\FormatCompatibilityService;
+
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**
@@ -157,6 +159,50 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test that the edit endpoints apply format compatibility where possible.
+     *
+     * @param string $editSuffix Set this to change the GET request suffix.
+     */
+    public function testEditFormatCompat(string $editSuffix = "/edit") {
+        $record = $this->record();
+
+        // Only check anything if we've got a format and body field.
+        if (!isset($record['body']) || !isset($record['format'])) {
+            $this->assertTrue(true);
+            return;
+        }
+
+        $row = $this->testPost($record);
+
+        $expectedBody = 'Converted!!';
+
+        // Create a stub for the compatService class.
+        $actualCompatService = static::container()->get(FormatCompatibilityService::class);
+        $mockCompatService = $this->createMock(FormatCompatibilityService::class);
+        $mockCompatService->method('convert')
+            ->willReturn($expectedBody);
+        static::container()
+            ->setInstance(FormatCompatibilityService::class, $mockCompatService);
+
+
+        // Get the actual record and assert our value was set.
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}$editSuffix"
+        );
+
+        $actualBody = $r['body'];
+        $this->assertEquals(
+            $expectedBody,
+            $actualBody,
+            "FormatCompatibilityServer::convert() should be run on edit endpoints."
+        );
+
+        // Restore back the actual format compat service.
+        static::container()
+            ->setInstance(FormatCompatibilityService::class, $actualCompatService);
+    }
+
+    /**
      * Modify the row for update requests.
      *
      * @param array $row The row to modify.
@@ -270,16 +316,17 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $originalIndex = $this->api()->get($indexUrl);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
-        $rows = $this->generateIndexRows();
-
-        $newIndex = $this->api()->get($indexUrl);
-
         $originalRows = $originalIndex->getBody();
+        $rows = $this->generateIndexRows();
+        $newIndex = $this->api()->get($indexUrl, ['limit' => count($originalRows) + count($rows) + 1]);
+
         $newRows = $newIndex->getBody();
-        $this->assertEquals(count($originalRows)+count($rows), count($newRows));
+        $this->assertEquals(count($originalRows) + count($rows), count($newRows));
         // The index should be a proper indexed array.
-        for ($i = 0; $i < count($newRows); $i++) {
-            $this->assertArrayHasKey($i, $newRows);
+        $count = 0;
+        foreach ($newRows as $i => $row) {
+            $this->assertSame($count, $i);
+            $count++;
         }
 
         if ($this->testPagingOnIndex) {

@@ -13,7 +13,7 @@ import chalk from "chalk";
  */
 export function print(contents: string) {
     if (process.env.NODE_ENV !== "test") {
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         console.log(contents);
     }
 }
@@ -38,7 +38,7 @@ export function printVerbose(contents: string) {
  * @param error - The error or string to print out.
  */
 export function printError(error: any) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.error(chalk.bold.red(error.toString()));
     throw error;
 }
@@ -49,7 +49,7 @@ export function printError(error: any) {
  * @param error - The error or string to print out.
  */
 export function fail(error: any) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.error(chalk.bold.red(error.toString()));
     process.exit(1);
 }

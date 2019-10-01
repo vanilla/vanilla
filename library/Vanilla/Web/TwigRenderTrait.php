@@ -11,15 +11,43 @@ namespace Vanilla\Web;
  * Class for rendering twig views with the vanilla environment configured.
  */
 trait TwigRenderTrait {
-    use \Garden\TwigTrait;
+
+    /** @var string The path to look for twig views in. */
+    protected static $twigDefaultFolder = PATH_ROOT;
+
+    /**
+     * @var \Twig\Environment
+     */
+    private $twig;
 
     /**
      * Initialize the twig environment.
      */
-    public function prepareTwig(): \Twig\Environment {
-        $twig = self::twigInit();
-        $this->enhanceTwig($twig);
-        return $twig;
+    private function prepareTwig(): \Twig\Environment {
+        /** @var TwigEnhancer $enhancer */
+        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
+
+        $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
+
+        $isDebug = \Gdn::config('Debug') === true;
+        $envArgs = [
+            'cache' => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
+            'debug' => $isDebug,
+            // Automatically controlled by the debug value.
+            // This causes twig to check the FS timestamp before going to cache.
+            // It will rebuild that file's cache if an update had occured.
+            // 'auto_reload' => $isDebug
+            'strict_variables' => $isDebug, // Surface template errors in debug mode.
+        ];
+        $environment = new \Twig\Environment($loader, $envArgs);
+
+        if ($isDebug) {
+            $environment->addExtension(new \Twig\Extension\DebugExtension());
+        }
+
+        $enhancer->enhanceEnvironment($environment);
+        $enhancer->enhanceFileSystem($loader);
+        return $environment;
     }
 
     /**
@@ -28,29 +56,14 @@ trait TwigRenderTrait {
      * @param string $path The view path.
      * @param array $data The data to render.
      *
-     * @return string The rendered HTML.
+     * @return string Rendered HTML.
      */
-    protected function renderTwig(string $path, array $data): string {
-        /** @var \Twig\Environment $twig */
-        static $twig;
-        if (!$twig) {
-            $twig = $this->prepareTwig();
+    public function renderTwig(string $path, array $data): string {
+        if (!$this->twig) {
+            $this->twig = $this->prepareTwig();
         }
         // Ensure that we don't duplicate our root path in the path view.
         $path = str_replace(PATH_ROOT, '', $path);
-
-        // We need to echo instead of return returning because \Gdn_Controller::fetchView()
-        // uses only ob_start and ob_get_clean to gather the rendered result.
-        return $twig->render($path, $data);
-    }
-
-    /**
-     * Add a few required method into the twig environment.
-     *
-     * @param \Twig\Environment $twig The twig environment to enhance.
-     */
-    private function enhanceTwig(\Twig\Environment $twig) {
-        $twig->addFunction(new \Twig_Function('t', [\Gdn::class, 'translate']));
-        $twig->addFunction(new \Twig_Function('url', 'url'));
+        return $this->twig->render($path, $data);
     }
 }

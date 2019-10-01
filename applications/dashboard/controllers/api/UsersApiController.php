@@ -29,7 +29,7 @@ class UsersApiController extends AbstractApiController {
 
     use PermissionsTranslationTrait;
 
-    const ME_ACTION_CONSTANT = "@@users/GET_ME_RESPONSE";
+    const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
 
     /** @var ActivityModel */
     private $activityModel;
@@ -157,6 +157,7 @@ class UsersApiController extends AbstractApiController {
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
+            'points:i',
             'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
@@ -658,7 +659,7 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function post_register(array $body) {
-        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+        $this->permission([\Vanilla\Permissions::BAN_CSRF, \Vanilla\Permissions::BAN_PRIVATE]);
 
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);
@@ -751,7 +752,7 @@ class UsersApiController extends AbstractApiController {
      * @throws Exception Throws all exceptions to the dispatcher.
      */
     public function post_requestPassword(array $body) {
-        $this->permission();
+        $this->permission(\Vanilla\Permissions::BAN_PRIVATE);
 
         $in = $this->schema([
             'email:s' => 'The email/username of the user.',
@@ -933,7 +934,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
+            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'points', 'emailConfirmed',
                 'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateLastActive', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');

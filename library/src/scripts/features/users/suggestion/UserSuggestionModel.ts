@@ -5,11 +5,13 @@
  */
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/UsersModel";
+import { IUsersStoreState } from "@library/features/users/userModel";
 import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import ReduxReducer from "@library/redux/ReduxReducer";
+import moment from "moment";
+import { IUserFragment } from "@library/@types/api/users";
 
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;
@@ -57,14 +59,26 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     private static stateSlice(state: IUsersStoreState): IUserSuggestionState {
         if (!state.users || !state.users.suggestions) {
             throw new Error(
-                `Could not find users.suggestions in state ${state}. Be sure to initialize the UsersModel.reducer()`,
+                `Could not find users.suggestions in state ${state}. Be sure to initialize the usersReducer()`,
             );
         }
 
         return state.users.suggestions;
     }
 
-    public static sortSuggestions(users: IUserSuggestion[], searchName: string) {
+    /**
+     * Sort a list of user suggestions.
+     *
+     * Priorities
+     * [Exact Match]
+     * [Users active in the last 90 days, sorted loosely with transliteration]
+     * [Users not active in the last 90 days, sorted loosely with transliteration]
+     *
+     * @param users The users to sort.
+     * @param searchName The current search text.
+     * @param currentMoment The current time.
+     */
+    public static sortSuggestions(users: IUserSuggestion[], searchName: string, currentMoment = moment()) {
         const looseCollator = Intl.Collator("en", {
             usage: "sort",
             sensitivity: "variant",
@@ -72,19 +86,67 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             numeric: true,
         });
 
-        return users.sort((userA, userB) => {
+        // Days of recent activity to look at.
+        const ACTIVE_THRESHOLD = 90;
+
+        // Fan out into most recently active users & less active users.
+        let recentlyActive: IUserSuggestion[] = [];
+        let lessActive: IUserSuggestion[] = [];
+
+        const daysAgo90 = currentMoment.subtract(ACTIVE_THRESHOLD, "days");
+
+        for (const user of users) {
+            if (!user.dateLastActive) {
+                lessActive.push(user);
+                continue;
+            }
+
+            const lastActiveMoment = moment(user.dateLastActive);
+            if (lastActiveMoment.isSameOrAfter(daysAgo90)) {
+                recentlyActive.push(user);
+            } else {
+                lessActive.push(user);
+            }
+        }
+
+        const sortByName = (userA: IUserSuggestion, userB: IUserSuggestion) => {
+            const casedSearchName = searchName.toLocaleLowerCase();
+            const aCasedName = userA.name.toLocaleLowerCase();
+            const bCasedName = userB.name.toLocaleLowerCase();
+
+            // Return partial matches first.
+            if (aCasedName.startsWith(casedSearchName) && !bCasedName.startsWith(casedSearchName)) {
+                return -1;
+            }
+            if (bCasedName.startsWith(casedSearchName) && !aCasedName.startsWith(casedSearchName)) {
+                return 1;
+            }
+            return looseCollator.compare(userA.name.toLocaleLowerCase(), userB.name.toLocaleLowerCase());
+        };
+
+        const exactToTheTop = (userA: IUserSuggestion, userB: IUserSuggestion) => {
+            const casedSearchName = searchName.toLocaleLowerCase();
+            const aCasedName = userA.name.toLocaleLowerCase();
+
             //  Return exact matches first.
-            if (userA.name.includes(searchName) && !userB.name.includes(searchName)) {
+            if (aCasedName === casedSearchName) {
                 return -1;
             }
 
-            if (userB.name.includes(searchName) && !userA.name.includes(searchName)) {
-                return 1;
-            }
+            // Don't affect the sorts otherwise.
+            return 0;
+        };
 
-            // Then do a loose sort.
-            return looseCollator.compare(userA.name, userB.name);
-        });
+        // Sort each set of users separately.
+        recentlyActive.sort(sortByName);
+        lessActive.sort(sortByName);
+
+        // Join them back together.
+        const allUsers = [...recentlyActive, ...lessActive];
+
+        // Sort exact matches to the top.
+        allUsers.sort(exactToTheTop);
+        return allUsers;
     }
 
     public readonly initialState: IUserSuggestionState = {
@@ -95,7 +157,10 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         activeSuggestionIndex: 0,
     };
 
-    public reducer(state = this.initialState, action: typeof UserSuggestionActions.ACTION_TYPES): IUserSuggestionState {
+    public reducer = (
+        state = this.initialState,
+        action: typeof UserSuggestionActions.ACTION_TYPES,
+    ): IUserSuggestionState => {
         switch (action.type) {
             case UserSuggestionActions.LOAD_USERS_REQUEST: {
                 const { username } = action.meta;
@@ -159,5 +224,5 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             default:
                 return state;
         }
-    }
+    };
 }

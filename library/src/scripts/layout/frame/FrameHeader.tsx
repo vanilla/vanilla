@@ -6,13 +6,14 @@
 
 import React from "react";
 import Heading, { ICommonHeadingProps } from "@library/layout/Heading";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { leftChevron } from "@library/icons/common";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
+import { LeftChevronIcon } from "@library/icons/common";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts
@@ -45,7 +46,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     onClick={this.props.onBackClick}
                     className={classNames("frameHeader-backButton", classes.backButton)}
                 >
-                    {leftChevron("frameHeader-backIcon isSmall", true)}
+                    <LeftChevronIcon className={classNames(classes.backButtonIcon)} centred={true} />
                 </Button>
             );
         }
@@ -53,8 +54,8 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         let closeButton;
         if (this.props.closeFrame) {
             closeButton = (
-                <div className={classNames("frameHeader-closePosition", classes.closePosition, classes.action)}>
-                    <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
+                <div className={classes.action}>
+                    <CloseButton className={classes.close} onClick={this.props.closeFrame} compact />
                 </div>
             );
         }

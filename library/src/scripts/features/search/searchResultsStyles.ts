@@ -26,7 +26,7 @@ export const searchResultsVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.primary,
         hover: {
-            bg: globalVars.states.hover.color,
+            fg: globalVars.links.colors.hover,
         },
     });
 
@@ -51,9 +51,9 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         padding: {
-            top: 18,
+            top: 15,
             right: globalVars.gutter.half,
-            bottom: 18,
+            bottom: 16,
             left: globalVars.gutter.half,
         },
     });
@@ -94,6 +94,7 @@ export const searchResultsClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        position: "relative",
         borderTop: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
@@ -116,6 +117,7 @@ export const searchResultsClasses = useThemeCache(() => {
     const result = style("result", {
         position: "relative",
         display: "block",
+        width: percent(100),
     });
 
     return {
@@ -133,19 +135,43 @@ export const searchResultClasses = useThemeCache(() => {
     const mediaQueries = vars.mediaQueries();
     const metaVars = metasVariables();
 
+    const title = style("title", {
+        display: "block",
+        ...fonts({
+            color: vars.title.fg,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+        }),
+        overflow: "hidden",
+        flexGrow: 1,
+        margin: 0,
+        paddingRight: unit(24),
+    });
+
     const root = style(
         {
             display: "flex",
             alignItems: "stretch",
             justifyContent: "space-between",
             ...paddings(vars.spacing.padding),
+            cursor: "pointer",
+            color: colorOut(vars.title.fg),
             borderBottom: singleBorder({
                 color: vars.separator.fg,
                 width: vars.separator.width,
             }) as any,
             $nest: {
-                "&:hover": {
-                    backgroundColor: colorOut(vars.colors.hover.bg),
+                [`&:hover .${title}`]: {
+                    color: colorOut(vars.colors.hover.fg),
+                },
+                [`&:focus .${title}`]: {
+                    color: colorOut(vars.colors.hover.fg),
+                },
+                [`&:active .${title}`]: {
+                    color: colorOut(vars.colors.hover.fg),
+                },
+                "&:not(.focus-visible)": {
+                    outline: 0,
                 },
             },
         },
@@ -194,19 +220,6 @@ export const searchResultClasses = useThemeCache(() => {
         ...objectFitWithFallback(),
     });
 
-    const title = style("title", {
-        display: "block",
-        ...fonts({
-            color: vars.title.fg,
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.bold as 400,
-        }),
-        overflow: "hidden",
-        flexGrow: 1,
-        margin: 0,
-        paddingRight: unit(24),
-    });
-
     const attachments = style(
         "attachments",
         {
@@ -221,17 +234,17 @@ export const searchResultClasses = useThemeCache(() => {
     );
 
     const metas = style("metas", {
-        marginTop: unit(12),
+        marginTop: unit(2),
         ...margins({
-            top: 12,
             left: -metaVars.spacing.default,
         }),
-        width: calc(`100% + ${metaVars.spacing.default * 2}`),
+        width: calc(`100% + ${unit(metaVars.spacing.default * 2)}`),
     });
 
     const excerpt = style("excerpt", {
         marginTop: unit(12),
         color: colorOut(vars.excerpt.fg),
+        lineHeight: globalVars.lineHeights.excerpt,
     });
 
     return {

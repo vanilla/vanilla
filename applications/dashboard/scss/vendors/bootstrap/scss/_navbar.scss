@@ -69,9 +69,9 @@
 
 .navbar-brand {
   float: left;
-  padding-top:    .25rem;
-  padding-bottom: .25rem;
-  margin-right: 1rem;
+  padding-top:    4px;
+  padding-bottom: 4px;
+  margin-right: 16px;
   font-size: $font-size-lg;
 
   @include hover-focus {
@@ -87,8 +87,8 @@
 .navbar-divider {
   float: left;
   width: 1px;
-  padding-top: .425rem;
-  padding-bottom: .425rem;
+  padding-top: 6.8px;
+  padding-bottom: 6.8px;
   margin-right: $navbar-padding-horizontal;
   margin-left:  $navbar-padding-horizontal;
   overflow: hidden;
@@ -105,7 +105,7 @@
 // Bootstrap JavaScript plugin.
 
 .navbar-toggler {
-  padding: .5rem .75rem;
+  padding: 8px 12px;
   font-size: $font-size-lg;
   line-height: 1;
   background: none;
@@ -148,16 +148,16 @@
 
   .nav-link {
     display: block;
-    padding-top:    .425rem;
-    padding-bottom: .425rem;
+    padding-top:    6.8px;
+    padding-bottom: 6.8px;
 
     + .nav-link {
-      margin-left: 1rem;
+      margin-left: 16px;
     }
   }
 
   .nav-item + .nav-item {
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 }
 

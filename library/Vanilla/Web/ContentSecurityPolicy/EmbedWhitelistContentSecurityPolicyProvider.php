@@ -14,7 +14,9 @@ class EmbedWhitelistContentSecurityPolicyProvider implements ContentSecurityPoli
         'https://embed-cdn.gettyimages.com',
         'https://s.imgur.com',
         'https://platform.instagram.com',
-        'https://platform.twitter.com'
+        'https://platform.twitter.com',
+        'https://cdn.syndication.twimg.com',
+        'https://www.instagram.com/embed.js',
     ];
 
     /**

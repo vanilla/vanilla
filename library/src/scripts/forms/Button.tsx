@@ -8,17 +8,18 @@ import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
 import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
     className?: string;
-    type?: string;
     disabled?: boolean;
     prefix?: string;
     legacyMode?: boolean;
     onClick?: (e) => void;
     onKeyDown?: (e) => void;
     title?: string;
+    submit?: boolean;
     ariaLabel?: string;
     baseClass?: ButtonTypes;
     ariaHidden?: boolean;
@@ -27,17 +28,20 @@ interface IProps extends IOptionalComponentID {
     buttonRef?: React.RefObject<HTMLButtonElement>;
     role?: string;
     onKeyDownCapture?: (event: any) => void;
+    controls?: string;
 }
 
 interface IState {
     id?: string;
 }
 
-export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => {
+export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
         switch (type) {
+            case ButtonTypes.STANDARD:
+                return classes.standard;
             case ButtonTypes.TEXT:
                 return classes.text;
             case ButtonTypes.TEXT_PRIMARY:
@@ -46,22 +50,28 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
                 return buttonUtils.buttonIcon;
             case ButtonTypes.ICON_COMPACT:
                 return buttonUtils.buttonIconCompact;
-            case ButtonTypes.COMPACT:
-                return classes.compact;
-            case ButtonTypes.COMPACT_PRIMARY:
-                return classes.compactPrimary;
             case ButtonTypes.PRIMARY:
                 return classes.primary;
+            case ButtonTypes.TRANSPARENT:
+                return classes.transparent;
             case ButtonTypes.TRANSLUCID:
                 return classes.translucid;
-            case ButtonTypes.INVERTED:
-                return classes.inverted;
-            case ButtonTypes.TAB:
-                return classes.tab;
+            case ButtonTypes.TITLEBAR_LINK:
+                return titleBarClasses().linkButton;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
+            case ButtonTypes.RESET:
+                return buttonUtilityClasses().reset;
+            case ButtonTypes.DASHBOARD_STANDARD:
+                return "btn";
+            case ButtonTypes.DASHBOARD_PRIMARY:
+                return "btn btn-primary";
+            case ButtonTypes.DASHBOARD_SECONDARY:
+                return "btn btn-secondary";
+            case ButtonTypes.DASHBOARD_LINK:
+                return "btn btn-link";
             default:
-                return classes.standard;
+                return "";
         }
     } else {
         return "";
@@ -75,7 +85,6 @@ export default class Button extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         id: undefined,
         disabled: false,
-        type: "button",
         prefix: "button",
         legacyMode: false,
         baseClass: ButtonTypes.STANDARD,
@@ -90,7 +99,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            getDynamicClassFromButtonType(this.props.baseClass),
+            getButtonStyleFromBaseClass(this.props.baseClass),
             { Button: this.props.legacyMode },
             this.props.className,
         );
@@ -99,7 +108,7 @@ export default class Button extends React.Component<IProps, IState> {
             <button
                 id={this.state.id}
                 disabled={this.props.disabled}
-                type={this.props.type}
+                type={this.props.submit ? "submit" : "button"}
                 className={componentClasses}
                 onClick={this.props.onClick}
                 title={this.props.title}
@@ -111,6 +120,7 @@ export default class Button extends React.Component<IProps, IState> {
                 lang={this.props.lang}
                 role={this.props.role}
                 onKeyDownCapture={this.props.onKeyDownCapture}
+                aria-controls={this.props.controls}
             >
                 {this.props.children}
             </button>

@@ -8,6 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats;
+use Vanilla\Web\TwigStaticRenderer;
+
 if (!function_exists('alternate')) {
     /**
      * Write alternating strings on each call.
@@ -44,22 +47,30 @@ if (!function_exists('dashboardSymbol')) {
      * @param string $class If set, overrides any 'class' attribute in the $attr param.
      * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
      * @return string An HTML-formatted string to render svg icons.
+     *
+     * @deprecated 3.3 Use @dashboard/components/dashboardSymbol.twig or the dashboardSymbol mixin.
      */
     function dashboardSymbol($name, $class = '', array $attr = []) {
-        if (empty($attr['alt'])) {
-            $attr['alt'] = $name;
+        $alt = $attr['alt'] ?? $name;
+        $providedClass = $class ?: ($attr['class'] ?? null);
+
+        // Clear out attrs that have dedicated variables.
+        if (isset($attr['alt'])) {
+            unset($attr['alt']);
         }
 
-        if (!empty($class)) {
-            $attr['class'] = $class.' ';
-        } else {
-            $attr['class'] = isset($attr['class']) ? $attr['class'].' ' : '';
+        if (isset($attr['class'])) {
+            unset($attr['class']);
         }
 
-        $baseCssClass = 'icon icon-svg-'.$name;
-        $attr['class'] .= $baseCssClass;
-
-        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
+        return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardSymbol.twig', [
+            'params' => [
+                'name' => $name,
+                'alt' => $alt,
+                'class' => $providedClass,
+                'dangerousAttributeString' => new \Twig\Markup(attribute($attr), 'utf-8'),
+            ]
+        ]);
     }
 }
 
@@ -110,6 +121,8 @@ if (!function_exists('heading')) {
      * @param string|array $buttonAttributes Can be string CSS class or an array of attributes. CSS class defaults to `btn btn-primary`.
      * @param string $returnUrl The url for the return chrevron button.
      * @return string The structured heading string.
+     *
+     * @deprecated 3.3 Use @dashboard/components/dashboardHeading.twig or the dashboardHeading mixin.
      */
     function heading($title, $buttonText = '', $buttonUrl = '', $buttonAttributes = [], $returnUrl = '') {
         if (is_array($buttonText)) {
@@ -145,20 +158,14 @@ if (!function_exists('heading')) {
                 $buttonsString .= ' <a '.attribute($buttonAttributes).' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
             }
         }
-        $buttonsString = '<div class="btn-container">'.$buttonsString.'</div>';
 
-        $title = '<h1>'.$title.'</h1>';
-
-        if ($returnUrl !== '') {
-            $title = '<div class="title-block">
-                <a class="btn btn-icon btn-return" aria-label="Return" href="'.url($returnUrl).'">'.
-                    dashboardSymbol('chevron-left').'
-                </a>
-                '.$title.'
-            </div>';
-        }
-
-        return '<header class="header-block">'.$title.$buttonsString.'</header>';
+        return TwigStaticRenderer::renderTwigStatic('@dashboard/components/dashboardHeading.twig', [
+            'params' => [
+                'title' => new \Twig\Markup($title, 'utf-8'),
+                'returnUrl' => $returnUrl ?: null,
+                'buttons' => $buttonsString ? new \Twig\Markup($buttonsString, 'utf-8') : null,
+            ]
+        ]);
     }
 }
 
@@ -887,12 +894,14 @@ if (!function_exists('fixnl2br')) {
      * @param string $text The text to fix.
      * @return string
      * @since 2.1
+     *
+     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
      */
     function fixnl2br($text) {
-        $allblocks = '(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary|li|tbody|tr|td|th|thead|tbody|tfoot|col|colgroup|caption|dt|dd)';
-        $text = preg_replace('!(?:<br\s*/>){1,2}\s*(<'.$allblocks.'[^>]*>)!', "\n$1", $text);
-        $text = preg_replace('!(</'.$allblocks.'[^>]*>)\s*(?:<br\s*/>){1,2}!', "$1\n", $text);
-        return $text;
+        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
+        /** @var Formats\HtmlFormat $htmlFormat */
+        $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
+        return $htmlFormat->cleanupLineBreaks((string) $text);
     }
 }
 
@@ -1027,6 +1036,30 @@ if (!function_exists('hasEditProfile')) {
             c('Garden.Profile.Locations', false) ||
             c('Garden.Registration.Method') != 'Connect'
         );
+
+        return $result;
+    }
+}
+
+if (!function_exists('hasViewProfile')) {
+    /**
+     * Determine whether or not a given user has the view profile link.
+     *
+     * @param int $userID The user ID to check.
+     * @return bool Return true if the user should have the view profile link or false otherwise.
+     */
+    function hasViewProfile($userID) {
+        if ($userID != Gdn::session()->UserID) {
+            return false;
+        }
+
+        $result = checkPermission('Garden.Profiles.View');
+
+        $result = $result && (
+                c('Garden.Profile.Titles') ||
+                c('Garden.Profile.Locations', false) ||
+                c('Garden.Registration.Method') != 'Connect'
+            );
 
         return $result;
     }

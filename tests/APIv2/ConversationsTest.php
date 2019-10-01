@@ -54,7 +54,6 @@ class ConversationsTest extends AbstractAPIv2Test {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
         $config->set('Garden.Email.Disabled', true, true, false);
-
         $session->end();
     }
 
@@ -144,15 +143,21 @@ class ConversationsTest extends AbstractAPIv2Test {
             $rows[] = $this->testPost();
         }
 
+        // Switch up to the regular member to get the conversations, then switch back to the admin.
+        $originalUserID = $this->api()->getUserID();
+        $this->api()->setUserID(self::$userIDs[0]);
         $result = $this->api()->get($this->baseUrl, ['insertUserID' => self::$userIDs[0]]);
+        $this->api()->setUserID($originalUserID);
         $this->assertEquals(200, $result->getStatusCode());
 
         $rows = $result->getBody();
-        $this->assertGreaterThan($nbsInsert, count($rows));
         // The index should be a proper indexed array.
         for ($i = 0; $i < count($rows); $i++) {
             $this->assertArrayHasKey($i, $rows);
         }
+
+        // Now that we're not a user in the conversations, and moderation is disabled, we should see an exception is thrown.
+        $this->api()->get($this->baseUrl, ['insertUserID' => self::$userIDs[0]]);
     }
 
     /**

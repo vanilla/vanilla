@@ -7,19 +7,22 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { checkCompact } from "@library/icons/common";
+import { CheckCompactIcon } from "./common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const currentColorFill = {
     fill: "currentColor",
 };
 
-export function revisionStatus_revision(className?: string) {
+// Placeholder
+export function RevisionStatusRevisionIcon(props: { className?: string }) {
     const title = t("Revision");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-revision", className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-revision", props.className)}
             role="img"
             aria-label={title}
         >
@@ -29,13 +32,14 @@ export function revisionStatus_revision(className?: string) {
     );
 }
 
-export function revisionStatus_draft(className?: string) {
+export function RevisionStatusDraftIcon(props: { className?: string }) {
     const title = t("Draft");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-draft", className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-draft", props.className)}
             role="img"
             aria-label={title}
         >
@@ -52,13 +56,14 @@ export function revisionStatus_draft(className?: string) {
     );
 }
 
-export function revisionStatus_pending(className?: string) {
+export function RevisionStatusPendingIcon(props: { className?: string }) {
     const title = t("Pending");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-pending", className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-pending", props.className)}
             role="img"
             aria-label={title}
         >
@@ -71,17 +76,18 @@ export function revisionStatus_pending(className?: string) {
     );
 }
 
-export function revisionStatus_published(className?: string) {
-    return checkCompact(className);
+export function RevisionStatusPublishedIcon(props: { className?: string }) {
+    return <CheckCompactIcon {...props} />;
 }
 
-export function revisionStatus_deleted(className?: string) {
+export function RevisionStatusDeletedIcon(props: { className?: string }) {
     const title = t("Deleted");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-deleted", className)}
+            className={classNames(classes.standard, "revisionIcon", "revisionIcon-deleted", props.className)}
             role="img"
             aria-label={title}
         >

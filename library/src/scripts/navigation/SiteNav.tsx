@@ -12,9 +12,9 @@ import Heading from "@library/layout/Heading";
 import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID } from "@library/utility/idUtils";
-import TabHandler from "@library/dom/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -22,7 +22,7 @@ interface IProps {
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
-    bottomCTA: React.ReactNode;
+    bottomCTA?: React.ReactNode;
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
@@ -37,16 +37,17 @@ export class SiteNav extends React.Component<IProps> {
         const { activeRecord, collapsible, onItemHover, children } = this.props;
         const hasChildren = children && children.length > 0;
         const classes = siteNavClasses();
+
         const content = hasChildren
             ? children.map((child, i) => {
                   return (
                       <SiteNavNode
                           {...child}
+                          collapsible={collapsible}
                           activeRecord={activeRecord}
                           key={child.recordType + child.recordID}
                           titleID={this.titleID}
                           depth={0}
-                          collapsible={collapsible}
                           onItemHover={onItemHover}
                           clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                       />
@@ -161,7 +162,7 @@ export class SiteNav extends React.Component<IProps> {
                     }
                 }
                 break;
-            case "Home":
+            case "Home": {
                 /*
                     If a cell is focused, moves focus to the previous interactive widget in the current row.
                     If a row is focused, moves focus out of the treegrid.
@@ -173,7 +174,8 @@ export class SiteNav extends React.Component<IProps> {
                     firstLink.focus();
                 }
                 break;
-            case "End":
+            }
+            case "End": {
                 /*
                     If a row is focused, moves to the first row.
                     If a cell is focused, moves focus to the first cell in the row containing focus.
@@ -185,6 +187,7 @@ export class SiteNav extends React.Component<IProps> {
                     lastLink.focus();
                 }
                 break;
+            }
         }
     };
 }

@@ -8,9 +8,11 @@ import React from "react";
 import classNames from "classnames";
 import CloseButton from "@library/navigation/CloseButton";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorFlyoutClasses } from "@rich-editor/flyouts/pieces/flyoutClasses";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IState {
     id: string;
@@ -110,6 +112,7 @@ export class Flyout extends React.Component<IProps, IState> {
                     {screenReaderDescription}
 
                     <CloseButton
+                        baseClass={ButtonTypes.ICON}
                         onClick={this.props.onCloseClick}
                         className={classNames("richEditor-close", classesRichEditor.close)}
                     />

@@ -13,6 +13,8 @@
  */
 class PostController extends VanillaController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var DiscussionModel */
     public $DiscussionModel;
 
@@ -239,11 +241,11 @@ class PostController extends VanillaController {
                 }
                 $this->populateForm($this->Form);
             }
-            
+
             // Decode HTML entities escaped by DiscussionModel::calculate() here.
             $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
-        } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
+        } elseif ($this->Form->authenticatedPostBack(true)) { // Form was submitted
             // Save as a draft?
             $formValues = $this->Form->formValues();
             $filters = ['Score'];
@@ -427,7 +429,7 @@ class PostController extends VanillaController {
      */
     public function editDiscussion($discussionID = '', $draftID = '') {
         if ($draftID != '') {
-            $this->Draft = $this->DraftModel->getID($draftID);
+            $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
 
             // Verify this is their draft
@@ -435,9 +437,13 @@ class PostController extends VanillaController {
                 throw permissionException();
             }
         } else {
-            $this->setData('Discussion', $this->DiscussionModel->getID($discussionID), true);
+            $record = $this->DiscussionModel->getID($discussionID);
+            $this->setData('Discussion', $record, true);
             $this->CategoryID = $this->Discussion->CategoryID;
         }
+
+        // Normalize the edit data.
+        $this->applyFormatCompatibility($record, 'Body', 'Format');
 
         // Verify we can add to the category content
         $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
@@ -477,6 +483,8 @@ class PostController extends VanillaController {
         $this->DiscussionID = $DiscussionID;
         $this->Discussion = $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
+        $isAuthenticatedPostback = $this->Form->authenticatedPostBack();
+
         // Is this an embedded comment being posted to a discussion that doesn't exist yet?
         if (c('Garden.Embed.Allow')) {
             $vanilla_type = $this->Form->getFormValue('vanilla_type', '');
@@ -502,7 +510,7 @@ class PostController extends VanillaController {
             }
 
             // If so, create it!
-            if (!$Discussion && $isEmbeddedComments) {
+            if (!$Discussion && $isEmbeddedComments && $isAuthenticatedPostback) {
                 // Add these values back to the form if they exist!
                 $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
                 $this->Form->addHidden('vanilla_type', $vanilla_type);
@@ -575,6 +583,9 @@ class PostController extends VanillaController {
                 } else {
                     $vanilla_category_id = $Category['CategoryID'];
                 }
+
+                // Ensure the user can comment in this category before creating a discussion in it.
+                $this->categoryPermission($vanilla_category_id, "Vanilla.Comments.Add");
 
                 $EmbedUserID = c('Garden.Embed.UserID');
                 if ($EmbedUserID) {
@@ -680,7 +691,7 @@ class PostController extends VanillaController {
             $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Add');
         }
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($isAuthenticatedPostback) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
 
@@ -700,7 +711,7 @@ class PostController extends VanillaController {
             if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
                 throw new Exception(t('You cannot comment in a closed discussion.'));
             }
-            
+
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }
@@ -965,6 +976,9 @@ class PostController extends VanillaController {
             $this->Form->setModel($this->DraftModel);
             $this->Comment = $this->DraftModel->getID($draftID);
         }
+
+        // Normalize the edit data.
+        $this->applyFormatCompatibility($this->Comment, 'Body', 'Format');
 
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');

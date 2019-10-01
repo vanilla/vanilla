@@ -8,7 +8,11 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Formats\Bold;
 use Vanilla\Formatting\Quill\Formats\Italic;
@@ -17,7 +21,7 @@ use Vanilla\Formatting\Quill\Formats\Link;
 /**
  * General testing of Filterer.
  */
-class FiltererTest extends TestCase {
+class FiltererTest extends MinimalContainerTestCase {
 
     /**
      * Assert that the filterer is validating json properly.
@@ -39,27 +43,121 @@ class FiltererTest extends TestCase {
     }
 
     /**
+     * Test that
+     * - unneeded embed data gets stripped off.
+     * - XSS in the body is prevent. We always have a fully rendered body.
+     */
+    public function testFilterEmbedData() {
+        $filterer = new Filterer();
+        $replacedUrl = 'http://test.com/replaced';
+
+        $input = [
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'embedType' => QuoteEmbed::TYPE,
+                            'body' => "Fake body contents, should be replaced.",
+                            'bodyRaw' => 'Rendered Body',
+                            'format' => MarkdownFormat::FORMAT_KEY,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'embedType' => QuoteEmbed::TYPE,
+                            'format' => RichFormat::FORMAT_KEY,
+                            'body' => '<div><script>alert("This should be replaced!")</script></div>',
+                            'bodyRaw' => [
+                                [
+                                    'insert' => [
+                                        'embed-external' => [
+                                            'data' => [
+                                                'url' => $replacedUrl,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                [ 'insert' => 'After Embed\n' ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        // Contents replaced with a link.
+        $expectedEmbedBodyRaw = [
+            [
+                'insert' => $replacedUrl,
+                'attributes' => [
+                    'link' => $replacedUrl,
+                ],
+            ],
+            [ 'insert' => "\n" ],
+            [ 'insert' => 'After Embed\n' ],
+        ];
+
+        $expected = [
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'embedType' => QuoteEmbed::TYPE,
+                            'body' => "<p>Rendered Body</p>\n",
+                            'bodyRaw' => 'Rendered Body',
+                            'format' => MarkdownFormat::FORMAT_KEY,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'insert' => [
+                    'embed-external' => [
+                        'data' => [
+                            'embedType' => QuoteEmbed::TYPE,
+                            'format' => RichFormat::FORMAT_KEY,
+                            'body' => \Gdn::formatService()->renderQuote(json_encode($expectedEmbedBodyRaw), RichFormat::FORMAT_KEY),
+                            'bodyRaw' => $expectedEmbedBodyRaw,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        // Pretty print.
+        $actual =  json_encode(
+            json_decode($filterer->filter(json_encode($input)), true),
+            JSON_PRETTY_PRINT
+        );
+        $this->assertSame(json_encode($expected, JSON_PRETTY_PRINT), $actual);
+    }
+
+    /**
      * Provide input and expected output examples.
      *
      * @return array
      */
     public function provideIO() {
         $loadingEmbed = <<<JSON
-   {  
-      "insert":{  
-         "embed-external":{  
-            "loaderData":{  
+   {
+      "insert":{
+         "embed-external":{
+            "loaderData":{
                "type":"file",
-               "file":{  
+               "file":{
 
                },
-               "progressEventEmitter":{  
-                  "listeners":[  
+               "progressEventEmitter":{
+                  "listeners":[
                      null
                   ]
                }
             },
-            "dataPromise":{  
+            "dataPromise":{
 
             }
          }

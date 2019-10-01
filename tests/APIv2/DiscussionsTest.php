@@ -199,4 +199,14 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->assertNotEquals($url, $discussion['canonicalUrl']);
         $this->assertEquals($discussion['url'], $discussion['canonicalUrl']);
     }
+
+    /**
+     * The discussion index should fail on a private community with a guest.
+     *
+     * @expectedException Garden\Web\Exception\ForbiddenException
+     * @expectedExceptionMessage You must sign in to the private community.
+     */
+    public function testIndexPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testIndex']);
+    }
 }

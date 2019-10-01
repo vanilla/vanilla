@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { delegateEvent } from "@library/dom/domUtils";
+import { delegateEvent } from "@vanilla/dom-utils";
 
 export function initSpoilers() {
     // Setup
@@ -13,8 +13,8 @@ export function initSpoilers() {
 /**
  * Toggle a spoiler open and closed.
  */
-function handleToggleSpoiler() {
-    const toggleButton: HTMLElement = this;
+function handleToggleSpoiler(event: MouseEvent, triggeringElement: HTMLElement) {
+    const toggleButton = triggeringElement;
 
     const spoilerContainer = toggleButton.closest(".spoiler");
     if (spoilerContainer) {

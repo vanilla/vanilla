@@ -48,7 +48,7 @@ export default class AttachmentIcons extends React.Component<IProps> {
             return (
                 <section className={classNames("attachmentsIcons", classes.root)}>
                     <h3 id={this.titleID} className="sr-only">
-                        {t("Attachments: ")}
+                        {t("Attachments") + ": "}
                     </h3>
                     <ul aria-labelledby={this.titleID} className={classNames("attachmentsIcons-items", classes.items)}>
                         {attachments}

@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
-import { check } from "@library/icons/common";
+import { CheckIcon } from "@library/icons/titleBar";
 
 export interface IMenuRadioOption {
     name: string;
@@ -69,7 +69,7 @@ export default class DropDownItemRadio extends React.Component<IProps, IState> {
                             onChange={this.props.onChange}
                         />
                         <span className="dropDownRadio-check" aria-hidden={true}>
-                            {option.selected && check()}
+                            {option.selected && <CheckIcon />}
                         </span>
                         <span className="dropDownRadio-label">{option.name}</span>
                     </label>

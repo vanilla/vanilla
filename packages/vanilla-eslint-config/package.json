@@ -1,0 +1,20 @@
+{
+    "name": "@vanilla/eslint-config",
+    "description": "The official Vanilla eslint configuration.",
+    "version": "3.0.0",
+    "main": "index.js",
+    "peerDependencies": {
+        "eslint": "^5.16.0"
+    },
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^1.9.0",
+        "@typescript-eslint/parser": "^1.9.0",
+        "eslint": "^5.16.0",
+        "eslint-config-prettier": "^4.3.0",
+        "eslint-plugin-import": "^2.17.3",
+        "eslint-plugin-jsx-a11y": "^6.2.1",
+        "eslint-plugin-react": "^7.13.0",
+        "eslint-plugin-react-hooks": "^1.6.0",
+        "eslint-plugin-lodash": "^6.0.0"
+    }
+}

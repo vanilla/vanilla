@@ -6,7 +6,7 @@
  */
 
 import { formatUrl, getMeta } from "@library/utility/appUtils";
-import { log, matchAtMention as _matchAtMention } from "@library/utility/utils";
+import { logDebug, matchAtMention as _matchAtMention } from "@vanilla/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.
@@ -86,7 +86,7 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
  * @returns Matching string if successful.  Null on failure to match.
  */
 export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
-    flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    flag = flag.replace(/[-[]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     if (shouldStartWithSpace) {
         flag = "(?:^|\\s)" + flag;
     }
@@ -261,6 +261,9 @@ export function initializeAtComplete(editorElement, iframe?: any) {
         // be false most of the time; the exception is when
         // it's true.
         if (!atQuote) {
+            // Supressing this error because this is legacy that is complicated to refactor.
+            // In the case here `this` is the atwho library which we don't have types.
+            // @ts-ignore
             insert = this.at + insert;
         }
 
@@ -311,7 +314,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             insert_tpl: "${atwho-data-value}",
             callbacks: {
                 matcher: matchFakeEmoji,
-                tplEval: (tpl, map) => log(map),
+                tplEval: (tpl, map) => logDebug(map),
             },
             limit: maxSuggestions,
             data: emojiList,

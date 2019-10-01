@@ -141,7 +141,7 @@ class ProxyRequest {
         $response = curl_exec($handler);
         $this->ResponseTime = microtime(true) - $startTime;
 
-        if ($response == false) {
+        if ($response === false) {
             $this->ResponseBody = curl_error($handler);
             $this->ResponseStatus = 400;
         } else {
@@ -337,6 +337,7 @@ class ProxyRequest {
         $requestMethod = strtoupper($requestMethod);
         switch ($requestMethod) {
             case 'PUT':
+            case 'PATCH':
             case 'POST':
                 break;
 
@@ -486,6 +487,22 @@ class ProxyRequest {
             }
 
             curl_setopt($handler, CURLOPT_POST, true);
+            curl_setopt($handler, CURLOPT_POSTFIELDS, $postData);
+
+            if (!is_array($postData) && !is_object($postData)) {
+                $sendExtraHeaders['Content-Length'] = strlen($postData);
+            }
+
+            $this->RequestBody = $postData;
+        }
+
+        // Allow PATCH
+        if ($requestMethod == 'PATCH') {
+            if ($preEncodePost && is_array($postData)) {
+                $postData = http_build_query($postData);
+            }
+
+            curl_setopt($handler, CURLOPT_CUSTOMREQUEST, 'PATCH');
             curl_setopt($handler, CURLOPT_POSTFIELDS, $postData);
 
             if (!is_array($postData) && !is_object($postData)) {

@@ -8,7 +8,9 @@
 namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\InternalClient;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\TestLogger;
@@ -54,7 +56,7 @@ abstract class AbstractAPIv2Test extends TestCase {
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
 
         if ($this->startSessionOnSetup) {
-            $this->api->setUserID(self::$siteInfo['adminUserID']);
+            $this->setAdminApiUser();
             $this->api->setTransientKey(md5(now()));
         }
 
@@ -87,7 +89,7 @@ abstract class AbstractAPIv2Test extends TestCase {
             if (array_intersect(array_keys($row), $this->formattedFields) && array_key_exists('format', $row)) {
                 foreach ($this->formattedFields as $field) {
                     if (array_key_exists($field, $row)) {
-                        $row[$field] = \Gdn_Format::to($row[$field], $row['format']);
+                        $row[$field] = \Gdn::formatService()->renderHTML($row[$field] ?? '', $row['format'] ?? TextFormat::FORMAT_KEY);
                     }
                 }
                 unset($row['format']);
@@ -163,5 +165,102 @@ abstract class AbstractAPIv2Test extends TestCase {
         $uniqueID = preg_replace('/[^0-9A-Z_]/i', '_', uniqid($prefix, true));
         $result = substr($uniqueID, 0, 20);
         return $result;
+    }
+
+    /**
+     * Set the API to the admin user.
+     */
+    protected function setAdminApiUser(): void {
+        $this->api->setUserID(self::$siteInfo['adminUserID']);
+    }
+
+    /**
+     * Assert that there is no session.
+     *
+     * @param bool $force End the session if there is one.
+     * @return int Returns the old user ID of the session.
+     */
+    protected function assertNoSession(bool $force = false): int {
+        $userID = $this->api()->getUserID();
+        if ($force) {
+            $this->api()->setUserID(0);
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = static::container()->get(\Gdn_Session::class);
+        $this->assertFalse($session->isValid());
+        return $userID;
+    }
+
+    /**
+     * Run another test with private community enabled.
+     *
+     * @param callable $test
+     * @return mixed Returns whatever the callback returns.
+     */
+    protected function runWithPrivateCommunity(callable $test) {
+        /* @var PrivateCommunityMiddleware $middleware */
+        $middleware = static::container()->get(PrivateCommunityMiddleware::class);
+        $private = $middleware->isPrivate();
+
+        try {
+            $userID = $this->api()->getUserID();
+            $middleware->setIsPrivate(true);
+            $this->assertNoSession(true);
+
+            return $test();
+        } finally {
+            $middleware->setIsPrivate($private);
+            $this->api()->setUserID($userID);
+        }
+    }
+
+    /**
+     * Run some code with the admin user then restore the session.
+     *
+     * @param callable $callback The code to run.
+     * @return mixed Returns whatever the callback returns.
+     */
+    protected function runWithAdminUser(callable $callback) {
+        // Ensure there is a permission to get the user.
+        $userID = $this->api()->getUserID();
+        try {
+            $this->setAdminApiUser();
+            $r = $callback();
+            return $r;
+        } finally {
+            $this->api()->setUserID($userID);
+        }
+    }
+
+    /**
+     * Run a callback with the following config and restore the config after.
+     *
+     * @param array $config The config to set.
+     * @param callable $callback The code to run.
+     * @return mixed Returns the result of the callback.
+     */
+    protected function runWithConfig(array $config, callable $callback) {
+        /* @var \Gdn_Configuration $c */
+        $c = $this->container()->get(\Gdn_Configuration::class);
+
+        // Create a backup of the config.
+        $bak = [];
+        foreach ($config as $key => $value) {
+            $bak[$key] = $c->get($key, null);
+        }
+
+        try {
+            foreach ($config as $key => $value) {
+                $c->set($key, $value);
+            }
+
+            $r = $callback();
+            return $r;
+        } finally {
+            foreach ($bak as $key => $value) {
+                $c->set($key, $value);
+            }
+        }
     }
 }

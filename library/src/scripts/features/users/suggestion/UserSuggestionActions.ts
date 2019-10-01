@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/UsersModel";
+import { IUsersStoreState } from "@library/features/users/userModel";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
@@ -91,6 +91,7 @@ export default class UserSuggestionActions extends ReduxActions {
                                 ),
                             );
                         }
+                        break;
                     case LoadStatus.LOADING:
                         // Already handled
                         return;
@@ -120,10 +121,13 @@ export default class UserSuggestionActions extends ReduxActions {
                                 ),
                             );
                         }
+                        break;
                     }
                     case LoadStatus.ERROR:
+                        break;
                     // Previously failed. We still want to proceed to a real lookup so do nothing.
                     case LoadStatus.PENDING:
+                        break;
                     // We still want to proceed to a real lookup so do nothing.
                 }
             }

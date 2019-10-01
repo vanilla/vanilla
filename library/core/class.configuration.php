@@ -385,7 +385,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Assigns a setting to the configuration array.
      *
-     * @param string $name The name of the configuration setting to assign. If the setting is
+     * @param string|array $name The name of the configuration setting to assign. If the setting is
      *   contained within an associative array, use dot denomination to get the
      *   setting. ie. $this->set('Database.Host', $value) would set
      *   $Configuration[$Group]['Database']['Host'] = $value

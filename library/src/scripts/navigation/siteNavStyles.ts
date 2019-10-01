@@ -6,8 +6,8 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { unit } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { negative, unit } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 
 export const siteNavVariables = useThemeCache(() => {
@@ -24,6 +24,7 @@ export const siteNavVariables = useThemeCache(() => {
             fg: globalVars.links.colors.default,
             fontWeight: globalVars.fonts.weights.bold,
         },
+        backgroundColor: "orange",
     });
 
     const title = makeThemeVars("title", {
@@ -56,9 +57,9 @@ export const siteNavClasses = useThemeCache(() => {
             position: "relative",
             display: "block",
             zIndex: 1,
-            marginTop: unit(vars.nodeToggle.height / 2 - vars.node.fontSize / 2),
+            marginTop: unit(negative(vars.nodeToggle.height / 2 - vars.node.fontSize / 2)),
         },
-        mediaQueries.noBleed({
+        mediaQueries.noBleedDown({
             marginLeft: unit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
         }),
     );
@@ -71,11 +72,6 @@ export const siteNavClasses = useThemeCache(() => {
     const children = style("children", {
         position: "relative",
         display: "block",
-        $nest: {
-            "& + .siteNavAdminLinks": {
-                margin: `25px 0 0`,
-            },
-        },
     });
 
     return { root, title, children };
@@ -99,7 +95,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
         $nest: {
             "&.isCurrent": {
                 color: vars.node.active.fg.toString(),
-                fontWeight: vars.node.active.fontWeight,
             },
         },
     });
@@ -161,7 +156,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
             paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
             paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.size.large),
         }),
     );

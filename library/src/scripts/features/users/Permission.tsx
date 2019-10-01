@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import apiv2 from "@library/apiv2";
-import UsersActions from "@library/features/users/UsersActions";
+import UserActions from "@library/features/users/UserActions";
 import { connect } from "react-redux";
 
 interface IProps extends IInjectableUserState {
@@ -78,14 +78,14 @@ export class Permission extends React.Component<IProps> {
 }
 
 function mapDispatchToProps(dispatch) {
-    const actions = new UsersActions(dispatch, apiv2);
+    const actions = new UserActions(dispatch, apiv2);
     return {
         requestData: actions.getMe,
     };
 }
 
 const withRedux = connect(
-    UsersModel.mapStateToProps,
+    mapUsersStoreState,
     mapDispatchToProps,
 );
 

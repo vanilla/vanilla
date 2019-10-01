@@ -40,7 +40,7 @@ $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
 
 $Configuration['HotReload']['IP'] = '127.0.0.1';
 
-$Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = ['https://ajax.googleapis.com/'];
+$Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = [];
 
 // Site specifics.
 $Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.
@@ -81,6 +81,11 @@ $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Password']['MinLength'] = 6;
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
+
+// Garden security features
+$Configuration['Garden']['Security']['Hsts']['IncludeSubDomains'] = false;
+$Configuration['Garden']['Security']['Hsts']['Preload'] = false;
+$Configuration['Garden']['Security']['Hsts']['MaxAge'] = 604800;
 
 // Outgoing email.
 $Configuration['Garden']['Email']['UseSmtp'] = false;

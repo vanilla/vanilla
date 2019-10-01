@@ -6,8 +6,8 @@
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
-import { debounce } from "lodash";
-import { ICategory } from "@vanilla/@types/api/categories";
+import debounce from "lodash/debounce";
+import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
 
 const createAction = actionCreatorFactory("@@categorySuggestions");
 

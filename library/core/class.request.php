@@ -372,14 +372,14 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function getHeader($header) {
+    public function getHeader(string $header) {
         return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), '');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setHeader($header, $value) {
+    public function setHeader(string $header, $value) {
         $this->setValueOn(self::INPUT_SERVER, $this->headerKey($header), $value);
         return $this;
     }
@@ -418,7 +418,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function hasHeader($header) {
+    public function hasHeader(string $header): bool {
         return !empty($this->getHeader($header));
     }
 
@@ -480,7 +480,7 @@ class Gdn_Request implements RequestInterface {
      * @param string $method The new HTTP method.
      * @return $this
      */
-    public function setMethod($method) {
+    public function setMethod(string $method) {
         $this->requestMethod($method);
         return $this;
     }
@@ -742,12 +742,10 @@ class Gdn_Request implements RequestInterface {
         $this->_environmentElement('ConfigWebRoot', Gdn::config('Garden.WebRoot'));
         $this->_environmentElement('ConfigStripUrls', Gdn::config('Garden.StripWebRoot', false));
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-            $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } elseif (isset($_SERVER['HTTP_HOST'])) {
+        if (isset($_SERVER['HTTP_HOST'])) {
             $host = $_SERVER['HTTP_HOST'];
         } else {
-            $host = val('SERVER_NAME', $_SERVER);
+            $host = $_SERVER['SERVER_NAME'] ?? false;
         }
 
         // The host can have the port passed in, remove it here if it exists
@@ -760,20 +758,13 @@ class Gdn_Request implements RequestInterface {
         }
 
         $this->_environmentElement('HOST', $host);
-        $this->_environmentElement('METHOD', isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD', $_SERVER) : 'CONSOLE');
+        $this->_environmentElement('METHOD', $_SERVER['REQUEST_METHOD'] ?? 'CONSOLE');
 
         // Request IP
 
         // Load balancers
-        if ($testIP = val('HTTP_X_CLUSTER_CLIENT_IP', $_SERVER)) {
-            $ip = $testIP;
-        } elseif ($testIP = val('HTTP_CLIENT_IP', $_SERVER)) {
-            $ip = $testIP;
-        } elseif ($testIP = val('HTTP_X_FORWARDED_FOR', $_SERVER)) {
-            $ip = $testIP;
-        } else {
-            $ip = val('REMOTE_ADDR', $_SERVER);
-        }
+        $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? false;
+
 
         if (strpos($ip, ',') !== false) {
             $matched = preg_match_all('/([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})(?:, )?/i', $ip, $matches);
@@ -785,7 +776,7 @@ class Gdn_Request implements RequestInterface {
 
                 // Fallback
             } else {
-                $remoteAddr = val('REMOTE_ADDR', $_SERVER);
+                $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? false;
 
                 if (strpos($remoteAddr, ',') !== false) {
                     $remoteAddr = substr($remoteAddr, 0, strpos($remoteAddr, ','));
@@ -807,14 +798,8 @@ class Gdn_Request implements RequestInterface {
         }
 
         // Loadbalancer-originated (and terminated) SSL
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https') {
+        if (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') == 'https') {
             $scheme = 'https';
-        }
-
-        // Varnish
-        $originalProto = val('HTTP_X_ORIGINALLY_FORWARDED_PROTO', $_SERVER, null);
-        if (!is_null($originalProto)) {
-            $scheme = $originalProto;
         }
 
         $this->_environmentElement('SCHEME', $scheme);
@@ -834,7 +819,7 @@ class Gdn_Request implements RequestInterface {
 
         $path = '';
         if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
-            $path = val('PATH_INFO', $_SERVER, '');
+            $path = $_SERVER['PATH_INFO'] ?? '';
 
             // Some hosts block PATH_INFO from being passed (or even manually set).
             // We set X_PATH_INFO in the .htaccess as a fallback for those situations.

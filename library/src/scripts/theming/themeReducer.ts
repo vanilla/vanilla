@@ -13,9 +13,16 @@ export interface ITheme {
 }
 
 export interface IThemeAssets {
+    fonts?: IThemeFont[];
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
+}
+
+export interface IThemeFont {
+    name: string;
+    url: string;
+    fallbacks: string[];
 }
 
 export interface IThemeExternalAsset {
@@ -49,7 +56,7 @@ export const themeReducer = produce(
             return state;
         })
         .case(ThemeActions.getAssets.failed, (state, payload) => {
-            if (payload.error.response.status === 404) {
+            if (payload.error.response && payload.error.response.status === 404) {
                 // This theme just doesn't have variables. Use the defaults.
                 state.assets.data = {};
                 state.assets.status = LoadStatus.SUCCESS;

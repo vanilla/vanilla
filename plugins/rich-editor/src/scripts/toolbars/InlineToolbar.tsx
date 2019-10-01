@@ -10,16 +10,17 @@ import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import { t, isAllowedUrl } from "@library/utility/appUtils";
-import { withEditor, IWithEditorProps } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
-import FocusWatcher from "@library/dom/FocusWatcher";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import ToolbarContainer from "@rich-editor/toolbars/pieces/ToolbarContainer";
 import InlineToolbarMenuItems from "@rich-editor/toolbars/pieces/InlineToolbarMenuItems";
 import InlineToolbarLinkInput from "@rich-editor/toolbars/pieces/InlineToolbarLinkInput";
+import { FocusWatcher } from "@vanilla/dom-utils";
 
 interface IProps extends IWithEditorProps {}
 
@@ -261,9 +262,13 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         }
     };
 
+    /**
+     * Clear the link input, focus quill, and restore the selection.
+     */
     private clearLinkInput() {
-        this.quill.setSelection(this.props.lastGoodSelection);
         this.setState({ isLinkMenuOpen: false, inputValue: "" });
+        this.quill.focus();
+        this.quill.setSelection(this.props.lastGoodSelection);
     }
 
     /**

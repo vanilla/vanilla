@@ -20,8 +20,9 @@
 
         <env name="TEST_BASEURL" value="http://vanilla.test:8080" />
         <env name="TEST_DB_NAME" value="vanilla_test"/>
-        <env name="TEST_DB_USER" value="travis" />
+        <env name="TEST_DB_USER" value="circleci" />
         <env name="TEST_DB_PASSWORD" value="" />
+        <env name="TEST_DB_HOST" value="127.0.0.1" />
     </php>
 
     <testsuites>
@@ -43,6 +44,11 @@
             <directory suffix="Test.php">./tests/APIv2</directory>
             <directory suffix="Test.php">./applications/*/tests/APIv2</directory>
             <directory suffix="Test.php">./plugins/*/tests/APIv2</directory>
+        </testsuite>
+        <testsuite name="Sphinx">
+            <directory suffix="Test.php">./tests/Sphinx</directory>
+            <directory suffix="Test.php">./applications/*/tests/Sphinx</directory>
+            <directory suffix="Test.php">./plugins/*/tests/Sphinx</directory>
         </testsuite>
     </testsuites>
 

@@ -6,15 +6,16 @@
 
 import React from "react";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
-import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
-import { fileUploadError } from "@library/icons/fileTypes";
 import classNames from "classnames";
+import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 
 interface IProps extends IFileAttachment {
     message: string;
@@ -38,8 +39,9 @@ export default class AttachmentError extends React.Component<IProps> {
         const classesMetas = metasClasses();
 
         return (
-            <div
-                className={classNames("attachment", "hasError", classes.root, this.props.className, FOCUS_CLASS)}
+            <EmbedContainer
+                className={classNames("hasError", FOCUS_CLASS)}
+                size={EmbedContainerSize.SMALL}
                 tabIndex={0}
                 aria-describedby={this.descrID}
                 aria-label={t("Error")}
@@ -48,7 +50,7 @@ export default class AttachmentError extends React.Component<IProps> {
             >
                 <div className={classNames("attachment-box", classes.box)}>
                     <div className={classNames("attachment-format", classes.format)}>
-                        {fileUploadError(iconClasses.error)}
+                        <AttachmentErrorIcon className={iconClasses.error} />
                     </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div id={this.descrID} className={classNames("attachment-title", classes.title)}>
@@ -76,7 +78,7 @@ export default class AttachmentError extends React.Component<IProps> {
                         onClick={this.props.deleteAttachment}
                     />
                 </div>
-            </div>
+            </EmbedContainer>
         );
     }
 }

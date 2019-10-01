@@ -19,14 +19,13 @@ import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownIt
 import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
-import { compose } from "redux";
 import FrameBody from "@library/layout/frame/FrameBody";
-import FramePanel from "@library/layout/frame/FramePanel";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
+import { ComposeIcon } from "@library/icons/titleBar";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -35,31 +34,36 @@ export class MessagesContents extends React.Component<IProps> {
     public render() {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
+
         return (
-            <Frame className={this.props.className}>
-                <FrameHeaderWithAction title={title}>
-                    <LinkAsButton
-                        title={t("New Message")}
-                        to={"/messages/inbox"}
-                        baseClass={ButtonTypes.ICON}
-                        className={classNames(buttonUtils.pushRight)}
-                    >
-                        {compose()}
-                    </LinkAsButton>
-                </FrameHeaderWithAction>
-                <FrameBody className={classNames("isSelfPadded")}>
-                    <FramePanel>{this.renderContents()}</FramePanel>
-                </FrameBody>
-                <FrameFooter>
-                    <LinkAsButton
-                        className={classNames(buttonUtils.pushLeft)}
-                        to={"/messages/inbox"}
-                        baseClass={ButtonTypes.TEXT}
-                    >
-                        {t("All Messages")}
-                    </LinkAsButton>
-                </FrameFooter>
-            </Frame>
+            <Frame
+                className={this.props.className}
+                canGrow={true}
+                header={
+                    <FrameHeaderWithAction title={title}>
+                        <LinkAsButton
+                            title={t("New Message")}
+                            to={"/messages/inbox"}
+                            baseClass={ButtonTypes.ICON}
+                            className={classNames(buttonUtils.pushRight)}
+                        >
+                            <ComposeIcon />
+                        </LinkAsButton>
+                    </FrameHeaderWithAction>
+                }
+                body={<FrameBody className={classNames("isSelfPadded")}>{this.renderContents()}</FrameBody>}
+                footer={
+                    <FrameFooter>
+                        <LinkAsButton
+                            className={classNames(buttonUtils.pushLeft)}
+                            to={"/messages/inbox"}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                        >
+                            {t("All Messages")}
+                        </LinkAsButton>
+                    </FrameFooter>
+                }
+            />
         );
     }
 
@@ -78,7 +82,7 @@ export class MessagesContents extends React.Component<IProps> {
         if (status !== LoadStatus.SUCCESS || !data) {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
-            const height = this.props.device === Devices.MOBILE ? 80 : 69;
+            const height = this.props.device === Devices.MOBILE || this.props.device === Devices.XS ? 80 : 69;
             return <Loader loaderStyleClass={classesLoader.smallLoader} height={height} minimumTime={0} padding={10} />;
         }
 
@@ -108,7 +112,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
  * @param state Current Redux store state.
  */
 function mapStateToProps(state: IConversationsStoreState) {
-    let countUnread: number = 0;
+    let countUnread = 0;
     const data: IMeBoxMessageItem[] = [];
     const { conversationsByID } = state.conversations;
 

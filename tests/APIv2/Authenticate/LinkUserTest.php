@@ -277,15 +277,6 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Assert that there is not currently a user in the session.
-     */
-    private function assertNoSession() {
-        /* @var \Gdn_Session $session */
-        $session = $this->container()->get(\Gdn_Session::class);
-        $this->assertEquals(0, $session->UserID);
-    }
-
-    /**
      * Assert that a given user has a session.
      *
      * @param int|null $expected The expected user or **null** for the current user.

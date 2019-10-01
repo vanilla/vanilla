@@ -5,13 +5,14 @@
  */
 
 import React from "react";
-import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import classNames from "classnames";
 
 export interface IFrameBodyProps {
     className?: string;
     selfPadded?: boolean;
     children: React.ReactNode;
+    scrollable?: boolean; // DON'T use at the same time as the Modal scrollable.
 }
 
 /**

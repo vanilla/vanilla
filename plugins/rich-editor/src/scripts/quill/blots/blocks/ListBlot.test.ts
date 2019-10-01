@@ -258,7 +258,7 @@ describe("ListBlot", () => {
             //         - list item
             //           - list item
             //      - list item
-            // - list item
+            // 1. list item
 
             expect(quill.scroll.children).has.length(2);
 
@@ -359,6 +359,117 @@ describe("ListBlot", () => {
             );
             const nestedListGroup = listItem.children.tail as UnorderedListGroup;
             expect(nestedListGroup.children, "There should be 2 nested list items").has.length(2);
+        });
+    });
+
+    describe("replacement", () => {
+        it("can have it's format replaced", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
+
+            quill.formatLine(0, 1, ListItem.blotName, false, Quill.sources.USER);
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("1\n1.1"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1.2"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
+        });
+
+        it("propert outdents nested children when it's format is replaced", () => {
+            // Before
+            // - 1
+            //   - 1.1
+            //   - 1.2
+            //     - 1.2.1
+            //     - 1.2.2
+            //   - 1.3
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
+            insertListBlot({ type: ListType.BULLETED, depth: 2 }, "1.2.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 2 }, "1.2.2");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.3");
+
+            quill.formatLine(6, 2, ListItem.blotName, false, Quill.sources.USER);
+            // After
+            // - 1
+            //   - 1.1
+            // 1.2
+            // - 1.2.1
+            // - 1.2.2
+            // - 1.3
+
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("1"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1.1"),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op("1.2\n1.2.1"),
+                OpUtils.list(ListType.BULLETED, 0),
+                OpUtils.op("1.2.2"),
+                OpUtils.list(ListType.BULLETED, 0),
+                OpUtils.op("1.3"),
+                OpUtils.list(ListType.BULLETED, 0),
+            ]);
+        });
+    });
+
+    /*
+        Press enter once; position in the line: last;
+    */
+
+    describe("newline insertion", () => {
+        it("can insert newlines at the start of a line", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+            quill.insertText(0, "\n");
+            /*
+                - 1234
+
+                After:
+                -
+                - 1234
+
+            */
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1234"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
+        });
+
+        it("can insert newlines midline", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+            quill.insertText(2, "\n");
+            /*
+                - 1234
+
+                After:
+                - 12
+                - 34
+
+            */
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("12"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("34"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
+        });
+
+        it("can insert newlines, end of the line", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1234");
+            quill.insertText(4, "\n");
+            /*
+                - 1234
+
+                After:
+                - 1234
+                -
+            */
+
+            expect(quill.getContents().ops).deep.eq([OpUtils.op("1234"), OpUtils.list(ListType.BULLETED, 0, "\n\n")]);
         });
     });
 });

@@ -1014,7 +1014,7 @@ class EditorPlugin extends Gdn_Plugin {
             $categoryID = $discussion->CategoryID;
             $category = CategoryModel::categories($categoryID);
 
-            if ($category && $category['AllowFileUploads'] !==1  && Gdn::request()->getValue('MediaIDs') !== false) {
+            if ($category && $category['AllowFileUploads'] != 1  && Gdn::request()->getValue('MediaIDs') !== false) {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }

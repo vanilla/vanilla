@@ -1,0 +1,12 @@
+{
+    "name": "@vanilla/utils",
+    "main": "./index.ts",
+    "module": "./index.ts",
+    "version": "3.0.0",
+    "devDependencies": {
+        "@vanilla/tsconfig": "*"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

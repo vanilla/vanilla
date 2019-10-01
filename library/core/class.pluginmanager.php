@@ -11,7 +11,7 @@
  * @since 2.0
  */
 use Garden\EventManager;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 

@@ -39,7 +39,7 @@ interface RequestInterface {
      * @param string $method The HTTP method.
      * @return $this
      */
-    public function setMethod($method);
+    public function setMethod(string $method);
 
     /**
      * Get the root folder of the request.
@@ -144,7 +144,7 @@ interface RequestInterface {
      * @param string $header The name of the header.
      * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header);
+    public function getHeader(string $header);
 
     /**
      * Set a header value.
@@ -153,7 +153,7 @@ interface RequestInterface {
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setHeader($header, $value);
+    public function setHeader(string $header, $value);
 
     /**
      * Checks if a header exists by the given case-insensitive name.
@@ -161,7 +161,7 @@ interface RequestInterface {
      * @param string $header Case-insensitive header name.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($header);
+    public function hasHeader(string $header): bool;
 
     /**
      * Conditionally gets the domain of the request.

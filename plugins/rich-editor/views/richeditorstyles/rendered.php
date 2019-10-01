@@ -1,5 +1,7 @@
 <?php
 
+use Vanilla\Formatting\Formats\RichFormat;
+
 $inlineOperations = '[
     {
         "insert": "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind\'s eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there\'s little good evidence Orion\'s sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n"
@@ -160,7 +162,7 @@ $blockOperations = '[
     { "insert": "}" },
     { "attributes": { "codeBlock": true }, "insert": "\n" },
     { "insert": "\nH2 Here. Spoiler next" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     { "insert": "Some Spoiler content with formatting " },
     { "attributes": { "bold": true }, "insert": "bold" },
     { "insert": " " },
@@ -211,7 +213,7 @@ $blockOperations = '[
 
 $embedOperations = '[
     { "insert": "Imgur:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -230,7 +232,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Image:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -256,7 +258,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Twitter:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -279,7 +281,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Getty:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -312,7 +314,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Vimeo:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -340,7 +342,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Youtube:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -369,7 +371,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Instagram:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -396,7 +398,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Soundcloud:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -424,7 +426,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Giphy:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -447,27 +449,32 @@ $embedOperations = '[
         }
     },
     { "insert": "Twitch:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
                 "data": {
-                    "url": "https://www.twitch.tv/videos/277077149",
+                    "url": "http://clips.twitch.tv/KnottyOddFishShazBotstix",
                     "type": "twitch",
-                    "name": "SamedWii Zeldaérobic",
+                    "name": "Lights! Camera! Action!",
                     "body": null,
-                    "photoUrl":
-                        "https://static-cdn.jtvnw.net/s3_vods/9e05228597e840e180f3_hoopyjv_29218011904_894795907/thumb/thumb0-640x360.jpg",
-                    "height": 281,
-                    "width": 500,
-                    "attributes": { "videoID": "277077149", "embedUrl": "https://player.twitch.tv/?video=v277077149" }
+                    "photoUrl": "https://clips-media-assets2.twitch.tv/AT-cm%7C267415465-preview.jpg",
+                    "height": 351,
+                    "width": 620,
+                    "attributes": {
+                        "videoID": "KnottyOddFishShazBotstix",
+                        "embedUrl": "https://clips.twitch.tv/embed?clip=KnottyOddFishShazBotstix"
+                    }
                 },
-                "loaderData": { "type": "link", "link": "https://www.twitch.tv/videos/277077149", "loaded": true }
+                "loaderData": {
+                    "type": "link",
+                    "link": "http://clips.twitch.tv/KnottyOddFishShazBotstix"
+                }
             }
         }
     },
     { "insert": "External No Image" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -490,7 +497,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Exernal With Image" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -510,7 +517,7 @@ $embedOperations = '[
         }
     },
     { "insert": "Wistia:" },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -562,16 +569,212 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n" }
+    { "insert": "CodePen:" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",
+                    "type": "codepen",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": 300,
+                    "width": null,
+                    "attributes": {
+                        "id": "cp_embed_YoKYVv",
+                        "embedUrl": "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?theme-id=0",
+                        "style": { "width": " 100%", "overflow": "hidden" }
+                    }
+                },
+                "loaderData": { "type": "link", "link": "https://codepen.io/hiroshi_m/pen/YoKYVv" }
+            }
+        }
+    },
+    { "insert": "File Upload" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip",
+                    "type": "file",
+                    "attributes": {
+                        "mediaID": 62,
+                        "name": "___img_onload_prompt(1)_ (2).zip",
+                        "path": "150/LKE0S2FWLFUP.zip",
+                        "type": "application/zip",
+                        "size": 41,
+                        "active": 1,
+                        "insertUserID": 4,
+                        "dateInserted": "2019-06-14 14:09:38",
+                        "foreignID": 4,
+                        "foreignTable": "embed",
+                        "imageWidth": null,
+                        "imageHeight": null,
+                        "thumbWidth": null,
+                        "thumbHeight": null,
+                        "thumbPath": null,
+                        "foreignType": "embed",
+                        "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip"
+                    }
+                },
+                "loaderData": {
+                    "type": "file",
+                    "file": [],
+                    "progressEventEmitter": {
+                        "listeners": [
+                            null
+                        ]
+                    }
+                }
+            }
+        }
+    }
+]';
+
+$quoteEmbeds = '
+[
+    { "insert": "Discussion Quote" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+                    "type": "quote",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": null,
+                    "width": null,
+                    "attributes": {
+                        "discussionID": 8,
+                        "name": "test file upload",
+                        "bodyRaw": [
+                            {
+                                "insert": {
+                                    "embed-external": {
+                                        "data": {
+                                            "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip",
+                                            "type": "file",
+                                            "attributes": {
+                                                "mediaID": 62,
+                                                "name": "___img_onload_prompt(1)_ (2).zip",
+                                                "path": "150/LKE0S2FWLFUP.zip",
+                                                "type": "application/zip",
+                                                "size": 41,
+                                                "active": 1,
+                                                "insertUserID": 4,
+                                                "dateInserted": "2019-06-14 14:09:38",
+                                                "foreignID": 4,
+                                                "foreignTable": "embed",
+                                                "imageWidth": null,
+                                                "imageHeight": null,
+                                                "thumbWidth": null,
+                                                "thumbHeight": null,
+                                                "thumbPath": null,
+                                                "foreignType": "embed",
+                                                "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip"
+                                            }
+                                        },
+                                        "loaderData": {
+                                            "type": "file",
+                                            "file": [],
+                                            "progressEventEmitter": {
+                                                "listeners": [null]
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            { "insert": "Aliquam egestas nulla ipsum, tempor pellentesque urna finibus id. Cras lacinia posuere quam vitae congue. Phasellus eget odio tincidunt, posuere dui at, ultrices ante. Praesent pharetra rutrum faucibus. Donec in lobortis urna, et lobortis enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec consequat justo id condimentum venenatis. Vestibulum mattis blandit leo, nec viverra ante molestie at. Suspendisse vel erat et nisi scelerisque volutpat ut eget urna. Morbi pulvinar posuere nisl.\nSed maximus in nisl lacinia scelerisque. Aliquam gravida, ligula ut varius feugiat, purus tellus faucibus nibh, ut scelerisque dolor velit gravida justo. Pellentesque accumsan velit sed rutrum imperdiet. Fusce vulputate enim sed felis ornare, et feugiat risus varius. Nam nibh massa, sodales sed lorem eu, rhoncus laoreet nibh. Nullam eu urna erat. Curabitur consectetur interdum libero, ut facilisis tellus vulputate id. Ut mollis dolor id rutrum aliquam. Aliquam id auctor velit, a efficitur nunc. Curabitur mollis dui non efficitur volutpat. Vestibulum laoreet iaculis congue. Duis laoreet quam eu justo ullamcorper finibus.\n" }
+                        ],
+                        "dateInserted": "2019-06-14T14:09:45+00:00",
+                        "dateUpdated": null,
+                        "insertUser": {
+                            "userID": 4,
+                            "name": "Karen A. Thomas",
+                            "photoUrl": "https://images.v-cdn.net/stubcontent/avatar_01.png",
+                            "dateLastActive": "2019-06-14T18:32:27+00:00"
+                        },
+                        "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+                        "format": "Rich"
+                    }
+                },
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://dev.vanilla.localhost/discussion/8/test-file-upload"
+                }
+            }
+        }
+    },
+    { "insert": "Comment Quote" },
+    { "attributes": { "header": 3 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+                    "type": "quote",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": null,
+                    "width": null,
+                    "attributes": {
+                        "commentID": 5,
+                        "bodyRaw": [{ "insert": "Testtes test\n" }],
+                        "dateInserted": "2019-06-17T18:52:20+00:00",
+                        "dateUpdated": null,
+                        "insertUser": {
+                            "userID": 2,
+                            "name": "admin",
+                            "photoUrl": "https://dev.vanilla.localhost/uploads/userpics/022/nWZ7BPS4F5HHQ.png",
+                            "dateLastActive": "2019-06-17T15:09:52+00:00"
+                        },
+                        "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+                        "format": "Rich"
+                    }
+                },
+                "loaderData": { "type": "link", "link": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5" }
+            }
+        }
+    }
 ]';
 
 echo "<div class='Item-Body'><div class='Message userContent'>";
-echo "<h1>Inline operations</h1>";
-echo Gdn_Format::rich($inlineOperations);
+echo "<h2>Inline operations</h2>";
+echo Gdn::formatService()->renderHTML($inlineOperations, RichFormat::FORMAT_KEY);
 echo "<hr>";
-echo "<h1>Block operations</h1>";
-echo Gdn_Format::rich($blockOperations);
+echo "<h2>Block operations</h2>";
+echo Gdn::formatService()->renderHTML($blockOperations, RichFormat::FORMAT_KEY);
 echo "<hr>";
-echo "<h1>Embed operations</h1>";
-echo Gdn_Format::rich($embedOperations);
-echo "</div></div>";
+echo "<h2>Embed operations</h2>";
+echo Gdn::formatService()->renderHTML($embedOperations, RichFormat::FORMAT_KEY);
+echo "<h2>Quotes</h2>";
+echo Gdn::formatService()->renderHTML($quoteEmbeds, RichFormat::FORMAT_KEY);
+echo "
+<h2>Spacer</h2>
+<p>
+<strong>This text is here to add some space for testing scroll position</strong>
+</p>
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nec risus a erat fermentum posuere quis ut mi. Donec luctus lacinia augue fringilla sodales. Nullam pharetra auctor tellus tincidunt luctus. Mauris sed maximus eros. Donec dictum, ante ac convallis consectetur, metus tortor accumsan lorem, in sagittis augue ligula et sapien. Donec vulputate euismod elit sit amet ultricies. Nullam sit amet rhoncus mauris, ac sodales velit.
+</p>
+<h2 id='scroll'>Scrollable heading. Go to <a href='#scroll'>#scroll</a></h2>
+<p>
+Aliquam egestas nulla ipsum, tempor pellentesque urna finibus id. Cras lacinia posuere quam vitae congue. Phasellus eget odio tincidunt, posuere dui at, ultrices ante. Praesent pharetra rutrum faucibus. Donec in lobortis urna, et lobortis enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec consequat justo id condimentum venenatis. Vestibulum mattis blandit leo, nec viverra ante molestie at. Suspendisse vel erat et nisi scelerisque volutpat ut eget urna. Morbi pulvinar posuere nisl.
+</p>
+<p>
+Sed maximus in nisl lacinia scelerisque. Aliquam gravida, ligula ut varius feugiat, purus tellus faucibus nibh, ut scelerisque dolor velit gravida justo. Pellentesque accumsan velit sed rutrum imperdiet. Fusce vulputate enim sed felis ornare, et feugiat risus varius. Nam nibh massa, sodales sed lorem eu, rhoncus laoreet nibh. Nullam eu urna erat. Curabitur consectetur interdum libero, ut facilisis tellus vulputate id. Ut mollis dolor id rutrum aliquam. Aliquam id auctor velit, a efficitur nunc. Curabitur mollis dui non efficitur volutpat. Vestibulum laoreet iaculis congue. Duis laoreet quam eu justo ullamcorper finibus.
+</p>
+<p>
+Sed feugiat varius vehicula. Integer dignissim at eros non fermentum. Vestibulum venenatis, purus a rhoncus suscipit, libero est euismod orci, vitae suscipit ligula felis non quam. Pellentesque vel interdum odio. Aenean vel est mattis, consectetur neque et, vestibulum nisi. Maecenas at imperdiet est. Sed fermentum ipsum condimentum ex lacinia, vitae accumsan massa sagittis. Aenean vel tortor leo. Suspendisse ut augue justo. Nullam arcu nunc, varius et porttitor in, pulvinar sed ex. Integer tristique vehicula nunc, vitae dapibus tellus interdum ut. Pellentesque auctor ex a molestie ultrices. Nulla sed diam purus. Aenean eu purus pellentesque, consequat mauris eget, rutrum sapien. In sed magna magna.
+</p>
+<p>
+Aenean fringilla tortor tellus, in elementum ligula ornare quis. Nam maximus vitae nibh at gravida. Vivamus eget magna leo. Integer rhoncus in tortor eget commodo. Quisque a magna in lectus malesuada dapibus ut quis quam. Praesent accumsan, justo et ornare ultricies, massa ex tincidunt arcu, sed volutpat orci nibh vel tortor. Vestibulum id sodales magna, at iaculis metus. Ut vel mauris enim. Sed molestie metus a molestie fermentum.
+</p>
+</div>
+";

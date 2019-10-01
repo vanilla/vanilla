@@ -4,30 +4,29 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import ButtonLoader from "@library/loaders/ButtonLoader";
-import FramePanel from "@library/layout/frame/FramePanel";
-import Frame from "@library/layout/frame/Frame";
-import { getRequiredID } from "@library/utility/idUtils";
-import ModalSizes from "@library/modal/ModalSizes";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FrameFooter from "@library/layout/frame/FrameFooter";
-import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import FrameHeader from "@library/layout/frame/FrameHeader";
 import SmartAlign from "@library/layout/SmartAlign";
-import { frameBodyClasses, frameFooterClasses } from "@library/layout/frame/frameStyles";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
-import { modalClasses } from "@library/modal/modalStyles";
+import ModalSizes from "@library/modal/ModalSizes";
+import { t } from "@library/utility/appUtils";
+import { getRequiredID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React from "react";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 
 interface IProps {
     title: string; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
-    onCancel?: () => void;
-    onConfirm: () => void;
+    onCancel?: (e: Event) => void;
+    onConfirm: (e: Event) => void;
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
@@ -44,7 +43,7 @@ interface IState {
 export default class ModalConfirm extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         srOnlyTitle: false,
-        confirmTitle: t("Ok"),
+        confirmTitle: t("OK"),
     };
 
     private cancelRef;
@@ -75,46 +74,50 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 titleID={this.titleID}
                 elementToFocusOnExit={this.props.elementToFocusOnExit}
             >
-                <Frame>
-                    <FrameHeader
-                        titleID={this.titleID}
-                        closeFrame={onCancel}
-                        srOnlyTitle={srOnlyTitle!}
-                        title={title}
-                    />
-                    <FrameBody>
-                        <FramePanel>
+                <Frame
+                    header={
+                        <FrameHeader
+                            titleID={this.titleID}
+                            closeFrame={onCancel}
+                            srOnlyTitle={srOnlyTitle!}
+                            title={title}
+                        />
+                    }
+                    body={
+                        <FrameBody>
                             <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>
                                 {children}
                             </SmartAlign>
-                        </FramePanel>
-                    </FrameBody>
-                    <FrameFooter>
-                        <Button
-                            className={classFrameFooter.actionButton}
-                            baseClass={ButtonTypes.TEXT_PRIMARY}
-                            buttonRef={this.cancelRef}
-                            onClick={onCancel}
-                        >
-                            {t("Cancel")}
-                        </Button>
-                        <Button
-                            className={classFrameFooter.actionButton}
-                            onClick={onConfirm}
-                            baseClass={ButtonTypes.TEXT}
-                            disabled={isConfirmLoading}
-                        >
-                            {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}
-                        </Button>
-                    </FrameFooter>
-                </Frame>
+                        </FrameBody>
+                    }
+                    footer={
+                        <FrameFooter justifyRight={true}>
+                            <Button
+                                className={classFrameFooter.actionButton}
+                                baseClass={ButtonTypes.TEXT}
+                                buttonRef={this.cancelRef}
+                                onClick={onCancel}
+                            >
+                                {t("Cancel")}
+                            </Button>
+                            <Button
+                                className={classFrameFooter.actionButton}
+                                onClick={onConfirm}
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                disabled={isConfirmLoading}
+                            >
+                                {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}
+                            </Button>
+                        </FrameFooter>
+                    }
+                />
             </Modal>
         );
     }
 
-    private handleCancel = () => {
+    private handleCancel = e => {
         this.setState({ cancelled: true });
-        this.props.onCancel && this.props.onCancel();
+        this.props.onCancel && this.props.onCancel(e);
     };
 
     public get titleID() {

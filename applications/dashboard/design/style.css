@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .clearfix::after {
-  content: '';
+  content: "";
   display: table;
   clear: both;
 }
@@ -64,14 +64,13 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
-          transition: height 0.1s ease;
+  transition: height 0.1s ease;
   resize: none !important;
 }
 
 /* Elements that are disabled, make sure they reflect that with UX feedback. */
 [disabled] {
-  opacity: 0.50;
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -117,7 +116,7 @@ body.Entry #Content {
 /* ============================================== General Styles & Typography */
 body {
   color: #000;
-  font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  font-family: "lucida grande", "Lucida Sans Unicode", tahoma, sans-serif;
   font-size: 75%;
   font-size: small;
   line-height: 1.7em;
@@ -239,7 +238,7 @@ input.DateBox,
 input.InputBox,
 input.SmallInput,
 textarea {
-  font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  font-family: "lucida grande", "Lucida Sans Unicode", tahoma, sans-serif;
   color: #333;
   font-size: 15px;
   padding: 3px;
@@ -266,7 +265,7 @@ textarea {
 
 .ui-datepicker .ui-datepicker-header {
   position: relative;
-  padding: .2em 0;
+  padding: 0.2em 0;
 }
 
 .ui-datepicker .ui-datepicker-prev,
@@ -330,13 +329,13 @@ textarea {
 
 .ui-datepicker table {
   width: 100%;
-  font-size: .9em;
+  font-size: 0.9em;
   border-collapse: collapse;
-  margin: 0 0 .4em;
+  margin: 0 0 0.4em;
 }
 
 .ui-datepicker th {
-  padding: .7em .3em;
+  padding: 0.7em 0.3em;
   text-align: center;
   font-weight: bold;
   border: 0;
@@ -350,15 +349,15 @@ textarea {
 .ui-datepicker td span,
 .ui-datepicker td a {
   display: block;
-  padding: .2em;
+  padding: 0.2em;
   text-align: right;
   text-decoration: none;
 }
 
 .ui-datepicker .ui-datepicker-buttonpane {
   background-image: none;
-  margin: .7em 0 0 0;
-  padding: 0 .2em;
+  margin: 0.7em 0 0 0;
+  padding: 0 0.2em;
   border-left: 0;
   border-right: 0;
   border-bottom: 0;
@@ -366,9 +365,9 @@ textarea {
 
 .ui-datepicker .ui-datepicker-buttonpane button {
   float: right;
-  margin: .5em .2em .4em;
+  margin: 0.5em 0.2em 0.4em;
   cursor: pointer;
-  padding: .2em .6em .3em .6em;
+  padding: 0.2em 0.6em 0.3em 0.6em;
   width: auto;
   overflow: visible;
 }
@@ -388,7 +387,7 @@ textarea {
 
 .ui-datepicker-multi .ui-datepicker-group table {
   width: 95%;
-  margin: 0 auto .4em;
+  margin: 0 auto 0.4em;
 }
 
 .ui-datepicker-multi-2 .ui-datepicker-group {
@@ -535,7 +534,7 @@ select {
 }
 
 .Button.Disabled {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 div.FileUpload .CurrentImage {
@@ -768,7 +767,7 @@ div.FileUpload .CurrentImage {
 }
 
 .InProgress {
-  opacity: .5;
+  opacity: 0.5;
   cursor: progress;
   pointer-events: none;
 }
@@ -804,7 +803,7 @@ div.Warning {
   color: #fff;
   font-size: 80%;
   font-weight: normal;
-  padding: 1px .8ex;
+  padding: 1px 0.8ex;
 }
 
 .Alert {
@@ -812,7 +811,7 @@ div.Warning {
   background: #d00;
   color: #fff;
   padding: 1px 3px;
-  border-radius: .5ex;
+  border-radius: 0.5ex;
 }
 
 .Alert a {
@@ -1344,9 +1343,9 @@ td.CheckBoxColumn {
   width: 200px;
   float: left;
   /*
-No overflow hidden on main elements. Causes too many bugs!
-overflow: hidden;
-*/
+  No overflow hidden on main elements. Causes too many bugs!
+  overflow: hidden;
+  */
 }
 
 .Box {
@@ -1805,7 +1804,7 @@ overflow: hidden;
   box-sizing: border-box;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
-  border-radius: .35ex;
+  border-radius: 0.35ex;
   border: solid 1px #bbb;
 }
 
@@ -1916,7 +1915,7 @@ overflow: hidden;
   background: #f3f3f3;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
   filter: alpha(opacity=90);
-  opacity: .9;
+  opacity: 0.9;
 }
 
 .Item.Read:hover {
@@ -2305,7 +2304,7 @@ mark {
 }
 
 .Message td, .Message th {
-  padding: .5em;
+  padding: 0.5em;
 }
 
 /* =============================================================== Categories */
@@ -2610,7 +2609,8 @@ div.Popup .Border {
   margin: 0 auto;
   text-align: left;
   position: relative;
-  max-width: 600px;
+  width: 600px;
+  max-width: 100vw;
   display: inline-block;
 }
 
@@ -2666,7 +2666,8 @@ div.Popup small {
   font-size: 11px;
 }
 
-div.Popup form p {
+div.Popup form p,
+div.Popup .userContent p {
   padding: 0;
 }
 
@@ -3171,15 +3172,15 @@ textarea.MultiComplete {
   cursor: default;
   display: block;
   /*
- if width will be 100% horizontal scrollbar will apear
- when scroll mode will be used
- */
+  if width will be 100% horizontal scrollbar will apear
+  when scroll mode will be used
+  */
   /*width: 100%;*/
   font-size: 12px;
   /*
- it is very important, if line-height not setted or setted
- in relative units scroll will be broken in firefox
- */
+  it is very important, if line-height not setted or setted
+  in relative units scroll will be broken in firefox
+  */
   line-height: 16px;
   overflow: hidden;
   border-bottom: 1px solid #d7d8da;
@@ -3738,25 +3739,26 @@ position on the page to notify users of things like drafts being saved, etc. */
     color: #fff;
     display: block;
   }
+
   .Item .OptionsTitle {
     visibility: visible;
   }
 }
-
 /* Small screens */
 @media (max-width: 500px) {
   .InformMessages {
     width: 100%;
   }
+
   .InformWrapper {
     margin: 5px;
   }
+
   .InformMessages .InformMessage {
     display: block;
     max-width: inherit;
   }
 }
-
 .InformMessages .Actions a {
   margin-right: 4px;
 }
@@ -4992,7 +4994,7 @@ body.embed .InformMessages {
   display: inline-block;
   width: 16px;
   height: 16px;
-  margin-right: .3em;
+  margin-right: 0.3em;
   line-height: 18px;
   vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
@@ -5145,7 +5147,7 @@ input + .ReactSprite {
   background: url("https://images.v-cdn.net/youtube-overlay-button.png") 0 -44px no-repeat transparent;
   position: absolute;
   display: block;
-  content: '';
+  content: "";
   top: 50%;
   left: 50%;
   margin-left: -30px;
@@ -5356,7 +5358,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
  * At mentions in core, moved from advanced editor.
  */
 .atwho-view {
-  font: normal 14px/1.7em 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
+  font: normal 14px/1.7em "lucida grande", "Lucida Sans Unicode", tahoma, sans-serif;
   position: absolute;
   top: 0;
   left: 0;
@@ -5497,8 +5499,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  -webkit-transition: background-color 100ms;
-          transition: background-color 100ms;
+  transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5523,11 +5524,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   .SocialIcon .Icon {
     background-image: url("images/socialcons-small@2x.png");
   }
+
   .SocialIcon.HasText .Icon {
     background-image: url("images/socialcons@2x.png");
   }
 }
-
 .SocialIcon-Facebook .Icon {
   background-position: 0 -24px;
 }
@@ -5562,21 +5563,32 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background-color: #1c8aba;
 }
 
-.SocialIcon-Google .Icon {
-  background-position: 0 -72px;
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google,
+.SocialIcon-Google {
+  background-color: #2a84fc;
 }
-
-.SocialIcon-Google.HasText .Icon {
-  background-position: 0 -96px;
-}
-
-.SocialIcon-Google,
-.SocialIcon-Google.HasText .Icon {
-  background-color: #da5442;
-}
-
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google:hover,
 .SocialIcon-Google:hover {
-  background-color: #c33926;
+  background-color: #3367d6;
+}
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google:not(.SocialIcon-OpenID) .Icon,
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google .Icon,
+.SocialIcon-Google:not(.SocialIcon-OpenID) .Icon,
+.SocialIcon-Google .Icon {
+  background-position: center;
+  background-color: #fff;
+  background-size: cover;
+  background-image: url(https://images.v-cdn.net/sso/google-border.svg);
+}
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google:not(.SocialIcon-OpenID) .Icon:before,
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google .Icon:before,
+.SocialIcon-Google:not(.SocialIcon-OpenID) .Icon:before,
+.SocialIcon-Google .Icon:before {
+  content: "";
+}
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google .Text,
+.SocialIcon-Google .Text {
+  border: none;
 }
 
 .SocialIcon-OpenID .Icon {
@@ -5959,8 +5971,7 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  -webkit-transition: all 0.2s ease;
-          transition: all 0.2s ease;
+  transition: all 0.2s ease;
   opacity: 1;
 }
 
@@ -5981,10 +5992,9 @@ Styleguide Attachments
     background-color: #ff9;
   }
 }
-
 .highlight-effect {
-  -webkit-animation: highlight .8s;
-          animation: highlight .8s;
+  -webkit-animation: highlight 0.8s;
+          animation: highlight 0.8s;
 }
 
 /* Groups section tweaks */
@@ -6185,45 +6195,40 @@ img.jcrop-preview {
 }
 
 .padded {
-  margin-top: 1.125rem;
-  margin-bottom: 1.125rem;
+  margin-top: 18px;
+  margin-bottom: 18px;
 }
 
 .padded-top {
-  margin-top: 1.125rem;
+  margin-top: 18px;
 }
 
 .padded-bottom {
-  margin-bottom: 1.125rem;
+  margin-bottom: 18px;
 }
 
 .padded-left {
-  margin-left: 1.125rem;
+  margin-left: 18px;
 }
 
 .padded-right {
-  margin-right: 1.125rem;
+  margin-right: 18px;
 }
 
 .flex {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
 }
-
 .flex > * {
-  margin-right: 0.28125rem;
+  margin-right: 4.5px;
 }
-
 .flex > *:last-child {
   margin-right: 0;
 }
@@ -6241,7 +6246,6 @@ img.jcrop-preview {
 }
 
 .grow {
-  -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
@@ -6254,7 +6258,6 @@ img.jcrop-preview {
 }
 
 .no-grow {
-  -webkit-box-flex: 0;
   -webkit-flex-grow: 0;
       -ms-flex-positive: 0;
           flex-grow: 0;
@@ -6281,22 +6284,21 @@ img.jcrop-preview {
   position: relative;
   -webkit-filter: blur(2px);
 }
-
 .foggy input {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
-
 .foggy::before {
   position: absolute;
   display: block;
   width: 100%;
   height: 100%;
-  opacity: .5;
+  opacity: 0.5;
   background-color: #fff;
   z-index: 1;
-  content: '';
+  content: "";
 }
+
 /*# sourceMappingURL=style.css.map */

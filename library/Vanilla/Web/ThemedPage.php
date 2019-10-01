@@ -9,20 +9,23 @@ namespace Vanilla\Web;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
-use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\FontsAsset;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
  */
 abstract class ThemedPage extends Page {
 
-    /** @var \ThemesApiController */
-    private $themesApi;
+    /** @var ThemePreloadProvider */
+    private $themeProvider;
 
     /**
      * @inheritdoc
@@ -33,12 +36,12 @@ abstract class ThemedPage extends Page {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        \ThemesApiController $themesApi = null, // Default required to conform to interface
         ContentSecurityPolicyModel $cspModel,
-        ConfigurationInterface $config
+        AssetPreloadModel $preloadModel,
+        ThemePreloadProvider $themeProvider = null // Default required to conform to interface
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $config);
-        $this->themesApi = $themesApi;
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel);
+        $this->themeProvider = $themeProvider;
         $this->initAssets();
     }
 
@@ -46,56 +49,17 @@ abstract class ThemedPage extends Page {
      * Initialize data that is shared among all of the controllers.
      */
     protected function initAssets() {
-        $themeKey = $this->siteMeta->getActiveTheme()->getKey();
-        $themeData = $this->themesApi->get($themeKey);
-        $assets = [];
+        // Preload for frontend
+        $this->registerReduxActionProvider($this->themeProvider);
 
-        /** @var JsonAsset $variablesAsset */
-        $variablesAsset = $themeData['assets']['variables'] ?? null;
-        if ($variablesAsset && $variablesAsset->getType()) {
-            $variables = json_decode($variablesAsset->getData(), true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new ServerException(
-                    "Failed to initialize theme data for theme $themeKey. Theme variables were not valid JSON"
-                );
-            }
-            $assets["variables"] = $variables;
+        // HTML handling
+        $this->headerHtml = $this->themeProvider->getThemeHeaderHtml();
+        $this->footerHtml = $this->themeProvider->getThemeFooterHtml();
+
+        // Add the theme's script asset if it exists.
+        $script = $this->themeProvider->getThemeScript();
+        if ($script !== null) {
+            $this->scripts[] = $script;
         }
-
-        /** @var ImageAsset $logoAsset */
-        $logoAsset = $themeData["assets"]["logo"] ?? null;
-        if ($logoAsset) {
-            $assets["logo"] = $logoAsset;
-        }
-
-        /** @var ImageAsset $logoAsset */
-        $mobileLogoAsset = $themeData["assets"]["mobileLogo"] ?? null;
-        if ($mobileLogoAsset) {
-            $assets["mobileLogo"] = $mobileLogoAsset;
-        }
-
-        $styleSheet = $themeData['assets']['styles'] ?? null;
-        $headerFooterPrefix = '';
-        if ($styleSheet) {
-            $style = $this->themesApi->get_assets($themeKey, 'styles.css');
-            $headerFooterPrefix = '<style>' . $style->getData() . '</style>';
-        }
-
-        // Add the themes javascript to the page.
-        $script = $themeData['assets']['javascript'] ?? null;
-        if ($script) {
-            $this->scripts[] = new Asset\ThemeScriptAsset($this->request, $themeKey, $themeData['version']);
-        }
-
-        // Apply theme data to the master view.
-        $this->headerHtml = $headerFooterPrefix . ($themeData['assets']['header'] ?? '');
-        $this->footerHtml = $headerFooterPrefix . ($themeData['assets']['footer'] ?? '');
-
-        // Preload the theme variables for the frontend.
-        $this->addReduxAction(new ReduxAction(
-            \ThemesApiController::GET_THEME_ACTION,
-            Data::box(["assets" => $assets]),
-            [ 'key' => $themeKey ]
-        ));
     }
 }

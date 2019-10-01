@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { logWarning } from "@library/utility/utils";
+import React, { useContext } from "react";
+import { logWarning } from "@vanilla/utils";
 import { style } from "typestyle";
 
 type ScollOffsetSetter = (offset: number) => void;
@@ -14,6 +14,9 @@ interface IContextParams {
     resetScrollOffset: () => void;
     scrollOffset: number | null;
     offsetClass: string;
+    getCalcedHashOffset(): number;
+    hashOffsetRef: React.RefObject<HTMLDivElement>;
+    temporarilyDisabledWatching: (duration: number) => void;
 }
 
 export const ScrollOffsetContext = React.createContext<IContextParams>({
@@ -21,9 +24,16 @@ export const ScrollOffsetContext = React.createContext<IContextParams>({
         logWarning("Set scroll offset called, but a proper provider was not configured.");
     },
     resetScrollOffset: () => {
-        logWarning("Set scroll offset called, but a proper provider was not configured.");
+        logWarning("Reset scroll offset called, but a proper provider was not configured.");
     },
     scrollOffset: null,
+    getCalcedHashOffset: () => 0,
+    temporarilyDisabledWatching: () => {
+        logWarning("Attempted to disable watching but a proper provider was not configured.");
+    },
+    hashOffsetRef: {
+        current: null,
+    },
     offsetClass: "",
 });
 
@@ -39,6 +49,8 @@ interface IProps {
 interface IState {
     scrollOffset: number;
     isScrolledOff: boolean;
+    hashOffset: number;
+    isWatchingEnabled: boolean;
 }
 
 /**
@@ -56,16 +68,17 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     public state: IState = {
         scrollOffset: 0,
         isScrolledOff: false,
+        hashOffset: 0,
+        isWatchingEnabled: true,
     };
+
+    private hashOffsetRef = React.createRef<HTMLDivElement>();
 
     /**
      * @inheritdoc
      */
     public render() {
-        // Early bailout if we aren't watching the scrolling.
-        if (!this.props.scrollWatchingEnabled) {
-            return this.props.children;
-        }
+        const { scrollWatchingEnabled } = this.props;
 
         // Generate a CSS based on our calculated values.
         const { scrollOffset, isScrolledOff } = this.state;
@@ -81,8 +94,11 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
                 value={{
                     setScrollOffset: this.setScrollOffset,
                     resetScrollOffset: this.resetScrollOffset,
-                    scrollOffset: isScrolledOff ? scrollOffset : 0,
-                    offsetClass,
+                    scrollOffset: isScrolledOff && scrollWatchingEnabled ? scrollOffset : 0,
+                    offsetClass: scrollWatchingEnabled ? offsetClass : "",
+                    getCalcedHashOffset: this.getCalcedHashOffset,
+                    hashOffsetRef: this.hashOffsetRef,
+                    temporarilyDisabledWatching: this.temporarilyDisabledWatching,
                 }}
             >
                 {this.props.children}
@@ -104,12 +120,23 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         window.removeEventListener("scroll", this.scrollHandler);
     }
 
+    private get shouldWatchScroll() {
+        return this.props.scrollWatchingEnabled && this.state.isWatchingEnabled;
+    }
+
+    private temporarilyDisabledWatching = (duration: number) => {
+        this.setState({ isWatchingEnabled: false });
+        setTimeout(() => {
+            this.setState({ isWatchingEnabled: true });
+        }, duration);
+    };
+
     /** Keep a local copy of our previous window scroll value. */
     private previousScrollValue = 0;
 
     private scrollHandler = () => {
         // Early bailout if we aren't watching scroll position.
-        if (!this.props.scrollWatchingEnabled) {
+        if (!this.shouldWatchScroll) {
             return;
         }
 
@@ -151,4 +178,29 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     private setScrollOffset: ScollOffsetSetter = offset => {
         this.setState({ scrollOffset: offset });
     };
+
+    private getCalcedHashOffset = (): number => {
+        const offsetElement = this.hashOffsetRef.current;
+        if (!offsetElement) {
+            return 0;
+        }
+
+        const rect = offsetElement.getBoundingClientRect();
+        return rect.bottom;
+    };
+}
+
+export function useScrollOffset() {
+    return useContext(ScrollOffsetContext);
+}
+
+/**
+ * Component that reports it's bottom most position to the scroll offset provider.
+ *
+ * Eg. If you click a link #some-hash and an element with the ID `some-hash` is present in the page
+ * that item will stay below the HashOffsetReporter.
+ */
+export function HashOffsetReporter(props: { children: React.ReactNode }) {
+    const offset = useScrollOffset();
+    return <div ref={offset.hashOffsetRef}>{props.children}</div>;
 }

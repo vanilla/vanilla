@@ -33,6 +33,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $blockExceptions = [
         '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
         '#^api/v\d+/locales.*#' => self::BLOCK_NEVER,
+        '#^api/v2/#' => self::BLOCK_PERMISSION,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
@@ -43,8 +44,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '#^plugin(/|$)#' => self::BLOCK_NEVER,
         '#^settings/analyticstick.json$#' => self::BLOCK_PERMISSION,
         '#^sso(/|$)#' => self::BLOCK_NEVER,
-        '#^user/emailavailable(/|$)#' => self::BLOCK_PERMISSION,
-        '#^user/usernameavailable(/|$)#' => self::BLOCK_PERMISSION,
+        '#^user/emailavailable(/|$|\.json)#' => self::BLOCK_PERMISSION,
+        '#^user/usernameavailable(/|$|\.json)#' => self::BLOCK_PERMISSION,
         '#^utility(/|$)#' => self::BLOCK_NEVER,
     ];
 

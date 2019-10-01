@@ -22,7 +22,7 @@ export const userDropDownVariables = useThemeCache(() => {
     };
 
     const userCard = {
-        topMargin: 38,
+        topMargin: 24,
         bottomMargin: 24,
         ...themeVars.subComponentStyles("userCard"),
     };

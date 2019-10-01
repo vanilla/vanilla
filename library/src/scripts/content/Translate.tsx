@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { logError } from "@library/utility/utils";
+import { logError } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 
 type TranslateCallback = (contents: string) => React.ReactNode;
@@ -58,7 +58,7 @@ export default class Translate extends React.Component<IProps> {
      */
     public render(): React.ReactNode {
         // First parse out the self closing elements.
-        const tagRegex = /<([\d\ ]+)>(.*?)<\/\1>|<([\d\ ]+)\/>|([^<]+|<)/g;
+        const tagRegex = /<([\d ]+)>(.*?)<\/\1>|<([\d ]+)\/>|([^<]+|<)/g;
 
         const result: React.ReactNode[] = [];
         this.translatedSource.replace(tagRegex, (match, childrenID, childrenMatch, standaloneID, textMatch, index) => {

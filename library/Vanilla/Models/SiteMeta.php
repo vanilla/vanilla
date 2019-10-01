@@ -50,6 +50,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var array */
+    private $featureFlags;
+
     /**
      * SiteMeta constructor.
      *
@@ -67,6 +70,8 @@ class SiteMeta implements \JsonSerializable {
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
 
+        $this->featureFlags = $config->get('Feature', []);
+
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
@@ -76,6 +81,7 @@ class SiteMeta implements \JsonSerializable {
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
         $maxSize = $config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize'));
         $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
+        $this->maxUploads = (int)$config->get('Garden.Upload.maxFileUploads', ini_get('max_file_uploads'));
 
         // localization
         $this->localeKey = $locale->current();
@@ -117,8 +123,10 @@ class SiteMeta implements \JsonSerializable {
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,
+                'maxUploads' => $this->maxUploads,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
+            'featureFlags' => $this->featureFlags,
         ];
     }
 

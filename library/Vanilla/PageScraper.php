@@ -10,15 +10,19 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Exception;
-use Garden\Http\HttpRequest;
+use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
 use Vanilla\Metadata\Parser\Parser;
+use Vanilla\Web\RequestValidator;
 
 class PageScraper {
 
-    /** @var HttpRequest */
-    private $httpRequest;
+    /** @var HttpClient */
+    private $httpClient;
+
+    /** @var RequestValidator */
+    private $requestValidator;
 
     /** @var array */
     private $metadataParsers = [];
@@ -29,10 +33,14 @@ class PageScraper {
     /**
      * PageInfo constructor.
      *
-     * @param HttpRequest $httpRequest
+     * @param HttpClient $httpClient
+     * @param RequestValidator $requestValidator
      */
-    public function __construct(HttpRequest $httpRequest) {
-        $this->httpRequest = $httpRequest;
+    public function __construct(HttpClient $httpClient, RequestValidator $requestValidator) {
+        $this->httpClient = $httpClient;
+        $this->requestValidator = $requestValidator;
+
+        $this->httpClient->setDefaultHeader("User-Agent", $this->userAgent());
     }
 
     /**
@@ -43,6 +51,13 @@ class PageScraper {
      * @throws Exception
      */
     public function pageInfo(string $url): array {
+        // Ensure that this function is never called during a GET request.
+        // This function makes some potentially very expensive calls
+        // It can also be used to force the site into an infinite loop (eg. GET page hits the scraper which hits the same page again).
+        // @see https://github.com/vanilla/dev-inter-ops/issues/23
+        // We've had some situations where the site gets in an infinite loop requesting itself.
+        $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+
         $response = $this->getUrl($url);
 
         if (!$response->isResponseClass('2xx')) {
@@ -89,7 +104,7 @@ class PageScraper {
      * @param string $url The URL where the request will be sent.
      * @return HttpResponse
      */
-    private function getUrl(string $url): HttpResponse {
+    protected function getUrl(string $url): HttpResponse {
         $urlParts = parse_url($url);
         if ($urlParts === false) {
             throw new InvalidArgumentException('Invalid URL.');
@@ -97,10 +112,7 @@ class PageScraper {
             throw new InvalidArgumentException('Unsupported URL scheme.');
         }
 
-        $this->httpRequest->setMethod(HttpRequest::METHOD_GET);
-        $this->httpRequest->setHeader('User-Agent', $this->userAgent());
-        $this->httpRequest->setUrl($url);
-        $result = $this->httpRequest->send();
+        $result = $this->httpClient->get($url);
         return $result;
     }
 

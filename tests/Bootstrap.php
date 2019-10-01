@@ -11,16 +11,19 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
-use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -72,8 +75,11 @@ class Bootstrap {
             ->setInstance('@baseUrl', $this->getBaseUrl())
             ->setInstance(Container::class, $container)
 
-            ->rule(ContainerInterface::class)
+            ->rule(\Psr\Container\ContainerInterface::class)
             ->setAliasOf(Container::class)
+
+            ->rule(\Interop\Container\ContainerInterface::class)
+            ->setClass(\Vanilla\InteropContainer::class)
 
             // Base classes that want to support DI without polluting their constructor implement this.
             ->rule(InjectableInterface::class)
@@ -106,6 +112,11 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
+            // Site sections
+            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(SingleSiteSectionProvider::class)
+            ->setShared(true)
+
             // AddonManager
             ->rule(AddonManager::class)
             ->setShared(true)
@@ -117,6 +128,7 @@ class Bootstrap {
                 ],
                 PATH_CACHE
             ])
+            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -179,6 +191,7 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
             ->addAlias(Gdn::AliasLocale)
+            ->addAlias(LocaleInterface::class)
 
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')
@@ -218,12 +231,20 @@ class Bootstrap {
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+
+            ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
+            ->addAlias('HstsModel')
 
             ->rule('@api-v2-route')
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+
+            ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+            ->setShared(true)
+            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
             ->rule('@view-application/json')
             ->setClass(\Vanilla\Web\JsonView::class)
@@ -244,9 +265,7 @@ class Bootstrap {
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Formatting\Embeds\EmbedManager::class)
-            ->addCall('addCoreEmbeds')
-            ->addCall('setNetworkEnabled', [false])
+            ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
             ->setShared(true)
 
             ->rule(\Vanilla\PageScraper::class)
@@ -269,8 +288,8 @@ class Bootstrap {
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Formatting\FormatService::class)
-            ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+            ->rule(FormatService::class)
+            ->addCall('registerBuiltInFormats')
             ->setShared(true)
 
             ->rule('HtmlFormatter')
@@ -359,6 +378,7 @@ class Bootstrap {
     public function setGlobals(Container $container) {
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
+        $_SERVER['X_REWRITE'] = true;
         $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
         $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
         $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;

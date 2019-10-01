@@ -4,11 +4,12 @@
  */
 
 import React from "react";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 
 interface ISiteNavCtx {
+    categoryRecordType: string;
     toggleItem: RecordToggle;
     openItem: RecordToggle;
     closeItem: RecordToggle;
@@ -22,6 +23,7 @@ const noop = () => {
 };
 
 const defaultContext: ISiteNavCtx = {
+    categoryRecordType: "item",
     toggleItem: noop,
     openItem: noop,
     closeItem: noop,
@@ -32,6 +34,7 @@ export const SiteNavContext = React.createContext<ISiteNavCtx>(defaultContext);
 
 interface IProps {
     children: React.ReactNode;
+    categoryRecordType: string;
 }
 
 interface IState {
@@ -58,6 +61,7 @@ export default class SiteNavProvider extends React.Component<IProps, IState> {
         return (
             <SiteNavContext.Provider
                 value={{
+                    categoryRecordType: this.props.categoryRecordType,
                     openItem: this.openItem,
                     closeItem: this.closeItem,
                     toggleItem: this.toggleItem,

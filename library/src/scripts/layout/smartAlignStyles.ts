@@ -4,25 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
-import { debugHelper } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 
 export const smartAlignClasses = useThemeCache(() => {
-    const debug = debugHelper("smartAlign");
+    const style = styleFactory("smartAlign");
 
     const root = style({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         width: percent(100),
-        ...debug.name(),
     });
 
-    const inner = style({
+    const inner = style("inner", {
         textAlign: "left",
     });
 
-    return { root, inner };
+    return {
+        root,
+        inner,
+    };
 });

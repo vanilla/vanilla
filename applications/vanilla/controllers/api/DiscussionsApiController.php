@@ -17,6 +17,8 @@ use Vanilla\ApiUtils;
  */
 class DiscussionsApiController extends AbstractApiController {
 
+    use \Vanilla\Formatting\FormatCompatTrait;
+
     /** @var CategoryModel */
     private $categoryModel;
 
@@ -355,7 +357,7 @@ class DiscussionsApiController extends AbstractApiController {
         $discussion['Url'] = discussionUrl($discussion);
 
         if ($discussion['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
         $isRich = $discussion['Format'] === 'Rich';
@@ -417,6 +419,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($row);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 

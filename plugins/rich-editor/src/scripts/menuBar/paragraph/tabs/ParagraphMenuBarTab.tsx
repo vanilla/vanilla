@@ -7,7 +7,8 @@
 import React from "react";
 import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 interface IProps {
     accessibleButtonLabel: string;
@@ -79,7 +80,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         tabIndex={this.props.tabIndex}
                         ref={this.toggleButtonRef}
                     >
-                        {icon}
+                        <IconForButtonWrap icon={icon} />
                         <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
                     </button>
                 </div>

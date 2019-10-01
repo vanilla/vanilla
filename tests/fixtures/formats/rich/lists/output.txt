@@ -1,0 +1,17 @@
+Bulleted 1
+Bulleted 2
+Bulleted 2.1 (indented 1)
+Bulleted 2.1.1 (indented 2)
+Bulleted 2.2 (indented 1)
+Bulleted 3
+
+Numbered 1
+Numbered 2
+Numbered 2.1 (indented 1)
+Numbered 2.1.1 (indented 2)
+
+Mixed 1
+Mixed 2
+Mixed 2.1 (indented 1)
+Mixed 2.2 (indented 1)
+Mixed 3

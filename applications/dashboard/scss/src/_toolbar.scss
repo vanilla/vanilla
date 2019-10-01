@@ -82,9 +82,16 @@
   }
 
   .toolbar-main {
-    flex-basis: to-rem(1024) / 2 - $spacer;
+    flex-basis: 1024px / 2 - $spacer;
     flex-shrink: 1;
   }
+}
+
+.js-toolbar-sticky.is-stuck {
+  position: fixed;
+  top: $navbar-height;
+  background: $white;
+  z-index: 1000;
 }
 
 // Pager

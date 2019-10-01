@@ -34,7 +34,7 @@ export const meBoxMessageVariables = useThemeCache(() => {
     });
 
     const unreadDot = makeThemeVars("unreadDot", {
-        width: 12,
+        width: 8,
     });
 
     return { spacing, imageContainer, unreadDot };

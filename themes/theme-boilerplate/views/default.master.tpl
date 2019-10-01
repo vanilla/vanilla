@@ -10,10 +10,7 @@
 </head>
 
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
-
-<body id="{$BodyID}" class="
-    {$BodyClass}
-
+{assign var="TemplateCss" value="
     {if $User.SignedIn}
         UserLoggedIn
     {else}
@@ -29,7 +26,8 @@
     {/if}
 
     locale-{$CurrentLocale.Lang}
-">
+"}
+<body id="{$BodyID}" class="{$BodyClass}{$TemplateCss|strip:" "}">
 
     <!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>

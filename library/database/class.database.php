@@ -159,6 +159,9 @@ class Gdn_Database {
      * `$timeoutAt` holds the timestamps at which no more retries are done. It's static as it's a fixed amount of time
      * we are willing to wait during the whole request processing time (Otherwise, waiting time could be accumulative in cases)
      *
+     * Beware that in the theoretical "worst" case scenario we wait for up to (SmoothTimeoutMillis +  SmoothWaitMaxMillis - 1),
+     * 5749ms for the defaults values.
+     *
      * @param $dsn
      * @param $user
      * @param $password

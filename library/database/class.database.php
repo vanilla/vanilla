@@ -70,6 +70,15 @@ class Gdn_Database {
     /** @var int Number of retries when the db has gone away. */
     public $ConnectRetries;
 
+    /** @var int Number of milliseconds we are willing to wait to make a successful connection to the DB */
+    protected $SmoothTimeoutMillis;
+
+    /** @var int Minimum number of milliseconds we want to wait before attempting a new DB connection*/
+    protected $SmoothWaitMinMillis;
+
+    /** @var int Maximum number of milliseconds we want to wait before attempting a new DB connection*/
+    protected $SmoothWaitMaxMillis;
+
     /**
      *
      *
@@ -140,7 +149,15 @@ class Gdn_Database {
     }
 
     /**
+     * Creates a new PDO object
      *
+     * Supports connection smoothness. In the case that the connection cannot be done because a resources limit is reached
+     * (max connections, max user connections, user limits) we loop up to `SmoothTimeoutMillis` milliseconds and we retry
+     * the connection.
+     * Every try sleeps for a random amount of time between SmoothWaitMinMillis & SmoothWaitMaxMillis and then attempts a
+     * new connection.
+     * `$timeoutAt` holds the timestamps at which no more retries are done. It's static as it's a fixed amount of time
+     * we are willing to wait during the whole request processing time (Otherwise, waiting time could be accumulative in cases)
      *
      * @param $dsn
      * @param $user
@@ -149,30 +166,55 @@ class Gdn_Database {
      * @throws Exception
      */
     protected function newPDO($dsn, $user, $password) {
-        try {
-            $pDO = new PDO(strtolower($this->Engine).':'.$dsn, $user, $password, $this->ConnectionOptions);
-            $pDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
-            $pDO->query("set time_zone = '+0:0'");
+        static $timeoutAt = null;
+        $timeoutAt = $timeoutAt ?? microtime(true) + ($this->SmoothTimeoutMillis / 1000);
+        do {
+            try {
+                $pDO = new PDO(strtolower($this->Engine).':'.$dsn, $user, $password, $this->ConnectionOptions);
+                $pDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
+                $pDO->query("set time_zone = '+0:0'");
 
-            // We only throw exceptions during connect
-            $pDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-        } catch (Exception $ex) {
-            $timeout = false;
-            if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage())) {
-                $timeout = true;
+                // We only throw exceptions during connect
+                $pDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+
+                return $pDO;
+
+            } catch (Exception $ex) {
+                if ($ex instanceof PDOException &&
+                    microtime(true) < $timeoutAt &&
+                    ($ex->getCode() === 1203 || $ex->getCode() === 1040 || $ex->getCode() === 1226)) {
+                    /*
+                     * https://dev.mysql.com/doc/refman/5.7/en/server-error-reference.html
+                     * ---
+                     * Error number: 1203; Symbol: ER_TOO_MANY_USER_CONNECTIONS; SQLSTATE: 42000
+                     * Message: User %s already has more than 'max_user_connections' active connections
+                     * ---
+                     * Error number: 1040; Symbol: ER_CON_COUNT_ERROR; SQLSTATE: 08004
+                     * Message: Too many connections
+                     * ---
+                     * Error number: 1226; Symbol: ER_USER_LIMIT_REACHED; SQLSTATE: 42000
+                     * Message: User '%s' has exceeded the '%s' resource (current value: %ld)
+                     * ---
+                     * In case connection limit is reached, we wait a random amount of time hoping the connection is released
+                     */
+                    usleep(rand($this->SmoothWaitMinMillis, $this->SmoothWaitMaxMillis) * 1000);
+                } else {
+                    $timeout = false;
+                    if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage())) {
+                        $timeout = true;
+                    }
+                    if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage())) {
+                        $timeout = true;
+                    }
+
+                    if ($timeout) {
+                        throw new Exception(errorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
+                    }
+
+                    throw new Exception(errorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), 500);
+                }
             }
-            if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage())) {
-                $timeout = true;
-            }
-
-            if ($timeout) {
-                throw new Exception(errorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
-            }
-
-            throw new Exception(errorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), 500);
-        }
-
-        return $pDO;
+        } while (true);
     }
 
     /**
@@ -237,6 +279,9 @@ class Gdn_Database {
             'ExtendedProperties' => [],
             'DatabasePrefix' => null,
             'Prefix' => null,
+            'SmoothTimeoutMillis' => 5000,
+            'SmoothWaitMinMillis' => 250,
+            'SmoothWaitMaxMillis' => 750,
         ];
 
         $this->Engine = $config['Engine'];
@@ -245,6 +290,9 @@ class Gdn_Database {
         $this->ConnectionOptions = $config['ConnectionOptions'];
         $this->DatabasePrefix = $config['DatabasePrefix'] ?: $config['Prefix'];
         $this->ExtendedProperties = $config['ExtendedProperties'];
+        $this->SmoothTimeoutMillis = $config['SmoothTimeoutMillis'];
+        $this->SmoothWaitMinMillis = $config['SmoothWaitMinMillis'];
+        $this->SmoothWaitMaxMillis = $config['SmoothWaitMaxMillis'];
 
         if (!empty($config['Dsn'])) {
             // Get the dsn from the property.
@@ -358,15 +406,15 @@ class Gdn_Database {
             $tries = 1;
         }
 
-        for ($try = 0; $try < $tries; $try++) {
-            if (val('Type', $options) == 'select' && val('Slave', $options, null) !== false) {
-                $pDO = $this->slave();
-                $this->LastInfo['connection'] = 'slave';
-            } else {
-                $pDO = $this->connection();
-                $this->LastInfo['connection'] = 'master';
-            }
+        if (val('Type', $options) == 'select' && val('Slave', $options, null) !== false) {
+            $pDO = $this->slave();
+            $this->LastInfo['connection'] = 'slave';
+        } else {
+            $pDO = $this->connection();
+            $this->LastInfo['connection'] = 'master';
+        }
 
+        for ($try = 0; $try < $tries; $try++) {
             // Make sure other unbufferred queries are not open
             if (is_object($this->_CurrentResultSet)) {
                 $this->_CurrentResultSet->result();

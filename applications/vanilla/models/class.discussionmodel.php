@@ -3390,13 +3390,13 @@ class DiscussionModel extends Gdn_Model {
      * htmlspecialchars in the calculate method could result in several XSS vulnerabilities in Vanilla.  This
      * method is a utility method to avoid encoding data where it's not necessary.
      *
-     * @param array $data The discussion record to fix.
+     * @param array $row The discussion record to fix.
      * @return array
      */
-    public function fixRows(array $data): array {
-        if (array_key_exists('Name', $data)) {
-            $data['Name'] = htmlspecialchars_decode($data['Name']);
+    public function fixRow(array $row): array {
+        if (array_key_exists('Name', $row)) {
+            $row['Name'] = htmlspecialchars_decode($row['Name']);
         }
-        return $data;
+        return $row;
     }
 }

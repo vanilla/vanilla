@@ -43,6 +43,12 @@ foreach ($files as $file) {
 // ===========================================================================
 require PATH_ROOT.'/environment.php';
 
+// Allow a test before.
+$bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';
+if (file_exists($bootstrapTestFile)) {
+    require_once $bootstrapTestFile;
+}
+
 // This effectively disable the auto instanciation of a new container when calling Gdn::getContainer();
 Gdn::setContainer(new NullContainer());
 

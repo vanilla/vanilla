@@ -14,19 +14,6 @@ use Garden\Web\Data;
  * Class JsonView
  */
 class JsonView implements ViewInterface {
-
-    /** @var WebLinking */
-    private $webLinking;
-
-    /**
-     * JsonView constructor.
-     *
-     * @param WebLinking $webLinking
-     */
-    public function __construct(WebLinking $webLinking) {
-        $this->webLinking = $webLinking;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -35,23 +22,23 @@ class JsonView implements ViewInterface {
 
         // Handle pagination.
         if ($paging) {
+            $links = new WebLinking();
             $hasPageCount = isset($paging['pageCount']);
 
             $firstPageUrl = str_replace('%s', 1, $paging['urlFormat']);
-            $this->webLinking->addLink('first', $firstPageUrl);
+            $links->addLink('first', $firstPageUrl);
             if ($paging['page'] > 1) {
                 $prevPageUrl = $paging['page'] > 2 ? str_replace('%s', $paging['page'] - 1, $paging['urlFormat']) : $firstPageUrl;
-                $this->webLinking->addLink('prev', $prevPageUrl);
+                $links->addLink('prev', $prevPageUrl);
             }
             if (($paging['more'] ?? false) || ($hasPageCount && $paging['page'] < $paging['pageCount'])) {
-                $this->webLinking->addLink('next', str_replace('%s', $paging['page'] + 1, $paging['urlFormat']));
+                $links->addLink('next', str_replace('%s', $paging['page'] + 1, $paging['urlFormat']));
             }
             if ($hasPageCount) {
-                $this->webLinking->addLink('last', str_replace('%s', $paging['pageCount'], $paging['urlFormat']));
+                $links->addLink('last', str_replace('%s', $paging['pageCount'], $paging['urlFormat']));
             }
+            $links->setHeader($data);
         }
-
-        $data->setHeader('Link', $this->webLinking->getLinkHeaderValue());
 
         echo $data->render();
     }

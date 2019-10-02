@@ -953,64 +953,76 @@ if (!$captureOnly && $AllIPAddressesExists) {
     unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $processedUsers);
 }
 
-// Save the current input formatter to the user's config.
-// This will allow us to change the default later and grandfather existing forums in.
-saveToConfig('Garden.InputFormatter', c('Garden.InputFormatter'));
-
-\Gdn::config()->touch('Garden.Email.Format', 'text');
-
-// Make sure the default locale is in its canonical form.
-$currentLocale = c('Garden.Locale');
-$canonicalLocale = Gdn_Locale::canonicalize($currentLocale);
-if ($currentLocale !== $canonicalLocale) {
-    saveToConfig('Garden.Locale', $canonicalLocale);
-}
-
-// We need to ensure that recaptcha is enabled if this site is upgrading from
-// 2.2 and has never had a captcha plugin
-\Gdn::config()->touch('EnabledPlugins.recaptcha', true);
-
-// Move recaptcha private key to plugin namespace.
-if (c('Garden.Registration.CaptchaPrivateKey')) {
-    \Gdn::config()->touch('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
-    removeFromConfig('Garden.Registration.CaptchaPrivateKey');
-}
-
-// Move recaptcha public key to plugin namespace.
-if (c('Garden.Registration.CaptchaPublicKey')) {
-    \Gdn::config()->touch('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
-    removeFromConfig('Garden.Registration.CaptchaPublicKey');
-}
+///
+/// CACHE
+///
 
 // Make sure the smarty folders exist.
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');
 
+///
+/// CONFIGURATION
+///
+
+$config = Gdn::config();
+$router = Gdn::router();
+
+// Save the current input formatter to the user's config.
+// This will allow us to change the default later and grandfather existing forums in.
+saveToConfig('Garden.InputFormatter', c('Garden.InputFormatter'));
+
+$config->touch('Garden.Email.Format', 'text');
+
+// Make sure the default locale is in its canonical form.
+$currentLocale = $config->get('Garden.Locale');
+$canonicalLocale = Gdn_Locale::canonicalize($currentLocale);
+if ($currentLocale !== $canonicalLocale) {
+    $config->saveToConfig('Garden.Locale', $canonicalLocale);
+}
+
+// We need to ensure that recaptcha is enabled if this site is upgrading from
+// 2.2 and has never had a captcha plugin
+$config->touch('EnabledPlugins.recaptcha', true);
+
+// Move recaptcha private key to plugin namespace.
+if ($config->get('Garden.Registration.CaptchaPrivateKey')) {
+    $config->touch('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
+    $config->removeFromConfig('Garden.Registration.CaptchaPrivateKey');
+}
+
+// Move recaptcha public key to plugin namespace.
+if ($publicKey = $config->get('Garden.Registration.CaptchaPublicKey')) {
+    $config->touch('Recaptcha.PublicKey', $publicKey);
+    $config->removeFromConfig('Garden.Registration.CaptchaPublicKey');
+}
+
 // For Touch Icon
-if (c('Plugins.TouchIcon.Uploaded')) {
-    saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
-    removeFromConfig('Plugins.TouchIcon.Uploaded');
+if ($config->get('Plugins.TouchIcon.Uploaded')) {
+    $config->saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
+    $config->removeFromConfig('Plugins.TouchIcon.Uploaded');
 }
 
 // Remove AllowJSONP globally
-if (c('Garden.AllowJSONP')) {
-    removeFromConfig('Garden.AllowJSONP');
+if ($config->get('Garden.AllowJSONP')) {
+    $config->removeFromConfig('Garden.AllowJSONP');
 }
 
 // Avoid the mobile posts having the rich format fall through as the default when the addon is not enabled.
-$mobileInputFormatter = Gdn::config()->get("Garden.MobileInputFormatter");
+$mobileInputFormatter = $config->get("Garden.MobileInputFormatter");
 $richEditorEnabled = Gdn::addonManager()->isEnabled("rich-editor", \Vanilla\Addon::TYPE_ADDON);
 if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
-    Gdn::config()->set("Garden.MobileInputFormatter", Gdn::config()->get("Garden.InputFormatter"));
+    $primaryFormatter = $config->get("Garden.InputFormatter");
+    $config->set("Garden.MobileInputFormatter", $primaryFormatter);
 }
 
-Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
-Gdn::router()->setRoute("robots.txt", "/robots", "Internal");
-Gdn::router()->setRoute("utility/robots", "/robots", "Internal");
-Gdn::router()->setRoute("container.html", 'staticcontent/container', "Internal");
+$router->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
+$router->setRoute("robots.txt", "/robots", "Internal");
+$router->setRoute("utility/robots", "/robots", "Internal");
+$router->setRoute("container.html", 'staticcontent/container', "Internal");
 
 // Migrate rules from Sitemaps addon.
-if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules")) {
-    Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
-    Gdn::config()->remove("Sitemap.Robots.Rules");
+if ($config->get("Robots.Rules") === false && $sitemapsRobotsRules = $config->get("Sitemap.Robots.Rules")) {
+    $config->set("Robots.Rules", $sitemapsRobotsRules);
+    $config->remove("Sitemap.Robots.Rules");
 }

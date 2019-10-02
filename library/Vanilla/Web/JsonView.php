@@ -15,12 +15,6 @@ use Garden\Web\Data;
  */
 class JsonView implements ViewInterface {
     /**
-     * JsonView constructor.
-     */
-    public function __construct() {
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function render(Data $data) {

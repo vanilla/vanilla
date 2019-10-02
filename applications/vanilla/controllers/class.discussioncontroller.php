@@ -573,7 +573,7 @@ class DiscussionController extends VanillaController {
                 $this->DiscussionModel->getAnnouncementCacheKey(val('CategoryID', $discussion))
             ];
             $this->DiscussionModel->SQL->cache($cacheKeys);
-            $this->DiscussionModel->setProperty($discussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
+            $this->DiscussionModel->setField($discussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
             if ($target) {
                 $this->setRedirectTo($target);

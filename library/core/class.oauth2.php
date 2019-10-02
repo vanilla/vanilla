@@ -60,6 +60,9 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     private $ssoUtils;
 
+    /**
+     * @var \SessionModel
+     */
     private $sessionModel;
 
     /**
@@ -71,7 +74,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
         $this->provider = $this->provider();
-        $this->sessionModel = new SessionModel();
         if ($accessToken) {
             // We passed in a connection
             $this->accessToken = $accessToken;
@@ -623,21 +625,20 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                $this->modifyCacheHeaders($sender);
+                \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
                 redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
 
-                $sessionModel = new SessionModel();
                 // Save the access token and the profile to the session table, set expiry to 3 minutes.
-                $stashID = $sessionModel->insert(['Attributes' => ['AccessToken' => $response['access_token'] , 'RefreshToken' => $response['refresh_token'], 'Profile' => $profile], 'DateExpires' => date(MYSQL_DATE_FORMAT, time() + 3*60)]);
+                $stashID = $this->sessionModel->insert(['Attributes' => ['AccessToken' => $response['access_token'] , 'RefreshToken' => $response['refresh_token'], 'Profile' => $profile], 'DateExpires' => date(MYSQL_DATE_FORMAT, time() + 3*60)]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
                 // Pass the "sessionID" to in the query so that it can be retrieved.
-                $url .= '?'.http_build_query(array_filter(['Target' => urlencode($state['target']) ?? '', 'stashID' => $stashID]));
+                $url .= '?'.http_build_query(array_filter(['Target' => $state['target'] ?? '/', 'stashID' => $stashID]));
                 // Pass no-cache headers.
-                $this->modifyCacheHeaders($sender);
+                \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
                 // Redirect to the connect script.
                 redirectTo($url);
                 break;
@@ -671,8 +672,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         }
 
         if ($stashID) {
-            $sessionModel = new SessionModel();
-            $savedProfile = $sessionModel->getActiveSession($stashID);
+            $savedProfile = $this->sessionModel->getActiveSession($stashID);
             if ($savedProfile['Attributes']) {
                 $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile['Attributes']]);
             } else {
@@ -990,6 +990,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function setDependencies(SsoUtils $ssoUtils) {
         $this->ssoUtils = $ssoUtils;
+        $this->sessionModel = new SessionModel();
     }
 
     /**
@@ -1041,15 +1042,5 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 return [];
             }
         }
-    }
-
-    /**
-     * A convenience method to send nocache and vary headers with requests.
-     *
-     * @param EntryController $sender
-     */
-    protected function modifyCacheHeaders($sender) {
-        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
-        $sender->setHeader('Vary', \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE);
     }
 }

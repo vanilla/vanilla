@@ -1026,3 +1026,11 @@ if ($config->get("Robots.Rules") === false && $sitemapsRobotsRules = $config->ge
     $config->set("Robots.Rules", $sitemapsRobotsRules);
     $config->remove("Sitemap.Robots.Rules");
 }
+
+// Set feature flag defaults into the config
+// So in a future update the can be safely changed for new sites.
+$config->touch('Feature.DeferredLegacyScripts.Enabled', false);
+$config->touch('Feature.AuthenticationAPI.Enabled', false);
+$config->touch('Feature.discussionSiteMaps.Enabled', false);
+$config->touch('Feature.Import.Enabled', false);
+$config->touch('Feature.updateTokens.Enabled', false);

@@ -7,7 +7,6 @@
  * @since 2.0
  */
 
-use SessionModel;
 
 /**
  * Class Gdn_OAuth2

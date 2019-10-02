@@ -2280,7 +2280,8 @@ if (!function_exists('joinRecords')) {
 
             $record = $joinData[$recordType][$iD];
 
-            if ($checkCategoryPermission && $allowedCats !== true) {
+            // Make sure the user is not the owner of the record before unsetting record values.
+            if ($checkCategoryPermission && $allowedCats !== true && $record['InsertUserID'] !==  Gdn::session()->UserID) {
                 // Check to see if the user has permission to view this record.
                 $categoryID = getValue('CategoryID', $record, -1);
                 if (!in_array($categoryID, $allowedCats)) {

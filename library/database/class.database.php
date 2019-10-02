@@ -181,7 +181,6 @@ class Gdn_Database {
                 $pDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 
                 return $pDO;
-
             } catch (Exception $ex) {
                 if ($ex instanceof PDOException &&
                     microtime(true) < $timeoutAt &&

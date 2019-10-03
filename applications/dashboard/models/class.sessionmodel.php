@@ -82,9 +82,9 @@ class SessionModel extends Gdn_Model {
     /**
      * Get a row from the sessions table that has not expired.
      *
-     * @param int $id
-     * @return array|object
-     * @throws Gdn_UserException
+     * @param int $id SessionID, primary key for storing session data.
+     * @return array|object Row from Session table.
+     * @throws Gdn_UserException Error thrown when sesssion is expired.
      */
     public function getActiveSession($id) {
         $row = $this->getID($id, DATASET_TYPE_ARRAY);

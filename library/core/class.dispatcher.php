@@ -12,6 +12,7 @@
  */
 use Garden\Container\Container;
 use Garden\Web\Dispatcher;
+use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -95,6 +96,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var  Dispatcher The forwards compatible dispatcher used for resourceful dispatching. */
     private $dispatcher;
 
+    /** @var Throwable */
+    private $dispatchException;
+
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
@@ -129,6 +136,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->addonManager = $addonManager;
         $this->container = $container;
         $this->dispatcher = $dispatcher;
+        $this->logger = $this->container->get(LoggerInterface::class);
         $this->reset();
     }
 
@@ -147,6 +155,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->deliveryType = DELIVERY_TYPE_ALL;
         $this->deliveryMethod = DELIVERY_METHOD_XHTML;
         $this->isHomepage = false;
+        $this->dispatchException = null;
     }
 
     /**
@@ -862,7 +871,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             call_user_func_array($callback, $args);
         } catch (\Throwable $ex) {
-            $controller->renderException($ex);
+            if ($this->dispatchException === null) {
+                $this->dispatchException = $ex;
+                $controller->renderException($ex);
+            } else {
+                trigger_error("Multiple exceptions encountered while dispatching {$request->path}.", E_USER_WARNING);
+                $this->logger->warning("Multiple exceptions encountered while dispatching.", [
+                    "lastException" => [
+                        "message" => $ex->getMessage(),
+                        "trace" => $ex->getTrace(),
+                    ],
+                    "originalException" => [
+                        "message" => $this->dispatchException->getMessage(),
+                        "trace" => $this->dispatchException->getTrace(),
+                    ],
+                    "timestamp" => time(),
+                ]);
+                safeHeader("HTTP/1.0 500", true, 500);
+            }
             exit();
         }
     }

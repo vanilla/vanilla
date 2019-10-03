@@ -37,12 +37,13 @@ class SsoUtils {
     /** @var string */
     private $stateToken;
 
+    /** @var Logger  */
     private $logger;
 
     /**
      * SsoUtils constructor.
      */
-    public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, Logger $logger) {
+    public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, ?\Psr\Log\LoggerInterface $logger = null) {
         $this->cookie = $cookie;
         $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-ssostatetoken';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
@@ -155,56 +156,31 @@ class SsoUtils {
     protected function isStateTokenValid($stateTokenData, $stateToken, $source = '') {
         // Validate expected data.
         if (!is_array($stateTokenData)) {
-            $this->logger->event(
-                'state_token',
-                $this->logger::ERROR,
-                'Missing stateTokenData',
-                ['source' => $source, 'stateTokenData' => $stateTokenData ?? []]
-            );
+            $this->logger->error('Missing stateTokenData', ['source' => $source]);
             return false;
         }
 
         // Validate it contains a stateToken.
         if (empty($stateTokenData['stateToken'])) {
-            $this->logger->event(
-                'state_token',
-                $this->logger::ERROR,
-                'Missing stateToken from stateToken Array',
-                ['source' => $source, 'stateTokenData' => $stateTokenData]
-            );
+            $this->logger->error('Missing stateToken from stateToken Array', ['source' => $source, 'stateTokenData' => $stateTokenData]);
             return false;
         }
 
         // Validate if exp exists.
         if (empty($stateTokenData['exp'])) {
-            $this->logger->event(
-                'state_token',
-                $this->logger::ERROR,
-                'Missing Expiry from stateTokenArray',
-                ['source' => $source, 'stateTokenData' => $stateTokenData]
-            );
+            $this->logger->error('Missing Expiry from stateTokenArray', ['source' => $source, 'stateTokenData' => $stateTokenData]);
             return false;
         }
 
         // Check for expiration.
         if ($stateTokenData['exp'] < time()) {
-            $this->logger->event(
-                'state_token',
-                $this->logger::ERROR,
-                'StateToken Expired',
-                ['source' => $source, 'stateTokenExp' => $stateTokenData['exp'], 'time' => time()]
-            );
+            $this->logger->error('StateToken Expired', ['source' => $source, 'stateTokenExp' => $stateTokenData['exp'], 'time' => time()]);
             return false;
         }
 
         // Check the token.
         if ($stateToken !== $stateTokenData['stateToken']) {
-            $this->logger->event(
-                'state_token',
-                $this->logger::ERROR,
-                'StateTokens do not match.',
-                ['source' => $source, 'stateToken' => $stateToken, 'time' => time()]
-            );
+            $this->logger->error('StateTokens do not match.', ['source' => $source, 'StoredStateToken' => $stateTokenData['stateToken'], 'RecievedStateToken' => $stateToken]);
             return false;
         }
 

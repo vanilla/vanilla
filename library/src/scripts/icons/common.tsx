@@ -20,8 +20,8 @@ const horizontalChevronViewBox = (centred?: boolean) => {
     return centred ? "-8 -4 30 30" : "0 0 24 24";
 };
 
-export function RightChevronIcon(props: { className?: string; centred?: boolean }) {
-    const title = `>`;
+export function RightChevronIcon(props: { className?: string; centred?: boolean; title?: string }) {
+    const title = props.title ? props.title : `>`;
     const classes = iconClasses();
     return (
         <svg
@@ -98,8 +98,8 @@ export function TopChevronIcon(props: { className?: string }) {
     );
 }
 
-export function BottomChevronIcon(props: { className?: string }) {
-    const title = `↓`;
+export function BottomChevronIcon(props: { className?: string; rotate?: number; title?: string }) {
+    const title = props.title ? props.title : `↓`;
     const classes = iconClasses();
     return (
         <svg
@@ -107,6 +107,9 @@ export function BottomChevronIcon(props: { className?: string }) {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             aria-hidden="true"
+            style={{
+                transform: props.rotate ? `rotate(${props.rotate}deg)` : undefined,
+            }}
         >
             <title>{title}</title>
             <path
@@ -416,13 +419,16 @@ export function SignInIcon(props: { className?: string }) {
     );
 }
 
-export function ChevronUpIcon(props: { className?: string }) {
+export function ChevronUpIcon(props: { className?: string; rotate?: number }) {
     const title = t("Chevron Up");
     const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 51 17"
+            style={{
+                transform: props.rotate ? `rotate(${props.rotate}deg)` : undefined,
+            }}
             className={classNames(classes.chevronUp, "icon-chevronUp", props.className)}
             aria-hidden="true"
         >
@@ -520,6 +526,19 @@ export function DeleteIcon(props: { className?: string }) {
 		C6,5.7,6.2,5.5,6.5,5.5z"
                 />
             </g>
+        </svg>
+    );
+}
+
+export function DiscussionIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.discussionIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+            <title>{props.title ? props.title : t("Speech Bubble")}</title>
+            <path
+                fill="currentColor"
+                d="M12 17.431c4.418 0 8-2.783 8-6.216C20 7.782 16.418 5 12 5s-8 2.783-8 6.216c0 1.572.75 3.008 1.99 4.102l-.765 3.11 3.28-1.619a9.9 9.9 0 0 0 3.495.623zm-6.332 1.892c-.762.376-1.616-.31-1.414-1.134l.627-2.55C3.678 14.396 3 12.854 3 11.215 3 7.168 7.077 4 12 4s9 3.168 9 7.215c0 4.048-4.077 7.215-9 7.215-1.192 0-2.352-.185-3.43-.54l-2.902 1.433z"
+            />
         </svg>
     );
 }

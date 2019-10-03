@@ -16,7 +16,9 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
@@ -126,6 +128,7 @@ class Bootstrap {
                 ],
                 PATH_CACHE
             ])
+            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -188,6 +191,7 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
             ->addAlias(Gdn::AliasLocale)
+            ->addAlias(LocaleInterface::class)
 
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')
@@ -227,6 +231,7 @@ class Bootstrap {
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
             ->addAlias('HstsModel')
@@ -236,6 +241,10 @@ class Bootstrap {
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+
+            ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
+            ->setShared(true)
+            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
             ->rule('@view-application/json')
             ->setClass(\Vanilla\Web\JsonView::class)
@@ -369,6 +378,7 @@ class Bootstrap {
     public function setGlobals(Container $container) {
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
+        $_SERVER['X_REWRITE'] = true;
         $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
         $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
         $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;

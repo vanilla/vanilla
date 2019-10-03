@@ -135,6 +135,18 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            type: string
+          type: array
+        style: form
       responses:
         '200':
           content:
@@ -180,6 +192,8 @@ components:
         insertUserID:
           description: The user that created the record.
           type: integer
+        insertUser:
+          $ref: 'schemas.yml#/components/schemas/UserFragment'
         name:
           description: 'The title of the record. A comment would be "RE: {DiscussionTitle}".'
           minLength: 1

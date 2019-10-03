@@ -4,18 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useRef, useMemo, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import SearchOption from "@library/features/search/SearchOption";
 import { t } from "@library/utility/appUtils";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SearchBar from "@library/features/search/SearchBar";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import { searchClasses } from "@library/features/search/searchStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
-import { visibility } from "@library/styles/styleHelpers";
 
 interface IProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -42,7 +41,7 @@ interface IState {
  * Implements independent search component. All wired up, just drop it where you need it.
  */
 export function IndependentSearch(props: IProps) {
-    const id = useMemo(() => uniqueIDFromPrefix("search"), []);
+    const id = useUniqueID("search");
     const resultsRef = useRef<HTMLDivElement>(null);
     const [query, setQuery] = useState("");
 

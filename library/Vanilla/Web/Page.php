@@ -363,7 +363,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->addReduxAction(new ReduxErrorAction($e))
             ->setSeoTitle($e->getMessage())
             ->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex'])
-            ->setSeoContent('resources/views/error.twig', ['error' => $e])
+            ->setSeoContent('resources/views/error.twig', [
+                'errorMessage' => $e->getMessage(),
+                'errorCode' => $e->getCode()
+            ])
         ;
 
         return $this->render();

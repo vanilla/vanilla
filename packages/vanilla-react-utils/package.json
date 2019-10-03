@@ -2,9 +2,9 @@
     "name": "@vanilla/react-utils",
     "main": "./src/index.ts",
     "module": "./src/index.ts",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "dependencies": {
-        "@vanilla/dom-utils": "*",
+        "@vanilla/dom-utils": "^3.0.1",
         "resize-observer-polyfill": "1.5.1"
     },
     "peerDependencies": {
@@ -13,7 +13,7 @@
         "typestyle": "^2.0.1"
     },
     "devDependencies": {
-        "@vanilla/tsconfig": "*"
+        "@vanilla/tsconfig": "^3.0.1"
     },
     "publishConfig": {
         "access": "public"

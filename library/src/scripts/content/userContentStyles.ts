@@ -138,6 +138,7 @@ export const userContentClasses = useThemeCache(() => {
         ["& ol"]: {
             listStylePosition: "inside",
             margin: `0 0 1em 3em`,
+            padding: 0,
             $nest: {
                 [`& li`]: {
                     listStyle: "decimal",
@@ -169,6 +170,7 @@ export const userContentClasses = useThemeCache(() => {
             listStylePosition: "inside",
             listStyle: "disc",
             margin: `1em 0 1em 2em`,
+            padding: 0,
             $nest: {
                 [`& li`]: {
                     listStyle: "none",
@@ -219,6 +221,12 @@ export const userContentClasses = useThemeCache(() => {
         "&& > *:first-child": {
             $unique: true, // Required to prevent collapsing in with some other variable.
             marginTop: 0,
+
+            $nest: {
+                "&::before": {
+                    marginTop: 0,
+                },
+            },
         },
     };
 

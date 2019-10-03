@@ -176,7 +176,7 @@ class Request implements RequestInterface {
      */
     public function setRoot($root) {
         $root = trim($root, '/');
-        $root = $root ? '' : "/$root";
+        $root = $root ? "/$root" : '';
         $this->root = $root;
 
         return $this;

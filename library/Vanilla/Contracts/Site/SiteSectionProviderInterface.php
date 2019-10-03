@@ -45,4 +45,11 @@ interface SiteSectionProviderInterface {
      * @return SiteSectionInterface[]
      */
     public function getForLocale(string $localeKey): array;
+
+    /**
+     * Get the current site section for the request automatically if possible.
+     *
+     * @return SiteSectionInterface
+     */
+    public function getCurrentSiteSection(): SiteSectionInterface;
 }

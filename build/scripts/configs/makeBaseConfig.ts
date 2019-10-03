@@ -54,11 +54,21 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
-                        const modulesRequiringTranspilation = ["quill", "p-debounce", "@vanilla/.*"];
-                        const exlusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
+                        const modulesRequiringTranspilation = [
+                            "quill",
+                            "p-debounce",
+                            "@vanilla/.*",
+                            "react-redux",
+                            "react-spring",
+                        ];
+                        const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
+
+                        if (modulePath.includes("core-js")) {
+                            return true;
+                        }
 
                         // We need to transpile quill's ES6 because we are building from source.
-                        return /node_modules/.test(modulePath) && !exlusionRegex.test(modulePath);
+                        return /node_modules/.test(modulePath) && !exclusionRegex.test(modulePath);
                     },
                     use: [
                         ...hotLoaders,

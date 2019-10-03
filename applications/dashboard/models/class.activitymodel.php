@@ -194,7 +194,12 @@ class ActivityModel extends Gdn_Model {
         }
 
 
-        $row['Url'] = externalUrl($row['Route']);
+        if (!empty($row['Route'])) {
+            $row['Url'] = externalUrl($row['Route']);
+        } else {
+            $id = $row['ActivityID'];
+            $row['Url'] = Gdn::request()->url("/activity/item/$id", true);
+        }
 
         if ($row['HeadlineFormat']) {
             $row['Headline'] = formatString($row['HeadlineFormat'], $row);

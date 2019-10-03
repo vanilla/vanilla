@@ -26,6 +26,11 @@ class TestInstallModel extends InstallModel {
     private $dbName;
 
     /**
+     * @var string $sphinxHost Sphinx host name.
+     */
+    private $sphinxHost;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct(
@@ -39,7 +44,7 @@ class TestInstallModel extends InstallModel {
         $this->setBaseUrl($request->url('/'));
 
         $this->config->Data = [];
-        $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
+        $this->config->load(PATH_ROOT . '/conf/config-defaults.php');
         $this->config->load($config->defaultPath(), 'Configuration', true);
     }
 
@@ -84,6 +89,8 @@ class TestInstallModel extends InstallModel {
 
         $result = parent::install($data);
 
+        $this->config->set('Plugins.Sphinx.Server', $this->getSphinxHost(), true, true);
+
         // Flush the config.
         $this->config->shutdown();
 
@@ -114,6 +121,20 @@ class TestInstallModel extends InstallModel {
             $this->dbHost = getenv('TEST_DB_HOST') ?: 'localhost';
         }
         return $this->dbHost;
+    }
+
+    /**
+     * Get the sphinx host.
+     *
+     * Enable server for test environment.
+     *
+     * @return string
+     */
+    public function getSphinxHost() {
+        if (empty($this->sphinxHost)) {
+            $this->sphinxHost = getenv('TEST_SPHINX_HOST') ?: 'sphinx';
+        }
+        return $this->sphinxHost;
     }
 
     /**

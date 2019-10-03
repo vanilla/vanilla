@@ -3,152 +3,116 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import debounce from "lodash/debounce";
-import { getElementHeight } from "@vanilla/dom-utils";
-import { forceRenderStyles } from "typestyle";
-import { onContent, removeOnContent } from "@library/utility/appUtils";
+import { collapsableContentClasses } from "@library/content/collapsableContentStyles";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { BottomChevronIcon } from "@library/icons/common";
+import { unit } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useMeasure } from "@vanilla/react-utils";
+import classNames from "classnames";
+import { nextTick } from "q";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { animated, useSpring } from "react-spring";
 
 interface IProps {
-    id: string;
-    isCollapsed: boolean;
-    preferredMaxHeight: number; // The actual max height could exceed this, but once we pass it stop adding elements.
-    setNeedsCollapser?: (needsCollapser: boolean) => void;
-    dangerouslySetInnerHTML: {
-        __html: string;
-    };
+    children: React.ReactNode;
+    maxHeight?: number;
+    overshoot?: number;
+    className?: string;
+    isExpandedDefault?: boolean;
+    firstChild?: boolean;
 }
 
-interface IState {
-    maxHeight: number | string;
-}
+export function CollapsableContent(props: IProps) {
+    const { isExpandedDefault = false, firstChild = false } = props;
+    const [isExpanded, setIsExpanded] = useState(isExpandedDefault);
 
-/**
- * A class for dynamic collapsable user content.
- */
-export default class CollapsableUserContent extends React.PureComponent<IProps, IState> {
-    public state = {
-        maxHeight: "100%",
-    };
-    private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
+    const containerMaxHeight = props.maxHeight ? props.maxHeight : 100;
+    const containerOvershoot = props.overshoot ? props.overshoot : 50;
 
-    public render() {
-        const style: React.CSSProperties = { overflow: "hidden", maxHeight: this.state.maxHeight };
+    const heightLimit = containerMaxHeight + containerOvershoot;
 
-        return (
-            <div
-                id={this.props.id}
-                className="collapsableContent userContent"
-                style={style}
-                ref={this.selfRef}
-                dangerouslySetInnerHTML={this.props.dangerouslySetInnerHTML}
-            />
-        );
-    }
+    const ref = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const measurements = useMeasure(ref);
 
-    /**
-     * Do the initial height calculation and recalcuate if the window dimensions change.
-     */
-    public componentDidMount() {
-        forceRenderStyles();
-        this.calcMaxHeight();
-        window.addEventListener("resize", this.windowResizerHandler);
-        onContent(this.calcMaxHeight);
-    }
+    useLayoutEffect(() => {
+        nextTick(() => {
+            scrollRef.current!.scrollTo({ top: 0 });
+        });
+    });
 
-    /**
-     * @inheritDoc
-     */
-    public componentWillUnmount() {
-        window.removeEventListener("resize", this.windowResizerHandler);
-        removeOnContent(this.calcMaxHeight);
-    }
-
-    /**
-     * If certain primary props change we need to recalculate the content height.
-     */
-    public componentDidUpdate(prevProps: IProps) {
-        if (
-            prevProps.dangerouslySetInnerHTML.__html !== this.props.dangerouslySetInnerHTML.__html ||
-            prevProps.isCollapsed !== this.props.isCollapsed
-        ) {
-            this.calcMaxHeight();
-        }
-    }
-
-    /**
-     * Handle recalcuating the components max height in a debounced fashion.
-     */
-    private windowResizerHandler = () =>
-        debounce(() => {
-            window.requestAnimationFrame(() => this.calcMaxHeight());
-        }, 200)();
-
-    /**
-     * Calculate the exact pixel max height of the content around the threshold of preferredMaxHeight.
-     */
-    private getHeightInfo(): {
-        height: number | null;
-        needsCollapser: boolean;
-    } {
-        const self = this.selfRef.current;
-
-        if (self === null) {
-            return {
-                height: null,
-                needsCollapser: false,
-            };
-        }
-
-        if (self.childElementCount <= 1) {
-            return {
-                height: null,
-                needsCollapser: false,
-            };
-        }
-
-        let finalMaxHeight = 0;
-        let lastBottomMargin = 0;
-        for (const child of Array.from(self.children)) {
-            if (finalMaxHeight > this.props.preferredMaxHeight) {
-                return {
-                    height: finalMaxHeight,
-                    needsCollapser: true,
-                };
+    const toggleCollapse = () => {
+        if (isExpanded) {
+            setIsExpanded(false);
+            if (ref.current) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                window.scrollTo({ top: ref.current.getBoundingClientRect().top + scrollTop, behavior: "smooth" });
             }
-
-            const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
-            if (finalMaxHeight > 0 && height > this.props.preferredMaxHeight) {
-                finalMaxHeight -= lastBottomMargin;
-
-                return {
-                    height: finalMaxHeight,
-                    needsCollapser: true,
-                };
-            }
-            lastBottomMargin = bottomMargin;
-            finalMaxHeight += height;
+        } else {
+            setIsExpanded(true);
         }
-
-        return {
-            height: finalMaxHeight,
-            needsCollapser: finalMaxHeight > this.props.preferredMaxHeight,
-        };
-    }
-
-    /**
-     * Calculate the CSS max height that we want to apply to the container div.
-     */
-    private calcMaxHeight = () => {
-        const { height, needsCollapser } = this.getHeightInfo();
-
-        let newHeight = needsCollapser && this.props.isCollapsed ? height! : this.selfRef.current!.scrollHeight;
-        if (newHeight === 0) {
-            // This is probably a mistake. Since we are hidden we don't want to actually re-render.
-            return;
-        }
-
-        this.setState({ maxHeight: newHeight });
-        this.props.setNeedsCollapser && this.props.setNeedsCollapser(needsCollapser);
     };
+
+    const maxCollapsedHeight = measurements.height < heightLimit ? measurements.height : containerMaxHeight;
+    const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
+    const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
+
+    const { height } = useSpring({
+        height: targetHeight > 0 ? targetHeight : "auto",
+    });
+
+    const gradientProps = useSpring({
+        opacity: isExpanded ? 0 : 1,
+    });
+
+    const classes = collapsableContentClasses();
+
+    const hasOverflow = measurements.height > heightLimit;
+
+    const title = isExpanded ? t("Collapse") : t("Expand");
+
+    const toggleID = useMemo(() => uniqueIDFromPrefix("collapsableContent_toggle"), []);
+    const contentID = useMemo(() => uniqueIDFromPrefix("collapsableContent_content"), []);
+
+    return (
+        <div className={classNames(classes.root)}>
+            <animated.div
+                id={contentID}
+                ref={scrollRef}
+                style={{
+                    minHeight: maxHeight,
+                    height: height,
+                }}
+                className={classNames(classes.heightContainer)}
+                aria-expanded={isExpanded}
+            >
+                <div ref={ref} className={props.className}>
+                    {props.children}
+                </div>
+            </animated.div>
+
+            {hasOverflow && (
+                <div className={classes.footer}>
+                    <animated.div style={gradientProps} className={classNames(classes.gradient)} />
+                    <Button
+                        id={toggleID}
+                        title={title}
+                        className={classes.collapser}
+                        baseClass={ButtonTypes.CUSTOM}
+                        onClick={toggleCollapse}
+                        controls={contentID}
+                    >
+                        <BottomChevronIcon
+                            title={title}
+                            className={classes.collapserIcon}
+                            rotate={!isExpanded ? undefined : 180}
+                        />
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
 }

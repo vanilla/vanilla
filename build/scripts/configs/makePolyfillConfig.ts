@@ -9,11 +9,13 @@ import { makeBaseConfig } from "./makeBaseConfig";
 import { POLYFILL_SOURCE_FILE, DIST_DIRECTORY } from "../env";
 import TerserWebpackPlugin from "terser-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
+import { getOptions } from "../options";
 
 /**
  * Create a config for building the polyfills file. This should be built entirely on its own.
  */
 export async function makePolyfillConfig(entryModel: EntryModel) {
+    const options = await getOptions();
     const baseConfig: Configuration = await makeBaseConfig(entryModel, "polyfill");
     baseConfig.mode = "production";
     baseConfig.devtool = "source-map";
@@ -24,13 +26,18 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     };
     baseConfig.optimization = {
         splitChunks: false,
-        minimizer: [
-            new TerserWebpackPlugin({
-                cache: true,
-                parallel: true,
-                sourceMap: true, // set to true if you want JS source maps
-            }),
-        ],
+        minimize: !options.debug,
+        namedChunks: options.debug,
+        namedModules: options.debug,
+        minimizer: options.debug
+            ? []
+            : [
+                  new TerserWebpackPlugin({
+                      cache: true,
+                      parallel: true,
+                      sourceMap: true, // set to true if you want JS source maps
+                  }),
+              ],
     };
 
     return baseConfig;

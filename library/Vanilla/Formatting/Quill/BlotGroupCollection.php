@@ -46,6 +46,10 @@ class BlotGroupCollection implements \IteratorAggregate {
     private $prevOp;
 
     // ITERABLE IMPLEMENTATION
+
+    /**
+     * @inheritdoc
+     */
     public function getIterator() {
         return new \ArrayIterator($this->groups);
     }
@@ -95,6 +99,9 @@ class BlotGroupCollection implements \IteratorAggregate {
 
         if ($prevGroup && $prevGroup->canNest($currentGroup)) {
             $prevGroup->nestGroup($currentGroup);
+        } elseif ($prevGroup && $prevGroup->canMerge($currentGroup)) {
+            // Merge the current group into the previous one.
+            $prevGroup->pushBlots($currentGroup->getBlotsAndGroups());
         } else {
             $this->groups[] = $this->inProgressGroup;
         }

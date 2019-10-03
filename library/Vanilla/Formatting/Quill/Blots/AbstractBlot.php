@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Quill\Blots;
 
 use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
@@ -16,7 +17,7 @@ use Vanilla\Formatting\Quill\Parser;
  * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
  * See https://github.com/quilljs/parchment#blots for an explanation of the JS implementation of quill (parchment) blots.
  */
-abstract class AbstractBlot {
+abstract class AbstractBlot implements NestableItemInterface {
 
     /** @var string */
     protected $parseMode;
@@ -136,9 +137,7 @@ abstract class AbstractBlot {
     }
 
     /**
-     * Get the nesting depth of the blot.
-     *
-     * @return int
+     * @inheritdoc
      */
     public function getNestingDepth(): int {
         return 0;

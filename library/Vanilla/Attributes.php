@@ -7,10 +7,14 @@
 
 namespace Vanilla;
 
+use Garden\JsonFilterTrait;
+
 /**
  * A container for API attributes.
  */
 class Attributes extends \ArrayObject implements \JsonSerializable {
+    use JsonFilterTrait;
+
     /**
      * Attributes constructor.
      *
@@ -38,8 +42,9 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
     public function jsonSerialize() {
         $r = $this->getArrayCopy();
         if (empty($r)) {
-            $r = (object)$r;
+            return (object)$r;
         }
+        $r = $this->jsonFilter($r);
         return $r;
     }
 }

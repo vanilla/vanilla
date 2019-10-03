@@ -18,10 +18,7 @@
     </div>"
 }
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
-
-<body id="{$BodyID}" class="
-    {$BodyClass}
-
+{assign var="TemplateCss" value="
     {if $ThemeOptions.Options.hasHeroBanner}
         ThemeOptions-hasHeroBanner
     {/if}
@@ -51,7 +48,8 @@
     {/if}
 
     locale-{$CurrentLocale.Lang}
-">
+"}
+<body id="{$BodyID}" class="{$BodyClass}{$TemplateCss|strip:" "}">
 
     <!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -258,9 +256,6 @@
                     <div class="row">
                         <div class="col col-copyRight">
                             <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
-                        </div>
-                        <div class="col">
-                            {community_chooser}
                         </div>
                         <div class="col col-logo">
                             <div class="Vanilla-logo">

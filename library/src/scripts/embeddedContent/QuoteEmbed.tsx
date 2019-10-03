@@ -3,23 +3,37 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { IUserFragment } from "@library/@types/api/users";
-import { useUniqueID } from "@library/utility/idUtils";
-import classnames from "classnames";
-import { makeProfileUrl, t } from "@library/utility/appUtils";
-import SmartLink from "@library/routing/links/SmartLink";
-import DateTime from "@library/content/DateTime";
-import CollapsableUserContent from "@library/content/CollapsableContent";
+import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
+import { CollapsableContent } from "@library/content/CollapsableContent";
+import UserContent from "@library/content/UserContent";
+import { UserLabel } from "@library/content/UserLabel";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { BottomChevronIcon, TopChevronIcon } from "@library/icons/common";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
+import { DiscussionIcon, RightChevronIcon } from "@library/icons/common";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@library/utility/appUtils";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps extends IBaseEmbedProps {
     body: string;
     dateInserted: string;
     insertUser: IUserFragment;
+    discussionLink?: string;
+    category?: ICategoryFragment;
+    // For compatibility, new options are hidden by default
+    displayOptions?: {
+        showUserLabel?: boolean;
+        showCompactUserInfo?: boolean;
+        showDiscussionLink?: boolean;
+        showPostLink?: boolean;
+        showCategoryLink?: boolean;
+        expandByDefault?: boolean;
+    };
 }
 
 /**
@@ -28,81 +42,97 @@ interface IProps extends IBaseEmbedProps {
  * This is not an editable quote. Instead it an expandable/collapsable snapshot of the quoted/embedded comment/discussion.
  */
 export function QuoteEmbed(props: IProps) {
-    const [isCollapsed, setIsCollapsed] = useState(true);
-    const [needsCollapseButton, setNeedsCollapseButton] = useState(false);
-    const toggleCollapseState = useCallback(
-        (event: React.MouseEvent<any>) => {
-            event.preventDefault();
-            setIsCollapsed(!isCollapsed);
-        },
-        [setIsCollapsed, isCollapsed],
+    const { body, insertUser, name, url, dateInserted, discussionLink, category, displayOptions = {} } = props;
+
+    const classes = quoteEmbedClasses();
+    const {
+        showUserLabel = false,
+        showCompactUserInfo = true,
+        showDiscussionLink = true,
+        showPostLink = false,
+        showCategoryLink = false,
+        expandByDefault = false,
+    } = displayOptions;
+
+    const discussionTitle = t("View Original Discussion");
+
+    const linkToDiscussion = showDiscussionLink && discussionLink && (
+        <SmartLink title={discussionTitle} to={discussionLink} className={classes.discussionLink}>
+            <DiscussionIcon title={discussionTitle} className={classes.discussionIcon} />
+            <ScreenReaderContent>{discussionTitle}</ScreenReaderContent>
+        </SmartLink>
     );
 
-    const { body, insertUser, name, url, dateInserted } = props;
-    const id = useUniqueID("collapsableContent-");
+    const postTitle = t("View Post");
+    const linkToPost = showPostLink && url && (
+        <SmartLink to={url} className={classes.postLink}>
+            {postTitle}
+            <RightChevronIcon title={postTitle} className={classes.postLinkIcon} />
+        </SmartLink>
+    );
 
-    const title = name ? (
-        <h2 className="embedText-title embedQuote-title">
-            <a href={url} className="embedText-titleLink">
-                {name}
-            </a>
-        </h2>
-    ) : null;
-
-    const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed });
-    const userUrl = makeProfileUrl(insertUser.name);
-
-    const [readyToRenderContent, setReadyToRender] = useState(!props.inEditor);
-    useEffect(() => {
-        setReadyToRender(true);
-    }, [setReadyToRender]);
+    const showHeader = showUserLabel || name || showCompactUserInfo;
 
     return (
-        <EmbedContainer className="embedText embedQuote">
+        <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote" inEditor={props.inEditor}>
-                <blockquote className={bodyClasses}>
-                    <div className="embedText-header embedQuote-header">
-                        {title}
-                        <SmartLink to={userUrl} className="embedQuote-userLink">
-                            <span className="embedQuote-userName">{insertUser.name}</span>
-                        </SmartLink>
-                        <SmartLink to={url} className="embedQuote-metaLink">
-                            <DateTime
-                                timestamp={dateInserted}
-                                className="embedText-dateTime embedQuote-dateTime meta"
-                            />
-                        </SmartLink>
-
-                        {needsCollapseButton && (
-                            <button
-                                type="button"
-                                className="embedQuote-collapseButton"
-                                aria-label={t("Toggle Quote")}
-                                onClick={toggleCollapseState}
-                                aria-pressed={isCollapsed}
-                            >
-                                {isCollapsed ? (
-                                    <BottomChevronIcon className={"embedQuote-chevronDown"} />
-                                ) : (
-                                    <TopChevronIcon className={"embedQuote-chevronUp"} />
-                                )}
-                            </button>
-                        )}
-                    </div>
-                    <div className="embedText-main embedQuote-main">
-                        <div className="embedQuote-excerpt">
-                            {readyToRenderContent && (
-                                <CollapsableUserContent
-                                    setNeedsCollapser={setNeedsCollapseButton}
-                                    isCollapsed={isCollapsed}
-                                    id={id}
-                                    preferredMaxHeight={100}
-                                    dangerouslySetInnerHTML={{ __html: body }}
+                <article className={classes.body}>
+                    {showHeader && (
+                        <header className={classes.header}>
+                            {showUserLabel && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={url}
+                                    category={category}
+                                    displayOptions={{
+                                        showCategory: showCategoryLink,
+                                        showRole: true,
+                                    }}
                                 />
                             )}
-                        </div>
-                    </div>
-                </blockquote>
+
+                            {name && (
+                                <SmartLink
+                                    to={url}
+                                    className={classNames(classes.titleLink, { [classes.isPadded]: showUserLabel })}
+                                >
+                                    <h2 className={classes.title}>{name}</h2>
+                                </SmartLink>
+                            )}
+
+                            {!showUserLabel && showCompactUserInfo && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={url}
+                                    compact={true}
+                                    category={category}
+                                    displayOptions={{ showCategory: showCategoryLink }}
+                                    fixLineHeight={!showUserLabel && !name}
+                                />
+                            )}
+                        </header>
+                    )}
+                    <CollapsableContent
+                        className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
+                        isExpandedDefault={!!expandByDefault}
+                        firstChild={!showUserLabel && !name && !showCompactUserInfo}
+                    >
+                        <blockquote className={classes.blockquote} cite={url}>
+                            <UserContent content={body} />
+                        </blockquote>
+                    </CollapsableContent>
+                    {(linkToDiscussion || linkToPost) && (
+                        <footer className={classes.footer}>
+                            <hr className={classes.footerSeparator} aria-hidden={true} />
+                            <div className={classes.footerMain}>
+                                {linkToDiscussion}
+                                {linkToPost}
+                            </div>
+                        </footer>
+                    )}
+                </article>
             </EmbedContent>
         </EmbedContainer>
     );

@@ -12,10 +12,12 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\ListLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
+use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
+use Vanilla\Formatting\Quill\Nesting\NestingParentInterface;
+use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
 
 /**
  * Class to represent a group of a quill blots. One group can contain:
@@ -23,9 +25,10 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
  * - Multiple Text formats in a single paragraph (as well as inline embeds).
  * - Multiple line blots if it is a line type grouping
  */
-class BlotGroup {
-    /** @var AbstractBlot[] */
-    private $blots = [];
+class BlotGroup implements NestableItemInterface, NestingParentInterface {
+
+    /** @var AbstractBlot|BlotGroup[] */
+    private $blotsAndGroups = [];
 
     /**
      * @var AbstractBlot[]
@@ -43,13 +46,14 @@ class BlotGroup {
      * @return bool
      */
     public function isBreakOnlyGroup(): bool {
-        if (count($this->blots) !== 1) {
+        if (count($this->blotsAndGroups) !== 1) {
             return false;
         }
 
-        $blot = $this->blots[0];
+        /** @var BlotGroup|AbstractBlot $blot */
+        $blot = $this->blotsAndGroups[0];
 
-        return get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
+        return get_class($blot) === TextBlot::class && $blot->getContent() === "";
     }
 
     /**
@@ -61,11 +65,11 @@ class BlotGroup {
      * @return bool
      */
     public function endsWithBlotOfType(string $blotClass, bool $needsExactMatch = false): bool {
-        if (count($this->blots) === 0) {
+        if (count($this->blotsAndGroups) === 0) {
             return false;
         }
 
-        $lastBlot = $this->blots[count($this->blots) - 1];
+        $lastBlot = $this->blotsAndGroups[count($this->blotsAndGroups) - 1];
 
         if ($needsExactMatch) {
             return get_class($lastBlot) === $blotClass;
@@ -80,33 +84,20 @@ class BlotGroup {
      * @return bool
      */
     public function isEmpty(): bool {
-        return count($this->blots) === 0;
+        return count($this->blotsAndGroups) === 0;
     }
 
-    /** @var BlotGroup[] */
-    private $nestedGroups = [];
-
     /**
-     * Determine if one group can nest another one inside of it.
-     *
-     * @param BlotGroup $otherGroup
-     * @return bool
+     * @inheritdoc
      */
     public function canNest(BlotGroup $otherGroup): bool {
-        $otherMainBlot = $otherGroup->getMainBlot();
-        $ownMainBlot = $this->getMainBlot();
-        if ($otherMainBlot instanceof ListLineTerminatorBlot
-            && $ownMainBlot instanceof ListLineTerminatorBlot
-            && $otherGroup->getNestingDepth() > $this->getNestingDepth()
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+        $lastIndex = count($this->blotsAndGroups) - 1;
+        $lastItem = $this->blotsAndGroups[$lastIndex] ?? null;
+        return $lastItem instanceof NestingParentInterface && $lastItem->canNest($otherGroup);
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getNestingDepth(): int {
         $ownMainBlot = $this->getMainBlot();
@@ -114,17 +105,38 @@ class BlotGroup {
     }
 
     /**
-     * Nest a blot group inside of this one.
-     *
-     * @param BlotGroup $blotGroup
+     * @inheritdoc
      */
-    public function nestGroup(BlotGroup $blotGroup) {
-        $lastNestedGroup = $this->nestedGroups[count($this->nestedGroups) - 1] ?? null;
-        if ($lastNestedGroup && $lastNestedGroup->canNest($blotGroup)) {
-            $lastNestedGroup->nestGroup($blotGroup);
-        } else {
-            $this->nestedGroups[] = $blotGroup;
+    public function nestGroup(BlotGroup $blotGroup): void {
+        // First try to nest into our own blotgroup, if possible.
+        $lastIndex = count($this->blotsAndGroups) - 1;
+        $lastItem = $this->blotsAndGroups[$lastIndex] ?? null;
+        if ($lastItem instanceof NestingParentInterface) {
+            $lastItem->nestGroup($blotGroup);
         }
+    }
+
+    /**
+     * See if another blot group can be merged into this one.
+     *
+     * @param BlotGroup $otherGroup
+     *
+     * @return bool
+     */
+    public function canMerge(BlotGroup $otherGroup): bool {
+        $otherGroupMainBlot = $otherGroup->getMainBlot();
+        return (
+            $otherGroupMainBlot instanceof NestingParentInterface
+            && $this->getMainBlot() instanceof NestingParentInterface
+            && !$otherGroupMainBlot->shouldClearCurrentGroup($this)
+        );
+    }
+
+    /**
+     * @return BlotGroup[]|AbstractBlot
+     */
+    public function getBlotsAndGroups() {
+        return $this->blotsAndGroups;
     }
 
     /**
@@ -137,12 +149,13 @@ class BlotGroup {
         // This because the ParagraphLineTerminatorBlot does not render a break if there is other group content
         // But does render a break if it is alone. This is mostly to make styling easier.
         // We do not want to need make the paragraph terminator aware of its group.
-        if (
-            count($this->blots) === 1 &&
-            $this->blots[0] instanceof ParagraphLineTerminatorBlot &&
-            $this->blots[0]->getContent() === "\n"
-        ) {
-            return "<p><br></p>";
+        if (count($this->blotsAndGroups) === 1) {
+            $blot = $this->blotsAndGroups[0];
+            if ($blot instanceof ParagraphLineTerminatorBlot &&
+                $blot->getContent() === "\n"
+            ) {
+                return "<p><br></p>";
+            }
         }
 
         // Don't render empty groups.
@@ -166,7 +179,7 @@ class BlotGroup {
             // Line blots have special rendering.
             $result .= $this->renderLineGroup();
         } else {
-            foreach ($this->blots as $blot) {
+            foreach ($this->blotsAndGroups as $blot) {
                 $result .= $blot->render();
             }
         }
@@ -191,30 +204,6 @@ class BlotGroup {
     }
 
     /**
-     * Render any nested groups inside of this one.
-     *
-     * If there are multiple nested groups they will share the start/end tag of the first nested group.
-     *
-     * @return string
-     */
-    private function renderNestedGroups(): string {
-        $firstNestedGroup = $this->nestedGroups[0] ?? null;
-        if (!$firstNestedGroup) {
-            return "";
-        }
-
-        $result = "";
-        $result .= $firstNestedGroup->renderOpeningTag();
-
-        foreach ($this->nestedGroups as $nestedGroup) {
-            // Only the first group will be used for the group tags.
-            $result .= $nestedGroup->renderContent();
-        }
-        $result .= $firstNestedGroup->renderClosingTag();
-        return $result;
-    }
-
-    /**
      * Render out a group with line terminators.
      *
      * We need to render potentially multiple inline blots than a line terminator, but the line terminator also
@@ -234,18 +223,15 @@ class BlotGroup {
         // Grab the first line terminator and start the line.
         $result .= $terminator->renderLineStart();
 
-        foreach ($this->blots as $index => $blot) {
-            $isLast = $index === count($this->blots) - 1;
+        foreach ($this->blotsAndGroups as $index => $blot) {
             if ($blot instanceof AbstractLineTerminatorBlot) {
                 // Render out the content of the line terminator (maybe nothing, maybe extra newlines).
                 $result .= $terminator->render();
-                if ($isLast) {
-                    // render the nested groups inside of the last line, before it's closing tag. Eg.
-                    // <li>Line 1 <ul>
-                    //     <li>Line 1.1</li>
-                    // </ul></li>
-                    $result .= $this->renderNestedGroups();
+
+                if ($blot instanceof NestingParentRendererInterface) {
+                    $result .= $blot->renderNestedGroups();
                 }
+
                 // End the line.
                 $result .= $terminator->renderLineEnd();
 
@@ -271,7 +257,7 @@ class BlotGroup {
      */
     private function getLineTerminators(): array {
         $terminators = [];
-        foreach ($this->blots as $blot) {
+        foreach ($this->blotsAndGroups as $blot) {
             if ($blot instanceof AbstractLineTerminatorBlot) {
                 $terminators[] = $blot;
             }
@@ -293,7 +279,7 @@ class BlotGroup {
         }
 
         $names = [];
-        foreach ($this->blots as $blot) {
+        foreach ($this->blotsAndGroups as $blot) {
             if ($blot instanceof Blots\Embeds\MentionBlot) {
                 $names[] = $blot->getUsername();
             } elseif ($blot instanceof ExternalBlot) {
@@ -317,7 +303,7 @@ class BlotGroup {
      */
     public function pushBlots(array $blots) {
         foreach ($blots as $blot) {
-            $this->blots[] = $blot;
+            $this->blotsAndGroups[] = $blot;
         }
     }
 
@@ -331,7 +317,7 @@ class BlotGroup {
     public function getIndexForBlotOfType(string $blotClass): int {
         $index = -1;
 
-        foreach ($this->blots as $blotIndex => $blot) {
+        foreach ($this->blotsAndGroups as $blotIndex => $blot) {
             if ($blot instanceof $blotClass) {
                 $index = $blotIndex;
                 break;
@@ -347,10 +333,10 @@ class BlotGroup {
      * @return AbstractBlot|null
      */
     public function getMainBlot(): ?AbstractBlot {
-        if (count($this->blots) === 0) {
+        if (count($this->blotsAndGroups) === 0) {
             return null;
         }
-        $blot = $this->blots[0];
+        $blot = $this->blotsAndGroups[0];
         $overridingBlot = $this->getOverrideBlot();
 
         return $overridingBlot ?? $blot;
@@ -365,7 +351,7 @@ class BlotGroup {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
-                return $this->blots[$index];
+                return $this->blotsAndGroups[$index];
             }
         }
 
@@ -379,11 +365,13 @@ class BlotGroup {
      */
     public function getTestData(): array {
         $blots = [];
-        foreach ($this->blots as $blot) {
-            $blots[] = [
-                "class" => get_class($blot),
-                "content" => $blot->getContent(),
-            ];
+        foreach ($this->blotsAndGroups as $blot) {
+            if ($blot instanceof AbstractBlot) {
+                $blots[] = [
+                    "class" => get_class($blot),
+                    "content" => $blot->getContent(),
+                ];
+            }
         }
 
         return $blots;
@@ -401,8 +389,16 @@ class BlotGroup {
             return \Gdn::translate("(Spoiler)") . "\n";
         }
 
-        foreach ($this->blots as $blot) {
-            $text .= $blot->getContent();
+        foreach ($this->blotsAndGroups as $blot) {
+            if ($blot instanceof AbstractBlot) {
+                $text .= $blot->getContent();
+            }
+
+            if ($blot instanceof NestingParentRendererInterface) {
+                foreach ($blot->getNestedGroups() as $nestedGroup) {
+                    $text .= $nestedGroup->getUnsafeText();
+                }
+            }
         }
 
         return $text;

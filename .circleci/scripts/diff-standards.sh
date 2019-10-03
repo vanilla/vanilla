@@ -14,8 +14,15 @@ if [ -z "$2" ]; then
 else
     BUILD_DIR=$2
 fi
+
 GIT_DIFF_FILENAME=$BUILD_DIR/git-diff.txt
 PHPCS_DIFF_FILENAME=$BUILD_DIR/phpcs-diff.json
+
+DIR=`dirname "$0"`
+VANILLA_ROOT=$(cd "$DIR/../../" && pwd)
+PHPCS_PATH="$VANILLA_ROOT/vendor/bin/phpcs"
+DIFF_FILTER_PATH="$VANILLA_ROOT/vendor/bin/diffFilter"
+STANDARD_PATH="$VANILLA_ROOT/vendor/vanilla/standards/code-sniffer/Vanilla"
 
 cd $BUILD_DIR
 
@@ -37,11 +44,11 @@ echo -n "$GIT_DIFF" > $GIT_DIFF_FILENAME
 
 echo "Exporting full PHP_CodeSniffer scan of changed files to $PHPCS_DIFF_FILENAME..."
 rm -f $PHPCS_DIFF_FILENAME
-./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --report=json $(git diff --diff-filter=ACM --name-only $DIFF_BRANCH -- '*.php') > $PHPCS_DIFF_FILENAME
+$PHPCS_PATH --standard=$STANDARD_PATH --report=json $(git diff --diff-filter=ACM --name-only $DIFF_BRANCH -- '*.php') > $PHPCS_DIFF_FILENAME
 
 echo "Comparing results of PHP_CodeSniffer scan with changed lines from branch diff..."
 echo ""
-./vendor/bin/diffFilter --phpcs $GIT_DIFF_FILENAME $PHPCS_DIFF_FILENAME
+$DIFF_FILTER_PATH --phpcs $GIT_DIFF_FILENAME $PHPCS_DIFF_FILENAME
 
 CODESNIFFER_RESULT=$?
 

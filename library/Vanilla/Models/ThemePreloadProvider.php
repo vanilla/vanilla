@@ -8,11 +8,13 @@
 namespace Vanilla\Models;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\Asset\ThemeScriptAsset;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
+use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
  * Class for preloading theme data into the frontend.
@@ -31,8 +33,11 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
-    /** @var array */
+    /** @var array|null */
     private $themeData;
+
+    /** @var \Throwable */
+    private $themeFetchError;
 
     /**
      * DI.
@@ -61,7 +66,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @return ThemeScriptAsset|null
      */
     public function getThemeScript(): ?ThemeScriptAsset {
-        if (!isset($this->getThemeData()['assets']['javascript'])) {
+        $data = $this->getThemeData();
+        if (!$data || !isset($data['assets']['javascript'])) {
             return null;
         }
 
@@ -80,10 +86,20 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * This data follows the format described in the ThemesApiController.
      */
-    public function getThemeData(): array {
+    public function getThemeData(): ?array {
         if (!$this->themeData) {
             $themeKey = $this->siteMeta->getActiveTheme()->getKey();
-            $this->themeData = $this->themesApi->get($themeKey);
+            try {
+                $this->themeData = $this->themesApi->get($themeKey);
+            } catch (\Throwable $e) {
+                // Prevent infinite loops.
+                // Our error handling page uses the theme when possible.
+                // As a result we absolutely CANNOT ever allow the this function to bubble up an error.
+                // If it did then we we get cascading OOM errors.
+                trigger_error("Could not load data for theme key $themeKey.");
+                $this->themeFetchError = $e;
+                $this->themeData = null;
+            }
         }
 
         return $this->themeData;
@@ -94,6 +110,15 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function createActions(): array {
         $themeData = $this->getThemeData();
+        if (!$themeData) {
+            if ($this->themeFetchError) {
+                return [
+                    new ReduxErrorAction($this->themeFetchError),
+                ];
+            } else {
+                return [];
+            }
+        }
 
         // Preload the theme variables for the frontend.
         return [new ReduxAction(
@@ -109,9 +134,12 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * Get an inline style tag for the header and footer.
      */
-    private function getThemeInlineCss() {
+    private function getThemeInlineCss(): string {
         if (!$this->inlineStyles) {
             $themeData = $this->getThemeData();
+            if (!$themeData) {
+                return '';
+            }
             $themeKey = $this->siteMeta->getActiveTheme()->getKey();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {
@@ -128,8 +156,11 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return string
      */
-    public function getThemeFooterHtml() {
+    public function getThemeFooterHtml(): string {
         $themeData = $this->getThemeData();
+        if (!$themeData) {
+            return '';
+        }
         return $this->getThemeInlineCss() . ($themeData['assets']['header'] ?? '');
     }
 
@@ -138,8 +169,11 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return string
      */
-    public function getThemeHeaderHtml() {
+    public function getThemeHeaderHtml(): string {
         $themeData = $this->getThemeData();
+        if (!$themeData) {
+            return '';
+        }
         return $this->getThemeInlineCss() . ($themeData['assets']['footer'] ?? '');
     }
 }

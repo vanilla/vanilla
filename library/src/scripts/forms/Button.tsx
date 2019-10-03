@@ -28,6 +28,7 @@ interface IProps extends IOptionalComponentID {
     buttonRef?: React.RefObject<HTMLButtonElement>;
     role?: string;
     onKeyDownCapture?: (event: any) => void;
+    controls?: string;
 }
 
 interface IState {
@@ -119,6 +120,7 @@ export default class Button extends React.Component<IProps, IState> {
                 lang={this.props.lang}
                 role={this.props.role}
                 onKeyDownCapture={this.props.onKeyDownCapture}
+                aria-controls={this.props.controls}
             >
                 {this.props.children}
             </button>

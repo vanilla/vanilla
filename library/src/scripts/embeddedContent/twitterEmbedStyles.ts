@@ -4,7 +4,7 @@
  */
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { margins } from "@library/styles/styleHelpers";
-import { important } from "csx";
+import { important, percent } from "csx";
 
 export const twitterEmbedClasses = useThemeCache(() => {
     const style = styleFactory("twitter");
@@ -13,6 +13,7 @@ export const twitterEmbedClasses = useThemeCache(() => {
         // borderRadius: 4,
         width: "auto",
         display: "inline-flex",
+        maxWidth: percent(100),
 
         $nest: {
             // The shadow DOM root.

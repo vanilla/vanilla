@@ -1,6 +1,14 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use VanillaTests\NullContainer;
+
+// Use consistent timezone for all tests.
+date_default_timezone_set("UTC");
+
 error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
@@ -34,6 +42,12 @@ foreach ($files as $file) {
 // Adding the minimum dependencies to support unit testing for core libraries
 // ===========================================================================
 require PATH_ROOT.'/environment.php';
+
+// Allow a test before.
+$bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';
+if (file_exists($bootstrapTestFile)) {
+    require_once $bootstrapTestFile;
+}
 
 // This effectively disable the auto instanciation of a new container when calling Gdn::getContainer();
 Gdn::setContainer(new NullContainer());

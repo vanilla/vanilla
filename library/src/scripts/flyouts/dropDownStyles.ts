@@ -20,6 +20,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const notUserContent = "u-notUserContent";
 
@@ -221,6 +222,7 @@ export const dropDownClasses = useThemeCache(() => {
     const action = style("action", {
         $nest: {
             "&&": {
+                ...buttonResetMixin(),
                 cursor: "pointer",
                 appearance: "none",
                 display: "flex",

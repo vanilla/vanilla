@@ -12,6 +12,7 @@ import React from "react";
 interface IProps {
     className?: string;
     content: string;
+    ignoreHashScrolling?: boolean;
 }
 
 /**
@@ -22,7 +23,7 @@ interface IProps {
 export default function UserContent(props: IProps) {
     const classes = userContentClasses();
 
-    useHashScrolling();
+    useHashScrolling(props.ignoreHashScrolling);
 
     return (
         <div

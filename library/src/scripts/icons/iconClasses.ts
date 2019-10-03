@@ -293,6 +293,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.editIcon.height),
     });
 
+    const discussionIcon = style("discussionIcon", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -318,5 +323,6 @@ export const iconClasses = useThemeCache(() => {
         categoryIcon,
         deleteIcon,
         editIcon,
+        discussionIcon,
     };
 });

@@ -7,11 +7,65 @@
 
 namespace Vanilla\Contracts\Search;
 
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use ReflectionClass;
+
 /**
  * Trait SearchRecordTypeTrait
  * @package Vanilla\Contracts\Search
  */
 trait SearchRecordTypeTrait {
+    /**
+     * Returns the list of all const properties required for this trait
+     *
+     * @return array
+     */
+    public static function required(): array {
+        return [
+            'TYPE',
+            'API_TYPE_KEY',
+            'SPHINX_DTYPE',
+            'SPHINX_INDEX',
+            'GUID_OFFSET',
+            'GUID_MULTIPLIER',
+            'SUB_KEY',
+            'CHECKBOX_LABEL',
+            'PROVIDER_GROUP'
+        ];
+    }
+
+    /**
+     * SearchRecordTypeTrait constructor.
+     */
+    public function __construct() {
+        $oClass = new ReflectionClass(__CLASS__);
+        $props = $oClass->getConstants();
+        foreach (self::required() as $const) {
+            if (!isset($props, $const)) {
+                throw new \Exception('SearchRecordTypeInterface require const '.$const);
+            }
+        }
+    }
+
+    /**
+     * Check if current  search type equal to foreign object
+     *
+     * @param \Vanilla\Contracts\Search\SearchRecordTypeInterface $searchType
+     * @return bool
+     */
+    public function equal(SearchRecordTypeInterface $searchType): bool {
+        $self = new ReflectionClass(__CLASS__);
+        $selfProps = $self->getConstants();
+        $clone = new ReflectionClass(get_class($searchType));
+        $cloneProps = $clone->getConstants();
+        foreach (self::required() as $const) {
+            if ($selfProps[$const] !== $cloneProps[$const]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * @inheritdoc
      */

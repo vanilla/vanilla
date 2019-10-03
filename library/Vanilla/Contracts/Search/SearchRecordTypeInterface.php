@@ -81,4 +81,12 @@ interface SearchRecordTypeInterface {
      * @return string
      */
     public function getProviderGroup(): string;
+
+    /**
+     * Check if current  search type equal to foreign object
+     *
+     * @param \Vanilla\Contracts\Search\SearchRecordTypeInterface $searchType
+     * @return bool
+     */
+    public function equal(SearchRecordTypeInterface $searchType): bool;
 }

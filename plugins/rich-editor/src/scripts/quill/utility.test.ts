@@ -194,6 +194,20 @@ describe("getMentionRange", () => {
         quill.setSelection(selection);
         expect(getMentionRange(quill, selection)).to.eq(null);
     });
+
+    it("Returns null if we are inside of a inline code", () => {
+        quill.setContents([OpUtils.code("@Somebody")]);
+        const selection = { index: 3, length: 0 };
+        quill.setSelection(selection);
+        expect(getMentionRange(quill, selection)).to.eq(null);
+    });
+
+    it("Returns null if we are inside of a link", () => {
+        quill.setContents([OpUtils.link("http://test.com", "@Somebody")]);
+        const selection = { index: 3, length: 0 };
+        quill.setSelection(selection);
+        expect(getMentionRange(quill, selection)).to.eq(null);
+    });
 });
 
 describe("getIDForQuill()", () => {

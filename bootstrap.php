@@ -14,6 +14,10 @@ use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
 use Vanilla\Web\TwigEnhancer;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Models\SearchRecordTypeComment;
+use Vanilla\Models\SearchRecordTypeDiscussion;
+use Vanilla\Models\SearchRecordTypeProvider;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -262,6 +266,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
+
+    ->rule(SearchRecordTypeProviderInterface::class)
+    ->setClass(SearchRecordTypeProvider::class)
+    ->addCall('setType', [new SearchRecordTypeDiscussion()])
+    ->addCall('setType', [new SearchRecordTypeComment()])
+    ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
+    ->addAlias('SearchRecordTypeProvider')
+    ->setShared(true)
 
     ->rule(SearchModel::class)
     ->setShared(true)

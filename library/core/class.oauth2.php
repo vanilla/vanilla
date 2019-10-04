@@ -632,11 +632,13 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
                 // Save the access token and the profile to the session table, set expiry to 3 minutes.
                 $stashID = $this->sessionModel->insert(
-                    ['Attributes' => [
-                        'AccessToken' => $response['access_token'] ,
-                        'RefreshToken' => $response['refresh_token'],
-                        'Profile' => $profile],
-                        'DateExpires' => date(MYSQL_DATE_FORMAT, time() + 3*60)
+                    [
+                        'Attributes' => [
+                                'AccessToken' => $response['access_token'] ,
+                                'RefreshToken' => $response['refresh_token'],
+                                'Profile' => $profile,
+                            ],
+                        'DateExpires' => date(MYSQL_DATE_FORMAT, strtotime('3 minutes')),
                     ]
                 );
                 $url = '/entry/connect/'.$this->getProviderKey();
@@ -674,19 +676,18 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         if (!$stashID) {
             $this->log('Missing stashID', ['POST' => $sender->Request->post(),'GET' => $sender->Request->get()]);
-            throw new Gdn_UserException('Missing session, please go back and log in again.');
+            throw new Gdn_UserException('Missing session, please go back and log in again.', 401);
         }
 
-        if ($stashID) {
-            $savedProfile = $this->sessionModel->getActiveSession($stashID);
-            if ($savedProfile['Attributes']) {
-                $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile['Attributes']]);
-            } else {
-                $this->log('Base Connect Data Profile Not Found in Session', []);
-            }
+        $savedProfile = $this->sessionModel->getActiveSession($stashID);
+        if ($savedProfile['Attributes']) {
+            $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile['Attributes']]);
+        } else {
+            $this->log('Base Connect Data Profile Not Found in Session', []);
         }
+
         // Retrieve the profile that was saved to the session in the entryEndPoint.
-        $profile = val('Profile', $savedProfile['Attributes']);
+        $profile = $savedProfile['Attributes']['Profile'] ?? [];
         $accessToken = val('AccessToken', $savedProfile);
         $refreshToken = val('RefreshToken', $savedProfile);
 
@@ -994,9 +995,9 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      *
      * @param SsoUtils $ssoUtils Used to generate SSO tokens.
      */
-    public function setDependencies(SsoUtils $ssoUtils) {
+    public function setDependencies(SsoUtils $ssoUtils, SessionModel $sessionModel) {
         $this->ssoUtils = $ssoUtils;
-        $this->sessionModel = new SessionModel();
+        $this->sessionModel = $sessionModel;
     }
 
     /**

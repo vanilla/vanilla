@@ -91,6 +91,8 @@ class CacheControlMiddleware {
         foreach (static::getHttp10Headers($cacheControl) as $key => $value) {
             header("$key: $value");
         }
-        header('Vary: '.self::VARY_COOKIE);
+        if ($cacheControl === self::NO_CACHE) {
+            header('Vary: '.self::VARY_COOKIE);
+        }
     }
 }

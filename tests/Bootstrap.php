@@ -28,6 +28,10 @@ use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Models\SearchRecords\SearchRecordTypeComment;
+use Vanilla\Models\SearchRecords\SearchRecordTypeDiscussion;
+use Vanilla\Models\SearchRecords\SearchRecordTypeProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -223,6 +227,14 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
             ->rule(SearchModel::class)
+            ->setShared(true)
+
+            ->rule(SearchRecordTypeProviderInterface::class)
+            ->setClass(SearchRecordTypeProvider::class)
+            ->addCall('setType', [new SearchRecordTypeDiscussion()])
+            ->addCall('setType', [new SearchRecordTypeComment()])
+            ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
+            ->addAlias('SearchRecordTypeProvider')
             ->setShared(true)
 
             ->rule(SSOModel::class)

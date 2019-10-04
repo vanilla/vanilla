@@ -226,15 +226,15 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
-            ->rule(SearchModel::class)
-            ->setShared(true)
-
             ->rule(SearchRecordTypeProviderInterface::class)
             ->setClass(SearchRecordTypeProvider::class)
             ->addCall('setType', [new SearchRecordTypeDiscussion()])
             ->addCall('setType', [new SearchRecordTypeComment()])
             ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
             ->addAlias('SearchRecordTypeProvider')
+            ->setShared(true)
+
+            ->rule(SearchModel::class)
             ->setShared(true)
 
             ->rule(SSOModel::class)

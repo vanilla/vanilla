@@ -29,9 +29,9 @@ use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-use Vanilla\Models\SearchRecords\SearchRecordTypeComment;
-use Vanilla\Models\SearchRecords\SearchRecordTypeDiscussion;
-use Vanilla\Models\SearchRecords\SearchRecordTypeProvider;
+use Vanilla\Models\SearchRecordTypeComment;
+use Vanilla\Models\SearchRecordTypeDiscussion;
+use Vanilla\Models\SearchRecordTypeProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.

@@ -5,14 +5,14 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Models\SearchRecords;
+namespace Vanilla\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeTrait;
 
 /**
  * Class SearchRecordTypeComment
- * @package Vanilla\AdvancedSearch\Models
+ * @package Vanilla\Models
  */
 class SearchRecordTypeComment implements SearchRecordTypeInterface {
     use SearchRecordTypeTrait;

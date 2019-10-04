@@ -48,6 +48,9 @@ class SsoUtils {
         $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-ssostatetoken';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
         $this->session = $session;
+        if ($logger === null) {
+            $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
+        }
         $this->logger = $logger;
 
         if (!$this->cookieSalt) {

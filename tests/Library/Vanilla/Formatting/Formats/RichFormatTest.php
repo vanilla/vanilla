@@ -8,6 +8,8 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Parser;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
@@ -22,7 +24,9 @@ class RichFormatTest extends AbstractFormatTestCase {
      */
     protected function prepareFormatter(): FormatInterface {
         self::container()->rule(Parser::class)
-            ->addCall('addCoreBlotsAndFormats');
+            ->addCall('addCoreBlotsAndFormats')
+            ->rule(EmbedService::class)
+            ->addCall('registerEmbed', [ImageEmbed::class, ImageEmbed::TYPE]);
         return self::container()->get(RichFormat::class);
     }
 

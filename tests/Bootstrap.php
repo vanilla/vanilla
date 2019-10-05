@@ -103,6 +103,10 @@ class Bootstrap {
             ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
 
+            ->rule(\Psr\SimpleCache\CacheInterface::class)
+            ->setShared(true)
+            ->setFactory([\Vanilla\Adapters\SimpleCacheAdapter::class, 'fromGdnCache'])
+
             // Configuration
             ->rule(ConfigurationInterface::class)
             ->setClass(\Gdn_Configuration::class)

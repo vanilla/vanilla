@@ -53,7 +53,9 @@
         "vanilla/nbbc": "~2.1",
         "vanilla/safecurl": "~0.9",
         "vanilla/vanilla-connect": "~0.0",
-        "twig/twig": "^2.5"
+        "twig/twig": "^2.5",
+        "psr/simple-cache": "^1.0",
+        "symfony/cache": "^3.4"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",

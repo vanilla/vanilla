@@ -849,6 +849,15 @@ class Gdn_Memcached extends Gdn_Cache {
     public function resultMessage() {
         return $this->memcache->getResultMessage();
     }
+
+    /**
+     * Get the driver instance for this cache.
+     *
+     * @return Memcached
+     */
+    public function getMemcached(): \Memcached {
+        return $this->memcache;
+    }
 }
 
 /**

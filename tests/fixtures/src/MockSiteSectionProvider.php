@@ -60,6 +60,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
 
     /**
      * Create site-sections to a section group.
+     *
      * @param array $locales
      *
      * @return array

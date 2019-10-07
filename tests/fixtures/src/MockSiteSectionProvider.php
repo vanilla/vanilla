@@ -23,7 +23,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
      * MockSiteSectionProvider constructor.
      */
     public function __construct() {
-        $this->siteSections = self::createSiteSections();
+        $this->siteSections = self::fromLocales();
     }
 
 
@@ -60,23 +60,25 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
 
     /**
      * Create site-sections to a section group.
+     * @param array $locales
+     *
      * @return array
      */
-    public static function createSiteSections() {
-        $locales = ["en", "fr", "es", "ru"];
+    public static function fromLocales(array $locales = ["en", "fr", "es", "ru"]): array {
+
         $siteSections = [];
 
         foreach ($locales as $locale) {
             $siteSectionPath = $locale.'/';
-            $siteSectionName = uniqid("siteSectionName");
-            $sectionGroup = "subcommunities-group-1";
-            $siteSectionID = "subcommunities-group-1";
+            $siteSectionName = "siteSectionName_".$locale;
+            $siteSectionGroup = "mockSiteSectionGroup-1";
+            $siteSectionID = "mockSiteSection-1";
             $siteSections[] = new MockSiteSection(
                 $siteSectionName,
                 $locale,
                 $siteSectionPath,
                 $siteSectionID,
-                $sectionGroup
+                $siteSectionGroup
             );
         }
 

@@ -73,7 +73,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
         $siteSections = [];
         foreach ($locales as $locale) {
 
-            $siteSectionPath = uniqid("folder").'/';
+            $siteSectionPath = $locale.'/';
             $siteSectionName = uniqid("siteSectionName");
             $sectionGroup = "subcommunities-group-1";
             $siteSectionID = "subcommunities-group-1";

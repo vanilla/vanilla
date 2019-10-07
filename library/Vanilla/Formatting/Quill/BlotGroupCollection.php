@@ -130,12 +130,13 @@ class BlotGroupCollection implements \IteratorAggregate {
                 continue;
             }
 
+            if (($this->inProgressBlot->shouldClearCurrentGroup($this->inProgressGroup))) {
+                // Ask the blot if it should close the current group.
+                $this->clearBlotGroup();
+            }
+
             // Ask the blot if it should close the current group.
             if ($this->inProgressBlot instanceof AbstractLineTerminatorBlot) {
-                if (($this->inProgressBlot->shouldClearCurrentGroup($this->inProgressGroup))) {
-                    $this->clearBlotGroup();
-                }
-
                 // Clear the line because we we had line terminator.
                 $this->clearLine();
             }

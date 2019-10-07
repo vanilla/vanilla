@@ -1,0 +1,20 @@
+[
+    { "insert": "List Item" },
+    { "attributes": { "list": { "depth": 0, "type": "bullet" } }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://us.v-cdn.net/6030677/uploads/698/E2G3E1MAL7AD.png",
+                    "name": "image.png",
+                    "type": "image/png",
+                    "size": 48779,
+                    "width": 746,
+                    "height": 682,
+                    "embedType": "image"
+                },
+                "loaderData": { "type": "image" }
+            }
+        }
+    }
+]

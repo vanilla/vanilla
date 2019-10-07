@@ -139,6 +139,7 @@ export const modalClasses = useThemeCache(() => {
                 transform: "none",
                 left: 0,
                 right: 0,
+                overflow: "scroll"
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),

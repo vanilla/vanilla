@@ -49,11 +49,10 @@ export function TranslationGrid(props: ITranslationGrid) {
                             defaultValue: t.translation,
                             multiline: !!t.multiLine,
                             maxLength: t.maxLength,
-                            resize: "none",
-                            overflow: "visible",
                         }}
                         textAreaProps={{
-                            minRows: 1,
+                            resize: "none",
+                            async: true,
                         }}
                     />
                 }

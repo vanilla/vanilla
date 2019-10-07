@@ -64,7 +64,7 @@ export const translationGridClasses = useThemeCache(() => {
                     left: vars.cell.paddings.outer + vars.cell.paddings.inner,
                     right: vars.cell.paddings.inner,
                 }),
-                minHeight: unit(innerPadding * 2 + (innerPadding > oneLineHeight ? innerPadding : oneLineHeight)),
+                minHeight: unit(innerPadding * 2 + oneLineHeight),
                 flexGrow: 1,
             },
         },
@@ -115,7 +115,7 @@ export const translationGridClasses = useThemeCache(() => {
             color: vars.cell.color,
         }),
         ...paddings({
-            vertical: vars.cell.paddings.outer,
+            vertical: vars.cell.paddings.inner,
             left: vars.cell.paddings.outer,
             right: vars.cell.paddings.outer + vars.cell.paddings.inner,
         }),

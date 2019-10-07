@@ -26,7 +26,7 @@ story.add("Translation Grid", () => {
                     height: "400px",
                     overflow: "auto",
                     border: "solid #1EA7FD 4px",
-                    width: "1024px",
+                    width: "1028px",
                     maxWidth: "100%",
                     margin: "auto",
                     position: "relative", // Scrolling container must have "position"

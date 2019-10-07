@@ -12,7 +12,7 @@ import { Omit } from "@library/@types/utils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { OverflowProperty, ResizeProperty } from "csstype";
-import Textarea from "react-textarea-autosize";
+import { TextareaAutosize } from "react-autosize-textarea/lib/TextareaAutosize";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -34,15 +34,14 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
         multiline?: boolean;
         maxLength?: number;
-        resize?: ResizeProperty; // for textarea only
-        overflow?: OverflowProperty; // for textarea only
     };
     textAreaProps?: {
-        inputRef?: (domNode) => {};
+        onResize?: (event) => {};
+        rows?: number;
         maxRows?: number;
-        minRows?: number;
-        onHeightChange?: (height, instance) => {};
-        useCacheForDOMMeasurements?: boolean;
+        async?: boolean;
+        resize?: ResizeProperty; // for textarea only
+        overflow?: OverflowProperty; // for textarea only
     };
 }
 
@@ -88,12 +87,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                     return !inputProps.multiline ? (
                         <input
                             id={this.id}
-                            className={classNames(classes, {
-                                [classesInputBlock.multiLine(
-                                    inputProps.resize,
-                                    inputProps.overflow,
-                                )]: inputProps.multiline,
-                            })}
+                            className={classes}
                             defaultValue={inputProps.defaultValue}
                             value={inputProps.value}
                             type={inputProps.type}
@@ -109,13 +103,13 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             onKeyPress={inputProps.onKeyPress}
                         />
                     ) : (
-                        <Textarea
+                        <TextareaAutosize
                             {...textAreaProps}
                             id={this.id}
                             className={classNames(classes, {
                                 [classesInputBlock.multiLine(
-                                    inputProps.resize,
-                                    inputProps.overflow,
+                                    textAreaProps.resize ? textAreaProps.resize : "none",
+                                    textAreaProps.overflow,
                                 )]: inputProps.multiline,
                             })}
                             defaultValue={inputProps.defaultValue}
@@ -129,7 +123,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             aria-labelledby={labelID}
                             maxLength={inputProps.maxLength}
                             onChange={this.onChange}
-                            inputRef={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
+                            ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
                             onKeyPress={inputProps.onKeyPress}
                         />
                     );

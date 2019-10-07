@@ -5,7 +5,6 @@
     "dependencies": {
         "@vanilla/dom-utils": "^3.0.1",
         "@vanilla/react-utils": "^3.0.1",
-        "@vanilla/utils": "^3.0.1",
-        "react-textarea-autosize": "^7.1.0"
+        "@vanilla/utils": "^3.0.1"
     }
 }

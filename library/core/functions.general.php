@@ -3058,10 +3058,9 @@ if (!function_exists('redirectTo')) {
             CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
         }
 
-        $controller = Gdn::controller();
-        if ($controller !== null
-            && in_array($controller->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)
-            && $controller->deliveryMethod() === DELIVERY_METHOD_JSON) {
+        if (Gdn::controller() !== null
+            && in_array(Gdn::controller()->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)
+            && Gdn::controller()->deliveryMethod() === DELIVERY_METHOD_JSON) {
             // This is a bit of a kludge, but it solves a perpetual gotcha when we switch full page forms to AJAX forms and forget about redirects.
             echo json_encode([
                 'FormSaved' => true,

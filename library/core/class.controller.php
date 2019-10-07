@@ -2107,10 +2107,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                 safeHeader("$name: $value", true, $code);
             }
         }
+
         if (!empty($this->_Headers['Cache-Control'])) {
-            foreach (\Vanilla\Web\CacheControlMiddleware::getHttp10Headers($this->_Headers['Cache-Control']) as $key => $value) {
-                safeHeader("$key: $value", true);
-            }
+            \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders($this->_Headers['Cache-Control']);
         }
 
         // Empty the collection after sending

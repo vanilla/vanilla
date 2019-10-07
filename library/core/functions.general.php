@@ -3054,22 +3054,11 @@ if (!function_exists('redirectTo')) {
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
 
-        $controller = Gdn::controller();
-
-        // Send any headers that were put together.
-        if ($controller !== null) {
-            if ($statusCode === 302) {
-                // 302 redirects are TEMPORARY and we don't want them cached by the browser.
-                $controller->setHeader('Cache-Control', CacheControlMiddleware::NO_CACHE);
-            }
-
-            // Send the headers the controller has collected so far.
-            $controller->sendHeaders();
-        } elseif ($statusCode === 302) {
-            // No controller, but we still shouldn't cache temporary redirects
-            safeHeader('Cache-Control', CacheControlMiddleware::NO_CACHE);
+        if ($statusCode === 302) {
+            CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
         }
 
+        $controller = Gdn::controller();
         if ($controller !== null
             && in_array($controller->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)
             && $controller->deliveryMethod() === DELIVERY_METHOD_JSON) {

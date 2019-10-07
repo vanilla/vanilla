@@ -315,7 +315,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
 
     ->rule(TwigEnhancer::class)
-    ->addCall('setCompileCacheDirectory', [PATH_CONF . '/twig'])
+    ->addCall('setCompileCacheDirectory', [PATH_CACHE . '/twig'])
     ->setShared(true)
 
     ->rule('Gdn_Form')

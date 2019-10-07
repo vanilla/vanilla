@@ -40,6 +40,38 @@ class ComposerHelper {
     }
 
     /**
+     * Clear the twig cache.
+     */
+    private static function clearTwigCache() {
+        $cacheDir = realpath(__DIR__.'/../../cache');
+
+        // Clear twig cache if it exists.
+        $twigCache = $cacheDir . '/twig';
+        if (file_exists($twigCache)) {
+            self::deleteRecursively($twigCache);
+        }
+
+        // Due to a previous bug, the twig cache may have lived in the conf directory.
+        if (file_exists($twigCache)) {
+            self::deleteRecursively($twigCache);
+        }
+    }
+
+    /**
+     * Recursively delete a directory.
+     *
+     * @param string $root
+     */
+    private static function deleteRecursively(string $root) {
+        $dir_iterator = new \RecursiveDirectoryIterator($root);
+        $iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Trigger builds of frontend assets after a composer install.
      *
      * - Installs node_modules
@@ -108,6 +140,7 @@ class ComposerHelper {
      */
     public static function preUpdate(Event $event) {
         self::clearAddonManagerCache();
+        self::clearTwigCache();
 
         // Check for a composer-local.json.
         $composerLocalPath = './composer-local.json';

@@ -30,8 +30,22 @@ export function TranslationGridRow(props: IProps) {
                 [classes.isLast]: isLast,
             })}
         >
-            <div className={classNames(classes.leftCell)}>{leftCell}</div>
-            <div className={classNames(classes.rightCell)}>{rightCell}</div>
+            <div
+                className={classNames(classes.leftCell, {
+                    [classes.isFirst]: isFirst,
+                    [classes.isLast]: isLast,
+                })}
+            >
+                {leftCell}
+            </div>
+            <div
+                className={classNames(classes.rightCell, {
+                    [classes.isFirst]: isFirst,
+                    [classes.isLast]: isLast,
+                })}
+            >
+                {rightCell}
+            </div>
         </div>
     );
 }

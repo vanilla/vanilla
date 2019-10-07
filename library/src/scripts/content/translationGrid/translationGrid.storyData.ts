@@ -21,7 +21,7 @@ export const translationGridData: ITranslationGrid = {
         {
             id: "1",
             source: "English",
-            translation: "French",
+            translation: "",
             multiLine: true,
         },
         {
@@ -38,7 +38,9 @@ export const translationGridData: ITranslationGrid = {
         {
             id: "1",
             source: "English",
-            translation: "French",
+            translation:
+                "Description Si vous recherchez un ordinateur, vous devez prendre en compte un certain nombre de facteurs. Sera-t-il utilisé pour votre maison, votre bureau ou peut-être même votre combo de bureau à domicile? Tout d'abord, vous devrez définir un budget pour votre nouvel achat avant de décider d'acheter des ordinateurs portables ou de bureau.",
+            multiLine: true,
         },
         {
             id: "1",

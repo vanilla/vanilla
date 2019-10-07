@@ -33,7 +33,7 @@ export function TranslationGrid(props: ITranslationGrid) {
 
     const classesMeta = metasClasses();
     const classes = translationGridClasses();
-    const count = props.data.length;
+    const count = props.data.length - 1;
     const translationRows = data.map((t, i) => {
         return (
             <TranslationGridRow

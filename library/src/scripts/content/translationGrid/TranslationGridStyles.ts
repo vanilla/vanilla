@@ -4,11 +4,19 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, defaultTransition, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    colorOut,
+    defaultTransition,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, linearGradient, percent, px, translateY } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 import { userLabelVariables } from "@library/content/userLabelStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const translationGridVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("translationGrid");
@@ -25,22 +33,58 @@ export const translationGridVariables = useThemeCache(() => {
     });
 
     const cell = makeThemeVars("cell", {
+        color: globalVars.mixBgAndFg(0.22),
         paddings: {
-            vertical: 20,
-            outer: 24,
-            inner: 36,
+            inner: 20,
+            outer: 15,
         },
     });
+
     return { paddings, header, cell };
 });
 
 export const translationGridClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const formElVars = formElementsVariables();
     const vars = translationGridVariables();
     const style = styleFactory("translationGrid");
 
-    const isFirst = style("isFirst", {});
-    const isLast = style("isLast", {});
+    const innerPadding = vars.cell.paddings.inner;
+    const oneLineHeight = Math.ceil(globalVars.lineHeights.condensed * globalVars.fonts.size.medium);
+
+    const input = style("input", {
+        $nest: {
+            "&&&": {
+                border: 0,
+                borderRadius: 0,
+                fontSize: unit(globalVars.fonts.size.medium),
+                lineHeight: globalVars.lineHeights.condensed,
+                ...paddings({
+                    vertical: vars.cell.paddings.inner,
+                    left: vars.cell.paddings.outer + vars.cell.paddings.inner,
+                    right: vars.cell.paddings.inner,
+                }),
+                minHeight: unit(innerPadding * 2 + (innerPadding > oneLineHeight ? innerPadding : oneLineHeight)),
+                flexGrow: 1,
+            },
+        },
+    });
+
+    const isFirst = style("isFirst", {
+        $nest: {
+            [`.${input}.${input}.${input}`]: {
+                paddingTop: unit(vars.cell.paddings.outer - vars.paddings.vertical),
+            },
+        },
+    });
+
+    const isLast = style("isLast", {
+        $nest: {
+            [`.${input}.${input}.${input}`]: {
+                paddingBottom: unit(vars.cell.paddings.outer - vars.paddings.vertical),
+            },
+        },
+    });
 
     const root = style({});
 
@@ -59,8 +103,27 @@ export const translationGridClasses = useThemeCache(() => {
     const leftCell = style("leftCell", {
         width: percent(50),
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
+        fontSize: unit(globalVars.fonts.size.medium),
+        lineHeight: globalVars.lineHeights.condensed,
+        cursor: "default",
+        borderRight: singleBorder({
+            color: vars.cell.color,
+        }),
+        borderBottom: singleBorder({
+            color: vars.cell.color,
+        }),
+        ...paddings({
+            vertical: vars.cell.paddings.outer,
+            left: vars.cell.paddings.outer,
+            right: vars.cell.paddings.outer + vars.cell.paddings.inner,
+        }),
+        $nest: {
+            [`&.${isLast}`]: {
+                borderBottom: 0,
+            },
+        },
     });
 
     const rightCell = style("rightCell", {
@@ -68,6 +131,14 @@ export const translationGridClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        borderBottom: singleBorder({
+            color: vars.cell.color,
+        }),
+        $nest: {
+            [`&.${isLast}`]: {
+                borderBottom: 0,
+            },
+        },
     });
 
     const header = style("header", {
@@ -96,20 +167,11 @@ export const translationGridClasses = useThemeCache(() => {
         },
     });
 
-    const input = style("input", {
-        $nest: {
-            "&&&": {
-                border: 0,
-                borderRadius: 0,
-                minHeight: unit(0),
-            },
-        },
-    });
-
     const body = style("body", {
         flexGrow: 1,
         height: calc(`100% - ${unit(vars.header.height)}`),
         overflow: "auto",
+        ...paddings(vars.paddings),
     });
 
     return {

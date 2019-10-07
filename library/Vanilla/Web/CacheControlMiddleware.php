@@ -74,6 +74,12 @@ class CacheControlMiddleware {
                 $this->session->isValid() || $request->getMethod() !== 'GET' ?  self::NO_CACHE : self::PUBLIC_CACHE
             );
         }
+
+        if ($response->getHeader('Cache-Control') !== self::NO_CACHE) {
+            // Unless we havy NO_CACHE set make sure to set the vary header.
+            $response->setHeader('Vary', self::VARY_COOKIE);
+        }
+
         foreach (static::getHttp10Headers($response->getHeader('Cache-Control')) as $key => $value) {
             $response->setHeader($key, $value);
         }

@@ -624,7 +624,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
                 redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
@@ -645,8 +644,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
                 // Pass the "sessionID" to in the query so that it can be retrieved.
                 $url .= '?'.http_build_query(array_filter(['Target' => $state['target'] ?? '/', 'stashID' => $stashID]));
-                // Pass no-cache headers.
-                \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
                 // Redirect to the connect script.
                 redirectTo($url);
                 break;

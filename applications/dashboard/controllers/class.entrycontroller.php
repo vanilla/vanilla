@@ -396,7 +396,7 @@ class EntryController extends Gdn_Controller {
         $this->View = 'connect';
         $this->addDefinition('Username already exists.', t('Username already exists.'));
         $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
-
+        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         // Determine what step in the process we're at.
         $isPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
         $userSelect = $this->Form->getFormValue('UserSelect');

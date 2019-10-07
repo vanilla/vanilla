@@ -15,11 +15,13 @@ $Session = Gdn::session();
                     <?php if ($Session->isValid()) { ?>
                         <p id="SignoutWrap">
                             <script>
-                                jQuery(document).ready(function($) {
-                                    var url = $('#SignoutLink').attr('href');
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    var url = document.getElementById('SignoutLink').getAttribute('href');;
                                     if (url) {
-                                        $('#SignoutWrap').hide();
-                                        $('#LeavingWrap').show();
+                                        var signoutWrap = document.getElementById('SignoutWrap');
+                                        var leavingWrap = document.getElementById('LeavingWrap');
+                                        signoutWrap.style.display = "none"; // Hide
+                                        leavingWrap.style.display = "block"; // Show
                                         window.location.replace(url);
                                     }
                                 });

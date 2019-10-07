@@ -82,5 +82,4 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
 
         return $siteSections;
     }
-
 }

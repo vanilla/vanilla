@@ -63,12 +63,18 @@ class ComposerHelper {
      * @param string $root
      */
     private static function deleteRecursively(string $root) {
-        $dir_iterator = new \RecursiveDirectoryIterator($root);
-        $iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
 
-        foreach ($iterator as $file) {
-            unlink($file);
+        foreach ($files as $fileinfo) {
+            $deleteFunction = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $deleteFunction($fileinfo->getRealPath());
         }
+
+        // Final directory delete.
+        rmdir($root);
     }
 
     /**

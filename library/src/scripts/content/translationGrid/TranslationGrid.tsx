@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IUser, IUserRoles } from "@library/@types/api/users";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { metasClasses } from "@library/styles/metasStyles";
@@ -8,6 +8,8 @@ import { TranslationGridRow } from "@library/content/translationGrid/Translation
 import { translationGridClasses } from "@library/content/translationGrid/TranslationGridStyles";
 import { TranslationGridText } from "@library/content/translationGrid/TranslationGridText";
 import InputTextBlock from "@library/forms/InputTextBlock";
+import { AlertIcon, EditIcon } from "@library/icons/common";
+import cloneDeep from "lodash/cloneDeep";
 
 export interface ITranslation {
     id: string;
@@ -30,11 +32,15 @@ export interface ITranslationGrid {
 
 export function TranslationGrid(props: ITranslationGrid) {
     const { data, inScrollingContainer = false } = props;
-
-    const classesMeta = metasClasses();
     const classes = translationGridClasses();
-    const count = props.data.length - 1;
-    const translationRows = data.map((t, i) => {
+    const count = data.length - 1;
+    const [translations, setTranslations] = useState(data);
+    const translationKey = "newTranslation";
+    const translationRows = translations.map((t, i) => {
+        const newTranslation = translations[i][translationKey] || "";
+        const isEditing = newTranslation !== "" && newTranslation !== t.translation;
+        const notTranslated = !isEditing && t.translation === "";
+
         return (
             <TranslationGridRow
                 key={`translationGridRow-${i}`}
@@ -42,19 +48,30 @@ export function TranslationGrid(props: ITranslationGrid) {
                 isLast={i === count}
                 leftCell={<TranslationGridText text={t.source} />}
                 rightCell={
-                    <InputTextBlock
-                        wrapClassName={classes.inputWrapper}
-                        inputProps={{
-                            inputClassNames: classes.input,
-                            defaultValue: t.translation,
-                            multiline: !!t.multiLine,
-                            maxLength: t.maxLength,
-                        }}
-                        textAreaProps={{
-                            resize: "none",
-                            async: true,
-                        }}
-                    />
+                    <>
+                        {isEditing && <EditIcon className={classes.icon} />}
+                        {notTranslated && <AlertIcon className={classes.icon} />}
+                        <InputTextBlock
+                            className={classNames({ [classes.fullHeight]: t.multiLine })}
+                            wrapClassName={classNames(classes.inputWrapper, { [classes.fullHeight]: t.multiLine })}
+                            inputProps={{
+                                inputClassNames: classes.input,
+                                onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                                    const { value } = event.target;
+                                    translations[i][translationKey] = value;
+                                    setTranslations(cloneDeep(translations));
+                                },
+                                value: newTranslation !== "" ? newTranslation : t.translation,
+                                multiline: t.multiLine,
+                                maxLength: t.maxLength,
+                            }}
+                            multiLineProps={{
+                                resize: "none",
+                                async: true,
+                                className: classes.multiLine,
+                            }}
+                        />
+                    </>
                 }
             />
         );

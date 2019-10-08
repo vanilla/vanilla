@@ -14,7 +14,7 @@ export const translationGridData: ITranslationGrid = {
         },
 
         {
-            id: "1",
+            id: "2",
             source: "English",
             translation:
                 "Description Si vous recherchez un ordinateur, vous devez prendre en compte un certain nombre de facteurs. Sera-t-il utilisé pour votre maison, votre bureau ou peut-être même votre combo de bureau à domicile? Tout d'abord, vous devrez définir un budget pour votre nouvel achat avant de décider d'acheter des ordinateurs portables ou de bureau.",
@@ -22,81 +22,82 @@ export const translationGridData: ITranslationGrid = {
         },
 
         {
-            id: "1",
-            source: "English",
-            translation: "French",
-        },
-        {
-            id: "1",
-            source: "English",
-            translation: "",
-            multiLine: true,
-        },
-        {
-            id: "1",
-            source: "English",
-            translation: "French",
-        },
-        {
-            id: "1",
-            source: "English",
-            translation: "French",
-        },
-
-        {
-            id: "1",
+            id: "3",
             source:
                 "Description Si vous recherchez un ordinateur, vous devez prendre en compte un certain nombre de facteurs. Sera-t-il utilisé pour votre maison, votre bureau ou peut-être même votre combo de bureau à domicile? Tout d'abord, vous devrez définir un budget pour votre nouvel achat avant de décider d'acheter des ordinateurs portables ou de bureau.",
             translation: "French",
             multiLine: true,
         },
+
         {
-            id: "1",
+            id: "4",
+            source: "Warnings & Notes",
+            translation: "",
+        },
+        {
+            id: "5",
+            source: "English",
+            translation: "",
+            multiLine: true,
+        },
+        {
+            id: "6",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "7",
+            source: "English",
+            translation: "French",
+        },
+
+        {
+            id: "8",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "9",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "10",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "11",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "12",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "13",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "14",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "15",
             source: "English",
             translation: "French",
         },
         {
-            id: "1",
+            id: "16",
+            source: "English",
+            translation: "French",
+        },
+        {
+            id: "17",
             source: "English",
             translation: "French",
         },

@@ -13,18 +13,15 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, linearGradient, percent, px, translateY } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
-import { userLabelVariables } from "@library/content/userLabelStyles";
+import { calc, percent, translate } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const translationGridVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("translationGrid");
     const globalVars = globalVariables();
-    const { mainColors } = globalVars;
 
     const paddings = makeThemeVars("paddings", {
-        vertical: 9,
+        vertical: 8,
         horizontal: 12,
     });
 
@@ -54,7 +51,7 @@ export const translationGridClasses = useThemeCache(() => {
 
     const input = style("input", {
         $nest: {
-            "&&&": {
+            "&&": {
                 border: 0,
                 borderRadius: 0,
                 fontSize: unit(globalVars.fonts.size.medium),
@@ -64,7 +61,6 @@ export const translationGridClasses = useThemeCache(() => {
                     left: vars.cell.paddings.outer + vars.cell.paddings.inner,
                     right: vars.cell.paddings.inner,
                 }),
-                minHeight: unit(innerPadding * 2 + oneLineHeight),
                 flexGrow: 1,
             },
         },
@@ -73,7 +69,7 @@ export const translationGridClasses = useThemeCache(() => {
     const isFirst = style("isFirst", {
         $nest: {
             [`.${input}.${input}.${input}`]: {
-                paddingTop: unit(vars.cell.paddings.outer - vars.paddings.vertical),
+                paddingTop: unit(vars.cell.paddings.inner - vars.paddings.vertical),
             },
         },
     });
@@ -81,7 +77,7 @@ export const translationGridClasses = useThemeCache(() => {
     const isLast = style("isLast", {
         $nest: {
             [`.${input}.${input}.${input}`]: {
-                paddingBottom: unit(vars.cell.paddings.outer - vars.paddings.vertical),
+                paddingBottom: unit(vars.cell.paddings.inner - vars.paddings.vertical),
             },
         },
     });
@@ -131,6 +127,7 @@ export const translationGridClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        position: "relative",
         borderBottom: singleBorder({
             color: vars.cell.color,
         }),
@@ -155,14 +152,39 @@ export const translationGridClasses = useThemeCache(() => {
         width: percent(100),
     });
 
-    const headerLeft = style("headerLeft", {});
+    const headerLeft = style("headerLeft", {
+        fontWeight: globalVars.fonts.weights.bold,
+        ...paddings({
+            vertical: vars.cell.paddings.inner,
+            horizontal: vars.cell.paddings.outer + vars.paddings.horizontal,
+        }),
+    });
 
-    const headerRight = style("headerRight", {});
+    const headerRight = style("headerRight", {
+        fontWeight: globalVars.fonts.weights.bold,
+        ...paddings({
+            vertical: vars.cell.paddings.inner,
+            horizontal: vars.cell.paddings.outer + vars.paddings.horizontal,
+        }),
+    });
+
+    const fullHeight = style("fullHeight", {
+        $nest: {
+            "&&": {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "stretch",
+                flexGrow: 1,
+                height: percent(100),
+            },
+        },
+    });
 
     const inputWrapper = style("inputWrapper", {
         $nest: {
             "&&&": {
                 margin: 0,
+                minHeight: unit(oneLineHeight),
             },
         },
     });
@@ -172,6 +194,26 @@ export const translationGridClasses = useThemeCache(() => {
         height: calc(`100% - ${unit(vars.header.height)}`),
         overflow: "auto",
         ...paddings(vars.paddings),
+    });
+
+    const multiLine = style("multiLine", {
+        $nest: {
+            "&&&": {
+                minHeight: percent(100),
+            },
+        },
+    });
+
+    const iconOffset = unit(globalVars.icon.sizes.default / -2) as string;
+
+    const icon = style("icon", {
+        position: "absolute",
+        display: "block",
+        top: unit(
+            vars.cell.paddings.inner + Math.floor(globalVars.lineHeights.condensed * globalVars.fonts.size.medium) / 2,
+        ),
+        left: unit((vars.cell.paddings.outer + vars.cell.paddings.inner) / 2),
+        transform: translate(iconOffset, iconOffset),
     });
 
     return {
@@ -184,11 +226,14 @@ export const translationGridClasses = useThemeCache(() => {
         rightCell,
         header,
         headerLeft,
-        frame,
         headerRight,
+        frame,
         input,
         inputWrapper,
         body,
         inScrollContainer,
+        fullHeight,
+        multiLine,
+        icon,
     };
 });

@@ -23,7 +23,7 @@ story.add("Translation Grid", () => {
             </StoryContent>
             <div
                 style={{
-                    height: "400px",
+                    height: "600px",
                     overflow: "auto",
                     border: "solid #1EA7FD 4px",
                     width: "1028px",

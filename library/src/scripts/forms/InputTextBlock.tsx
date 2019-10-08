@@ -34,14 +34,16 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
         multiline?: boolean;
         maxLength?: number;
+        className?: string;
     };
-    textAreaProps?: {
+    multiLineProps?: {
         onResize?: (event) => {};
         rows?: number;
         maxRows?: number;
         async?: boolean;
         resize?: ResizeProperty; // for textarea only
         overflow?: OverflowProperty; // for textarea only
+        className?: string;
     };
 }
 
@@ -69,7 +71,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const classesInput = inputClasses();
         const classesInputBlock = inputBlockClasses();
 
-        const { inputProps, textAreaProps = {}, ...blockProps } = this.props;
+        const { inputProps, multiLineProps = {}, ...blockProps } = this.props;
         const classes = classNames(classesInputBlock.inputText, "inputText", inputProps.inputClassNames, {
             InputBox: this.props.legacyMode,
             [classesInput.text]: !this.props.legacyMode,
@@ -87,7 +89,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                     return !inputProps.multiline ? (
                         <input
                             id={this.id}
-                            className={classes}
+                            className={classNames(classes, inputProps.className)}
                             defaultValue={inputProps.defaultValue}
                             value={inputProps.value}
                             type={inputProps.type}
@@ -104,12 +106,12 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                         />
                     ) : (
                         <TextareaAutosize
-                            {...textAreaProps}
+                            {...multiLineProps}
                             id={this.id}
-                            className={classNames(classes, {
+                            className={classNames(classes, multiLineProps.className, {
                                 [classesInputBlock.multiLine(
-                                    textAreaProps.resize ? textAreaProps.resize : "none",
-                                    textAreaProps.overflow,
+                                    multiLineProps.resize ? multiLineProps.resize : "none",
+                                    multiLineProps.overflow,
                                 )]: inputProps.multiline,
                             })}
                             defaultValue={inputProps.defaultValue}

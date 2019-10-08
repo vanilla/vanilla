@@ -34,13 +34,13 @@ trait ThemeVariablesTrait {
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
-            $additionalVariables = array_replace_recursive($variableProvider->getVariables(), $additionalVariables);
+            $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 
         if ($additionalVariables) {
             $variables = json_decode($assetContent, true) ?? [];
 
-            $variables = array_replace_recursive($additionalVariables, $variables);
+            $variables = array_replace_recursive($variables, $additionalVariables);
             $assetContent = json_encode($variables);
         }
         return $assetContent;

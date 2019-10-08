@@ -158,36 +158,37 @@ class SsoUtils {
      */
     protected function isStateTokenValid($stateTokenData, $stateToken, $source = '') {
         $loggingContext = [
+            'source' => $source,
             'event' => 'state_token_errors',
             'timestamp' => time(),
         ];
         // Validate expected data.
         if (!is_array($stateTokenData)) {
-            $this->logger->error('Missing stateTokenData', ['source' => $source] + $loggingContext);
+            $this->logger->error('Missing stateTokenData', $loggingContext);
             return false;
         }
 
         // Validate it contains a stateToken.
         if (empty($stateTokenData['stateToken'])) {
-            $this->logger->error('Missing stateToken from stateToken Array', ['source' => $source, 'stateTokenData' => $stateTokenData] + $loggingContext);
+            $this->logger->error('Missing stateToken from stateToken Array', ['stateTokenData' => $stateTokenData] + $loggingContext);
             return false;
         }
 
         // Validate if exp exists.
         if (empty($stateTokenData['exp'])) {
-            $this->logger->error('Missing Expiry from stateTokenArray', ['source' => $source, 'stateTokenData' => $stateTokenData] + $loggingContext);
+            $this->logger->error('Missing Expiry from stateTokenArray', ['stateTokenData' => $stateTokenData] + $loggingContext);
             return false;
         }
 
         // Check for expiration.
         if ($stateTokenData['exp'] < time()) {
-            $this->logger->error('StateToken Expired', ['source' => $source, 'stateTokenExp' => $stateTokenData['exp'], 'time' => time()] + $loggingContext);
+            $this->logger->error('StateToken Expired', ['stateTokenExp' => $stateTokenData['exp'], 'time' => time()] + $loggingContext);
             return false;
         }
 
         // Check the token.
         if ($stateToken !== $stateTokenData['stateToken']) {
-            $this->logger->error('StateTokens do not match.', ['source' => $source, 'StoredStateToken' => $stateTokenData['stateToken'], 'RecievedStateToken' => $stateToken] + $loggingContext);
+            $this->logger->error('StateTokens do not match.', ['StoredStateToken' => $stateTokenData['stateToken'], 'RecievedStateToken' => $stateToken] + $loggingContext);
             return false;
         }
 

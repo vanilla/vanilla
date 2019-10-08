@@ -484,12 +484,11 @@ export function accessibleImageMenu(message?: string, className?: string) {
     );
 }
 
-export function EditIcon(props: { className?: string }) {
+export function EditIcon(props: { className?: string; title?: string }) {
     const classes = iconClasses();
-
     return (
         <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
-            <title>{t("Edit")}</title>
+            <title>{props.title ? props.title : t("Edit")}</title>
             <g transform="translate(4, 3)">
                 <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
                 <path

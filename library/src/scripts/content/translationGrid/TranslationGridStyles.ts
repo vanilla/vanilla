@@ -74,13 +74,7 @@ export const translationGridClasses = useThemeCache(() => {
         },
     });
 
-    const isLast = style("isLast", {
-        $nest: {
-            [`.${input}.${input}.${input}`]: {
-                paddingBottom: unit(vars.cell.paddings.inner - vars.paddings.vertical),
-            },
-        },
-    });
+    const isLast = style("isLast", {});
 
     const root = style({});
 
@@ -181,6 +175,7 @@ export const translationGridClasses = useThemeCache(() => {
     });
 
     const inputWrapper = style("inputWrapper", {
+        width: percent(100),
         $nest: {
             "&&&": {
                 margin: 0,
@@ -204,7 +199,7 @@ export const translationGridClasses = useThemeCache(() => {
         },
     });
 
-    const iconOffset = unit(globalVars.icon.sizes.default / -2) as string;
+    const iconOffset = globalVars.icon.sizes.default / -2;
 
     const icon = style("icon", {
         position: "absolute",
@@ -213,7 +208,12 @@ export const translationGridClasses = useThemeCache(() => {
             vars.cell.paddings.inner + Math.floor(globalVars.lineHeights.condensed * globalVars.fonts.size.medium) / 2,
         ),
         left: unit((vars.cell.paddings.outer + vars.cell.paddings.inner) / 2),
-        transform: translate(iconOffset, iconOffset),
+        transform: translate(unit(iconOffset) as string, unit(iconOffset)),
+        $nest: {
+            [`&.${isFirst}`]: {
+                transform: translate(unit(iconOffset) as string, unit(iconOffset - vars.paddings.vertical / 2)),
+            },
+        },
     });
 
     return {

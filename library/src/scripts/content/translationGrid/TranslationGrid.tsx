@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import { IUser, IUserRoles } from "@library/@types/api/users";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { metasClasses } from "@library/styles/metasStyles";
-import { rolesClasses } from "@library/content/rolesStyles";
 import classNames from "classnames";
 import { TranslationGridRow } from "@library/content/translationGrid/TranslationGridRow";
 import { translationGridClasses } from "@library/content/translationGrid/TranslationGridStyles";
@@ -10,6 +6,7 @@ import { TranslationGridText } from "@library/content/translationGrid/Translatio
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { AlertIcon, EditIcon } from "@library/icons/common";
 import cloneDeep from "lodash/cloneDeep";
+import { t } from "@library/utility/appUtils";
 
 export interface ITranslation {
     id: string;
@@ -36,34 +33,48 @@ export function TranslationGrid(props: ITranslationGrid) {
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
     const translationKey = "newTranslation";
-    const translationRows = translations.map((t, i) => {
+    const translationRows = translations.map((translation, i) => {
+        const notTranslated = !translations[i][translationKey];
         const newTranslation = translations[i][translationKey] || "";
-        const isEditing = newTranslation !== "" && newTranslation !== t.translation;
-        const notTranslated = !isEditing && t.translation === "";
+        const isEditing = newTranslation !== "" && newTranslation !== translation.translation;
+        const isFirst = i === 0;
+        const isLast = i === count;
 
         return (
             <TranslationGridRow
                 key={`translationGridRow-${i}`}
-                isFirst={i === 0}
-                isLast={i === count}
-                leftCell={<TranslationGridText text={t.source} />}
+                isFirst={isFirst}
+                isLast={isLast}
+                leftCell={<TranslationGridText text={translation.source} />}
                 rightCell={
                     <>
-                        {isEditing && <EditIcon className={classes.icon} />}
-                        {notTranslated && <AlertIcon className={classes.icon} />}
+                        {isEditing && (
+                            <EditIcon
+                                className={classNames(classes.icon, { [classes.isFirst]: isFirst })}
+                                title={t("You have unsaved changes")}
+                            />
+                        )}
+                        {notTranslated && (
+                            <AlertIcon
+                                className={classNames(classes.icon, { [classes.isFirst]: isFirst })}
+                                title={t("Not translated")}
+                            />
+                        )}
                         <InputTextBlock
-                            className={classNames({ [classes.fullHeight]: t.multiLine })}
-                            wrapClassName={classNames(classes.inputWrapper, { [classes.fullHeight]: t.multiLine })}
+                            className={classNames({ [classes.fullHeight]: translation.multiLine || isLast })}
+                            wrapClassName={classNames(classes.inputWrapper, {
+                                [classes.fullHeight]: translation.multiLine || isLast,
+                            })}
                             inputProps={{
-                                inputClassNames: classes.input,
+                                inputClassNames: classNames(classes.input, { [classes.fullHeight]: isLast }),
                                 onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                                     const { value } = event.target;
                                     translations[i][translationKey] = value;
                                     setTranslations(cloneDeep(translations));
                                 },
-                                value: newTranslation !== "" ? newTranslation : t.translation,
-                                multiline: t.multiLine,
-                                maxLength: t.maxLength,
+                                value: notTranslated ? translation.translation : newTranslation,
+                                multiline: translation.multiLine,
+                                maxLength: translation.maxLength,
                             }}
                             multiLineProps={{
                                 resize: "none",

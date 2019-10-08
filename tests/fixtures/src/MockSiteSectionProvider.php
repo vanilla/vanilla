@@ -73,7 +73,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
             $siteSectionPath = $locale.'/';
             $siteSectionName = "siteSectionName_".$locale;
             $siteSectionGroup = "mockSiteSectionGroup-1";
-            $siteSectionID = "mockSiteSection-1";
+            $siteSectionID = "mockSiteSection-".$locale;
             $siteSections[] = new MockSiteSection(
                 $siteSectionName,
                 $locale,

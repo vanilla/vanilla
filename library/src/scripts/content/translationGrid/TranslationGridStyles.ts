@@ -158,7 +158,7 @@ export const translationGridClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.bold,
         ...paddings({
             vertical: vars.cell.paddings.inner,
-            horizontal: vars.cell.paddings.outer + vars.paddings.horizontal,
+            horizontal: vars.cell.paddings.outer + vars.cell.paddings.inner,
         }),
     });
 

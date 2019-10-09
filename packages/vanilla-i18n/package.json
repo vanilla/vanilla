@@ -1,0 +1,17 @@
+{
+    "name": "@vanilla/i18n",
+    "main": "./src/index.ts",
+    "module": "./src/index.ts",
+    "version": "3.0.1",
+    "dependencies": {},
+    "peerDependencies": {
+        "react": "^16.0.0",
+        "@vanilla/utils": "^3.0.1"
+    },
+    "devDependencies": {
+        "@vanilla/tsconfig": "^3.0.1"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

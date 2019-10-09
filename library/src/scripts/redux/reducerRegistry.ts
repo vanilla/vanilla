@@ -7,47 +7,28 @@
  * @license GPL-2.0-only
  */
 
-import { onReady } from "@library/utility/appUtils";
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
-import { logError } from "@vanilla/utils";
-import { Reducer, ReducersMapObject } from "redux";
+import { Reducer, ReducersMapObject, combineReducers } from "redux";
+import getStore from "@library/redux/getStore";
 
-let haveGot = false;
-let wasReadyCalled = false;
-const reducers = {};
-
-onReady(() => {
-    wasReadyCalled = true;
-});
+const dynamicReducers = {};
 
 export function registerReducer(name: string, reducer: Reducer) {
-    if (haveGot) {
-        logError("Cannot register reducer %s after reducers applied to the store.", name);
-    } else {
-        reducers[name] = reducer;
-    }
+    dynamicReducers[name] = reducer;
+    getStore().replaceReducer(combineReducers(getReducers()));
 }
 
 export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
 }
 
-export function getReducersReady(): boolean {
-    return haveGot;
-}
-
 export function getReducers(): ReducersMapObject<any, any> {
-    haveGot = true;
-
-    if (!wasReadyCalled) {
-        logError("getReducers() was called before onReady");
-    }
-
     return {
+        // We have a few static reducers.
         users: usersReducer,
         theme: themeReducer,
-        ...reducers,
+        ...dynamicReducers,
     };
 }
 

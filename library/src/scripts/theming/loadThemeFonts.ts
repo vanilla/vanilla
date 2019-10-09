@@ -3,8 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { getDeferredStoreState } from "@library/redux/getStore";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import getStore from "@library/redux/getStore";
 import WebFont from "webfontloader";
 
 const defaultFontConfig: WebFont.Config = {
@@ -14,25 +13,23 @@ const defaultFontConfig: WebFont.Config = {
 };
 
 export function loadThemeFonts() {
-    const state = getDeferredStoreState<ICoreStoreState, null>(null);
-    if (state !== null) {
-        const assets = state.theme.assets.data || {};
-        const { fonts } = assets;
+    const state = getStore().getState();
+    const assets = state.theme.assets.data || {};
+    const { fonts } = assets;
 
-        if (fonts && fonts.length > 0) {
-            const webFontConfig: WebFont.Config = {
-                custom: {
-                    families: fonts.map(font => font.name),
-                    urls: fonts.map(font => font.url),
-                },
-            };
+    if (fonts && fonts.length > 0) {
+        const webFontConfig: WebFont.Config = {
+            custom: {
+                families: fonts.map(font => font.name),
+                urls: fonts.map(font => font.url),
+            },
+        };
 
-            if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
-                WebFont.load(webFontConfig);
-            }
-        } else {
-            // If the theme has no font config of its own, load the default.
-            WebFont.load(defaultFontConfig);
+        if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
+            WebFont.load(webFontConfig);
         }
+    } else {
+        // If the theme has no font config of its own, load the default.
+        WebFont.load(defaultFontConfig);
     }
 }

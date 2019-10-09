@@ -1,4 +1,5 @@
 openapi: 3.0.2
+info:
 paths:
   '/locales':
     get:

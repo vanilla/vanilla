@@ -39,14 +39,10 @@ export interface ILanguageDropDownProps {
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
         const showPicker = this.props.data && this.props.data.length > 1;
-        const fakeData = this.props.data.map(value => {
-            value.name = value.locale;
-            return value;
-        });
-
         if (showPicker) {
             let foundIndex = false;
             const processedChildren = this.props.data.map(language => {
+                language.name = language.locale; // remove this line once name has been added to /article/translations api
                 const selected = language.locale === this.props.selected;
                 language.selected = selected;
                 if (selected) {

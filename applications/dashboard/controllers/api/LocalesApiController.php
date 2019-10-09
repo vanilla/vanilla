@@ -5,21 +5,18 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Container\Container;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
-use Vanilla\Addon;
-use Vanilla\ApiUtils;
-use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Web\Controller;
 
 /**
  * Endpoint for getting translations.
  */
 class LocalesApiController extends Controller {
-    /**
-     * @var \Gdn_Locale
-     */
+
+    const GET_ALL_REDUX_KEY = "@@locales/GET_ALL_DONE";
+
+    /** @var \Gdn_Locale */
     private $locale;
 
     /** @var LocaleModel */

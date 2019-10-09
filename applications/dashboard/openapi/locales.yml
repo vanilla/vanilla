@@ -86,9 +86,5 @@ components:
         displayNames:
           type: object
           description: Translatable names of the
-          example: {
-            "en": "French",
-            "fr": "Français",
-            "de": "Französisch",
-          }
+          example: { "en": "French", "fr": "Français", "de": "Französisch" }
       type: object

@@ -818,17 +818,14 @@ class Gdn_Session {
         $session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
         if (!$session) {
-            $sessionID = betterRandomString(32);
-
             $session = [
-                'SessionID' => $sessionID,
                 'UserID' => Gdn::session()->UserID,
                 'DateInserted' => Gdn_Format::toDateTime(),
                 'Attributes' => [],
             ];
 
             // Save the session information to the database.
-            $sessionModel->insert($session);
+            $sessionID = $sessionModel->insert($session);
             trace("Inserting session stash $sessionID");
 
             // Save a session cookie.

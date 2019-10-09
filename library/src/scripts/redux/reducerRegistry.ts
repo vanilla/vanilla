@@ -10,7 +10,6 @@
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
 import { Reducer, ReducersMapObject, combineReducers } from "redux";
-import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
 import getStore from "@library/redux/getStore";
 
 const dynamicReducers = {};
@@ -22,7 +21,6 @@ export function registerReducer(name: string, reducer: Reducer) {
 
 export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
-    locales: ILocaleState;
 }
 
 export function getReducers(): ReducersMapObject<any, any> {
@@ -30,7 +28,6 @@ export function getReducers(): ReducersMapObject<any, any> {
         // We have a few static reducers.
         users: usersReducer,
         theme: themeReducer,
-        locales: localeReducer,
         ...dynamicReducers,
     };
 }

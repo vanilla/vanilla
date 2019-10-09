@@ -38,22 +38,6 @@ describe("metaDataFunctions", () => {
     });
 });
 
-describe("translate", () => {
-    gdn.translations.foo = "bar";
-
-    it("Translates a string", () => {
-        expect(application.translate("foo")).eq("bar");
-    });
-
-    it("Returns the default string", () => {
-        expect(application.translate("baz", "bam")).eq("bam");
-    });
-
-    it("Falls back to the string code", () => {
-        expect(application.translate("moo")).eq("moo");
-    });
-});
-
 describe("formatUrl", () => {
     it("passes absolute URLs through directly", () => {
         const paths = ["https://test.com", "//test.com", "http://test.com"];

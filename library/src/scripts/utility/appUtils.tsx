@@ -5,14 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { ComponentClass } from "react";
-import ReactDOM from "react-dom";
 import gdn from "@library/gdn";
-import { RouteProps } from "react-router";
-import { logError, PromiseOrNormalCallback, logWarning } from "@vanilla/utils";
+import { PromiseOrNormalCallback } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
-import { mountReact } from "@vanilla/react-utils";
-import { AppContext } from "@library/AppContext";
+
+// Re-exported for backwards compatibility
+export { t, translate } from "@vanilla/i18n";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -63,32 +61,6 @@ export function setMeta(key: string, value: any) {
     }
     haystack[last] = value;
 }
-
-/**
- * Translate a string into the current locale.
- *
- * @param str - The string to translate.
- * @param defaultTranslation - The default translation to use.
- *
- * @returns Returns the translation or the default.
- */
-export function translate(str: string, defaultTranslation?: string): string {
-    // Codes that begin with @ are considered literals.
-    if (str.substr(0, 1) === "@") {
-        return str.substr(1);
-    }
-
-    if (gdn.translations[str] !== undefined) {
-        return gdn.translations[str];
-    }
-
-    return defaultTranslation !== undefined ? defaultTranslation : str;
-}
-
-/**
- * The t function is an alias for translate.
- */
-export const t = translate;
 
 /**
  * Determine if a string is an allowed URL.

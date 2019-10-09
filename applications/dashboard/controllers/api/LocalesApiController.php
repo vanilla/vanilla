@@ -36,7 +36,13 @@ class LocalesApiController extends Controller {
         $this->localeModel = $localeModel;
     }
 
-    public function index() {
+    /**
+     * Get all enabled locales for the site.
+     *
+     * @return array
+     */
+    public function index(): array {
+        $this->permission();
         $out = $this->schema([":a" => $this->localeSchema()], 'out');
         $enabled = $this->getEnabledLocales();
         $this->expandDisplayNames($enabled, array_column($enabled, 'localeKey'));

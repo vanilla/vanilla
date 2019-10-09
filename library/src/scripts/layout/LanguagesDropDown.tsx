@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
+import { find } from "lodash";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 
@@ -21,7 +22,7 @@ export interface ILanguageProps extends ISelectBoxItem {
 
 export interface ILanguageDropDownProps {
     id?: string;
-    children: ILanguageProps[];
+    data: ILanguageProps[];
     titleID?: string; // set when it comes with a heading
     widthOfParent?: boolean;
     selected: any;
@@ -37,11 +38,16 @@ export interface ILanguageDropDownProps {
  */
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
-        const showPicker = this.props.children && this.props.children.length > 1;
+        const showPicker = this.props.data && this.props.data.length > 1;
+        const fakeData = this.props.data.map(value => {
+            value.name = value.locale;
+            return value;
+        });
+
         if (showPicker) {
             let foundIndex = false;
-            const processedChildren = this.props.children.map(language => {
-                const selected = language.lang === this.props.selected;
+            const processedChildren = this.props.data.map(language => {
+                const selected = language.locale === this.props.selected;
                 language.selected = selected;
                 if (selected) {
                     foundIndex = selected;

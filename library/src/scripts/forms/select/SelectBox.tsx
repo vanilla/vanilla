@@ -6,23 +6,27 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
+import { has, map } from "lodash";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
 import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 
 export interface ISelectBoxItem {
+    [x: string]: string | undefined;
     name: string;
     className?: string;
     onClick?: () => {};
     selected?: boolean;
     outdated?: boolean;
     lang?: string;
+    url?: string;
 }
 
 interface IProps {
@@ -83,48 +87,65 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
     };
 
     public render() {
+        const checkURL = has(this.props.children[0], "url");
         const classes = selectBoxClasses();
         const classesDropDown = dropDownClasses();
         const classesMetas = metasClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
-            return (
-                <DropDownItemButton
-                    key={this.props.id + "-item" + i}
-                    className={classNames({ isSelected: child.selected })}
-                    name={child.name}
-                    onClick={this.handleClick.bind(this, child, i)}
-                    disabled={i === this.state.selectedIndex}
-                    clickData={child}
-                    index={i}
-                    current={selected}
-                    lang={child.lang}
-                    buttonClassName={classNames(
-                        "dropDownItem-button",
-                        "selectBox-buttonItem",
-                        classesDropDown.action,
-                        classes.buttonItem,
-                        {
-                            isInModal: this.props.openAsModal,
-                        },
-                    )}
-                >
-                    <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
-                        {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
-                        {!selected && (
-                            <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
-                                {` `}
+
+            if (!checkURL) {
+                return (
+                    <DropDownItemButton
+                        key={this.props.id + "-item" + i}
+                        className={classNames({ isSelected: child.selected })}
+                        name={child.name}
+                        onClick={this.handleClick.bind(this, child, i)}
+                        disabled={i === this.state.selectedIndex}
+                        clickData={child}
+                        index={i}
+                        current={selected}
+                        lang={child.lang}
+                        buttonClassName={classNames(
+                            "dropDownItem-button",
+                            "selectBox-buttonItem",
+                            classesDropDown.action,
+                            classes.buttonItem,
+                            {
+                                isInModal: this.props.openAsModal,
+                            },
+                        )}
+                    >
+                        <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
+                            {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
+                            {!selected && (
+                                <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
+                                    {` `}
+                                </span>
+                            )}
+                        </span>
+                        <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{child.name}</span>
+                        {child.outdated && (
+                            <span
+                                className={classNames("selectBox-outdated", classesMetas.metaStyle, classes.outdated)}
+                            >
+                                {t("(Outdated)")}
                             </span>
                         )}
-                    </span>
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{child.name}</span>
-                    {child.outdated && (
-                        <span className={classNames("selectBox-outdated", classesMetas.metaStyle, classes.outdated)}>
-                            {t("(Outdated)")}
-                        </span>
-                    )}
-                </DropDownItemButton>
-            );
+                    </DropDownItemButton>
+                );
+            } else {
+                return (
+                    <DropDownItemLink
+                        key={i}
+                        name={child.locale}
+                        to={child.url}
+                        className={classNames({ isSelected: child.selected })}
+                        lang={child.locale}
+                        onClick={this.handleClick.bind(this, child, i)}
+                    />
+                );
+            }
         });
         const buttonContents =
             this.state.selectedItem && this.state.selectedItem.name ? (
@@ -140,26 +161,37 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
             >
                 {"label" in this.props && <span className="selectBox-label sr-only">{this.props.label}</span>}
                 <div className="selectBox-content">
-                    <DropDown
-                        id={this.state.id}
-                        className={classNames(
-                            "selectBox-dropDown",
-                            "dropDownItem-verticalPadding",
-                            classesDropDown.verticalPadding,
-                        )}
-                        name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
-                        buttonContents={buttonContents}
-                        buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
-                        contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
-                        buttonBaseClass={this.props.buttonBaseClass}
-                        renderAbove={this.props.renderAbove}
-                        renderLeft={this.props.renderLeft}
-                        openAsModal={this.props.openAsModal}
-                        flyoutType={FlyoutType.LIST}
-                        selfPadded={true}
-                    >
-                        {selectItems}
-                    </DropDown>
+                    {!checkURL ? (
+                        <DropDown
+                            id={this.state.id}
+                            className={classNames(
+                                "selectBox-dropDown",
+                                "dropDownItem-verticalPadding",
+                                classesDropDown.verticalPadding,
+                            )}
+                            name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
+                            buttonContents={buttonContents}
+                            buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
+                            contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
+                            buttonBaseClass={this.props.buttonBaseClass}
+                            renderAbove={this.props.renderAbove}
+                            renderLeft={this.props.renderLeft}
+                            openAsModal={this.props.openAsModal}
+                            flyoutType={FlyoutType.LIST}
+                            selfPadded={true}
+                        >
+                            {selectItems}
+                        </DropDown>
+                    ) : (
+                        <DropDown
+                            buttonContents={buttonContents}
+                            buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
+                            contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
+                            buttonBaseClass={this.props.buttonBaseClass}
+                        >
+                            {selectItems}
+                        </DropDown>
+                    )}
                 </div>
             </div>
         );

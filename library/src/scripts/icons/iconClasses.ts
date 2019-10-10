@@ -298,6 +298,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
+    const alertIcon = style("alertIcon", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -324,5 +329,6 @@ export const iconClasses = useThemeCache(() => {
         deleteIcon,
         editIcon,
         discussionIcon,
+        alertIcon,
     };
 });

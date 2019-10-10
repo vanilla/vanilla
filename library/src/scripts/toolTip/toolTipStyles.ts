@@ -20,17 +20,12 @@ export const tooltipVariables = useThemeCache(() => {
         default: 205,
     });
 
-    const border = makeThemeVars("radius", {
-        radius: 6,
-    });
-
     const nub = makeThemeVars("nub", {
         width: 12,
     });
 
     return {
         sizes,
-        border,
         nub,
     };
 });
@@ -47,7 +42,7 @@ export const toolTipClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.fg),
         backgroundColor: colorOut(globalVars.mainColors.bg),
         lineHeight: globalVars.lineHeights.base,
-        ...borders(vars.border),
+        ...borders(),
         ...paddings({
             all: globalVars.fonts.size.medium,
         }),
@@ -57,15 +52,16 @@ export const toolTipClasses = useThemeCache(() => {
     const nubPosition = style("nubPosition", {
         position: "absolute",
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
         width: unit(vars.nub.width * 2),
-        height: unit(vars.nub.width),
-        ...userSelect(),
+        height: unit(vars.nub.width * 2),
         transform: translateX("-50%"),
+        marginLeft: unit(vars.nub.width),
         pointerEvents: "none",
         zIndex: 1,
+        ...userSelect(),
     });
 
     const nub = style("nub", {
@@ -81,13 +77,16 @@ export const toolTipClasses = useThemeCache(() => {
         }),
         boxShadow: globalVars.overlay.dropShadow,
         background: colorOut(globalVars.mainColors.bg),
+        zIndex: 1,
         $nest: {
             [`&.isUp`]: {
-                marginTop: unit(vars.nub.width - globalVars.border.width * 2 + 1),
-                transform: `rotate(-45deg) translateY(-50%)`,
+                // marginTop: unit(vars.nub.width - globalVars.border.width),
+                // transform: `rotate(-45deg) translateY(-50%)`,
+                transform: `rotate(-45deg)`,
             },
             [`&.isDown`]: {
-                transform: translateY(unit(vars.nub.width) as string),
+                // transform: `rotate(45deg)  translateY(unit(vars.nub.width) )`,
+                transform: `rotate(135deg)`,
             },
         },
     });

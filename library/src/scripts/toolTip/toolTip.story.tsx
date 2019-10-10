@@ -23,6 +23,7 @@ story.add("Tool Tips", () => {
             <div
                 style={{
                     height: "calc(100vh - 100px)",
+                    minHeight: "500px",
                     width: "100%",
                     border: "solid #1EA7FD 4px",
                     display: "flex",

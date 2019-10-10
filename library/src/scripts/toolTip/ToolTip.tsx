@@ -22,17 +22,26 @@ import ReactDOM from "react-dom";
 import { mountModal } from "@library/modal/Modal";
 import { ConvertDiscussionModal } from "@knowledge/articleDiscussion/ConvertDiscussionModal";
 import Portal from "@reach/portal";
-import { toolTipClasses } from "@library/toolTip/toolTipStyles";
+import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
-const trianglePosition = (triggerRect, hasOverflow) => {
+const nubPosition = (triggerRect, hasOverflow) => {
+    const toolTipVars = tooltipVariables();
+    const globalVars = globalVariables();
+
+    const overTriggerPosition =
+        triggerRect.top - toolTipVars.nub.width * 2 + globalVars.border.width * 2 + window.scrollY;
+    const underTriggerPosition = triggerRect.bottom - globalVars.border.width * 2 + window.scrollY;
+
     return {
-        left: triggerRect && triggerRect.left - 10 + triggerRect.width / 2,
-        top: hasOverflow ? triggerRect.top - 10 + 2 + window.scrollY : triggerRect.bottom + window.scrollY,
+        left: triggerRect.left + triggerRect.width / 2 - toolTipVars.nub.width,
+        top: hasOverflow ? overTriggerPosition : underTriggerPosition,
     };
 };
 
 function TriangleTooltip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
+    const globalVars = globalVariables();
     const { children, label, ariaLabel } = props;
 
     // get the props from useTooltip
@@ -43,25 +52,26 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
 
     const [hasOverflow, setHasOverflow] = useState(false);
     const classes = toolTipClasses();
+    const toolTipVars = tooltipVariables();
+    const borderOffset = globalVars.border.width * 2;
 
-    const toolTipPosition = (triggerRect, tooltipRect) => {
-        const triangleHeight = 10;
-        const borderWidth = 2;
-
+    const toolBoxPosition = (triggerRect, tooltipRect) => {
+        const triangleHeight = toolTipVars.nub.width / 2;
         const triggerCenter = triggerRect.left + triggerRect.width / 2;
         const left = triggerCenter - tooltipRect.width / 2;
         const maxLeft = window.innerWidth - tooltipRect.width - 2;
-        const maxBottom = window.innerHeight - tooltipRect.height - borderWidth + triangleHeight;
-        const hasOverflow = triggerRect.bottom + tooltipRect.height + borderWidth + triangleHeight > maxBottom;
+        const hasOverflow = triggerRect.bottom + tooltipRect.height + triangleHeight > window.innerHeight;
 
         setHasOverflow(hasOverflow);
+
+        const overTriggerPosition =
+            triggerRect.top - tooltipRect.height + borderOffset - toolTipVars.nub.width + window.scrollY;
+        const underTriggerPosition = triggerRect.bottom - borderOffset + toolTipVars.nub.width + window.scrollY;
 
         return {
             position: "absolute",
             left: Math.min(Math.max(2, left), maxLeft) + window.scrollX,
-            top: hasOverflow
-                ? triggerRect.top - triangleHeight - tooltipRect.height + window.scrollY
-                : triggerRect.bottom + triangleHeight + window.scrollY,
+            top: hasOverflow ? overTriggerPosition : underTriggerPosition,
         };
     };
 
@@ -75,7 +85,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
                 // positioning logic simpler here instead of needing to consider
                 // the popup's position relative to the trigger and collisions
                 <Portal>
-                    <div className={classes.nubPosition} style={trianglePosition(triggerRect, hasOverflow) as any}>
+                    <div className={classes.nubPosition} style={nubPosition(triggerRect, hasOverflow) as any}>
                         <div className={classNames(classes.nub, hasOverflow ? "isDown" : "isUp")} />
                     </div>
                 </Portal>
@@ -84,7 +94,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
                 {...tooltip}
                 label={label}
                 ariaLabel={ariaLabel ? ariaLabel : label}
-                position={toolTipPosition}
+                position={toolBoxPosition}
                 className={classes.box}
             />
         </>

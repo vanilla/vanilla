@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { has } from "lodash";
+import { has, map } from "lodash";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -188,6 +188,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                             buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
                             contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
                             buttonBaseClass={this.props.buttonBaseClass}
+                            flyoutType={FlyoutType.LIST}
                         >
                             {selectItems}
                         </DropDown>

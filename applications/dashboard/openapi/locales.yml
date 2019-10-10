@@ -1,6 +1,20 @@
 openapi: 3.0.2
 info:
 paths:
+  '/locales':
+    get:
+      summary: Get all enabled locales on the site.
+      tags:
+        - Locales
+      responses:
+        '200':
+          description: A list of enabled locales
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Locale'
   '/locales/translations/{locale}':
     get:
       summary: Get all of the application's translation strings.
@@ -54,3 +68,24 @@ components:
         Whether or not output is cached.
       schema:
         type: string
+  schemas:
+    Locale:
+      properties:
+        localeID:
+          description: The key of the locale addon.
+          minLength: 1
+          type: string
+          example: vf_fr_CA,
+        localeKey:
+          description: The normalized key of the locale without any regional modifier.
+          type: string
+          example: fr
+        regionalKey:
+          description: The normalized key of the locale with a regional modifier if it exists.
+          type: string
+          example: fr_CA
+        displayNames:
+          type: object
+          description: Translatable names of the
+          example: { "en": "French", "fr": "Français", "de": "Französisch" }
+      type: object

@@ -4,7 +4,7 @@
  */
 
 import { createStore, compose, applyMiddleware, combineReducers, Store, AnyAction } from "redux";
-import { getReducers, getReducersReady } from "@library/redux/reducerRegistry";
+import { getReducers, ICoreStoreState } from "@library/redux/reducerRegistry";
 import thunk from "redux-thunk";
 
 // There may be an initial state to import.
@@ -30,7 +30,7 @@ const enhancer = composeEnhancers(applyMiddleware(...middleware));
 // Build the store, add devtools extension support if it's available.
 let store;
 
-export default function getStore<S>(): Store<S> {
+export default function getStore<S = ICoreStoreState>(): Store<S, any> {
     if (store === undefined) {
         // Get our reducers.
         const reducer = combineReducers(getReducers());
@@ -41,12 +41,4 @@ export default function getStore<S>(): Store<S> {
     }
 
     return store;
-}
-
-export function getDeferredStoreState<S, T>(fallback: T): S | T {
-    if (getReducersReady()) {
-        return getStore<S>().getState();
-    } else {
-        return fallback;
-    }
 }

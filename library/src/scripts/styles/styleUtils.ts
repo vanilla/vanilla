@@ -6,9 +6,8 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { style } from "typestyle";
-import { getDeferredStoreState } from "@library/redux/getStore";
+import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
@@ -71,9 +70,9 @@ export function styleFactory(componentName: string) {
  */
 export function useThemeCache<Cb>(callback: Cb): Cb {
     const makeCacheKey = (...args) => {
-        const storeState = getDeferredStoreState<ICoreStoreState, null>(null);
+        const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
-        const status = storeState ? storeState.theme.assets.status : "not loaded yet";
+        const status = storeState.theme.assets.status;
         const cacheKey = themeKey + status;
         return cacheKey + JSON.stringify(args);
     };

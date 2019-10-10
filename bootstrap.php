@@ -9,10 +9,12 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
+use Vanilla\Web\Page;
 use Vanilla\Web\TwigEnhancer;
 
 if (!defined('APPLICATION')) exit();
@@ -315,7 +317,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
 
     ->rule(TwigEnhancer::class)
-    ->addCall('setCompileCacheDirectory', [PATH_CONF . '/twig'])
+    ->addCall('setCompileCacheDirectory', [PATH_CACHE . '/twig'])
     ->setShared(true)
 
     ->rule('Gdn_Form')
@@ -366,6 +368,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('setDispatchEventName', ['SchedulerDispatch'])
     ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
     ->setShared(true)
+
+    // Controller data preloading
+    ->rule(Page::class)
+    ->setInherit(true)
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
+    ->rule(Gdn_Controller::class)
+    ->setInherit(true)
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
 ;
 
 // Run through the bootstrap with dependencies.

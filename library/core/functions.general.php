@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Web\CacheControlMiddleware;
+
 if (!function_exists('absoluteSource')) {
     /**
      * Get the full url of a source path relative to a base url.
@@ -3051,6 +3053,10 @@ if (!function_exists('redirectTo')) {
         // Encode backslashes because most modern browsers convert backslashes to slashes.
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
+
+        if ($statusCode === 302) {
+            CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
+        }
 
         if (Gdn::controller() !== null
             && in_array(Gdn::controller()->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)

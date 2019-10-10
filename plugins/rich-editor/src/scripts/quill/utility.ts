@@ -14,6 +14,7 @@ import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { logDebug } from "@vanilla/utils";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
+import Link from "quill/formats/link";
 
 interface IBoundary {
     start: number;
@@ -277,6 +278,8 @@ export function getBlotAtIndex<T extends Blot>(
 
 const MIN_MENTION_LENGTH = 1;
 
+const EXCLUDED_MENTION_BLOTS = [CodeBlockBlot, CodeBlot, Link];
+
 /**
  * Get the range of text to convert to a mention.
  *
@@ -296,11 +299,10 @@ export function getMentionRange(quill: Quill, currentSelection: RangeStatic | nu
         return null;
     }
 
-    if (
-        rangeContainsBlot(quill, CodeBlockBlot, currentSelection) ||
-        rangeContainsBlot(quill, CodeBlot, currentSelection)
-    ) {
-        return null;
+    for (const excludedBlot of EXCLUDED_MENTION_BLOTS) {
+        if (rangeContainsBlot(quill, excludedBlot, currentSelection)) {
+            return null;
+        }
     }
 
     // Get details about our current leaf (likely a TextBlot).

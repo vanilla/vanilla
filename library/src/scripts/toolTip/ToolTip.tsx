@@ -23,17 +23,12 @@ import { mountModal } from "@library/modal/Modal";
 import { ConvertDiscussionModal } from "@knowledge/articleDiscussion/ConvertDiscussionModal";
 import Portal from "@reach/portal";
 import { toolTipClasses } from "@library/toolTip/toolTipStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 const trianglePosition = (triggerRect, hasOverflow) => {
     return {
         left: triggerRect && triggerRect.left - 10 + triggerRect.width / 2,
         top: hasOverflow ? triggerRect.top - 10 + 2 + window.scrollY : triggerRect.bottom + window.scrollY,
-        position: "absolute",
-        width: 0,
-        height: 0,
-        borderLeft: "10px solid transparent",
-        borderRight: "10px solid transparent",
-        borderBottom: "10px solid black",
     };
 };
 
@@ -65,7 +60,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
             position: "absolute",
             left: Math.min(Math.max(2, left), maxLeft) + window.scrollX,
             top: hasOverflow
-                ? triggerRect.top - triangleHeight - tooltipRect.height - borderWidth + window.scrollY
+                ? triggerRect.top - triangleHeight - tooltipRect.height + window.scrollY
                 : triggerRect.bottom + triangleHeight + window.scrollY,
         };
     };
@@ -73,16 +68,18 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
     return (
         <>
             {cloneElement(children as any, trigger)}
-            {/*{isVisible && triggerRect && (*/}
-            {/*    // The Triangle. We position it relative to the trigger, not the popup*/}
-            {/*    // so that collisions don't have a triangle pointing off to nowhere.*/}
-            {/*    // Using a Portal may seem a little extreme, but we can keep the*/}
-            {/*    // positioning logic simpler here instead of needing to consider*/}
-            {/*    // the popup's position relative to the trigger and collisions*/}
-            {/*    <Portal>*/}
-            {/*        <div aria-hidden={true} style={trianglePosition(triggerRect, hasOverflow)} />*/}
-            {/*    </Portal>*/}
-            {/*)}*/}
+            {isVisible && triggerRect && (
+                // The Triangle. We position it relative to the trigger, not the popup
+                // so that collisions don't have a triangle pointing off to nowhere.
+                // Using a Portal may seem a little extreme, but we can keep the
+                // positioning logic simpler here instead of needing to consider
+                // the popup's position relative to the trigger and collisions
+                <Portal>
+                    <div className={classes.nubPosition} style={trianglePosition(triggerRect, hasOverflow) as any}>
+                        <div className={classNames(classes.nub, hasOverflow ? "isDown" : "isUp")} />
+                    </div>
+                </Portal>
+            )}
             <TooltipPopup
                 {...tooltip}
                 label={label}

@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { borders, paddings, singleBorder, unit, userSelect } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { translateX, translateY } from "csx";
+import { translateX } from "csx";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");
@@ -37,6 +37,7 @@ export const toolTipClasses = useThemeCache(() => {
     const shadow = shadowHelper();
 
     const box = style("box", {
+        position: "absolute",
         fontSize: unit(globalVars.fonts.size.medium),
         width: unit(vars.sizes.default),
         color: colorOut(globalVars.mainColors.fg),
@@ -80,12 +81,9 @@ export const toolTipClasses = useThemeCache(() => {
         zIndex: 1,
         $nest: {
             [`&.isUp`]: {
-                // marginTop: unit(vars.nub.width - globalVars.border.width),
-                // transform: `rotate(-45deg) translateY(-50%)`,
                 transform: `rotate(-45deg)`,
             },
             [`&.isDown`]: {
-                // transform: `rotate(45deg)  translateY(unit(vars.nub.width) )`,
                 transform: `rotate(135deg)`,
             },
         },

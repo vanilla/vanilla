@@ -41,7 +41,7 @@ story.add("Tool Tips", () => {
                                 "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
                             }
                         >
-                            <span tabIndex={0} style={{ width: "100%", textAlign: "center" }}>
+                            <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                                 Center
                             </span>
                         </ToolTip>
@@ -63,7 +63,7 @@ story.add("Tool Tips", () => {
                             "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
                         }
                     >
-                        <span tabIndex={0} style={{ width: "100%", textAlign: "center" }}>
+                        <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                             Top Left
                         </span>
                     </ToolTip>
@@ -84,7 +84,7 @@ story.add("Tool Tips", () => {
                             "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
                         }
                     >
-                        <span tabIndex={0} style={{ width: "100%", textAlign: "center" }}>
+                        <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                             Top Right
                         </span>
                     </ToolTip>
@@ -106,7 +106,7 @@ story.add("Tool Tips", () => {
                             "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
                         }
                     >
-                        <span tabIndex={0} style={{ width: "100%", textAlign: "center" }}>
+                        <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                             Bottom Left
                         </span>
                     </ToolTip>
@@ -127,7 +127,7 @@ story.add("Tool Tips", () => {
                             "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
                         }
                     >
-                        <span tabIndex={0} style={{ width: "100%", textAlign: "center" }}>
+                        <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                             Bottom Left
                         </span>
                     </ToolTip>

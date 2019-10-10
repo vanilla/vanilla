@@ -4,26 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import IndependentSearch from "@library/features/search/IndependentSearch";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
-import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import FlexSpacer from "@library/layout/FlexSpacer";
-import Heading from "@library/layout/Heading";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { splashClasses, splashVariables } from "@library/splash/splashStyles";
-import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { cloneElement, ReactElement, useState } from "react";
-import Tooltip, { useTooltip, TooltipPopup } from "@reach/tooltip";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { url } from "csx";
-import ReactDOM from "react-dom";
-import { mountModal } from "@library/modal/Modal";
-import { ConvertDiscussionModal } from "@knowledge/articleDiscussion/ConvertDiscussionModal";
+import { useTooltip, TooltipPopup } from "@reach/tooltip";
 import Portal from "@reach/portal";
 import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 const nubPosition = (triggerRect, hasOverflow) => {
@@ -69,7 +54,6 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
         const underTriggerPosition = triggerRect.bottom - borderOffset + toolTipVars.nub.width + window.scrollY;
 
         return {
-            position: "absolute",
             left: Math.min(Math.max(2, left), maxLeft) + window.scrollX,
             top: hasOverflow ? overTriggerPosition : underTriggerPosition,
         };

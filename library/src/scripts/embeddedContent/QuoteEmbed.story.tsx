@@ -29,7 +29,7 @@ const dummyUser: IUserFragment = {
     photoUrl: "https://us.v-cdn.net/5018160/uploads/userpics/809/nHZP3CA8JMR2H.jpg",
     userID: 4,
     dateLastActive: "2019-02-10T23:54:14+00:00",
-    title: "Staff",
+    label: "Staff",
 };
 
 const dummyDate = "2019-02-10T23:54:14+00:00";

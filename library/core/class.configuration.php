@@ -19,6 +19,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';
 
+
     /** @var string  */
     public $NotFound = 'NOT_FOUND';
 
@@ -327,6 +328,26 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
+     * Split a configuration key into individual pieces by dots.
+     *
+     * @param string $key The key.
+     * @return array The peices of the key.
+     */
+    private function splitConfigKey(string $key): array {
+        $keys = explode('.', $key);
+        if (!$this->splitting) {
+            $firstKey = $keys[0];
+            if ($firstKey == $this->defaultGroup) {
+                $keys = [array_shift($keys), implode('.', $keys)];
+            } else {
+                $keys = [$key];
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *
      * @param string $name The name of the configuration setting to get. If the setting is contained
@@ -341,17 +362,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             return $this->Data;
         }
 
-        $keys = explode('.', $name);
-        // If splitting is off, HANDLE IT
-        if (!$this->splitting) {
-//         $FirstKey = getValue(0, $Keys);
-            $firstKey = $keys[0];
-            if ($firstKey == $this->defaultGroup) {
-                $keys = [array_shift($keys), implode('.', $keys)];
-            } else {
-                $keys = [$name];
-            }
-        }
+        $keys = $this->splitConfigKey($name);
         $keyCount = count($keys);
 
         $value = $this->Data;
@@ -364,6 +375,36 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
 
         return $value;
+    }
+
+    /**
+     * Check if a configuration key exists.
+     *
+     * @param string $name The name of the configuration setting to get. If the setting is contained
+     * within an associative array, use dot denomination to get the setting. ie.
+     * <code>$this->configKeyExists('Database.Host')</code> would check <code>$Configuration[$Group]['Database']['Host']</code>.
+     *
+     * @return bool Whether or not the config key is defined.
+     */
+    public function configKeyExists(string $name): bool {
+        // Shortcut, get the whole config
+        if ($name == '.') {
+            return true;
+        }
+
+        $keys = $this->splitConfigKey($name);
+        $keyCount = count($keys);
+
+        $value = $this->Data;
+        for ($i = 0; $i < $keyCount; ++$i) {
+            if (is_array($value) && array_key_exists($keys[$i], $value)) {
+                $value = $value[$keys[$i]];
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -593,7 +634,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * This array should be a hierarchical Vanilla config.
      *
-     * @param string $configData An array containing the configuration data
+     * @param array $configData An array containing the configuration data
      * @param string $tag A string descriptor of this config set
      * @param string $name The name of the variable and initial group settings.
      *   Note: When $name is 'Configuration' then the data will be set to the root of the config.
@@ -880,7 +921,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         $save = [];
         foreach ($name as $key => $value) {
-            if (!$this->get($key)) {
+            if (!$this->configKeyExists($key)) {
                 $save[$key] = $value;
             }
         }

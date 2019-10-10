@@ -93,8 +93,7 @@ export function _mountComponents(parent: Element) {
                 </AppContext>,
                 node,
                 undefined,
-                // registeredComponent.moun
-                { overwrite: true },
+                registeredComponent.mountOptions,
             );
         } else {
             logError("Could not find component %s.", name);

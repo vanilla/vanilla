@@ -19,7 +19,7 @@ export const typographyClasses = useThemeCache(() => {
     const vars = containerVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const articleTitle = style("articleTitle", {});
+    const largeTitle = style("largeTitle", {});
 
     const pageTitle = style(
         "pageTitle",
@@ -29,13 +29,18 @@ export const typographyClasses = useThemeCache(() => {
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
             $nest: {
                 ...lineHeightAdjustment(),
-                [`&.${articleTitle}`]: {
-                    fontSize: unit(globalVars.fonts.size.articleTitle),
+                [`&.${largeTitle}`]: {
+                    fontSize: unit(globalVars.fonts.size.largeTitle),
                 },
             },
         } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.mobile.size.title),
+            $nest: {
+                [`&.${largeTitle}`]: {
+                    fontSize: unit(globalVars.fonts.mobile.size.title),
+                },
+            },
         }),
     );
 
@@ -48,7 +53,7 @@ export const typographyClasses = useThemeCache(() => {
     });
 
     return {
-        articleTitle,
+        largeTitle,
         pageTitle,
         subTitle,
         componentSubTitle,

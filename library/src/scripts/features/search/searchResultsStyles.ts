@@ -18,6 +18,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { metasVariables } from "@library/styles/metasStyles";
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
+import { embedMenuMediaQueries } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -91,15 +93,21 @@ export const searchResultsClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
+    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style({
-        display: "block",
-        position: "relative",
-        borderTop: singleBorder({
-            color: vars.separator.fg,
-            width: vars.separator.width,
+    const root = style(
+        {
+            display: "block",
+            position: "relative",
+            borderTop: singleBorder({
+                color: vars.separator.fg,
+                width: vars.separator.width,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            borderTop: 0,
         }),
-    });
+    );
     const noResults = style("noResults", {
         fontSize: globalVars.userContent.font.sizes.default,
         ...paddings({

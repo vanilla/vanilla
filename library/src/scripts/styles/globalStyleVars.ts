@@ -147,8 +147,8 @@ export const globalVariables = useThemeCache(() => {
             large: 16,
             medium: 14,
             small: 12,
-            title: 32,
-            smallTitle: 22,
+            articleTitle: 32,
+            title: 22,
             subTitle: 18,
         },
 

@@ -96,7 +96,11 @@ trait SearchRecordTypeTrait {
     }
 
     /**
-     * Check if sphinx index template is enabled on infrastructure
+     * Check if sphinx index template is enabled on infrastructure.
+     * Note: We just want to double check if 'knowledgearticle' and 'groups'
+     *       templates are enabled properly.
+     *       If ''standard' template is OFF for some reason  - it should/can break the search
+     *       and we need to enable it manually. This case is not 'acceptable'.
      *
      * @return bool
      */

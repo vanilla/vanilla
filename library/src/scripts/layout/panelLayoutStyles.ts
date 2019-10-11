@@ -76,7 +76,7 @@ export const layoutVariables = useThemeCache(() => {
         extraPadding: {
             top: 32,
             noBreadcrumbs: {
-                top: 16,
+                top: 30,
             },
         },
         largePadding: {

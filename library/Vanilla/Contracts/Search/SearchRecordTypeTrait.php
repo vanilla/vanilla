@@ -30,7 +30,8 @@ trait SearchRecordTypeTrait {
             'GUID_MULTIPLIER',
             'SUB_KEY',
             'CHECKBOX_LABEL',
-            'PROVIDER_GROUP'
+            'PROVIDER_GROUP',
+            'INFRASTRUCTURE_TEMPLATE',
         ];
     }
 
@@ -91,7 +92,26 @@ trait SearchRecordTypeTrait {
      * @inheritdoc
      */
     public function getIndexName(): string {
-        return self::SPHINX_INDEX;
+        return $this->templateExists() ? self::SPHINX_INDEX : '';
+    }
+
+    /**
+     * Check if sphinx index template is enabled on infrastructure
+     *
+     * @return bool
+     */
+    private function templateExists(): bool {
+        if (
+            self::PROVIDER_GROUP === 'sphinx'
+            && self::INFRASTRUCTURE_TEMPLATE !== 'standard'
+            && class_exists('Infrastructure')
+        ) {
+            $enabledTemplates = c('Plugins.Sphinx.Templates');
+            if (is_array($enabledTemplates) && !array_key_exists(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

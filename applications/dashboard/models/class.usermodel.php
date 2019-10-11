@@ -2031,7 +2031,7 @@ class UserModel extends Gdn_Model {
                 break;
         }
 
-        if ($userID) {
+        if ($userID && is_numeric($userID)) {
             $this->EventArguments['UserID'] = $userID;
             $this->fireEvent('AfterRegister');
         }

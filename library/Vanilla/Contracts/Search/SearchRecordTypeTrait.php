@@ -101,13 +101,12 @@ trait SearchRecordTypeTrait {
      * @return bool
      */
     private function templateExists(): bool {
-        if (
-            self::PROVIDER_GROUP === 'sphinx'
+        if (self::PROVIDER_GROUP === 'sphinx'
             && self::INFRASTRUCTURE_TEMPLATE !== 'standard'
             && class_exists('Infrastructure')
         ) {
             $enabledTemplates = c('Plugins.Sphinx.Templates');
-            if (is_array($enabledTemplates) && !array_key_exists(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)){
+            if (is_array($enabledTemplates) && !array_key_exists(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)) {
                 return false;
             }
         }

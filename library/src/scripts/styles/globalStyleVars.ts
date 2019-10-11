@@ -267,7 +267,7 @@ export const globalVariables = useThemeCache(() => {
         dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
         bg: overlayBg,
         border: {
-            color: mixBgAndFg(0.1),
+            color: border.color,
             radius: border.radius,
         },
         fullPageHeadingSpacer: 32,

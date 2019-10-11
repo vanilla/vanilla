@@ -190,22 +190,34 @@ class DiscussionController extends VanillaController {
 
         $PageNumber = pageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);
-        $this->_SetOpenGraph();
-        if ($PageNumber == 1) {
-            $this->description(sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
-            // Add images to head for open graph
-            $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
-        } else {
+        if ($PageNumber != 1) {
             $this->Data['Title'] .= sprintf(t(' - Page %s'), pageNumber($this->Offset, $Limit));
-
-            $FirstComment = $this->data('Comments')->firstRow();
-            $FirstBody = val('Body', $FirstComment);
-            $FirstFormat = val('Format', $FirstComment);
-            $this->description(sliceParagraph(Gdn_Format::plainText($FirstBody, $FirstFormat), 160));
-            // Add images to head for open graph
-            $Dom = pQuery::parseStr(Gdn_Format::to($FirstBody, $FirstFormat));
         }
 
+        // Set open graph and meta data depending on the page and permalink we are on.
+        $this->_SetOpenGraph();
+
+        // Comment permalink: Use the comment content.
+        if (isset($this->commentID)) {
+            $LinkComment = Gdn_DataSet::index($this->data('Comments'), 'CommentID')[$this->commentID];
+
+            $this->description(sliceParagraph(Gdn_Format::plainText($LinkComment->Body, $LinkComment->Format), 160));
+            $Dom = pQuery::parseStr(Gdn_Format::to($LinkComment->Body, $LinkComment->Format));
+
+        // First page: Use the discussion post.
+        } elseif ($PageNumber == 1) {
+            $this->description(sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
+            $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
+
+        // Any other page: Use the first comment on that page.
+        } else {
+            $FirstComment = $this->data('Comments')->firstRow();
+
+            $this->description(sliceParagraph(Gdn_Format::plainText($FirstComment->Body, $FirstComment->Format), 160));
+            $Dom = pQuery::parseStr(Gdn_Format::to($FirstComment->Body, $FirstComment->Format));
+        }
+
+        // Add images to head for open graph.
         if ($Dom) {
             foreach ($Dom->query('img') as $img) {
                 if ($img->attr('src')) {
@@ -390,6 +402,7 @@ class DiscussionController extends VanillaController {
         }
 
         $discussionID = $comment->DiscussionID;
+        $this->commentID = $comment->CommentID;
 
         // Figure out how many comments are before this one
         $offset = $this->CommentModel->getOffset($comment);

@@ -110,7 +110,7 @@ trait SearchRecordTypeTrait {
             && class_exists('Infrastructure')
         ) {
             $enabledTemplates = c('Plugins.Sphinx.Templates');
-            if (is_array($enabledTemplates) && !array_key_exists(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)) {
+            if (is_array($enabledTemplates) && !in_array(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)) {
                 return false;
             }
         }

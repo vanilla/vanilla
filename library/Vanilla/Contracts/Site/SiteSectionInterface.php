@@ -12,7 +12,7 @@ namespace Vanilla\Contracts\Site;
  *
  * Through this mechanism content across the site may be separated and filtered.
  */
-interface SiteSectionInterface {
+interface SiteSectionInterface extends \JsonSerializable {
     /**
      * Get the base path for the section of the site.
      *
@@ -43,15 +43,14 @@ interface SiteSectionInterface {
     /**
      * Get the uniqueID representing the section.
      *
-     * @return int
+     * @return string
      */
-    public function getSectionID(): int;
-    
+    public function getSectionID(): string;
+
     /**
      * Get the section group that a section belongs.
      *
      * @return string
      */
     public function getSectionGroup(): string;
-
 }

@@ -14,7 +14,7 @@ interface IProps {
 export function DashboardMediaItem(props: IProps) {
     return (
         <div className="media-sm">
-            {props.imgSrc && (
+            {props.imgSrc !== undefined && (
                 <div className="media-left">
                     <div className="media-image-wrap">
                         <img src={props.imgSrc} />

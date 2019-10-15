@@ -307,7 +307,7 @@ export const iconClasses = useThemeCache(() => {
     const alertIconCompact = style("alertIconCompact", {
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
-        margin: -globalVars.buttonIcon.offset,
+        margin: unit(-globalVars.buttonIcon.offset),
     });
 
     return {

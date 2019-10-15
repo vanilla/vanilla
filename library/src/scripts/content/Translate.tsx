@@ -38,13 +38,13 @@ interface IProps {
  * - These tag's CANNOT be nested currently.
  *
  * Examples
- * <Translation source="test" />
+ * <Translate source="test" />
  *   -> translated text of "test"
- * <Translation source="Hello <0/>" />
+ * <Translate source="Hello <0/>" />
  *   -> Error because c0 was not provided.
- * <Translation source="Hello <0/> world!" c0={<SomeComponent />}/>
+ * <Translate source="Hello <0/> world!" c0={<SomeComponent />}/>
  *   -> Hello <SomeComponent/> world!
- * <Translation source="Visit <0>our site</0> for help." c0={content => <a href="http://site.com">{content}</a>}/>"
+ * <Translate source="Visit <0>our site</0> for help." c0={content => <a href="http://site.com">{content}</a>}/>"
  *   -> Visit <a href="http://site.com">our site</a> for help.
  */
 export default class Translate extends React.Component<IProps> {

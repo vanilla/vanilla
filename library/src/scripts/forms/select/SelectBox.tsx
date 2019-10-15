@@ -86,7 +86,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
 
         const classesDropDown = dropDownClasses();
         const selectItems = this.props.children.map((child, i) => {
-            console.log("==>", child);
             const selected = this.state.selectedIndex === i;
             return (
                 <DropDownItemButton

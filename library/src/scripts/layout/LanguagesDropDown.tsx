@@ -10,6 +10,8 @@ import { t } from "@library/utility/appUtils";
 import { find } from "lodash";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { useLocaleInfo, LocaleDisplayer, ILocale } from "@vanilla/i18n";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 
 interface IState {
     id: string;
@@ -17,7 +19,7 @@ interface IState {
 
 export interface ILanguageProps extends ISelectBoxItem {
     lang: string;
-    outdated?: boolean;
+    //outdated?: boolean;
 }
 
 export interface ILanguageDropDownProps {
@@ -31,18 +33,22 @@ export interface ILanguageDropDownProps {
     buttonBaseClass?: ButtonTypes;
     renderLeft?: boolean;
     openAsModal?: boolean;
+    useLocaleInfo?: {
+        [key: string]: ILocale[];
+    };
+    currentLocale?: string;
+    languageSelect?: boolean;
 }
 
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
+export default class gLanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
         const showPicker = this.props.data && this.props.data.length > 1;
         if (showPicker) {
             let foundIndex = false;
             const processedChildren = this.props.data.map(language => {
-                language.name = language.locale; // remove this line once name has been added to /article/translations api
                 const selected = language.locale === this.props.selected;
                 language.selected = selected;
                 if (selected) {
@@ -63,6 +69,9 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                     buttonClassName={this.props.buttonClassName}
                     buttonBaseClass={this.props.buttonBaseClass}
                     openAsModal={this.props.openAsModal}
+                    useLocaleInfo={this.props.useLocaleInfo}
+                    currentLocale={this.props.currentLocale}
+                    languageSelect={true}
                 >
                     {processedChildren}
                 </SelectBox>

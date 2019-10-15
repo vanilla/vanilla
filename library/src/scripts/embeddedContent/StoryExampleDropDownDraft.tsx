@@ -14,10 +14,12 @@ import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useRef } from "react";
+import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftPreviewStyles";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
 
 export function StoryExampleDropDownDraft(props: IProps) {
+    const classes = draftPreviewClasses();
     const device = useDevice();
     const toggleButtonRef = useRef(null);
     const doNothing = e => {
@@ -31,12 +33,12 @@ export function StoryExampleDropDownDraft(props: IProps) {
                 buttonClassName={ButtonTypes.CUSTOM}
                 renderLeft={true}
                 buttonRef={toggleButtonRef}
-                toggleButtonClassName="draftPreview-actionsToggle"
-                className={classNames("draftPreview-actions", "draftPreview-menu")}
+                toggleButtonClassName={classes.toggle}
+                className={classNames(classes.actions, "draftPreview-menu")}
                 flyoutType={FlyoutType.LIST}
                 openAsModal={device === Devices.MOBILE || device === Devices.XS}
             >
-                <DropDownItemLink name={t("Edit")} to={"#"} className="draftPreview-option" />
+                <DropDownItemLink name={t("Edit")} to={"#"} className={classes.option} />
                 <DropDownItemButton name={t("Delete")} onClick={doNothing} className="draftPreview-option" />
             </DropDown>
         </DeviceProvider>

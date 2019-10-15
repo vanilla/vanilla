@@ -33,7 +33,12 @@ export const searchResultsVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fg: globalVars.mainColors.fg,
+        fonts: {
+            color: globalVars.mainColors.fg,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
     });
 
     const excerpt = makeThemeVars("excerpt", {
@@ -127,7 +132,6 @@ export const searchResultsClasses = useThemeCache(() => {
         display: "block",
         width: percent(100),
     });
-
     return {
         root,
         noResults,
@@ -145,11 +149,7 @@ export const searchResultClasses = useThemeCache(() => {
 
     const title = style("title", {
         display: "block",
-        ...fonts({
-            color: vars.title.fg,
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.semiBold,
-        }),
+        ...fonts(vars.title.fonts),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
@@ -250,7 +250,7 @@ export const searchResultClasses = useThemeCache(() => {
     });
 
     const excerpt = style("excerpt", {
-        marginTop: unit(12),
+        marginTop: unit(6),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
     });

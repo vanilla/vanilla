@@ -122,27 +122,16 @@ export const pageTitleClasses = useThemeCache(() => {
     const style = styleFactory("pageTitle");
 
     const root = style({
+        fontSize: globalVars.fonts.size.title,
         lineHeight: vars.font.lineHeight,
         display: "block",
         ...margins({
             vertical: 0,
         }),
         $nest: lineHeightAdjustment(),
-    } as NestedCSSProperties);
-
-    const pageSmallTitle = style("pageSmallTitle", {
-        $nest: lineHeightAdjustment(),
-        lineHeight: vars.font.lineHeight,
-        fontSize: globalVars.fonts.size.smallTitle,
-        fontWeight: globalVars.fonts.weights.bold,
-        display: "block",
-        ...margins({
-            vertical: 0,
-        }),
     } as NestedCSSProperties);
 
     return {
         root,
-        pageSmallTitle,
     };
 });

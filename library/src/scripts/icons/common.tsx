@@ -212,9 +212,10 @@ export function DropDownMenuIcon(props: { className?: string }) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <circle cx="5.7" cy="12" r="2" fill="currentColor" />
-            <circle cx="18.3" cy="12" r="2" fill="currentColor" />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <path
+                fill="currentColor"
+                d="M5.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+            />
         </svg>
     );
 }

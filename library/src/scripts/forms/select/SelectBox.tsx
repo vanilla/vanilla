@@ -111,6 +111,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
         const classesDropDown = dropDownClasses();
         const classesMetas = metasClasses();
         const selectItems = this.props.children.map((child, i) => {
+            console.log("jwi", child);
             const selected = this.state.selectedIndex === i;
 
             if (!checkURL) {
@@ -158,9 +159,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     <DropDownItemLink
                         key={i}
                         name={localeInfo.map(l => {
-                            if (l.localeKey === child.locale) return l.displayNames[`${child.locale}`];
+                            if (l.localeKey === child.locale) {
+                                return l.displayNames[`${child.locale}`];
+                            }
                         })}
-                        to={child.url}
+                        to={child.translationStatus !== "not-translated" ? child.url : "/"}
                         className={classNames({ isSelected: child.selected })}
                         lang={child.locale}
                         onClick={this.handleClick.bind(this, child, i)}

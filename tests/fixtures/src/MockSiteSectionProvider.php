@@ -37,6 +37,22 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
+    public function getForSectionGroup(string $sectionGroupKey): array {
+        $sections = [];
+
+        /** @var SiteSectionInterface $section */
+        foreach ($this->siteSections as $section) {
+            if ($section->getSectionGroup() === $sectionGroupKey) {
+                $sections[] = $section;
+            }
+        }
+
+        return $sections;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getByID(int $id): ?SiteSectionInterface {
     }
 

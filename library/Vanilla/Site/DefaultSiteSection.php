@@ -62,7 +62,7 @@ class DefaultSiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
-    public function getSectionID(): int {
+    public function getSectionID(): string {
         return self::DEFAULT_ID;
     }
 
@@ -71,5 +71,12 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getSectionGroup(): string {
         return self::DEFAULT_SECTION_GROUP;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return SiteSectionSchema::toArray($this);
     }
 }

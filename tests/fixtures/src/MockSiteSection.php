@@ -7,6 +7,7 @@
 namespace VanillaTests\fixtures;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionSchema;
 
 /**
  * Mock site-section.
@@ -74,7 +75,7 @@ class MockSiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
-    public function getSectionID(): int {
+    public function getSectionID(): string {
         return $this->sectionID;
     }
 
@@ -83,5 +84,12 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function getSectionGroup(): string {
         return $this->sectionGroup;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return SiteSectionSchema::toArray($this);
     }
 }

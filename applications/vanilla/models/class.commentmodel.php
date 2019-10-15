@@ -617,9 +617,10 @@ class CommentModel extends Gdn_Model {
             ],
             "participated" => [
                 "notifyUserIDs" => array_column(
-                    $discussionModel->getParticipatedUsers($discussionID),
+                    $discussionModel->getParticipatedUsers($discussionID)->resultArray(),
                     "UserID"
-                ),                "options" => ['CheckRecord' => true],
+                ),
+                "options" => ['CheckRecord' => true],
                 "preference" => "ParticipateComment",
             ],
         ];

@@ -542,7 +542,7 @@ export function DiscussionIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function AlertIcon(props: { className?: string; title?: string }) {
+export function AlertIcon(props: { className?: string; title?: string | null }) {
     const classes = iconClasses();
     return (
         <svg className={classNames(classes.alertIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">

@@ -18,7 +18,7 @@
         "yarn": "^1.4.2"
     },
     "dependencies": {
-        "@reach/tooltip": "^0.2.2",
+        "@reach/tooltip": "^0.3.0",
         "axios": "0.18.1",
         "classnames": "2.2.6",
         "csx": "9.0.0",

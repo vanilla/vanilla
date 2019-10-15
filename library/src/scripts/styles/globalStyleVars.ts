@@ -111,7 +111,7 @@ export const globalVariables = useThemeCache(() => {
         radius: 6,
     });
 
-    const gutterSize = 24;
+    const gutterSize = 16;
     const gutter = makeThemeVars("gutter", {
         size: gutterSize,
         half: gutterSize / 2,
@@ -139,7 +139,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const content = makeThemeVars("content", {
-        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 2,
+        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
     });
 
     const fonts = makeThemeVars("fonts", {
@@ -147,8 +147,8 @@ export const globalVariables = useThemeCache(() => {
             large: 16,
             medium: 14,
             small: 12,
-            title: 32,
-            smallTitle: 22,
+            largeTitle: 32,
+            title: 22,
             subTitle: 18,
         },
 

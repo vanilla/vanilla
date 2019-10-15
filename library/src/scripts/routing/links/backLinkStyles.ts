@@ -51,7 +51,7 @@ const backLinkClasses = useThemeCache(() => {
             height: unit(vars.sizing.height),
             minWidth: unit(vars.sizing.width),
             ...margins({
-                left: negative(vars.sizing.width + globalVars.gutter.half),
+                left: negative(globalVars.gutter.half),
                 right: globalVars.gutter.half,
             }),
         },

@@ -59,6 +59,12 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getForSectionGroup(string $sectionGroupKey): array {
+    }
+
+    /**
      * Create site-sections to a section group.
      *
      * @param array $locales

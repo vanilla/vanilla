@@ -19,6 +19,7 @@ interface IState {
 interface ILanguageItem {
     locale: string;
     url: string;
+    translationStatus: string;
 }
 
 export interface ILanguageDropDownProps {
@@ -57,6 +58,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 onClick: () => {
                     window.location.href = data.url;
                 },
+                translationStatus: data.translationStatus,
             };
         });
 

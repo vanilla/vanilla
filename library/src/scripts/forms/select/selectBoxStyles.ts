@@ -68,10 +68,11 @@ export const selectBoxClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         color: globalVars.mainColors.primary.toString(),
-        width: px(18),
+        width: percent(100),
         height: px(18),
         flexBasis: px(18),
-        marginRight: px(9),
+        marginRight: px(2),
+        marginLeft: px(50),
     });
 
     const spacer = style("spacer", {

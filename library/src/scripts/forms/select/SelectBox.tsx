@@ -14,7 +14,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
-import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
+import { CheckCompactIcon, DownTriangleIcon, AlertIcon } from "@library/icons/common";
 
 export interface ISelectBoxItem {
     name: string;
@@ -22,6 +22,7 @@ export interface ISelectBoxItem {
     className?: string;
     onClick?: () => void;
     selected?: boolean;
+    translationStatus?: string;
 }
 
 interface IProps {
@@ -82,8 +83,10 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
 
     public render() {
         const classes = selectBoxClasses();
+
         const classesDropDown = dropDownClasses();
         const selectItems = this.props.children.map((child, i) => {
+            console.log("==>", child);
             const selected = this.state.selectedIndex === i;
             return (
                 <DropDownItemButton
@@ -108,6 +111,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         },
                     )}
                 >
+                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
+                        {child.content || child.name}
+                    </span>
                     <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
                         {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
                         {!selected && (
@@ -115,10 +121,12 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                                 {` `}
                             </span>
                         )}
+                        {selected ||
+                            (child.translationStatus === "not-translated" && (
+                                <AlertIcon className={"selectBox-selectedIcon"} />
+                            ))}
                     </span>
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
-                        {child.content || child.name}
-                    </span>
+
                     {/* {child.outdated && (
                         <span className={classNames("selectBox-outdated", classesMetas.metaStyle, classes.outdated)}>
                             {t("(Outdated)")}

@@ -111,7 +111,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
         const classesDropDown = dropDownClasses();
         const classesMetas = metasClasses();
         const selectItems = this.props.children.map((child, i) => {
-            console.log("jwi", child);
             const selected = this.state.selectedIndex === i;
 
             if (!checkURL) {

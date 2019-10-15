@@ -15,7 +15,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { metasClasses } from "@library/styles/metasStyles";
-import { LocaleDisplayer, useLocaleInfo, ILocale } from "@vanilla/i18n";
+import { LocaleDisplayer, ILocale } from "@vanilla/i18n";
 import classNames from "classnames";
 import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 
@@ -23,9 +23,6 @@ export interface ISelectBoxItem {
     [x: string]: string | undefined;
     name: string;
     className?: string;
-    onClick?: () => {};
-    selected?: boolean;
-    outdated?: boolean;
     lang?: string;
     url?: string;
 }
@@ -40,15 +37,16 @@ interface IProps {
     buttonBaseClass?: ButtonTypes;
     widthOfParent?: boolean;
     openAsModal?: boolean;
-    useLocaleInfo?: {
-        [key: string]: ILocale;
-    };
+    localeInfo?: ILocale[];
     languageSelect?: boolean;
     currentLocale?: string;
 }
 
 export interface ISelfLabelledProps extends IProps {
     label: string;
+    onClick?: () => {};
+    selected?: boolean;
+    outdated?: boolean;
 }
 
 export interface IExternalLabelledProps extends IProps {
@@ -96,14 +94,19 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
     };
 
     public getLanguageName = (val: string) => {
-        const name = this.props.useLocaleInfo.map((l: string) => {
-            if (l.localeKey === val) return l.displayNames[`${val}`];
-        });
-        return name[0];
+        if (this.props.localeInfo !== undefined) {
+            let name = this.props.localeInfo.map(l => {
+                if (l.localeKey === val) return l.displayNames[`${val}`];
+            });
+            return name[0];
+        } else {
+            return "";
+        }
     };
 
     public render() {
         const checkURL = "url" in this.props.children[0];
+        const { localeInfo, currentLocale } = this.props;
         const classes = selectBoxClasses();
         const classesDropDown = dropDownClasses();
         const classesMetas = metasClasses();
@@ -154,7 +157,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 return (
                     <DropDownItemLink
                         key={i}
-                        name={this.props.useLocaleInfo.map((l: string) => {
+                        name={localeInfo.map(l => {
                             if (l.localeKey === child.locale) return l.displayNames[`${child.locale}`];
                         })}
                         to={child.url}
@@ -171,7 +174,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 <React.Fragment>
                     {!this.props.languageSelect
                         ? this.state.selectedItem.name
-                        : this.getLanguageName(this.props.currentLocale)}
+                        : currentLocale !== undefined
+                        ? this.getLanguageName(currentLocale)
+                        : ""}
                     <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
                 </React.Fragment>
             ) : null;

@@ -7,7 +7,6 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { find } from "lodash";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useLocaleInfo, LocaleDisplayer, ILocale } from "@vanilla/i18n";
@@ -18,8 +17,9 @@ interface IState {
 }
 
 export interface ILanguageProps extends ISelectBoxItem {
+    [x: string]: any;
     lang: string;
-    //outdated?: boolean;
+    outdated?: boolean;
 }
 
 export interface ILanguageDropDownProps {
@@ -33,9 +33,7 @@ export interface ILanguageDropDownProps {
     buttonBaseClass?: ButtonTypes;
     renderLeft?: boolean;
     openAsModal?: boolean;
-    useLocaleInfo?: {
-        [key: string]: ILocale[];
-    };
+    localeInfo?: ILocale[];
     currentLocale?: string;
     languageSelect?: boolean;
 }
@@ -43,7 +41,7 @@ export interface ILanguageDropDownProps {
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default class gLanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
+export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
         const showPicker = this.props.data && this.props.data.length > 1;
         if (showPicker) {
@@ -62,14 +60,14 @@ export default class gLanguagesDropDown extends React.Component<ILanguageDropDow
             return (
                 <SelectBox
                     describedBy={this.props.titleID!}
-                    label={!this.props.titleID ? t("Locale") : null}
+                    //label={!this.props.titleID ? t("Locale") : null}
                     widthOfParent={!!this.props.widthOfParent}
                     className={classNames("languagesDropDown", this.props.className)}
                     renderLeft={this.props.renderLeft}
                     buttonClassName={this.props.buttonClassName}
                     buttonBaseClass={this.props.buttonBaseClass}
                     openAsModal={this.props.openAsModal}
-                    useLocaleInfo={this.props.useLocaleInfo}
+                    localeInfo={this.props.localeInfo}
                     currentLocale={this.props.currentLocale}
                     languageSelect={true}
                 >

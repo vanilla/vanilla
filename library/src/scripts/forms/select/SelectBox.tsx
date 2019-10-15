@@ -106,6 +106,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
 
     public render() {
         const checkURL = "url" in this.props.children[0];
+        const url = "/";
         const { localeInfo, currentLocale } = this.props;
         const classes = selectBoxClasses();
         const classesDropDown = dropDownClasses();
@@ -157,11 +158,15 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 return (
                     <DropDownItemLink
                         key={i}
-                        name={localeInfo.map(l => {
-                            if (l.localeKey === child.locale) {
-                                return l.displayNames[`${child.locale}`];
-                            }
-                        })}
+                        name={
+                            localeInfo !== undefined
+                                ? localeInfo.map(l => {
+                                      if (l.localeKey === child.locale) {
+                                          return l.displayNames[`${child.locale}`];
+                                      }
+                                  })
+                                : { url }
+                        }
                         to={child.translationStatus !== "not-translated" ? child.url : "/"}
                         className={classNames({ isSelected: child.selected })}
                         lang={child.locale}

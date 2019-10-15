@@ -163,7 +163,7 @@ export const searchResultClasses = useThemeCache(() => {
             justifyContent: "space-between",
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
-            color: colorOut(vars.title.fg),
+            color: colorOut(vars.title.fonts.color),
             borderBottom: singleBorder({
                 color: vars.separator.fg,
                 width: vars.separator.width,

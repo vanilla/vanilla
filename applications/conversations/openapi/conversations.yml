@@ -277,6 +277,8 @@ components:
       type: array
     ConversationPost:
       properties:
+        name:
+          type: string
         participantUserIDs:
           description: List of userID of the participants.
           items:
@@ -284,4 +286,5 @@ components:
           type: array
       required:
       - participantUserIDs
+      - name
       type: object

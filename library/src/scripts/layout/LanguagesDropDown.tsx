@@ -34,7 +34,7 @@ export interface ILanguageDropDownProps {
     renderLeft?: boolean;
     openAsModal?: boolean;
     localeInfo?: ILocale[];
-    currentLocale?: string;
+    currentLocale?: any;
     languageSelect?: boolean;
 }
 

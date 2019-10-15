@@ -12,7 +12,8 @@ import { color } from "csx";
 import { StoryContent } from "@library/storybook/StoryContent";
 import SearchContext from "@library/contexts/SearchContext";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { AlertIcon } from "@library/icons/common";
 
 const story = storiesOf("Components", module);
 
@@ -44,6 +45,11 @@ story.add("Tool Tips", () => {
                             <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
                                 Center
                             </span>
+                        </ToolTip>
+                        <ToolTip label={"This one's an icon"}>
+                            <ToolTipIcon>
+                                <AlertIcon />
+                            </ToolTipIcon>
                         </ToolTip>
                     </div>
                 </StoryContent>

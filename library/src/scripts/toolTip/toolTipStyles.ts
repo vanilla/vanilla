@@ -36,6 +36,14 @@ export const toolTipClasses = useThemeCache(() => {
     const vars = tooltipVariables();
     const shadow = shadowHelper();
 
+    const noPointerContent = style("content", {
+        $nest: {
+            "& *": {
+                pointerEvents: "none",
+            },
+        },
+    });
+
     const box = style("box", {
         position: "absolute",
         fontSize: unit(globalVars.fonts.size.medium),
@@ -93,5 +101,6 @@ export const toolTipClasses = useThemeCache(() => {
         box,
         nub,
         nubPosition,
+        noPointerContent,
     };
 });

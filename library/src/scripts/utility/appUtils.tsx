@@ -105,6 +105,23 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
 }
 
 /**
+ * Generate a URL from the site's web root.
+ *
+ * No site section will be included.
+ */
+export function siteUrl(path: string): string {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
+
+    // The context paths that come down are expect to have no / at the end of them.
+    // Normally a domain like so: https://someforum.com
+    // When we don't have that we want to fallback to "" so that our path with a / can get passed.
+    const urlBase = window.location.origin + getMeta("context.host", "");
+    return urlBase + path;
+}
+
+/**
  * Extract relative URL part from absolute full URL.
  *
  * @param fullUrl - The absolute url to transform.

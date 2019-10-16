@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, t, getMeta } from "@library/utility/appUtils";
+import { formatUrl, t, getMeta, siteUrl } from "@library/utility/appUtils";
 import { indexArrayByKey } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
@@ -23,7 +23,7 @@ function fieldErrorTransformer(responseData) {
 }
 
 const apiv2 = axios.create({
-    baseURL: formatUrl("/api/v2/"),
+    baseURL: siteUrl("/api/v2/"),
     headers: {
         common: {
             "X-Requested-With": "vanilla",

@@ -85,6 +85,11 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
     );
 }
 
+/**
+ * Tooltip component.
+ *
+ * Custom children (not base dom nodes), must use React.forwardRef().
+ */
 export function ToolTip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
     const { children, label, ariaLabel } = props;
 
@@ -94,3 +99,20 @@ export function ToolTip(props: { children: React.ReactNode; label: string; ariaL
         </TriangleTooltip>
     );
 }
+
+interface IIconProps extends React.HTMLAttributes<HTMLSpanElement> {}
+
+/**
+ * Class for reprenting to wrap an icon inside of a tooltip.
+ */
+export const ToolTipIcon = React.forwardRef(function ToolTipIcon(
+    props: IIconProps,
+    ref: React.RefObject<HTMLSpanElement>,
+) {
+    const classes = toolTipClasses();
+    return (
+        <span {...props} ref={ref} className={classes.noPointerContent}>
+            {props.children}
+        </span>
+    );
+});

@@ -163,6 +163,7 @@ export const iconVariables = useThemeCache(() => {
 
 export const iconClasses = useThemeCache(() => {
     const vars = iconVariables();
+    const globalVars = globalVariables();
     const style = styleFactory("iconSizes");
 
     const standard = style("defaultIcon", {
@@ -303,6 +304,12 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
+    const alertIconCompact = style("alertIconCompact", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+        margin: unit(-globalVars.buttonIcon.offset),
+    });
+
     return {
         standard,
         newFolder,
@@ -330,5 +337,6 @@ export const iconClasses = useThemeCache(() => {
         editIcon,
         discussionIcon,
         alertIcon,
+        alertIconCompact,
     };
 });

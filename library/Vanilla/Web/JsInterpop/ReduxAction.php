@@ -28,10 +28,14 @@ class ReduxAction implements \JsonSerializable {
      * @param string $type Redux action type to create
      * @param Data $data Redux payload data.
      * @param array $requestParams The params if this is a FSA. This opts in to the new action structure (FSA).
+     * @param bool $isRawAction If set, there will be no wrapper around the data.
      */
-    public function __construct(string $type, Data $data, array $requestParams = null) {
+    public function __construct(string $type, Data $data, array $requestParams = null, bool $isRawAction = false) {
         $this->type = $type;
         $this->payload = $requestParams !== null ? ['result' => $data, 'params' => $requestParams] : ['data' => $data];
+        if ($isRawAction) {
+            $this->payload = $data;
+        }
     }
 
     /**

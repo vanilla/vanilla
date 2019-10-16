@@ -543,10 +543,14 @@ export function DiscussionIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function AlertIcon(props: { className?: string; title?: string | null }) {
+export function AlertIcon(props: { className?: string; title?: string; compact?: boolean }) {
     const classes = iconClasses();
     return (
-        <svg className={classNames(classes.alertIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+            className={classNames(props.compact ? classes.alertIconCompact : classes.alertIcon, props.className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
             <title>{props.title ? props.title : t("Alert")}</title>
 
             <circle cx="12" cy="12" r="7" style={{ fill: "#d0021b" }} />

@@ -1,5 +1,5 @@
 import React from "react";
-import { IUser, IUserFragment, IUserFragmentAndRoles, IUserRoles } from "@library/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import SmartLink from "@library/routing/links/SmartLink";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import { userLabelClasses } from "@library/content/userLabelStyles";
@@ -7,7 +7,6 @@ import { Roles } from "@library/content/Roles";
 import classNames from "classnames";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/styles/metasStyles";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
 
 /**
@@ -71,7 +70,7 @@ export function UserLabel(props: IUserLabel) {
                         <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
                             {user.name}
                         </SmartLink>
-                        {showRole && user.title && <Roles roles={[{ roleID: 0, name: user.title }]} wrapper={false} />}
+                        {showRole && user.label && <Roles roles={[{ roleID: 0, name: user.label }]} wrapper={false} />}
                     </div>
                     <div className={classNames(classesMeta.root, "isFlexed", classes.bottomRow)}>
                         {dateComponent}

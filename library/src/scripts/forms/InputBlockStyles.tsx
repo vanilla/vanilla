@@ -10,6 +10,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
+import { OverflowProperty, ResizeProperty, StandardLonghandPropertiesFallback } from "csstype";
 
 export const inputBlockVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -39,6 +40,7 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        width: percent(100),
         $nest: {
             [`& + &`]: {
                 marginTop: unit(formElementVars.spacing.margin),
@@ -104,6 +106,13 @@ export const inputBlockClasses = useThemeCache(() => {
         marginTop: unit(formElementVars.spacing.margin),
     });
 
+    const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
+        return style("multiLine", {
+            resize: (resize ? resize : "vertical") as ResizeProperty,
+            overflow: (overflow ? overflow : "auto") as OverflowProperty,
+        });
+    };
+
     return {
         root,
         inputText,
@@ -115,5 +124,6 @@ export const inputBlockClasses = useThemeCache(() => {
         labelAndDescription,
         sectionTitle,
         fieldsetGroup,
+        multiLine,
     };
 });

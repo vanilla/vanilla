@@ -25,24 +25,25 @@ trait ThemeVariablesTrait {
     }
 
     /**
-     * Add Addons variables to theme variables
+     * Add Addons variables to theme variables.
+     * Addon provided variables will override the theme variables.
      *
-     * @param string $assetContent Variables json theme asset string
-     * @return string
+     * @param string $baseAssetContent Variables json theme asset string.
+     * @return string The updated asset content.
      */
-    public function addAddonVariables(string $assetContent): string {
+    public function addAddonVariables(string $baseAssetContent): string {
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
-            $additionalVariables = array_replace_recursive($variableProvider->getVariables(), $additionalVariables);
+            $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 
         if ($additionalVariables) {
-            $variables = json_decode($assetContent, true) ?? [];
+            $variables = json_decode($baseAssetContent, true) ?? [];
 
-            $variables = array_replace_recursive($additionalVariables, $variables);
-            $assetContent = json_encode($variables);
+            $variables = array_replace_recursive($variables, $additionalVariables);
+            $baseAssetContent = json_encode($variables);
         }
-        return $assetContent;
+        return $baseAssetContent;
     }
 }

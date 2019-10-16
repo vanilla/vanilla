@@ -32,6 +32,17 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
+    public function getForSectionGroup(string $sectionGroupKey): array {
+        if ($sectionGroupKey === DefaultSiteSection::DEFAULT_SECTION_GROUP) {
+            return [$this->defaultSite];
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAll(): array {
         return [$this->defaultSite];
     }

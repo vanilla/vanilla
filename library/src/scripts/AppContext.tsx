@@ -16,6 +16,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 import { style } from "typestyle";
 import { percent } from "csx";
+import { LocaleProvider } from "@vanilla/i18n";
 
 interface IProps {
     children: React.ReactNode;
@@ -39,20 +40,22 @@ export function AppContext(props: IProps) {
         <div className={classNames("js-appContext", rootStyle, inheritHeightClass())}>
             {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
             <Provider store={store}>
-                <LiveAnnouncer>
-                    <ThemeProvider
-                        disabled={props.noTheme}
-                        errorComponent={props.errorComponent || null}
-                        themeKey={getMeta("ui.themeKey", "keystone")}
-                        variablesOnly={props.variablesOnly}
-                    >
-                        <FontSizeCalculatorProvider>
-                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                <DeviceProvider>{props.children}</DeviceProvider>
-                            </ScrollOffsetProvider>
-                        </FontSizeCalculatorProvider>
-                    </ThemeProvider>
-                </LiveAnnouncer>
+                <LocaleProvider>
+                    <LiveAnnouncer>
+                        <ThemeProvider
+                            disabled={props.noTheme}
+                            errorComponent={props.errorComponent || null}
+                            themeKey={getMeta("ui.themeKey", "keystone")}
+                            variablesOnly={props.variablesOnly}
+                        >
+                            <FontSizeCalculatorProvider>
+                                <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                    <DeviceProvider>{props.children}</DeviceProvider>
+                                </ScrollOffsetProvider>
+                            </FontSizeCalculatorProvider>
+                        </ThemeProvider>
+                    </LiveAnnouncer>
+                </LocaleProvider>
             </Provider>
         </div>
     );

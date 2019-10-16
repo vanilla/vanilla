@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "82e136d54009dffb5e08c3b8ebccc705",
+    "content-hash": "7fc0a1883fc32a13c4ae8f9ab9abd2a1",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -1071,16 +1071,16 @@
         },
         {
             "name": "vanilla/htmlawed",
-            "version": "v2.2.4.1",
+            "version": "v2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/htmlawed.git",
-                "reference": "58651edbc4c45a2d6b5254b8a9a69dc63ff1457b"
+                "reference": "b1fc7b3990796112387c08a132f85b7333022ec2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/58651edbc4c45a2d6b5254b8a9a69dc63ff1457b",
-                "reference": "58651edbc4c45a2d6b5254b8a9a69dc63ff1457b",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/b1fc7b3990796112387c08a132f85b7333022ec2",
+                "reference": "b1fc7b3990796112387c08a132f85b7333022ec2",
                 "shasum": ""
             },
             "require": {
@@ -1106,7 +1106,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2017-09-13T19:20:25+00:00"
+            "time": "2019-10-16T15:36:02+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -1483,8 +1483,8 @@
             "authors": [
                 {
                     "name": "Frank Kleine",
-                    "homepage": "http://frankkleine.de/",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "homepage": "http://frankkleine.de/"
                 }
             ],
             "description": "Virtual file system to mock the real file system in unit tests.",
@@ -3089,8 +3089,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "arne@blankerts.de"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",

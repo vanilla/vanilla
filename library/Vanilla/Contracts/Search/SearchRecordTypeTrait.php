@@ -30,7 +30,8 @@ trait SearchRecordTypeTrait {
             'GUID_MULTIPLIER',
             'SUB_KEY',
             'CHECKBOX_LABEL',
-            'PROVIDER_GROUP'
+            'PROVIDER_GROUP',
+            'INFRASTRUCTURE_TEMPLATE',
         ];
     }
 
@@ -91,7 +92,29 @@ trait SearchRecordTypeTrait {
      * @inheritdoc
      */
     public function getIndexName(): string {
-        return self::SPHINX_INDEX;
+        return $this->templateExists() ? self::SPHINX_INDEX : '';
+    }
+
+    /**
+     * Check if sphinx index template is enabled on infrastructure.
+     * Note: We just want to double check if 'knowledgearticle' and 'groups'
+     *       templates are enabled properly.
+     *       If ''standard' template is OFF for some reason  - it should/can break the search
+     *       and we need to enable it manually. This case is not 'acceptable'.
+     *
+     * @return bool
+     */
+    private function templateExists(): bool {
+        if (self::PROVIDER_GROUP === 'sphinx'
+            && self::INFRASTRUCTURE_TEMPLATE !== 'standard'
+            && class_exists('Infrastructure')
+        ) {
+            $enabledTemplates = c('Plugins.Sphinx.Templates');
+            if (is_array($enabledTemplates) && !in_array(self::INFRASTRUCTURE_TEMPLATE, $enabledTemplates)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

@@ -9,7 +9,7 @@ interface IProps {
     condition: boolean;
     className?: string;
     tag?: keyof JSX.IntrinsicElements;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 /**

@@ -35,7 +35,7 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const heading = themeVars("heading", {
-        margin: 5,
+        margin: 12,
     });
 
     const border = themeVars("border", {
@@ -246,8 +246,12 @@ export const searchBarClasses = useThemeCache(() => {
 
     // Has a search button attached.
     const compoundValueContainer = style("compoundValueContainer", {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
+        $nest: {
+            "&&": {
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+            },
+        },
     });
 
     const actionButton = style("actionButton", {

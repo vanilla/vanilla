@@ -105,7 +105,10 @@ interface IIconProps extends React.HTMLAttributes<HTMLSpanElement> {}
 /**
  * Class for reprenting to wrap an icon inside of a tooltip.
  */
-export const ToolTipIcon = React.forwardRef((props: IIconProps, ref: React.RefObject<HTMLSpanElement>) => {
+export const ToolTipIcon = React.forwardRef(function ToolTipIcon(
+    props: IIconProps,
+    ref: React.RefObject<HTMLSpanElement>,
+) {
     const classes = toolTipClasses();
     return (
         <span {...props} ref={ref} className={classes.noPointerContent}>

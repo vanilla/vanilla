@@ -18,7 +18,7 @@
         "yarn": "^1.4.2"
     },
     "dependencies": {
-        "@reach/tooltip": "^0.2.2",
+        "@reach/tooltip": "^0.3.0",
         "axios": "0.18.1",
         "classnames": "2.2.6",
         "csx": "9.0.0",
@@ -95,9 +95,6 @@
         "@types/redux-test-utils": "^0.2.0",
         "@types/sinon": "^7.0.11",
         "@types/sprintf-js": "^1.1.2",
-        "@types/storybook__addon-actions": "^3.4.3",
-        "@types/storybook__addon-knobs": "^5.0.4",
-        "@types/storybook__react": "^4.0.2",
         "@types/validator": "^10.11.0",
         "@types/webfontloader": "^1.6.29",
         "@types/webpack": "^4.4.27",

@@ -75,8 +75,11 @@ export const layoutVariables = useThemeCache(() => {
         },
         extraPadding: {
             top: 32,
-            noBreadcrumbs: {
-                top: 16,
+            noBreadcrumbs: {},
+            mobile: {
+                noBreadcrumbs: {
+                    top: 16,
+                },
             },
         },
         largePadding: {
@@ -188,35 +191,44 @@ export const panelLayoutClasses = useThemeCache(() => {
         width: percent(100),
     });
 
-    const root = style({
-        ...margins(vars.panelLayoutSpacing.margin),
-        width: percent(100),
-        $nest: {
-            [`&.noBreadcrumbs > .${main}`]: {
-                paddingTop: unit(globalVars.gutter.size),
-                ...mediaQueries.oneColumnDown({
-                    paddingTop: 0,
-                }),
-            },
-            "&.isOneCol": {
-                width: unit(vars.middleColumn.paddedWidth),
-                maxWidth: percent(100),
-                margin: "auto",
-                ...mediaQueries.oneColumnDown({
-                    width: percent(100),
-                }),
-            },
-            "&.hasTopPadding": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
-            },
-            "&.hasTopPadding.noBreadcrumbs": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.noBreadcrumbs.top),
-            },
-            "&.hasLargePadding": {
-                ...paddings(vars.panelLayoutSpacing.largePadding),
+    const root = style(
+        {
+            ...margins(vars.panelLayoutSpacing.margin),
+            width: percent(100),
+            $nest: {
+                [`&.noBreadcrumbs > .${main}`]: {
+                    paddingTop: unit(globalVars.gutter.size),
+                    ...mediaQueries.oneColumnDown({
+                        paddingTop: 0,
+                    }),
+                },
+                "&.isOneCol": {
+                    width: unit(vars.middleColumn.paddedWidth),
+                    maxWidth: percent(100),
+                    margin: "auto",
+                    ...mediaQueries.oneColumnDown({
+                        width: percent(100),
+                    }),
+                },
+                "&.hasTopPadding": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
+                },
+                "&.hasTopPadding.noBreadcrumbs": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                },
+                "&.hasLargePadding": {
+                    ...paddings(vars.panelLayoutSpacing.largePadding),
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&.hasTopPadding.noBreadcrumbs": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                },
+            },
+        }),
+    );
 
     const content = style("content", {
         display: "flex",

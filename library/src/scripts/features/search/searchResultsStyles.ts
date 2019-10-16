@@ -18,6 +18,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { metasVariables } from "@library/styles/metasStyles";
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
+import { embedMenuMediaQueries } from "@rich-editor/editor/pieces/embedMenuStyles";
+import { layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -31,7 +33,12 @@ export const searchResultsVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fg: globalVars.mainColors.fg,
+        fonts: {
+            color: globalVars.mainColors.fg,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
     });
 
     const excerpt = makeThemeVars("excerpt", {
@@ -91,15 +98,21 @@ export const searchResultsClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
+    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style({
-        display: "block",
-        position: "relative",
-        borderTop: singleBorder({
-            color: vars.separator.fg,
-            width: vars.separator.width,
+    const root = style(
+        {
+            display: "block",
+            position: "relative",
+            borderTop: singleBorder({
+                color: vars.separator.fg,
+                width: vars.separator.width,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            borderTop: 0,
         }),
-    });
+    );
     const noResults = style("noResults", {
         fontSize: globalVars.userContent.font.sizes.default,
         ...paddings({
@@ -119,7 +132,6 @@ export const searchResultsClasses = useThemeCache(() => {
         display: "block",
         width: percent(100),
     });
-
     return {
         root,
         noResults,
@@ -137,11 +149,7 @@ export const searchResultClasses = useThemeCache(() => {
 
     const title = style("title", {
         display: "block",
-        ...fonts({
-            color: vars.title.fg,
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.semiBold,
-        }),
+        ...fonts(vars.title.fonts),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
@@ -155,7 +163,7 @@ export const searchResultClasses = useThemeCache(() => {
             justifyContent: "space-between",
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
-            color: colorOut(vars.title.fg),
+            color: colorOut(vars.title.fonts.color),
             borderBottom: singleBorder({
                 color: vars.separator.fg,
                 width: vars.separator.width,
@@ -242,7 +250,7 @@ export const searchResultClasses = useThemeCache(() => {
     });
 
     const excerpt = style("excerpt", {
-        marginTop: unit(12),
+        marginTop: unit(6),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
     });

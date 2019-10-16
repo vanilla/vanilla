@@ -30,7 +30,7 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fontSize: globalVars.fonts.size.smallTitle,
+        fontSize: globalVars.fonts.size.title,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         maxWidth: percent(100),

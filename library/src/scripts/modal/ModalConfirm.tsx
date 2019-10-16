@@ -31,6 +31,7 @@ interface IProps {
     children: React.ReactNode;
     isConfirmLoading?: boolean;
     elementToFocusOnExit: HTMLElement;
+    size?: ModalSizes;
 }
 
 interface IState {
@@ -62,13 +63,13 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         if (this.state.cancelled) {
             return null;
         }
-        const { onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
+        const { onConfirm, srOnlyTitle, isConfirmLoading, title, children, size } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
         return (
             <Modal
-                size={ModalSizes.SMALL}
+                size={size ? size : ModalSizes.SMALL}
                 elementToFocus={this.cancelRef.current}
                 exitHandler={onCancel}
                 titleID={this.titleID}

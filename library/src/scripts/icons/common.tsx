@@ -212,9 +212,10 @@ export function DropDownMenuIcon(props: { className?: string }) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <circle cx="5.7" cy="12" r="2" fill="currentColor" />
-            <circle cx="18.3" cy="12" r="2" fill="currentColor" />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <path
+                fill="currentColor"
+                d="M5.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+            />
         </svg>
     );
 }
@@ -542,10 +543,14 @@ export function DiscussionIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function AlertIcon(props: { className?: string; title?: string | null }) {
+export function AlertIcon(props: { className?: string; title?: string; compact?: boolean }) {
     const classes = iconClasses();
     return (
-        <svg className={classNames(classes.alertIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+            className={classNames(props.compact ? classes.alertIconCompact : classes.alertIcon, props.className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
             <title>{props.title ? props.title : t("Alert")}</title>
 
             <circle cx="12" cy="12" r="7" style={{ fill: "#d0021b" }} />

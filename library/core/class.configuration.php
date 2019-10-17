@@ -9,6 +9,8 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\Deprecation;
+
 /**
  * The Configuration class can be used to load configuration arrays from files,
  * retrieve settings from the arrays, assign new values to the arrays, and save
@@ -362,7 +364,13 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             return $this->Data;
         }
 
-        $keys = $this->splitConfigKey($name);
+        if (!is_string($name)) {
+            Deprecation::unsupportedParam('$name', $name, "Only string parameters are allowed.");
+        } elseif (strlen($name) === 0) {
+            Deprecation::unsupportedParam("$name", $name, "Empty config keys may lead to undefined behaviour.");
+        }
+
+        $keys = $this->splitConfigKey((string) $name);
         $keyCount = count($keys);
 
         $value = $this->Data;

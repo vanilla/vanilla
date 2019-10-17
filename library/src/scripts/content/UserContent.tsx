@@ -23,7 +23,7 @@ interface IProps {
 export default function UserContent(props: IProps) {
     const classes = userContentClasses();
 
-    useHashScrolling(props.ignoreHashScrolling);
+    useHashScrolling(props.content, props.ignoreHashScrolling);
 
     return (
         <div

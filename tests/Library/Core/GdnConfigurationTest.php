@@ -27,7 +27,7 @@ class GdnConfigurationTest extends TestCase {
         $config = new \Gdn_Configuration();
         $config->loadArray($configData, "test");
 
-        $this->assertEquals($expectedResult, $config->configKeyExists($keyToCheck));
+        $this->assertSame($expectedResult, $config->configKeyExists($keyToCheck));
     }
 
     /**
@@ -78,7 +78,7 @@ class GdnConfigurationTest extends TestCase {
         $config = new \Gdn_Configuration();
         $config->loadArray($configData, "test");
 
-        $this->assertEquals($expectedResult, $config->get($keyToCheck));
+        $this->assertSame($expectedResult, $config->get($keyToCheck));
     }
 
     /**
@@ -108,9 +108,14 @@ class GdnConfigurationTest extends TestCase {
                 'Nested.Value',
                 "",
             ],
-            "Value is undefined" =>[
+            "Value is undefined" => [
                 [],
                 'Nested.Value',
+                false,
+            ],
+            "Value is empty string" => [
+                [],
+                "",
                 false,
             ],
         ];

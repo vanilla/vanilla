@@ -18,7 +18,6 @@ import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
-import { IAutoHighlightResult } from "highlight.js";
 import { userContentClasses } from "@library/content/userContentStyles";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
@@ -49,29 +48,6 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
-let highLightJs: any;
-
-/**
- * Use a dynamically imported highlight.js to highlight text synchronously.
- *
- * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
- * but until then we need this hack.60FPS
- *
- * - If highLightJs is loaded, run it.
- * - Otherwise return the text back and start loading highLightJs.
- */
-function highLightText(text: string): IAutoHighlightResult | string {
-    if (!highLightJs) {
-        void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
-            highLightJs = imported.default;
-            highLightJs.highlightAuto(text).value;
-        });
-        return text;
-    } else {
-        return highLightJs.highlightAuto(text).value;
-    }
-}
-
 /**
  * Manage and construct a quill instance ot some ref.
  *
@@ -87,7 +63,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
             theme: "vanilla",
             modules: {
                 syntax: {
-                    highlight: highLightText,
+                    highlight: () => {}, // Unused but required to satisfy
+                    // https://github.com/quilljs/quill/blob/1.3.7/modules/syntax.js#L43
+                    // We have overridden the highlight method ourselves.
                 },
             },
         };

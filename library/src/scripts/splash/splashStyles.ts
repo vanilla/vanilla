@@ -99,7 +99,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         maxWidth: 700,
         font: {
             color: colors.contrast,
-            size: globalVars.fonts.size.title,
+            size: globalVars.fonts.size.largeTitle,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             align: "center",
             shadow: `0 1px 1px ${colorOut(

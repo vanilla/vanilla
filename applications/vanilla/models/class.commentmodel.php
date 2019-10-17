@@ -567,6 +567,7 @@ class CommentModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Comment",
             "ActivityUserID" => $comment["InsertUserID"] ?? null,
+            "Format" => $comment["Format"] ?? null,
             "HeadlineFormat" => t(
                 "HeadlineFormat.Comment",
                 '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>'
@@ -574,17 +575,12 @@ class CommentModel extends Gdn_Model {
             "RecordType" => "Comment",
             "RecordID" => $commentID,
             "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
+            "Story" => $comment["Body"] ?? null,
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
             ]
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowCommentBody", false)) {
-            $data["Story"] = $comment["Body"] ?? null;
-            $data["Format"] = $comment["Format"] ?? null;
-        }
 
         // Pass generic activity to events.
         $this->EventArguments["Activity"] = $data;

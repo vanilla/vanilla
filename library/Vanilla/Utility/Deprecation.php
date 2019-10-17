@@ -63,16 +63,28 @@ class Deprecation {
      */
     public static function unsupportedParam(string $paramName, $value, string $reason = "") {
         // Set Garden.Log.Deprecation to false to disable log output
-        if (self::c('Garden.Log.Deprecation', true)) {
-            $stack = debug_backtrace();
-
-            $message = "Method received unsupported parameter type.\n" . $paramName . ": " . json_encode($value);
-            if ($reason) {
-                $message .= "\n" . $reason;
-            }
-            $message .= self::formatBackTrace($stack);
-            self::logErrorMessage($message);
+        if (!self::c('Garden.Log.Deprecation', true)) {
+            return;
         }
+
+        $stack = debug_backtrace();
+        $firstFrame = $stack[1];
+        $methodName = self::extractMethodNameFromFrame($firstFrame);
+        $lookupKey = $methodName . '-' . $paramName . '-' . $value;
+        if (array_key_exists($lookupKey, self::$calls)) {
+            // We've already logged this call in this request.
+            return;
+        } else {
+            self::$calls[$lookupKey] = true;
+        }
+
+
+        $message = "Method received unsupported parameter type.\n" . $paramName . ": " . json_encode($value);
+        if ($reason) {
+            $message .= "\n" . $reason;
+        }
+        $message .= self::formatBackTrace($stack);
+        self::logErrorMessage($message);
     }
 
     /**

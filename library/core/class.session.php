@@ -826,6 +826,7 @@ class Gdn_Session {
 
             // Save the session information to the database.
             $sessionID = $sessionModel->insert($session);
+            $session['SessionID'] = $sessionID;
             trace("Inserting session stash $sessionID");
 
             // Save a session cookie.

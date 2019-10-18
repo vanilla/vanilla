@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\Web\Exception\HttpException;
 use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
@@ -355,14 +356,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @inheritdoc
      */
     public function hasExceptionHandler(\Throwable $e): bool {
-        switch ($e->getCode()) {
-            case 404:
-            case 403:
-                return true;
-                break;
-            default:
-                return false;
-        }
+        return $e instanceof HttpException;
     }
 
     /**

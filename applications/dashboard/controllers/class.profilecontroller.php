@@ -391,6 +391,14 @@ class ProfileController extends Gdn_Controller {
         // Decide if we can *see* email
         $this->setData('_CanViewPersonalInfo', Gdn::session()->UserID == val('UserID', $user) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
 
+        // Decide if there will be a Titles field.
+        $canAddEditTitle = c('Garden.Profile.Titles', false);
+        $this->setData('_CanAddEditTitle', $canAddEditTitle);
+
+        // Decide if there will be Locations field.
+        $canAddEditLocations = c('Garden.Profile.Locations', false);
+        $this->setData('_CanAddEditLocation', $canAddEditLocations);
+
         // Define gender dropdown options
         $this->GenderOptions = [
             'u' => t('Unspecified'),
@@ -431,6 +439,11 @@ class ProfileController extends Gdn_Controller {
             // This field cannot be updated from here.
             $this->Form->removeFormValue('Password');
 
+            // If someone tries to update the email without permission, send back the original email to the form.
+            if (!$canEditEmail) {
+                $this->Form->setFormValue("Email", $user['Email']);
+            }
+
             if (!$canEditUsername) {
                 $this->Form->setFormValue("Name", $user['Name']);
             } else {
@@ -438,6 +451,15 @@ class ProfileController extends Gdn_Controller {
                 Gdn::userModel()->Validation->applyRule('Name', 'Username', $usernameError);
             }
 
+            // Do not accept Title updates if the user isn't allowed.
+            if (!$canAddEditTitle) {
+                $this->Form->removeFormValue('Title');
+            }
+
+            // Do not accept Location updates if the user isn't allowed.
+            if (!$canAddEditLocations) {
+                $this->Form->removeFormValue('Location');
+            }
             // API
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
@@ -499,11 +521,6 @@ class ProfileController extends Gdn_Controller {
 
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
-
-            if (!$canEditEmail) {
-                $this->Form->setFormValue("Email", $user['Email']);
-            }
-
         }
 
         $this->title(t('Edit Profile'));

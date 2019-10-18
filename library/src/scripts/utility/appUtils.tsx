@@ -83,6 +83,21 @@ export function isAllowedUrl(input: string): boolean {
     return isUrl(input, options);
 }
 
+interface ISiteSection {
+    basePath: string;
+    contentLocale: string;
+    sectionGroup: string;
+    sectionID: string;
+    name: string;
+}
+
+/**
+ * Get the current site section.
+ */
+export function getSiteSection(): ISiteSection {
+    return getMeta("siteSection");
+}
+
 /**
  * Format a URL in the format passed from the controller.
  *

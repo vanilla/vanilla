@@ -53,6 +53,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var array */
     private $featureFlags;
 
+    /** @var Contracts\Site\SiteSectionInterface */
+    private $currentSiteSection;
+
     /**
      * SiteMeta constructor.
      *
@@ -60,8 +63,15 @@ class SiteMeta implements \JsonSerializable {
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param \Gdn_Locale $locale
      * @param Addon $activeTheme
+     * @param Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
      */
-    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config, \Gdn_Locale $locale, Addon $activeTheme) {
+    public function __construct(
+        RequestInterface $request,
+        Contracts\ConfigurationInterface $config,
+        \Gdn_Locale $locale,
+        Addon $activeTheme,
+        Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
+    ) {
         $this->host = $request->getHost();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -71,6 +81,8 @@ class SiteMeta implements \JsonSerializable {
         $this->debugModeEnabled = $config->get('Debug');
 
         $this->featureFlags = $config->get('Feature', []);
+
+        $this->currentSiteSection = $siteSectionProvider->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
@@ -127,7 +139,15 @@ class SiteMeta implements \JsonSerializable {
                 'allowedExtensions' => $this->allowedExtensions,
             ],
             'featureFlags' => $this->featureFlags,
+            'siteSection' => $this->currentSiteSection,
         ];
+    }
+
+    /**
+     * @return Contracts\Site\SiteSectionInterface
+     */
+    public function getCurrentSiteSection(): Contracts\Site\SiteSectionInterface {
+        return $this->currentSiteSection;
     }
 
     /**

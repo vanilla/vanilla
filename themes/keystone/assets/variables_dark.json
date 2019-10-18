@@ -2,7 +2,6 @@
     "global": {
         "mainColors": {
             "primary": "#f2ae09",
-            "secondary": "#984B43",
             "bg": "#000",
             "fg": "#fff"
         }

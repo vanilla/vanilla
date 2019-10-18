@@ -6,7 +6,7 @@
 import React from "react";
 import { ComponentClass } from "react";
 import { logWarning, logError } from "@vanilla/utils";
-import { mountReact } from "@vanilla/react-utils";
+import { mountReact, IComponentMountOptions } from "@vanilla/react-utils";
 import { AppContext } from "@library/AppContext";
 
 let useTheme = true;
@@ -18,11 +18,18 @@ export function disableComponentTheming() {
     useTheme = false;
 }
 
+interface IRegisteredComponent {
+    Component: React.ComponentType<any>;
+    mountOptions?: IComponentMountOptions;
+}
+
 /**
  * The currently registered Components.
  * @private
  */
-const _components = {};
+const _components: {
+    [key: string]: IRegisteredComponent;
+} = {};
 
 /**
  * Register a component in the Components registry.
@@ -30,8 +37,11 @@ const _components = {};
  * @param name The name of the component.
  * @param component The component to register.
  */
-export function addComponent(name: string, component: React.ComponentType<any>) {
-    _components[name.toLowerCase()] = component;
+export function addComponent(name: string, Component: React.ComponentType<any>, mountOptions?: IComponentMountOptions) {
+    _components[name.toLowerCase()] = {
+        Component,
+        mountOptions,
+    };
 }
 
 /**
@@ -50,7 +60,7 @@ export function componentExists(name: string): boolean {
  * @param name The name of the component.
  * @returns Returns the component or **undefined** if there is no registered component.
  */
-export function getComponent(name: string): ComponentClass | undefined {
+export function getComponent(name: string): IRegisteredComponent | undefined {
     return _components[name.toLowerCase()];
 }
 
@@ -74,16 +84,16 @@ export function _mountComponents(parent: Element) {
             props = JSON.parse(props);
         }
 
-        const Component = getComponent(name);
+        const registeredComponent = getComponent(name);
 
-        if (Component) {
+        if (registeredComponent) {
             mountReact(
                 <AppContext variablesOnly noTheme={!useTheme}>
-                    <Component {...props} />
+                    <registeredComponent.Component {...props} />
                 </AppContext>,
                 node,
                 undefined,
-                { overwrite: true },
+                registeredComponent.mountOptions,
             );
         } else {
             logError("Could not find component %s.", name);

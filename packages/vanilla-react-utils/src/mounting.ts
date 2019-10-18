@@ -6,6 +6,10 @@
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
 
+export interface IComponentMountOptions {
+    overwrite?: boolean;
+}
+
 /**
  * Mount a root component of a React tree.
  *
@@ -24,7 +28,7 @@ export function mountReact(
     component: React.ReactElement,
     target: HTMLElement,
     callback?: () => void,
-    options?: { overwrite: boolean },
+    options?: IComponentMountOptions,
 ) {
     let mountPoint = target;
     let cleanupContainer: HTMLElement | undefined;

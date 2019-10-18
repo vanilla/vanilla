@@ -60,6 +60,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     private $ssoUtils;
 
     /**
+     * @var \SessionModel
+     */
+    private $sessionModel;
+
+    /**
      * Set up OAuth2 access properties.
      *
      * @param string $providerKey Fixed key set in child class.
@@ -564,8 +569,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             throw new Gdn_UserException('The code parameter is either not set or empty.');
         }
 
-        Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
-
         $response = $this->requestAccessToken($code);
         if (!$response) {
             throw new Gdn_UserException('The OAuth server did not return a valid response.');
@@ -626,14 +629,22 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is base_ConnectData_Handler() in this class.
-                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => val('access_token', $response), 'RefreshToken' => val('refresh_token', $response), 'Profile' => $profile]);
+                // Save the access token and the profile to the session table, set expiry to 3 minutes.
+                $stashID = $this->sessionModel->insert(
+                    [
+                        'Attributes' => [
+                                'AccessToken' => $response['access_token'] ,
+                                'RefreshToken' => $response['refresh_token'],
+                                'Profile' => $profile,
+                            ],
+                        'DateExpires' => date(MYSQL_DATE_FORMAT, strtotime('3 minutes')),
+                    ]
+                );
                 $url = '/entry/connect/'.$this->getProviderKey();
 
-                //pass the target if there is one so that the user will be redirected to where the request originated.
-                if ($target = val('target', $state)) {
-                    $url .= '?Target='.urlencode($target);
-                }
+                // Pass the "sessionID" to in the query so that it can be retrieved.
+                $url .= '?'.http_build_query(array_filter(['Target' => $state['target'] ?? '/', 'stashID' => $stashID]));
+                // Redirect to the connect script.
                 redirectTo($url);
                 break;
         }
@@ -651,12 +662,29 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             return;
         }
 
-        // Retrieve the profile that was saved to the session in the entry controller.
-        $savedProfile = Gdn::session()->stash($this->getProviderKey(), '', false);
-        if (Gdn::session()->stash($this->getProviderKey(), '', false)) {
-            $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile]);
+        /* @var Gdn_Form $form */
+        $form = $sender->Form; //new gdn_Form();
+
+        if ($form->isPostBack()) {
+            $stashID = $form->getFormValue('stashID');
+        } else {
+            $stashID = $sender->Request->get('stashID');
         }
-        $profile = val('Profile', $savedProfile);
+
+        if (!$stashID) {
+            $this->log('Missing stashID', ['POST' => $sender->Request->post(),'GET' => $sender->Request->get()]);
+            throw new Gdn_UserException('Missing session, please go back and log in again.', 401);
+        }
+
+        $savedProfile = $this->sessionModel->getActiveSession($stashID);
+        if ($savedProfile['Attributes']) {
+            $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile['Attributes']]);
+        } else {
+            $this->log('Base Connect Data Profile Not Found in Session', []);
+        }
+
+        // Retrieve the profile that was saved to the session in the entryEndPoint.
+        $profile = $savedProfile['Attributes']['Profile'] ?? [];
         $accessToken = val('AccessToken', $savedProfile);
         $refreshToken = val('RefreshToken', $savedProfile);
 
@@ -664,8 +692,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         trace($accessToken, 'Access Token');
         trace($refreshToken, 'Refresh Token');
 
-        /* @var Gdn_Form $form */
-        $form = $sender->Form; //new gdn_Form();
 
         // Create a form and populate it with values from the profile.
         $originaFormValues = $form->formValues();
@@ -681,7 +707,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'Profile' => $profile
         ];
         $form->setFormValue('Attributes', $attributes);
-
+        $form->addHidden('stashID', $stashID);
         $sender->EventArguments['Profile'] = $profile;
         $sender->EventArguments['Form'] = $form;
 
@@ -966,8 +992,9 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      *
      * @param SsoUtils $ssoUtils Used to generate SSO tokens.
      */
-    public function setDependencies(SsoUtils $ssoUtils) {
+    public function setDependencies(SsoUtils $ssoUtils, SessionModel $sessionModel) {
         $this->ssoUtils = $ssoUtils;
+        $this->sessionModel = $sessionModel;
     }
 
     /**

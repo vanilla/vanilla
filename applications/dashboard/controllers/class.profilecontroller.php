@@ -1212,7 +1212,7 @@ class ProfileController extends Gdn_Controller {
         $this->permission('Garden.SignIn.Allow');
 
         // If users are registering with SSO, don't bother with this form.
-        if (c('Garden.Registration.Method') == 'Connect') {
+        if (!is_object(Gdn::session()->User) || (c('Garden.Registration.Method') === 'Connect' && (Gdn::session()->User->HashMethod ?? '') !== 'Vanilla')) {
             Gdn::dispatcher()->dispatch('DefaultPermission');
             exit();
         }

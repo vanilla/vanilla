@@ -147,6 +147,17 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @return Data Data object for global dispatcher.
      */
     public function render(): Data {
+        return $this->renderMasterView();
+    }
+
+    /**
+     * Render the page content and wrap it in a data object for the dispatcher.
+     *
+     * This method is kept private so that it can be called internally for error pages without being overridden.
+     *
+     * @return Data Data object for global dispatcher.
+     */
+    private function renderMasterView(): Data {
         $this->validateSeo();
 
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
@@ -369,7 +380,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             ])
         ;
 
-        return $this->render();
+        return $this->renderMasterView();
     }
 
     /**

@@ -128,6 +128,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`DiscussionIcon`}>
                     <CommonIcons.DiscussionIcon />
                 </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`GlobeIcon`}>
+                    <CommonIcons.GlobeIcon />
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>

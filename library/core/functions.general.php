@@ -3926,19 +3926,40 @@ if (!function_exists('userAgentType')) {
             $type = $value;
         }
 
+        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+            $type = null;
+        }
+
         if ($type !== null) {
             return $type;
         }
 
+        // A function to make sure the type is one of our supported types.
+        $validateType = function (string $type): string {
+            $validTypes = ['desktop', 'tablet', 'app', 'mobile'];
+
+            if (in_array($type, $validTypes)) {
+                return $type;
+            } else {
+                // There is no exact match so look for a partial match.
+                foreach ($validTypes as $validType) {
+                    if (strpos($type, $validType) !== false) {
+                        return $validType;
+                    }
+                }
+            }
+            return 'desktop';
+        };
+
         // Try and get the user agent type from the header if it was set from the server, varnish, etc.
         $type = strtolower(val('HTTP_X_UA_DEVICE', $_SERVER, ''));
         if ($type) {
-            return $type;
+            return $validateType($type);
         }
 
         // See if there is an override in the cookie.
         if ($type = val('X-UA-Device-Force', $_COOKIE)) {
-            return $type;
+            return $validateType($type);
         }
 
         // Now we will have to figure out the type based on the user agent and other things.

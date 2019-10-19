@@ -754,8 +754,10 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $tableName The name of the table to delete from.
      * @param array $wheres An array of where conditions.
+     * @param int $limit Limit the number of records to delete.
+     * @return string Returns an DML statement.
      */
-    public function getDelete($tableName, $wheres = []) {
+    public function getDelete($tableName, $wheres = [], $limit = 0) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetDelete'), E_USER_ERROR);
     }
 

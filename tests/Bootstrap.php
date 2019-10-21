@@ -28,6 +28,7 @@ use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -114,7 +115,7 @@ class Bootstrap {
 
             // Site sections
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(SingleSiteSectionProvider::class)
+            ->setClass(MockSiteSectionProvider::class)
             ->setShared(true)
 
             // AddonManager

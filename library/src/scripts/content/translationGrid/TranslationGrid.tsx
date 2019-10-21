@@ -7,6 +7,9 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import { AlertIcon, EditIcon } from "@library/icons/common";
 import cloneDeep from "lodash/cloneDeep";
 import { t } from "@library/utility/appUtils";
+import { ILocale } from "@vanilla/i18n";
+import { useUniqueID } from "@library/utility/idUtils";
+import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 
 export interface ITranslation {
     id: string;
@@ -16,9 +19,18 @@ export interface ITranslation {
     maxLength?: number; // Please add maximum character counts where possible.
 }
 
+export interface ILanguageItems {
+    name: string;
+    url: string;
+    locale: string;
+    translationStatus: string;
+}
+
 export interface ITranslationGrid {
     data: ITranslation[];
     inScrollingContainer?: boolean;
+    otherLanguages?: ILanguageItems[];
+    i18nLocales: ILocale[];
 }
 
 /**
@@ -28,7 +40,8 @@ export interface ITranslationGrid {
  */
 
 export function TranslationGrid(props: ITranslationGrid) {
-    const { data, inScrollingContainer = false } = props;
+    const id = useUniqueID("articleOtherLanguages");
+    const { data, inScrollingContainer = false, otherLanguages } = props;
     const classes = translationGridClasses();
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
@@ -94,7 +107,17 @@ export function TranslationGrid(props: ITranslationGrid) {
                 <div className={classes.frame}>
                     <div className={classes.header}>
                         <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
-                        <div className={classNames(classes.rightCell, classes.headerRight)}>Français</div>
+                        <div className={classNames(classes.rightCell, classes.headerRight)}>
+                            <LanguagesDropDown
+                                titleID={id}
+                                widthOfParent={true}
+                                className="otherLanguages-select"
+                                renderLeft={true}
+                                data={props.otherLanguages}
+                                currentLocale={"en"}
+                                // dateUpdated={props.dateUpdated}
+                            />
+                        </div>
                     </div>
                     <div className={classes.body}>{translationRows}</div>
                 </div>

@@ -15,7 +15,7 @@ use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Heading;
+use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Web\TwigRenderTrait;

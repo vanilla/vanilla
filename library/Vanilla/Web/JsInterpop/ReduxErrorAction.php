@@ -8,6 +8,7 @@
 namespace Vanilla\Web\JsInterpop;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\HttpException;
 
 /**
  * A redux error action to render a frontend error page.
@@ -20,7 +21,16 @@ class ReduxErrorAction extends ReduxAction {
      * @param \Throwable $throwable The exception to create the error for.
      */
     public function __construct(\Throwable $throwable) {
-        parent::__construct(self::ACTION_TYPE, new Data($throwable));
+        $data = [
+            'message' => $throwable->getMessage(),
+            'status' => $throwable->getCode(),
+        ];
+
+        if ($throwable instanceof HttpException) {
+            $data['description'] = $throwable->getDescription();
+        }
+
+        parent::__construct(self::ACTION_TYPE, new Data($data));
     }
 
     /**

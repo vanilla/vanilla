@@ -13,10 +13,10 @@ use Garden\SafeCurl\SafeCurl;
  * HTTP handler interface utilizing SafeCurl.
  */
 class SafeCurlHttpHandler extends CurlHandler {
-    /**
-     * @var bool followLocation.
-     */
+
+    /** @var bool Should location headers be followed? */
     private $followLocation = true;
+
     /**
      * Execute a curl handle using the SafeCurl wrapper.
      *
@@ -33,7 +33,8 @@ class SafeCurlHttpHandler extends CurlHandler {
     }
 
     /**
-     * cURL followLocation setter.
+     * Set whether or not location headers should be followed.
+     *
      * @param bool $followLocation
      */
     public function setFollowLocation(bool $followLocation) {
@@ -41,7 +42,8 @@ class SafeCurlHttpHandler extends CurlHandler {
     }
 
     /**
-     * cURL followLocation getter.
+     * Get whether or not location headers should be followed.
+     *
      * @return bool
      */
     public function getFollowLocation(): bool {

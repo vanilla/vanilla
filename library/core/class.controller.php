@@ -1286,7 +1286,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // ...and have a proper password.
         $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-        if (val('HashMethod', $user) == 'Random') {
+        if (val('HashMethod', $user) === 'Random') {
             return;
         }
 

@@ -4,8 +4,8 @@
  */
 
 import { SwaggerUIBundle } from "swagger-ui-dist";
-import { formatUrl, getMeta } from "@library/utility/appUtils";
 import "swagger-ui-dist/swagger-ui.css";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
 import "../scss/swagger-ui.scss";
 
 export function mountSwagger() {

@@ -17694,10 +17694,10 @@ svgo@^1.0.0, svgo@^1.0.5, svgo@^1.2.2:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-swagger-ui-dist@3.20.4:
-  version "3.20.4"
-  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-3.20.4.tgz#dcbbeb25a0f6bdbb2e858b1e2371cde12475b9a1"
-  integrity sha512-SR/N+N7EIncEhyA4UGiMQ12vJBSv5OKO4S1g7E7etO+9ZUV6SZ7SqKVC8RDDyMOJzdXgMXV7aGIBIiMSCbEMJw==
+swagger-ui-dist@^3.24.0:
+  version "3.24.0"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-3.24.0.tgz#700aa1981d7a4077bf993f44b6da5966416160a6"
+  integrity sha512-5uAjeEqV+zbtalBDXAIrkqUZwsUHYwvBSeGYlFcLj1ERS3jfprL4OPLSSriDoeXCtNmWzpz5aooV2qJW+DqdUQ==
 
 "sylvester@>= 0.0.12", "sylvester@>= 0.0.8":
   version "0.0.21"

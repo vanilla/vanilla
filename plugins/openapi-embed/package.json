@@ -1,0 +1,7 @@
+{
+    "name": "@vanilla/addon-openapi-embed",
+    "version": "3.0.1",
+    "private": true,
+    "dependencies": {},
+    "devDependencies": {}
+}

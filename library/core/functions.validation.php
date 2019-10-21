@@ -270,11 +270,16 @@ if (!function_exists('validateUsername')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateUsername($value) {
-        $validateUsernameRegex = validateUsernameRegex();
+        $validationRegexPattern = c('Garden.User.ValidationRegexPattern');
+
+        if (!$validationRegexPattern) {
+            $validateUsernameRegex = validateUsernameRegex();
+            $validationRegexPattern = "/^({$validateUsernameRegex})?$/siu";
+        }
 
         return validateRegex(
             $value,
-            "/^({$validateUsernameRegex})?$/siu"
+            $validationRegexPattern
         );
     }
 }

@@ -6,11 +6,16 @@
 
 import React from "react";
 import classNames from "classnames";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { useLocaleInfo, LocaleDisplayer, ILocale } from "@vanilla/i18n";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { AlertIcon } from "@library/icons/common";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
 
 interface IState {
     id: string;
@@ -20,6 +25,7 @@ interface ILanguageItem {
     locale: string;
     url: string;
     translationStatus: string;
+    dateUpdated?: string;
 }
 
 export interface ILanguageDropDownProps {
@@ -33,6 +39,7 @@ export interface ILanguageDropDownProps {
     renderLeft?: boolean;
     openAsModal?: boolean;
     currentLocale?: string;
+    dateUpdated?: string;
 }
 
 /**
@@ -40,6 +47,7 @@ export interface ILanguageDropDownProps {
  */
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
+        const classes = selectBoxClasses();
         const showPicker = this.props.data && this.props.data.length > 1;
         if (!showPicker) {
             return null;
@@ -54,11 +62,28 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
             return {
                 selected: isSelected,
                 name: data.locale,
-                content: <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />,
+                content: (
+                    <>
+                        <ToolTip
+                            label={`This article was editied in its source locale on ${(
+                                <DateTime timestamp={this.props.dateUpdated} />
+                            )}. Edit this article to update its translation and clear this meesage.`}
+                        >
+                            <span>
+                                <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                                {data.translationStatus === "not-translated" && (
+                                    <AlertIcon className={"selectBox-selectedIcon"} />
+                                )}
+                            </span>
+                        </ToolTip>
+                    </>
+                ),
+
                 onClick: () => {
                     window.location.href = data.url;
                 },
-                translationStatus: data.translationStatus,
+
+                //translationStatus: data.translationStatus,
             };
         });
 

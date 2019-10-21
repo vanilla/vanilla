@@ -120,10 +120,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                                 {` `}
                             </span>
                         )}
-                        {selected ||
-                            (child.translationStatus === "not-translated" && (
-                                <AlertIcon className={"selectBox-selectedIcon"} />
-                            ))}
                     </span>
 
                     {/* {child.outdated && (

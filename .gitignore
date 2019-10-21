@@ -45,6 +45,7 @@
 !/plugins/HtmLawed/
 !/plugins/OpenID/
 !/plugins/oauth2/
+!/plugins/openapi-embed/
 !/plugins/pockets/
 !/plugins/PrivateCommunity/
 !/plugins/ProfileExtender/

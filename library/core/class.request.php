@@ -1673,7 +1673,7 @@ class Gdn_Request implements RequestInterface {
     public function getSimpleUrl(string $uri = ''): string {
         $scheme = $this->getScheme();
         $hostAndPort = $this->getHostAndPort();
-        return "{$scheme}://{$hostAndPort}/{$uri}";
+        return "{$scheme}://{$hostAndPort}{$uri}";
     }
 
     /**

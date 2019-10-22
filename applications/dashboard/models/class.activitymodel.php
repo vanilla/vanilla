@@ -1117,7 +1117,8 @@ class ActivityModel extends Gdn_Model {
      * @return string
      */
     private function getEmailSubject(array $activity, array $options): string {
-        $result = $options["EmailSubject"] ?: Gdn_Format::plainText($activity["Headline"]);
+        $emailSubject = $options["EmailSubject"] ?? null;
+        $result = $emailSubject ?: Gdn_Format::plainText($activity["Headline"]);
         return $result;
     }
 

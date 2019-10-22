@@ -28,7 +28,7 @@ class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
      * Execute all queued up items in the ActivityModel queue.
      */
     public function run(): JobExecutionStatus {
-        $this->activityModel->saveQueue();
+        $this->activityModel->saveQueue(true);
         return JobExecutionStatus::complete();
     }
 

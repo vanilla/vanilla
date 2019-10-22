@@ -247,6 +247,13 @@ if (!function_exists('validateUsernameRegex')) {
         static $validateUsernameRegex;
 
         if (is_null($validateUsernameRegex)) {
+            // Get the full regular expression from the configuration file.
+            $validateUsernameRegex = c('Garden.User.ValidationRegexPattern');
+
+            if ($validateUsernameRegex) {
+                return $validateUsernameRegex;
+            }
+
             // Set our default ValidationRegex based on Unicode support.
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
             $defaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
@@ -258,7 +265,7 @@ if (!function_exists('validateUsernameRegex')) {
             );
         }
 
-        return $validateUsernameRegex;
+        return "/^({$validateUsernameRegex})?$/siu";
     }
 }
 
@@ -270,16 +277,9 @@ if (!function_exists('validateUsername')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateUsername($value) {
-        $validationRegexPattern = c('Garden.User.ValidationRegexPattern');
-
-        if (!$validationRegexPattern) {
-            $validateUsernameRegex = validateUsernameRegex();
-            $validationRegexPattern = "/^({$validateUsernameRegex})?$/siu";
-        }
-
         return validateRegex(
             $value,
-            $validationRegexPattern
+            validateUsernameRegex()
         );
     }
 }

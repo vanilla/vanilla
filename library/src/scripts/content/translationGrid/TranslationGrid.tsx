@@ -10,6 +10,7 @@ import { t } from "@library/utility/appUtils";
 import { ILocale } from "@vanilla/i18n";
 import { useUniqueID } from "@library/utility/idUtils";
 import LanguagesDropDown from "@library/layout/LanguagesDropDown";
+import { ILanguageItem } from "@library/layout/LanguagesDropDown";
 
 export interface ITranslation {
     id: string;
@@ -19,18 +20,19 @@ export interface ITranslation {
     maxLength?: number; // Please add maximum character counts where possible.
 }
 
-export interface ILanguageItems {
+/*interface ILanguageItems {
     name: string;
     url: string;
     locale: string;
     translationStatus: string;
-}
+}*/
 
 export interface ITranslationGrid {
     data: ITranslation[];
     inScrollingContainer?: boolean;
-    otherLanguages?: ILanguageItems[];
+    otherLanguages: ILanguageItem[];
     i18nLocales: ILocale[];
+    dateUpdated?: string;
 }
 
 /**
@@ -115,7 +117,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                                 renderLeft={true}
                                 data={props.otherLanguages}
                                 currentLocale={"en"}
-                                // dateUpdated={props.dateUpdated}
+                                dateUpdated={props.dateUpdated}
                             />
                         </div>
                     </div>

@@ -16,6 +16,7 @@ import { ILocale, loadLocales, LocaleProvider } from "@vanilla/i18n";
 
 const story = storiesOf("Components", module);
 const locales = translationGridData.i18nLocales;
+const dateUpdated = "2019-10-09T20:05:51+00:00";
 loadLocales(locales);
 story.add("Translation Grid", () => {
     return (
@@ -41,6 +42,7 @@ story.add("Translation Grid", () => {
                         inScrollingContainer={true}
                         otherLanguages={translationGridData.otherLanguages}
                         i18nLocales={translationGridData.i18nLocales}
+                        dateUpdated={dateUpdated}
                     />
                 </div>
             </LocaleProvider>

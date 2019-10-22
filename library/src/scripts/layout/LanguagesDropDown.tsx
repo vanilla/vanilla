@@ -21,7 +21,7 @@ interface IState {
     id: string;
 }
 
-interface ILanguageItem {
+export interface ILanguageItem {
     locale: string;
     url: string;
     translationStatus: string;
@@ -48,6 +48,7 @@ export interface ILanguageDropDownProps {
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
         const classes = selectBoxClasses();
+        console.log("==>", this.props.dateUpdated);
         const showPicker = this.props.data && this.props.data.length > 1;
         if (!showPicker) {
             return null;

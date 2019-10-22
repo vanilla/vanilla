@@ -1965,9 +1965,9 @@ class ActivityModel extends Gdn_Model {
         $subject = $this->getEmailSubjectFormatted($activity, $options);
         $body = $this->getEmailMessage($activity);
         $key = implode(".", [
-            $activity["ActivityTypeID"],
-            $activity["RecordID"],
-            $activity["RecordType"],
+            $activity["ActivityTypeID"] ?? null,
+            $activity["RecordID"] ?? null,
+            $activity["RecordType"] ?? null,
             md5($subject),
             md5($body),
         ]);

@@ -70,9 +70,12 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                         )}
                         {data.translationStatus === "not-translated" && (
                             <ToolTip
-                                label={`This article was editied in its source locale on ${this.getDate(
-                                    this.props.dateUpdated,
-                                )}. Edit this article to update its translation and clear this meesage.`}
+                                label={
+                                    <Translate
+                                        source="This article was editied in its source locale on <0/>. Edit this article to update its translation and clear this meesage."
+                                        c0={<DateTime timestamp={this.props.dateUpdated} />}
+                                    />
+                                }
                             >
                                 <span>
                                     <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
@@ -102,13 +105,6 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
             >
                 {selectBoxItems}
             </SelectBox>
-        );
-    }
-    getDate(dateUpdated: string | undefined) {
-        return (
-            <span>
-                <DateTime timestamp={dateUpdated} />
-            </span>
         );
     }
 }

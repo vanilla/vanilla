@@ -25,7 +25,7 @@ const nubPosition = (triggerRect, hasOverflow) => {
     };
 };
 
-function TriangleTooltip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
+function TriangleTooltip(props: { children: React.ReactNode; label: Element; ariaLabel?: Element }) {
     const globalVars = globalVariables();
     const { children, label, ariaLabel } = props;
 
@@ -90,7 +90,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
  *
  * Custom children (not base dom nodes), must use React.forwardRef().
  */
-export function ToolTip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
+export function ToolTip(props: { children: React.ReactNode; label: Element; ariaLabel?: Element }) {
     const { children, label, ariaLabel } = props;
 
     return (

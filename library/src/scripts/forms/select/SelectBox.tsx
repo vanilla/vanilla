@@ -10,7 +10,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
@@ -161,6 +161,8 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         openAsModal={this.props.openAsModal}
                         flyoutType={FlyoutType.LIST}
                         selfPadded={true}
+                        renderLeft={true}
+                        //openDirection={DropDownOpenDirection.BELOW_LEFT}
                     >
                         {selectItems}
                     </DropDown>

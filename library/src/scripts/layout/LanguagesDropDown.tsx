@@ -16,6 +16,7 @@ import { AlertIcon } from "@library/icons/common";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import "@reach/tooltip/styles.css";
 
 interface IState {
     id: string;
@@ -49,6 +50,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
     public render() {
         const classes = selectBoxClasses();
         const showPicker = this.props.data && this.props.data.length > 1;
+
         if (!showPicker) {
             return null;
         }
@@ -71,10 +73,12 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                         {data.translationStatus === "not-translated" && (
                             <ToolTip
                                 label={
-                                    <Translate
-                                        source="This article was editied in its source locale on <0/>. Edit this article to update its translation and clear this meesage."
-                                        c0={<DateTime timestamp={this.props.dateUpdated} />}
-                                    />
+                                    <span>
+                                        <Translate
+                                            source="This article was editied in its source locale on <0/>. Edit this article to update its translation and clear this meesage."
+                                            c0={<DateTime timestamp={this.props.dateUpdated} />}
+                                        />
+                                    </span>
                                 }
                             >
                                 <span>
@@ -88,8 +92,6 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 onClick: () => {
                     window.location.href = data.url;
                 },
-
-                //translationStatus: data.translationStatus,
             };
         });
 

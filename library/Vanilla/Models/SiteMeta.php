@@ -129,7 +129,7 @@ class SiteMeta implements \JsonSerializable {
             'ui' => [
                 'siteName' => $this->siteTitle,
                 'localeKey' => $this->localeKey,
-                'themeKey' => $this->activeTheme->getKey(),
+                'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
                 'favIcon' => $this->favIcon,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],

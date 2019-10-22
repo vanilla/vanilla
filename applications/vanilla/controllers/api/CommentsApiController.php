@@ -171,6 +171,9 @@ class CommentsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         $comment = $this->commentByID($id);
+        if (isset($comment['DiscussionID'])) {
+            $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $comment['DiscussionID'], $query);
+        }
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);

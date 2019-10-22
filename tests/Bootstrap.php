@@ -115,6 +115,9 @@ class Bootstrap {
 
             // Site sections
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setFactory(function () {
+                return MockSiteSectionProvider::fromLocales();
+            })
             ->setClass(MockSiteSectionProvider::class)
             ->setShared(true)
 

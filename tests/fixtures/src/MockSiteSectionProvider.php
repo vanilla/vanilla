@@ -15,7 +15,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 class MockSiteSectionProvider implements SiteSectionProviderInterface {
 
     /**
-     * @var array $siteSections
+     * @var SiteSectionInterface[] $siteSections
      */
     private $siteSections = [];
 
@@ -72,6 +72,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getCurrentSiteSection(): SiteSectionInterface {
+        return $this->siteSections[0];
     }
 
     /**

@@ -63,7 +63,7 @@ dashboardHeading({
         'Photo',
         t('Photo'),
         '',
-        category.CategoryID !== null ? 'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID : ''
+        category.CategoryID is null ? 'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID : ''
     ) }}
 
     {#

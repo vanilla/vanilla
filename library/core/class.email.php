@@ -180,6 +180,19 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     /**
+     * Get the site's default from address.
+     *
+     * @return string
+     */
+    public function getDefaultFromAddress(): string {
+        $result = c('Garden.Email.SupportAddress', '');
+        if (!$result) {
+            $result = 'noreply@'.Gdn::request()->host();
+        }
+        return $result;
+    }
+
+    /**
      * Allows the explicit definition of the email's sender address & name.
      * Defaults to the applications Configuration 'SupportEmail' & 'SupportName' settings respectively.
      *
@@ -190,10 +203,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
      */
     public function from($senderEmail = '', $senderName = '', $bOverrideSender = false) {
         if ($senderEmail == '') {
-            $senderEmail = c('Garden.Email.SupportAddress', '');
-            if (!$senderEmail) {
-                $senderEmail = 'noreply@'.Gdn::request()->host();
-            }
+            $senderEmail = $this->getDefaultFromAddress();
         }
 
         if ($senderName == '') {

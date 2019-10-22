@@ -63,7 +63,7 @@ dashboardHeading({
         'Photo',
         t('Photo'),
         '',
-        'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID
+        category.CategoryID !== null ? 'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID : ''
     ) }}
 
     {#
@@ -110,7 +110,9 @@ dashboardHeading({
         </div>
     {% endif %}
 
+    {% if _PermissionFields is defined %}
     {{ form.simple(_PermissionFields, []) }}
+    {% endif %}
 
     <div class="padded">{{ t('Check all permissions that apply for each role') }}</div>
     {{ form.checkBoxGridGroups(PermissionData, 'Permission') }}

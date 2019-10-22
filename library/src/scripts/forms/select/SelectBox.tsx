@@ -23,6 +23,7 @@ export interface ISelectBoxItem {
     onClick?: () => void;
     selected?: boolean;
     translationStatus?: string;
+    icon?: React.ReactNode;
 }
 
 interface IProps {
@@ -120,6 +121,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                                 {` `}
                             </span>
                         )}
+                        {child.icon}
                     </span>
 
                     {/* {child.outdated && (

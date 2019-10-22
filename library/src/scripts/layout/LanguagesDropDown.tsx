@@ -62,20 +62,23 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
             return {
                 selected: isSelected,
                 name: data.locale,
+                icon: data.translationStatus === "not-translated" && <AlertIcon className={"selectBox-selectedIcon"} />,
                 content: (
                     <>
-                        <ToolTip
-                            label={`This article was editied in its source locale on ${(
-                                <DateTime timestamp={this.props.dateUpdated} />
-                            )}. Edit this article to update its translation and clear this meesage.`}
-                        >
-                            <span>
-                                <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                                {data.translationStatus === "not-translated" && (
-                                    <AlertIcon className={"selectBox-selectedIcon"} />
-                                )}
-                            </span>
-                        </ToolTip>
+                        {data.translationStatus !== "not-translated" && (
+                            <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                        )}
+                        {data.translationStatus === "not-translated" && (
+                            <ToolTip
+                                label={`This article was editied in its source locale on ${this.getDate(
+                                    this.props.dateUpdated,
+                                )}. Edit this article to update its translation and clear this meesage.`}
+                            >
+                                <span>
+                                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                                </span>
+                            </ToolTip>
+                        )}
                     </>
                 ),
 
@@ -99,6 +102,13 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
             >
                 {selectBoxItems}
             </SelectBox>
+        );
+    }
+    getDate(dateUpdated: string | undefined) {
+        return (
+            <span>
+                <DateTime timestamp={dateUpdated} />
+            </span>
         );
     }
 }

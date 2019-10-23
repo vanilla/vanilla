@@ -1990,7 +1990,7 @@ class ActivityModel extends Gdn_Model {
         }
 
         $activityEmail->addActivityID($activityID);
-        $activityEmail->addRecipient($address);
+        $activityEmail->addRecipient($address, $user["Name"] ?? null);
     }
 
     /**
@@ -2056,7 +2056,8 @@ class ActivityModel extends Gdn_Model {
             $email->to($email->getDefaultFromAddress(), t("Undisclosed Recipients"));
 
             foreach ($batch as $recipient) {
-                $email->bcc($recipient);
+                [$address, $name] = $recipient;
+                $email->bcc($address, $name ?? "");
             }
 
             $emailTemplate = $email->getEmailTemplate()

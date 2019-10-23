@@ -54,8 +54,8 @@ class ActivityEmail {
      *
      * @param string $email
      */
-    public function addRecipient(string $email) {
-        $this->recipients[] = $email;
+    public function addRecipient(string $email, ?string $name = null) {
+        $this->recipients[] = [$email, $name];
     }
 
     /**

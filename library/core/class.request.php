@@ -1664,6 +1664,20 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Get the url.
+     * (Simply concatenate host to uri provided)
+     *
+     * @param strinп $uri
+     * @return string
+     */
+    public function getSimpleUrl(string $uri = ''): string {
+        $scheme = $this->getScheme();
+        $hostAndPort = $this->getHostAndPort();
+        $assetRoot = $this->getAssetRoot();
+        return "{$scheme}://{$hostAndPort}{$assetRoot}{$uri}";
+    }
+
+    /**
      * Compare two urls for equality.
      *
      * @param string $url1 The first url to compare.

@@ -1,8 +1,7 @@
 {
     "global": {
         "mainColors": {
-            "primary": "#E14658",
-            "secondary": "#22252C"
+            "primary": "#E14658"
         }
     },
     "titleBar": {

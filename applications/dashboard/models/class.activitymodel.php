@@ -2078,7 +2078,7 @@ class ActivityModel extends Gdn_Model {
         $batchOffset = 0;
         while ($batch = array_slice($recipients, $batchOffset, $batchSize)) {
             $email->subject($activityEmail->getSubject());
-            $email->to($email->getDefaultFromAddress(), t("Notifications"));
+            $email->to($email->getNoReplyAddress(), t("Notifications Postmaster"));
 
             foreach ($batch as $recipient) {
                 [$address, $name] = $recipient;

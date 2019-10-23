@@ -16,8 +16,7 @@ import { AlertIcon } from "@library/icons/common";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
-import "@reach/tooltip/styles.css";
-
+import NumberType from "@storybook/addon-knobs/dist/components/types/Number";
 interface IState {
     id: string;
 }
@@ -40,6 +39,8 @@ export interface ILanguageDropDownProps {
     renderLeft?: boolean;
     openAsModal?: boolean;
     currentLocale?: string;
+    selectedIndex?: number;
+    selcteBoxItems: ISelectBoxItem[];
     dateUpdated?: string;
 }
 
@@ -55,46 +56,6 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
             return null;
         }
 
-        let selectedIndex = 0;
-        const selectBoxItems: ISelectBoxItem[] = this.props.data.map((data, index) => {
-            const isSelected = data.locale === this.props.currentLocale;
-            if (isSelected) {
-                selectedIndex = index;
-            }
-            return {
-                selected: isSelected,
-                name: data.locale,
-                icon: data.translationStatus === "not-translated" && <AlertIcon className={"selectBox-selectedIcon"} />,
-                content: (
-                    <>
-                        {data.translationStatus !== "not-translated" && (
-                            <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                        )}
-                        {data.translationStatus === "not-translated" && (
-                            <ToolTip
-                                label={
-                                    <span>
-                                        <Translate
-                                            source="This article was editied in its source locale on <0/>. Edit this article to update its translation and clear this meesage."
-                                            c0={<DateTime timestamp={this.props.dateUpdated} />}
-                                        />
-                                    </span>
-                                }
-                            >
-                                <span>
-                                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                                </span>
-                            </ToolTip>
-                        )}
-                    </>
-                ),
-
-                onClick: () => {
-                    window.location.href = data.url;
-                },
-            };
-        });
-
         return (
             <SelectBox
                 describedBy={this.props.titleID!}
@@ -103,9 +64,9 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 buttonClassName={this.props.buttonClassName}
                 buttonBaseClass={this.props.buttonBaseClass}
                 openAsModal={this.props.openAsModal}
-                selectedIndex={selectedIndex}
+                selectedIndex={this.props.selectedIndex}
             >
-                {selectBoxItems}
+                {this.props.selcteBoxItems}
             </SelectBox>
         );
     }

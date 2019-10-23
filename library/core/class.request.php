@@ -446,7 +446,7 @@ class Gdn_Request implements RequestInterface {
         $port = $this->getPort();
 
         // Only append the port if it is non-standard.
-        if (($port == 80 && $this->getScheme() === 'http') || ($port == 443 && $this->getScheme() === 'https')) {
+        if ($port == 80 || $port == 443) {
             $port = '';
         } else {
             $port = ':'.$port;

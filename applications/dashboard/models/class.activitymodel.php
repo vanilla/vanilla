@@ -1642,7 +1642,10 @@ class ActivityModel extends Gdn_Model {
 
                 $activityID = $this->SQL->insert('Activity', $activity);
                 $activity['ActivityID'] = $activityID;
-                $this->queueEmail($activity, $options);
+
+                if ($activity['Emailed'] == self::SENT_PENDING) {
+                    $this->queueEmail($activity, $options);
+                }
 
                 $this->prune();
             }

@@ -187,8 +187,19 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     public function getDefaultFromAddress(): string {
         $result = c('Garden.Email.SupportAddress', '');
         if (!$result) {
-            $result = 'noreply@'.Gdn::request()->host();
+            $result = $this->getNoReplyAddress();
         }
+        return $result;
+    }
+
+    /**
+     * Get an address suitable for no-reply-style emails.
+     *
+     * @return string
+     */
+    public function getNoReplyAddress(): string {
+        $host = Gdn::request()->host();
+        $result = "noreply@{$host}";
         return $result;
     }
 

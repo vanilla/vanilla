@@ -1965,9 +1965,9 @@ class ActivityModel extends Gdn_Model {
         $subject = $this->getEmailSubjectFormatted($activity, $options);
         $body = $this->getEmailMessage($activity);
         $key = implode(".", [
-            $activity["ActivityTypeID"] ?? null,
-            $activity["RecordID"] ?? null,
-            $activity["RecordType"] ?? null,
+            $activity["ActivityTypeID"] ?? "",
+            $activity["RecordID"] ?? "",
+            $activity["RecordType"] ?? "",
             md5($subject),
             md5($body),
         ]);
@@ -2053,7 +2053,7 @@ class ActivityModel extends Gdn_Model {
         $batchOffset = 0;
         while ($batch = array_slice($recipients, $batchOffset, $batchSize)) {
             $email->subject($activityEmail->getSubject());
-            $email->to($email->getDefaultFromAddress(), t("Undisclosed Recipients"));
+            $email->to($email->getDefaultFromAddress(), t("Notifications"));
 
             foreach ($batch as $recipient) {
                 [$address, $name] = $recipient;

@@ -90,7 +90,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
             $siteSections[] = new MockSiteSection(
                 "siteSectionName_".$locale,
                 $locale,
-                '/'.$locale.'/',
+                '/'.$locale,
                 "mockSiteSection-".$locale,
                 "mockSiteSectionGroup-1"
             );
@@ -98,7 +98,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
             $siteSections[] = new MockSiteSection(
                 "ssg2_siteSectionName_".$locale,
                 $locale,
-                '/ssg2-'.$locale.'/',
+                '/ssg2-'.$locale,
                 "ssg2-mockSiteSection-".$locale,
                 "mockSiteSectionGroup-2"
             );

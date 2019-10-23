@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 
 /**
@@ -59,6 +60,9 @@ class ActivityModel extends Gdn_Model {
     /** @var ActivityEmail[] Emails pending sending. */
     private static $emailQueue = [];
 
+    /** @var Psr\Log\LoggerInterface */
+    private $logger;
+
     /**
      * @var string The amount of time to delete logs after.
      */
@@ -68,14 +72,17 @@ class ActivityModel extends Gdn_Model {
      * Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
+     * @param LoggerInterface $logger
      */
-    public function __construct(Gdn_Validation $validation = null) {
+    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null) {
         parent::__construct('Activity', $validation);
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
+
+        $this->logger = $logger instanceof LoggerInterface ? $logger : Gdn::getContainer()->get(LoggerInterface::class);
     }
 
     /**
@@ -2015,12 +2022,20 @@ class ActivityModel extends Gdn_Model {
             $email->send();
             return self::SENT_OK;
         } catch (phpmailerException $pex) {
+            $this->logger->error("A PHPMailer exception occurred while sending a notification.", [
+                "event" => "activity_email_failed",
+                "exception" => $pex,
+            ]);
             if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$email->PhpMailer->isServerError($pex)) {
                 return self::SENT_FAIL;
             } else {
                 return self::SENT_ERROR;
             }
         } catch (Exception $ex) {
+            $this->logger->error("An exception occurred while sending a notification.", [
+                "event" => "activity_email_failed",
+                "exception" => $ex,
+            ]);
             switch ($ex->getCode()) {
                 case Gdn_Email::ERR_SKIPPED:
                     return self::SENT_SKIPPED;

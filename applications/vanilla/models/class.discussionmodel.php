@@ -2994,7 +2994,7 @@ class DiscussionModel extends Gdn_Model {
             $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, $categoryID, $permission);
         }
         // Check if we've timed out.
-        if (strpos(strtolower($permission), 'edit' !== false)) {
+        if (strpos(strtolower($permission), 'edit') !== false) {
             $hasPermission &= self::editContentTimeout($discussion);
         }
         // Fire event to override permission ruling.

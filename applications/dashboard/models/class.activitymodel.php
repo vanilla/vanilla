@@ -2005,7 +2005,14 @@ class ActivityModel extends Gdn_Model {
      */
     private function sendEmailQueue() {
         foreach (static::$emailQueue as $activityEmail) {
-            $this->sendActivityEmail($activityEmail);
+            try {
+                $this->sendActivityEmail($activityEmail);
+            } catch (Exception $e) {
+                $this->logger->error("An exception occurred while processing the notification email queue.", [
+                    "event" => "activity_email_failed",
+                    "exception" => $e,
+                ]);
+            }
         }
         static::$emailQueue = [];
     }

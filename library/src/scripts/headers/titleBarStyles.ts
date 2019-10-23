@@ -112,7 +112,10 @@ export const titleBarVariables = useThemeCache(() => {
             },
         },
     };
-    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
+    const linkButton: IButtonType = makeThemeVars("linkButton", {
+        ...linkButtonDefaults,
+        minWidth: unit(formElementVars.sizing.height,
+    });
 
     const count = makeThemeVars("count", {
         size: 18,

@@ -7,10 +7,15 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import { AlertIcon, EditIcon } from "@library/icons/common";
 import cloneDeep from "lodash/cloneDeep";
 import { t } from "@library/utility/appUtils";
-import { ILocale } from "@vanilla/i18n";
 import { useUniqueID } from "@library/utility/idUtils";
 import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 import { ILanguageItem } from "@library/layout/LanguagesDropDown";
+import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
 
 export interface ITranslation {
     id: string;
@@ -19,13 +24,6 @@ export interface ITranslation {
     multiLine?: boolean; // We'll default to a textarea, that looks like a single line, but it would be much better to know.
     maxLength?: number; // Please add maximum character counts where possible.
 }
-
-/*interface ILanguageItems {
-    name: string;
-    url: string;
-    locale: string;
-    translationStatus: string;
-}*/
 
 export interface ITranslationGrid {
     data: ITranslation[];
@@ -48,6 +46,39 @@ export function TranslationGrid(props: ITranslationGrid) {
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
     const translationKey = "newTranslation";
+    const currentLocale = "en";
+    let selectedIndex = 0;
+    const selectBoxItems: ISelectBoxItem[] = props.otherLanguages.map((data, index) => {
+        const isSelected = data.locale === currentLocale;
+        if (isSelected) {
+            selectedIndex = index;
+        }
+        return {
+            selected: isSelected,
+            name: data.locale,
+            content: (
+                <>
+                    <ToolTip
+                        label={`This article was editied in its source locale on ${(
+                            <DateTime timestamp={props.dateUpdated} />
+                        )}. Edit this article to update its translation and clear this meesage.`}
+                    >
+                        <span>
+                            <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                            {data.translationStatus === "not-translated" && (
+                                <AlertIcon className={"selectBox-selectedIcon"} />
+                            )}
+                        </span>
+                    </ToolTip>
+                </>
+            ),
+
+            onClick: () => {
+                window.location.href = data.url;
+            },
+        };
+    });
+
     const translationRows = translations.map((translation, i) => {
         const notTranslated = !translations[i][translationKey];
         const newTranslation = translations[i][translationKey] || "";
@@ -116,8 +147,10 @@ export function TranslationGrid(props: ITranslationGrid) {
                                 className="otherLanguages-select"
                                 renderLeft={true}
                                 data={props.otherLanguages}
-                                currentLocale={"en"}
+                                currentLocale={currentLocale}
                                 dateUpdated={props.dateUpdated}
+                                selcteBoxItems={selectBoxItems}
+                                selectedIndex={selectedIndex}
                             />
                         </div>
                     </div>

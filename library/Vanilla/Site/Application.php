@@ -26,6 +26,7 @@ class Application implements ApplicationInterface {
 
     /**
      * Application constructor.
+     *
      * @param string $name
      * @param array $reservedSlugs
      */

@@ -18,6 +18,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\Fixtures\MockAddonProvider;
@@ -52,7 +53,11 @@ class MinimalContainerTestCase extends TestCase {
         \Gdn::setContainer(new Container());
         self::container()
             ->rule(FormatService::class)
+            ->setShared(true)
             ->addCall('registerBuiltInFormats', [self::container()])
+
+            ->rule(Parser::class)
+            ->addCall('addCoreBlotsAndFormats')
 
             // Site sections
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)

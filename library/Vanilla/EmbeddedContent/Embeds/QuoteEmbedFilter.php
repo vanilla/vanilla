@@ -86,29 +86,12 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
         $bodyRaw = $embed->getData()['bodyRaw'];
         $format = $embed->getData()['format'];
 
-        // Remove nested external embed data. We don't want it rendered and this will prevent it from being
-        // searched.
-        if (strtolower($format) === RichFormat::FORMAT_KEY) {
-            $arrayBody = Parser::jsonToOperations($bodyRaw);
-
-            // Iterate through the nested embed.
-            foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
-                $insert = &$subInsertOp['insert'];
-                if (is_array($insert)) {
-                    $url = $insert['embed-external']['data']['url'] ?? null;
-                    if ($url !== null) {
-                        // Replace the embed with just a link.
-                        $linkEmbedOps = $this->makeLinkEmbedInserts($url);
-                        array_splice($bodyRaw, $subInsertIndex, 1, $linkEmbedOps);
-                    }
-                }
-            }
-            $bodyRaw = json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
-        }
-
         if ($embed->getDisplayOptons()->isRenderFullContent()) {
             $renderedBody = \Gdn::formatService()->renderHTML($bodyRaw, $format);
         } else {
+            if (strtolower($format) === RichFormat::FORMAT_KEY) {
+                $bodyRaw = $this->stripNestedRichEmbeds($bodyRaw);
+            }
             $renderedBody = \Gdn::formatService()->renderQuote($bodyRaw, $format);
         }
 
@@ -116,6 +99,30 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
             'body' => $renderedBody,
             'bodyRaw' => $bodyRaw,
         ], false);
+    }
+
+    /**
+     * Strip nested embeds from a raw rich body.
+     *
+     * @param string $richRawBody A rich content body, JSON encoded.
+     *
+     * @return string
+     */
+    private function stripNestedRichEmbeds(string $richRawBody): string {
+        $arrayBody = Parser::jsonToOperations($richRawBody);
+        // Iterate through the nested embed.
+        foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
+            $insert = &$subInsertOp['insert'];
+            if (is_array($insert)) {
+                $url = $insert['embed-external']['data']['url'] ?? null;
+                if ($url !== null) {
+                    // Replace the embed with just a link.
+                    $linkEmbedOps = $this->makeLinkEmbedInserts($url);
+                    array_splice($arrayBody, $subInsertIndex, 1, $linkEmbedOps);
+                }
+            }
+        }
+        return json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
     }
 
     /**

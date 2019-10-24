@@ -352,11 +352,7 @@ class AddonManager implements Contracts\AddonProviderInterface {
                 } elseif (!array_key_exists($key, $addons)) {
                     $addons[$key] = $addon;
                 } else {
-                    \Logger::error('Duplicate addon: {key}', [
-                        'key' => $key,
-                        'event' => 'duplicate_addon'
-                    ]);
-                    throw new \Exception("Duplicate addon: {$key}");
+                    throw new \Exception("Duplicate addon: {$key}", 500);
                 }
             } catch (\Exception $ex) {
                 $exceptionMessage = $ex->getMessage();
@@ -402,10 +398,7 @@ class AddonManager implements Contracts\AddonProviderInterface {
                 } elseif (!array_key_exists($basename, $result)) {
                     $result[$basename] = substr($path, $strlen);
                 } else {
-                    \Logger::error('Duplicate addon: {basename}', [
-                        'basename' => $basename,
-                        'event' => 'duplicate_addon'
-                    ]);
+                    trigger_error("Duplicate addon: $basename", E_USER_WARNING);
                 }
             }
         }

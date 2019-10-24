@@ -1201,8 +1201,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                 }
 
                 if ($options['asFragments'] ?? false) {
-                    setValue($destination, $row, UserFragmentSchema::normalizeUserFragment($user));
+                    $user =  UserFragmentSchema::normalizeUserFragment($user);
                 }
+                setValue($destination, $row, $user);
             }
         };
 

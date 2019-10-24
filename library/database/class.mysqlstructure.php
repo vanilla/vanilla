@@ -226,14 +226,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
                 if ($columnKeyType == 'primary') {
                     $primaryKey[] = $columnName;
-                } elseif ($columnKeyType == 'key')
+                } elseif ($columnKeyType == 'key') {
                     $indexes['FK'][$indexGroup][] = $columnName;
-                elseif ($columnKeyType == 'index')
+                } elseif ($columnKeyType == 'index') {
                     $indexes['IX'][$indexGroup][] = $columnName;
-                elseif ($columnKeyType == 'unique')
+                } elseif ($columnKeyType == 'unique') {
                     $uniqueKey[] = $columnName;
-                elseif ($columnKeyType == 'fulltext')
+                } elseif ($columnKeyType == 'fulltext') {
                     $fullTextKey[] = $columnName;
+                }
             }
         }
         // Build primary keys

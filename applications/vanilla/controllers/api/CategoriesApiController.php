@@ -104,10 +104,10 @@ class CategoriesApiController extends AbstractApiController {
         $row = $this->category($id);
         $children = $this->categoryModel->getChildTree($row['CategoryID']);
         if (!$row['CanDelete']) {
-            throw new ServerException('The specified category cannot be deleted.', 400);
+            throw new ServerException('The specified category cannot be deleted.', 500);
         }
         if (count($children) > 0) {
-            throw new ServerException('Cannot delete categories with children.', 400);
+            throw new ServerException('Cannot delete categories with children.', 500);
         }
         $this->categoryModel->deleteID($id);
     }

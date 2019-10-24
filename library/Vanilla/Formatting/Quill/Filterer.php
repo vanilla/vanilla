@@ -17,17 +17,17 @@ use Vanilla\Formatting\Formats\RichFormat;
  */
 class Filterer {
 
-    /** @var EmbedService */
-    private $embedService;
-
-    /**
-     * DI.
-     *
-     * @param EmbedService $embedService
-     */
-    public function __construct(EmbedService $embedService) {
-        $this->embedService = $embedService;
-    }
+//    /** @var EmbedService */
+//    private $embedService;
+//
+//    /**
+//     * DI.
+//     *
+//     * @param EmbedService $embedService
+//     */
+//    public function __construct(EmbedService $embedService) {
+//        $this->embedService = $embedService;
+//    }
 
 
     /**
@@ -79,7 +79,8 @@ class Filterer {
                 continue;
             }
             $embedData = &$embed['data'];
-            $embed['data'] = $this->embedService->filterEmbedData($embedData);
+            $embedService = \Gdn::getContainer()->get(EmbedService::class);
+            $embed['data'] = $embedService->filterEmbedData($embedData);
         }
 
         return array_values($operations);

@@ -80,9 +80,6 @@ class DashboardHooks extends Gdn_Plugin {
             ->addCall('addProvider', [new Reference(ActivityCounterProvider::class)])
             ->addCall('addProvider', [new Reference(LogCounterProvider::class)])
             ->addCall('addProvider', [new Reference(RoleCounterProvider::class)])
-
-            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
-            ->addCall('add', [new \Vanilla\Site\Application('vanilla', ['api', 'entry', 'sso', 'utility'])])
         ;
     }
 

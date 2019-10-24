@@ -16,6 +16,7 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
@@ -23,6 +24,7 @@ use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
+use VanillaTests\Fixtures\Models\MockUserProvider;
 use VanillaTests\Fixtures\NullCache;
 
 /**
@@ -106,6 +108,10 @@ class MinimalContainerTestCase extends TestCase {
             ->setShared(true)
             ->addAlias(Gdn::AliasRequest)
             ->addAlias(RequestInterface::class)
+
+            ->rule(UserProviderInterface::class)
+            ->setClass(MockUserProvider::class)
+            ->setShared(true)
         ;
     }
 
@@ -179,6 +185,12 @@ class MinimalContainerTestCase extends TestCase {
         $_SERVER['HTTPS'] = parse_url($baseUrl, PHP_URL_SCHEME) === 'https';
     }
 
+    /**
+     * @return MockUserProvider
+     */
+    protected function getMockUserProvider(): MockUserProvider {
+        return self::container()->get(UserProviderInterface::class);
+    }
 
     /**
      * Reset the container.

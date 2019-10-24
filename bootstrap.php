@@ -258,6 +258,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Gdn_Model')
     ->setShared(true)
 
+    ->rule(Contracts\Models\UserProviderInterface::class)
+    ->setClass(UserModel::class)
+
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
 

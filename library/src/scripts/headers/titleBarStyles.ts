@@ -87,6 +87,13 @@ export const titleBarVariables = useThemeCache(() => {
         fonts: {
             color: colors.fg,
         },
+        sizing: {
+            minWidth: unit(globalVars.icon.sizes.large),
+            minHeight: unit(globalVars.icon.sizes.large),
+        },
+        padding: {
+            side: 6,
+        },
         borders: {
             style: "none",
             color: "transparent",
@@ -112,10 +119,7 @@ export const titleBarVariables = useThemeCache(() => {
             },
         },
     };
-    const linkButton: IButtonType = makeThemeVars("linkButton", {
-        ...linkButtonDefaults,
-        minWidth: unit(formElementVars.sizing.height,
-    });
+    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
 
     const count = makeThemeVars("count", {
         size: 18,

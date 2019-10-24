@@ -95,8 +95,8 @@ endif;
 if (!function_exists('MostRecentString')):
     function mostRecentString($row, $options = []) {
         $options = (array)$options + [
-            'user' => true,
-            'date' => true,
+            'showUser' => true,
+            'showDate' => true,
         ];
 
         if (!$row['LastTitle']) {
@@ -112,7 +112,7 @@ if (!function_exists('MostRecentString')):
             $row['LastUrl'],
             'LatestPostTitle');
 
-        if ($options['user'] && val('LastName', $row)) {
+        if ($options['showUser'] && val('LastName', $row)) {
             $r .= ' ';
 
             $r .= '<span class="MostRecentBy">'.t('by').' ';
@@ -120,7 +120,7 @@ if (!function_exists('MostRecentString')):
             $r .= '</span>';
         }
 
-        if ($options['date'] && val('LastDateInserted', $row)) {
+        if ($options['showDate'] && val('LastDateInserted', $row)) {
             $r .= ' ';
 
             $r .= '<span class="MostRecentOn"><span class="CommentDate">';
@@ -206,7 +206,7 @@ if (!function_exists('writeListItem')):
 
                         <?php if (val('LastTitle', $category) != '') : ?>
                             <span class="MItem LastDiscussionTitle">
-                                <?php echo mostRecentString($category, ['date' => false]); ?>
+                                <?php echo mostRecentString($category, ['showDate' => false]); ?>
                             </span>
                             <span class="MItem LastCommentDate">
                                 <?php echo Gdn_Format::date(val('LastDateInserted', $category)); ?>

@@ -57,7 +57,7 @@ class MockUserProvider implements UserProviderInterface {
         $record = [
             'userID' => $this->currentID,
             'name' => 'user' . $this->currentID,
-            'email' => 'user' . $this->currentID . '@example.com',
+            'dateLastActive' => null,
             'photoUrl' => 'image.png',
         ];
 

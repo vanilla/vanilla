@@ -190,6 +190,9 @@ class Bootstrap {
             ->addAlias('MySQLDriver')
             ->addAlias(Gdn::AliasSqlDriver)
 
+            ->rule(\Vanilla\Contracts\Models\UserProviderInterface::class)
+            ->setClass(\UserModel::class)
+
             // Locale
             ->rule(\Gdn_Locale::class)
             ->setShared(true)

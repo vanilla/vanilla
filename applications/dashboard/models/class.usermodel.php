@@ -10,11 +10,14 @@
 
 use Garden\EventManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\UserFragmentSchema;
 
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model {
+class UserModel extends Gdn_Model implements UserProviderInterface {
 
     /** @var int */
     const GUEST_USER_ID = 0;
@@ -1115,11 +1118,31 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function expandUserFragments(array &$records, array $columnNames): void {
+        $this->expandUsers($records, $columnNames, ['asFragments' => true]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUnknownFragment(): array {
+        return [
+            'userID' => 0,
+            'name' => 'unknown',
+            'email' => 'unknown@example.com',
+            'photoUrl' => self::getDefaultAvatarUrl(),
+        ];
+    }
+
+    /**
      * Add multi-dimensional user data to an array.
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
      * @param array $options Additional options. Passed to filter event.
+     *        [bool asFragments] - Expand as user fragments.
      */
     public function expandUsers(array &$rows, array $columns, array $options = []) {
         // How are we supposed to lookup users by column if we don't have any columns?
@@ -1173,16 +1196,13 @@ class UserModel extends Gdn_Model {
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
                     } else {
-                        $user = [
-                            'userID' => 0,
-                            'name' => 'unknown',
-                            'email' => 'unknown@example.com'
-                        ];
-                        $user['photoUrl'] = self::getDefaultAvatarUrl($user);
+                        $user = self::getUnknownFragment();
                     }
                 }
 
-                setValue($destination, $row, $user);
+                if ($options['asFragments'] ?? false) {
+                    setValue($destination, $row, UserFragmentSchema::normalizeUserFragment($user));
+                }
             }
         };
 
@@ -1501,6 +1521,23 @@ class UserModel extends Gdn_Model {
             ->firstRow();
 
         return $data === false ? 0 : $data->UserCount;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array {
+        $record = $this->getID($id, DATASET_TYPE_ARRAY);
+        if ($record === false) {
+            if ($useUnknownFallback) {
+                return $this->getUnknownFragment();
+            } else {
+                throw new NoResultsException("No user found for ID: " . $id);
+            }
+        }
+
+        return UserFragmentSchema::normalizeUserFragment($record);
     }
 
     /**

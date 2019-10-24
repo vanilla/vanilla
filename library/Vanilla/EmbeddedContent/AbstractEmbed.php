@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent;
 
 use DateTime;
 use DateTimeInterface;
+use Garden\JsonFilterTrait;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Web\TwigRenderTrait;
@@ -22,9 +23,10 @@ use Vanilla\Web\TwigRenderTrait;
 abstract class AbstractEmbed implements \JsonSerializable {
 
     use TwigRenderTrait;
+    use JsonFilterTrait;
 
     /** @var array */
-    protected $data;
+    protected $data = [];
 
     /**
      * Create the embed by taking some data and validating it.
@@ -34,44 +36,43 @@ abstract class AbstractEmbed implements \JsonSerializable {
      * @throws ValidationException If the data doesn't match the specification.
      */
     public function __construct(array $data) {
-        // Validate the data before assigning local variables.
-        $data = $this->normalizeCommonData($data);
-        $normalizedData = $this->normalizeData($data);
-        $validatedData = $this->fullSchema()->validate($normalizedData);
-        $this->data = $validatedData;
+        $this->updateData($data);
     }
 
     /**
-     * @return array|mixed
+     * Update various embed data fields.
+     *
+     * @param array $fieldsToUpdate A sparse array of fields and data to update.
+     * @param bool $revalidate Whether or not we should re-normalize and validate the content.
+     *
+     * @throws ValidationException If the data doesn't match the specification.
+     */
+    public function updateData(array $fieldsToUpdate, bool $revalidate = true) {
+        $data = array_merge($this->data, $fieldsToUpdate);
+
+        // Validate the data before assigning local variables.
+        if ($revalidate) {
+            $data = $this->normalizeCommonData($data);
+            $data = $this->normalizeData($data);
+            $data = $this->fullSchema()->validate($data);
+        }
+        $this->data = $data;
+    }
+
+    /**
+     * @return array
      */
     public function jsonSerialize() {
-        return $this->jsonFilter($this->data);
+        return $this->getData();
     }
 
     /**
-     * Prepare data for json_encode
+     * Get normalized data from the embed.
      *
-     * @param mixed $value
-     * @return mixed
+     * @return array;
      */
-    private function jsonFilter($value) {
-        $fn = function (&$value, $key = '') use (&$fn) {
-            if (is_array($value)) {
-                array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
-                    $fn($childValue, $childKey);
-                });
-            } elseif ($value instanceof DateTimeInterface) {
-                $value = $value->format(DateTime::RFC3339);
-            }
-        };
-
-        if (is_array($value)) {
-            array_walk($value, $fn);
-        } else {
-            $fn($value);
-        }
-
-        return $value;
+    public function getData(): array {
+        return $this->jsonFilter($this->data);
     }
 
     /**

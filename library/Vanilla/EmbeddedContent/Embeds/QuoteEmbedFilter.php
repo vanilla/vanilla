@@ -7,13 +7,30 @@
 
 namespace Vanilla\EmbeddedContent\Embeds;
 
+use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedFilterInterface;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * Class for filtering data inside of quote embeds.
  */
 class QuoteEmbedFilter implements EmbedFilterInterface {
+
+    /** @var FormatService */
+    private $formatService;
+
+    /**
+     * DI.
+     *
+     * @param FormatService $formatService
+     */
+    public function __construct(FormatService $formatService) {
+        $this->formatService = $formatService;
+    }
+
 
     /**
      * @inheritdoc
@@ -27,17 +44,33 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      *
      * @inheritdoc
      */
-    public function filterData(array $embedData): array {
-        $bodyRaw = &$embedData['bodyRaw'] ?? null;
-        $format = &$embedData['format'] ?? null;
+    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
+        if (!($embed instanceof QuoteEmbed)) {
+            throw new EmbeddedContentException('Expected a quote embed. Instead got a ' . get_class($embed));
+        }
+        $this->cleanupBody($embed);
+        return $embed;
+    }
 
-        $stringBodyRaw = $bodyRaw;
+    /**
+     * Cleanup the body of the quote.
+     *
+     * - Strip out nested embeds.
+     * - Rerender it to ensure it's secure.
+     *
+     * @param QuoteEmbed $embed
+     */
+    private function cleanupBody(QuoteEmbed $embed) {
+        $bodyRaw = $embed->getData()['bodyRaw'];
+        $format = $embed->getData()['format'];
 
         // Remove nested external embed data. We don't want it rendered and this will prevent it from being
         // searched.
-        if (strtolower($format) === RichFormat::FORMAT_KEY && is_array($bodyRaw)) {
+        if (strtolower($format) === RichFormat::FORMAT_KEY) {
+            $arrayBody = Parser::jsonToOperations($bodyRaw);
+
             // Iterate through the nested embed.
-            foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
+            foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
                 $insert = &$subInsertOp['insert'];
                 if (is_array($insert)) {
                     $url = $insert['embed-external']['data']['url'] ?? null;
@@ -48,24 +81,19 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
                     }
                 }
             }
-            $stringBodyRaw = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
+            $bodyRaw = json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
         }
 
-        // Fix improperly encoded unicode:
-        if (strstr($stringBodyRaw, "\\u") !== false) {
-            $decoded = json_decode($stringBodyRaw);
-            $stringBodyRaw = json_encode($decoded, JSON_UNESCAPED_UNICODE);
-            $embedData['bodyRaw'] = $stringBodyRaw;
-        }
-
-        // Finally render the new body to overwrite the previous HTML body.
-        if ($embedData['displayOptions']['renderFullContent'] ?? null) {
-            $embedData['body'] = \Gdn::formatService()->renderHTML($stringBodyRaw, $format);
+        if ($embed->getDisplayOptons()->isRenderFullContent()) {
+            $renderedBody = $this->formatService->renderHTML($bodyRaw, $format);
         } else {
-            $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);
+            $renderedBody = $this->formatService->renderQuote($bodyRaw, $format);
         }
 
-        return $embedData;
+        $embed->updateData([
+            'body' => $renderedBody,
+            'bodyRaw' => $bodyRaw,
+        ], false);
     }
 
     /**

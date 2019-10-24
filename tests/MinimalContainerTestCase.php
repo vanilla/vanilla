@@ -50,6 +50,7 @@ class MinimalContainerTestCase extends TestCase {
         \Gdn::setContainer(new Container());
         self::container()
             ->rule(FormatService::class)
+            ->setShared(true)
             ->addCall('registerBuiltInFormats', [self::container()])
 
             // Site sections

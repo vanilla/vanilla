@@ -24,8 +24,8 @@ interface EmbedFilterInterface {
      * Filter some embed data.
      * This is used for sanitizing embeds on the way in/out of the site.
      *
-     * @param array $data
-     * @return array
+     * @param AbstractEmbed $embed
+     * @return AbstractEmbed
      */
-    public function filterData(array $data): array;
+    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed;
 }

@@ -87,12 +87,12 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
         $format = $embed->getData()['format'];
 
         if ($embed->getDisplayOptons()->isRenderFullContent()) {
-            $renderedBody = \Gdn::formatService()->renderHTML($bodyRaw, $format);
+            $renderedBody = $this->formatService->renderHTML($bodyRaw, $format);
         } else {
             if (strtolower($format) === RichFormat::FORMAT_KEY) {
                 $bodyRaw = $this->stripNestedRichEmbeds($bodyRaw);
             }
-            $renderedBody = \Gdn::formatService()->renderQuote($bodyRaw, $format);
+            $renderedBody = $this->formatService->renderQuote($bodyRaw, $format);
         }
 
         $embed->updateData([
@@ -122,6 +122,7 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
                 }
             }
         }
+
         return json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
     }
 

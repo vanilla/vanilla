@@ -138,56 +138,6 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     *
-     */
-    public function archive() {
-        // Check permission
-        $this->permission('Garden.Settings.Manage');
-
-        // Load up config options we'll be setting
-        $validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField([
-            'Vanilla.Archive.Date',
-            'Vanilla.Archive.Exclude'
-        ]);
-
-        // Set the model on the form.
-        $this->Form->setModel($configurationModel);
-
-        // If seeing the form for the first time...
-        if ($this->Form->authenticatedPostBack() === false) {
-            $this->Form->setData($configurationModel->Data);
-        } else {
-            // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
-
-            // Grab old config values to check for an update.
-            $archiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $archiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
-
-            // Save new settings
-            $saved = $this->Form->save();
-            if ($saved !== false) {
-                $archiveDate = Gdn::config('Vanilla.Archive.Date');
-                $archiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-
-                if ($archiveExclude != $archiveExcludeBak || ($archiveExclude && $archiveDate != $archiveDateBak)) {
-                    $discussionModel = new DiscussionModel();
-                    $discussionModel->updateDiscussionCount('All');
-                }
-                $this->informMessage(t("Your changes have been saved."));
-            }
-        }
-
-        $this->setHighlightRoute('vanilla/settings/archive');
-        $this->title(t('Archive Discussions'));
-
-        // Render default view (settings/archive.php)
-        $this->render();
-    }
-
-    /**
      * Alias for ManageCategories method.
      *
      * @since 2.0.0

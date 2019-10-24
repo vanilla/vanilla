@@ -480,8 +480,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
-        $this->addArchiveWhere($this->SQL);
-
         if ($offset !== false && $limit !== false) {
             $this->SQL->limit($limit, $offset);
         }
@@ -868,9 +866,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
-        $this->addArchiveWhere($this->SQL);
-
-
         $this->SQL->limit($limit, $offset);
 
         $this->EventArguments['SortField'] = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
@@ -1006,8 +1001,6 @@ class DiscussionModel extends Gdn_Model {
     }
 
     public function calculate(&$discussion) {
-        $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
-
         // Fix up output
         $discussion->Name = htmlspecialchars($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
@@ -1043,15 +1036,7 @@ class DiscussionModel extends Gdn_Model {
 
         // Allow for discussions to be archived
         $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
-        if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
-            $discussion->Closed = '1';
-            if ($discussion->CountCommentWatch) {
-                $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-            } else {
-                $discussion->CountUnreadComments = 0;
-            }
-            // Allow for discussions to just be new.
-        } elseif ($discussion->CountCommentWatch === null) {
+        if ($discussion->CountCommentWatch === null) {
             $discussion->CountUnreadComments = true;
 
         } else {
@@ -1120,23 +1105,12 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Add SQL Where to account for archive date.
      *
-     * @since 2.0.0
-     * @access public
+     * @deprecated
      *
-     * @param object $sql Gdn_SQLDriver
+     * @param Gdn_SQLDriver $sql
      */
     public function addArchiveWhere($sql = null) {
-        if (is_null($sql)) {
-            $sql = $this->SQL;
-        }
-
-        $exclude = Gdn::config('Vanilla.Archive.Exclude');
-        if ($exclude) {
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
-            if ($archiveDate) {
-                $sql->where('d.DateLastComment >', $archiveDate);
-            }
-        }
+        deprecated('DiscussionModel::addArchiveWhere');
     }
 
 
@@ -2416,15 +2390,8 @@ class DiscussionModel extends Gdn_Model {
     public function updateDiscussionCount($categoryID, $discussion = false) {
         $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
-            $exclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
             $params = [];
             $where = '';
-
-            if ($exclude && $archiveDate) {
-                $where = 'where d.DateLastComment > :ArchiveDate';
-                $params[':ArchiveDate'] = $archiveDate;
-            }
 
             // Update all categories.
             $sql = "update :_Category c
@@ -2450,8 +2417,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.CountComments', 'sum', 'CountComments')
                 ->from('Discussion d')
                 ->where('d.CategoryID', $categoryID);
-
-            $this->addArchiveWhere();
 
             $data = $this->SQL->get()->firstRow();
             $countDiscussions = (int)getValue('CountDiscussions', $data, 0);

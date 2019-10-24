@@ -11,7 +11,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import React from "react";
-import { CheckIcon } from "@library/icons/common";
+import { CheckIcon, DropDownMenuIcon } from "@library/icons/common";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
@@ -36,7 +36,6 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
             <DropDownItem className={classNames(className, classesDropDown.item)}>
                 <LinkComponent to={to} title={name} lang={this.props.lang} className={classesDropDown.action}>
                     {linkContents}
-                    {isCurrent && <CheckIcon />}
                 </LinkComponent>
             </DropDownItem>
         );

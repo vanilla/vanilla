@@ -77,6 +77,22 @@ class QuoteEmbed extends AbstractEmbed {
     }
 
     /**
+     * Override to remove rawBody from output. It's unnecssary.
+     * @inheritdoc
+     */
+    public function renderHtml(): string {
+        $viewPath = dirname(__FILE__) . '/QuoteEmbed.twig';
+        $data = $this->getData();
+
+        // No need to bloat the HTML with this.
+        unset($data['bodyRaw']);
+
+        return $this->renderTwig($viewPath, [
+            'url' => $this->getUrl(),
+            'data' => json_encode($this, JSON_UNESCAPED_UNICODE)
+        ]);
+    }
+    /**
      * Get the name of the user being quoted.
      *
      * @return string

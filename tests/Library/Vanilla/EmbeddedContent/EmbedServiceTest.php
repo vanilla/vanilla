@@ -70,8 +70,8 @@ class EmbedServiceTest extends MinimalContainerTestCase {
         $embed1 = new MockEmbed(['embedType' => $type1, "url" => 'https://url1.com'], [$type1]);
         $embed2 = new MockEmbed(['embedType' => $type2, "url" => 'https://url2.com'], [$type2]);
 
-        $replace1 =  ['embedType' => 'replace1', "url" => "https://replace1.com"];
-        $replace2 =  ['embedType' => 'replace2', "url" => "https://replace2.com"];
+        $replace1 =  new MockEmbed(['embedType' => 'replace1', "url" => "https://replace1.com"], [$type1]);
+        $replace2 =  new MockEmbed(['embedType' => 'replace2', "url" => "https://replace2.com"], [$type2]);
 
         $embedFilter1 = new MockEmbedFilter(false, $replace1, [$type1]);
         $embedFilter2 = new MockEmbedFilter(false, $replace2, [$type2]);

@@ -38,7 +38,7 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function expandUserFragments(array &$records, array $columnNames): void {
+    public function expandFragments(array &$records, array $columnNames): void {
         foreach ($columnNames as $column) {
             $noIDName = str_replace('ID', '', $column);
             foreach ($records as $record) {
@@ -46,6 +46,15 @@ class MockUserProvider implements UserProviderInterface {
             }
         }
     }
+
+    /**
+     * All values are supported.
+     * @return array
+     */
+    public function getAllowedGeneratedRecordKeys(): array {
+        return [];
+    }
+
 
     /**
      * Create a mock user, add it, and return it.
@@ -73,12 +82,12 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getUnknownFragment(): array {
+    public function getGeneratedFragment(string $key): array {
         return [
             'userID' => 0,
-            'name' => 'unknown',
-            'email' => 'unknown@example.com',
-            'photoUrl' => 'unknown.png',
+            'name' => $key,
+            'email' => $key . '@example.com',
+            'photoUrl' => $key . '.png',
         ];
     }
 }

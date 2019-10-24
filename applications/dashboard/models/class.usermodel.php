@@ -22,6 +22,15 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     /** @var int */
     const GUEST_USER_ID = 0;
 
+    /** @var int This happens to be the same as the guest ID because it's just been that way for so long. */
+    const UNKNOWN_USER_ID = 0;
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_UNKNOWN = "unknown";
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_GUEST = "guest";
+
     /** Deprecated. */
     const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 
@@ -1120,20 +1129,44 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function expandUserFragments(array &$records, array $columnNames): void {
+    public function expandFragments(array &$records, array $columnNames): void {
         $this->expandUsers($records, $columnNames, ['asFragments' => true]);
     }
 
     /**
      * @inheritdoc
      */
-    public function getUnknownFragment(): array {
-        return [
-            'userID' => 0,
+    public function getAllowedGeneratedRecordKeys(): array {
+        return [self::GENERATED_FRAGMENT_KEY_GUEST, self::GENERATED_FRAGMENT_KEY_UNKNOWN];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGeneratedFragment(string $key): array {
+        $unknownFragment = [
+            'userID' => self::UNKNOWN_USER_ID,
             'name' => 'unknown',
             'email' => 'unknown@example.com',
             'photoUrl' => self::getDefaultAvatarUrl(),
         ];
+        switch ($key) {
+            case self::GENERATED_FRAGMENT_KEY_GUEST:
+                return [
+                    'userID' => self::GUEST_USER_ID,
+                    'name' => 'guest',
+                    'email' => 'guest@example.com',
+                    'photoUrl' => self::getDefaultAvatarUrl(),
+                ];
+            case self::GENERATED_FRAGMENT_KEY_UNKNOWN:
+                return $unknownFragment;
+            default:
+                trigger_error(
+                    'Called '.__CLASS__.'::'.__METHOD__.'($key) with an non-matching key. Supported values are: '
+                    . "\n" . implode(", ", $this->getAllowedGeneratedRecordKeys())
+                );
+                return $unknownFragment;
+        }
     }
 
     /**

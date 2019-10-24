@@ -24,6 +24,11 @@ class Application implements ApplicationInterface {
      */
     private $reservedSlugs = [];
 
+    /**
+     * Application constructor.
+     * @param string $name
+     * @param array $reservedSlugs
+     */
     public function __construct(string $name, array $reservedSlugs) {
         $this->name = $name;
         $this->reservedSlugs = $reservedSlugs;

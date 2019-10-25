@@ -10,14 +10,26 @@
 
 use Garden\EventManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\UserFragmentSchema;
 
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model {
+class UserModel extends Gdn_Model implements UserProviderInterface {
 
     /** @var int */
     const GUEST_USER_ID = 0;
+
+    /** @var int This happens to be the same as the guest ID because it's just been that way for so long. */
+    const UNKNOWN_USER_ID = 0;
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_UNKNOWN = "unknown";
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_GUEST = "guest";
 
     /** Deprecated. */
     const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
@@ -1115,11 +1127,55 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function expandFragments(array &$records, array $columnNames): void {
+        $this->expandUsers($records, $columnNames, ['asFragments' => true]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAllowedGeneratedRecordKeys(): array {
+        return [self::GENERATED_FRAGMENT_KEY_GUEST, self::GENERATED_FRAGMENT_KEY_UNKNOWN];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGeneratedFragment(string $key): array {
+        $unknownFragment = [
+            'userID' => self::UNKNOWN_USER_ID,
+            'name' => 'unknown',
+            'email' => 'unknown@example.com',
+            'photoUrl' => self::getDefaultAvatarUrl(),
+        ];
+        switch ($key) {
+            case self::GENERATED_FRAGMENT_KEY_GUEST:
+                return [
+                    'userID' => self::GUEST_USER_ID,
+                    'name' => 'guest',
+                    'email' => 'guest@example.com',
+                    'photoUrl' => self::getDefaultAvatarUrl(),
+                ];
+            case self::GENERATED_FRAGMENT_KEY_UNKNOWN:
+                return $unknownFragment;
+            default:
+                trigger_error(
+                    'Called '.__CLASS__.'::'.__METHOD__.'($key) with an non-matching key. Supported values are: '
+                    . "\n" . implode(", ", $this->getAllowedGeneratedRecordKeys())
+                );
+                return $unknownFragment;
+        }
+    }
+
+    /**
      * Add multi-dimensional user data to an array.
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
      * @param array $options Additional options. Passed to filter event.
+     *        [bool asFragments] - Expand as user fragments.
      */
     public function expandUsers(array &$rows, array $columns, array $options = []) {
         // How are we supposed to lookup users by column if we don't have any columns?
@@ -1173,15 +1229,13 @@ class UserModel extends Gdn_Model {
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
                     } else {
-                        $user = [
-                            'userID' => 0,
-                            'name' => 'unknown',
-                            'email' => 'unknown@example.com'
-                        ];
-                        $user['photoUrl'] = self::getDefaultAvatarUrl($user);
+                        $user = self::getUnknownFragment();
                     }
                 }
 
+                if ($options['asFragments'] ?? false) {
+                    $user =  UserFragmentSchema::normalizeUserFragment($user);
+                }
                 setValue($destination, $row, $user);
             }
         };
@@ -1501,6 +1555,23 @@ class UserModel extends Gdn_Model {
             ->firstRow();
 
         return $data === false ? 0 : $data->UserCount;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array {
+        $record = $this->getID($id, DATASET_TYPE_ARRAY);
+        if ($record === false) {
+            if ($useUnknownFallback) {
+                return $this->getUnknownFragment();
+            } else {
+                throw new NoResultsException("No user found for ID: " . $id);
+            }
+        }
+
+        return UserFragmentSchema::normalizeUserFragment($record);
     }
 
     /**

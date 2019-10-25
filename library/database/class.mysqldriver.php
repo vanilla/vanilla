@@ -38,7 +38,8 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Takes a string of SQL and adds backticks if necessary.
      *
      * @param string|array $string The string (or array of strings) of SQL to be escaped.
-     * @param boolean $firstWordOnly Should the function only escape the first word?\
+     * @param boolean $firstWordOnly Should the function only escape the first word?
+     * @return string|array
      */
     public function escapeSql($string, $firstWordOnly = false) {
         if (is_array($string)) {
@@ -101,6 +102,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Returns a platform-specific query to fetch column data from $table.
      *
      * @param string $table The name of the table to fetch column data from.
+     * @return string
      */
     public function fetchColumnSql($table) {
         if ($table[0] != '`' && !stringBeginsWith($table, $this->Database->DatabasePrefix)) {
@@ -116,6 +118,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *  - <b>TRUE</b>: The search will be limited to the database prefix.
      *  - <b>FALSE</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
+     * @return string
      */
     public function fetchTableSql($limitToPrefix = false) {
         $sql = "show tables";
@@ -126,7 +129,6 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $sql .= " like ".$this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $limitToPrefix));
 
         return $sql;
-        echo "<pre>$sql</pre>";
     }
 
     /**
@@ -135,6 +137,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
      *
      * @param string $table The name of the table to get schema data for.
+     * @return array
      */
     public function fetchTableSchema($table) {
         // Format the table name.
@@ -198,6 +201,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * engine.
      *
      * @param string $table The name of the table name to format.
+     * @return string
      */
     public function formatTableName($table) {
 
@@ -213,11 +217,12 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     }
 
     /**
-     * Returns a delete statement for the specified table and the supplied
-     * conditions.
+     * Returns a delete statement for the specified table and the supplied conditions.
      *
      * @param string $tableName The name of the table to delete from.
      * @param array $wheres An array of where conditions.
+     * @param int $limit Limit the number of records to delete.
+     * @return string Returns an DML statement.
      */
     public function getDelete($tableName, $wheres = [], $limit = 0) {
         $conditions = '';
@@ -263,6 +268,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * or an array of FieldName values that should have values inserted from
      * $select.
      * @param string $select A select query that will fill the FieldNames specified in $data.
+     * @return string
      */
     public function getInsert($table, $data, $select = '') {
         if (!is_array($data)) {
@@ -309,6 +315,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $query The SQL string to which the limit statement should be appended.
      * @param int $limit The number of records to limit the query to.
      * @param int $offset The number of records to offset the query from.
+     * @return string
      */
     public function getLimit($query, $limit, $offset) {
         $offset = $offset == 0 ? '' : $offset.', ';
@@ -373,6 +380,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Returns a truncate statement for this database engine.
      *
      * @param string The name of the table to updated data in.
+     * @return string
      */
     public function getTruncate($table) {
         return 'truncate '.$this->formatTableName($table);
@@ -386,6 +394,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * final "else" option of the case statement. eg.
      * array('null' => 1, '' => 0) results in "when null then 1 else 0".
      * @param string $alias The alias to give a column name.
+     * @return $this
      */
     public function selectCase($field, $options, $alias) {
         $caseOptions = '';

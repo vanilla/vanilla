@@ -3916,18 +3916,17 @@ if (!function_exists('userAgentType')) {
      * This method checks the user agent to try and determine the type of device making the current request.
      * It also checks for a special X-UA-Device header that a server module can set to more quickly determine the device.
      *
-     * @param string|null $value The new value to set. This should be one of desktop, mobile, tablet, or app.
+     * @param string|null|false $value The new value to set or **false** to clear. This should be one of desktop, mobile, tablet, or app.
      * @return string Returns one of desktop, mobile, tablet, or app.
      */
     function userAgentType($value = null) {
         static $type = null;
 
-        if ($value !== null) {
-            $type = $value;
-        }
-
-        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+        if ($value === false) {
             $type = null;
+            return null;
+        } elseif ($value !== null) {
+            $type = $value;
         }
 
         if ($type !== null) {

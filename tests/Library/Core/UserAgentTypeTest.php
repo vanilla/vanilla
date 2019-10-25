@@ -17,6 +17,11 @@ class UserAgentTypeTest extends TestCase {
     const HEADER_NAME = 'HTTP_X_UA_DEVICE';
     const COOKIE_NAME = 'X-UA-Device-Force';
 
+    public function tearDown() {
+        parent::tearDown();
+        userAgentType(false);
+    }
+
     /**
      * Test device detection from the header.
      *

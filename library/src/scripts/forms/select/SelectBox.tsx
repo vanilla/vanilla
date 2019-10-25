@@ -22,7 +22,6 @@ export interface ISelectBoxItem {
     className?: string;
     onClick?: () => void;
     selected?: boolean;
-    translationStatus?: string;
     icon?: React.ReactNode;
 }
 

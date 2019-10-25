@@ -15,12 +15,14 @@ import {
     fonts,
     allButtonStates,
     margins,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { percent, translate, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,7 +36,7 @@ export const messagesVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         padding: {
             vertical: 8,
-            horizontal: 42,
+            horizontal: 50,
         },
     });
 
@@ -172,13 +174,19 @@ export const messagesClasses = useThemeCache(() => {
     );
 
     const messageIcon = style("messageIcon", {
+        ...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
         transform: translate(`-100%`),
-        marginLeft: unit(-12),
+        marginLeft: unit(-8),
+        color: colorOut(globalVars.messageColors.error.fg),
     });
 
     const iconWrap = style("iconWrap", {
         position: "relative",
+        width: percent(100),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
     });
 
     return {
@@ -189,5 +197,6 @@ export const messagesClasses = useThemeCache(() => {
         fixed,
         setWidth,
         messageIcon,
+        iconWrap,
     };
 });

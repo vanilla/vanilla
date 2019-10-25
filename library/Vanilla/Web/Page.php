@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\Web\Exception\HttpException;
 use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
@@ -147,6 +148,17 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @return Data Data object for global dispatcher.
      */
     public function render(): Data {
+        return $this->renderMasterView();
+    }
+
+    /**
+     * Render the page content and wrap it in a data object for the dispatcher.
+     *
+     * This method is kept private so that it can be called internally for error pages without being overridden.
+     *
+     * @return Data Data object for global dispatcher.
+     */
+    private function renderMasterView(): Data {
         $this->validateSeo();
 
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
@@ -344,14 +356,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @inheritdoc
      */
     public function hasExceptionHandler(\Throwable $e): bool {
-        switch ($e->getCode()) {
-            case 404:
-            case 403:
-                return true;
-                break;
-            default:
-                return false;
-        }
+        return $e instanceof HttpException;
     }
 
     /**
@@ -369,7 +374,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             ])
         ;
 
-        return $this->render();
+        return $this->renderMasterView();
     }
 
     /**

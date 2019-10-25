@@ -1,6 +1,13 @@
 <div class='DismissMessage Warning userContent-error'>
-    <a href='{{ errorUrl }}' rel='nofollow' title='{{ title }}'>
-        <span class='icon icon-warning-sign userContent-errorIcon'><span class="sr-only">Warning</span></span>
-        {{ title }}
-    </a>
+    {% if errorUrl is defined %}
+        <a href='{{ errorUrl }}' rel='nofollow' title='{{ title }}'>
+            <span class='icon icon-warning-sign userContent-errorIcon'><span class="sr-only">Warning</span></span>
+            {{ title }}
+        </a>
+    {% else %}
+       <span>
+            <span class='icon icon-warning-sign userContent-errorIcon'><span class="sr-only">Warning</span></span>
+            {{ title }}
+       </span>
+    {% endif %}
 </div>

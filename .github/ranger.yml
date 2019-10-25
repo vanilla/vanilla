@@ -1,0 +1,15 @@
+labels:
+  'Status: Resolved':
+    action: close
+    delay: 7 days
+    comment: |
+      We think we've answered this question to the best of our abilities and have resolved the issue.
+
+      *This issue will automatically be closed in 7 days. If you don't think the issue should be closed you can remove the **Status: Resolved** label, but please comment why.*
+  "Status: Won't Fix":
+    action: close
+    delay: 7 days
+    comment: |
+      This is something that is working as intended or we won't fix at this time.
+
+      *This issue will automatically be closed in 7 days. If you don't think the issue should be closed you can remove the **Status: Won't Fix** label, but please comment why.*

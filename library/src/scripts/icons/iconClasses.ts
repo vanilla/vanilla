@@ -304,6 +304,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
+    const globeIcon = style("globeIcon", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
     const alertIconCompact = style("alertIconCompact", {
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
@@ -338,5 +343,6 @@ export const iconClasses = useThemeCache(() => {
         discussionIcon,
         alertIcon,
         alertIconCompact,
+        globeIcon,
     };
 });

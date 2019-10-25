@@ -239,10 +239,11 @@ export const buttonVariables = useThemeCache(() => {
     };
 });
 
-export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
+export const buttonSizing = (minHeight, minWidth, fontSize, paddingHorizontal, formElementVars, debug?: boolean) => {
     const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobalVariables().border.width;
     return {
-        minHeight: unit(formElementVars.sizing.minHeight),
+        minHeight: unit(minHeight ? minHeight : formElementVars.sizing.minHeight),
+        minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
         padding: `${unit(0)} ${px(paddingHorizontal)}`,
         lineHeight: unit(formElementVars.sizing.height - borderWidth * 2),

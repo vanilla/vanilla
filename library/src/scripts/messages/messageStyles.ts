@@ -16,7 +16,7 @@ import {
     allButtonStates,
     margins,
 } from "@library/styles/styleHelpers";
-import { percent, viewWidth } from "csx";
+import { percent, translate, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
@@ -133,6 +133,10 @@ export const messagesClasses = useThemeCache(() => {
     const message = style("message", {
         ...userSelect(),
         ...fonts(vars.text.font),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flexStart",
+        width: percent(100),
         flex: 1,
     });
 
@@ -167,6 +171,16 @@ export const messagesClasses = useThemeCache(() => {
         }),
     );
 
+    const messageIcon = style("messageIcon", {
+        maxWidth: percent(100),
+        transform: translate(`-100%`),
+        marginLeft: unit(-12),
+    });
+
+    const iconWrap = style("iconWrap", {
+        position: "relative",
+    });
+
     return {
         root,
         wrap,
@@ -174,5 +188,6 @@ export const messagesClasses = useThemeCache(() => {
         message,
         fixed,
         setWidth,
+        messageIcon,
     };
 });

@@ -3924,7 +3924,7 @@ if (!function_exists('userAgentType')) {
 
         if ($value === false) {
             $type = null;
-            return null;
+            return '';
         } elseif ($value !== null) {
             $type = $value;
         }

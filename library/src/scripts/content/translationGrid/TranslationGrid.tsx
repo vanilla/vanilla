@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import classNames from "classnames";
+import { PanelWidget } from "@library/layout/PanelLayout";
 import { TranslationGridRow } from "@library/content/translationGrid/TranslationGridRow";
 import { translationGridClasses } from "@library/content/translationGrid/TranslationGridStyles";
 import { TranslationGridText } from "@library/content/translationGrid/TranslationGridText";
@@ -42,6 +43,7 @@ export interface ITranslationGrid {
 export function TranslationGrid(props: ITranslationGrid) {
     const id = useUniqueID("articleOtherLanguages");
     const { data, inScrollingContainer = false, otherLanguages } = props;
+    const dateUpdated = "2019-10-08T13:54:41+00:00";
     const classes = translationGridClasses();
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
@@ -56,23 +58,26 @@ export function TranslationGrid(props: ITranslationGrid) {
         return {
             selected: isSelected,
             name: data.locale,
+            icon: data.translationStatus === "not-translated" && (
+                <ToolTip
+                    label={
+                        <Translate
+                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
+                            c0={<DateTime timestamp={props.dateUpdated} />}
+                        />
+                    }
+                    ariaLabel={"This article was editied in its source locale."}
+                >
+                    <span>
+                        <AlertIcon className={"selectBox-selectedIcon"} />
+                    </span>
+                </ToolTip>
+            ),
             content: (
                 <>
-                    <ToolTip
-                        label={`This article was editied in its source locale on ${(
-                            <DateTime timestamp={props.dateUpdated} />
-                        )}. Edit this article to update its translation and clear this meesage.`}
-                    >
-                        <span>
-                            <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                            {data.translationStatus === "not-translated" && (
-                                <AlertIcon className={"selectBox-selectedIcon"} />
-                            )}
-                        </span>
-                    </ToolTip>
+                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
-
             onClick: () => {
                 window.location.href = data.url;
             },
@@ -141,17 +146,19 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classes.header}>
                         <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
                         <div className={classNames(classes.rightCell, classes.headerRight)}>
-                            <LanguagesDropDown
-                                titleID={id}
-                                widthOfParent={true}
-                                className="otherLanguages-select"
-                                renderLeft={true}
-                                data={props.otherLanguages}
-                                currentLocale={currentLocale}
-                                dateUpdated={props.dateUpdated}
-                                selcteBoxItems={selectBoxItems}
-                                selectedIndex={selectedIndex}
-                            />
+                            <PanelWidget>
+                                <LanguagesDropDown
+                                    titleID={id}
+                                    widthOfParent={true}
+                                    className="otherLanguages-select"
+                                    renderLeft={true}
+                                    data={props.otherLanguages}
+                                    currentLocale={currentLocale}
+                                    dateUpdated={props.dateUpdated}
+                                    selcteBoxItems={selectBoxItems}
+                                    selectedIndex={selectedIndex}
+                                />
+                            </PanelWidget>
                         </div>
                     </div>
                     <div className={classes.body}>{translationRows}</div>

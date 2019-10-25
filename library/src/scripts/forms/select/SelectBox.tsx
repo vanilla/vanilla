@@ -123,12 +123,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         )}
                         {child.icon}
                     </span>
-
-                    {/* {child.outdated && (
-                        <span className={classNames("selectBox-outdated", classesMetas.metaStyle, classes.outdated)}>
-                            {t("(Outdated)")}
-                        </span>
-                    )} */}
                 </DropDownItemButton>
             );
         });
@@ -162,7 +156,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         flyoutType={FlyoutType.LIST}
                         selfPadded={true}
                         renderLeft={true}
-                        //openDirection={DropDownOpenDirection.BELOW_LEFT}
                     >
                         {selectItems}
                     </DropDown>

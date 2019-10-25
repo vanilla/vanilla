@@ -47,6 +47,7 @@ export interface ILanguageDropDownProps {
 /**
  * Implements "other languages" DropDown for articles.
  */
+
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
         const classes = selectBoxClasses();

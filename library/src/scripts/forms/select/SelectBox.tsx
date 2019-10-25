@@ -22,7 +22,7 @@ export interface ISelectBoxItem {
     className?: string;
     onClick?: () => void;
     selected?: boolean;
-    //translationStatus?: string;
+    icon?: React.ReactNode;
 }
 
 interface IProps {
@@ -121,6 +121,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                                 {` `}
                             </span>
                         )}
+                        {child.icon}
                     </span>
                 </DropDownItemButton>
             );
@@ -154,7 +155,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         openAsModal={this.props.openAsModal}
                         flyoutType={FlyoutType.LIST}
                         selfPadded={true}
-                        renderLeft={this.props.renderLeft}
+                        renderLeft={true}
                     >
                         {selectItems}
                     </DropDown>

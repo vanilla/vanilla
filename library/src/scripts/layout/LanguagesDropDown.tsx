@@ -10,7 +10,6 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-
 interface IState {
     id: string;
 }
@@ -33,9 +32,9 @@ export interface ILanguageDropDownProps {
     renderLeft?: boolean;
     openAsModal?: boolean;
     currentLocale?: string;
-    dateUpdated?: string;
-    selcteBoxItems: ISelectBoxItem[];
     selectedIndex?: number;
+    selcteBoxItems: ISelectBoxItem[];
+    dateUpdated?: string;
 }
 
 /**
@@ -45,6 +44,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
     public render() {
         const classes = selectBoxClasses();
         const showPicker = this.props.data && this.props.data.length > 1;
+
         if (!showPicker) {
             return null;
         }
@@ -57,9 +57,8 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 className={classNames("languagesDropDown", this.props.className)}
                 openAsModal={this.props.openAsModal}
                 selectedIndex={this.props.selectedIndex}
-                renderLeft={true}
             >
-                {selcteBoxItems}
+                {this.props.selcteBoxItems}
             </SelectBox>
         );
     }

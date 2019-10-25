@@ -66,7 +66,7 @@ export const richEditorVariables = useThemeCache(() => {
     });
 
     const pilcrow = makeThemeVars("pilcrow", {
-        offset: 9,
+        offset: 0,
         fontSize: 14,
         animation: {
             duration: ".3s",

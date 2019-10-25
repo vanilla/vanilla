@@ -61,7 +61,7 @@ export const storyBookVariables = useThemeCache(() => {
 export const storyBookClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = storyBookVariables();
-    const style = styleFactory("storyBookStyles");
+    const style = styleFactory("storyBook");
 
     const paragraph = style("paragraph", {
         display: "block",
@@ -188,8 +188,8 @@ export const storyBookClasses = useThemeCache(() => {
         alignItems: "stretch",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        width: calc(`100% + ${unit(vars.gaps.tile * 2)}`),
-        transform: translateX(`-${unit(vars.gaps.tile)}`),
+        width: calc(`100% + ${unit(vars.gaps.tile * 8)}`),
+        transform: translateX(`-${unit(vars.gaps.tile * 4)}`),
     });
 
     const tile = style("tile", {

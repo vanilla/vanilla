@@ -128,6 +128,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`DiscussionIcon`}>
                     <CommonIcons.DiscussionIcon />
                 </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`GlobeIcon`}>
+                    <CommonIcons.GlobeIcon />
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>
@@ -254,9 +257,6 @@ story.add("Icons", () => {
             </StoryTiles>
             <StoryHeading>title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`CheckIcon`}>
-                    <titleBarIcons.CheckIcon />
-                </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`HelpIcon`}>
                     <titleBarIcons.HelpIcon />
                 </StoryTileAndTextCompact>

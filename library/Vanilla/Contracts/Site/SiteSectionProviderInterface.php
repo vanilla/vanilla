@@ -47,7 +47,7 @@ interface SiteSectionProviderInterface {
     public function getForLocale(string $localeKey): array;
 
     /**
-     * Get all site sections that match a particular locale.
+     * Get all site sections that match a particular site section group.
      *
      * @param string $sectionGroupKey The name of the section group to check.
      * @return SiteSectionInterface[]

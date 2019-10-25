@@ -28,6 +28,7 @@ use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -114,7 +115,19 @@ class Bootstrap {
 
             // Site sections
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(SingleSiteSectionProvider::class)
+            ->setFactory(function () {
+                return MockSiteSectionProvider::fromLocales();
+            })
+            ->setClass(MockSiteSectionProvider::class)
+            ->setShared(true)
+
+            // Site applications
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->setClass(\Vanilla\Site\ApplicationProvider::class)
+            ->addCall('add', [new Reference(
+                \Vanilla\Site\Application::class,
+                ['garden', ['api', 'entry', 'sso', 'utility']]
+            )])
             ->setShared(true)
 
             // AddonManager

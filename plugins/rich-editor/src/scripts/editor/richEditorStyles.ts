@@ -12,11 +12,9 @@ import {
     srOnly,
     unit,
     userSelect,
-    sticky,
     pointerEvents,
-    allButtonStates,
     borders,
-    negative,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -316,7 +314,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const embedBar = style("embedBar", {
         display: "block",
         width: percent(100),
-        padding: unit(vars.embedMenu.padding),
+        ...paddings({
+            horizontal: (vars.menuButton.size - globalVars.icon.sizes.small) / 2,
+            vertical: vars.embedMenu.padding,
+        }),
         background: legacyMode ? undefined : colorOut(vars.colors.bg),
     });
 
@@ -393,6 +394,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         marginTop: unit((vars.menuButton.size - vars.iconWrap.width) / -2 + 1),
     });
 
+    const placeholder = style("placeholder", {
+        $nest: {
+            "&&&:before": {
+                margin: 0,
+            },
+        },
+    });
+
     return {
         root,
         menuBar,
@@ -418,5 +427,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         iconWrap,
         flyoutOffset,
         emojiGroup,
+        placeholder,
     };
 });

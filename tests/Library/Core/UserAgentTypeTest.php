@@ -18,6 +18,14 @@ class UserAgentTypeTest extends TestCase {
     const COOKIE_NAME = 'X-UA-Device-Force';
 
     /**
+     * Clean up before each test.
+     */
+    public function setUp() {
+        parent::setUp();
+        userAgentType(false);
+    }
+
+    /**
      * Clean up the user agent cache at the end of each test.
      */
     public function tearDown() {

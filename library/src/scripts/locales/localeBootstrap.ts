@@ -4,8 +4,9 @@
  */
 
 import { fetchLocalesFromApi } from "@library/locales/localeActions";
-import { setCurrentLocale, loadLocales } from "@vanilla/i18n";
+import { setCurrentLocale, loadLocales, loadTranslations } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
+import gdn from "@library/gdn";
 
 export async function bootstrapLocales() {
     // Fetch the current locale from meta.
@@ -16,4 +17,5 @@ export async function bootstrapLocales() {
     // They may already be preloaded.
     const locales = await fetchLocalesFromApi();
     loadLocales(locales);
+    loadTranslations(gdn.translations);
 }

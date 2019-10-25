@@ -339,6 +339,10 @@ export const dropDownClasses = useThemeCache(() => {
         ...paddings(vars.contents.padding),
     });
 
+    const check = style("check", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
     return {
         root,
         contents,
@@ -360,5 +364,6 @@ export const dropDownClasses = useThemeCache(() => {
         title,
         noVerticalPadding,
         paddedFrame,
+        check,
     };
 });

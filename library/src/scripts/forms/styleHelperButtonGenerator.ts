@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, buttonResetMixin, buttonSizing, ButtonTypes } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { borders } from "@library/styles/styleHelpersBorders";
@@ -76,12 +76,16 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         }),
         ...defaultBorder,
         ...buttonSizing(
-            buttonDimensions && buttonDimensions.minHeight
+            buttonDimensions && buttonDimensions.minHeight !== undefined
                 ? buttonDimensions.minHeight
                 : buttonGlobals.sizing.minHeight,
-            buttonDimensions && buttonDimensions.minWidth ? buttonDimensions.minWidth : buttonGlobals.sizing.minWidth,
-            buttonTypeVars.fonts && buttonTypeVars.fonts.size ? buttonTypeVars.fonts.size : buttonGlobals.font.size,
-            buttonTypeVars.padding && buttonTypeVars.padding.side
+            buttonDimensions && buttonDimensions.minWidth !== undefined
+                ? buttonDimensions.minWidth
+                : buttonGlobals.sizing.minWidth,
+            buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined
+                ? buttonTypeVars.fonts.size
+                : buttonGlobals.font.size,
+            buttonTypeVars.padding && buttonTypeVars.padding.side !== undefined
                 ? buttonTypeVars.padding.side
                 : buttonGlobals.padding.side,
             formElVars,
@@ -95,8 +99,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         justifyContent: "center",
         touchAction: "manipulation",
         cursor: "pointer",
-        minWidth: buttonGlobals.sizing.minWidth,
-        minHeight: buttonGlobals.sizing.minHeight,
         $nest: {
             "&:not([disabled])": {
                 $nest: {

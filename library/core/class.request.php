@@ -446,7 +446,7 @@ class Gdn_Request implements RequestInterface {
         $port = $this->getPort();
 
         // Only append the port if it is non-standard.
-        if (($port == 80 && $this->getScheme() === 'http') || ($port == 443 && $this->getScheme() === 'https')) {
+        if ($port == 80 || $port == 443) {
             $port = '';
         } else {
             $port = ':'.$port;
@@ -1661,6 +1661,20 @@ class Gdn_Request implements RequestInterface {
         }
 
         return $result;
+    }
+
+    /**
+     * Get the url.
+     * (Simply concatenate host to uri provided)
+     *
+     * @param strinп $uri
+     * @return string
+     */
+    public function getSimpleUrl(string $uri = ''): string {
+        $scheme = $this->getScheme();
+        $hostAndPort = $this->getHostAndPort();
+        $assetRoot = $this->getAssetRoot();
+        return "{$scheme}://{$hostAndPort}{$assetRoot}{$uri}";
     }
 
     /**

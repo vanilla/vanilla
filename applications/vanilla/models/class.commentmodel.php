@@ -865,25 +865,6 @@ class CommentModel extends Gdn_Model {
                     ]
                 );
             }
-
-        } else {
-            // Make sure the discussion isn't archived.
-            $archiveDate = Gdn::config('Vanilla.Archive.Date', false);
-            if (!$archiveDate || (Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($archiveDate))) {
-                $newComments = true;
-
-                // Insert watch data.
-                $this->SQL->options('Ignore', true);
-                $this->SQL->insert(
-                    'UserDiscussion',
-                    [
-                        'UserID' => $userID,
-                        'DiscussionID' => $discussion->DiscussionID,
-                        'CountComments' => $countWatch,
-                        'DateLastViewed' => Gdn_Format::toDateTime()
-                    ]
-                );
-            }
         }
 
         /**

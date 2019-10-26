@@ -175,6 +175,35 @@ if (!function_exists('checkRequirements')) {
     }
 }
 
+if (!function_exists('arrayCombine')) {
+    /**
+     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
+     *
+     * @param array $keys Array of keys to be used. Illegal values for key will be converted to string.
+     * @param array $values Array of values to be used.
+     * @return array
+     * @deprecated
+     */
+    function arrayCombine($keys, $values) {
+        deprecated('arrayCombine', 'array_combine');
+        if (!is_array($keys)) {
+            $keys = [];
+        }
+
+        if (!is_array($values)) {
+            $values = [];
+        }
+
+        if (count($keys) > 0 && count($values) > 0) {
+            return array_combine($keys, $values);
+        } elseif (count($keys) == 0) {
+            return $values;
+        } else {
+            return $keys;
+        }
+    }
+}
+
 if (!function_exists('compareHashDigest')) {
     /**
      * Determine whether or not two strings are equal in a time that is independent of partial matches.

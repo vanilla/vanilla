@@ -246,7 +246,7 @@ class Gdn_Router extends Gdn_Pluggable {
      */
     private function _parseRoute($destination) {
         // If Destination is a serialized array
-        if (is_string($destination) && ($decoded = @unserialize($destination)) !== false) {
+        if (is_string($destination) && ($decoded = @unserialize($destination, ['allowed_classes' => false])) !== false) {
             $destination = $decoded;
         }
 

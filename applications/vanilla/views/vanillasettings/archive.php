@@ -14,7 +14,7 @@ echo $this->Form->errors();
         </div>
         <div class="input-wrap">
             <?php
-            echo $this->Form->calendar('Vanilla.Archive.Date', ['placeholder' => t('YYYY-mm-dd')]);
+            echo $this->Form->calendar('Vanilla.Archive.Date', ['placeholder' => t('Ex: 2009-01-01, 6 months, 1 year')]);
             ?>
         </div>
     </li>

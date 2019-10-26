@@ -149,7 +149,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
             'Vanilla.Archive.Date',
-            'Vanilla.Archive.Exclude'
         ]);
 
         // Set the model on the form.
@@ -164,18 +163,10 @@ class VanillaSettingsController extends Gdn_Controller {
 
             // Grab old config values to check for an update.
             $archiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $archiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
             // Save new settings
             $saved = $this->Form->save();
             if ($saved !== false) {
-                $archiveDate = Gdn::config('Vanilla.Archive.Date');
-                $archiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-
-                if ($archiveExclude != $archiveExcludeBak || ($archiveExclude && $archiveDate != $archiveDateBak)) {
-                    $discussionModel = new DiscussionModel();
-                    $discussionModel->updateDiscussionCount('All');
-                }
                 $this->informMessage(t("Your changes have been saved."));
             }
         }

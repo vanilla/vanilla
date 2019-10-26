@@ -480,8 +480,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
-        $this->addArchiveWhere($this->SQL);
-
         if ($offset !== false && $limit !== false) {
             $this->SQL->limit($limit, $offset);
         }
@@ -868,9 +866,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
-        $this->addArchiveWhere($this->SQL);
-
-
         $this->SQL->limit($limit, $offset);
 
         $this->EventArguments['SortField'] = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
@@ -1120,23 +1115,11 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Add SQL Where to account for archive date.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param object $sql Gdn_SQLDriver
+     * @param Gdn_SQLDriver $sql
+     * @deprecated
      */
     public function addArchiveWhere($sql = null) {
-        if (is_null($sql)) {
-            $sql = $this->SQL;
-        }
-
-        $exclude = Gdn::config('Vanilla.Archive.Exclude');
-        if ($exclude) {
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
-            if ($archiveDate) {
-                $sql->where('d.DateLastComment >', $archiveDate);
-            }
-        }
+        deprecated('DiscussionModel::addArchiveWhere()');
     }
 
 
@@ -2450,8 +2433,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.CountComments', 'sum', 'CountComments')
                 ->from('Discussion d')
                 ->where('d.CategoryID', $categoryID);
-
-            $this->addArchiveWhere();
 
             $data = $this->SQL->get()->firstRow();
             $countDiscussions = (int)getValue('CountDiscussions', $data, 0);

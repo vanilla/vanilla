@@ -18,12 +18,5 @@ echo $this->Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group">
-        <div class="input-wrap no-label">
-            <?php
-            echo $this->Form->checkBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
-            ?>
-        </div>
-    </li>
 </ul>
 <?php echo $this->Form->close('Save'); ?>

@@ -3417,17 +3417,17 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Determine whether or not the discussion is archived based on its last comment date.
      *
-     * @param string|null $DateLastComment
+     * @param string|null $dateLastComment
      * @return bool
      */
-    public function isArchived($DateLastComment): bool {
-        if (empty($DateLastComment) || $this->getArchiveDate() === null) {
+    public function isArchived($dateLastComment): bool {
+        if (empty($dateLastComment) || $this->getArchiveDate() === null) {
             return false;
         }
         try {
-            $dt = new DateTimeImmutable($DateLastComment, $this->getArchiveDate()->getTimezone());
+            $dt = new DateTimeImmutable($dateLastComment, $this->getArchiveDate()->getTimezone());
         } catch (\Exception $ex) {
-            trigger_error($ex->getMessage(), E_USER_WARNING);
+            trigger_error('DiscussionModel::isArchived() got an invalid dateLastComment.', E_USER_WARNING);
             return false;
         }
         if ($dt < $this->getArchiveDate()) {

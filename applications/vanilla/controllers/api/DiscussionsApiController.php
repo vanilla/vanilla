@@ -216,6 +216,7 @@ class DiscussionsApiController extends AbstractApiController {
             'category?' => $this->getCategoryFragmentSchema(),
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'lastUser?' => $this->getUserFragmentSchema(),
@@ -317,6 +318,11 @@ class DiscussionsApiController extends AbstractApiController {
             }
 
             $dbRecord['lastPost'] = $lastPost;
+        }
+
+        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
+        if (empty($dbRecord['DateLastComment'])) {
+            $dbRecord['DateLastComment'] = $dbRecord['DateInserted'];
         }
 
         // The Category key will hold a category fragment in API responses. Ditch the default string.
@@ -466,6 +472,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'description' => 'When the discussion was updated.',
                 'x-filter' => [
                     'field' => 'd.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateLastComment?' => new DateFilterSchema([
+                'description' => 'When the last comment was posted.',
+                'x-filter' => [
+                    'field' => 'd.DateLastComment',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),

@@ -13,6 +13,7 @@ paths:
           field: d.CategoryID
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
+      - $ref: '#/components/parameters/DateLastComment'
       - description: |
           Filter by discussion type.
         in: query
@@ -774,6 +775,15 @@ paths:
       - Discussions
       summary: Remove custom canonical url for a discussion.
 components:
+  parameters:
+    DateLastComment:
+      name: dateLastComment
+      in: query
+      description: >
+        Filter by the date of the last comment or the original discussion date if it has no comments. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+      schema:
+        format: date-filter
+        type: string
   schemas:
     CategoryFragment:
       properties:
@@ -872,6 +882,10 @@ components:
           format: date-time
           nullable: true
           type: string
+        dateLastComment:
+          description: The date of the last comment or the original discussion date if it has no comments.
+          type: string
+          format: date-time
         discussionID:
           description: The ID of the discussion.
           type: integer

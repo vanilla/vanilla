@@ -91,7 +91,7 @@ class DiscussionModelTest extends TestCase {
     public function testIsArchivedInvalidDate() {
         $this->model->setArchiveDate('2019-10-26');
 
-        $this->expectError(function() {
+        $this->expectError(function () {
             $actual = $this->model->isArchived('fldjsjs');
             $this->assertFalse($actual);
         }, self::assertErrorNumber(E_USER_WARNING));

@@ -47,8 +47,8 @@ trait ExpectErrorTrait {
      * @param int $number One of the error constants.
      * @return callable Returns a callback that can be passed to higher order functions.
      */
-    static function assertErrorNumber(int $number): callable {
-        return function(\Throwable $ex) use ($number) {
+    public static function assertErrorNumber(int $number): callable {
+        return function (\Throwable $ex) use ($number) {
             if ($number !== $ex->getCode()) {
                 $this->fail("Failed asserting the error number: $number.");
             }

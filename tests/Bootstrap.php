@@ -19,6 +19,7 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
@@ -113,14 +114,15 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
-            ->rule(MockSiteSectionProvider::class)
+            ->rule(SiteSectionProviderInterface::class)
             ->setFactory(function () {
                 return MockSiteSectionProvider::fromLocales();
             })
+            ->setShared(true)
 
             // Site sections
             ->rule(SiteSectionModel::class)
-            ->addCall('addProvider', [ new Reference(MockSiteSectionProvider::class)])
+            ->addCall('addProvider', [ new Reference(SiteSectionProviderInterface::class)])
             ->setShared(true)
 
             // Site applications

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Site;
 
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 
@@ -27,8 +28,8 @@ class SiteSectionModel {
     /** @var SiteSectionInterface $currentSiteSection */
     private $defaultSiteSection;
 
-    public function  __construct() {
-        $this->defaultSiteSection = new DefaultSiteSection();
+    public function  __construct(ConfigurationInterface $config) {
+        $this->defaultSiteSection = new DefaultSiteSection($config);
     }
 
     /**

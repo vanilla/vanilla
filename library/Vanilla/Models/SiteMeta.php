@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\Addon;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * A class for gathering particular data about the site.
@@ -63,13 +64,13 @@ class SiteMeta implements \JsonSerializable {
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel;
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
         RequestInterface $request,
         Contracts\ConfigurationInterface $config,
-        Contracts\Site\SiteSectionProviderInterface $siteSectionProvider,
+        SiteSectionModel $siteSectionModel,
         ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
@@ -82,7 +83,7 @@ class SiteMeta implements \JsonSerializable {
 
         $this->featureFlags = $config->get('Feature', []);
 
-        $this->currentSiteSection = $siteSectionProvider->getCurrentSiteSection();
+        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.

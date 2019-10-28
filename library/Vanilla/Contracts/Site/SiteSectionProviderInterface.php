@@ -26,5 +26,5 @@ interface SiteSectionProviderInterface {
      *
      * @return SiteSectionInterface
      */
-    public function getCurrentSiteSection(): SiteSectionInterface;
+    public function getCurrentSiteSection(): ?SiteSectionInterface;
 }

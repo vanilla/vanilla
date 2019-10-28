@@ -67,7 +67,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
-    ->addCall('addProvider', [ new Reference(SingleSiteSectionProvider::class)])
+    ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])
     ->setShared(true)
 
     // Site applications

@@ -122,7 +122,7 @@ class Bootstrap {
 
             // Site sections
             ->rule(SiteSectionModel::class)
-            ->addCall('addProvider', [ new Reference(SiteSectionProviderInterface::class)])
+            ->addCall('addProvider', [new Reference(SiteSectionProviderInterface::class)])
             ->setShared(true)
 
             // Site applications

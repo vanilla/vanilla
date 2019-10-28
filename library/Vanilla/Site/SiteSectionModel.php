@@ -15,8 +15,8 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
  * @package Vanilla\Site
  */
 class SiteSectionModel {
-    /** @var SiteSectionProviderInterface[] $siteSectionProviders */
-    private $siteSectionProviders;
+    /** @var SiteSectionProviderInterface[] $providers */
+    private $providers;
 
     /** @var SiteSectionInterface[] $siteSections */
     private $siteSections;
@@ -26,8 +26,8 @@ class SiteSectionModel {
      *
      * @param SiteSectionInterface $siteSection
      */
-    public function addSiteSectionProvider(SiteSectionProviderInterface $provider) {
-        $this->siteSectionProviders[] = $provider;
+    public function addProvider(SiteSectionProviderInterface $provider) {
+        $this->providers[] = $provider;
     }
 
     /**
@@ -54,7 +54,7 @@ class SiteSectionModel {
     public function getAll(): array  {
         if (empty($this->siteSections)) {
             $this->siteSections = [];
-            foreach ($this->siteSectionProviders as $provider) {
+            foreach ($this->providers as $provider) {
                 $this->siteSections = array_merge($this->siteSections, $provider->getAll());
             }
         }

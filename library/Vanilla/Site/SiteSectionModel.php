@@ -24,6 +24,13 @@ class SiteSectionModel {
     /** @var SiteSectionInterface $currentSiteSection */
     private $currentSiteSection;
 
+    /** @var SiteSectionInterface $currentSiteSection */
+    private $defaultSiteSection;
+
+    public function  __construct() {
+        $this->defaultSiteSection = new DefaultSiteSection();
+    }
+
     /**
      * Register site section
      *
@@ -106,6 +113,6 @@ class SiteSectionModel {
      * @return SiteSectionInterface
      */
     public function getCurrentSiteSection(): SiteSectionInterface {
-        return $this->currentSiteSection;
+        return $this->currentSiteSection ?? $this->defaultSiteSection;
     }
 }

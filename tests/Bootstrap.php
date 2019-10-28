@@ -113,12 +113,14 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
-            // Site sections
-            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->rule(MockSiteSectionProvider::class)
             ->setFactory(function () {
                 return MockSiteSectionProvider::fromLocales();
             })
-            ->setClass(MockSiteSectionProvider::class)
+
+            // Site sections
+            ->rule(\Vanilla\Contracts\Site\SiteSectionModel::class)
+            ->addCall('addProvider', [ new Reference(MockSiteSectionProvider::class)])
             ->setShared(true)
 
             // Site applications

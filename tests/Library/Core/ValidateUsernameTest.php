@@ -56,7 +56,7 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * Test some partial regex patterns.
+     * Test `Garden.User.ValidationRegex`.
      *
      * @param string $pattern The pattern to test.
      * @param string $username The username to test.
@@ -72,6 +72,8 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test `Garden.User.ValidationRegexPattern`.
+     *
      * @param string $pattern
      * @param string $username
      * @param bool $expected
@@ -82,6 +84,8 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test `Garden.User.ValidationLength`.
+     *
      * @param string $length
      * @param string $username
      * @param bool $expected
@@ -100,6 +104,7 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
         $r = [
             'valid' => ['^0-9', 'todd', true],
             'invalid' => ['^0-9', 'todd0', false],
+            'invalid slash' => ['^/', 'to/dd', false],
         ];
 
         return $r;

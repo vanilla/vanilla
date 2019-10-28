@@ -90,6 +90,15 @@ export const translationGridClasses = useThemeCache(() => {
         alignItems: "stretch",
     });
 
+    const languageDropdown = style("languageDropdown", {
+        width: 200,
+        $nest: {
+            ul: {
+                fontWeight: "normal",
+            },
+        },
+    });
+
     const leftCell = style("leftCell", {
         width: percent(50),
         display: "flex",
@@ -235,5 +244,6 @@ export const translationGridClasses = useThemeCache(() => {
         fullHeight,
         multiLine,
         icon,
+        languageDropdown,
     };
 });

@@ -17,6 +17,7 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import { panelListClasses } from "@library/layout/panelListStyles";
 
 export interface ITranslation {
     id: string;
@@ -42,6 +43,7 @@ export interface ITranslationGrid {
 
 export function TranslationGrid(props: ITranslationGrid) {
     const id = useUniqueID("articleOtherLanguages");
+    const classesPanelList = panelListClasses();
     const { data, inScrollingContainer = false, otherLanguages } = props;
     const dateUpdated = "2019-10-08T13:54:41+00:00";
     const classes = translationGridClasses();
@@ -68,7 +70,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                     }
                     ariaLabel={"This article was editied in its source locale."}
                 >
-                    <span>
+                    <span tabIndex={0}>
                         <AlertIcon className={"selectBox-selectedIcon"} />
                     </span>
                 </ToolTip>
@@ -146,19 +148,21 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classes.header}>
                         <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
                         <div className={classNames(classes.rightCell, classes.headerRight)}>
-                            <PanelWidget>
-                                <LanguagesDropDown
-                                    titleID={id}
-                                    widthOfParent={true}
-                                    className="otherLanguages-select"
-                                    renderLeft={true}
-                                    data={props.otherLanguages}
-                                    currentLocale={currentLocale}
-                                    dateUpdated={props.dateUpdated}
-                                    selcteBoxItems={selectBoxItems}
-                                    selectedIndex={selectedIndex}
-                                />
-                            </PanelWidget>
+                            <div className={classes.languageDropdown}>
+                                <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+                                    <LanguagesDropDown
+                                        titleID={id}
+                                        widthOfParent={true}
+                                        className="otherLanguages-select"
+                                        renderLeft={true}
+                                        data={props.otherLanguages}
+                                        currentLocale={currentLocale}
+                                        dateUpdated={props.dateUpdated}
+                                        selcteBoxItems={selectBoxItems}
+                                        selectedIndex={selectedIndex}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className={classes.body}>{translationRows}</div>

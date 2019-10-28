@@ -170,6 +170,10 @@ export const dropDownClasses = useThemeCache(() => {
     } as NestedCSSProperties);
 
     const items = style("items", {
+        paddingTop: 3,
+        paddingBottom: 3,
+        paddingLeft: 0,
+        paddingRight: 0,
         fontSize: unit(globalVars.fonts.size.medium),
     });
 

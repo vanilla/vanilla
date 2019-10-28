@@ -11,18 +11,17 @@ import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
 import { CheckCompactIcon, DownTriangleIcon, AlertIcon } from "@library/icons/common";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 
 export interface ISelectBoxItem {
     name: string;
     content?: React.ReactNode;
     className?: string;
-    onClick?: () => void;
     selected?: boolean;
     icon?: React.ReactNode;
+    url?: string;
 }
 
 interface IProps {
@@ -89,27 +88,12 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
             return (
-                <DropDownItemButton
+                <DropDownItemLink
                     key={this.props.id + "-item" + i}
                     className={classNames({ isSelected: child.selected })}
-                    name={child.name}
-                    onClick={() => {
-                        this.handleClick.bind(this, child, i);
-                        child.onClick && child.onClick();
-                    }}
-                    disabled={i === this.state.selectedIndex}
-                    clickData={child}
-                    index={i}
-                    current={selected}
-                    buttonClassName={classNames(
-                        "dropDownItem-button",
-                        "selectBox-buttonItem",
-                        classesDropDown.action,
-                        classes.buttonItem,
-                        {
-                            isInModal: this.props.openAsModal,
-                        },
-                    )}
+                    // name={child.name}
+                    to={child.url || ""}
+                    isModalLink={this.props.openAsModal}
                 >
                     <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
                         {child.content || child.name}
@@ -123,7 +107,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         )}
                         {child.icon}
                     </span>
-                </DropDownItemButton>
+                </DropDownItemLink>
             );
         });
         const buttonContents =

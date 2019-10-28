@@ -118,7 +118,6 @@ if (!function_exists('MostRecentString')):
             $r .= ' ';
 
             $r .= '<span class="MostRecentOn">';
-            $r .= t('on').' ';
             $r .= anchor(
                 Gdn_Format::date($row['LastDateInserted'], 'html'),
                 $row['LastUrl'],

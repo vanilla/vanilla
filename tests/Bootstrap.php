@@ -23,7 +23,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Site\SiteSectionModel;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -119,7 +119,7 @@ class Bootstrap {
             })
 
             // Site sections
-            ->rule(\Vanilla\Contracts\Site\SiteSectionModel::class)
+            ->rule(SiteSectionModel::class)
             ->addCall('addProvider', [ new Reference(MockSiteSectionProvider::class)])
             ->setShared(true)
 

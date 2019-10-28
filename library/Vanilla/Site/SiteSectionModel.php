@@ -21,6 +21,9 @@ class SiteSectionModel {
     /** @var SiteSectionInterface[] $siteSections */
     private $siteSections;
 
+    /** @var SiteSectionInterface $currentSiteSection */
+    private $currentSiteSection;
+
     /**
      * Register site section
      *
@@ -28,6 +31,9 @@ class SiteSectionModel {
      */
     public function addProvider(SiteSectionProviderInterface $provider) {
         $this->providers[] = $provider;
+        if (!empty($current = $provider->getCurrentSiteSection())) {
+            $this->currentSiteSection = $current;
+        }
     }
 
     /**
@@ -92,5 +98,14 @@ class SiteSectionModel {
             }
         }
         return $siteSections;
+    }
+
+    /**
+     * Get the current site section for the request automatically if possible.
+     *
+     * @return SiteSectionInterface
+     */
+    public function getCurrentSiteSection(): SiteSectionInterface {
+        return $this->currentSiteSection;
     }
 }

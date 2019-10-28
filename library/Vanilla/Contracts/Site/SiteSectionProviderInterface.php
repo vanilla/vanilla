@@ -21,4 +21,10 @@ interface SiteSectionProviderInterface {
      */
     public function getAll(): array;
 
+    /**
+     * Get the current site section for the request automatically if possible.
+     *
+     * @return SiteSectionInterface
+     */
+    public function getCurrentSiteSection(): SiteSectionInterface;
 }

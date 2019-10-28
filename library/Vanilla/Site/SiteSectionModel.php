@@ -94,7 +94,7 @@ class SiteSectionModel {
         /** @var SiteSectionInterface $siteSection */
         foreach ($this->getAll() as $siteSection) {
             if ($localeKey === $siteSection->getContentLocale()) {
-                $siteSections[] = $this->defaultSite;
+                $siteSections[] = $siteSection;
             }
         }
         return $siteSections;

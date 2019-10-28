@@ -73,19 +73,11 @@ export function ImageEmbedMenu(props: IProps) {
     };
 
     return (
-        <div
-            className={classNames(
-                classes.root,
-                "u-excludeFromPointerEvents",
-                classes.embedMetaDataMenu,
-                props.className,
-            )}
-        >
+        <div className={classNames(classes.root, classes.embedMetaDataMenu, props.className)}>
             <EditorEventWall>
                 <DropDown
                     title={t("Alt Text")}
                     buttonContents={icon}
-                    className={classNames("u-excludeFromPointerEvents")}
                     onVisibilityChange={setVisible}
                     isVisible={isVisible}
                     openAsModal={device === Devices.MOBILE || device === Devices.XS}

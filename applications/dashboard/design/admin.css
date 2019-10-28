@@ -11849,17 +11849,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedLinkLoader-link:hover:after {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
 }
-.richEditor .embedExternal-content:focus:after,
-.richEditor .embedLinkLoader-link:focus:after {
+.richEditor .embed-isSelected .embedExternal-content:after,
+.richEditor .embed-isSelected .embedLinkLoader-link:after {
   box-shadow: 0 0 0 2px #0291db inset;
-}
-.richEditor .embedExternal-content > *,
-.richEditor .embedLinkLoader-link > * {
-  pointer-events: none;
-}
-.richEditor .embedExternal-content > .u-excludeFromPointerEvents,
-.richEditor .embedLinkLoader-link > .u-excludeFromPointerEvents {
-  pointer-events: initial;
 }
 
 .embed-focusableElement {
@@ -12008,7 +12000,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedImage-img:hover {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
 }
-.richEditor .embedImage-img:focus {
+
+.richEditor .embed-isSelected .embedImage-img {
   box-shadow: 0 0 0 2px #0291db;
 }
 
@@ -12137,133 +12130,6 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.embedQuote {
-  display: block;
-  width: 100%;
-}
-
-.embedQuote-content {
-  display: block;
-  width: 100%;
-}
-
-.embedQuote-header {
-  position: relative;
-}
-
-.embedQuote-userLink {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-.embedQuote-userName {
-  padding: 0;
-  color: #6f737a;
-  font-weight: 700;
-  font-size: 12px;
-}
-
-.embedQuote-userPhoto {
-  display: block;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-}
-
-.embedQuote-excerpt {
-  white-space: normal;
-}
-
-.embedQuote-collapseButton {
-  position: absolute;
-  top: 0;
-  right: 8px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: auto;
-  height: 36px;
-  width: 36px;
-  opacity: 0.6;
-  padding: 0;
-}
-.embedQuote-collapseButton:active {
-  opacity: 1;
-}
-.embedQuote-collapseButton:focus {
-  opacity: 1;
-  outline: none;
-}
-.embedQuote-collapseButton:hover {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.embedQuote-title {
-  padding-right: 36px;
-}
-
-.embedQuote-chevronUp,
-.embedQuote-chevronDown {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  vertical-align: 0.2em;
-}
-
-.embedQuote-dateTime {
-  font-size: 12px;
-  color: #6f737a;
-  margin-left: 8px;
-}
-
-.embedQuote-header {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  padding-top: 14px;
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-bottom: 0;
-}
-
-.embedQuote-body {
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-.embedQuote-body::before, .embedQuote-body::after {
-  content: initial;
-}
-
-.embedQuote-metaLink {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
-
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only

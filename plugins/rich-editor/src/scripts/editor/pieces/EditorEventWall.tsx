@@ -27,12 +27,12 @@ export function EditorEventWall(props: IProps) {
 
         current.addEventListener("click", eventFlagger);
         current.addEventListener("mouseup", eventFlagger);
-        current.addEventListener("mousedown", eventFlagger);
+        // current.addEventListener("mousedown", eventFlagger);
         current.addEventListener("keydown", eventFlagger);
         return () => {
             current.removeEventListener("click", eventFlagger);
             current.removeEventListener("mouseup", eventFlagger);
-            current.removeEventListener("mousedown", eventFlagger);
+            // current.removeEventListener("mousedown", eventFlagger);
             current.removeEventListener("keydown", eventFlagger);
         };
     }, [ref]);

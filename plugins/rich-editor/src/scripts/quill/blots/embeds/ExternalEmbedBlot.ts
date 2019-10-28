@@ -8,11 +8,11 @@ import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedServ
 import { getData, setData } from "@vanilla/dom-utils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import ErrorBlot, { ErrorBlotType, IErrorData } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { logError } from "@vanilla/utils";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 const DATA_KEY = "__embed-data__";
 
@@ -40,7 +40,7 @@ export type IEmbedValue = IEmbedLoadedValue | IEmbedUnloadedValue;
  *
  * If you're trying to render an embed, you likely want to use the {EmbedInsertionModule}.
  */
-export default class ExternalEmbedBlot extends FocusableEmbedBlot {
+export default class ExternalEmbedBlot extends SelectableEmbedBlot {
     public static blotName = "embed-external";
     public static className = "embed-external";
     public static tagName = "div";
@@ -69,10 +69,18 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
+     * Get the data representing the  blot.
+     */
+    public getData(): IEmbedLoadedValue {
+        const value = this.value();
+        return value[ExternalEmbedBlot.blotName];
+    }
+
+    /**
      * Callback for syncing some values back into the blot data from a react rendered embed.
      */
     private syncMountedValues = (newValues: object) => {
-        const existingValue: IEmbedLoadedValue = ExternalEmbedBlot.value(this.domNode as Element);
+        const existingValue: IEmbedLoadedValue = this.getData();
         const mergedValue = {
             ...existingValue,
             data: {
@@ -80,48 +88,70 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
                 ...newValues,
             },
         };
+
         setData(this.domNode as Element, DATA_KEY, mergedValue);
+        void this.renderReact();
+    };
+
+    private async renderReact() {
+        const data = this.value()["embed-external"].data;
+        const mountNode = this.domNode as HTMLElement;
+        mountNode.classList.add("isMounted");
+
+        const fullData = {
+            ...data,
+            syncBackEmbedValue: this.syncMountedValues,
+            quill: this.quill,
+            isSelected: this.isSelected,
+            selectSelf: this.select,
+        };
+
+        await mountEmbed(mountNode, fullData, true);
+    }
+
+    public select = () => {
+        super.select();
+        void this.renderReact();
+    };
+
+    public clearSelection = () => {
+        super.clearSelection();
+        void this.renderReact();
     };
 
     /**
      * Create a successful embed element.
      */
     public async createEmbedFromData(data: IBaseEmbedProps, loaderElement: Element | null, newValueToSet: any) {
-        const jsEmbed = FocusableEmbedBlot.create(data);
+        const jsEmbed = SelectableEmbedBlot.create(data);
         setData(jsEmbed, DATA_KEY, newValueToSet);
 
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
-        jsEmbed.tabIndex = -1;
 
         // Append these nodes.
         loaderElement && jsEmbed.appendChild(loaderElement);
 
-        await mountEmbed(
-            jsEmbed,
-            {
-                ...data,
-                syncBackEmbedValue: this.syncMountedValues,
-                quill: this.quill,
-            },
-            true,
-        );
-        // Remove the focus class. It should be handled by the mounted embed at this point.
-        loaderElement && loaderElement.remove();
-        jsEmbed.classList.remove(FOCUS_CLASS);
-        jsEmbed.removeAttribute("tabindex");
-
         // Replace the old dom node.
-        this.domNode.parentNode!.insertBefore(jsEmbed, this.domNode);
-        this.domNode.parentNode!.removeChild(this.domNode);
+        const oldNode = this.domNode;
+        const parent = oldNode.parentNode!;
+        parent.insertBefore(jsEmbed, oldNode);
+        parent.removeChild(oldNode);
 
         // Move the blot reference from the old node to the new one.
+
         delete this.domNode["__blot"];
         jsEmbed["__blot"] = { blot: this };
 
         // Assign the new domNode.
         this.domNode = jsEmbed;
+        this.attach();
 
+        await this.renderReact();
+
+        // Remove the focus class. It should be handled by the mounted embed at this point.
+        loaderElement && loaderElement.remove();
+        jsEmbed.classList.remove(FOCUS_CLASS);
         // Trigger an update.
         forceSelectionUpdate();
     }

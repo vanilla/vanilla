@@ -26,8 +26,8 @@
     &:hover {
         box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5);
     }
+}
 
-    &:focus {
-        box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
-    }
+.richEditor .embed-isSelected .embedImage-img {
+    box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
 }

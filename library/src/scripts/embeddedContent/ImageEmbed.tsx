@@ -9,7 +9,6 @@ import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
-import { useFocusWatcher } from "@vanilla/react-utils";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -25,11 +24,7 @@ interface IProps extends IBaseEmbedProps {
  */
 export function ImageEmbed(props: IProps) {
     const contentRef = useRef<HTMLDivElement>(null);
-    const [isFocused, setFocused] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    useFocusWatcher(contentRef, newFocusValue => {
-        setFocused(newFocusValue);
-    });
 
     return (
         <DeviceProvider>
@@ -42,7 +37,7 @@ export function ImageEmbed(props: IProps) {
                         tabIndex={props.inEditor ? -1 : undefined}
                     />
                 </div>
-                {props.inEditor && (isFocused || isOpen) && (
+                {props.inEditor && props.isSelected && (
                     <ImageEmbedMenu
                         onVisibilityChange={setIsOpen}
                         onSave={newValue => {
@@ -50,6 +45,7 @@ export function ImageEmbed(props: IProps) {
                                 props.syncBackEmbedValue({
                                     name: newValue.alt,
                                 });
+                            props.selectSelf && props.selectSelf();
                         }}
                         initialAlt={props.name}
                     />

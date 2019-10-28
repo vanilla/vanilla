@@ -35,6 +35,8 @@ export interface IBaseEmbedProps {
     onRenderComplete?: () => void;
     syncBackEmbedValue?: (values: object) => void;
     quill?: Quill | null;
+    isSelected?: boolean;
+    selectSelf?: () => void;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {

@@ -13,7 +13,7 @@ import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
  */
 export default class NewLineClickInsertionModule {
     constructor(private quill: Quill) {
-        this.quill.root.addEventListener("click", this.handleClick);
+        // this.quill.root.addEventListener("click", this.handleClick);
     }
 
     /**
@@ -21,7 +21,7 @@ export default class NewLineClickInsertionModule {
      */
     public handleClick = (event: MouseEvent) => {
         // Make sure that we were directly clicked and are not handling a bubbled event.
-        if (event.target !== this.quill.root) {
+        if (event.currentTarget !== this.quill.root) {
             return;
         }
 

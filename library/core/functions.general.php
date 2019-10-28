@@ -92,31 +92,6 @@ if (!function_exists('anonymizeIP')) {
     }
 }
 
-if (!function_exists('arrayCombine')) {
-    /**
-     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
-     *
-     * @param array $array1 Array of keys to be used. Illegal values for key will be converted to string.
-     * @param array $array2 Array of values to be used.
-     */
-    function arrayCombine($array1, $array2) {
-        if (!is_array($array1)) {
-            $array1 = [];
-        }
-
-        if (!is_array($array2)) {
-            $array2 = [];
-        }
-
-        if (count($array1) > 0 && count($array2) > 0) {
-            return array_combine($array1, $array2);
-        } elseif (count($array1) == 0) {
-            return $array2;
-        } else {
-            return $array1;
-        }
-    }
-}
 /*
  We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {

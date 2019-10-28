@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
-import { CheckIcon } from "@library/icons/titleBar";
+import { CheckIcon } from "@library/icons/common";
 
 export interface IMenuRadioOption {
     name: string;

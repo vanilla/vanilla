@@ -536,9 +536,7 @@ class UserController extends DashboardController {
             $this->EventArguments['RoleData'] = &$this->RoleData;
 
             $userRoleData = $userModel->getRoles($userID)->resultArray();
-            $roleIDs = array_column($userRoleData, 'RoleID');
-            $roleNames = array_column($userRoleData, 'Name');
-            $this->UserRoleData = arrayCombine($roleIDs, $roleNames);
+            $this->UserRoleData = array_column($userRoleData, 'Name', 'RoleID');
             $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
 
             $this->fireEvent("BeforeUserDelete");
@@ -695,9 +693,7 @@ class UserController extends DashboardController {
             $this->EventArguments['RoleData'] = &$roleData;
 
             $userRoleData = $userModel->getRoles($userID)->resultArray();
-            $roleIDs = array_column($userRoleData, 'RoleID');
-            $roleNames = array_column($userRoleData, 'Name');
-            $userRoleData = arrayCombine($roleIDs, $roleNames);
+            $userRoleData = array_column($userRoleData, 'Name', 'RoleID');
             $this->EventArguments['UserRoleData'] = &$userRoleData;
 
             $this->fireEvent("BeforeUserEdit");

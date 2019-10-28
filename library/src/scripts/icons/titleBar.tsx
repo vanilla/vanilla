@@ -9,22 +9,6 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconClasses";
 
-export function CheckIcon(props: { className?: string }) {
-    const title = `✓`;
-    const classes = iconClasses();
-    return (
-        <svg
-            className={classNames(classes.standard, "icon-check", props.className)}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8" />
-        </svg>
-    );
-}
-
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
     const classes = iconClasses();

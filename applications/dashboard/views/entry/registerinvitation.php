@@ -30,6 +30,7 @@
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
                 echo $this->Form->input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
                 ?>
             </li>

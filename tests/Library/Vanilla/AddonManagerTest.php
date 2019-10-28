@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use VanillaTests\SharedBootstrapTestCase;
 use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
@@ -17,6 +16,7 @@ use Test\OldApplication\arbitraryLowercase;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the AddonManager
@@ -30,6 +30,7 @@ class AddonManagerTest extends SharedBootstrapTestCase {
      */
     public static function setUpBeforeClass() {
         \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache/am');
+        parent::setUpBeforeClass();
     }
 
     /**

@@ -16,6 +16,7 @@ use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
@@ -69,6 +70,9 @@ class EmbedService implements EmbedCreatorInterface {
     /** @var array Mapping of 'embedType' => EmbedClass::class */
     private $registeredEmbeds = [];
 
+    /** @var EmbedFilterInterface[] */
+    private $registeredFilters = [];
+
     /**
      * EmbedManager constructor.
      *
@@ -78,6 +82,19 @@ class EmbedService implements EmbedCreatorInterface {
     public function __construct(EmbedCache $cache, RequestValidator $requestValidator) {
         $this->cache = $cache;
         $this->requestValidator = $requestValidator;
+    }
+
+    /**
+     * Register an embed data class to map to a particular string type.
+     * This class will be instantiated through createEmbedFromData().
+     *
+     * @param EmbedFilterInterface $embedFilter An embed filter instance.
+     *
+     * @return $this
+     */
+    public function registerFilter(EmbedFilterInterface $embedFilter): EmbedService {
+        $this->registeredFilters[] = $embedFilter;
+        return $this;
     }
 
     /**
@@ -170,12 +187,37 @@ class EmbedService implements EmbedCreatorInterface {
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
+            ->registerFilter($dic->get(QuoteEmbedFilter::class))
             ->registerFactory($dic->get(DiscussionEmbedFactory::class))
             ->registerFactory($dic->get(CommentEmbedFactory::class))
-
-//            ->registerFactory(VimeoEmbedFactory::class)
-//            ->registerFactory(WistiaFactory::class)
         ;
+    }
+
+    /**
+     * Filter some embed data with on of the registered filterers.
+     *
+     * @param array $data The data to filter.
+     *
+     * @return array The filtered data.
+     */
+    public function filterEmbedData(array $data): array {
+        $type = $data['embedType'] ?? $data['type'] ?? null;
+
+        if (!$type) {
+            trigger_error(
+                "Attempted to filter embed data, but a type could not be found\n" . json_encode($data, JSON_PRETTY_PRINT),
+                E_USER_NOTICE
+            );
+        }
+
+        foreach ($this->registeredFilters as $filter) {
+            if ($filter->canHandleEmbedType($type)) {
+                $data = $filter->filterData($data);
+            }
+        }
+        // Make an embed and return it's output./
+        $embed = $this->createEmbedFromData($data);
+        return $embed->jsonSerialize();
     }
 
     /**

@@ -18,7 +18,7 @@ class DefaultSiteSection implements SiteSectionInterface {
 
     const DEFAULT_ID = 0;
 
-    const EMPTY_BASE_PATH = "/";
+    const EMPTY_BASE_PATH = "";
 
     const DEFAULT_SECTION_GROUP = "vanilla";
 

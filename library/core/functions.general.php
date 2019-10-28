@@ -92,31 +92,6 @@ if (!function_exists('anonymizeIP')) {
     }
 }
 
-if (!function_exists('arrayCombine')) {
-    /**
-     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
-     *
-     * @param array $array1 Array of keys to be used. Illegal values for key will be converted to string.
-     * @param array $array2 Array of values to be used.
-     */
-    function arrayCombine($array1, $array2) {
-        if (!is_array($array1)) {
-            $array1 = [];
-        }
-
-        if (!is_array($array2)) {
-            $array2 = [];
-        }
-
-        if (count($array1) > 0 && count($array2) > 0) {
-            return array_combine($array1, $array2);
-        } elseif (count($array1) == 0) {
-            return $array2;
-        } else {
-            return $array1;
-        }
-    }
-}
 /*
  We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {
@@ -3916,13 +3891,16 @@ if (!function_exists('userAgentType')) {
      * This method checks the user agent to try and determine the type of device making the current request.
      * It also checks for a special X-UA-Device header that a server module can set to more quickly determine the device.
      *
-     * @param string|null $value The new value to set. This should be one of desktop, mobile, tablet, or app.
+     * @param string|null|false $value The new value to set or **false** to clear. This should be one of desktop, mobile, tablet, or app.
      * @return string Returns one of desktop, mobile, tablet, or app.
      */
     function userAgentType($value = null) {
         static $type = null;
 
-        if ($value !== null) {
+        if ($value === false) {
+            $type = null;
+            return '';
+        } elseif ($value !== null) {
             $type = $value;
         }
 
@@ -3930,15 +3908,32 @@ if (!function_exists('userAgentType')) {
             return $type;
         }
 
+        // A function to make sure the type is one of our supported types.
+        $validateType = function (string $type): string {
+            $validTypes = ['desktop', 'tablet', 'app', 'mobile'];
+
+            if (in_array($type, $validTypes)) {
+                return $type;
+            } else {
+                // There is no exact match so look for a partial match.
+                foreach ($validTypes as $validType) {
+                    if (strpos($type, $validType) !== false) {
+                        return $validType;
+                    }
+                }
+            }
+            return 'desktop';
+        };
+
         // Try and get the user agent type from the header if it was set from the server, varnish, etc.
         $type = strtolower(val('HTTP_X_UA_DEVICE', $_SERVER, ''));
         if ($type) {
-            return $type;
+            return $validateType($type);
         }
 
         // See if there is an override in the cookie.
         if ($type = val('X-UA-Device-Force', $_COOKIE)) {
-            return $type;
+            return $validateType($type);
         }
 
         // Now we will have to figure out the type based on the user agent and other things.

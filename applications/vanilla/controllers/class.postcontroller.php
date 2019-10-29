@@ -180,6 +180,13 @@ class PostController extends VanillaController {
         } else {
             // New discussion? Make sure a discussion ID didn't sneak in.
             $this->Form->removeFormValue('DiscussionID');
+            $formCategoryID = $this->Form->_FormValues['CategoryID'];
+            if ($formCategoryID) {
+                $category = $categoryModel->getID($formCategoryID);
+                if (!$category) {
+                    $this->Form->addError(t('Category does not exist,'));
+                }
+            }
             // Make sure a group discussion doesn't get announced outside the groups category.
             $formAnnounce = $this->Form->_FormValues['Announce'];
             if (isset($formAnnounce) && $formAnnounce === '1') {

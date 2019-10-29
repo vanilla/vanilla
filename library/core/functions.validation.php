@@ -281,7 +281,7 @@ if (!function_exists('validateUsername')) {
         $validateUsernameRegex = validateUsernameRegex($isPartialRegex);
 
         if ($isPartialRegex) {
-            $validateUsernameRegex = "/^({$validateUsernameRegex})?$/siu";
+            $validateUsernameRegex = "`^({$validateUsernameRegex})?$`siu";
         }
 
         return validateRegex(

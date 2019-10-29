@@ -80,7 +80,10 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      * @dataProvider provideValidationRegexPatternTests
      */
     public function testValidationRegexPattern(string $pattern, string $username, bool $expected): void {
-        $this->fail('Not implemented');
+        $this->config->set('Garden.User.ValidationRegexPattern', $pattern, true, false);
+
+        $actual = validateUsername($username);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -89,10 +92,13 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      * @param string $length
      * @param string $username
      * @param bool $expected
-     * @dataProvider provideValidationLengthTests
+     * @dataProvider providePartialLengthTests
      */
     public function testValidationLength(string $length, string $username, bool $expected) {
-        $this->fail('Not implemented');
+        $this->config->set('Garden.User.ValidationLength', $length, true, false);
+
+        $actual = validateUsername($username);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -118,19 +124,21 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     public function provideValidationRegexPatternTests(): array {
         $r = [
             'valid' => ['`[tod]+`', 'todd', true],
+            'invalid' => ['`(\w+){3,30}`', 'sh', false],
         ];
 
         return $r;
     }
 
     /**
-     * Provide tests for full regex configs.
+     * Provide tests for partial length regex configs.
      *
      * @return array
      */
-    public function provideValidationLengthTests(): array {
+    public function providePartialLengthTests(): array {
         $r = [
-            'valid' => ['`{2,4}`', 'todd', true],
+            'valid' => ['{2,4}', 'todd', true],
+            'invalid' => ['{3}', 'todd', false],
         ];
 
         return $r;

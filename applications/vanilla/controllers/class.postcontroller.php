@@ -184,7 +184,7 @@ class PostController extends VanillaController {
             if ($formCategoryID) {
                 $category = $categoryModel->getID($formCategoryID);
                 if (!$category) {
-                    $this->Form->addError(t('Category does not exist,'));
+                    $this->Form->addError(t('Category does not exist.'));
                 }
             }
             // Make sure a group discussion doesn't get announced outside the groups category.

@@ -25,6 +25,7 @@ const DEFAULT_CONTENT = [{ insert: "\n" }];
 interface IProps {
     legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
+    placeholderClassName?: string;
 }
 
 /**
@@ -37,7 +38,7 @@ export default function EditorContent(props: IProps) {
     useQuillInstance(quillMountRef);
     useLegacyTextAreaSync(props.legacyTextArea);
     useDebugPasteListener(props.legacyTextArea);
-    useQuillAttributeSync(props.placeholder);
+    useQuillAttributeSync(props.placeholder, props.placeholderClassName);
     useLoadStatus();
     useInitialValue();
     useOperationsQueue();
@@ -91,13 +92,13 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
 /**
  * Apply our CSS classes/styles and other attributes to quill's root. (Not a react component).
  */
-function useQuillAttributeSync(placeholder?: string) {
+function useQuillAttributeSync(placeholder?: string, placeholderClass?: string) {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
     const quillRootClasses = useMemo(
         () =>
-            classNames("richEditor-text", "userContent", classesRichEditor.text, {
+            classNames("richEditor-text", "userContent", placeholderClass, classesRichEditor.text, {
                 // These classes shouln't be applied until the forum is converted to the new styles.
                 [classesUserContent.root]: !legacyMode,
             }),

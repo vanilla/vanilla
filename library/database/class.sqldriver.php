@@ -754,8 +754,10 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $tableName The name of the table to delete from.
      * @param array $wheres An array of where conditions.
+     * @param int $limit Limit the number of records to delete.
+     * @return string Returns an DML statement.
      */
-    public function getDelete($tableName, $wheres = []) {
+    public function getDelete($tableName, $wheres = [], $limit = 0) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetDelete'), E_USER_ERROR);
     }
 
@@ -2114,13 +2116,12 @@ abstract class Gdn_SQLDriver {
      * @param string $field The field to search in for $values.
      * @param array $values An array of values to look for in $field.
      * @param string $op Either 'in' or 'not in' for the respective operation.
-     * @param string $escape Whether or not to escape the items in $values.
-     * clause.
-     * @return Gdn_SQLDriver $this
+     * @param bool $escape Whether or not to escape the items in $values.
+     * @return $this
      */
     public function _whereIn($field, $values, $op = 'in', $escape = true) {
         if (is_null($field) || !is_array($values)) {
-            return;
+            return $this;
         }
 
         $fieldExpr = $this->_parseExpr($field);
@@ -2140,16 +2141,20 @@ abstract class Gdn_SQLDriver {
         }
         if (count($in) > 0) {
             $inExpr = '('.implode(', ', $in).')';
-        } else {
-            if ($op == 'not in') {
-                deprecated('Gdn_SQLDriver::whereNotIn() was called with empty $values array. This will no longer be supported in a future release.');
-                \Vanilla\Utility\Deprecation::log();
-            }
-            $inExpr = '(null)';
-        }
 
-        // Set the final expression.
-        $expr = $fieldExpr.' '.$op.' '.$inExpr;
+            // Set the final expression.
+            $expr = $fieldExpr.' '.$op.' '.$inExpr;
+        } else {
+            // We have an empty set.
+            if ($op === 'not in') {
+                // This is necessarily true.
+                // This is a statement just in case their are any boolean expressions depending on this being here.
+                $expr = '1 = 1';
+            } else {
+                // This is necessarily false.
+                $expr = '1 = 0';
+            }
+        }
         $this->_where($expr);
 
         return $this;

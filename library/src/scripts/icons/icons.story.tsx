@@ -257,9 +257,6 @@ story.add("Icons", () => {
             </StoryTiles>
             <StoryHeading>title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`CheckIcon`}>
-                    <titleBarIcons.CheckIcon />
-                </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`HelpIcon`}>
                     <titleBarIcons.HelpIcon />
                 </StoryTileAndTextCompact>

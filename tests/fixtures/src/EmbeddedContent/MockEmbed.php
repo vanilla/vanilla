@@ -23,9 +23,9 @@ class MockEmbed extends AbstractEmbed {
      * Override constructor to allow passing allowed types.
      *
      * @param array $data
-     * @param string $allowedTypes
+     * @param array|null $allowedTypes
      */
-    public function __construct(array $data, string $allowedTypes = null) {
+    public function __construct(array $data, array $allowedTypes = null) {
         if ($allowedTypes) {
             $this->allowedTypes = $allowedTypes;
         }
@@ -57,7 +57,7 @@ class MockEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'testProp:s',
+            'testProp:s?',
         ]);
     }
 }

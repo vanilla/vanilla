@@ -292,7 +292,7 @@ class Gdn_Request implements RequestInterface {
      * @return Gdn_Request
      */
     public function fromEnvironment() {
-        $this->withURI()
+        $this->setURI()
             ->withArgs(self::INPUT_GET, self::INPUT_POST, self::INPUT_SERVER, self::INPUT_FILES, self::INPUT_COOKIES);
 
         return $this;
@@ -303,9 +303,9 @@ class Gdn_Request implements RequestInterface {
      *
      * This method allows one method to import the raw information of another request
      *
-     * @param $newRequest New Request from which to import environment and arguments.
+     * @param Gdn_Request $newRequest New Request from which to import environment and arguments.
      * @flow chain
-     * @return Gdn_Request
+     * @return $this
      */
     public function fromImport($newRequest) {
         // Import Environment
@@ -446,7 +446,7 @@ class Gdn_Request implements RequestInterface {
         $port = $this->getPort();
 
         // Only append the port if it is non-standard.
-        if (($port == 80 && $this->getScheme() === 'http') || ($port == 443 && $this->getScheme() === 'https')) {
+        if ($port == 80 || $port == 443) {
             $port = '';
         } else {
             $port = ':'.$port;
@@ -1664,6 +1664,20 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Get the url.
+     * (Simply concatenate host to uri provided)
+     *
+     * @param strinп $uri
+     * @return string
+     */
+    public function getSimpleUrl(string $uri = ''): string {
+        $scheme = $this->getScheme();
+        $hostAndPort = $this->getHostAndPort();
+        $assetRoot = $this->getAssetRoot();
+        return "{$scheme}://{$hostAndPort}{$assetRoot}{$uri}";
+    }
+
+    /**
      * Compare two urls for equality.
      *
      * @param string $url1 The first url to compare.
@@ -1834,14 +1848,26 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Chainable URI Setter, source is a simple string
+     * Set the URI of the request.
      *
-     * @param $uri optional URI to set as as replacement for the REQUEST_URI superglobal value
-     * @flow chain
-     * @return Gdn_Request
+     * @param string $uri Optional URI to set as as replacement for the REQUEST_URI super global value.
+     * @return $this
      */
-    public function withURI($uri = null) {
+    public function setURI($uri = null) {
         $this->_environmentElement('URI', $uri);
         return $this;
+    }
+
+    /**
+     * WARNING: This method is being temporarily deprecated so that we can later change its signature to match the PSR-7
+     * `ServerRequestInterface`. DO NOT MAKE CALLS TO THIS METHOD.
+     *
+     * @param string $uri
+     * @return $this
+     * @deprecated
+     */
+    public function withURI($uri = null) {
+        deprecated('Gdn_Request::withURI()', 'Gdn_Request::setURI()');
+        return $this->setURI($uri);
     }
 }

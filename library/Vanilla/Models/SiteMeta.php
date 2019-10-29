@@ -9,8 +9,8 @@ namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Addon;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * A class for gathering particular data about the site.
@@ -38,6 +38,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var int */
     private $maxUploadSize;
 
+    /** @var int */
+    private $maxUploads;
+
     /** @var string */
     private $localeKey;
 
@@ -61,16 +64,14 @@ class SiteMeta implements \JsonSerializable {
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param \Gdn_Locale $locale
-     * @param Addon $activeTheme
-     * @param Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
+     * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
         RequestInterface $request,
         Contracts\ConfigurationInterface $config,
-        \Gdn_Locale $locale,
-        Addon $activeTheme,
-        Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
+        SiteSectionModel $siteSectionModel,
+        ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
 
@@ -82,7 +83,7 @@ class SiteMeta implements \JsonSerializable {
 
         $this->featureFlags = $config->get('Feature', []);
 
-        $this->currentSiteSection = $siteSectionProvider->getCurrentSiteSection();
+        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
@@ -96,7 +97,7 @@ class SiteMeta implements \JsonSerializable {
         $this->maxUploads = (int)$config->get('Garden.Upload.maxFileUploads', ini_get('max_file_uploads'));
 
         // localization
-        $this->localeKey = $locale->current();
+        $this->localeKey = $this->currentSiteSection->getContentLocale();
 
         // Theming
         $this->activeTheme = $activeTheme;
@@ -129,7 +130,7 @@ class SiteMeta implements \JsonSerializable {
             'ui' => [
                 'siteName' => $this->siteTitle,
                 'localeKey' => $this->localeKey,
-                'themeKey' => $this->activeTheme->getKey(),
+                'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
                 'favIcon' => $this->favIcon,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
@@ -141,13 +142,6 @@ class SiteMeta implements \JsonSerializable {
             'featureFlags' => $this->featureFlags,
             'siteSection' => $this->currentSiteSection,
         ];
-    }
-
-    /**
-     * @return Contracts\Site\SiteSectionInterface
-     */
-    public function getCurrentSiteSection(): Contracts\Site\SiteSectionInterface {
-        return $this->currentSiteSection;
     }
 
     /**
@@ -209,7 +203,7 @@ class SiteMeta implements \JsonSerializable {
     /**
      * @return Addon
      */
-    public function getActiveTheme(): Addon {
+    public function getActiveTheme(): ?Contracts\AddonInterface {
         return $this->activeTheme;
     }
 

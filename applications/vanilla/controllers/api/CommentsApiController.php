@@ -171,6 +171,9 @@ class CommentsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         $comment = $this->commentByID($id);
+        if (isset($comment['DiscussionID'])) {
+            $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $comment['DiscussionID'], $query);
+        }
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
@@ -340,6 +343,9 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
+        if (isset($query['discussionID'])) {
+            $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $query['discussionID'], $query);
+        }
         $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);

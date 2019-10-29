@@ -8,7 +8,6 @@
 namespace Vanilla\Models;
 
 use Garden\Web\Data;
-use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\Asset\ThemeScriptAsset;
@@ -88,6 +87,11 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function getThemeData(): ?array {
         if (!$this->themeData) {
+            $theme = $this->siteMeta->getActiveTheme();
+            if ($theme === null) {
+                $this->themeData = null;
+                return null;
+            }
             $themeKey = $this->siteMeta->getActiveTheme()->getKey();
             try {
                 $this->themeData = $this->themesApi->get($themeKey);

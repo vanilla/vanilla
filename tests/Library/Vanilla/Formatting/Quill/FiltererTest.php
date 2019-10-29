@@ -7,21 +7,29 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
-use PHPUnit\Framework\TestCase;
+use Garden\Container\Reference;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\MarkdownFormat;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Filterer;
 use VanillaTests\MinimalContainerTestCase;
-use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Formatting\Quill\Formats\Bold;
-use Vanilla\Formatting\Quill\Formats\Italic;
-use Vanilla\Formatting\Quill\Formats\Link;
 
 /**
  * General testing of Filterer.
  */
 class FiltererTest extends MinimalContainerTestCase {
+
+    /**
+     * Do some container registration.
+     */
+    public function setUp() {
+        parent::setUp();
+        self::container()->rule(EmbedService::class)
+            ->addCall('registerFilter', [new Reference(QuoteEmbedFilter::class)]);
+    }
+
 
     /**
      * Assert that the filterer is validating json properly.
@@ -32,7 +40,8 @@ class FiltererTest extends MinimalContainerTestCase {
      * @dataProvider provideIO
      */
     public function testFilterer(string $input, string $output) {
-        $filterer = new Filterer();
+        /** @var Filterer $filterer */
+        $filterer = self::container()->get(Filterer::class);
 
         $filteredOutput = $filterer->filter($input);
 
@@ -48,7 +57,8 @@ class FiltererTest extends MinimalContainerTestCase {
      * - XSS in the body is prevent. We always have a fully rendered body.
      */
     public function testFilterEmbedData() {
-        $filterer = new Filterer();
+        /** @var Filterer $filterer */
+        $filterer = self::container()->get(Filterer::class);
         $replacedUrl = 'http://test.com/replaced';
 
         $input = [
@@ -60,6 +70,7 @@ class FiltererTest extends MinimalContainerTestCase {
                             'body' => "Fake body contents, should be replaced.",
                             'bodyRaw' => 'Rendered Body',
                             'format' => MarkdownFormat::FORMAT_KEY,
+                            'url' => 'https://open.vanillaforums.com/discussions/1',
                         ],
                     ],
                 ],
@@ -83,6 +94,7 @@ class FiltererTest extends MinimalContainerTestCase {
                                 ],
                                 [ 'insert' => 'After Embed\n' ],
                             ],
+                            'url' => 'https://open.vanillaforums.com/discussions/1',
                         ],
                     ],
                 ],
@@ -110,6 +122,7 @@ class FiltererTest extends MinimalContainerTestCase {
                             'body' => "<p>Rendered Body</p>\n",
                             'bodyRaw' => 'Rendered Body',
                             'format' => MarkdownFormat::FORMAT_KEY,
+                            'url' => 'https://open.vanillaforums.com/discussions/1',
                         ],
                     ],
                 ],
@@ -122,6 +135,7 @@ class FiltererTest extends MinimalContainerTestCase {
                             'format' => RichFormat::FORMAT_KEY,
                             'body' => \Gdn::formatService()->renderQuote(json_encode($expectedEmbedBodyRaw), RichFormat::FORMAT_KEY),
                             'bodyRaw' => $expectedEmbedBodyRaw,
+                            'url' => 'https://open.vanillaforums.com/discussions/1',
                         ],
                     ],
                 ],

@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\EmbeddedContent;
 
 use Vanilla\EmbeddedContent\EmbedService;
+use VanillaTests\Fixtures\EmbeddedContent\MockEmbedFilter;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbedFactory;
@@ -58,6 +59,29 @@ class EmbedServiceTest extends MinimalContainerTestCase {
             $factory->setSupportedPathRegex('/^$/');
         }
         return [$embed, $factory];
+    }
+
+    /**
+     * Test that registered filters apply to their types.
+     */
+    public function testFilterRegistration() {
+        $type1 = "type1";
+        $type2 = "type2";
+        $embed1 = new MockEmbed(['embedType' => $type1, "url" => 'https://url1.com'], [$type1]);
+        $embed2 = new MockEmbed(['embedType' => $type2, "url" => 'https://url2.com'], [$type2]);
+
+        $replace1 =  ['embedType' => 'replace1', "url" => "https://replace1.com"];
+        $replace2 =  ['embedType' => 'replace2', "url" => "https://replace2.com"];
+
+        $embedFilter1 = new MockEmbedFilter(false, $replace1, [$type1]);
+        $embedFilter2 = new MockEmbedFilter(false, $replace2, [$type2]);
+
+        $this->embedService
+            ->registerFilter($embedFilter1)
+            ->registerFilter($embedFilter2);
+
+        $this->assertSame($replace1, $this->embedService->filterEmbedData($embed1->jsonSerialize()));
+        $this->assertSame($replace2, $this->embedService->filterEmbedData($embed2->jsonSerialize()));
     }
 
     /**

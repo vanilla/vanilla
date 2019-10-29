@@ -87,6 +87,13 @@ export const titleBarVariables = useThemeCache(() => {
         fonts: {
             color: colors.fg,
         },
+        sizing: {
+            minWidth: unit(globalVars.icon.sizes.large),
+            minHeight: unit(globalVars.icon.sizes.large),
+        },
+        padding: {
+            side: 6,
+        },
         borders: {
             style: "none",
             color: "transparent",

@@ -182,9 +182,9 @@ class PostController extends VanillaController {
             $this->Form->removeFormValue('DiscussionID');
             $formCategoryID = $this->Form->_FormValues['CategoryID'];
             if ($formCategoryID) {
-                $category = $categoryModel->getID($formCategoryID);
-                if (!$category) {
-                    $this->Form->addError(t('Category does not exist.'));
+                $formCategory = $categoryModel->getID($formCategoryID);
+                if (!$formCategory) {
+                    $this->Form->addError(t('Category does not exist,'));
                 }
             }
             // Make sure a group discussion doesn't get announced outside the groups category.

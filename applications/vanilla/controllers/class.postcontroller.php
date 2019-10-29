@@ -180,13 +180,6 @@ class PostController extends VanillaController {
         } else {
             // New discussion? Make sure a discussion ID didn't sneak in.
             $this->Form->removeFormValue('DiscussionID');
-            $formCategoryID = $this->Form->_FormValues['CategoryID'];
-            if ($formCategoryID) {
-                $formCategory = $categoryModel->getID($formCategoryID);
-                if (!$formCategory) {
-                    $this->Form->addError(t('Category does not exist,'));
-                }
-            }
             // Make sure a group discussion doesn't get announced outside the groups category.
             $formAnnounce = $this->Form->_FormValues['Announce'];
             if (isset($formAnnounce) && $formAnnounce === '1') {
@@ -255,6 +248,13 @@ class PostController extends VanillaController {
         } elseif ($this->Form->authenticatedPostBack(true)) { // Form was submitted
             // Save as a draft?
             $formValues = $this->Form->formValues();
+            $formCategoryID = $this->Form->getFormValue('CategoryID');
+            if ($formCategoryID) {
+                $formCategory = $categoryModel->getID($formCategoryID);
+                if (!$formCategory) {
+                    $this->Form->addError(t('Category does not exist,'));
+                }
+            }
             $filters = ['Score'];
             $formValues = $this->filterFormValues($formValues, $filters);
             $formValues = $this->DiscussionModel->filterForm($formValues);

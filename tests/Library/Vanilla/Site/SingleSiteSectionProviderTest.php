@@ -30,7 +30,7 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
         parent::setUp();
         $this->setConfig('Garden.Locale', self::LOCALE_KEY);
         $config = self::container()->get(ConfigurationInterface::class);
-        $provider = new SingleSiteSectionProvider( new DefaultSiteSection($config));
+        $provider = new SingleSiteSectionProvider(new DefaultSiteSection($config));
         static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
         $model = new SiteSectionModel($config);
         $model->addProvider($provider);

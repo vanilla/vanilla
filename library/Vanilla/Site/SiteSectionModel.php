@@ -33,7 +33,7 @@ class SiteSectionModel {
      *
      * @param ConfigurationInterface $config
      */
-    public function  __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config) {
         $this->defaultSiteSection = new DefaultSiteSection($config);
     }
 

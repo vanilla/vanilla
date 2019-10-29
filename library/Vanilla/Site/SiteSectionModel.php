@@ -28,6 +28,11 @@ class SiteSectionModel {
     /** @var SiteSectionInterface $currentSiteSection */
     private $defaultSiteSection;
 
+    /**
+     * SiteSectionModel constructor.
+     *
+     * @param ConfigurationInterface $config
+     */
     public function  __construct(ConfigurationInterface $config) {
         $this->defaultSiteSection = new DefaultSiteSection($config);
     }
@@ -35,7 +40,7 @@ class SiteSectionModel {
     /**
      * Register site section
      *
-     * @param SiteSectionInterface $siteSection
+     * @param SiteSectionProviderInterface $provider
      */
     public function addProvider(SiteSectionProviderInterface $provider) {
         $this->providers[] = $provider;
@@ -51,13 +56,13 @@ class SiteSectionModel {
      * @return SiteSectionInterface[]
      */
     public function getForSectionGroup(string $sectionGroupKey): array {
-            $siteSections = [];
-            foreach ($this->getAll() as $siteSection) {
-                if ($siteSection->getSectionGroup() === $sectionGroupKey) {
-                    $siteSections[] = $siteSection;
-                }
+        $siteSections = [];
+        foreach ($this->getAll() as $siteSection) {
+            if ($siteSection->getSectionGroup() === $sectionGroupKey) {
+                $siteSections[] = $siteSection;
             }
-            return $siteSections;
+        }
+        return $siteSections;
     }
 
     /**
@@ -65,7 +70,7 @@ class SiteSectionModel {
      *
      * @return SiteSectionInterface[]
      */
-    public function getAll(): array  {
+    public function getAll(): array {
         if (empty($this->siteSections)) {
             $this->siteSections = [];
             foreach ($this->providers as $provider) {

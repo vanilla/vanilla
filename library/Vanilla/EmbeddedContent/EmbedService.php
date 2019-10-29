@@ -212,6 +212,7 @@ class EmbedService implements EmbedCreatorInterface {
 
         // Construct the embed.
         $embed = $this->createEmbedFromData($data);
+        $embed = $this->filterEmbed($embed);
         return $embed->jsonSerialize();
     }
 

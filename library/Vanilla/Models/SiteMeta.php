@@ -64,7 +64,7 @@ class SiteMeta implements \JsonSerializable {
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param SiteSectionModel $siteSectionModel;
+     * @param SiteSectionModel $siteSectionModel
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(

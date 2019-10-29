@@ -19,15 +19,17 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Site\SiteSectionModel;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -112,9 +114,24 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
+            ->rule(SiteSectionProviderInterface::class)
+            ->setFactory(function () {
+                return MockSiteSectionProvider::fromLocales();
+            })
+            ->setShared(true)
+
             // Site sections
-            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(SingleSiteSectionProvider::class)
+            ->rule(SiteSectionModel::class)
+            ->addCall('addProvider', [new Reference(SiteSectionProviderInterface::class)])
+            ->setShared(true)
+
+            // Site applications
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->setClass(\Vanilla\Site\ApplicationProvider::class)
+            ->addCall('add', [new Reference(
+                \Vanilla\Site\Application::class,
+                ['garden', ['api', 'entry', 'sso', 'utility']]
+            )])
             ->setShared(true)
 
             // AddonManager
@@ -185,6 +202,9 @@ class Bootstrap {
             ->addAlias('Gdn_MySQLDriver')
             ->addAlias('MySQLDriver')
             ->addAlias(Gdn::AliasSqlDriver)
+
+            ->rule(\Vanilla\Contracts\Models\UserProviderInterface::class)
+            ->setClass(\UserModel::class)
 
             // Locale
             ->rule(\Gdn_Locale::class)

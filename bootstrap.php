@@ -66,8 +66,17 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias(Contracts\ConfigurationInterface::class)
 
     // Site sections
-    ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-    ->setClass(SingleSiteSectionProvider::class)
+    ->rule(\Vanilla\Site\SiteSectionModel::class)
+    ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])
+    ->setShared(true)
+
+    // Site applications
+    ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+    ->setClass(\Vanilla\Site\ApplicationProvider::class)
+    ->addCall('add', [new Reference(
+        \Vanilla\Site\Application::class,
+        ['garden', ['api', 'entry', 'sso', 'utility']]
+    )])
     ->setShared(true)
 
     // AddonManager
@@ -257,6 +266,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule('Gdn_Model')
     ->setShared(true)
+
+    ->rule(Contracts\Models\UserProviderInterface::class)
+    ->setClass(UserModel::class)
 
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])

@@ -34,7 +34,9 @@ paths:
             - discussion
             - comment
             - question
+            - answer
             - group
+            - poll
             type: string
           type: array
         style: form

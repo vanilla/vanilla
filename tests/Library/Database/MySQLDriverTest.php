@@ -102,4 +102,62 @@ class MySQLDriverTest extends TestCase {
         $aliases = $this->sql->mapAliases($input, $escape);
         $this->assertSame($aliases, $expected);
     }
+
+    /**
+     * Testing a basic where in expression.
+     */
+    public function testWhereIn() {
+        $sql = $this->sql
+            ->select()
+            ->from('foo')
+            ->whereIn('bar', ['a'])
+            ->getSelect();
+
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where `bar` in ('a')
+EOT;
+
+        $this->assertEquals($expected, $sql);
+    }
+
+    /**
+     * Testing a where in expression with an empty list.
+     */
+    public function testWhereInEmpty() {
+        $sql = $this->sql
+            ->select()
+            ->from('foo')
+            ->whereIn('bar', [])
+            ->getSelect();
+
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where 1 = 0
+EOT;
+
+
+        $this->assertEquals($expected, $sql);
+    }
+
+    /**
+     * Testing a where not in expression with an empty list.
+     */
+    public function testWhereNotInEmpty() {
+        $sql = $this->sql
+            ->select()
+            ->from('foo')
+            ->whereNotIn('bar', [])
+            ->getSelect();
+
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where 1 = 1
+EOT;
+
+        $this->assertEquals($expected, $sql);
+    }
 }

@@ -1173,12 +1173,12 @@ class EntryController extends Gdn_Controller {
             // Try to grab the authenticator data
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
-                Gdn::request()->withURI('dashboard/entry/auth/password');
+                Gdn::request()->setURI('dashboard/entry/auth/password');
 
                 return Gdn::dispatcher()->dispatch();
             }
         } catch (Exception $e) {
-            Gdn::request()->withURI('/entry/signin');
+            Gdn::request()->setURI('/entry/signin');
 
             return Gdn::dispatcher()->dispatch();
         }

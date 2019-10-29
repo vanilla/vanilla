@@ -75,14 +75,3 @@ export const negative = val => {
         return val;
     }
 };
-
-// export interface IStates {
-//     hover?: object;
-//     focus?: object;
-//     active?: object;
-//     accessibleFocus?: object;
-// }
-//
-// export interface IStatesAll {
-//     allStates?: object;
-// }

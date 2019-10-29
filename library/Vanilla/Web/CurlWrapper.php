@@ -6,9 +6,18 @@
 
 namespace Vanilla\Web;
 use Garden\SafeCurl\SafeCurl;
-
+/*
+ * SafeCurl wrapper.
+ */
 Class CurlWrapper {
-
+    /**
+     * Executes a safecurl request.
+     *
+     * @param $url
+     * @param resource $ch The curl handle to execute.
+     * @param bool $followLocation
+     * @return string
+     */
     Static function curlExec($url, $ch, $followLocation = false) {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);

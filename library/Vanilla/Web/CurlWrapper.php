@@ -5,11 +5,13 @@
  */
 
 namespace Vanilla\Web;
+
 use Garden\SafeCurl\SafeCurl;
+
 /*
  * SafeCurl wrapper.
  */
-Class CurlWrapper {
+class CurlWrapper {
     /**
      * Executes a safecurl request.
      *
@@ -18,7 +20,7 @@ Class CurlWrapper {
      * @param bool $followLocation
      * @return string
      */
-    Static function curlExec($url, $ch, $followLocation = false) {
+    public static function curlExec($url, $ch, $followLocation = false) {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);
         return $safeCurl->execute($url);

@@ -146,6 +146,7 @@ export const translationGridClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "nowrap",
         width: percent(100),
+        height: 55,
         backgroundColor: colorOut(globalVars.mainColors.bg),
     });
 
@@ -159,7 +160,7 @@ export const translationGridClasses = useThemeCache(() => {
     const headerLeft = style("headerLeft", {
         fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
-            vertical: vars.cell.paddings.outer + vars.paddings.vertical,
+            vertical: vars.cell.paddings.outer + vars.paddings.vertical - 3,
             horizontal: vars.cell.paddings.outer + vars.paddings.horizontal, //vars.cell.paddings.outer + vars.paddings.horizontal
         }),
         borderRight: "none",
@@ -168,7 +169,6 @@ export const translationGridClasses = useThemeCache(() => {
     const headerRight = style("headerRight", {
         fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
-            //vertical: vars.cell.paddings.inner,
             horizontal: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
         }),
     });

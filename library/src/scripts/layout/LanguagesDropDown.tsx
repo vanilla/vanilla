@@ -6,30 +6,35 @@
 
 import React from "react";
 import classNames from "classnames";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-
 interface IState {
     id: string;
 }
 
-export interface ILanguageProps extends ISelectBoxItem {
-    lang: string;
-    outdated?: boolean;
+export interface ILanguageItem {
+    locale: string;
+    url: string;
+    translationStatus: string;
+    dateUpdated?: string;
 }
 
 export interface ILanguageDropDownProps {
     id?: string;
-    children: ILanguageProps[];
+    data: ILanguageItem[];
     titleID?: string; // set when it comes with a heading
     widthOfParent?: boolean;
-    selected: any;
     className?: string;
     buttonClassName?: string;
     buttonBaseClass?: ButtonTypes;
     renderLeft?: boolean;
     openAsModal?: boolean;
+    currentLocale?: string;
+    selectedIndex?: number;
+    selcteBoxItems: ISelectBoxItem[];
+    dateUpdated?: string;
 }
 
 /**
@@ -37,36 +42,24 @@ export interface ILanguageDropDownProps {
  */
 export default class LanguagesDropDown extends React.Component<ILanguageDropDownProps, IState> {
     public render() {
-        const showPicker = this.props.children && this.props.children.length > 1;
-        if (showPicker) {
-            let foundIndex = false;
-            const processedChildren = this.props.children.map(language => {
-                const selected = language.lang === this.props.selected;
-                language.selected = selected;
-                if (selected) {
-                    foundIndex = selected;
-                }
-                return language;
-            });
-            if (!foundIndex) {
-                processedChildren[0].selected = true;
-            }
-            return (
-                <SelectBox
-                    describedBy={this.props.titleID!}
-                    label={!this.props.titleID ? t("Locale") : null}
-                    widthOfParent={!!this.props.widthOfParent}
-                    className={classNames("languagesDropDown", this.props.className)}
-                    renderLeft={this.props.renderLeft}
-                    buttonClassName={this.props.buttonClassName}
-                    buttonBaseClass={this.props.buttonBaseClass}
-                    openAsModal={this.props.openAsModal}
-                >
-                    {processedChildren}
-                </SelectBox>
-            );
-        } else {
+        const classes = selectBoxClasses();
+        const showPicker = this.props.data && this.props.data.length > 1;
+
+        if (!showPicker) {
             return null;
         }
+        const selcteBoxItems: ISelectBoxItem[] = this.props.selcteBoxItems;
+
+        return (
+            <SelectBox
+                describedBy={this.props.titleID!}
+                widthOfParent={!!this.props.widthOfParent}
+                className={classNames("languagesDropDown", this.props.className)}
+                openAsModal={this.props.openAsModal}
+                selectedIndex={this.props.selectedIndex}
+            >
+                {this.props.selcteBoxItems}
+            </SelectBox>
+        );
     }
 }

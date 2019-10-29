@@ -10,31 +10,30 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import { metasClasses } from "@library/styles/metasStyles";
+import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
 import classNames from "classnames";
-import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
+import { CheckCompactIcon, DownTriangleIcon, AlertIcon } from "@library/icons/common";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 
 export interface ISelectBoxItem {
     name: string;
+    content?: React.ReactNode;
     className?: string;
-    onClick?: () => {};
     selected?: boolean;
-    outdated?: boolean;
-    lang?: string;
+    icon?: React.ReactNode;
+    url?: string;
 }
 
 interface IProps {
     className?: string;
     id?: string;
     children: ISelectBoxItem[];
-    renderAbove?: boolean; // Adjusts the flyout position vertically
-    renderLeft?: boolean; // Adjusts the flyout position horizontally
     buttonClassName?: string;
     buttonBaseClass?: ButtonTypes;
     widthOfParent?: boolean;
     openAsModal?: boolean;
+    selectedIndex?: number;
+    renderLeft?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -66,7 +65,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
         this.state = {
             id: getRequiredID(props, "selectBox-"),
             selectedIndex: props.selectedIndex,
-            selectedItem: props.selectedItem || props.children[props.selectedIndex],
+            selectedItem: props.children[props.selectedIndex],
         };
     }
 
@@ -84,31 +83,21 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
 
     public render() {
         const classes = selectBoxClasses();
+
         const classesDropDown = dropDownClasses();
-        const classesMetas = metasClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
             return (
-                <DropDownItemButton
+                <DropDownItemLink
                     key={this.props.id + "-item" + i}
                     className={classNames({ isSelected: child.selected })}
-                    name={child.name}
-                    onClick={this.handleClick.bind(this, child, i)}
-                    disabled={i === this.state.selectedIndex}
-                    clickData={child}
-                    index={i}
-                    current={selected}
-                    lang={child.lang}
-                    buttonClassName={classNames(
-                        "dropDownItem-button",
-                        "selectBox-buttonItem",
-                        classesDropDown.action,
-                        classes.buttonItem,
-                        {
-                            isInModal: this.props.openAsModal,
-                        },
-                    )}
+                    // name={child.name}
+                    to={child.url || ""}
+                    isModalLink={this.props.openAsModal}
                 >
+                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
+                        {child.content || child.name}
+                    </span>
                     <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
                         {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
                         {!selected && (
@@ -116,20 +105,15 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                                 {` `}
                             </span>
                         )}
+                        {child.icon}
                     </span>
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{child.name}</span>
-                    {child.outdated && (
-                        <span className={classNames("selectBox-outdated", classesMetas.metaStyle, classes.outdated)}>
-                            {t("(Outdated)")}
-                        </span>
-                    )}
-                </DropDownItemButton>
+                </DropDownItemLink>
             );
         });
         const buttonContents =
             this.state.selectedItem && this.state.selectedItem.name ? (
                 <React.Fragment>
-                    {this.state.selectedItem.name}
+                    {this.state.selectedItem.content || this.state.selectedItem.name}
                     <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
                 </React.Fragment>
             ) : null;
@@ -152,11 +136,10 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
                         contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
                         buttonBaseClass={this.props.buttonBaseClass}
-                        renderAbove={this.props.renderAbove}
-                        renderLeft={this.props.renderLeft}
                         openAsModal={this.props.openAsModal}
                         flyoutType={FlyoutType.LIST}
                         selfPadded={true}
+                        renderLeft={true}
                     >
                         {selectItems}
                     </DropDown>

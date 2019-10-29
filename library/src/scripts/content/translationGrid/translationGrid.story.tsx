@@ -12,28 +12,40 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { TranslationGrid } from "@library/content/translationGrid/TranslationGrid";
 import { translationGridData } from "@library/content/translationGrid/translationGrid.storyData";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { ILocale, loadLocales, LocaleProvider } from "@vanilla/i18n";
 
 const story = storiesOf("Components", module);
+const locales = translationGridData.i18nLocales;
+const dateUpdated = "2019-10-09T20:05:51+00:00";
+loadLocales(locales);
 story.add("Translation Grid", () => {
     return (
         <>
-            <StoryContent>
-                <StoryHeading depth={1}>Translation Grid</StoryHeading>
-                <StoryParagraph>Border is just to show it works in a scroll container, like a Modal</StoryParagraph>
-            </StoryContent>
-            <div
-                style={{
-                    height: "600px",
-                    overflow: "auto",
-                    border: "solid #1EA7FD 4px",
-                    width: "1028px",
-                    maxWidth: "100%",
-                    margin: "auto",
-                    position: "relative", // Scrolling container must have "position"
-                }}
-            >
-                <TranslationGrid data={translationGridData.data} inScrollingContainer={true} />
-            </div>
+            <LocaleProvider>
+                <StoryContent>
+                    <StoryHeading depth={1}>Translation Grid</StoryHeading>
+                    <StoryParagraph>Border is just to show it works in a scroll container, like a Modal</StoryParagraph>
+                </StoryContent>
+                <div
+                    style={{
+                        height: "600px",
+                        overflow: "auto",
+                        border: "solid #1EA7FD 4px",
+                        width: "1028px",
+                        maxWidth: "100%",
+                        margin: "auto",
+                        position: "relative", // Scrolling container must have "position"
+                    }}
+                >
+                    <TranslationGrid
+                        data={translationGridData.data}
+                        inScrollingContainer={true}
+                        otherLanguages={translationGridData.otherLanguages}
+                        i18nLocales={translationGridData.i18nLocales}
+                        dateUpdated={dateUpdated}
+                    />
+                </div>
+            </LocaleProvider>
         </>
     );
 });

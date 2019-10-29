@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import classNames from "classnames";
+import { PanelWidget } from "@library/layout/PanelLayout";
 import { TranslationGridRow } from "@library/content/translationGrid/TranslationGridRow";
 import { translationGridClasses } from "@library/content/translationGrid/TranslationGridStyles";
 import { TranslationGridText } from "@library/content/translationGrid/TranslationGridText";
@@ -7,6 +8,16 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import { AlertIcon, EditIcon } from "@library/icons/common";
 import cloneDeep from "lodash/cloneDeep";
 import { t } from "@library/utility/appUtils";
+import { useUniqueID } from "@library/utility/idUtils";
+import LanguagesDropDown from "@library/layout/LanguagesDropDown";
+import { ILanguageItem } from "@library/layout/LanguagesDropDown";
+import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
+import { panelListClasses } from "@library/layout/panelListStyles";
 
 export interface ITranslation {
     id: string;
@@ -19,6 +30,9 @@ export interface ITranslation {
 export interface ITranslationGrid {
     data: ITranslation[];
     inScrollingContainer?: boolean;
+    otherLanguages: ILanguageItem[];
+    i18nLocales: ILocale[];
+    dateUpdated?: string;
 }
 
 /**
@@ -28,11 +42,50 @@ export interface ITranslationGrid {
  */
 
 export function TranslationGrid(props: ITranslationGrid) {
-    const { data, inScrollingContainer = false } = props;
+    const id = useUniqueID("articleOtherLanguages");
+    const classesPanelList = panelListClasses();
+    const { data, inScrollingContainer = false, otherLanguages } = props;
+    const dateUpdated = "2019-10-08T13:54:41+00:00";
     const classes = translationGridClasses();
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
     const translationKey = "newTranslation";
+    const currentLocale = "en";
+    let selectedIndex = 0;
+    const selectBoxItems: ISelectBoxItem[] = props.otherLanguages.map((data, index) => {
+        const isSelected = data.locale === currentLocale;
+        if (isSelected) {
+            selectedIndex = index;
+        }
+        return {
+            selected: isSelected,
+            name: data.locale,
+            icon: data.translationStatus === "not-translated" && (
+                <ToolTip
+                    label={
+                        <Translate
+                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
+                            c0={<DateTime timestamp={props.dateUpdated} />}
+                        />
+                    }
+                    ariaLabel={"This article was editied in its source locale."}
+                >
+                    <span tabIndex={0}>
+                        <AlertIcon className={"selectBox-selectedIcon"} />
+                    </span>
+                </ToolTip>
+            ),
+            content: (
+                <>
+                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                </>
+            ),
+            onClick: () => {
+                window.location.href = data.url;
+            },
+        };
+    });
+
     const translationRows = translations.map((translation, i) => {
         const notTranslated = !translations[i][translationKey];
         const newTranslation = translations[i][translationKey] || "";
@@ -94,7 +147,23 @@ export function TranslationGrid(props: ITranslationGrid) {
                 <div className={classes.frame}>
                     <div className={classes.header}>
                         <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
-                        <div className={classNames(classes.rightCell, classes.headerRight)}>Français</div>
+                        <div className={classNames(classes.rightCell, classes.headerRight)}>
+                            <div className={classes.languageDropdown}>
+                                <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+                                    <LanguagesDropDown
+                                        titleID={id}
+                                        widthOfParent={true}
+                                        className="otherLanguages-select"
+                                        renderLeft={true}
+                                        data={props.otherLanguages}
+                                        currentLocale={currentLocale}
+                                        dateUpdated={props.dateUpdated}
+                                        selcteBoxItems={selectBoxItems}
+                                        selectedIndex={selectedIndex}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className={classes.body}>{translationRows}</div>
                 </div>

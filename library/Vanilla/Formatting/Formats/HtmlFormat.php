@@ -173,8 +173,29 @@ class HtmlFormat extends BaseFormat {
     }
 
     public function getClasses($domElmement) {
-        const attributes = $domElmement ["attrs"];
+        $attributes = $domElmement["attrs"];
+        $classes = explodeTrim(" ", $attributes["class"]);
+        return $classes;
     }
+
+    public function hasClass($classes, $target) {
+        foreach ($classes as $c) {
+            if ($c === $target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function appendClass($el, $class) {
+        $attributes = $el["attrs"];
+        if (!array_key_exists("class", $attributes)){
+            $el["attrs"]["class"] = "";
+        }
+        $el["attrs"]["class"] .= " " . $class;
+        return $el;
+    }
+
 
 
     /**
@@ -189,20 +210,26 @@ class HtmlFormat extends BaseFormat {
         $contentID = 'contentID';
         $contentPrefix = <<<HTML
 <html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head>
-<body><div id='$contentID'>
+<body>
 HTML;
-        $contentSuffix = "</div></body></html>";
+        $contentSuffix = "</body></html>";
         $dom = new \DOMDocument();
         @$dom->loadHTML($contentPrefix . $html . $contentSuffix);
         $xpath = new \DOMXPath($dom);
 
-        $codeBlocks = $xpath->query('.//*[self::pre::code]');
+        $codeBlocks = $xpath->query('.//*[self::pre]');
         foreach ($codeBlocks as $codeBlock) {
+            $classes = getClasses($codeBlock);
+            if (!!hasClass($classes, "code") && !hasClass($classes, "codeBlock")) {
+                appendClass($codeBlock, "code");
+                appendClass($codeBlock, "codeBlock");
+            }
+
 
 
 //            $classes = $codeBlock["attrs"]
 
-            $break = "here";
+//            $break = "here";
 //            $level = (int) str_replace('h', '', $domHeading->tagName);
 
 //            $text = $domHeading->textContent;
@@ -214,9 +241,8 @@ HTML;
 //            }
         }
 
-        $code = $xpath->query('.//*[self::code]');
+//        $code = $xpath->query('.//*[self::code]');
 
-        $break = "here";
 
         //  = Inline =
         // code block
@@ -254,8 +280,8 @@ HTML;
 //            );
 //        }
 //
-        $content = $dom->getElementById('contentID');
-        $htmlBodyString = @$dom->saveXML($content, LIBXML_NOEMPTYTAG);
+        $content = $dom->getElementsByTagName('body');
+        $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
         return $htmlBodyString;
     }
 

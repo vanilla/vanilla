@@ -15,7 +15,7 @@ class CurlWrapper {
     /**
      * Executes a safecurl request.
      *
-     * @param $url
+     * @param string $url The request url.
      * @param resource $ch The curl handle to execute.
      * @param bool $followLocation
      * @return string

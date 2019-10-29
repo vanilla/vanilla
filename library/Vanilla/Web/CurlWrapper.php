@@ -23,6 +23,8 @@ class CurlWrapper {
     public static function curlExec($url, $ch, $followLocation = false): string {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);
-        return $safeCurl->execute($url);
+        $response = $safeCurl->execute($url);
+
+        return $response;
     }
 }

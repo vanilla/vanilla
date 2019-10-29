@@ -212,13 +212,23 @@ class EmbedService implements EmbedCreatorInterface {
 
         // Construct the embed.
         $embed = $this->createEmbedFromData($data);
+        return $embed->jsonSerialize();
+    }
 
+    /**
+     * Filter an embed. This should always happen after creation.
+     *
+     * @param AbstractEmbed $embed
+     * @return AbstractEmbed
+     */
+    private function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
+        $type = $embed->getData()['embedType'];
         foreach ($this->registeredFilters as $filter) {
             if ($filter->canHandleEmbedType($type)) {
                 $embed = $filter->filterEmbed($embed);
             }
         }
-        return $embed->jsonSerialize();
+        return $embed;
     }
 
     /**
@@ -244,6 +254,7 @@ class EmbedService implements EmbedCreatorInterface {
 
         $factory = $this->getFactoryForUrl($url);
         $embed = $factory->createEmbedForUrl($url);
+        $embed = $this->filterEmbed($embed);
         $this->cache->cacheEmbed($embed);
         return $embed;
     }
@@ -264,7 +275,9 @@ class EmbedService implements EmbedCreatorInterface {
             if ($embedClass === null) {
                 return new ErrorEmbed(new \Exception("Embed class for type $type not found."), $data);
             }
-            return new $embedClass($data);
+            $embed = new $embedClass($data);
+            $embed = $this->filterEmbed($embed);
+            return $embed;
         } catch (ValidationException $e) {
             trigger_error(
                 "Validation error while instantiating embed type $type with class $embedClass and data \n"

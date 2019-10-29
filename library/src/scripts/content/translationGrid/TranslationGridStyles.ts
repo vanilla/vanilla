@@ -11,6 +11,7 @@ import {
     paddings,
     singleBorder,
     unit,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate } from "csx";
@@ -58,7 +59,7 @@ export const translationGridClasses = useThemeCache(() => {
                 lineHeight: globalVars.lineHeights.condensed,
                 ...paddings({
                     vertical: vars.cell.paddings.inner,
-                    left: vars.cell.paddings.outer + vars.cell.paddings.inner,
+                    left: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
                     right: vars.cell.paddings.inner,
                 }),
                 flexGrow: 1,
@@ -156,18 +157,19 @@ export const translationGridClasses = useThemeCache(() => {
     });
 
     const headerLeft = style("headerLeft", {
-        fontWeight: globalVars.fonts.weights.bold,
+        fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
-            vertical: vars.cell.paddings.inner,
-            horizontal: vars.cell.paddings.outer + vars.paddings.horizontal,
+            vertical: vars.cell.paddings.outer + vars.paddings.vertical,
+            horizontal: vars.cell.paddings.outer + vars.paddings.horizontal, //vars.cell.paddings.outer + vars.paddings.horizontal
         }),
+        borderRight: "none",
     });
 
     const headerRight = style("headerRight", {
-        fontWeight: globalVars.fonts.weights.bold,
+        fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
-            vertical: vars.cell.paddings.inner,
-            horizontal: vars.cell.paddings.outer + vars.cell.paddings.inner,
+            //vertical: vars.cell.paddings.inner,
+            horizontal: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
         }),
     });
 

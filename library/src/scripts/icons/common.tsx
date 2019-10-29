@@ -242,19 +242,17 @@ export function NewFolderIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function WarningIcon(props: { className?: string; warningMessage?: string; hidden?: boolean }) {
+export function WarningIcon(props: { className?: string; warningMessage: string }) {
     const classes = iconClasses();
-    const { className, warningMessage = t("Warning"), hidden = true } = props;
 
     return (
         <svg
-            className={classNames(classes.warning, className)}
-            aria-label={warningMessage}
+            className={classNames(classes.warning, props.className)}
+            aria-label={props.warningMessage}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            aria-hidden={hidden ? "true" : "false"}
         >
-            <title>{warningMessage}</title>
+            <title>{props.warningMessage}</title>
             <circle cx="8" cy="8" r="8" style={currentColorFill} />
             <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
             <path

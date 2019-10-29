@@ -15,9 +15,8 @@ import {
     fonts,
     allButtonStates,
     margins,
-    absolutePosition,
 } from "@library/styles/styleHelpers";
-import { percent, translate, viewWidth } from "csx";
+import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
@@ -102,36 +101,38 @@ export const messagesClasses = useThemeCache(() => {
         margins({ horizontal: "auto" }),
     );
 
-    const wrap = style("wrap", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        flexWrap: "nowrap",
-        minHeight: unit(vars.sizing.minHeight),
-        backgroundColor: colorOut(vars.colors.bg),
-        width: percent(100),
-        ...shadowOrBorderBasedOnLightness(
-            globalVars.body.backgroundImage.color,
-            borders({
-                color: globalVars.mainColors.fg,
+    const wrap = style(
+        "wrap",
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            minHeight: unit(vars.sizing.minHeight),
+            backgroundColor: colorOut(vars.colors.bg),
+            width: percent(100),
+            ...shadowOrBorderBasedOnLightness(
+                globalVars.body.backgroundImage.color,
+                borders({
+                    color: globalVars.mainColors.fg,
+                }),
+                shadows.embed(),
+            ),
+            margin: "auto",
+            color: colorOut(vars.colors.fg),
+            ...paddings({
+                ...vars.spacing.padding,
+                right: vars.spacing.padding.horizontal / 2,
             }),
-            shadows.embed(),
-        ),
-        margin: "auto",
-        color: colorOut(vars.colors.fg),
-        ...paddings({
-            ...vars.spacing.padding,
-            right: vars.spacing.padding.right,
+        },
+        mediaQueries.xs({
+            flexWrap: "wrap",
+            paddingLeft: unit(vars.spacing.padding.horizontal / 2),
         }),
-    });
+    );
 
     const message = style("message", {
         ...userSelect(),
         ...fonts(vars.text.font),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flexStart",
-        width: percent(100),
         flex: 1,
     });
 
@@ -140,49 +141,31 @@ export const messagesClasses = useThemeCache(() => {
         maxWidth: percent(100),
     });
 
-    const actionButton = style("actionButton", {
-        $nest: {
-            "&&": {
-                ...paddings(vars.actionButton.padding),
-                minHeight: unit(vars.actionButton.minHeight),
-                whiteSpace: "nowrap",
-                ...fonts(vars.actionButton.font),
-                ...allButtonStates({
-                    noState: {
-                        color: colorOut(vars.colors.fg),
-                    },
-                    allStates: {
-                        color: colorOut(vars.colors.states.fg),
-                    },
-                    focusNotKeyboard: {
-                        outline: 0,
-                    },
-                }),
-            },
+    const actionButton = style(
+        "actionButton",
+        {
+            ...paddings(vars.actionButton.padding),
+            minHeight: unit(vars.actionButton.minHeight),
+            whiteSpace: "nowrap",
+            ...fonts(vars.actionButton.font),
+            ...allButtonStates({
+                noState: {
+                    color: colorOut(vars.colors.fg),
+                },
+                allStates: {
+                    color: colorOut(vars.colors.states.fg),
+                },
+                focusNotKeyboard: {
+                    outline: 0,
+                },
+            }),
         },
-    });
-
-    const messageIcon = style("messageIcon", {
-        ...absolutePosition.middleLeftOfParent(),
-        maxWidth: percent(100),
-        transform: translate(`-100%`),
-        marginLeft: unit(-14),
-        $nest: {
-            "&&": {
-                color: colorOut(globalVars.messageColors.error.fg),
-            },
-        },
-    });
-
-    const iconWrap = style("iconWrap", {
-        position: "relative",
-        width: percent(100),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-    });
-
-    const confirm = style("confirm", {});
+        mediaQueries.xs({
+            padding: 0,
+            width: percent(100),
+            textAlign: "center",
+        }),
+    );
 
     return {
         root,
@@ -191,8 +174,5 @@ export const messagesClasses = useThemeCache(() => {
         message,
         fixed,
         setWidth,
-        messageIcon,
-        iconWrap,
-        confirm,
     };
 });

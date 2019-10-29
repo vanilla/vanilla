@@ -73,6 +73,9 @@ class HtmlFormat extends BaseFormat {
         if ($enhance) {
             $result = $this->htmlEnhancer->enhance($result);
         }
+
+        $result = self::cleanupEmbeds($result);
+
         return $result;
     }
 
@@ -167,6 +170,93 @@ class HtmlFormat extends BaseFormat {
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.
         return getMentions($content);
+    }
+
+    public function getClasses($domElmement) {
+        const attributes = $domElmement ["attrs"];
+    }
+
+
+    /**
+     * Fixes html output for embeds that were imported from another platform
+     *
+     * @param string $html An HTML string to process.
+     *
+     * @return string
+     * @internal Marked public for internal backwards compatibility only.
+     */
+    public function cleanupEmbeds(string $html): string {
+        $contentID = 'contentID';
+        $contentPrefix = <<<HTML
+<html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head>
+<body><div id='$contentID'>
+HTML;
+        $contentSuffix = "</div></body></html>";
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($contentPrefix . $html . $contentSuffix);
+        $xpath = new \DOMXPath($dom);
+
+        $codeBlocks = $xpath->query('.//*[self::pre::code]');
+        foreach ($codeBlocks as $codeBlock) {
+
+
+//            $classes = $codeBlock["attrs"]
+
+            $break = "here";
+//            $level = (int) str_replace('h', '', $domHeading->tagName);
+
+//            $text = $domHeading->textContent;
+//            $slug = slugify($text);
+//            $count = $slugKeyCache[$slug] ?? 0;
+//            $slugKeyCache[$slug] = $count + 1;
+//            if ($count > 0) {
+//                $slug .= '-' . $count;
+//            }
+        }
+
+        $code = $xpath->query('.//*[self::code]');
+
+        $break = "here";
+
+        //  = Inline =
+        // code block
+
+        // = Block =
+        // Code Block
+        // blockquote
+        // img
+
+
+//        $domHeadings = $xpath->query('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
+//
+//        /** @var Heading[] $headings */
+//        $headings = [];
+//
+//        // Mapping of $key => $usageCount.
+//        $slugKeyCache = [];
+//
+//        /** @var \DOMNode $domHeading */
+//        foreach ($domHeadings as $domHeading) {
+//            $level = (int) str_replace('h', '', $domHeading->tagName);
+//
+//            $text = $domHeading->textContent;
+//            $slug = slugify($text);
+//            $count = $slugKeyCache[$slug] ?? 0;
+//            $slugKeyCache[$slug] = $count + 1;
+//            if ($count > 0) {
+//                $slug .= '-' . $count;
+//            }
+//
+//            $headings[] = new Heading(
+//                $domHeading->textContent,
+//                $level,
+//                $slug
+//            );
+//        }
+//
+        $content = $dom->getElementById('contentID');
+        $htmlBodyString = @$dom->saveXML($content, LIBXML_NOEMPTYTAG);
+        return $htmlBodyString;
     }
 
     const BLOCK_WITH_OWN_WHITESPACE =

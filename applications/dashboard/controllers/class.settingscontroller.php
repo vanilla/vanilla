@@ -1577,9 +1577,9 @@ class SettingsController extends DashboardController {
             $configurationModel->Validation->applyRule('Garden.Registration.Method', 'Required');
 
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
-            $invitationRoleIDs = $this->Form->getValue('InvitationRoleID');
-            $invitationCounts = $this->Form->getValue('InvitationCount');
-            $this->ExistingRoleInvitations = arrayCombine($invitationRoleIDs, $invitationCounts);
+            $invitationRoleIDs = (array)$this->Form->getValue('InvitationRoleID');
+            $invitationCounts = (array)$this->Form->getValue('InvitationCount');
+            $this->ExistingRoleInvitations = array_combine($invitationRoleIDs, $invitationCounts);
             $configurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
             if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {

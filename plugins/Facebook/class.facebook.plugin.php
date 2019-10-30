@@ -5,6 +5,9 @@
  * @package Facebook
  */
 
+use Vanilla\Web\CurlWrapper;
+use Vanilla\SafeCurl\Exception;
+
 /**
  * Class FacebookPlugin
  */
@@ -93,7 +96,6 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_URL, $url);
 
         if ($post !== false) {
@@ -104,7 +106,11 @@ class FacebookPlugin extends Gdn_Plugin {
             trace("  GET  $url");
         }
 
-        $response = curl_exec($ch);
+        try {
+            $response = CurlWrapper::curlExec($url, $ch, false);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -471,7 +477,11 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
-        $contents = curl_exec($c);
+        try {
+            $contents = CurlWrapper::curlExec($url, $c, false);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
 
         $info = curl_getinfo($c);
         if (strpos(val('content_type', $info, ''), '/javascript') !== false) {
@@ -503,7 +513,13 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
-        $contents = curl_exec($c);
+
+        try {
+            $contents = CurlWrapper::curlExec($url, $c, false);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
         $profile = json_decode($contents, true);
         return $profile;
     }

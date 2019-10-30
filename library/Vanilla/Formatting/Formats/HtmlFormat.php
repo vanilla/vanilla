@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Garden\StaticCacheTranslationTrait;
+use Twig\Node\DoNode;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
@@ -172,10 +173,23 @@ class HtmlFormat extends BaseFormat {
         return getMentions($content);
     }
 
+
+
+    function getAttrData(string $attr, \DOMElement $domNode) {
+        // Empty array to hold all classes to return
+        //Loop through each tag in the dom and add it's attribute data to the array
+        $attrData = [];
+        if(empty($domNode->getAttribute($attr)) === false) {
+            $attrData = explode(" ", $domNode->getAttribute($attr));
+        } else {
+            array_push($attrData, "");
+        }
+        //Return the array of attribute data
+        return array_unique($attrData);
+    }
+
     public function getClasses($domElmement) {
-        $attributes = $domElmement["attrs"];
-        $classes = explodeTrim(" ", $attributes["class"]);
-        return $classes;
+        return self::getAttrData('class', $domElmement);
     }
 
     public function hasClass($classes, $target) {
@@ -187,15 +201,18 @@ class HtmlFormat extends BaseFormat {
         return false;
     }
 
-    public function appendClass($el, $class) {
-        $attributes = $el["attrs"];
-        if (!array_key_exists("class", $attributes)){
-            $el["attrs"]["class"] = "";
-        }
-        $el["attrs"]["class"] .= " " . $class;
-        return $el;
+    public function setAttribute(&$domNode, $key, $value) {
+        $domNode->setAttribute($key, $value);
     }
 
+    public function appendClass(&$domNode, $class) {
+        if(empty($domNode->getAttribute("class"))) {
+            $domNode->setAttribute("class", $class);
+        } else {
+            $domNode->setAttribute("class", $domNode->getAttribute("class") . " " . $class);
+            $here = "toto";
+        }
+    }
 
 
     /**
@@ -207,7 +224,7 @@ class HtmlFormat extends BaseFormat {
      * @internal Marked public for internal backwards compatibility only.
      */
     public function cleanupEmbeds(string $html): string {
-        $contentID = 'contentID';
+
         $contentPrefix = <<<HTML
 <html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head>
 <body>
@@ -217,31 +234,23 @@ HTML;
         @$dom->loadHTML($contentPrefix . $html . $contentSuffix);
         $xpath = new \DOMXPath($dom);
 
-        $codeBlocks = $xpath->query('.//*[self::pre]');
-        foreach ($codeBlocks as $codeBlock) {
-            $classes = getClasses($codeBlock);
-            if (!!hasClass($classes, "code") && !hasClass($classes, "codeBlock")) {
-                appendClass($codeBlock, "code");
-                appendClass($codeBlock, "codeBlock");
+        $blockCodeBlocks = $xpath->query('.//*[self::pre]');
+
+        foreach ($blockCodeBlocks as $c) {
+            $classes = self::getClasses($c);
+            if (!self::hasClass($classes, "code")){
+                self::appendClass($c, "code");
             }
 
+            if (!self::hasClass($classes, "codeBlock")) {
+                self::appendClass($c, "codeBlock");
+            }
 
-
-//            $classes = $codeBlock["attrs"]
-
-//            $break = "here";
-//            $level = (int) str_replace('h', '', $domHeading->tagName);
-
-//            $text = $domHeading->textContent;
-//            $slug = slugify($text);
-//            $count = $slugKeyCache[$slug] ?? 0;
-//            $slugKeyCache[$slug] = $count + 1;
-//            if ($count > 0) {
-//                $slug .= '-' . $count;
-//            }
+            self::setAttribute($c, "spellcheck", "false");
         }
 
-//        $code = $xpath->query('.//*[self::code]');
+
+
 
 
         //  = Inline =
@@ -252,34 +261,15 @@ HTML;
         // blockquote
         // img
 
+//
+        foreach ($blockCodeBlocks as $c) {
+            $classes = self::getClasses($c);
+            $hasCode = self::hasClass($classes, "code");
+            $hasCodeBlock = self::hasClass($classes, "codeBlock");
+            $break = "here";
+        }
 
-//        $domHeadings = $xpath->query('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
-//
-//        /** @var Heading[] $headings */
-//        $headings = [];
-//
-//        // Mapping of $key => $usageCount.
-//        $slugKeyCache = [];
-//
-//        /** @var \DOMNode $domHeading */
-//        foreach ($domHeadings as $domHeading) {
-//            $level = (int) str_replace('h', '', $domHeading->tagName);
-//
-//            $text = $domHeading->textContent;
-//            $slug = slugify($text);
-//            $count = $slugKeyCache[$slug] ?? 0;
-//            $slugKeyCache[$slug] = $count + 1;
-//            if ($count > 0) {
-//                $slug .= '-' . $count;
-//            }
-//
-//            $headings[] = new Heading(
-//                $domHeading->textContent,
-//                $level,
-//                $slug
-//            );
-//        }
-//
+
         $content = $dom->getElementsByTagName('body');
         $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
         return $htmlBodyString;

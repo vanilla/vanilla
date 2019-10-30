@@ -25,9 +25,11 @@ export function Roles(props: IProps) {
     const userRoles = roles.map((r, i) => {
         if (i < maxRoleCount) {
             return (
-                <span key={i} className={classNames(classesMeta.meta, classes.role)}>
-                    {r.name}
-                </span>
+                <span
+                    key={i}
+                    className={classNames(classesMeta.meta, classes.role)}
+                    dangerouslySetInnerHTML={{ __html: r.name }}
+                />
             );
         }
     });

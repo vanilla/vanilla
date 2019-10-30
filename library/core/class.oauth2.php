@@ -630,6 +630,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             default:
 
                 // Save the access token and the profile to the session table, set expiry to 3 minutes.
+                $expiryTime = new \DateTimeImmutable('now + 5 minutes');
                 $stashID = $this->sessionModel->insert(
                     [
                         'Attributes' => [
@@ -637,7 +638,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                                 'RefreshToken' => $response['refresh_token'],
                                 'Profile' => $profile,
                             ],
-                        'DateExpires' => date(MYSQL_DATE_FORMAT, strtotime('3 minutes')),
+                        'DateExpires' => $expiryTime->format(MYSQL_DATE_FORMAT),
                     ]
                 );
                 $url = '/entry/connect/'.$this->getProviderKey();

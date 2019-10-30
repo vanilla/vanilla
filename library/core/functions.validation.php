@@ -281,6 +281,8 @@ if (!function_exists('validateUsername')) {
         $validateUsernameRegex = validateUsernameRegex($isPartialRegex);
 
         if ($isPartialRegex) {
+            // Unescape the delimiters and escape them again to prevent double escaping.
+            $validateUsernameRegex = str_replace('`', '\\`', str_replace('\\`', '`', $validateUsernameRegex));
             $validateUsernameRegex = "`^({$validateUsernameRegex})?$`siu";
         }
 

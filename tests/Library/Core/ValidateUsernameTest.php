@@ -109,8 +109,13 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     public function providePartialRegexTests(): array {
         $r = [
             'valid' => ['^0-9', 'todd', true],
+            'valid unescaped backtick' => ['^`', 'patches', true],
+            'valid escaped backtick' => ['^\\`', 'patches', true],
             'invalid' => ['^0-9', 'todd0', false],
             'invalid slash' => ['^/', 'to/dd', false],
+            'invalid unescaped backtick' => ['^`+', 'p`tches', false],
+            'invalid escaped backtick' => ['^\\`+', 'p`tches', false],
+
         ];
 
         return $r;

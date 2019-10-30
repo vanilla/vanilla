@@ -26,7 +26,7 @@ class CurlWrapper {
         $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         if (!$url) {
             throw new Exception('Could not get the url.');
-        } 
+        }
         $response = $safeCurl->execute($url);
         return $response;
     }

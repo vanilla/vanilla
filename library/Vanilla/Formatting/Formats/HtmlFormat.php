@@ -65,6 +65,7 @@ class HtmlFormat extends BaseFormat {
     public function renderHtml(string $content, bool $enhance = true): string {
         $result = $this->htmlSanitizer->filter($content);
 
+
         if ($this->shouldCleanupLineBreaks) {
             $result = self::cleanupLineBreaks($result);
         }
@@ -76,6 +77,7 @@ class HtmlFormat extends BaseFormat {
         }
 
         $result = self::cleanupEmbeds($result);
+
 
         return $result;
     }
@@ -267,8 +269,10 @@ class HtmlFormat extends BaseFormat {
                         self::setAttribute($child, "class", "blockquote-content");
                         $grandChildren = $child->childNodes;
                         foreach ($grandChildren as $grandChild) {
-                            if (property_exists( $grandChild, "tagName") && $grandChild->tagName === "p") {
-                                self::appendClass($grandChild, "blockquote-line");
+                            if (property_exists($grandChild, "tagName")) {
+                                if ($grandChild->tagName === "p") {
+                                    self::appendClass($grandChild, "blockquote-line");
+                                }
                             }
                         }
                     }

@@ -7,6 +7,11 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
+use Exception;
 use Garden\StaticCacheTranslationTrait;
 use Twig\Node\DoNode;
 use Vanilla\Contracts\Formatting\FormatInterface;
@@ -113,7 +118,7 @@ class HtmlFormat extends BaseFormat {
     public function filter(string $content): string {
         try {
             $this->renderHtml($content);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Rethrow as a formatting exception with exception chaining.
             throw new FormattingException($e->getMessage(), 500, $e);
         }
@@ -132,10 +137,10 @@ class HtmlFormat extends BaseFormat {
      */
     public function parseHeadings(string $content): array {
         $rendered = $this->renderHtml($content);
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         @$dom->loadHTML($rendered);
 
-        $xpath = new \DOMXPath($dom);
+        $xpath = new DOMXPath($dom);
         $domHeadings = $xpath->query('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
 
         /** @var Heading[] $headings */
@@ -144,7 +149,7 @@ class HtmlFormat extends BaseFormat {
         // Mapping of $key => $usageCount.
         $slugKeyCache = [];
 
-        /** @var \DOMNode $domHeading */
+        /** @var DOMNode $domHeading */
         foreach ($domHeadings as $domHeading) {
             $level = (int) str_replace('h', '', $domHeading->tagName);
 
@@ -176,12 +181,19 @@ class HtmlFormat extends BaseFormat {
     }
 
 
-
-    function getAttrData(string $attr, \DOMElement $domNode) {
+    /**
+     * Get Attribute from dom node
+     *
+     * @param string $attr The attribute you want
+     * @param DOMElement $domNode The dom node
+     *
+     * @return string array
+     */
+    public function getAttrData(string $attr, DOMElement $domNode) {
         // Empty array to hold all classes to return
         //Loop through each tag in the dom and add it's attribute data to the array
         $attrData = [];
-        if(empty($domNode->getAttribute($attr)) === false) {
+        if (empty($domNode->getAttribute($attr)) === false) {
             $attrData = explode(" ", $domNode->getAttribute($attr));
         } else {
             array_push($attrData, "");
@@ -190,10 +202,23 @@ class HtmlFormat extends BaseFormat {
         return array_unique($attrData);
     }
 
-    public function getClasses($domElmement) {
-        return self::getAttrData('class', $domElmement);
+    /**
+     * Get dom node classes
+     *
+     * @param DOMElement $domElement the dom element
+     * @return string array
+     */
+    public function getClasses($domElement) {
+        return self::getAttrData('class', $domElement);
     }
 
+    /**
+     * Check if class exists in class array
+     *
+     * @param array of strings $classes
+     * @param string $target
+     * @return string array
+     */
     public function hasClass($classes, $target) {
         foreach ($classes as $c) {
             if ($c === $target) {
@@ -203,23 +228,44 @@ class HtmlFormat extends BaseFormat {
         return false;
     }
 
+    /**
+     * Set attribute on dom node
+     *
+     * @param DOMNode $domNode
+     * @param string $key
+     * @param string $value
+     * @return string array
+     */
     public function setAttribute($domNode, $key, $value) {
         $domNode->setAttribute($key, $value);
     }
 
+    /**
+     * Append class to dom node.
+     *
+     * @param DOMNode $domNode
+     * @param string $class
+     * @return string array
+     */
     public function appendClass(&$domNode, $class) {
-        if(empty($domNode->getAttribute("class"))) {
+        if (empty($domNode->getAttribute("class"))) {
             $domNode->setAttribute("class", $class);
         } else {
             $domNode->setAttribute("class", $domNode->getAttribute("class") . " " . $class);
         }
     }
 
+    /**
+     * Format HTML of code blocks imported from other formats.
+     *
+     * @param array $blockCodeBlocks
+     * @return string array
+     */
     public function cleanupCodeBlocks(&$blockCodeBlocks) {
         foreach ($blockCodeBlocks as $c) {
             $child = $c->firstChild;
 
-            if (property_exists( $child, "tagName") && $child->tagName === "code"){
+            if (property_exists($child, "tagName") && $child->tagName === "code") {
                 $children = $child->childNodes;
                 $c->removeChild($child);
                 foreach ($children as $child) {
@@ -228,7 +274,7 @@ class HtmlFormat extends BaseFormat {
             }
 
             $classes = self::getClasses($c);
-            if (!self::hasClass($classes, "code")){
+            if (!self::hasClass($classes, "code")) {
                 self::appendClass($c, "code");
             }
 
@@ -240,6 +286,12 @@ class HtmlFormat extends BaseFormat {
         }
     }
 
+    /**
+     * Format HTML of inline code blocks imported from other formats.
+     *
+     * @param array $inlineCodeBlocks
+     * @return string array
+     */
     public function cleanupInlineCodeBlocks(&$inlineCodeBlocks) {
         foreach ($inlineCodeBlocks as $c) {
             self::setAttribute($c, "class", "code");
@@ -248,6 +300,12 @@ class HtmlFormat extends BaseFormat {
         }
     }
 
+    /**
+     * Format HTML of images imported from other formats.
+     *
+     * @param array $images
+     * @return string array
+     */
     public function cleanupImages(&$images) {
         foreach ($images as $i) {
             $classes = self::getClasses($i);
@@ -258,13 +316,18 @@ class HtmlFormat extends BaseFormat {
         }
     }
 
-
-    public function cleanupBlockquotes(&$blockquotes, $dom) {
+    /**
+     * Format HTML of blockquotes imported from other formats.
+     *
+     * @param array $blockquotes
+     * @return string array
+     */
+    public function cleanupBlockquotes(&$blockquotes) {
         foreach ($blockquotes as $b) {
             self::setAttribute($b, "class", "blockquote");
             $children = $b->childNodes;
             foreach ($children as $child) {
-                if (property_exists( $child, "tagName")) {
+                if (property_exists($child, "tagName")) {
                     if ($child->tagName === "div") {
                         self::setAttribute($child, "class", "blockquote-content");
                         $grandChildren = $child->childNodes;
@@ -296,9 +359,9 @@ class HtmlFormat extends BaseFormat {
 <body>
 HTML;
         $contentSuffix = "</body></html>";
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         @$dom->loadHTML($contentPrefix . $html . $contentSuffix, LIBXML_NOBLANKS);
-        $xpath = new \DOMXPath($dom);
+        $xpath = new DOMXPath($dom);
 
         $blockCodeBlocks = $xpath->query('.//*[self::pre]');
         self::cleanupCodeBlocks($blockCodeBlocks);

@@ -7,6 +7,8 @@
  * @package StopForumSpam
  */
 
+use Vanilla\Web\CurlWrapper;
+
 /**
  * Class StopForumSpamPlugin
  */
@@ -61,7 +63,8 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_TIMEOUT, 4);
         curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-        $resultString = curl_exec($curl);
+        
+        $resultString = CurlWrapper::curlExec($curl, false);
         curl_close($curl);
 
         if ($resultString) {

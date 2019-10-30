@@ -115,7 +115,6 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
             'invalid slash' => ['^/', 'to/dd', false],
             'invalid unescaped backtick' => ['^`+', 'p`tches', false],
             'invalid escaped backtick' => ['^\\`+', 'p`tches', false],
-
         ];
 
         return $r;

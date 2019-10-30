@@ -14,7 +14,7 @@ class AddonsTest extends AbstractAPIv2Test {
     private $coreAddons = [
         'conversations', // applications
         'allviewed', 'emojiextender', 'facebook', 'flagging',
-        'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'profileextender', 'quotes',
+        'googleprettify', 'gravatar', 'indexphotos', 'profileextender', 'quotes',
         'splitmerge', 'stopforumspam', 'twitter', 'vanillainthisdiscussion', 'vanillastats', 'editor', 'oauth2',
         'recaptcha', 'stubcontent', 'vanillicon', 'googlesignin'// plugins
     ];
@@ -24,7 +24,7 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $hiddenAddons = [
-        'dashboard', 'vanilla', 'gettingstarted'
+        'dashboard', 'vanilla', 'gettingstarted', 'googleplus'
     ];
 
     /**

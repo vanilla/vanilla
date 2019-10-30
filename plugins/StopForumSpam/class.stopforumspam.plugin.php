@@ -63,11 +63,8 @@ class StopForumSpamPlugin extends Gdn_Plugin {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_TIMEOUT, 4);
         curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-        try {
-            $resultString = CurlWrapper::curlExec($url, $curl, false);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
+        
+        $resultString = CurlWrapper::curlExec($curl, false);
         curl_close($curl);
 
         if ($resultString) {

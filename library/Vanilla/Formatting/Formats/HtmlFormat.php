@@ -201,7 +201,7 @@ class HtmlFormat extends BaseFormat {
         return false;
     }
 
-    public function setAttribute(&$domNode, $key, $value) {
+    public function setAttribute($domNode, $key, $value) {
         $domNode->setAttribute($key, $value);
     }
 
@@ -240,10 +240,32 @@ class HtmlFormat extends BaseFormat {
 
     public function cleanupImages(&$images) {
         foreach ($images as $i) {
-            self::appendClass($i, "embedImage-img");
+            $classes = self::getClasses($i);
+            if (!self::hasClass($classes, "emoji")) {
+                self::appendClass($i, "embedImage-img");
+            }
         }
     }
 
+
+    public function cleanupBlockquotes(&$blockquotes, $dom) {
+        foreach ($blockquotes as $b) {
+            self::setAttribute($b, "class", "blockquote");
+
+            $children = $b->childNodes;
+            foreach ($children as $child) {
+                if (property_exists( $child, "tagName") && $child->tagName === "div") {
+                    self::setAttribute($child, "class", "blockquote-content");
+                    $grandChildren = $child->childNodes;
+                    foreach ($grandChildren as $grandChild) {
+                        if (property_exists( $grandChild, "tagName") && $grandChild->tagName === "p") {
+                            self::appendClass($grandChild, "blockquote-line");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Fixes html output for embeds that were imported from another platform
@@ -268,8 +290,8 @@ HTML;
         self::cleanupCodeBlocks($blockCodeBlocks);
         $images = $xpath->query('.//*[self::img]');
         self::cleanupImages($images);
-
-
+        $blockQuotes = $xpath->query('.//*[self::blockquote]');
+        self::cleanupBlockquotes($blockQuotes, $dom);
 
         $content = $dom->getElementsByTagName('body');
         $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);

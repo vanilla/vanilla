@@ -251,6 +251,7 @@ class HtmlFormat extends BaseFormat {
             $classes = self::getClasses($i);
             if (!self::hasClass($classes, "emoji")) {
                 self::appendClass($i, "embedImage-img");
+                self::appendClass($i, "importedEmbed-img");
             }
         }
     }

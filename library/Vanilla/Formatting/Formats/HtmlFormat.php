@@ -210,7 +210,37 @@ class HtmlFormat extends BaseFormat {
             $domNode->setAttribute("class", $class);
         } else {
             $domNode->setAttribute("class", $domNode->getAttribute("class") . " " . $class);
-            $here = "toto";
+        }
+    }
+
+    public function cleanupCodeBlocks(&$blockCodeBlocks) {
+        foreach ($blockCodeBlocks as $c) {
+            $child = $c->firstChild;
+
+            if (property_exists( $child, "tagName") && $child->tagName === "code"){
+                $children = $child->childNodes;
+                $c->removeChild($child);
+                foreach ($children as $child) {
+                    $c->appendChild($child);
+                }
+            }
+
+            $classes = self::getClasses($c);
+            if (!self::hasClass($classes, "code")){
+                self::appendClass($c, "code");
+            }
+
+            if (!self::hasClass($classes, "codeBlock")) {
+                self::appendClass($c, "codeBlock");
+            }
+
+            self::setAttribute($c, "spellcheck", "false");
+        }
+    }
+
+    public function cleanupImages(&$images) {
+        foreach ($images as $i) {
+            self::appendClass($i, "embedImage-img");
         }
     }
 
@@ -235,55 +265,10 @@ HTML;
         $xpath = new \DOMXPath($dom);
 
         $blockCodeBlocks = $xpath->query('.//*[self::pre]');
+        self::cleanupCodeBlocks($blockCodeBlocks);
+        $images = $xpath->query('.//*[self::img]');
+        self::cleanupImages($images);
 
-        foreach ($blockCodeBlocks as $c) {
-
-            $child = $c->firstChild;
-
-            if (property_exists( $child, "tagName") && $child->tagName === "code"){
-                $children = $child->childNodes;
-                $c->removeChild($child);
-                foreach ($children as $child) {
-                    $c->appendChild($child);
-                }
-            }
-
-            $break = "here";
-
-
-
-
-            $classes = self::getClasses($c);
-            if (!self::hasClass($classes, "code")){
-                self::appendClass($c, "code");
-            }
-
-            if (!self::hasClass($classes, "codeBlock")) {
-                self::appendClass($c, "codeBlock");
-            }
-
-            self::setAttribute($c, "spellcheck", "false");
-        }
-
-
-
-
-
-        //  = Inline =
-        // code block
-
-        // = Block =
-        // Code Block
-        // blockquote
-        // img
-
-//
-        foreach ($blockCodeBlocks as $c) {
-            $classes = self::getClasses($c);
-            $hasCode = self::hasClass($classes, "code");
-            $hasCodeBlock = self::hasClass($classes, "codeBlock");
-            $break = "here";
-        }
 
 
         $content = $dom->getElementsByTagName('body');

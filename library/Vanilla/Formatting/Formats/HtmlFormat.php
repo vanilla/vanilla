@@ -10,11 +10,10 @@ namespace Vanilla\Formatting\Formats;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use DOMNodeList;
 use DOMXPath;
 use Exception;
 use Garden\StaticCacheTranslationTrait;
-use Twig\Node\DoNode;
-use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
@@ -265,11 +264,13 @@ class HtmlFormat extends BaseFormat {
         foreach ($blockCodeBlocks as $c) {
             $child = $c->firstChild;
 
-            if (property_exists($child, "tagName") && $child->tagName === "code") {
-                $children = $child->childNodes;
-                $c->removeChild($child);
-                foreach ($children as $child) {
-                    $c->appendChild($child);
+            if (!is_null($child)) {
+                if (property_exists($child, "tagName") && $child->tagName === "code") {
+                    $children = $child->childNodes;
+                    $c->removeChild($child);
+                    foreach ($children as $child) {
+                        $c->appendChild($child);
+                    }
                 }
             }
 
@@ -319,10 +320,10 @@ class HtmlFormat extends BaseFormat {
     /**
      * Format HTML of blockquotes imported from other formats.
      *
-     * @param array $blockquotes
+     * @param DOMNodeList $blockquotes
      * @return string array
      */
-    public function cleanupBlockquotes(&$blockquotes) {
+    public function cleanupBlockquotes(DOMNodeList &$blockquotes) {
         foreach ($blockquotes as $b) {
             self::setAttribute($b, "class", "blockquote");
             $children = $b->childNodes;

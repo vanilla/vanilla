@@ -237,6 +237,22 @@ HTML;
         $blockCodeBlocks = $xpath->query('.//*[self::pre]');
 
         foreach ($blockCodeBlocks as $c) {
+
+            $child = $c->firstChild;
+
+            if (property_exists( $child, "tagName") && $child->tagName === "code"){
+                $children = $child->childNodes;
+                $c->removeChild($child);
+                foreach ($children as $child) {
+                    $c->appendChild($child);
+                }
+            }
+
+            $break = "here";
+
+
+
+
             $classes = self::getClasses($c);
             if (!self::hasClass($classes, "code")){
                 self::appendClass($c, "code");

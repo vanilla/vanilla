@@ -7,7 +7,16 @@
 
 
 [h1]No heading support in bbcode[/h1]
-(Quote)
+Quote Hello world
+
+
+Line 4
+Line 5
+
+
+Line 8
+
+
 
 Image
 (Image)
@@ -15,4 +24,3 @@ Image
 <script>var thing = $('#HelloWorld');</script>
 
 (Spoiler)
-

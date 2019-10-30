@@ -105,12 +105,7 @@ class FacebookPlugin extends Gdn_Plugin {
             trace("  GET  $url");
         }
 
-        try {
-            $response = CurlWrapper::curlExec($url, $ch, false);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
+        $response = CurlWrapper::curlExec($ch, false);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
@@ -476,12 +471,8 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
-        try {
-            $contents = CurlWrapper::curlExec($url, $c, false);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
+        
+        $contents = CurlWrapper::curlExec($c, false);
         $info = curl_getinfo($c);
         if (strpos(val('content_type', $info, ''), '/javascript') !== false) {
             $tokens = json_decode($contents, true);
@@ -513,12 +504,7 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
 
-        try {
-            $contents = CurlWrapper::curlExec($url, $c, false);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
+        $contents = CurlWrapper::curlExec($c, false);
         $profile = json_decode($contents, true);
         return $profile;
     }

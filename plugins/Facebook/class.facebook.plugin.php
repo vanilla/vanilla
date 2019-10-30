@@ -6,7 +6,6 @@
  */
 
 use Vanilla\Web\CurlWrapper;
-use Vanilla\SafeCurl\Exception;
 
 /**
  * Class FacebookPlugin

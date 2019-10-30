@@ -104,16 +104,16 @@ export const translationGridData: ITranslationGrid = {
     ],
     otherLanguages: [
         {
-            name: "English",
             url: "https://dev.vanilla.localhost/food-en/kb/articles/3-draft-testing",
             locale: "en",
             translationStatus: "out-of-date",
+            dateUpdated: "",
         },
         {
-            name: "French",
-            url: "https://dev.vanilla.localhost/food-en/kb/articles/3-draft-testing",
+            url: "https://dev.vanilla.localhost/food-fr/kb/articles/3-draft-testing",
             locale: "fr",
             translationStatus: "not-translated",
+            dateUpdated: "",
         },
     ],
     i18nLocales: [

@@ -6,4 +6,5 @@ heading 2
 
 (Quote)
     <script>alert("xss");</script>(Spoiler)
-[spoiler]Legacy Spoiler's Don't Apply[/spoiler]
+[spoiler]Legacy Spoiler's Don't Apply[/spoiler]            Quote
+            Quote line 2

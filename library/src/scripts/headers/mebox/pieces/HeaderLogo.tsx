@@ -24,7 +24,7 @@ export interface IHeaderLogo {
  */
 export default class HeaderLogo extends React.Component<IHeaderLogo> {
     public static defaultProps: Partial<IHeaderLogo> = {
-        to: formatUrl("/"),
+        to: "/",
     };
 
     public render() {

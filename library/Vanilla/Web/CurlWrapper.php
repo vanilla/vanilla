@@ -15,14 +15,15 @@ class CurlWrapper {
     /**
      * Executes a safecurl request.
      *
-     * @param string $url The request url.
      * @param resource $ch The curl handle to execute.
      * @param bool $followLocation
      * @return string
      */
-    public static function curlExec($url, $ch, $followLocation = false): string {
+    public static function curlExec($ch, $followLocation = false): string {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);
+        $curlInfo = curl_getinfo($ch);
+        $url = $curlInfo['url'];
         $response = $safeCurl->execute($url);
 
         return $response;

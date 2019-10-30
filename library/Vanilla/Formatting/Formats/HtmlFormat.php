@@ -238,6 +238,14 @@ class HtmlFormat extends BaseFormat {
         }
     }
 
+    public function cleanupInlineCodeBlocks(&$inlineCodeBlocks) {
+        foreach ($inlineCodeBlocks as $c) {
+            self::setAttribute($c, "class", "code");
+            self::appendClass($c, "codeInline");
+            self::setAttribute($c, "spellcheck", "false");
+        }
+    }
+
     public function cleanupImages(&$images) {
         foreach ($images as $i) {
             $classes = self::getClasses($i);
@@ -292,6 +300,8 @@ HTML;
         self::cleanupImages($images);
         $blockQuotes = $xpath->query('.//*[self::blockquote]');
         self::cleanupBlockquotes($blockQuotes, $dom);
+        $inlineCodeBlocks = $xpath->query('.//*[self::code]');
+        self::cleanupInlineCodeBlocks($inlineCodeBlocks);
 
         $content = $dom->getElementsByTagName('body');
         $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);

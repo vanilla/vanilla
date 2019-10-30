@@ -7,6 +7,7 @@
 namespace Vanilla\Web;
 
 use Garden\SafeCurl\SafeCurl;
+use Garden\SafeCurl\Exception;
 
 /*
  * SafeCurl wrapper.
@@ -19,13 +20,15 @@ class CurlWrapper {
      * @param bool $followLocation
      * @return string
      */
-    public static function curlExec($ch, $followLocation = false): string {
+    public static function curlExec($ch, bool $followLocation = false): string {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);
-        $curlInfo = curl_getinfo($ch);
-        $url = $curlInfo['url'];
-        $response = $safeCurl->execute($url);
-
+        $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        if (!$url) {
+            throw new Exception('Could not get the url.');
+        } else {
+            $response = $safeCurl->execute($url);
+        }
         return $response;
     }
 }

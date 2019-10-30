@@ -260,15 +260,16 @@ class HtmlFormat extends BaseFormat {
     public function cleanupBlockquotes(&$blockquotes, $dom) {
         foreach ($blockquotes as $b) {
             self::setAttribute($b, "class", "blockquote");
-
             $children = $b->childNodes;
             foreach ($children as $child) {
-                if (property_exists( $child, "tagName") && $child->tagName === "div") {
-                    self::setAttribute($child, "class", "blockquote-content");
-                    $grandChildren = $child->childNodes;
-                    foreach ($grandChildren as $grandChild) {
-                        if (property_exists( $grandChild, "tagName") && $grandChild->tagName === "p") {
-                            self::appendClass($grandChild, "blockquote-line");
+                if (property_exists( $child, "tagName")) {
+                    if ($child->tagName === "div") {
+                        self::setAttribute($child, "class", "blockquote-content");
+                        $grandChildren = $child->childNodes;
+                        foreach ($grandChildren as $grandChild) {
+                            if (property_exists( $grandChild, "tagName") && $grandChild->tagName === "p") {
+                                self::appendClass($grandChild, "blockquote-line");
+                            }
                         }
                     }
                 }
@@ -292,7 +293,7 @@ class HtmlFormat extends BaseFormat {
 HTML;
         $contentSuffix = "</body></html>";
         $dom = new \DOMDocument();
-        @$dom->loadHTML($contentPrefix . $html . $contentSuffix);
+        @$dom->loadHTML($contentPrefix . $html . $contentSuffix, LIBXML_NOBLANKS);
         $xpath = new \DOMXPath($dom);
 
         $blockCodeBlocks = $xpath->query('.//*[self::pre]');

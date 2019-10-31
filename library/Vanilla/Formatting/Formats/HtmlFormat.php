@@ -325,7 +325,7 @@ class HtmlFormat extends BaseFormat {
      */
     public function cleanupBlockquotes(DOMNodeList &$blockquotes) {
         foreach ($blockquotes as $b) {
-            self::appendClass($b,"blockquote");
+            self::appendClass($b, "blockquote");
             $children = $b->childNodes;
             foreach ($children as $child) {
                 if (property_exists($child, "tagName")) {

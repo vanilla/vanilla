@@ -142,7 +142,7 @@
         "react-docgen-typescript-webpack-plugin": "^1.1.0",
         "react-hot-loader": "^4.8.4",
         "react-refresh": "^0.6.0",
-        "react-refresh-webpack-plugin": "https://github.com/pmmmwh/react-refresh-webpack-plugin",
+        "react-refresh-webpack-plugin": "https://github.com/vanilla/react-refresh-webpack-plugin#6b483ff",
         "sass": "^1.20.1",
         "sass-loader": "^7.1.0",
         "sinon": "^7.3.2",

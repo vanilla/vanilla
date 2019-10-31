@@ -15332,7 +15332,7 @@ react-day-picker@7.2.4:
   dependencies:
     prop-types "^15.6.2"
 
-react-dev-utils@^9.0.0:
+react-dev-utils@^9.0.0, react-dev-utils@^9.0.3:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-9.1.0.tgz#3ad2bb8848a32319d760d0a84c56c14bdaae5e81"
   integrity sha512-X2KYF/lIGyGwP/F/oXgGDF24nxDA2KC4b7AFto+eqzc/t838gpSGiaU8trTqHXOohuLxxc5qi1eDzsl9ucPDpg==
@@ -15426,7 +15426,7 @@ react-draggable@^4.0.3:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
-react-error-overlay@^6.0.3:
+react-error-overlay@^6.0.1, react-error-overlay@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.3.tgz#c378c4b0a21e88b2e159a3e62b2f531fd63bf60d"
   integrity sha512-bOUvMWFQVk5oz8Ded9Xb7WVdEi3QGLC8tH7HmYP0Fdp4Bn3qw0tRFmr5TW6mvahzvmrK4a6bqWGfCevBflP+Xw==
@@ -15561,9 +15561,14 @@ react-redux@^7.0.2, react-redux@^7.1.0:
     prop-types "^15.7.2"
     react-is "^16.9.0"
 
-"react-refresh-webpack-plugin@https://github.com/pmmmwh/react-refresh-webpack-plugin":
+"react-refresh-webpack-plugin@https://github.com/vanilla/react-refresh-webpack-plugin#6b483ff":
   version "0.1.0"
-  resolved "https://github.com/pmmmwh/react-refresh-webpack-plugin#f5fcd4989ffd8505866cb618b06a85ec15865302"
+  resolved "https://github.com/vanilla/react-refresh-webpack-plugin#6b483ff24526a63e6a6fe3cadffe6e2e74ac21d9"
+  dependencies:
+    react-dev-utils "^9.0.3"
+    react-error-overlay "^6.0.1"
+    sockjs-client "^1.4.0"
+    strip-ansi "^5.2.0"
 
 react-refresh@^0.6.0:
   version "0.6.0"
@@ -16873,7 +16878,7 @@ socket.io@2.1.1:
     socket.io-client "2.1.1"
     socket.io-parser "~3.2.0"
 
-sockjs-client@1.4.0:
+sockjs-client@1.4.0, sockjs-client@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.4.0.tgz#c9f2568e19c8fd8173b4997ea3420e0bb306c7d5"
   integrity sha512-5zaLyO8/nri5cua0VtOrFXBPK1jbL4+1cebT/mmKA1E1ZXOvJrII75bPu0l0k843G/+iAbhEqzyKr0w/eCCj7g==

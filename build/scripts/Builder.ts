@@ -128,6 +128,7 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const devServerOptions: DevServerConfiguration = {
             host: this.options.devIp,
             port: 3030,
+            hotOnly: true,
             open: false,
             https: false,
             disableHostCheck: true,

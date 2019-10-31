@@ -412,6 +412,9 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $curl = $this->_curl($request);
         $response = CurlWrapper::curlExec($curl, false);
+        if ($response === false) {	
+            $response = curl_error($curl);	
+        }
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
@@ -472,6 +475,9 @@ class TwitterPlugin extends Gdn_Plugin {
 
             $curl = $this->_Curl($request);
             $response = CurlWrapper::curlExec($curl, false);
+            if ($response === false) {	
+                $response = curl_error($curl);	
+            }
             $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
@@ -589,6 +595,9 @@ class TwitterPlugin extends Gdn_Plugin {
         curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 
         $response = CurlWrapper::curlExec($curl, false);
+        if ($response == false) {	
+            $response = curl_error($curl);	
+        }
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         trace(curl_getinfo($curl, CURLINFO_HEADER_OUT));
         trace($response, 'Response');

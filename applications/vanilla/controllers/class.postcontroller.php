@@ -248,13 +248,6 @@ class PostController extends VanillaController {
         } elseif ($this->Form->authenticatedPostBack(true)) { // Form was submitted
             // Save as a draft?
             $formValues = $this->Form->formValues();
-            $formCategoryID = $this->Form->getFormValue('CategoryID');
-            if ($formCategoryID) {
-                $formCategory = $categoryModel->getID($formCategoryID);
-                if (!$formCategory) {
-                    $this->Form->addError(t('Category does not exist,'));
-                }
-            }
             $filters = ['Score'];
             $formValues = $this->filterFormValues($formValues, $filters);
             $formValues = $this->DiscussionModel->filterForm($formValues);
@@ -280,6 +273,13 @@ class PostController extends VanillaController {
             if (!$preview) {
                 if (!is_object($this->Category) && is_array($categoryData) && isset($formValues['CategoryID'])) {
                     $this->Category = val($formValues['CategoryID'], $categoryData);
+                    $formCategoryID = $formValues['CategoryID'];
+                    if ($formCategoryID) {
+                        $formCategory = $categoryModel->getID($formCategoryID);
+                        if (!$formCategory) {
+                            $this->Form->addError(t('Category does not exist.'));
+                        }
+                    }
                 }
 
                 if (is_object($this->Category)) {

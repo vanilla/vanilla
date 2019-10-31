@@ -18,9 +18,9 @@ class CurlWrapper {
      *
      * @param resource $ch The curl handle to execute.
      * @param bool $followLocation
-     * @return string
+     * @return mixed
      */
-    public static function curlExec($ch, bool $followLocation = false): string {
+    public static function curlExec($ch, bool $followLocation = false) {
         $safeCurl = new SafeCurl($ch);
         $safeCurl->setFollowLocation($followLocation);
         $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);

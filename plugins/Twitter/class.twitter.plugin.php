@@ -285,6 +285,9 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $curl = $this->_Curl($request, $params);
         $response = CurlWrapper::curlExec($curl, false);
+        if ($response === false) {
+            $response = curl_error($curl);
+        }
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 

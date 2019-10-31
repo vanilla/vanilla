@@ -18,7 +18,7 @@ class CurlWrapper {
      *
      * @param resource $ch The curl handle to execute.
      * @param bool $followLocation
-     * @return mixed
+     * @return bool|string
      */
     public static function curlExec($ch, bool $followLocation = false) {
         $safeCurl = new SafeCurl($ch);

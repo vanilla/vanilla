@@ -22,7 +22,4 @@ Code Block
 
 (Image)
 
-
-Block Quote line 1
-
-Block Quote line 2
+(Quote)

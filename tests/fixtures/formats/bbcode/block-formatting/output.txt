@@ -7,23 +7,7 @@
 
 
 [h1]No heading support in bbcode[/h1]
-Quote Hello world
-
-
-Line 4
-Line 5
-
-
-Line 8
-
-
-Line 4
-Line 5
-
-
-Line 8
-
-
+(Quote)
 
 Image
 (Image)

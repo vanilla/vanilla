@@ -1,1 +1,1 @@
-Normal h1 h2 Quote <script>alert('Hello World')</script> (Spoiler) (Spoiler)
+Normal h1 h2 (Quote) <script>alert('Hello World')</script> (Spoiler) (Spoiler)

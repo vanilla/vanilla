@@ -108,7 +108,7 @@ if (!function_exists('writeComment')) :
 
                 <?php
                 // Write a stub for the latest comment so it's easy to link to it from outside.
-                if ($currentOffset == Gdn::controller()->data('_LatestItem')) {
+                if ($currentOffset == Gdn::controller()->data('_LatestItem') && c('Vanilla.Comments.AutoOffset')) {
                     echo '<span id="latest"></span>';
                 }
                 ?>

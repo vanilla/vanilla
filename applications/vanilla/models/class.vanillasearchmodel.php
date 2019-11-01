@@ -68,12 +68,12 @@ class VanillaSearchModel extends Gdn_Model {
             ->from('Discussion d')
             ->orderBy('d.DateInserted', 'desc')
         ;
+        if ($searchModel->EventArguments['Limit'] ?? false) {
+            $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
+        }
 
         if ($addMatch) {
             // Generate query.
-            if ($searchModel->EventArguments['Limit'] ?? false) {
-                $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
-            }
             $result = '( '.$this->SQL->getSelect().' )';
 
             // Unset SQL
@@ -117,12 +117,12 @@ class VanillaSearchModel extends Gdn_Model {
             ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
             ->orderBy('c.DateInserted', 'desc')
         ;
+         if ($searchModel->EventArguments['Limit'] ?? false) {
+             $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
+         }
 
         if ($addMatch) {
             // Generate query
-            if ($searchModel->EventArguments['Limit'] ?? false) {
-                $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
-            }
             $result = '( '.$this->SQL->getSelect().' )';
             // Unset SQL
             $this->SQL->reset();

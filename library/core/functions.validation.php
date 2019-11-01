@@ -241,22 +241,27 @@ if (!function_exists('validateUsernameRegex')) {
     /**
      * Get the regular expression used to validate usernames.
      *
+     * @param mixed $partial Either the regex is partial or not.
      * @return string Returns a regular expression without enclosing delimiters.
      */
-    function validateUsernameRegex() {
-        static $validateUsernameRegex;
+    function validateUsernameRegex(&$partial = true) {
+        // Get the full regular expression from the configuration file.
+        $validateUsernameRegex = c('Garden.User.ValidationRegexPattern');
 
-        if (is_null($validateUsernameRegex)) {
-            // Set our default ValidationRegex based on Unicode support.
-            // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
-            $defaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
-
-            $validateUsernameRegex = sprintf(
-                "[%s]%s",
-                c("Garden.User.ValidationRegex", $defaultPattern),
-                c("Garden.User.ValidationLength", "{3,20}")
-            );
+        if ($validateUsernameRegex) {
+            $partial = false;
+            return $validateUsernameRegex;
         }
+
+        // Set our default ValidationRegex based on Unicode support.
+        // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
+        $defaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
+
+        $validateUsernameRegex = sprintf(
+            "[%s]%s",
+            c("Garden.User.ValidationRegex", $defaultPattern),
+            c("Garden.User.ValidationLength", "{3,20}")
+        );
 
         return $validateUsernameRegex;
     }
@@ -270,11 +275,20 @@ if (!function_exists('validateUsername')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateUsername($value) {
-        $validateUsernameRegex = validateUsernameRegex();
+        $isPartialRegex = true;
+
+        // $isPartialRegex will be set to false if Garden.User.ValidationRegexPattern is set in the config.
+        $validateUsernameRegex = validateUsernameRegex($isPartialRegex);
+
+        if ($isPartialRegex) {
+            // Unescape the delimiters and escape them again to prevent double escaping.
+            $validateUsernameRegex = str_replace('`', '\\`', str_replace('\\`', '`', $validateUsernameRegex));
+            $validateUsernameRegex = "`^({$validateUsernameRegex})?$`siu";
+        }
 
         return validateRegex(
             $value,
-            "/^({$validateUsernameRegex})?$/siu"
+            $validateUsernameRegex
         );
     }
 }

@@ -1247,16 +1247,16 @@
         },
         {
             "name": "vanilla/safecurl",
-            "version": "v0.9",
+            "version": "v0.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/safecurl.git",
-                "reference": "c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97"
+                "reference": "84be09328597549260d28a0b96db0bb30f58e25a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/safecurl/zipball/c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97",
-                "reference": "c2d6b00289a97bb0f1a5c0d08ac7861e36a78d97",
+                "url": "https://api.github.com/repos/vanilla/safecurl/zipball/84be09328597549260d28a0b96db0bb30f58e25a",
+                "reference": "84be09328597549260d28a0b96db0bb30f58e25a",
                 "shasum": ""
             },
             "require": {
@@ -1296,7 +1296,7 @@
                 "ssrf",
                 "websec"
             ],
-            "time": "2019-09-11T03:24:55+00:00"
+            "time": "2019-10-31T14:47:41+00:00"
         },
         {
             "name": "vanilla/vanilla-connect",

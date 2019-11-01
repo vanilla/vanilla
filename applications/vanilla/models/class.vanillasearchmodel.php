@@ -117,9 +117,9 @@ class VanillaSearchModel extends Gdn_Model {
             ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
             ->orderBy('c.DateInserted', 'desc')
         ;
-         if ($searchModel->EventArguments['Limit'] ?? false) {
-             $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
-         }
+        if ($searchModel->EventArguments['Limit'] ?? false) {
+            $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
+        }
 
         if ($addMatch) {
             // Generate query

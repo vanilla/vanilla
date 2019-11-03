@@ -580,9 +580,7 @@ class PermissionModel extends Gdn_Model {
                     $disabledWhere[] = $tableName;
                 }
             }
-            if (count($disabledWhere) > 0) {
-                $sQL->whereNotIn('JunctionTable', $disabledWhere);
-            }
+            $sQL->whereNotIn('JunctionTable', $disabledWhere);
         }
 
         $data = $sQL->get()->resultArray();

@@ -55,6 +55,9 @@ EOT;
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test a multi-line spoiler.
+     */
     public function testMultilineSpoiler() {
         $md = <<<EOT
 [spoiler]

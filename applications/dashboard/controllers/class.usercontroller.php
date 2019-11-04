@@ -176,6 +176,7 @@ class UserController extends DashboardController {
         $this->addJsFile('user.js');
         $this->title(t('Add User'));
         $this->setHighlightRoute('dashboard/user');
+        Gdn_Theme::section('Moderation');
 
         $roleModel = new RoleModel();
         $roleData = $roleModel->getAssignable();
@@ -514,6 +515,7 @@ class UserController extends DashboardController {
             trigger_error(errorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
         }
         $this->setHighlightRoute('dashboard/user');
+        Gdn_Theme::section('Moderation');
         $this->title(t('Delete User'));
 
         $roleModel = new RoleModel();
@@ -638,6 +640,7 @@ class UserController extends DashboardController {
         $this->addJsFile('user.js');
         $this->title(t('Edit User'));
         $this->setHighlightRoute('dashboard/user');
+        Gdn_Theme::section('Moderation');
 
         // Only admins can reassign roles
         $roleModel = new RoleModel();

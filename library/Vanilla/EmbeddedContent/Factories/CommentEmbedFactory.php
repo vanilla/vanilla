@@ -9,18 +9,14 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
-use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
-use Vanilla\Web\Asset\SiteAsset;
 
 /**
  * Quote embed factory for comments.
  */
-class CommentEmbedFactory extends AbstractEmbedFactory {
-
-    /** @var RequestInterface */
-    private $request;
+final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
 
     /** @var \CommentsApiController */
     private $commentApi;
@@ -29,31 +25,24 @@ class CommentEmbedFactory extends AbstractEmbedFactory {
      * DI
      *
      * @param RequestInterface $request
+     * @param SiteSectionProviderInterface $siteSectionProvider
      * @param \CommentsApiController $commentApi
      */
-    public function __construct(RequestInterface $request, \CommentsApiController $commentApi) {
-        $this->request = $request;
+    public function __construct(
+        RequestInterface $request,
+        SiteSectionProviderInterface $siteSectionProvider,
+        \CommentsApiController $commentApi
+    ) {
+        parent::__construct($request, $siteSectionProvider);
         $this->commentApi = $commentApi;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getSupportedDomains(): array {
-        return [
-            $this->request->getHost(),
-        ];
     }
 
     /**
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain = ''): string {
-        // We need ot be sure to the proper web root here.
-        $root = SiteAsset::joinWebPath($this->request->getRoot(), '/discussion/comment');
-        $root = str_replace('/', '\/', $root);
-
-        return "/$root\/(?<commentID>\d+)/i";
+        $regexRoot = $this->getRegexRoot();
+        return "/^$regexRoot\/discussion\/comment\/(?<commentID>\d+)/i";
     }
 
     /**

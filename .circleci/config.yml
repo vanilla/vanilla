@@ -42,7 +42,7 @@ jobs:
                 command: |
                     node --version
                     yarn --version
-            - core/checkout
+            - checkout
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory

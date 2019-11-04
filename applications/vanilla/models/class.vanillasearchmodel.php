@@ -65,11 +65,16 @@ class VanillaSearchModel extends Gdn_Model {
             ->select('d.DateInserted')
             ->select('d.InsertUserID as UserID')
             ->select("'Discussion'", '', 'RecordType')
-            ->from('Discussion d');
+            ->from('Discussion d')
+            ->orderBy('d.DateInserted', 'desc')
+        ;
+        if ($searchModel->EventArguments['Limit'] ?? false) {
+            $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
+        }
 
         if ($addMatch) {
-            // Execute query.
-            $result = $this->SQL->getSelect();
+            // Generate query.
+            $result = '( '.$this->SQL->getSelect().' )';
 
             // Unset SQL
             $this->SQL->reset();
@@ -109,12 +114,16 @@ class VanillaSearchModel extends Gdn_Model {
             ->select('c.InsertUserID as UserID')
             ->select("'Comment'", '', 'RecordType')
             ->from('Comment c')
-            ->join('Discussion d', 'd.DiscussionID = c.DiscussionID');
+            ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+            ->orderBy('c.DateInserted', 'desc')
+        ;
+        if ($searchModel->EventArguments['Limit'] ?? false) {
+            $this->SQL->limit($searchModel->EventArguments['Limit'] + $searchModel->EventArguments['Offset'] ?? 0);
+        }
 
         if ($addMatch) {
-            // Exectute query
-            $result = $this->SQL->getSelect();
-
+            // Generate query
+            $result = '( '.$this->SQL->getSelect().' )';
             // Unset SQL
             $this->SQL->reset();
         } else {

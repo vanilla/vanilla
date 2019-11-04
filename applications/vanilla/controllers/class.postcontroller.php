@@ -1002,58 +1002,6 @@ class PostController extends VanillaController {
         $this->CssClass = 'NoPanel';
     }
 
-    public function notifyNewDiscussion($discussionID) {
-        if (!c('Vanilla.QueueNotifications')) {
-            throw forbiddenException('NotifyNewDiscussion');
-        }
-
-        if (!$this->Request->isPostBack()) {
-            throw forbiddenException('GET');
-        }
-
-        // Grab the discussion.
-        $discussion = $this->DiscussionModel->getID($discussionID);
-        if (!$discussion) {
-            throw notFoundException('Discussion');
-        }
-
-        if (val('Notified', $discussion) != ActivityModel::SENT_PENDING) {
-            die('Not pending');
-        }
-
-        // Mark the notification as in progress.
-        $this->DiscussionModel->setField($discussionID, 'Notified', ActivityModel::SENT_INPROGRESS);
-
-        $discussionType = val('Type', $discussion);
-        if ($discussionType) {
-            $code = "HeadlineFormat.Discussion.{$discussionType}";
-        } else {
-            $code = 'HeadlineFormat.Discussion';
-        }
-
-        $headlineFormat = t($code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
-        $category = CategoryModel::categories(val('CategoryID', $discussion));
-        $activity = [
-            'ActivityType' => 'Discussion',
-            'ActivityUserID' => $discussion->InsertUserID,
-            'HeadlineFormat' => $headlineFormat,
-            'RecordType' => 'Discussion',
-            'RecordID' => $discussionID,
-            'Route' => discussionUrl($discussion, '', '/'),
-            'Data' => [
-                'Name' => $discussion->Name,
-                'Category' => val('Name', $category)
-            ]
-        ];
-
-        $activityModel = new ActivityModel();
-        $this->DiscussionModel->notifyNewDiscussion($discussion, $activityModel, $activity);
-        $activityModel->saveQueue();
-        $this->DiscussionModel->setField($discussionID, 'Notified', ActivityModel::SENT_OK);
-
-        die('OK');
-    }
-
     /**
      * Pre-populate the form with values from the query string.
      *

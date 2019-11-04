@@ -2144,10 +2144,6 @@ class DiscussionModel extends Gdn_Model {
                         $fields['Format'] = c('Garden.InputFormatter', '');
                     }
 
-                    if (c('Vanilla.QueueNotifications')) {
-                        $fields['Notified'] = ActivityModel::SENT_PENDING;
-                    }
-
                     // Check for approval
                     $approvalRequired = checkRestriction('Vanilla.Approval.Require');
                     if ($approvalRequired && !val('Verified', Gdn::session()->User)) {
@@ -2317,11 +2313,9 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments["Activity"] = $data;
 
         // Notify everyone that has advanced notifications.
-        if (!c("Vanilla.QueueNotifications")) {
-            $advancedActivity = $data;
-            $advancedActivity["Data"]["Reason"] = "advanced";
-            $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-        }
+        $advancedActivity = $data;
+        $advancedActivity["Data"]["Reason"] = "advanced";
+        $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
 
         // Throw an event for users to add their own events.
         $this->EventArguments["Discussion"] = $discussion;

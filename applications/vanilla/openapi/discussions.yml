@@ -79,11 +79,13 @@ paths:
         schema:
           items:
             enum:
+            - all
             - category
             - insertUser
             - lastUser
             - lastPost
-            - all
+            - lastPost.body
+            - lastPost.insertUser
             - reactions
             type: string
           type: array
@@ -147,6 +149,8 @@ paths:
             - insertUser
             - lastUser
             - lastPost
+            - lastPost.body
+            - lastPost.insertUser
             - all
             type: string
           type: array
@@ -1073,29 +1077,32 @@ components:
       type: object
     PostFragment:
       properties:
-        commentID:
-          description: 'The comment ID of the post, if any.'
-          type: integer
-        dateInserted:
-          description: The date of the post.
-          format: date-time
-          type: string
         discussionID:
           description: The discussion ID of the post.
           type: integer
-        insertUser:
-          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
-        insertUserID:
-          description: The author of the post.
+        commentID:
+          description: 'The comment ID of the post, if any.'
           type: integer
         name:
           description: The title of the post.
           minLength: 1
           type: string
+        body:
+          description: The HTML formatted body of the post.
+          type: string
         url:
           description: The URL of the post.
           minLength: 1
           type: string
+        dateInserted:
+          description: The date of the post.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        insertUserID:
+          description: The author of the post.
+          type: integer
       required:
       - name
       - url

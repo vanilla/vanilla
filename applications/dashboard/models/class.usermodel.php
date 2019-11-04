@@ -3826,6 +3826,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         // Remove activities
         $this->getDelete('Activity', ['InsertUserID' => $userID], $content);
+        $this->getDelete('Activity', ['ActivityUserID' => $userID], $content);
 
         // Remove activity comments.
         $this->getDelete('ActivityComment', ['InsertUserID' => $userID], $content);

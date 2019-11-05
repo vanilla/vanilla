@@ -133,12 +133,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->cspModel = $cspModel;
         $this->preloadModel = $preloadModel;
 
-        if ($favIcon = $this->siteMeta->getFavIcon()) {
-            $this->setFavIcon($favIcon);
-        }
-
         if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
-            $this->addMetaTag("theme-color", ["name" => "theme-color", "content" => $mobileAddressBarColor]);
+            $this->addMetaTag(["name" => "theme-color", "content" => $mobileAddressBarColor]);
         }
     }
 
@@ -160,12 +156,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     private function renderMasterView(): Data {
         $this->validateSeo();
+        $this->applyMetaTags();
 
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
             'meta' => $this->siteMeta,
         ]);
         $this->inlineScripts[] = $this->getReduxActionsAsJsVariable();
-        $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
             'nonce' => $this->cspModel->getNonce(),
             'title' => $this->seoTitle,
@@ -186,11 +182,45 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
                 null,
-            'favIcon' => $this->favIcon,
+            'favIcon' => $this->siteMeta->getFavIcon(),
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);
+    }
+
+    /**
+     * Use existing site data to create open graph meta tags.
+     */
+    private function applyMetaTags() {
+
+        // Standard meta tags
+        if ($this->seoDescription) {
+            $this->addMetaTag(['name' => 'description', 'content' => $this->seoDescription]);
+        }
+
+        // Site name
+        $this->addOpenGraphTag('og:site_name', $this->siteMeta->getSiteTitle());
+
+        if ($this->seoTitle) {
+            $this->addOpenGraphTag('og:title', $this->seoTitle);
+        }
+
+        if ($this->seoDescription) {
+            $this->addOpenGraphTag('og:description', $this->seoDescription);
+        }
+
+        if ($this->canonicalUrl) {
+            $this->addOpenGraphTag('og:url', $this->canonicalUrl);
+        }
+
+        // Twitter specific tags
+        $this->addMetaTag(['name' => 'twitter:card', 'content' => 'summary']);
+        // There is no need to duplicate twitter & OG tags.
+        //
+        // When the Twitter card processor looks for tags on a page, it first checks for the Twitter-specific property,
+        // and if not present, falls back to the supported Open Graph property.
+        // From https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started#twitter-cards-and-open-graph
     }
 
     /**
@@ -221,28 +251,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     public function blockRobots(): self {
         header('X-Robots-Tag: noindex', true);
-        $this->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex']);
+        $this->addMetaTag(['name' => 'robots', 'content' => 'noindex']);
 
-        return $this;
-    }
-
-    /**
-     * Get the page's "favorite icon".
-     *
-     * @return string|null
-     */
-    protected function getFavIcon(): ?string {
-        return $this->favIcon;
-    }
-
-    /**
-     * Set the "favorite icon" for the page.
-     *
-     * @param string $favIcon
-     * @return self
-     */
-    protected function setFavIcon(string $favIcon): self {
-        $this->favIcon = $favIcon;
         return $this;
     }
 
@@ -341,15 +351,25 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /**
      * Set page meta tag attributes.
      *
-     * @param string $tag Tag name.
      * @param array $attributes Array of attributes to set for tag.
      *
      * @return $this Own instance for chaining.
      */
-    protected function addMetaTag(string $tag, array $attributes): self {
-        $this->metaTags[$tag] = $attributes;
+    protected function addMetaTag(array $attributes): self {
+        $this->metaTags[] = $attributes;
 
         return $this;
+    }
+
+    /**
+     * Apply an open graph tag.
+     *
+     * @param string $property
+     * @param string $content
+     * @return $this
+     */
+    protected function addOpenGraphTag(string $property, string $content): self {
+        return $this->addMetaTag(['property' => $property, 'content' => $content]);
     }
 
     /**
@@ -367,7 +387,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->statusCode = $e->getCode();
         $this->addReduxAction(new ReduxErrorAction($e))
             ->setSeoTitle($e->getMessage())
-            ->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex'])
+            ->addMetaTag(['name' => 'robots', 'content' => 'noindex'])
             ->setSeoContent('resources/views/error.twig', [
                 'errorMessage' => $e->getMessage(),
                 'errorCode' => $e->getCode()

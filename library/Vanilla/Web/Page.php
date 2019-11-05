@@ -71,6 +71,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var int The page status code. */
     private $statusCode = 200;
 
+    /** @var AbstractJsonLDItem */
+    private $jsonLDItems = [];
+
     /**
      * Prepare the page contents.
      *
@@ -179,14 +182,37 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'footer' => $this->footerHtml,
             'preloadModel' => $this->preloadModel,
             'cssClasses' => ['isLoading'],
-            'breadcrumbsJson' => $this->seoBreadcrumbs ?
-                $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
-                null,
             'favIcon' => $this->siteMeta->getFavIcon(),
+            'jsonLD' => $this->getJsonLDScriptContent(),
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);
+    }
+
+    /**
+     * Add a JSON-LD item to be represented.
+     *
+     * @param AbstractJsonLDItem $item
+     *
+     * @return $this For chaining.
+     */
+    public function addJsonLDItem(AbstractJsonLDItem $item): self {
+        $this->jsonLDItems[] = $item;
+        return $this;
+    }
+
+    /**
+     * Get the content of the page's JSON-LD script.
+     * @return string
+     */
+    private function getJsonLDScriptContent(): string {
+        $data = [
+            '@context' => "https://schema.org",
+            "@graph" => $this->jsonLDItems,
+        ];
+
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -325,6 +351,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     protected function setSeoBreadcrumbs(array $crumbs): self {
         $this->seoBreadcrumbs = $crumbs;
+        $this->addJsonLDItem(new BreadcrumbJsonLD($crumbs));
         return $this;
     }
 

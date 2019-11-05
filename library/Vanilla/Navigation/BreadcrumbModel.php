@@ -49,33 +49,6 @@ class BreadcrumbModel {
      *
      * @param array Breadcrumb[] $crumbs The array of breadcrumbs to convert to JSON-LD.
      *
-     * @return string Breadcrumb data serialized into the JSON-LD breadcrumb micro-data format.
-     */
-    public function crumbsAsJsonLD(array $crumbs): string {
-        $crumbList = [];
-        foreach ($crumbs as $index => $crumb) {
-            $crumbList[] = [
-                '@type' => 'ListItem',
-                'position' => $index,
-                'name' => $crumb->getName(),
-                'item' => $crumb->getUrl(),
-            ];
-        }
-
-        $data = [
-            '@context' => 'http://schema.org',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => $crumbList,
-        ];
-
-        return json_encode($data);
-    }
-
-    /**
-     * Convert an array of breadcrumbs into
-     *
-     * @param array Breadcrumb[] $crumbs The array of breadcrumbs to convert to JSON-LD.
-     *
      * @return array Breadcrumb data as array of structure ['Name'=>'', 'Url'=>'//'].
      */
     public function crumbsAsArray(array $crumbs): array {

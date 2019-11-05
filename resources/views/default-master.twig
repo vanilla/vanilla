@@ -24,9 +24,9 @@
             <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
         {% endfor %}
 
-        {%- if breadcrumbsJson -%}
+        {%- if jsonLD -%}
             <script type="application/ld+json">
-                {{- breadcrumbsJson|raw -}}
+                {{- jsonLD|raw -}}
             </script>
         {%- endif -%}
 

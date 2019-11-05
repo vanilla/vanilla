@@ -496,9 +496,9 @@ class SettingsController extends DashboardController {
                     "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
             ],
             'Garden.OrgName' => [
-                'LabelCode' => t('Organization Name'),
+                'LabelCode' => t('Organization'),
                 'Control' => 'textbox',
-                'Description' => t("OrgDescription", "The organization name is used for various types of SEO microdata, such as JSON-LD"),
+                'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
             ],
             'Garden.Logo' => [
                 'LabelCode' => t('Banner Logo'),

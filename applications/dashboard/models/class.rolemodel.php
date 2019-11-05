@@ -505,9 +505,9 @@ class RoleModel extends Gdn_Model {
     }
 
     /**
-     * Given a role ID, get the corresponding record.
+     * Get all known roles, or one particular role by its ID.
      *
-     * @param null $roleID A role ID.
+     * @param int|null $roleID A role ID. If null, return all known roles.
      * @param bool $force If the ID does not correspond to a known role, return an empty fragment (row ID, blank name).
      * @return array|mixed|null|type
      */

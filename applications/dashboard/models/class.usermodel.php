@@ -1823,9 +1823,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * Get the roles for a user.
      *
      * @param int $userID The user to get the roles for.
+     * @param bool $includeInvalid Include invalid (e.g. non-existent) roles.
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
-    public function getRoles($userID) {
+    public function getRoles($userID, bool $includeInvalid = true) {
         $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
         $rolesDataArray = Gdn::cache()->get($userRolesKey);
 
@@ -1838,7 +1839,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         $result = [];
         foreach ($rolesDataArray as $roleID) {
-            $result[] = RoleModel::roles($roleID, true);
+            $role = RoleModel::roles($roleID, $includeInvalid);
+            if ($role !== null) {
+                $result[] = $role;
+            }
         }
 
         return new Gdn_DataSet($result, DATASET_TYPE_ARRAY);

@@ -95,6 +95,10 @@ export const messagesClasses = useThemeCache(() => {
         zIndex: 20,
     });
 
+    const fullWidth = style("fullWidth", {
+        justifyContent: "center !important",
+    });
+
     const root = style(
         {
             width: percent(100),
@@ -174,6 +178,17 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
+    const errorIcon = style("errorIcon", {
+        ...absolutePosition.middleLeftOfParent(),
+        maxWidth: percent(100),
+        transform: translate(`-100%`),
+        marginLeft: unit(-14),
+        $nest: {
+            "&&": {
+                color: "#555A62",
+            },
+        },
+    });
     const iconWrap = style("iconWrap", {
         position: "relative",
         width: percent(100),
@@ -181,6 +196,8 @@ export const messagesClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
     });
+
+    const messageContainer = style("messageContainer", {});
 
     const confirm = style("confirm", {});
 
@@ -190,9 +207,12 @@ export const messagesClasses = useThemeCache(() => {
         actionButton,
         message,
         fixed,
+        fullWidth,
+        messageContainer,
         setWidth,
         messageIcon,
         iconWrap,
         confirm,
+        errorIcon,
     };
 });

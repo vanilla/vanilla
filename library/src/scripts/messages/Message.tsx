@@ -23,6 +23,7 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
+    isFullWidth?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
@@ -34,8 +35,14 @@ export default function Message(props: IMessageProps) {
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
                 <WrapperElement>
-                    <div className={classNames(classes.wrap)}>
-                        <div className={classes.message}>{props.contents || props.stringContents}</div>
+                    <div
+                        className={classNames(classes.wrap, props.className, {
+                            [classes.fullWidth]: props.isFullWidth,
+                        })}
+                    >
+                        <div className={classNames(props.className, { [classes.fullWidth]: props.isFullWidth })}>
+                            <div className={classes.message}>{props.contents || props.stringContents}</div>
+                        </div>
                         {props.onConfirm && (
                             <Button
                                 baseClass={ButtonTypes.TEXT_PRIMARY}

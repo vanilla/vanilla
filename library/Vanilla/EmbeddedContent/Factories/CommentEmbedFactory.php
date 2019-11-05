@@ -9,9 +9,9 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Quote embed factory for comments.
@@ -25,15 +25,15 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
      * DI
      *
      * @param RequestInterface $request
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      * @param \CommentsApiController $commentApi
      */
     public function __construct(
         RequestInterface $request,
-        SiteSectionProviderInterface $siteSectionProvider,
+        SiteSectionModel $siteSectionModel,
         \CommentsApiController $commentApi
     ) {
-        parent::__construct($request, $siteSectionProvider);
+        parent::__construct($request, $siteSectionModel);
         $this->commentApi = $commentApi;
     }
 
@@ -49,7 +49,8 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
      * @inheritdoc
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
-        preg_match($this->getSupportedPathRegex(), $url, $matches);
+        $path = parse_url($url, PHP_URL_PATH);
+        preg_match($this->getSupportedPathRegex(), $path, $matches);
         $id = $matches['commentID'] ?? null;
 
         if ($id === null) {

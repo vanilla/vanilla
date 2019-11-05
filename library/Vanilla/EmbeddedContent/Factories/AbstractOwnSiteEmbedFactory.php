@@ -13,6 +13,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\SiteAsset;
 
 /**
@@ -23,26 +24,21 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
     /** @var RequestInterface */
     private $request;
 
-    /** @var string[] */
-    private $allowedSiteSectionSlugs = [];
+    /** @var SiteSectionModel */
+    private $sectionModel;
 
     /**
      * DI
      *
      * @param RequestInterface $request
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $sectionModel
      */
     public function __construct(
         RequestInterface $request,
-        SiteSectionProviderInterface $siteSectionProvider
+        SiteSectionModel $sectionModel
     ) {
         $this->request = $request;
-
-        foreach ($siteSectionProvider->getAll() as $siteSection) {
-            if ($siteSection->getBasePath() !== '') {
-                $this->allowedSiteSectionSlugs[] = $siteSection->getBasePath();
-            }
-        }
+        $this->sectionModel = $sectionModel;
     }
 
     /**
@@ -58,8 +54,14 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
      * Get a regex representing the root of the site w/ all allowable site sections and siteRoot.
      */
     protected function getRegexRoot(): string {
-        $siteSectionRegex = count($this->allowedSiteSectionSlugs) > 0 ?
-            '(' . implode('|', $this->allowedSiteSectionSlugs) . ')'
+        $allowedSlugs = [];
+        foreach ($this->sectionModel->getAll() as $siteSection) {
+            if ($siteSection->getBasePath() !== '') {
+                $allowedSlugs[] = $siteSection->getBasePath();
+            }
+        }
+        $siteSectionRegex = count($allowedSlugs) > 0 ?
+            '(' . implode('|', $allowedSlugs) . ')'
             : '';
         $root = $this->request->getAssetRoot() . $siteSectionRegex;
 

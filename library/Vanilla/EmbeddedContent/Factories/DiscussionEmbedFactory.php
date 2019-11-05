@@ -13,6 +13,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\SiteAsset;
 
 /**
@@ -27,15 +28,15 @@ class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
      * DI
      *
      * @param RequestInterface $request
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      * @param \DiscussionsApiController $discussionApi
      */
     public function __construct(
         RequestInterface $request,
-        SiteSectionProviderInterface $siteSectionProvider,
+        SiteSectionModel $siteSectionModel,
         \DiscussionsApiController $discussionApi
     ) {
-        parent::__construct($request, $siteSectionProvider);
+        parent::__construct($request, $siteSectionModel);
         $this->discussionApi = $discussionApi;
     }
 
@@ -44,14 +45,15 @@ class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
      */
     protected function getSupportedPathRegex(string $domain = ''): string {
         $regexRoot = $this->getRegexRoot();
-        return "/^$regexRoot\/discussion\/(?<commentID>\d+)/i";
+        return "/^$regexRoot\/discussion\/(?<discussionID>\d+)/i";
     }
 
     /**
      * @inheritdoc
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
-        preg_match($this->getSupportedPathRegex(), $url, $matches);
+        $path = parse_url($url, PHP_URL_PATH);
+        preg_match($this->getSupportedPathRegex(), $path, $matches);
         $id = $matches['discussionID'] ?? null;
 
         if ($id === null) {

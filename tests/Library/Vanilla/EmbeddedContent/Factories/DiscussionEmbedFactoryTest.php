@@ -11,6 +11,7 @@ use Garden\Web\RequestInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Site\SiteSectionModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockSiteSection;
@@ -39,8 +40,10 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
 
         $sectionProvider = new MockSiteSectionProvider(new DefaultSiteSection(new MockConfig()));
         $sectionProvider->addSiteSections($siteSections);
+        $sectionModel = new SiteSectionModel(new MockConfig());
+        $sectionModel->addProvider($sectionProvider);
 
-        $factory = new DiscussionEmbedFactory($request, $sectionProvider, $discussionApi);
+        $factory = new DiscussionEmbedFactory($request, $sectionModel, $discussionApi);
 
         $this->assertEquals($isSupported, $factory->canHandleUrl($urlToTest));
     }

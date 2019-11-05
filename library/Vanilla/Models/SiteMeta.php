@@ -62,6 +62,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $logo;
 
+    /** @var string */
+    private $orgName;
+
     /**
      * SiteMeta constructor.
      *
@@ -92,6 +95,8 @@ class SiteMeta implements \JsonSerializable {
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
         $this->siteTitle = $config->get('Garden.Title', "");
+
+        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
 
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
@@ -136,6 +141,7 @@ class SiteMeta implements \JsonSerializable {
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
                 'logo' => $this->logo,
@@ -157,6 +163,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getSiteTitle(): string {
         return $this->siteTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgName(): string {
+        return $this->orgName;
     }
 
     /**

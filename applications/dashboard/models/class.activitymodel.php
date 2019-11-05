@@ -1990,8 +1990,8 @@ class ActivityModel extends Gdn_Model {
             $activityEmail->setBody($body);
             $activityEmail->setSubject($subject);
             $activityEmail->setActionText($activity["ActionText"] ?? t("Check it out"));
-            $activityEmail->setActionUrl(externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity)));
             $activityEmail->setActivityTypeID($activity["ActivityTypeID"] ?? null);
+            $activityEmail->setInternalRoute($activity["Route"] ?? "");
             $activityEmail->setRecordID($activity["RecordID"] ?? null);
             $activityEmail->setRecordType($activity["RecordType"] ?? null);
             static::$emailQueue[$key] = $activityEmail;
@@ -2066,13 +2066,16 @@ class ActivityModel extends Gdn_Model {
         $recipients = $activityEmail->getRecipients();
 
         $activityType = static::getActivityType($activityEmail->getActivityTypeID());
+        $route = $activityEmail->getInternalRoute() ?? "/";
         $notification = [
             "Activity" => [
                 "ActivityType" => $activityType["Name"] ?? null,
                 "RecordID" => $activityEmail->getRecordID(),
                 "RecordType" => $activityEmail->getRecordType(),
+                "Route" => $route,
             ],
             "Email" => $email,
+            "Route" => $route,
         ];
 
         $batchOffset = 0;
@@ -2085,8 +2088,9 @@ class ActivityModel extends Gdn_Model {
                 $email->bcc($address, $name ?? "");
             }
 
+            $actionUrl = externalUrl($route);
             $emailTemplate = $email->getEmailTemplate()
-                ->setButton($activityEmail->getActionUrl(), $activityEmail->getActionText())
+                ->setButton($actionUrl, $activityEmail->getActionText())
                 ->setTitle($activityEmail->getSubject());
             if ($message = $activityEmail->getBody()) {
                 $emailTemplate->setMessage($message, true);

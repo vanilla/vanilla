@@ -19,14 +19,14 @@ class ActivityEmail {
     /** @var string */
     private $actionText;
 
-    /** @var string */
-    private $actionUrl;
-
     /** @var int */
     private $activityTypeID;
 
     /** @var string */
     private $body = "";
+
+    /** @var string */
+    private $internalRoute;
 
     /** @var string[] */
     private $recipients = [];
@@ -68,15 +68,6 @@ class ActivityEmail {
     }
 
     /**
-     * Get the call to action URL for this email.
-     *
-     * @return string|null
-     */
-    public function getActionUrl(): ?string {
-        return $this->actionUrl;
-    }
-
-    /**
      * Return all associated activity IDs.
      *
      * @return array
@@ -101,6 +92,15 @@ class ActivityEmail {
      */
     public function getBody(): string {
         return $this->body;
+    }
+
+    /**
+     * Get the internal route behind the call to action for this email.
+     *
+     * @return string|null
+     */
+    public function getInternalRoute(): ?string {
+        return $this->internalRoute;
     }
 
     /**
@@ -144,10 +144,10 @@ class ActivityEmail {
      */
     public function reset() {
         $this->actionText = null;
-        $this->actionUrl = null;
         $this->activityIDs = [];
         $this->activityTypeID = null;
         $this->body = "";
+        $this->internalRoute = null;
         $this->recipients = [];
         $this->recordID = null;
         $this->recordType = null;
@@ -164,12 +164,12 @@ class ActivityEmail {
     }
 
     /**
-     * Set the call to action URL for this email.
+     * Set the route behind the call to action for this email.
      *
-     * @param string|null $actionUrl
+     * @param string|null $internalRoute
      */
-    public function setActionUrl(?string $actionUrl) {
-        $this->actionUrl = $actionUrl;
+    public function setInternalRoute(?string $internalRoute) {
+        $this->internalRoute = $internalRoute;
     }
 
     /**

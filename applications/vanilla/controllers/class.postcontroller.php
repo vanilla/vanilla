@@ -493,6 +493,7 @@ class PostController extends VanillaController {
             $Attributes = ['ForeignUrl' => $vanilla_url];
             $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
             $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
+            $emptyBody = empty($this->Form->getFormValue('Body'));
 
             // If we already have a discussion with this ForeginID, add the discussion id to the form, to avoid duplicate discussions.
             if ($isEmbeddedComments && !$DiscussionID) {
@@ -510,7 +511,7 @@ class PostController extends VanillaController {
             }
 
             // If so, create it!
-            if (!$Discussion && $isEmbeddedComments && $isAuthenticatedPostback) {
+            if (!$Discussion && $isEmbeddedComments && $isAuthenticatedPostback && !$emptyBody) {
                 // Add these values back to the form if they exist!
                 $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
                 $this->Form->addHidden('vanilla_type', $vanilla_type);

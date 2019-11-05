@@ -1043,6 +1043,9 @@ class EntryController extends Gdn_Controller {
 
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));
+        // Add open graph description in case a restricted page is shared.
+        $this->description(Gdn::config('Garden.Description'));
+
         $this->Form->addHidden('Target', $this->target());
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 

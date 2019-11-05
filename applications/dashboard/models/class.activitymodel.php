@@ -2076,6 +2076,7 @@ class ActivityModel extends Gdn_Model {
             ],
             "Email" => $email,
             "Route" => $route,
+            "UserAuthorized" => true, // Let anything hooking in know we've already authorized user access to the resources.
         ];
 
         $batchOffset = 0;

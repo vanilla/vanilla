@@ -88,9 +88,9 @@ class DiscussionsController extends VanillaController {
         $this->fireEvent('AfterPageCalculation');
 
         // Set canonical URL
-        $canonicalUrl = $this->Data['isHomepage'] ?
-            url('/', true) :
-            url(concatSep('/', 'discussions', pageNumber($Offset, $Limit, true, false)), true);
+        $canonicalUrl = empty($this->Data['isHomepage']) ?
+            url(concatSep('/', 'discussions', pageNumber($Offset, $Limit, true, false)), true) :
+            url('/', true);
         $this->canonicalUrl($canonicalUrl);
 
         // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.

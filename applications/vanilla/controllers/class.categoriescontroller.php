@@ -580,7 +580,7 @@ class CategoriesController extends VanillaController {
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
-        $canonicalUrl = $this->getCanonicalUrl($this->Data);
+        $canonicalUrl = $this->calculateCanonicalUrl($this->Data);
         $this->canonicalUrl($canonicalUrl);
 
         if ($this->View === 'all' && $displayAs === 'Flat') {
@@ -674,7 +674,7 @@ class CategoriesController extends VanillaController {
         // Set view and render
         $this->View = 'discussions';
 
-        $canonicalUrl = $this->getCanonicalUrl($this->Data);
+        $canonicalUrl = $this->calculateCanonicalUrl($this->Data);
         $this->canonicalUrl($canonicalUrl);
 
         $Path = $this->fetchViewLocation('helper_functions', 'discussions', false, false);
@@ -777,7 +777,7 @@ class CategoriesController extends VanillaController {
      * @param array $data
      * @return string
      */
-    private function getCanonicalUrl($data) {
-        return $data['isHomepage'] ? url('/', true) : url('/categories', true);
+    private function calculateCanonicalUrl($data) {
+        return empty($data['isHomepage']) ? url(Gdn::request()->path(), true) : url('/', true);
     }
 }

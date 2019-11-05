@@ -20,6 +20,9 @@ class Attachment implements \JsonSerializable {
     /** @var string The URL pointing to the file. */
     public $url;
 
+    /** @var int */
+    public $mediaID;
+
     /** @var \DateTimeInterface The date the attachment was uploaded. */
     public $dateInserted;
 
@@ -40,6 +43,7 @@ class Attachment implements \JsonSerializable {
             $schema = Schema::parse([
                 'mediaID:i',
                 'name:s',
+                'mediaID:i',
                 'dateInserted:dt',
                 'size:i',
                 'type:s',
@@ -76,6 +80,7 @@ class Attachment implements \JsonSerializable {
         return [
             'name' => $this->name,
             'dateInserted' => $this->dateInserted,
+            'mediaID' => $this->mediaID,
             'size' => $this->size,
             'type' => $this->type,
             'url' => $this->url,

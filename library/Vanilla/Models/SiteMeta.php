@@ -59,6 +59,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var Contracts\Site\SiteSectionInterface */
     private $currentSiteSection;
 
+    /** @var string */
+    private $logo;
+
     /**
      * SiteMeta constructor.
      *
@@ -106,6 +109,10 @@ class SiteMeta implements \JsonSerializable {
             $this->favIcon = \Gdn_Upload::url($favIcon);
         }
 
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
+        }
+
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
 
@@ -131,6 +138,7 @@ class SiteMeta implements \JsonSerializable {
                 'siteName' => $this->siteTitle,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
+                'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
@@ -214,6 +222,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getFavIcon(): ?string {
         return $this->favIcon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): string {
+        return $this->logo;
     }
 
     /**

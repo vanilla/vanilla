@@ -2106,7 +2106,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                 break;
         }
 
-        if ($userID) {
+        if ($userID && is_numeric($userID)) {
             $this->EventArguments['UserID'] = $userID;
             $this->fireEvent('AfterRegister');
         }

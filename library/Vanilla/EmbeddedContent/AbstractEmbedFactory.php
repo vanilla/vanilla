@@ -62,7 +62,7 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
             $pathMatches = $this->canHandleEmptyPaths;
         } else {
             $regex = $this->getSupportedPathRegex($domain);
-            $pathMatches = (bool) preg_match($regex, $path);
+            $pathMatches = preg_match($regex, $path) === 1;
         }
 
         return $schemeMatches && $pathMatches && $domainMatches;

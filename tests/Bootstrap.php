@@ -315,6 +315,13 @@ class Bootstrap {
             ->rule('HtmlFormatter')
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
+
+            ->rule(Vanilla\Scheduler\SchedulerInterface::class)
+            ->setClass(Vanilla\Scheduler\DummyScheduler::class)
+            ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+            ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+            ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
+            ->setShared(true)
             ;
     }
 

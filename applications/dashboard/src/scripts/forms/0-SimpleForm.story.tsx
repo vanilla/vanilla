@@ -13,7 +13,7 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import TranslationButton from "@library/content/translationGrid/TranslationButton";
+import Translator from "@library/content/translationGrid/TranslationButton";
 
 const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCssDecorator);
 
@@ -23,7 +23,7 @@ formsStory.add("FormGroup", () =>
 
         return (
             <StoryContent>
-                <TranslationButton
+                <Translator
                     translationData={{
                         id: 123,
                         resource: "kb",

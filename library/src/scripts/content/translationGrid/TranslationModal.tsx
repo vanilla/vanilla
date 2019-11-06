@@ -17,21 +17,25 @@ import { translationGridData } from "@library/content/translationGrid/translatio
 interface IProps {
     className?: string;
     buttonRef: RefObject<HTMLButtonElement>;
-    checkForUnsavedModifications;
-    setUnsavedModifications: (unsavedModifications: boolean) => {};
-    unsavedModifications: boolean;
+    // setUnsavedModifications: (unsavedModifications: boolean) => void;
+    // unsavedModifications: boolean;
 }
 
 const saveTranslation = () => {
     alert("Saved!");
 };
 
+const exitHandler = () => {};
+
 export default function TranslationModal(props: IProps) {
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const { className, buttonRef } = props;
+
+    console.log("translationGridData.i18nLocales", translationGridData.i18nLocales);
 
     return (
         <Modal
-            exitHandler={checkForUnsavedChanges}
+            exitHandler={exitHandler}
             size={ModalSizes.LARGE}
             className={classNames(props.className)}
             label={t("Choose a location for this page.")}
@@ -44,7 +48,6 @@ export default function TranslationModal(props: IProps) {
                 otherLanguages={translationGridData.otherLanguages}
                 i18nLocales={translationGridData.i18nLocales}
                 dateUpdated={"2019-10-09T20:05:51+00:00"}
-                // Use setHasUnsavedModifications to set if we have unsaved changes.
             />
         </Modal>
     );

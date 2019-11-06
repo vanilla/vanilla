@@ -23,7 +23,7 @@ interface IProps {
     translationData: ITranslationData;
 }
 
-export default function TranslationButton(props: IProps) {
+export default function Translator(props: IProps) {
     const { translationData } = props;
     const [showTranslationModal, setShowTranslationModal] = useState(false);
     const [showConfirmationModal, setConfirmationModal] = useState(false);
@@ -50,15 +50,7 @@ export default function TranslationButton(props: IProps) {
             >
                 <TranslateIcon />
             </Button>
-            {showTranslationModal && (
-                <TranslationModal
-                    id={id}
-                    unsavedModifications={unsavedModifications}
-                    setUnsavedModifications={setUnsavedModifications}
-                    buttonRef={buttonRef}
-                    {...translationData}
-                />
-            )}
+            {showTranslationModal && <TranslationModal id={id} buttonRef={buttonRef} {...translationData} />}
             {unsavedModifications && exiting && <ModalConfirm />}
         </>
     );

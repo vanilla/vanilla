@@ -7,7 +7,7 @@ import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import TranslationButton, { ITranslationData } from "@library/content/translationGrid/TranslationButton";
+import Translator, { ITranslationData } from "@library/content/translationGrid/TranslationButton";
 
 interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     translationData?: ITranslationData;
@@ -22,7 +22,7 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     return (
         <div className={rootClass}>
             <input type="text" {...props} id={inputID} className={classes} />
-            {props.translationData && <TranslationButton translationData={props.translationData} />}
+            {props.translationData && <Translator translationData={props.translationData} />}
         </div>
     );
 };

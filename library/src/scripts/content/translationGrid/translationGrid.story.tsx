@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { TranslationGrid } from "@library/content/translationGrid/TranslationGrid";
+import { TranslationLanguageHandler } from "@library/content/translationGrid/TranslationLanguageHandler";
 import { translationGridData } from "@library/content/translationGrid/translationGrid.storyData";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { ILocale, loadLocales, LocaleProvider } from "@vanilla/i18n";
@@ -17,6 +17,7 @@ import { ILocale, loadLocales, LocaleProvider } from "@vanilla/i18n";
 const story = storiesOf("Components", module);
 const locales = translationGridData.i18nLocales;
 const dateUpdated = "2019-10-09T20:05:51+00:00";
+console.log("");
 loadLocales(locales);
 story.add("Translation Grid", () => {
     return (
@@ -37,7 +38,7 @@ story.add("Translation Grid", () => {
                         position: "relative", // Scrolling container must have "position"
                     }}
                 >
-                    <TranslationGrid
+                    <TranslationLanguageHandler
                         data={translationGridData.data}
                         inScrollingContainer={true}
                         otherLanguages={translationGridData.otherLanguages}

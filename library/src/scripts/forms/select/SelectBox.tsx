@@ -14,6 +14,7 @@ import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/Dr
 import classNames from "classnames";
 import { CheckCompactIcon, DownTriangleIcon, AlertIcon } from "@library/icons/common";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 
 export interface ISelectBoxItem {
     name: string;
@@ -81,34 +82,57 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
         });
     };
 
+    private renderChild = (child, selected, classes) => {
+        return (
+            <>
+                <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
+                    {child.content || child.name}
+                </span>
+                <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
+                    {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
+                    {!selected && (
+                        <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
+                            {` `}
+                        </span>
+                    )}
+                    {child.icon}
+                </span>
+            </>
+        );
+    };
     public render() {
         const classes = selectBoxClasses();
 
         const classesDropDown = dropDownClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
-            return (
-                <DropDownItemLink
-                    key={this.props.id + "-item" + i}
-                    className={classNames({ isSelected: child.selected })}
-                    // name={child.name}
-                    to={child.url || ""}
-                    isModalLink={this.props.openAsModal}
-                >
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
-                        {child.content || child.name}
-                    </span>
-                    <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
-                        {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
-                        {!selected && (
-                            <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
-                                {` `}
-                            </span>
-                        )}
-                        {child.icon}
-                    </span>
-                </DropDownItemLink>
-            );
+            const key = this.props.id + "-item" + i;
+
+            if ("url" in child) {
+                return (
+                    <DropDownItemLink
+                        key={key}
+                        className={classNames({ isSelected: child.selected })}
+                        // name={child.name}
+                        to={child.url || ""}
+                        isModalLink={this.props.openAsModal}
+                    >
+                        {this.renderChild(child, selected, classes)}
+                    </DropDownItemLink>
+                );
+            } else {
+                return (
+                    <DropDownItemButton
+                        key={key}
+                        className={classNames({ isSelected: child.selected })}
+                        // name={child.name}
+                        onClick={this.handleClick}
+                        //isModalLink={this.props.openAsModal}
+                    >
+                        {this.renderChild(child, selected, classes)}
+                    </DropDownItemButton>
+                );
+            }
         });
         const buttonContents =
             this.state.selectedItem && this.state.selectedItem.name ? (

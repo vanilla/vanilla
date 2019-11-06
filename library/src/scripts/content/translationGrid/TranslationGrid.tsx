@@ -33,6 +33,7 @@ export interface ITranslationGrid {
     otherLanguages: ILanguageItem[];
     i18nLocales: ILocale[];
     dateUpdated?: string;
+    rightHeaderCell: React.ReactNode;
 }
 
 /**
@@ -45,46 +46,11 @@ export function TranslationGrid(props: ITranslationGrid) {
     const id = useUniqueID("articleOtherLanguages");
     const classesPanelList = panelListClasses();
     const { data, inScrollingContainer = false, otherLanguages } = props;
-    const dateUpdated = "2019-10-08T13:54:41+00:00";
+
     const classes = translationGridClasses();
     const count = data.length - 1;
     const [translations, setTranslations] = useState(data);
     const translationKey = "newTranslation";
-    const currentLocale = "en";
-    let selectedIndex = 0;
-    const selectBoxItems: ISelectBoxItem[] = props.otherLanguages.map((data, index) => {
-        const isSelected = data.locale === currentLocale;
-        if (isSelected) {
-            selectedIndex = index;
-        }
-        return {
-            selected: isSelected,
-            name: data.locale,
-            icon: data.translationStatus === "not-translated" && (
-                <ToolTip
-                    label={
-                        <Translate
-                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
-                            c0={<DateTime timestamp={props.dateUpdated} />}
-                        />
-                    }
-                    ariaLabel={"This article was editied in its source locale."}
-                >
-                    <span tabIndex={0}>
-                        <AlertIcon className={"selectBox-selectedIcon"} />
-                    </span>
-                </ToolTip>
-            ),
-            content: (
-                <>
-                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                </>
-            ),
-            onClick: () => {
-                window.location.href = data.url;
-            },
-        };
-    });
 
     const translationRows = translations.map((translation, i) => {
         const notTranslated = !translations[i][translationKey];
@@ -148,21 +114,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classes.header}>
                         <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
                         <div className={classNames(classes.rightCell, classes.headerRight)}>
-                            <div className={classes.languageDropdown}>
-                                <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                                    <LanguagesDropDown
-                                        titleID={id}
-                                        widthOfParent={true}
-                                        className="otherLanguages-select"
-                                        renderLeft={true}
-                                        data={props.otherLanguages}
-                                        currentLocale={currentLocale}
-                                        dateUpdated={props.dateUpdated}
-                                        selcteBoxItems={selectBoxItems}
-                                        selectedIndex={selectedIndex}
-                                    />
-                                </div>
-                            </div>
+                            {props.rightHeaderCell}
                         </div>
                     </div>
                     <div className={classes.body}>{translationRows}</div>

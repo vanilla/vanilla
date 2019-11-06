@@ -122,7 +122,6 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "auto",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
-        left: 0,
         $nest: {
             "&&": {
                 zIndex: 3,
@@ -132,6 +131,8 @@ export const dropDownClasses = useThemeCache(() => {
             },
             "&.isParentWidth": {
                 minWidth: "initial",
+                left: 0,
+                right: 0,
             },
             "&.isOwnWidth": {
                 width: "initial",

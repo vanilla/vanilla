@@ -17,8 +17,14 @@ class CallbackJob implements LocalJobInterface {
     /** @var callable */
     private $callback;
 
+    /** @var int */
+    private $delay;
+
     /** @var array */
     private $parameters = [];
+
+    /** @var JobPriority */
+    private $priority;
 
     /**
      * Execute the configured callback function.
@@ -59,6 +65,7 @@ class CallbackJob implements LocalJobInterface {
      * @return void
      */
     public function setPriority(JobPriority $priority) {
+        $this->priority = $priority;
     }
 
     /**
@@ -68,5 +75,6 @@ class CallbackJob implements LocalJobInterface {
      * @return void
      */
     public function setDelay(int $seconds) {
+        $this->delay = $seconds;
     }
 }

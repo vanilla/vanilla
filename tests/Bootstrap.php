@@ -317,7 +317,7 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(Vanilla\Scheduler\SchedulerInterface::class)
-            ->setClass(Vanilla\Scheduler\DummyScheduler::class)
+            ->setClass(VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
             ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
             ->addCall('setDispatchEventName', ['SchedulerDispatch'])
             ->addCall('setDispatchedEventName', ['SchedulerDispatched'])

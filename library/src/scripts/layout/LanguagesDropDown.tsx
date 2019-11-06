@@ -35,6 +35,7 @@ export interface ILanguageDropDownProps {
     selectedIndex?: number;
     selcteBoxItems: ISelectBoxItem[];
     dateUpdated?: string;
+    handleOnChange?: (...args: any[]) => any;
 }
 
 /**
@@ -57,6 +58,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 className={classNames("languagesDropDown", this.props.className)}
                 openAsModal={this.props.openAsModal}
                 selectedIndex={this.props.selectedIndex}
+                handleOnChange={this.props.handleOnChange}
             >
                 {this.props.selcteBoxItems}
             </SelectBox>

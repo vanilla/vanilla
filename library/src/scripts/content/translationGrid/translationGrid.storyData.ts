@@ -105,9 +105,9 @@ export const translationGridData: ITranslationLanguageHandler = {
 
     otherLanguages: [
         {
-            url: "https://dev.vanilla.localhost/food-en/kb/articles/3-draft-testing",
-            locale: "en",
-            translationStatus: "out-of-date",
+            url: "https://dev.vanilla.localhost/food-ca/kb/articles/3-draft-testing",
+            locale: "ca",
+            translationStatus: "not-translated",
             dateUpdated: "",
         },
         {
@@ -158,6 +158,56 @@ export const translationGridData: ITranslationLanguageHandler = {
             localeID: "vf_fr",
             localeKey: "fr",
             regionalKey: "fr",
+        },
+    ],
+    newtranslationData: [
+        {
+            key: "name",
+            locale: "fr",
+            source: "English name",
+            translation: "French name",
+            translationStatus: "translated",
+            multiLine: true,
+        },
+        {
+            key: "description",
+            locale: "fr",
+            source: "English description",
+            translation: "",
+            translationStatus: "not-translated",
+            multiLine: true,
+        },
+        {
+            key: "comments",
+            locale: "fr",
+            source: "English comments",
+            translation: "French comments",
+            translationStatus: "translated",
+            multiLine: true,
+        },
+        {
+            key: "name",
+            locale: "ca",
+            source: "English name",
+            translation: "Catala name",
+            translationStatus: "translated",
+            multiLine: true,
+        },
+        {
+            key: "description",
+            locale: "ca",
+            source: "English description",
+            translation: "Catala description",
+            translationStatus: "translated",
+            multiLine: true,
+        },
+        {
+            key: "comments",
+            locale: "ca",
+            source: "English comments",
+            translation: "",
+            translationStatus: "not-translated",
+            multiLine: true,
         },
     ],
 };

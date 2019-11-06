@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import { TranslationGrid } from "@library/content/translationGrid/TranslationGrid";
 import { ITranslationGrid } from "./TranslationGrid";
@@ -23,12 +23,23 @@ export interface ITranslation {
     maxLength?: number; // Please add maximum character counts where possible.
 }
 
+export interface ITranslationDummy {
+    // for storybook
+    key: string;
+    locale: string;
+    source: string;
+    translation: string;
+    translationStatus: string;
+    multiLine?: boolean;
+    maxLength?: number;
+}
 export interface ITranslationLanguageHandler {
     data: ITranslation[];
     inScrollingContainer?: boolean;
     otherLanguages: ILanguageItem[];
     i18nLocales: ILocale[];
     dateUpdated?: string;
+    newtranslationData: ITranslationDummy[]; // for storybook
 }
 
 export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
@@ -37,6 +48,18 @@ export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
     const currentLocale = "en";
     const classes = translationGridClasses();
     let selectedIndex = 0;
+    let { newtranslationData } = props;
+
+    const handleOnChange = (name: string) => {
+        const filteredData = newtranslationData.filter(v => v.locale === name);
+        setData(filteredData);
+    };
+    useEffect(() => {
+        const filteredData = newtranslationData.filter(v => v.locale === "ca");
+        setData(filteredData);
+    }, [newtranslationData]);
+    let [newData, setData] = useState(newtranslationData);
+
     const selectBoxItems: ISelectBoxItem[] = props.otherLanguages.map((data, index) => {
         const isSelected = data.locale === currentLocale;
         if (isSelected) {
@@ -65,14 +88,12 @@ export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
                     <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
-            /*onClick: () => {
-                window.location.href = data.url;
-            },*/
         };
     });
     return (
         <TranslationGrid
             {...props}
+            newtranslationData={newData}
             rightHeaderCell={
                 <div className={classes.languageDropdown}>
                     <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
@@ -86,6 +107,7 @@ export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
                             dateUpdated={props.dateUpdated}
                             selcteBoxItems={selectBoxItems}
                             selectedIndex={selectedIndex}
+                            handleOnChange={handleOnChange}
                         />
                     </div>
                 </div>

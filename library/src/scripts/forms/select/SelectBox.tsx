@@ -35,6 +35,7 @@ interface IProps {
     openAsModal?: boolean;
     selectedIndex?: number;
     renderLeft?: boolean;
+    handleOnChange?: (...args: any[]) => any;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -80,6 +81,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
             selectedIndex: index,
             selectedItem,
         });
+        this.props.handleOnChange(selectedItem.name);
     };
 
     private renderChild = (child, selected, classes) => {

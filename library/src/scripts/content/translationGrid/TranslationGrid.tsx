@@ -92,7 +92,7 @@ export function TranslationGrid(props: ITranslationGrid) {
         const isEditing = newTranslation !== "" && newTranslation !== translation.translation;
         const isFirst = i === 0;
         const isLast = i === count;
-
+        console.log("");
         return (
             <TranslationGridRow
                 key={`translationGridRow-${i}`}

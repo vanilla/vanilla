@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import { ITranslationGrid } from "@library/content/translationGrid/TranslationGrid";
-
+console.log("");
 export const translationGridData: ITranslationGrid = {
     data: [
         {

@@ -28,7 +28,7 @@ export const messagesVariables = useThemeCache(() => {
     const themeVars = variableFactory("messages");
 
     const sizing = themeVars("sizing", {
-        minHeight: 54,
+        minHeight: 49,
         width: 900, // only applies to "fixed" style
     });
 
@@ -95,8 +95,22 @@ export const messagesClasses = useThemeCache(() => {
         zIndex: 20,
     });
 
-    const fullWidth = style("fullWidth", {
-        justifyContent: "center !important",
+    const innerWrapper = style("innerWrapper", {
+        $nest: {
+            "&&": {
+                flexDirection: "unset",
+                maxWidth: "max-content",
+            },
+        },
+    });
+
+    const noPadding = style("noPadding", {
+        $nest: {
+            "&&": {
+                padding: 0,
+                //position: "fixed",
+            },
+        },
     });
 
     const root = style(
@@ -185,7 +199,7 @@ export const messagesClasses = useThemeCache(() => {
         marginLeft: unit(-14),
         $nest: {
             "&&": {
-                color: "#555A62",
+                color: colorOut(globalVars.mainColors.fg),
             },
         },
     });
@@ -207,12 +221,13 @@ export const messagesClasses = useThemeCache(() => {
         actionButton,
         message,
         fixed,
-        fullWidth,
+        innerWrapper,
         messageContainer,
         setWidth,
         messageIcon,
         iconWrap,
         confirm,
         errorIcon,
+        noPadding,
     };
 });

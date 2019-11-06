@@ -113,7 +113,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     <DropDownItemLink
                         key={key}
                         className={classNames({ isSelected: child.selected })}
-                        // name={child.name}
+                        name={child.name}
                         to={child.url || ""}
                         isModalLink={this.props.openAsModal}
                     >
@@ -125,7 +125,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     <DropDownItemButton
                         key={key}
                         className={classNames({ isSelected: child.selected })}
-                        // name={child.name}
+                        name={child.name || ""}
                         onClick={this.handleClick}
                         //isModalLink={this.props.openAsModal}
                     >
@@ -155,7 +155,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                             "dropDownItem-verticalPadding",
                             classesDropDown.verticalPadding,
                         )}
-                        name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
+                        //name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
                         contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}

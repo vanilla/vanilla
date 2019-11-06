@@ -18,22 +18,11 @@ import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { ITranslationLanguageHandler } from "./TranslationLanguageHandler";
 
-export interface ITranslation {
-    id: string;
-    source: string;
-    translation: string;
-    multiLine?: boolean; // We'll default to a textarea, that looks like a single line, but it would be much better to know.
-    maxLength?: number; // Please add maximum character counts where possible.
-}
-
-export interface ITranslationGrid {
-    data: ITranslation[];
-    inScrollingContainer?: boolean;
-    otherLanguages: ILanguageItem[];
-    i18nLocales: ILocale[];
-    dateUpdated?: string;
+export interface ITranslationGrid extends ITranslationLanguageHandler {
     rightHeaderCell: React.ReactNode;
+    leftHeaderCell: React.ReactNode;
 }
 
 /**
@@ -58,7 +47,6 @@ export function TranslationGrid(props: ITranslationGrid) {
         const isEditing = newTranslation !== "" && newTranslation !== translation.translation;
         const isFirst = i === 0;
         const isLast = i === count;
-        console.log("");
         return (
             <TranslationGridRow
                 key={`translationGridRow-${i}`}
@@ -112,7 +100,7 @@ export function TranslationGrid(props: ITranslationGrid) {
             <div className={classNames(classes.root, { [classes.inScrollContainer]: inScrollingContainer })}>
                 <div className={classes.frame}>
                     <div className={classes.header}>
-                        <div className={classNames(classes.leftCell, classes.headerLeft)}>English (source)</div>
+                        <div className={classNames(classes.leftCell, classes.headerLeft)}>{props.leftHeaderCell}</div>
                         <div className={classNames(classes.rightCell, classes.headerRight)}>
                             {props.rightHeaderCell}
                         </div>

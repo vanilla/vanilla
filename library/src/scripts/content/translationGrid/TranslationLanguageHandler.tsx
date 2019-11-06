@@ -13,18 +13,25 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
-interface IProps extends Omit<ITranslationGrid, "rightHeaderCell"> {}
+import { ILanguageItem } from "@library/layout/LanguagesDropDown";
 
-// export interface ITranslationGrid {
-//     data: ITranslation[];
-//     inScrollingContainer?: boolean;
-//     otherLanguages: ILanguageItem[];
-//     i18nLocales: ILocale[];
-//     dateUpdated?: string;
-//     rightHeaderCell : React.ReactNode;
-// }
+export interface ITranslation {
+    id: string;
+    source: string;
+    translation: string;
+    multiLine?: boolean; // We'll default to a textarea, that looks like a single line, but it would be much better to know.
+    maxLength?: number; // Please add maximum character counts where possible.
+}
 
-export function TranslationLanguageHandler(props: IProps) {
+export interface ITranslationLanguageHandler {
+    data: ITranslation[];
+    inScrollingContainer?: boolean;
+    otherLanguages: ILanguageItem[];
+    i18nLocales: ILocale[];
+    dateUpdated?: string;
+}
+
+export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
     const classesPanelList = panelListClasses();
     const id = useUniqueID("articleOtherLanguages");
     const currentLocale = "en";
@@ -58,9 +65,9 @@ export function TranslationLanguageHandler(props: IProps) {
                     <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
-            onClick: () => {
+            /*onClick: () => {
                 window.location.href = data.url;
-            },
+            },*/
         };
     });
     return (
@@ -83,6 +90,7 @@ export function TranslationLanguageHandler(props: IProps) {
                     </div>
                 </div>
             }
+            leftHeaderCell={<Translate source="<0/> (Source)" c0={"English"} />}
         />
     );
 }

@@ -3,9 +3,9 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { ITranslationGrid } from "@library/content/translationGrid/TranslationGrid";
-console.log("");
-export const translationGridData: ITranslationGrid = {
+import { ITranslationLanguageHandler } from "@library/content/translationGrid/TranslationLanguageHandler";
+
+export const translationGridData: ITranslationLanguageHandler = {
     data: [
         {
             id: "1",

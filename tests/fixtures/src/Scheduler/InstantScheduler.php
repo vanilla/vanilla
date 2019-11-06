@@ -27,6 +27,7 @@ class InstantScheduler extends DummyScheduler {
     public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface {
         $result = parent::addJob($jobType, $message, $jobPriority, $delay);
         $this->dispatchAll();
+        $this->trackingSlips = [];
         return $result;
     }
 }

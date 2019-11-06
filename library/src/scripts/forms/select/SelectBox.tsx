@@ -125,9 +125,19 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     <DropDownItemButton
                         key={key}
                         className={classNames({ isSelected: child.selected })}
-                        name={child.name || ""}
-                        onClick={this.handleClick}
-                        //isModalLink={this.props.openAsModal}
+                        //name={child.name}
+                        onClick={this.handleClick.bind(this, child, i)}
+                        disabled={i === this.state.selectedIndex}
+                        clickData={child}
+                        buttonClassName={classNames(
+                            "dropDownItem-button",
+                            "selectBox-buttonItem",
+                            classesDropDown.action,
+                            classes.buttonItem,
+                            {
+                                isInModal: this.props.openAsModal,
+                            },
+                        )}
                     >
                         {this.renderChild(child, selected, classes)}
                     </DropDownItemButton>

@@ -102,6 +102,7 @@ export const translationGridData: ITranslationLanguageHandler = {
             translation: "French",
         },
     ],
+
     otherLanguages: [
         {
             url: "https://dev.vanilla.localhost/food-en/kb/articles/3-draft-testing",

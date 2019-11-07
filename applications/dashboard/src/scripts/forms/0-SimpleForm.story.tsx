@@ -13,12 +13,15 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
+import { IUploadedMedia } from "@library/apiv2";
 
 const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCssDecorator);
 
 formsStory.add("FormGroup", () =>
     (() => {
         const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
+        const [image, setImage] = useState<string | null>(null);
 
         return (
             <StoryContent>
@@ -59,6 +62,17 @@ formsStory.add("FormGroup", () =>
                                 onChange={setDropdownValue}
                             />
                         </DashboardFormGroup>
+                        <DashboardImageUploadGroup
+                            value={image}
+                            onChange={setImage}
+                            imageUploader={() => {
+                                // Always returns null for the story.
+                                // Stubbed out because we may not have a real API available.
+                                return Promise.resolve(null) as any;
+                            }}
+                            label="Image Upload"
+                            description="An image upload can have a description. Ideally it should describe things like the expected image dimensions"
+                        />
                     </ul>
                 </form>
                 <StoryHeading depth={1}>Label Variants</StoryHeading>

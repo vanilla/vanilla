@@ -43,12 +43,27 @@ export function createTrackableRequest(
         return requestFunction(onUploadProgress);
     };
 }
+
+export interface IUploadedMedia {
+    mediaID: 0;
+    url: string;
+    dateInserted: string;
+    insertUserID: number;
+    name: string;
+    size: number;
+    type: string; // Mime type
+    foreignID: number | null;
+    foreignType: string | null;
+    height: number | null;
+    width: number | null;
+}
+
 /**
  * Upload an image using Vanilla's API v2.
  *
  * @param file - The file to upload.
  */
-export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}) {
+export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}): Promise<IUploadedMedia> {
     let allowedExtensions = getMeta("upload.allowedExtensions", []) as string[];
     allowedExtensions = allowedExtensions.map((ext: string) => ext.toLowerCase());
     const maxSize = getMeta("upload.maxSize", 0);

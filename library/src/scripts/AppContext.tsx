@@ -18,6 +18,8 @@ import { style } from "typestyle";
 import { percent } from "csx";
 import { LocaleProvider } from "@vanilla/i18n";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
+import { ContentTranslationProvider } from "@vanilla/i18n/src/ContentTranslationProvider";
+import { ContentTranslator } from "@library/content/translationGrid/ContentTranslator";
 
 interface IProps {
     children: React.ReactNode;
@@ -25,6 +27,7 @@ interface IProps {
     noTheme?: boolean;
     errorComponent?: React.ReactNode;
 }
+ContentTranslationProvider.setTranslator(ContentTranslator);
 
 /**
  * Core provider set for running most Vanilla components.
@@ -42,22 +45,24 @@ export function AppContext(props: IProps) {
             {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
             <Provider store={store}>
                 <LocaleProvider>
-                    <LiveAnnouncer>
-                        <ThemeProvider
-                            disabled={props.noTheme}
-                            errorComponent={props.errorComponent || null}
-                            themeKey={getMeta("ui.themeKey", "keystone")}
-                            variablesOnly={props.variablesOnly}
-                        >
-                            <FontSizeCalculatorProvider>
-                                <SearchFilterContextProvider>
-                                    <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                        <DeviceProvider>{props.children}</DeviceProvider>
-                                    </ScrollOffsetProvider>
-                                </SearchFilterContextProvider>
-                            </FontSizeCalculatorProvider>
-                        </ThemeProvider>
-                    </LiveAnnouncer>
+                    <ContentTranslationProvider>
+                        <LiveAnnouncer>
+                            <ThemeProvider
+                                disabled={props.noTheme}
+                                errorComponent={props.errorComponent || null}
+                                themeKey={getMeta("ui.themeKey", "keystone")}
+                                variablesOnly={props.variablesOnly}
+                            >
+                                <FontSizeCalculatorProvider>
+                                    <SearchFilterContextProvider>
+                                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                            <DeviceProvider>{props.children}</DeviceProvider>
+                                        </ScrollOffsetProvider>
+                                    </SearchFilterContextProvider>
+                                </FontSizeCalculatorProvider>
+                            </ThemeProvider>
+                        </LiveAnnouncer>
+                    </ContentTranslationProvider>
                 </LocaleProvider>
             </Provider>
         </div>

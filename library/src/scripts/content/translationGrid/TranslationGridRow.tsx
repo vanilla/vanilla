@@ -9,8 +9,8 @@ import { translationGridClasses } from "@library/content/translationGrid/Transla
 interface IProps {
     leftCell: React.ReactNode;
     rightCell: React.ReactNode;
-    isFirst: boolean;
-    isLast: boolean;
+    isFirst?: boolean;
+    isLast?: boolean;
     className?: string;
 }
 

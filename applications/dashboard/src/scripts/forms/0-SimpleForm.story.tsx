@@ -14,7 +14,6 @@ import React, { useState } from "react";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
-import { IUploadedMedia } from "@library/apiv2";
 
 const formsStory = storiesOf("Dashboard/Forms", module).addDecorator(dashboardCssDecorator);
 

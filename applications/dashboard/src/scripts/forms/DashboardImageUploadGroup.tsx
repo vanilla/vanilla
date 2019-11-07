@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { IUploadedMedia, uploadFile } from "@library/apiv2";
+import { uploadFile } from "@library/apiv2";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardImageUpload } from "@dashboard/forms/DashboardImageUpload";
 import Button from "@library/forms/Button";
@@ -13,7 +13,7 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     value: string | null; // The image url
-    onChange: (newUrl: string) => void;
+    onChange: (newUrl: string | null) => void;
     label: string;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;

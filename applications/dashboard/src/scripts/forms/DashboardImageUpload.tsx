@@ -8,7 +8,7 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
-import { IUploadedMedia, uploadFile } from "@library/apiv2";
+import { uploadFile } from "@library/apiv2";
 
 interface IProps {
     value: string | null; // The image url

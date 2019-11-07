@@ -41,14 +41,9 @@ trait UpdateMediaTrait {
             ->update($mediaModel->Name)
             ->set("Active", 0)
             ->where("ForeignID", $foreignID)
-            ->where("ForeignTable", $foreignTable);
-
-        /** @see https://github.com/vanilla/vanilla/issues/2969 */
-        if (!empty($currentMediaIDs)) {
-            $mediaModel->SQL->whereNotIn("MediaID", $currentMediaIDs);
-        }
-
-        $mediaModel->SQL->put();
+            ->where("ForeignTable", $foreignTable)
+            ->whereNotIn("MediaID", $currentMediaIDs)
+            ->put();
     }
 
     /**

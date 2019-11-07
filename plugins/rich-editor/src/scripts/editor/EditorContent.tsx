@@ -323,6 +323,7 @@ function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement
 function useUpdateHandler() {
     const { onChange, quill } = useEditor();
     const editorContents = useEditorContents();
+    const { updateSelection } = editorContents;
 
     const getOperations = useCallback((): DeltaOperation[] => {
         if (!quill) {
@@ -341,8 +342,8 @@ function useUpdateHandler() {
         return quill.getContents().ops!;
     }, [quill]);
 
-    const handleUpdate = useCallback(
-        throttle((type: string, newValue, oldValue, source: Sources) => {
+    const handleUpdate = useMemo(() => {
+        const updateFn = (type: string, newValue, oldValue, source: Sources) => {
             if (!quill) {
                 return;
             }
@@ -358,11 +359,11 @@ function useUpdateHandler() {
             }
 
             if (shouldDispatch) {
-                editorContents.updateSelection(quill.getSelection());
+                updateSelection(quill.getSelection());
             }
-        }, 1000 / 60), // Throttle to 60 FPS.
-        [quill, onChange, getOperations],
-    );
+        };
+        return throttle(updateFn, 1000 / 60); // Throttle to 60 FPS.
+    }, [quill, onChange, getOperations, updateSelection]);
 
     return handleUpdate;
 }

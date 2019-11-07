@@ -44,7 +44,7 @@ module.exports = {
             },
         ],
         "@typescript-eslint/camelcase": "off",
-        "@typescript-eslint/array-type": ["error", "array-simple"],
+        "@typescript-eslint/array-type": ["error", { default: 'array' }],
         "@typescript-eslint/interface-name-prefix": ["error", "always"],
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-parameter-properties": "off",

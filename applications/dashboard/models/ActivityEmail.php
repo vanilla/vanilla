@@ -53,6 +53,7 @@ class ActivityEmail {
      * Add an email address to the list of recipients.
      *
      * @param string $email
+     * @param string $name
      */
     public function addRecipient(string $email, ?string $name = null) {
         $this->recipients[] = [$email, $name];

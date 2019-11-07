@@ -42,10 +42,8 @@ export default function Message(props: IMessageProps) {
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
-                            {/* <div className={classNames(props.className, { [classes.fullWidth]: props.isFullWidth })}> */}
-
                             <div className={classes.message}>{props.contents || props.stringContents}</div>
-                            {/* </div> */}
+
                             {props.onConfirm && (
                                 <Button
                                     baseClass={ButtonTypes.TEXT_PRIMARY}

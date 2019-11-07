@@ -8,23 +8,18 @@ import { withRouter, RouteComponentProps } from "react-router";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
-interface IProps extends RouteComponentProps<{}> {
+interface IProps extends Partial<RouteComponentProps<{}>> {
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;
 }
 
-function DashboardHeaderBlock(props: IProps) {
+export function DashboardHeaderBlock(props: IProps) {
     return (
         <header className="header-block">
             <div className="title-block">
-                {props.showBackLink && (
-                    <Button
-                        baseClass={ButtonTypes.ICON}
-                        // className="btn btn-icon btn-return"
-                        aria-label="Return"
-                        onClick={props.history.goBack}
-                    >
+                {props.showBackLink && props.history && (
+                    <Button baseClass={ButtonTypes.ICON} aria-label="Return" onClick={props.history.goBack}>
                         <LeftChevronCompactIcon />
                     </Button>
                 )}
@@ -35,4 +30,4 @@ function DashboardHeaderBlock(props: IProps) {
     );
 }
 
-export default withRouter(DashboardHeaderBlock);
+export default withRouter(DashboardHeaderBlock as any); // Typescript is complaining that RouteComponentProps are optional, but they are if you don't import the default.

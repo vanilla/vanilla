@@ -98,8 +98,8 @@ export const messagesClasses = useThemeCache(() => {
     const innerWrapper = style("innerWrapper", {
         $nest: {
             "&&": {
-                flexDirection: "unset",
-                maxWidth: "max-content",
+                flexDirection: "row",
+                maxWidth: 920,
             },
         },
     });
@@ -108,7 +108,6 @@ export const messagesClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 padding: 0,
-                //position: "fixed",
             },
         },
     });
@@ -211,8 +210,6 @@ export const messagesClasses = useThemeCache(() => {
         justifyContent: "flex-start",
     });
 
-    const messageContainer = style("messageContainer", {});
-
     const confirm = style("confirm", {});
 
     return {
@@ -222,7 +219,6 @@ export const messagesClasses = useThemeCache(() => {
         message,
         fixed,
         innerWrapper,
-        messageContainer,
         setWidth,
         messageIcon,
         iconWrap,

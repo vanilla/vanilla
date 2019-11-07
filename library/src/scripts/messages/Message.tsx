@@ -23,7 +23,7 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
-    isContained?: boolean;
+    isContained: boolean;
 }
 
 export default function Message(props: IMessageProps) {
@@ -39,6 +39,7 @@ export default function Message(props: IMessageProps) {
                     <div
                         className={classNames(classes.wrap, props.className, {
                             [classes.noPadding]: props.isContained,
+                            [classes.fixed]: props.isContained,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>

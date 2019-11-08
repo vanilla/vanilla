@@ -19,23 +19,25 @@ export enum InputTextBlockBaseClass {
     CUSTOM = "",
 }
 
+export interface IInputProps {
+    value?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onKeyPress?: React.KeyboardEventHandler;
+    inputClassNames?: string;
+    type?: string;
+    defaultValue?: string;
+    placeholder?: string;
+    valid?: boolean;
+    required?: boolean;
+    disabled?: boolean;
+    inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
+    multiline?: boolean;
+    maxLength?: number;
+    className?: string;
+}
+
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
-    inputProps: {
-        value?: string;
-        onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-        onKeyPress?: React.KeyboardEventHandler;
-        inputClassNames?: string;
-        type?: string;
-        defaultValue?: string;
-        placeholder?: string;
-        valid?: boolean;
-        required?: boolean;
-        disabled?: boolean;
-        inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
-        multiline?: boolean;
-        maxLength?: number;
-        className?: string;
-    };
+    inputProps: IInputProps;
     multiLineProps?: {
         onResize?: (event) => {};
         rows?: number;

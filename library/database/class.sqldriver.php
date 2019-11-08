@@ -1567,9 +1567,7 @@ abstract class Gdn_SQLDriver {
      * @return string The parsed expression.
      */
     protected function _parseExpr($expr, $name = null, $escapeExpr = false) {
-        $result = '';
-
-        $c = substr($expr, 0, 1);
+        $c = is_string($expr) ? substr($expr, 0, 1) : '';
 
         if ($c === '=' && $escapeExpr === false) {
             // This is a function call. Each parameter has to be parsed.
@@ -1595,7 +1593,7 @@ abstract class Gdn_SQLDriver {
                 // This is a named parameter.
 
                 // Check to see if the named parameter is valid.
-                if (in_array(substr($expr, 0, 1), ['=', '@'])) {
+                if (in_array($c, ['=', '@'])) {
                     // The parameter has to be a default name.
                     $result = $this->namedParameter('Param', true);
                 } else {

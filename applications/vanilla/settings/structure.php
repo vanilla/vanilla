@@ -121,7 +121,7 @@ $Construct
     ->primaryKey('DiscussionID')
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(32)', true, 'index')// For relating foreign records to discussions
-    ->column('CategoryID', 'int', false, ['index.CategoryPages', 'index.CategoryInserted'])
+    ->column('CategoryID', 'int', false, ['index.CategoryPages', 'index.CategoryInserted', 'index.AnnounceCategory'])
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('FirstCommentID', 'int', true)
@@ -134,7 +134,7 @@ $Construct
     ->column('CountBookmarks', 'int', null)
     ->column('CountViews', 'int', '1')
     ->column('Closed', 'tinyint(1)', '0')
-    ->column('Announce', 'tinyint(1)', '0')
+    ->column('Announce', 'tinyint(1)', '0', ['index', 'index.AnnounceCategory'])
     ->column('Sink', 'tinyint(1)', '0')
     ->column('DateInserted', 'datetime', false, ['index', 'index.CategoryInserted'])
     ->column('DateUpdated', 'datetime', true)

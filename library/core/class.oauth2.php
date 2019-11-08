@@ -587,67 +587,30 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $this->log('Profile', $profile);
 
         if ($state) {
-            $rawState = $state;
             $state = $this->decodeState($state);
-        } else {
-            $state = ['r' => 'entry', 'uid' => null, 'd' => 'none'];
         }
 
         $suppliedStateToken = $state['token'] ?? '';
         $this->ssoUtils->verifyStateToken($this->providerKey, $suppliedStateToken);
 
-        switch ($state['r']) {
-            case 'profile':
-                // This is a connect request from the user's profile.
-                $user = Gdn::userModel()->getID($state['uid']);
-                if (!$user) {
-                    throw notFoundException('User');
-                }
-                // Save the authentication.
-                Gdn::userModel()->saveAuthentication([
-                    'UserID' => $user->UserID,
-                    'Provider' => $this->getProviderKey(),
-                    'UniqueID' => $profile['id']]);
+        // Save the access token and the profile to the session table, set expiry to 3 minutes.
+        $expiryTime = new \DateTimeImmutable('now + 5 minutes');
+        $stashID = $this->sessionModel->insert(
+            [
+                'Attributes' => [
+                    'AccessToken' => $response['access_token'] ,
+                    'RefreshToken' => $response['refresh_token'],
+                    'Profile' => $profile,
+                ],
+                'DateExpires' => $expiryTime->format(MYSQL_DATE_FORMAT),
+            ]
+        );
+        $url = '/entry/connect/'.$this->getProviderKey();
 
-                // Save the information as attributes.
-                // If a client has passed a refresh_token, store it as the access_token in the attributes
-                // for future requests, if not, store the access_token.
-                $attributes = [
-                    'RefreshToken' => val('refresh_token', $response),
-                    'AccessToken' => val('access_token', $response, val('refresh_token', $response)),
-                    'Profile' => $profile
-                ];
-
-                Gdn::userModel()->saveAttribute($user->UserID, $this->getProviderKey(), $attributes);
-
-                $sender->EventArguments['Provider'] = $this->getProviderKey();
-                $sender->EventArguments['User'] = $sender->User;
-                $sender->fireEvent('AfterConnection');
-
-                redirectTo(userUrl($user, '', 'connections'));
-                break;
-            case 'entry':
-            default:
-
-                // Save the access token and the profile to the session table, set expiry to 3 minutes.
-                $stashID = $this->sessionModel->insert(
-                    [
-                        'Attributes' => [
-                                'AccessToken' => $response['access_token'] ,
-                                'RefreshToken' => $response['refresh_token'],
-                                'Profile' => $profile,
-                            ],
-                        'DateExpires' => date(MYSQL_DATE_FORMAT, strtotime('3 minutes')),
-                    ]
-                );
-                $url = '/entry/connect/'.$this->getProviderKey();
-
-                // Pass the "sessionID" to in the query so that it can be retrieved.
-                $url .= '?'.http_build_query(array_filter(['Target' => $state['target'] ?? '/', 'stashID' => $stashID]));
-                // Redirect to the connect script.
-                redirectTo($url);
-                break;
-        }
+        // Pass the "sessionID" to in the query so that it can be retrieved.
+        $url .= '?'.http_build_query(array_filter(['Target' => $state['target'] ?? '/', 'stashID' => $stashID]));
+        // Redirect to the connect script.
+        redirectTo($url);
     }
 
 

@@ -137,9 +137,6 @@ class MessageModel extends Gdn_Model {
     public function getMessagesForLocation($Location, $Exceptions = ['[Base]'], $CategoryID = null) {
         $Session = Gdn::session();
         $Prefs = $Session->getPreference('DismissedMessages', []);
-        if (count($Prefs) == 0) {
-            $Prefs[] = 0;
-        }
 
         $category = null;
         if (!empty($CategoryID)) {

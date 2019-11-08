@@ -122,6 +122,7 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "auto",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
+        left: 0,
         $nest: {
             "&&": {
                 zIndex: 3,
@@ -169,6 +170,10 @@ export const dropDownClasses = useThemeCache(() => {
     } as NestedCSSProperties);
 
     const items = style("items", {
+        paddingTop: 3,
+        paddingBottom: 3,
+        paddingLeft: 0,
+        paddingRight: 0,
         fontSize: unit(globalVars.fonts.size.medium),
     });
 

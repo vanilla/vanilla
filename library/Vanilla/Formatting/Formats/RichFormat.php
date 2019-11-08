@@ -60,6 +60,7 @@ class RichFormat extends BaseFormat {
      */
     public function renderHTML(string $content, bool $throw = false): string {
         try {
+            $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
             return $this->renderer->render($blotGroups);
@@ -79,6 +80,7 @@ class RichFormat extends BaseFormat {
     public function renderPlainText(string $content): string {
         $text = '';
         try {
+            $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
 
@@ -98,6 +100,7 @@ class RichFormat extends BaseFormat {
      */
     public function renderQuote(string $content): string {
         try {
+            $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
             $rendered = $this->renderer->render($blotGroups);

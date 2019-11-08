@@ -23,7 +23,7 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
-    isContained: boolean;
+    isContained?: boolean;
 }
 
 export default function Message(props: IMessageProps) {

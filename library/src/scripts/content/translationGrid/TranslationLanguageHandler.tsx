@@ -34,9 +34,7 @@ export interface ITranslationDummy {
     maxLength?: number;
 }
 export interface ITranslationLanguageHandler {
-    data: ITranslation[];
     inScrollingContainer?: boolean;
-    otherLanguages: ILanguageItem[];
     i18nLocales: ILocale[];
     dateUpdated?: string;
     newTranslationData: ITranslationDummy[]; // for storybook

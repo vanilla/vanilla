@@ -34,10 +34,10 @@ export interface ITranslationGrid extends ITranslationLanguageHandler {
 export function TranslationGrid(props: ITranslationGrid) {
     const id = useUniqueID("articleOtherLanguages");
     const classesPanelList = panelListClasses();
-    const { data, inScrollingContainer = false, otherLanguages, newTranslationData } = props;
+    const { inScrollingContainer = false, newTranslationData } = props;
 
     const classes = translationGridClasses();
-    const count = data.length - 1;
+    const count = newTranslationData.length - 1;
     const [translations, setTranslations] = useState(newTranslationData);
     const translationKey = "newTranslation";
 

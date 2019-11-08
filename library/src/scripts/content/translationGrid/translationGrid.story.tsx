@@ -39,9 +39,7 @@ story.add("Translation Grid", () => {
                     }}
                 >
                     <TranslationLanguageHandler
-                        data={translationGridData.data}
                         inScrollingContainer={true}
-                        otherLanguages={translationGridData.otherLanguages}
                         i18nLocales={translationGridData.i18nLocales}
                         dateUpdated={dateUpdated}
                         newTranslationData={translationGridData.newTranslationData}

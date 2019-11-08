@@ -211,6 +211,21 @@ class DiscussionsTest extends AbstractResourceTest {
     }
 
     /**
+     * Test the new dateLastComment filter.
+     */
+    public function testDateLastCommentFilter() {
+        $this->generateIndexRows();
+        sleep(1);
+        $rows = $this->generateIndexRows();
+        $row0 = $rows[0];
+        $this->assertNotEmpty($row0['dateLastComment']);
+
+        $filteredRows = $this->api()->get('/discussions', ['dateLastComment' => '<'.$row0['dateLastComment']])->getBody();
+        $filteredRow0 = $filteredRows[0];
+        $this->assertNotSame($row0['discussionID'], $filteredRow0['discussionID']);
+    }
+
+    /**
      * Test comment body expansion.
      */
     public function testExpandLastPostBody() {

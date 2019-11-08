@@ -160,4 +160,33 @@ EOT;
 
         $this->assertEquals($expected, $sql);
     }
+
+    /**
+     * Test a `DateTimeInterface` being passed to `where()`.
+     */
+    public function testDateWhere() {
+        $where = [
+            'd.DateLastComment <' =>
+                \DateTimeImmutable::__set_state([
+                    'date' => '2019-10-27 23:32:35.000000',
+                    'timezone_type' => 1,
+                    'timezone' => '+00:00',
+                ]),
+        ];
+
+        $this->sql
+            ->from('foo')
+            ->where($where);
+
+        $sql = $this->sql->getSelect();
+
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where `d`.`DateLastComment` < :dDateLastComment
+EOT;
+
+
+        $this->assertEquals($expected, $sql);
+    }
 }

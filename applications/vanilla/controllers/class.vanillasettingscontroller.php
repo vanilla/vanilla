@@ -149,7 +149,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
             'Vanilla.Archive.Date',
-            'Vanilla.Archive.Exclude'
         ]);
 
         // Set the model on the form.
@@ -159,23 +158,26 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack() === false) {
             $this->Form->setData($configurationModel->Data);
         } else {
-            // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
+            // Define some validation rules for the fields being saved.
+            $configurationModel->Validation->addRule('dateish', function ($value) {
+                if (empty($value)) {
+                    return $value;
+                }
+                try {
+                    $dt = new \DateTimeImmutable($value, new \DateTimeZone('UTC'));
+                    return $value;
+                } catch (\Exception $ex) {
+                    return new \Vanilla\Invalid('%s is not a valid date string.');
+                }
+            });
+            $configurationModel->Validation->applyRule('Vanilla.Archive.Date', 'dateish');
 
             // Grab old config values to check for an update.
             $archiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $archiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
             // Save new settings
             $saved = $this->Form->save();
             if ($saved !== false) {
-                $archiveDate = Gdn::config('Vanilla.Archive.Date');
-                $archiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-
-                if ($archiveExclude != $archiveExcludeBak || ($archiveExclude && $archiveDate != $archiveDateBak)) {
-                    $discussionModel = new DiscussionModel();
-                    $discussionModel->updateDiscussionCount('All');
-                }
                 $this->informMessage(t("Your changes have been saved."));
             }
         }

@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { Omit } from "@library/@types/utils";
 import React from "react";
 import { IWithEditorProps, useEditor } from "@rich-editor/editor/context";
 import { useEditorContents } from "@rich-editor/editor/contentContext";

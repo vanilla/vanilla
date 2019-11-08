@@ -24,7 +24,7 @@
         "csx": "9.0.0",
         "emojibase-data": "3.2.1",
         "highlight.js": "9.15.6",
-        "immer": "5.0.0",
+        "immer": "^2.0.0",
         "lodash": "^4.17.11",
         "lodash.debounce": "^4.0.8",
         "moment": "2.24.0",

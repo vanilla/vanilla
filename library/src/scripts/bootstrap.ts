@@ -15,9 +15,7 @@ import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
-import { setAutoFreeze } from "immer";
 
-setAutoFreeze(false);
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
 debug(debugValue);

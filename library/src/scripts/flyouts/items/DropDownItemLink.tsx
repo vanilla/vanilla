@@ -16,7 +16,6 @@ import { CheckIcon, DropDownMenuIcon } from "@library/icons/common";
 export interface IDropDownItemLink {
     to: LocationDescriptor;
     name?: string;
-    isModalLink?: boolean;
     children?: React.ReactNode;
     className?: string;
     lang?: string;
@@ -28,15 +27,14 @@ export interface IDropDownItemLink {
  */
 export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
-        const { children, name, isModalLink, className, to, isCurrent } = this.props;
+        const { children, name, className, to } = this.props;
         const linkContents = children ? children : name;
-        const LinkComponent = isModalLink ? ModalLink : SmartLink;
         const classesDropDown = dropDownClasses();
         return (
             <DropDownItem className={classNames(className, classesDropDown.item)}>
-                <LinkComponent to={to} title={name} lang={this.props.lang} className={classesDropDown.action}>
+                <SmartLink to={to} title={name} lang={this.props.lang} className={classesDropDown.action}>
                     {linkContents}
-                </LinkComponent>
+                </SmartLink>
             </DropDownItem>
         );
     }

@@ -20,13 +20,13 @@ export enum TranslationPropertyType {
 }
 
 export interface ITranslationProperty {
+    translationPropertyKey: string; // Ex. kb.knowledge-bases.1.name
     resource: string; // Ex. knowledge
     recordType: string; // Ex. knowledgeCategory
     recordID?: number; // Ex. 425
     recordKey?: string; // Ex. Garden.Description
     sourceText: string; // Ex. "Howdy Stranger"
-    property: string; // Ex. name
-    propertyKey: string; // Ex. kb.knowledge-bases.1.name
+    propertyName: string; // Ex. name
     propertyValidation: ITranslationPropertyValidation;
     propertyType: TranslationPropertyType;
 }

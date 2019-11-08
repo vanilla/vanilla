@@ -8,7 +8,6 @@ import React from "react";
 import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
-import { Omit } from "@library/@types/utils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { OverflowProperty, ResizeProperty } from "csstype";

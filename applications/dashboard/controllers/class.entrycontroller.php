@@ -1043,6 +1043,9 @@ class EntryController extends Gdn_Controller {
 
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));
+        // Add open graph description in case a restricted page is shared.
+        $this->description(Gdn::config('Garden.Description'));
+
         $this->Form->addHidden('Target', $this->target());
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
@@ -1173,12 +1176,12 @@ class EntryController extends Gdn_Controller {
             // Try to grab the authenticator data
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
-                Gdn::request()->withURI('dashboard/entry/auth/password');
+                Gdn::request()->setURI('dashboard/entry/auth/password');
 
                 return Gdn::dispatcher()->dispatch();
             }
         } catch (Exception $e) {
-            Gdn::request()->withURI('/entry/signin');
+            Gdn::request()->setURI('/entry/signin');
 
             return Gdn::dispatcher()->dispatch();
         }

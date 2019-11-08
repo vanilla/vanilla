@@ -40,21 +40,27 @@ class DiscussionsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CommentModel */
+    private $commentModel;
+
     /**
      * DiscussionsApiController constructor.
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
      * @param CategoryModel $categoryModel
+     * @param CommentModel $commentModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
         UserModel $userModel,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        CommentModel $commentModel
     ) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->commentModel = $commentModel;
     }
 
     /**
@@ -79,7 +85,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
         ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -94,13 +100,14 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID']),
             ['expand' => $query['expand']]
         );
 
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand'] ?? []);
         }
+        $this->expandLastCommentBody($rows, $query['expand']);
 
         $result = $out->validate($rows);
 
@@ -252,7 +259,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema([
-            'expand?' => ApiUtils::getExpandDefinition([]) // Allow addons to expand additional fields.
+            'expand?' => ApiUtils::getExpandDefinition(['lastPost', 'lastPost.body', 'lastPost.insertUser']) // Allow addons to expand additional fields.
         ], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
@@ -269,6 +276,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
         $row = $this->normalizeOutput($row, $query["expand"] ?? []);
+        $rows = [&$row];
+        $this->expandLastCommentBody($rows, $query['expand'] ?? []);
 
         $result = $out->validate($row);
 
@@ -305,7 +314,6 @@ class DiscussionsApiController extends AbstractApiController {
             $lastPost = [
                 'discussionID' => $dbRecord['DiscussionID'],
                 'dateInserted' => $dbRecord['DateLastComment'],
-                'insertUser' => $dbRecord['LastUser'],
                 "insertUserID" => $dbRecord["LastUserID"],
             ];
             if ($dbRecord['LastCommentID']) {
@@ -315,6 +323,13 @@ class DiscussionsApiController extends AbstractApiController {
             } else {
                 $lastPost['name'] = $dbRecord['Name'];
                 $lastPost['url'] = $dbRecord['Url'];
+            }
+
+            if ($this->isExpandField('lastPost.insertUser', $expand) || $this->isExpandField('lastUser', $expand) && array_key_exists('LastUser', $dbRecord)) {
+                $lastPost['insertUser'] = $dbRecord['LastUser'];
+                if (!$this->isExpandField('lastUser', $expand)) {
+                    unset($dbRecord['LastUser']);
+                }
             }
 
             $dbRecord['lastPost'] = $lastPost;
@@ -516,7 +531,7 @@ class DiscussionsApiController extends AbstractApiController {
                     'field' => 'd.InsertUserID',
                 ],
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost'])
+            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
         ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -558,7 +573,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID']),
             ['expand' => $query['expand']]
         );
         if ($this->isExpandField('category', $query['expand'])) {
@@ -568,6 +583,7 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
+        $this->expandLastCommentBody($rows, $query['expand']);
 
         $result = $out->validate($rows, true);
 
@@ -748,6 +764,41 @@ class DiscussionsApiController extends AbstractApiController {
         if (!empty($attributes['CanonicalUrl'] ?? '')) {
             unset($attributes['CanonicalUrl']);
             $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
+        }
+    }
+
+    /**
+     * Expand the body of the last comment.
+     *
+     * @param array $rows
+     * @param array|bool $expand
+     */
+    private function expandLastCommentBody(array &$rows, $expand): void {
+        if (!$this->isExpandField('lastPost', $expand) || !$this->isExpandField('lastPost.body', $expand)) {
+            return;
+        }
+
+        $commentIDs = [];
+        foreach ($rows as $row) {
+            $id = $row['lastPost']['commentID'] ?? null;
+            if (is_int($id)) {
+                $commentIDs[] = $id;
+            }
+        }
+        if (!empty($commentIDs)) {
+            $comments = $this->commentModel->getWhere(['commentID' => $commentIDs], '', 'asc', count($commentIDs))->resultArray();
+            $comments = array_column($comments, null, 'CommentID');
+        } else {
+            $comments = [];
+        }
+
+        foreach ($rows as &$row) {
+            $id = $row['lastPost']['commentID'] ?? null;
+            if (isset($comments[$id])) {
+                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format']);
+            } else {
+                $row['lastPost']['body'] = $row['body'];
+            }
         }
     }
 }

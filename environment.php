@@ -7,8 +7,12 @@
  * @license GPL-2.0-only
  */
 
-if (PHP_VERSION_ID < 70100) {
-    die('Vanilla requires PHP 7.1 or greater.');
+// Environment
+define('ENVIRONMENT_PHP_VERSION', '7.1');
+define('ENVIRONMENT_PHP_NEXT_VERSION', '7.2');
+
+if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
+    die('Vanilla requires PHP '.ENVIRONMENT_PHP_VERSION.' or greater.');
 }
 
 // Define the constants we need to get going.

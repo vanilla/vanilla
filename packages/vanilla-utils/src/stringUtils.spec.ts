@@ -3,14 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { expect } from "chai";
 import { hashString, splitStringLoosely, matchAtMention } from "./stringUtils";
 
 describe("hashString()", () => {
     it("the same string always results in the same value", () => {
         const str =
             "a; lksdjfl;aska;lskd fjaskl;dfj al;skdjfalsjkdfa;lksdjfl;kasdjflksaf;kbfjal;skdfbjanv;slkdfjbals;dkjfslkadfj;alsdjf;oiawjef;oiawbejvf;ioawbevf;aoiwebfjaov;wifebvl";
-        expect(hashString(str)).eq(hashString(str));
+        expect(hashString(str)).toEqual(hashString(str));
     });
 
     it("different strings hash to different values", () => {
@@ -18,7 +17,7 @@ describe("hashString()", () => {
         const str2 =
             "a;sldkfjal;skdfjl;kasjdfl;k;laksjdf;laksjdf;laksjdf;lkajsd;lkfjaskl;dfjals;kdfjnal;skdjbfl;kasbdjfv;laskjbdfal;skdjfalv;skdjfalskdbjnfav;bslkdfjnalv;ksdfjbalskdfbjalvsk.dfjbalsv;kdbfjalsv;kdfjbadklsfjals";
 
-        expect(hashString(str1)).not.eq(hashString(str2));
+        expect(hashString(str1)).not.toEqual(hashString(str2));
     });
 });
 
@@ -37,7 +36,7 @@ describe("splitStringLoosely()", () => {
 
     paramsAndResults.forEach(([fullString, subString, result], index) => {
         it(`Case ${index}`, () => {
-            expect(splitStringLoosely(fullString, subString)).deep.equals(result);
+            expect(splitStringLoosely(fullString, subString)).toEqual(result);
         });
     });
 });
@@ -48,9 +47,9 @@ function testSubjectsAndMatches(subjectsAndMatches: object) {
             const result = matchAtMention(subject, true);
 
             if (result === null) {
-                expect(result).eq(match);
+                expect(result).toEqual(match);
             } else {
-                expect(result.match).eq(match);
+                expect(result.match).toEqual(match);
             }
         });
     });

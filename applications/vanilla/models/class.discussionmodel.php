@@ -2144,10 +2144,6 @@ class DiscussionModel extends Gdn_Model {
                         $fields['Format'] = c('Garden.InputFormatter', '');
                     }
 
-                    if (c('Vanilla.QueueNotifications')) {
-                        $fields['Notified'] = ActivityModel::SENT_PENDING;
-                    }
-
                     // Check for approval
                     $approvalRequired = checkRestriction('Vanilla.Approval.Require');
                     if ($approvalRequired && !val('Verified', Gdn::session()->User)) {
@@ -2267,6 +2263,7 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
+            "Format" => $format ?? null,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2274,17 +2271,12 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
+            "Story" => $body ?? null,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
             ]
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowDiscussionBody", false)) {
-            $data["Story"] = $body;
-            $data["Format"] = $format;
-        }
 
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];
@@ -2317,11 +2309,9 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments["Activity"] = $data;
 
         // Notify everyone that has advanced notifications.
-        if (!c("Vanilla.QueueNotifications")) {
-            $advancedActivity = $data;
-            $advancedActivity["Data"]["Reason"] = "advanced";
-            $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-        }
+        $advancedActivity = $data;
+        $advancedActivity["Data"]["Reason"] = "advanced";
+        $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
 
         // Throw an event for users to add their own events.
         $this->EventArguments["Discussion"] = $discussion;

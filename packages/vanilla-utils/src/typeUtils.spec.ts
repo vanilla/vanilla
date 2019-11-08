@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { expect } from "chai";
 import { isInstanceOfOneOf } from "./typeUtils";
 
 it("isInstanceOfOneOf", () => {
@@ -17,6 +16,6 @@ it("isInstanceOfOneOf", () => {
 
     const thing2 = new Thing4();
 
-    expect(isInstanceOfOneOf(thing2, classes)).eq(true);
-    expect(isInstanceOfOneOf(5, classes)).not.eq(true);
+    expect(isInstanceOfOneOf(thing2, classes)).toEqual(true);
+    expect(isInstanceOfOneOf(5, classes)).not.toEqual(true);
 });

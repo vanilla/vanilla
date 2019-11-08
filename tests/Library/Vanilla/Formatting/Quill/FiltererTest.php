@@ -27,6 +27,7 @@ class FiltererTest extends MinimalContainerTestCase {
     public function setUp() {
         parent::setUp();
         self::container()->rule(EmbedService::class)
+            ->addCall('registerEmbed', [QuoteEmbed::class, QuoteEmbed::TYPE])
             ->addCall('registerFilter', [new Reference(QuoteEmbedFilter::class)]);
     }
 
@@ -49,105 +50,6 @@ class FiltererTest extends MinimalContainerTestCase {
         $output = json_encode(json_decode($output));
         $filteredOutput = json_encode(json_decode($filteredOutput));
         $this->assertEquals($output, $filteredOutput);
-    }
-
-    /**
-     * Test that
-     * - unneeded embed data gets stripped off.
-     * - XSS in the body is prevent. We always have a fully rendered body.
-     */
-    public function testFilterEmbedData() {
-        /** @var Filterer $filterer */
-        $filterer = self::container()->get(Filterer::class);
-        $replacedUrl = 'http://test.com/replaced';
-
-        $input = [
-            [
-                'insert' => [
-                    'embed-external' => [
-                        'data' => [
-                            'embedType' => QuoteEmbed::TYPE,
-                            'body' => "Fake body contents, should be replaced.",
-                            'bodyRaw' => 'Rendered Body',
-                            'format' => MarkdownFormat::FORMAT_KEY,
-                            'url' => 'https://open.vanillaforums.com/discussions/1',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'insert' => [
-                    'embed-external' => [
-                        'data' => [
-                            'embedType' => QuoteEmbed::TYPE,
-                            'format' => RichFormat::FORMAT_KEY,
-                            'body' => '<div><script>alert("This should be replaced!")</script></div>',
-                            'bodyRaw' => [
-                                [
-                                    'insert' => [
-                                        'embed-external' => [
-                                            'data' => [
-                                                'url' => $replacedUrl,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                                [ 'insert' => 'After Embed\n' ],
-                            ],
-                            'url' => 'https://open.vanillaforums.com/discussions/1',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        // Contents replaced with a link.
-        $expectedEmbedBodyRaw = [
-            [
-                'insert' => $replacedUrl,
-                'attributes' => [
-                    'link' => $replacedUrl,
-                ],
-            ],
-            [ 'insert' => "\n" ],
-            [ 'insert' => 'After Embed\n' ],
-        ];
-
-        $expected = [
-            [
-                'insert' => [
-                    'embed-external' => [
-                        'data' => [
-                            'embedType' => QuoteEmbed::TYPE,
-                            'body' => "<p>Rendered Body</p>\n",
-                            'bodyRaw' => 'Rendered Body',
-                            'format' => MarkdownFormat::FORMAT_KEY,
-                            'url' => 'https://open.vanillaforums.com/discussions/1',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'insert' => [
-                    'embed-external' => [
-                        'data' => [
-                            'embedType' => QuoteEmbed::TYPE,
-                            'format' => RichFormat::FORMAT_KEY,
-                            'body' => \Gdn::formatService()->renderQuote(json_encode($expectedEmbedBodyRaw), RichFormat::FORMAT_KEY),
-                            'bodyRaw' => $expectedEmbedBodyRaw,
-                            'url' => 'https://open.vanillaforums.com/discussions/1',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        // Pretty print.
-        $actual =  json_encode(
-            json_decode($filterer->filter(json_encode($input)), true),
-            JSON_PRETTY_PRINT
-        );
-        $this->assertSame(json_encode($expected, JSON_PRETTY_PRINT), $actual);
     }
 
     /**

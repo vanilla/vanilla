@@ -92,31 +92,6 @@ if (!function_exists('anonymizeIP')) {
     }
 }
 
-if (!function_exists('arrayCombine')) {
-    /**
-     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
-     *
-     * @param array $array1 Array of keys to be used. Illegal values for key will be converted to string.
-     * @param array $array2 Array of values to be used.
-     */
-    function arrayCombine($array1, $array2) {
-        if (!is_array($array1)) {
-            $array1 = [];
-        }
-
-        if (!is_array($array2)) {
-            $array2 = [];
-        }
-
-        if (count($array1) > 0 && count($array2) > 0) {
-            return array_combine($array1, $array2);
-        } elseif (count($array1) == 0) {
-            return $array2;
-        } else {
-            return $array1;
-        }
-    }
-}
 /*
  We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {
@@ -435,6 +410,7 @@ if (!function_exists('c')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function c($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -450,6 +426,7 @@ if (!function_exists('config')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function config($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -3301,6 +3278,7 @@ if (!function_exists('saveToConfig')) {
      *  - Save: If this is false then only the in-memory config is set.
      *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
      * @return bool: Whether or not the save was successful. null if no changes were necessary.
+     * @deprecated
      */
     function saveToConfig($name, $value = '', $options = []) {
         Gdn::config()->saveToConfig($name, $value, $options);
@@ -3550,6 +3528,7 @@ if (!function_exists('t')) {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
+     * @deprecated
      */
     function t($code, $default = false) {
         return Gdn::translate($code, $default);

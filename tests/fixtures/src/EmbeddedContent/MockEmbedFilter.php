@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Fixtures\EmbeddedContent;
 
+use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedFilterInterface;
 
 /**
@@ -22,17 +23,17 @@ class MockEmbedFilter implements EmbedFilterInterface {
     /** @var bool */
     private $handleAllTypes;
 
-    /** @var array */
+    /** @var AbstractEmbed */
     private $filterResult;
 
     /**
      * Constuctor.
      *
      * @param bool $handleAllTypes
-     * @param array $filterResult
+     * @param AbstractEmbed $filterResult
      * @param string[] $supportedTypes
      */
-    public function __construct(bool $handleAllTypes, array $filterResult, array $supportedTypes = []) {
+    public function __construct(bool $handleAllTypes, AbstractEmbed $filterResult, array $supportedTypes = []) {
         $this->supportedTypes = $supportedTypes;
         $this->handleAllTypes = $handleAllTypes;
         $this->filterResult = $filterResult;
@@ -48,7 +49,7 @@ class MockEmbedFilter implements EmbedFilterInterface {
     /**
      * @inheritdoc
      */
-    public function filterData(array $data): array {
+    public function filterEmbed(AbstractEmbed $data): AbstractEmbed {
         return $this->filterResult;
     }
 }

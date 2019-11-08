@@ -36,10 +36,7 @@ export interface ISelectOneProps {
     noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
     inputClassName?: string;
-}
-
-interface IState {
-    focus: boolean;
+    isClearable?: boolean;
 }
 
 /**
@@ -82,7 +79,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     inputId={inputID}
                     onChange={props.onChange}
                     onInputChange={props.onInputChange}
-                    isClearable={true}
+                    isClearable={props.isClearable}
                     isDisabled={disabled}
                     classNamePrefix={prefix}
                     className={classNames(prefix, className)}
@@ -105,6 +102,10 @@ export default function SelectOne(props: ISelectOneProps) {
         </div>
     );
 }
+
+SelectOne.defaultProps = {
+    isClearable: true,
+};
 
 /**
  * Hook to create react-select override props.

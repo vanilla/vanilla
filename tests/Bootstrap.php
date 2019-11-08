@@ -19,11 +19,12 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Site\SiteSectionModel;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -113,12 +114,15 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
-            // Site sections
-            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->rule(SiteSectionProviderInterface::class)
             ->setFactory(function () {
                 return MockSiteSectionProvider::fromLocales();
             })
-            ->setClass(MockSiteSectionProvider::class)
+            ->setShared(true)
+
+            // Site sections
+            ->rule(SiteSectionModel::class)
+            ->addCall('addProvider', [new Reference(SiteSectionProviderInterface::class)])
             ->setShared(true)
 
             // Site applications
@@ -310,6 +314,13 @@ class Bootstrap {
 
             ->rule('HtmlFormatter')
             ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
+
+            ->rule(Vanilla\Scheduler\SchedulerInterface::class)
+            ->setClass(VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
+            ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+            ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+            ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
             ->setShared(true)
             ;
     }

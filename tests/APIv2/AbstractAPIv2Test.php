@@ -232,35 +232,4 @@ abstract class AbstractAPIv2Test extends TestCase {
             $this->api()->setUserID($userID);
         }
     }
-
-    /**
-     * Run a callback with the following config and restore the config after.
-     *
-     * @param array $config The config to set.
-     * @param callable $callback The code to run.
-     * @return mixed Returns the result of the callback.
-     */
-    protected function runWithConfig(array $config, callable $callback) {
-        /* @var \Gdn_Configuration $c */
-        $c = $this->container()->get(\Gdn_Configuration::class);
-
-        // Create a backup of the config.
-        $bak = [];
-        foreach ($config as $key => $value) {
-            $bak[$key] = $c->get($key, null);
-        }
-
-        try {
-            foreach ($config as $key => $value) {
-                $c->set($key, $value);
-            }
-
-            $r = $callback();
-            return $r;
-        } finally {
-            foreach ($bak as $key => $value) {
-                $c->set($key, $value);
-            }
-        }
-    }
 }

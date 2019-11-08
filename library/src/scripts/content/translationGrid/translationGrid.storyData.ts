@@ -102,4 +102,61 @@ export const translationGridData: ITranslationGrid = {
             translation: "French",
         },
     ],
+    otherLanguages: [
+        {
+            url: "https://dev.vanilla.localhost/food-en/kb/articles/3-draft-testing",
+            locale: "en",
+            translationStatus: "out-of-date",
+            dateUpdated: "",
+        },
+        {
+            url: "https://dev.vanilla.localhost/food-fr/kb/articles/3-draft-testing",
+            locale: "fr",
+            translationStatus: "not-translated",
+            dateUpdated: "",
+        },
+    ],
+    i18nLocales: [
+        {
+            displayNames: {
+                ca: "Anglès",
+                en: "English",
+                zh: "英文",
+            },
+            localeID: "en",
+            localeKey: "en",
+            regionalKey: "en",
+        },
+        {
+            displayNames: {
+                ca: "Xinès",
+                en: "Chinese",
+                zh: "中文",
+            },
+            localeID: "vf_zh",
+            localeKey: "zh",
+            regionalKey: "zh",
+        },
+        {
+            displayNames: {
+                ca: "Català",
+                en: "Catalan",
+                zh: "加泰罗尼亚文",
+            },
+            localeID: "vf_ca",
+            localeKey: "ca",
+            regionalKey: "ca",
+        },
+        {
+            displayNames: {
+                ca: "Francès",
+                en: "French",
+                fr: "Français",
+                zh: "法文",
+            },
+            localeID: "vf_fr",
+            localeKey: "fr",
+            regionalKey: "fr",
+        },
+    ],
 };

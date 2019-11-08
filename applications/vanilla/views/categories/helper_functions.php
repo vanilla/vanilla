@@ -93,9 +93,15 @@ if (!function_exists('getOptions')):
 endif;
 
 if (!function_exists('MostRecentString')):
-    function mostRecentString($row) {
-        if (!$row['LastTitle'])
+    function mostRecentString($row, $options = []) {
+        $options = (array)$options + [
+            'showUser' => true,
+            'showDate' => true,
+        ];
+
+        if (!$row['LastTitle']) {
             return '';
+        }
 
         $r = '';
 
@@ -106,7 +112,7 @@ if (!function_exists('MostRecentString')):
             $row['LastUrl'],
             'LatestPostTitle');
 
-        if (val('LastName', $row)) {
+        if ($options['showUser'] && val('LastName', $row)) {
             $r .= ' ';
 
             $r .= '<span class="MostRecentBy">'.t('by').' ';
@@ -114,16 +120,12 @@ if (!function_exists('MostRecentString')):
             $r .= '</span>';
         }
 
-        if (val('LastDateInserted', $row)) {
+        if ($options['showDate'] && val('LastDateInserted', $row)) {
             $r .= ' ';
 
-            $r .= '<span class="MostRecentOn">';
-            $r .= t('on').' ';
-            $r .= anchor(
-                Gdn_Format::date($row['LastDateInserted'], 'html'),
-                $row['LastUrl'],
-                'CommentDate');
-            $r .= '</span>';
+            $r .= '<span class="MostRecentOn"><span class="CommentDate">';
+            $r .= Gdn_Format::date($row['LastDateInserted'], 'html');
+            $r .= '</span></span>';
         }
 
         $r .= '</span>';
@@ -204,7 +206,7 @@ if (!function_exists('writeListItem')):
 
                         <?php if (val('LastTitle', $category) != '') : ?>
                             <span class="MItem LastDiscussionTitle">
-                                <?php echo mostRecentString($category); ?>
+                                <?php echo mostRecentString($category, ['showDate' => false]); ?>
                             </span>
                             <span class="MItem LastCommentDate">
                                 <?php echo Gdn_Format::date(val('LastDateInserted', $category)); ?>

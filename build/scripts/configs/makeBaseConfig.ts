@@ -38,9 +38,7 @@ ${chalk.green(aliases)}`;
     const hotLoaders: any[] = [];
     const hotAliases: any = {};
     if (options.mode === BuildMode.DEVELOPMENT) {
-        babelPlugins.push(require.resolve("react-hot-loader/babel"));
-        hotLoaders.push(require.resolve("react-hot-loader/webpack"));
-        hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
+        babelPlugins.push(require.resolve("react-refresh/babel"));
     }
 
     // Leaving this out until we get the docs actually generating. Huge slowdown.

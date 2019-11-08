@@ -224,4 +224,50 @@ class DiscussionsTest extends AbstractResourceTest {
         $filteredRow0 = $filteredRows[0];
         $this->assertNotSame($row0['discussionID'], $filteredRow0['discussionID']);
     }
+
+    /**
+     * Test comment body expansion.
+     */
+    public function testExpandLastPostBody() {
+        $this->testPost();
+
+        // Test that the field is there.
+        $query = ['expand' => 'lastPost,lastPost.body'];
+        $rows = $this->api()->get($this->baseUrl, $query);
+        $this->assertArrayHasKey('body', $rows[0]['lastPost']);
+
+        // Comment on a discussions to see if it becomes the last post.
+        $comment = $this->api()->post("/comments", [
+            'discussionID' => $rows[0]['discussionID'],
+            'body' => 'hello',
+            'format' => 'markdown',
+        ]);
+
+        $rows = $this->api()->get($this->baseUrl, $query);
+        $this->assertSame($comment['commentID'], $rows[0]['lastPost']['commentID']);
+
+        // Individual discussions should expand too.
+        $discussion = $this->api()->get($this->baseUrl.'/'.$rows[0]['discussionID'], $query);
+        $this->assertArrayHasKey('body', $discussion['lastPost']);
+        $this->assertSame($comment['commentID'], $discussion['lastPost']['commentID']);
+    }
+
+    /**
+     * @requires testExpandLastPostBody
+     */
+    public function testExpandLastUser() {
+        $rows = $this->api()->get($this->baseUrl, ['expand' => 'lastPost,lastPost.insertUser']);
+        $this->assertArrayHasKey('insertUser', $rows[0]['lastPost']);
+        $this->assertArrayNotHasKey('lastUser', $rows[0]);
+
+        // Deprecated but should work for BC.
+        $rows = $this->api()->get($this->baseUrl, ['expand' => 'lastPost,lastUser']);
+        $this->assertArrayHasKey('insertUser', $rows[0]['lastPost']);
+        $this->assertArrayHasKey('lastUser', $rows[0]);
+
+        $url = $this->baseUrl.'/'.$rows[0]['discussionID'];
+        $row = $this->api()->get($url, ['expand' => 'lastPost,lastPost.insertUser']);
+        $this->assertArrayHasKey('insertUser', $row['lastPost']);
+        $this->assertArrayNotHasKey('lastUser', $row);
+    }
 }

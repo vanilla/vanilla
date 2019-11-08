@@ -44,9 +44,6 @@ class SiteSectionModel {
      */
     public function addProvider(SiteSectionProviderInterface $provider) {
         $this->providers[] = $provider;
-        if (!empty($current = $provider->getCurrentSiteSection())) {
-            $this->currentSiteSection = $current;
-        }
     }
 
     /**
@@ -119,6 +116,13 @@ class SiteSectionModel {
      * @return SiteSectionInterface
      */
     public function getCurrentSiteSection(): SiteSectionInterface {
+        if (is_null($this->currentSiteSection)) {
+            foreach ($this->providers as $provider) {
+                if (!empty($current = $provider->getCurrentSiteSection())) {
+                    $this->currentSiteSection = $current;
+                }
+            }
+        }
         return $this->currentSiteSection ?? $this->defaultSiteSection;
     }
 }

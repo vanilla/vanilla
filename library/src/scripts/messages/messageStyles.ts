@@ -108,6 +108,8 @@ export const messagesClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 padding: 0,
+                top: 49,
+                minHeight: 48,
             },
         },
     });

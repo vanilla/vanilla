@@ -35,7 +35,7 @@ interface IProps {
     openAsModal?: boolean;
     selectedIndex?: number;
     renderLeft?: boolean;
-    handleOnChange?: (...args: any[]) => any;
+    handleChange?: (value: string, index: number) => any;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -70,19 +70,6 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
             selectedItem: props.children[props.selectedIndex],
         };
     }
-
-    /**
-     * Handle click on item in select box.
-     * @param selectedItem data for item
-     * @param index the index of the item
-     */
-    public handleClick = (selectedItem: ISelectBoxItem, index: number) => {
-        this.setState({
-            selectedIndex: index,
-            selectedItem,
-        });
-        this.props.handleOnChange(selectedItem.name);
-    };
 
     private renderChild = (child, selected, classes) => {
         return (
@@ -128,7 +115,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         key={key}
                         className={classNames({ isSelected: child.selected })}
                         //name={child.name}
-                        onClick={this.handleClick.bind(this, child, i)}
+                        onClick={() => this.props.handleChange(child.name, i)}
                         disabled={i === this.state.selectedIndex}
                         clickData={child}
                         buttonClassName={classNames(

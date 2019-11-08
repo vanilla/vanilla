@@ -39,53 +39,51 @@ export interface ITranslationLanguageHandler {
     otherLanguages: ILanguageItem[];
     i18nLocales: ILocale[];
     dateUpdated?: string;
-    newtranslationData: ITranslationDummy[]; // for storybook
+    newTranslationData: ITranslationDummy[]; // for storybook
 }
 
 export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
+    let { currentLocale, locales } = useLocaleInfo();
+    locales = locales.filter(val => val.localeKey != currentLocale);
     const classesPanelList = panelListClasses();
     const id = useUniqueID("articleOtherLanguages");
-    const currentLocale = "en";
     const classes = translationGridClasses();
-    let selectedIndex = 0;
-    let { newtranslationData } = props;
+    //let selectedIndex = 0;
+    let { newTranslationData } = props;
+    const [selectedItem, setSelectedItem] = useState<string | null>(locales ? locales[0].localeKey : null);
+    let [selectedIndex, setSelectedIndex] = useState<number>(0);
 
-    const handleOnChange = (name: string) => {
-        const filteredData = newtranslationData.filter(v => v.locale === name);
+    const handleChange = (name: string, index: number) => {
+        setSelectedItem(name);
+        setSelectedIndex(index);
+        const filteredData = newTranslationData.filter(v => v.locale === name);
         setData(filteredData);
     };
-    useEffect(() => {
-        const filteredData = newtranslationData.filter(v => v.locale === "ca");
-        setData(filteredData);
-    }, [newtranslationData]);
-    let [newData, setData] = useState(newtranslationData);
 
-    const selectBoxItems: ISelectBoxItem[] = props.otherLanguages.map((data, index) => {
-        const isSelected = data.locale === currentLocale;
+    useEffect(() => {
+        const filteredData = newTranslationData.filter(v => v.locale === locales[0].localeKey);
+        setData(filteredData);
+    }, [newTranslationData]);
+
+    let [newData, setData] = useState(newTranslationData);
+
+    const selectBoxItems: ISelectBoxItem[] = locales.map((data, index) => {
+        const isSelected = true;
         if (isSelected) {
-            selectedIndex = index;
+            selectedIndex = selectedIndex;
         }
         return {
             selected: isSelected,
-            name: data.locale,
-            icon: data.translationStatus === "not-translated" && (
-                <ToolTip
-                    label={
-                        <Translate
-                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
-                            c0={<DateTime timestamp={props.dateUpdated} />}
-                        />
-                    }
-                    ariaLabel={"This article was editied in its source locale."}
-                >
-                    <span tabIndex={0}>
-                        <AlertIcon className={"selectBox-selectedIcon"} />
-                    </span>
-                </ToolTip>
+            name: data.localeKey,
+            icon: (
+                <span tabIndex={0}>
+                    <AlertIcon className={"selectBox-selectedIcon"} />
+                </span>
             ),
+
             content: (
                 <>
-                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                    <LocaleDisplayer displayLocale={data.localeKey} localeContent={data.localeKey} />
                 </>
             ),
         };
@@ -93,26 +91,35 @@ export function TranslationLanguageHandler(props: ITranslationLanguageHandler) {
     return (
         <TranslationGrid
             {...props}
-            newtranslationData={newData}
+            newTranslationData={newData}
             rightHeaderCell={
                 <div className={classes.languageDropdown}>
                     <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                        <LanguagesDropDown
-                            titleID={id}
-                            widthOfParent={true}
-                            className="otherLanguages-select"
+                        <SelectBox
+                            describedBy={id!}
+                            widthOfParent={!!true}
+                            className={classNames("languagesDropDown", "otherLanguages-select")}
                             renderLeft={true}
-                            data={props.otherLanguages}
-                            currentLocale={currentLocale}
-                            dateUpdated={props.dateUpdated}
-                            selcteBoxItems={selectBoxItems}
                             selectedIndex={selectedIndex}
-                            handleOnChange={handleOnChange}
-                        />
+                            handleChange={(val, i) => {
+                                handleChange(val, i);
+                            }}
+                        >
+                            {selectBoxItems}
+                        </SelectBox>
                     </div>
                 </div>
             }
-            leftHeaderCell={<Translate source="<0/> (Source)" c0={"English"} />}
+            leftHeaderCell={
+                <Translate
+                    source="<0/> (Source)"
+                    c0={
+                        <>
+                            <LocaleDisplayer displayLocale={currentLocale || ""} localeContent={currentLocale || ""} />
+                        </>
+                    }
+                />
+            }
         />
     );
 }

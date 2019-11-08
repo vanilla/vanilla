@@ -44,7 +44,7 @@ story.add("Translation Grid", () => {
                         otherLanguages={translationGridData.otherLanguages}
                         i18nLocales={translationGridData.i18nLocales}
                         dateUpdated={dateUpdated}
-                        newtranslationData={translationGridData.newtranslationData}
+                        newTranslationData={translationGridData.newTranslationData}
                     />
                 </div>
             </LocaleProvider>

@@ -160,7 +160,7 @@ export const translationGridData: ITranslationLanguageHandler = {
             regionalKey: "fr",
         },
     ],
-    newtranslationData: [
+    newTranslationData: [
         {
             key: "name",
             locale: "fr",

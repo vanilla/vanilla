@@ -31,17 +31,18 @@ class BreadcrumbModel {
      * Get a breadcrumb array for a particular record.
      *
      * @param RecordInterface $record
+     * @param string $locale
      *
      * @return Breadcrumb[]
      */
-    public function getForRecord(RecordInterface $record): array {
+    public function getForRecord(RecordInterface $record, string $locale = null): array {
         /** @var BreadcrumbProviderInterface|null $provider */
         $provider = $this->providers[$record->getRecordType()];
         if (!$provider) {
             throw new BreadcrumbProviderNotFoundException($record->getRecordType() . " could not be found");
         }
 
-        return $provider->getForRecord($record);
+        return $provider->getForRecord($record, $locale);
     }
 
     /**

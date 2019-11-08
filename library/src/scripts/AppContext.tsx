@@ -16,10 +16,8 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { LocaleProvider } from "@vanilla/i18n";
+import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
-import { ContentTranslationProvider } from "@vanilla/i18n/src/ContentTranslationProvider";
-import { ContentTranslator } from "@library/content/translationGrid/ContentTranslator";
 
 interface IProps {
     children: React.ReactNode;
@@ -27,7 +25,6 @@ interface IProps {
     noTheme?: boolean;
     errorComponent?: React.ReactNode;
 }
-ContentTranslationProvider.setTranslator(ContentTranslator);
 
 /**
  * Core provider set for running most Vanilla components.

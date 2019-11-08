@@ -54,12 +54,6 @@ class CategoryModel extends Gdn_Model {
     /** @var EventManager */
     private $eventManager;
 
-    /**
-     * @deprecated 2.6
-     * @var bool
-     */
-    public $Watching = false;
-
     /** @var array Merged Category data, including Pure + UserCategory. */
     public static $Categories = null;
 

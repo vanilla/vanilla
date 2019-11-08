@@ -528,13 +528,6 @@ class CategoriesController extends VanillaController {
 
         $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
 
-        // Set the category follow toggle before we load category data so that it affects the category query appropriately.
-        $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
-        $CategoryFollowToggleModule->setToggle();
-
-        // Get category data
-        $this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
-
         if ($Category) {
             $this->setData('Category', CategoryModel::categories($Category));
 
@@ -577,7 +570,6 @@ class CategoriesController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
-        $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
         $this->canonicalUrl(url('/categories', true));
@@ -619,12 +611,6 @@ class CategoriesController extends VanillaController {
         }
 
         Gdn_Theme::section('CategoryDiscussionList');
-
-        // Set the category follow toggle before we load category data so that it affects the category query appropriately.
-        $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
-        $CategoryFollowToggleModule->setToggle();
-
-        //$this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
 
         if ($Category) {
             $Subtree = CategoryModel::getSubtree($Category, false);
@@ -668,7 +654,6 @@ class CategoriesController extends VanillaController {
         $this->addModule('DiscussionFilterModule');
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
-        $this->addModule($CategoryFollowToggleModule);
 
         // Set view and render
         $this->View = 'discussions';

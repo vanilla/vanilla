@@ -2263,6 +2263,7 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
+            "Format" => $format ?? null,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2270,17 +2271,12 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
+            "Story" => $body ?? null,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
             ]
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowDiscussionBody", false)) {
-            $data["Story"] = $body;
-            $data["Format"] = $format;
-        }
 
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];

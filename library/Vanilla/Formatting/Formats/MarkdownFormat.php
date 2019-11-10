@@ -48,16 +48,6 @@ class MarkdownFormat extends HtmlFormat {
     }
 
     /**
-     * This copy of legacy spoilers processes first.
-     *
-     * @param string $html The HTML to process.
-     * @return string
-     */
-    private function parentLegacySpoilers(string $html): string {
-        return parent::legacySpoilers($html);
-    }
-
-    /**
      * This override does not format spoiler so that it can be done early.
      *
      * @inheritdoc
@@ -70,7 +60,7 @@ class MarkdownFormat extends HtmlFormat {
      * @inheritdoc
      */
     public function renderHtml(string $value, bool $enhance = true): string {
-        $value = $this->parentLegacySpoilers($value);
+        $value = parent::legacySpoilers($value);
         $markdownParsed = $this->markdownParser->transform($value);
         return parent::renderHtml($markdownParsed, $enhance);
     }

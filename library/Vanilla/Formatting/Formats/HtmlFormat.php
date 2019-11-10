@@ -239,7 +239,7 @@ class HtmlFormat extends BaseFormat {
         }
 
         // Check for a multi-line spoiler.
-        if (preg_match_all('`^\[\/?spoiler\]$`m', $html, $m)) {
+        if (preg_match('`^\[\/?spoiler\]$`m', $html, $m)) {
             return true;
         }
 

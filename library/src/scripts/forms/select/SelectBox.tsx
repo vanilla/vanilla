@@ -53,12 +53,12 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     const firstValue = props.options.length > 0 ? props.options[0] : null;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const [ownValue, setOwnValue] = useState(firstValue);
-    const selectedOption = props.value ?? ownValue;
+    const selectedOption = props.value || ownValue;
     const onChange = (value: ISelectBoxItem) => {
-        const funct = props.onChange ?? setOwnValue;
+        const funct = props.onChange || setOwnValue;
         funct(value);
         setImmediate(() => {
-            buttonRef.current?.focus();
+            buttonRef.current && buttonRef.current.focus();
         });
     }
 

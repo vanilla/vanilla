@@ -7,7 +7,7 @@ import React from "react";
 import classNames from "classnames";
 import { dashboardFormListClasses } from "@dashboard/forms/DashboardFormListStyles";
 
-export function DashboardFormList(props) {
+export function DashboardFormList(props: { children: React.ReactNode }) {
     const classes = dashboardFormListClasses();
     return <ul className={classNames(classes.root)}>{props.children}</ul>;
 }

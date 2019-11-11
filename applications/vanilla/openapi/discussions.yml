@@ -13,6 +13,7 @@ paths:
           field: d.CategoryID
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
+      - $ref: '#/components/parameters/DateLastComment'
       - description: |
           Filter by discussion type.
         in: query
@@ -79,11 +80,13 @@ paths:
         schema:
           items:
             enum:
+            - all
             - category
             - insertUser
             - lastUser
             - lastPost
-            - all
+            - lastPost.body
+            - lastPost.insertUser
             - reactions
             type: string
           type: array
@@ -147,6 +150,8 @@ paths:
             - insertUser
             - lastUser
             - lastPost
+            - lastPost.body
+            - lastPost.insertUser
             - all
             type: string
           type: array
@@ -774,6 +779,15 @@ paths:
       - Discussions
       summary: Remove custom canonical url for a discussion.
 components:
+  parameters:
+    DateLastComment:
+      name: dateLastComment
+      in: query
+      description: >
+        Filter by the date of the last comment or the original discussion date if it has no comments. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+      schema:
+        format: date-filter
+        type: string
   schemas:
     CategoryFragment:
       properties:
@@ -872,6 +886,10 @@ components:
           format: date-time
           nullable: true
           type: string
+        dateLastComment:
+          description: The date of the last comment or the original discussion date if it has no comments.
+          type: string
+          format: date-time
         discussionID:
           description: The ID of the discussion.
           type: integer
@@ -1073,29 +1091,32 @@ components:
       type: object
     PostFragment:
       properties:
-        commentID:
-          description: 'The comment ID of the post, if any.'
-          type: integer
-        dateInserted:
-          description: The date of the post.
-          format: date-time
-          type: string
         discussionID:
           description: The discussion ID of the post.
           type: integer
-        insertUser:
-          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
-        insertUserID:
-          description: The author of the post.
+        commentID:
+          description: 'The comment ID of the post, if any.'
           type: integer
         name:
           description: The title of the post.
           minLength: 1
           type: string
+        body:
+          description: The HTML formatted body of the post.
+          type: string
         url:
           description: The URL of the post.
           minLength: 1
           type: string
+        dateInserted:
+          description: The date of the post.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        insertUserID:
+          description: The author of the post.
+          type: integer
       required:
       - name
       - url

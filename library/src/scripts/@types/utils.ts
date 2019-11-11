@@ -5,20 +5,6 @@
  */
 
 /**
- * Generic type utility to subtract keys from one interface from the other.
- *
- * @example
- * interface One { one: string }
- * interface Three { one: string, two: string }
- *
- * type Two = Omit<Three, keyof One>;
- *
- * // The type of Two will be
- * interface Two { two: string }
- */
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-/**
  * Mark mark all the properies from K in T as optional.
  *
  * @example

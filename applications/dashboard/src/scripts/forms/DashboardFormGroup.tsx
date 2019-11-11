@@ -12,6 +12,7 @@ import classNames from "classnames";
 interface IProps {
     label: string;
     description?: React.ReactNode;
+    afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;
     tag?: keyof JSX.IntrinsicElements;
     children: React.ReactNode;

@@ -9,6 +9,7 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 interface IProps {
     label: string;
     description?: React.ReactNode;
+    afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;
 }
 
@@ -27,6 +28,7 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
         <div className={rootClass} id={labelID}>
             {props.label && <label htmlFor={inputID}>{props.label}</label>}
             {props.description && <div className="info">{props.description}</div>}
+            {props.afterDescription}
         </div>
     );
 };

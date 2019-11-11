@@ -147,10 +147,6 @@ $Construct
     ->column('RegardingID', 'int(11)', true, 'index');
 //->column('Source', 'varchar(20)', true)
 
-if (c('Vanilla.QueueNotifications')) {
-    $Construct->column('Notified', 'tinyint', ActivityModel::SENT_ARCHIVE);
-}
-
 $Construct
     ->set($Explicit, $Drop);
 

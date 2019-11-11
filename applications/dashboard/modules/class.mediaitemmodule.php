@@ -354,6 +354,22 @@ class MediaItemModule extends Gdn_Module {
     }
 
     /**
+     * @return string The top-level HTML element for the Media Item.
+     */
+    public function getTag() {
+        return $this->tag;
+    }
+
+    /**
+     * @param string $tag The top-level HTML element for the Media Item.
+     * @return MediaItemModule $this
+     */
+    public function setTag($tag) {
+        $this->tag = $tag;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getToggle() {

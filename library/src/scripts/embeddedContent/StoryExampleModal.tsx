@@ -9,7 +9,6 @@ import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
-import { Omit } from "@library/@types/utils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import FrameHeader from "@library/layout/frame/FrameHeader";

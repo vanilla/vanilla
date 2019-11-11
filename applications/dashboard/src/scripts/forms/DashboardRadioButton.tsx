@@ -12,8 +12,8 @@ interface IProps {
     className?: string;
     label: string;
     value: string;
-    name: string;
-    note: string;
+    name?: string;
+    note?: string;
 }
 
 export function DashboardRadioButton(props: IProps) {

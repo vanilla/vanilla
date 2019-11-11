@@ -62,6 +62,11 @@ class DummyScheduler implements SchedulerInterface {
     protected $dispatchedEventName = null;
 
     /**
+     * @var bool
+     */
+    protected $finalizeRequest = true;
+
+    /**
      * DummyScheduler constructor.
      *
      * @param ContainerInterface $container
@@ -149,17 +154,20 @@ class DummyScheduler implements SchedulerInterface {
                 return false;
             }
 
-            // Finish Flushes all response data to the client
-            // so that job payloads can run without affecting the browser experience
-            session_write_close();
+            if ($this->getFinalizeRequest()) {
 
-            // we assume fastCgi. If that fails, go old-school
-            if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
-                // need to calculate content length *after* URL rewrite!
-                if (headers_sent() === false) {
-                    header("Content-length: " . ob_get_length());
+                // Finish Flushes all response data to the client
+                // so that job payloads can run without affecting the browser experience
+                session_write_close();
+
+                // We assume fastCgi. If that fails, go old-school.
+                if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
+                    // need to calculate content length *after* URL rewrite!
+                    if (headers_sent() === false) {
+                        header("Content-length: " . ob_get_length());
+                    }
+                    ob_end_flush();
                 }
-                ob_end_flush();
             }
 
             $this->dispatchAll();
@@ -281,5 +289,25 @@ class DummyScheduler implements SchedulerInterface {
         if ($this->dispatchedEventName != null) {
             $this->eventManager->fire($this->dispatchedEventName, $this->trackingSlips);
         }
+    }
+
+    /**
+     * Whether or not to finalize the request and flush output buffers.
+     *
+     * In a web request, you probably want to flush buffers, however in other environments, it's best not to flush buffers you didn't start.
+     *
+     * @return bool
+     */
+    public function getFinalizeRequest(): bool {
+        return $this->finalizeRequest;
+    }
+
+    /**
+     * Set the finalize request flag.
+     *
+     * @param bool $finalizeRequest
+     */
+    public function setFinalizeRequest(bool $finalizeRequest): void {
+        $this->finalizeRequest = $finalizeRequest;
     }
 }

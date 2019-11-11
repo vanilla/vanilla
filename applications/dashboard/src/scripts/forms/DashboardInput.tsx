@@ -7,18 +7,23 @@ import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
 
-interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface IProps extends IInputTextProps {}
 
 export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType } = useFormGroup();
-    const classes = classNames("form-control", props.className);
-
+    const classes = classNames(props.className);
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
     return (
         <div className={rootClass}>
-            <input type="text" {...props} id={inputID} className={classes} />
+            <InputTextBlock
+                id={inputID}
+                inputProps={props.inputProps}
+                className={classNames(props.inputProps ? props.inputProps.className : null, classes)}
+                noMargin={true}
+            />
         </div>
     );
 };

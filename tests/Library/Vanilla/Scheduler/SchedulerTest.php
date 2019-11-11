@@ -276,6 +276,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             ->setShared(true)
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
+            ->addCall('setFinalizeRequest', [false])
             ->setShared(true)
         ;
 

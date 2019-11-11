@@ -38,6 +38,7 @@ export interface ISelectOneProps {
     inputClassName?: string;
     isClearable?: boolean;
     describedBy?: string;
+    menuPlacement?: "auto" | "bottom" | "top";
 }
 
 /**
@@ -95,7 +96,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     isLoading={props.isLoading}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    menuPlacement="auto"
+                    menuPlacement={props.menuPlacement ?? "auto"}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />

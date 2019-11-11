@@ -17,6 +17,7 @@ interface IProps {
     className?: string;
     placeholder?: string;
     imageUploader?: typeof uploadFile;
+    disabled?: boolean;
 }
 
 export function DashboardImageUpload(props: IProps) {
@@ -43,6 +44,7 @@ export function DashboardImageUpload(props: IProps) {
                     type="file"
                     id={inputID}
                     className={classes}
+                    disabled={props.disabled}
                     onChange={async event => {
                         const file = event.target.files && event.target.files[0];
                         if (!file) {

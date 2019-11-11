@@ -17,6 +17,7 @@ interface IProps {
     label: string;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
+    disabled?: boolean;
 }
 
 export function DashboardImageUploadGroup(props: IProps) {
@@ -40,6 +41,7 @@ export function DashboardImageUploadGroup(props: IProps) {
                                     setPreviewUrl(null);
                                     props.onChange(originalValue);
                                 }}
+                                disabled={props.disabled}
                             >
                                 {t("Undo")}
                             </Button>
@@ -53,6 +55,7 @@ export function DashboardImageUploadGroup(props: IProps) {
                 onChange={props.onChange}
                 onImagePreview={setPreviewUrl}
                 imageUploader={props.imageUploader}
+                disabled={props.disabled}
             />
         </DashboardFormGroup>
     );

@@ -85,7 +85,7 @@ export const frameClasses = useThemeCache(() => {
         $nest: {
             [`.${bodyWrap}`]: {
                 flex: 1,
-                overflow: "auto",
+                overflowY: "auto",
             },
         },
     });

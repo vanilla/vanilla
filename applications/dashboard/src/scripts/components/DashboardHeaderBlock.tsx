@@ -8,7 +8,7 @@ import { RouteComponentProps, useHistory } from "react-router";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
-interface IProps extends Partial<RouteComponentProps<{}>> {
+interface IProps {
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;

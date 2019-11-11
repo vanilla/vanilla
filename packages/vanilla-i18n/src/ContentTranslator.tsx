@@ -7,8 +7,9 @@ import React from "react";
 import { logError } from "@vanilla/utils";
 
 export interface IContentTranslatorProps {
-    modalTypes: string;
-    property: ITranslationProperty[];
+    isLoading?: boolean;
+    isFullScreen?: boolean;
+    properties: ITranslationProperty[];
     afterSave: () => void; // You probably want to re-fetch your resource here, then close the modal.
     onDismiss: () => void; // You probably just want to close the modal.
 }

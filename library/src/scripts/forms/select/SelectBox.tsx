@@ -24,7 +24,7 @@ export interface ISelectBoxItem {
     url?: string;
 }
 
-type IProps = {
+interface IProps {
     className?: string;
     options: ISelectBoxItem[];
     value?: ISelectBoxItem;

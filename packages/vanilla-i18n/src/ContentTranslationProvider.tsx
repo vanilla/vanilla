@@ -44,18 +44,3 @@ ContentTranslationProvider.setTranslator = (Translator: React.ComponentType<ICon
 export function useContentTranslator(): IContentTranslator {
     return useContext(context);
 }
-
-// /// Example
-
-// function MyThing() {
-//     const { shouldDisplay, Translator } = useContentTranslator();
-
-//     return <div>{shouldDisplay && <Translator fields={[
-//         {
-//             recordID: 5,
-//             recordType: "knowledge-base",
-//             resource: "kb",
-
-//         }
-//     ]}/>}</div>;
-// }

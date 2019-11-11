@@ -11,6 +11,8 @@ import { formatUrl, t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { LeftChevronCompactIcon } from "@library/icons/common";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps extends RouteComponentProps<{}> {
     fallbackUrl?: string;
@@ -18,7 +20,7 @@ interface IProps extends RouteComponentProps<{}> {
     className?: string;
     linkClassName?: string;
     visibleLabel?: boolean;
-    clickHandler?: () => void;
+    onClick?: (e: React.MouseEvent) => void;
     fallbackElement?: React.ReactNode;
 }
 
@@ -37,22 +39,41 @@ export class BackLink extends React.Component<IProps> {
         } else {
             const classes = backLinkClasses();
             const routingUrl = this.props.fallbackUrl ? this.props.fallbackUrl : formatUrl("/kb");
+            const content = (
+                <>
+                    <LeftChevronCompactIcon className={classes.icon} />
+                    {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
+                </>
+            );
+            const className = classNames(
+                classes.link,
+                { hasVisibleLabel: !!this.props.visibleLabel },
+                this.props.linkClassName,
+            );
+
             return (
                 <div className={classNames(classes.root, this.props.className)}>
-                    <Link
-                        to={routingUrl}
-                        aria-label={this.props.title as string}
-                        title={this.props.title as string}
-                        onClick={this.clickHandler}
-                        className={classNames(
-                            classes.link,
-                            { hasVisibleLabel: !!this.props.visibleLabel },
-                            this.props.linkClassName,
-                        )}
-                    >
-                        <LeftChevronCompactIcon className={classes.icon} />
-                        {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
-                    </Link>
+                    {this.props.onClick ? (
+                        <Button
+                            baseClass={ButtonTypes.RESET}
+                            className={className}
+                            aria-label={this.props.title as string}
+                            title={this.props.title as string}
+                            onClick={this.props.onClick}
+                        >
+                            {content}
+                        </Button>
+                    ) : (
+                        <Link
+                            to={routingUrl}
+                            aria-label={this.props.title as string}
+                            title={this.props.title as string}
+                            className={className}
+                        >
+                            <LeftChevronCompactIcon className={classes.icon} />
+                            {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
+                        </Link>
+                    )}
                 </div>
             );
         }

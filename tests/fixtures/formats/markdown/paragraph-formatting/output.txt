@@ -8,6 +8,4 @@ h2
 <script>alert('Hello World')</script>
 
 (Spoiler)
-
-
 (Spoiler)

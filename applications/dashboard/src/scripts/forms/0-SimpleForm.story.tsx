@@ -28,10 +28,10 @@ formsStory.add("FormGroup", () =>
                 <form>
                     <ul>
                         <DashboardFormGroup label="label" description="Here's some info text for this field.">
-                            <DashboardInput inputProps={{}} />
+                            <DashboardInput />
                         </DashboardFormGroup>
                         <DashboardFormGroup label="Another (fake) Label">
-                            <DashboardInput inputProps={{}} />
+                            <DashboardInput />
                         </DashboardFormGroup>
                         <DashboardFormGroup label="Select input">
                             <DashboardSelect
@@ -82,14 +82,14 @@ formsStory.add("FormGroup", () =>
                             description="Here's some info text for this field. I'm giving a little description of what this field does and how it affects the user."
                             labelType={DashboardLabelType.STANDARD} // Default
                         >
-                            <DashboardInput inputProps={{}} />
+                            <DashboardInput />
                         </DashboardFormGroup>
                         <DashboardFormGroup
                             label="Wide label and narrow form input, useful for small text inputs or toggles"
                             description="Here's some info text for this field. I'm giving a little description of what this field does and how it affects the user."
                             labelType={DashboardLabelType.WIDE}
                         >
-                            <DashboardInput inputProps={{}} />
+                            <DashboardInput />
                         </DashboardFormGroup>
                     </ul>
                 </form>

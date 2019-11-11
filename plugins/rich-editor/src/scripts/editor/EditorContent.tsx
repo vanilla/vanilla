@@ -102,7 +102,7 @@ function useQuillAttributeSync(placeholder?: string, placeholderClass?: string) 
                 // These classes shouln't be applied until the forum is converted to the new styles.
                 [classesUserContent.root]: !legacyMode,
             }),
-        [classesRichEditor.text, classesUserContent.root, legacyMode],
+        [classesRichEditor.text, classesUserContent.root, legacyMode, placeholderClass],
     );
 
     useEffect(() => {

@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { LeftChevronCompactIcon } from "@library/icons/common";
-import { withRouter, RouteComponentProps } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
@@ -15,11 +15,12 @@ interface IProps extends Partial<RouteComponentProps<{}>> {
 }
 
 export function DashboardHeaderBlock(props: IProps) {
+    const history = useHistory();
     return (
         <header className="header-block">
             <div className="title-block">
-                {props.showBackLink && props.history && (
-                    <Button baseClass={ButtonTypes.ICON} aria-label="Return" onClick={props.history.goBack}>
+                {props.showBackLink && history && (
+                    <Button baseClass={ButtonTypes.ICON} aria-label="Return" onClick={history.goBack}>
                         <LeftChevronCompactIcon />
                     </Button>
                 )}
@@ -29,5 +30,3 @@ export function DashboardHeaderBlock(props: IProps) {
         </header>
     );
 }
-
-export default withRouter(DashboardHeaderBlock as any); // Typescript is complaining that RouteComponentProps are optional, but they are if you don't import the default.

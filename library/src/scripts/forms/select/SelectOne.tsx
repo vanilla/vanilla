@@ -37,6 +37,7 @@ export interface ISelectOneProps {
     isLoading?: boolean;
     inputClassName?: string;
     isClearable?: boolean;
+    describedBy?: string;
 }
 
 /**

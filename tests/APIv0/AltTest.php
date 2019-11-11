@@ -56,6 +56,7 @@ class AltTest extends SharedBootstrapTestCase {
      *
      * @param bool $enabled Whether the update token feature should be enabled.
      * @param string $updateToken The update token to use.
+     * @param string $postUpdateToken The update token to post during `utility/update`.
      */
     private function doAltInstallWithUpdateToken(bool $enabled, string $updateToken, string $postUpdateToken) {
         $this->api()->uninstall();

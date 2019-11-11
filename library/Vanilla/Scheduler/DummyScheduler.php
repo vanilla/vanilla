@@ -155,7 +155,6 @@ class DummyScheduler implements SchedulerInterface {
             }
 
             if ($this->getFinalizeRequest()) {
-
                 // Finish Flushes all response data to the client
                 // so that job payloads can run without affecting the browser experience
                 session_write_close();

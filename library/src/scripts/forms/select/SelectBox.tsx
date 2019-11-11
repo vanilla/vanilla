@@ -48,7 +48,6 @@ export interface IExternalLabelledProps extends IProps {
  * Generates Select Box component (similar to a select)
  */
 export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledProps) {
-
     const id = useUniqueID("selectBox");
     const firstValue = props.options.length > 0 ? props.options[0] : null;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -60,7 +59,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
         setImmediate(() => {
             buttonRef.current && buttonRef.current.focus();
         });
-    }
+    };
 
     const classes = selectBoxClasses();
     const classesDropDown = dropDownClasses();
@@ -72,7 +71,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
             {"label" in props && <span className="selectBox-label sr-only">{props.label}</span>}
             <div className="selectBox-content">
                 <DropDown
-                    key={selectedOption?.value}
+                    key={selectedOption ? selectedOption.value : undefined}
                     buttonRef={buttonRef}
                     id={id}
                     className={classNames(
@@ -91,7 +90,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                 >
                     {props.options.map((option, i) => {
                         const isSelected = selectedOption && option.value === selectedOption.value;
-                        return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange}/>
+                        return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
                     })}
                 </DropDown>
             </div>
@@ -108,24 +107,19 @@ function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
     const { activeItem } = props;
     const classes = selectBoxClasses();
 
-    return (activeItem && activeItem.name ? (
+    return activeItem && activeItem.name ? (
         <React.Fragment>
             {activeItem.content || activeItem.name}
             <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
         </React.Fragment>
-    ) : null);
+    ) : null;
 }
 
-
-function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean, onClick: (item: ISelectBoxItem) => void }) {
+function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onClick: (item: ISelectBoxItem) => void }) {
     const { item, isSelected, onClick } = props;
     if ("url" in item) {
         return (
-            <DropDownItemLink
-                className={classNames({ isSelected: isSelected })}
-                name={item.name}
-                to={item.url || ""}
-            >
+            <DropDownItemLink className={classNames({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemLink>
         );
@@ -137,10 +131,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean, onCli
                 className={classNames({ isSelected: isSelected })}
                 onClick={() => onClick(item)}
                 disabled={isSelected}
-                buttonClassName={classNames(
-                    classesDropDown.action,
-                    classes.buttonItem,
-                )}
+                buttonClassName={classNames(classesDropDown.action, classes.buttonItem)}
             >
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemButton>

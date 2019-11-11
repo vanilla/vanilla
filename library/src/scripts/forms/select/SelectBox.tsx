@@ -13,7 +13,7 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 export interface ISelectBoxItem {
     value: string;
@@ -51,9 +51,16 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
 
     const id = useUniqueID("selectBox");
     const firstValue = props.options.length > 0 ? props.options[0] : null;
+    const buttonRef = useRef<HTMLButtonElement | null>(null);
     const [ownValue, setOwnValue] = useState(firstValue);
-    let selectedOption = props.value ?? ownValue;
-    let onChange = props.onChange ?? setOwnValue;
+    const selectedOption = props.value ?? ownValue;
+    const onChange = (value: ISelectBoxItem) => {
+        const funct = props.onChange ?? setOwnValue;
+        funct(value);
+        setImmediate(() => {
+            buttonRef.current?.focus();
+        });
+    }
 
     const classes = selectBoxClasses();
     const classesDropDown = dropDownClasses();
@@ -65,13 +72,14 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
             {"label" in props && <span className="selectBox-label sr-only">{props.label}</span>}
             <div className="selectBox-content">
                 <DropDown
+                    key={selectedOption?.value}
+                    buttonRef={buttonRef}
                     id={id}
                     className={classNames(
                         "selectBox-dropDown",
                         "dropDownItem-verticalPadding",
                         classesDropDown.verticalPadding,
                     )}
-                    //name={"label" in props ? props.label : this.state.selectedItem.name}
                     buttonContents={<SelectBoxButton activeItem={selectedOption} />}
                     buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
                     contentsClassName={classNames({ isParentWidth: props.widthOfParent })}

@@ -186,9 +186,6 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
-            "&.isFullHeight": {
-                height: `100vh`,
-            },
         },
     } as NestedCSSProperties);
 

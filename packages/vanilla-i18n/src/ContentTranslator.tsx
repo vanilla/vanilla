@@ -11,8 +11,6 @@ export interface IContentTranslatorProps {
     isFullScreen?: boolean;
     properties: ITranslationProperty[];
     resource: string;
-    afterSave: () => void; // You probably want to re-fetch your resource here, then close the modal.
-    onDismiss: () => void; // You probably just want to close the modal.
 }
 
 // Subtypes

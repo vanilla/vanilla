@@ -103,7 +103,7 @@ export function useBackRouting() {
 /**
  * Component version of `useFallbackBackUrl`.
  */
-export function FallbackUrlSetter(props: { url: string }) {
+export function FallbackBackUrlSetter(props: { url: string }) {
     useFallbackBackUrl(props.url);
     return <React.Fragment />;
 }

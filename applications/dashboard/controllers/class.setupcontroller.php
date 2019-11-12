@@ -307,16 +307,19 @@ class SetupController extends DashboardController {
         }
 
         // Check for required PHP extensions:
-        // - PDO & MySQL driver for PDO
+        // - PDO & MySQL native driver for PDO
         // - cURL
         // - GD
         // - Multibyte String
+        // - Internationalization Functions
         $requiredPHPModules = [
-            'pdo' => 'You must have the <a href="http://php.net/manual/en/pdo.installation.php">PDO module</a> enabled in PHP in order for Vanilla to connect to your database.',
-            'pdo_mysql' => 'You must have the <a href="http://php.net/manual/en/ref.pdo-mysql.php">MySQL driver for PDO</a> enabled in order for Vanilla to connect to your database.',
-            'curl' => 'You must have the <a href="http://php.net/manual/en/curl.installation.php">cURL module</a> enabled in PHP.',
-            'gd' => 'You must have the <a href="http://php.net/manual/en/image.installation.php">gd module</a> enabled in PHP for processing images.',
-            'mbstring' => 'You must have the <a href="http://php.net/manual/en/mbstring.installation.php">mbstring module</a> enabled in PHP.',
+            'pdo' => 'You must have the <a href="https://php.net/manual/en/pdo.installation.php">PDO module</a> enabled in PHP in order for Vanilla to connect to your database.',
+            'pdo_mysql' => 'You must have the <a href="https://php.net/manual/en/ref.pdo-mysql.php">MySQL driver for PDO</a> enabled in order for Vanilla to connect to your database.',
+            'mysqlnd' => 'You must have the <a href="https://www.php.net/manual/en/mysqlnd.install.php">MySQL Native Driver</a> enabled in order for Vanilla to connect to your database.',
+            'curl' => 'You must have the <a href="https://php.net/manual/en/curl.installation.php">cURL module</a> enabled in PHP.',
+            'gd' => 'You must have the <a href="https://php.net/manual/en/image.installation.php">gd module</a> enabled in PHP for processing images.',
+            'mbstring' => 'You must have the <a href="https://php.net/manual/en/mbstring.installation.php">mbstring module</a> enabled in PHP.',
+            'intl' => 'You must have the <a href="https://www.php.net/manual/en/intl.installation.php">Internationalization Functions</a> enabled in PHP.'
         ];
 
         foreach ($requiredPHPModules as $module => $errorMessage) {

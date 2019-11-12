@@ -10,11 +10,11 @@
         "@typescript-eslint/eslint-plugin": "^2.6.1",
         "@typescript-eslint/parser": "^2.6.1",
         "eslint": "^6.6.0",
-        "eslint-config-prettier": "^4.3.0",
+        "eslint-config-prettier": "^6.5.0",
         "eslint-plugin-import": "^2.17.3",
         "eslint-plugin-jsx-a11y": "^6.2.1",
         "eslint-plugin-lodash": "^6.0.0",
         "eslint-plugin-react": "^7.13.0",
-        "eslint-plugin-react-hooks": "^1.6.0"
+        "eslint-plugin-react-hooks": "^2.2.0"
     }
 }

@@ -11,3 +11,4 @@ export * from "./useMeasure";
 export * from "./useLastValue";
 export * from "./useTabKeyboardHandler";
 export * from "./useThrowError";
+export * from "./useDefaultProps";

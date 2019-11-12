@@ -39,7 +39,7 @@ export default function SearchOption(props: IProps) {
         return (
             <li className="suggestedTextInput-item">
                 <SmartLink
-                    {...innerProps as any}
+                    {...(innerProps as any)}
                     // We want to use the SmarkLink clickHandler, not the innerProps one from the SearchBar.
                     // The innerProps click handler will trigger a search event (goes to search page).
                     // The SmartLink will navigate to the result itself.

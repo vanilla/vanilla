@@ -100,10 +100,18 @@ export const messagesClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 flexDirection: "row",
-                maxWidth: "inherit",
-                width: "auto",
             },
         },
+    });
+    const messageWrapper = style("messageWrapper", {
+        position: "relative",
+        display: "flex",
+        paddingLeft: 30,
+        alignItems: "center",
+        flexDirection: "row",
+        margin: "0 auto",
+        paddingTop: 7,
+        paddingBottom: 7,
     });
 
     const noPadding = style("noPadding", {
@@ -230,5 +238,6 @@ export const messagesClasses = useThemeCache(() => {
         confirm,
         errorIcon,
         noPadding,
+        messageWrapper,
     };
 });

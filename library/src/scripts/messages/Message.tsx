@@ -43,26 +43,28 @@ export default function Message(props: IMessageProps) {
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
-                            <div className={classes.message}>{props.contents || props.stringContents}</div>
+                            <div className={classes.messageWrapper}>
+                                <div className={classes.message}>{props.contents || props.stringContents}</div>
 
-                            {props.onConfirm && (
-                                <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={props.onConfirm}
-                                    className={classes.actionButton}
-                                >
-                                    {props.confirmText || t("OK")}
-                                </Button>
-                            )}
-                            {props.onCancel && (
-                                <Button
-                                    baseClass={ButtonTypes.TEXT}
-                                    onClick={props.onCancel}
-                                    className={classes.actionButton}
-                                >
-                                    {props.cancelText || t("Cancel")}
-                                </Button>
-                            )}
+                                {props.onConfirm && (
+                                    <Button
+                                        baseClass={ButtonTypes.TEXT_PRIMARY}
+                                        onClick={props.onConfirm}
+                                        className={classes.actionButton}
+                                    >
+                                        {props.confirmText || t("OK")}
+                                    </Button>
+                                )}
+                                {props.onCancel && (
+                                    <Button
+                                        baseClass={ButtonTypes.TEXT}
+                                        onClick={props.onCancel}
+                                        className={classes.actionButton}
+                                    >
+                                        {props.cancelText || t("Cancel")}
+                                    </Button>
+                                )}
+                            </div>
                         </InnerWrapper>
                     </div>
                 </OuterWrapper>

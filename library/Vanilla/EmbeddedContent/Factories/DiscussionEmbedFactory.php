@@ -9,18 +9,17 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\SiteAsset;
 
 /**
  * Quote embed factory for comments.
  */
-class DiscussionEmbedFactory extends AbstractEmbedFactory {
-
-    /** @var RequestInterface */
-    private $request;
+class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
 
     /** @var \DiscussionsApiController */
     private $discussionApi;
@@ -29,39 +28,32 @@ class DiscussionEmbedFactory extends AbstractEmbedFactory {
      * DI
      *
      * @param RequestInterface $request
+     * @param SiteSectionModel $siteSectionModel
      * @param \DiscussionsApiController $discussionApi
      */
-    public function __construct(RequestInterface $request, \DiscussionsApiController $discussionApi) {
-        $this->request = $request;
+    public function __construct(
+        RequestInterface $request,
+        SiteSectionModel $siteSectionModel,
+        \DiscussionsApiController $discussionApi
+    ) {
+        parent::__construct($request, $siteSectionModel);
         $this->discussionApi = $discussionApi;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getSupportedDomains(): array {
-        return [
-            $this->request->getHost(),
-        ];
     }
 
     /**
      * @inheritdoc
      */
     protected function getSupportedPathRegex(string $domain = ''): string {
-        // We need ot be sure to the proper web root here.
-        $root = SiteAsset::joinWebPath($this->request->getRoot(), '/discussion');
-        $root = str_replace('/', '\/', $root);
-
-        $regex = "/$root\/(?<discussionID>\d+)/i";
-        return $regex;
+        $regexRoot = $this->getRegexRoot();
+        return "/^$regexRoot\/discussion\/(?<discussionID>\d+)/i";
     }
 
     /**
      * @inheritdoc
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
-        preg_match($this->getSupportedPathRegex(), $url, $matches);
+        $path = parse_url($url, PHP_URL_PATH);
+        preg_match($this->getSupportedPathRegex(), $path, $matches);
         $id = $matches['discussionID'] ?? null;
 
         if ($id === null) {

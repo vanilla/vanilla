@@ -510,7 +510,7 @@ export class ListItem extends LineBlot {
     private static getListDepth(listElement: HTMLElement): number {
         let depth = 0;
         let parent = listElement.parentElement;
-        while (parent && Object.values(ListTag).includes(parent.tagName)) {
+        while (parent && Object.values(ListTag).includes(parent.tagName as ListTag)) {
             if (parent.tagName === ListTag.LI) {
                 depth++;
             }

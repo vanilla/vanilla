@@ -16,7 +16,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { LocaleProvider } from "@vanilla/i18n";
+import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
@@ -42,22 +42,24 @@ export function AppContext(props: IProps) {
             {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
             <Provider store={store}>
                 <LocaleProvider>
-                    <LiveAnnouncer>
-                        <ThemeProvider
-                            disabled={props.noTheme}
-                            errorComponent={props.errorComponent || null}
-                            themeKey={getMeta("ui.themeKey", "keystone")}
-                            variablesOnly={props.variablesOnly}
-                        >
-                            <FontSizeCalculatorProvider>
-                                <SearchFilterContextProvider>
-                                    <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                        <DeviceProvider>{props.children}</DeviceProvider>
-                                    </ScrollOffsetProvider>
-                                </SearchFilterContextProvider>
-                            </FontSizeCalculatorProvider>
-                        </ThemeProvider>
-                    </LiveAnnouncer>
+                    <ContentTranslationProvider>
+                        <LiveAnnouncer>
+                            <ThemeProvider
+                                disabled={props.noTheme}
+                                errorComponent={props.errorComponent || null}
+                                themeKey={getMeta("ui.themeKey", "keystone")}
+                                variablesOnly={props.variablesOnly}
+                            >
+                                <FontSizeCalculatorProvider>
+                                    <SearchFilterContextProvider>
+                                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                            <DeviceProvider>{props.children}</DeviceProvider>
+                                        </ScrollOffsetProvider>
+                                    </SearchFilterContextProvider>
+                                </FontSizeCalculatorProvider>
+                            </ThemeProvider>
+                        </LiveAnnouncer>
+                    </ContentTranslationProvider>
                 </LocaleProvider>
             </Provider>
         </div>

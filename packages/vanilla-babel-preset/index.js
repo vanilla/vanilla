@@ -47,6 +47,8 @@ module.exports = api => {
             resolve("@babel/plugin-proposal-class-properties"),
             resolve("@babel/plugin-proposal-object-rest-spread"),
             resolve("@babel/plugin-syntax-dynamic-import"),
+            resolve("@babel/plugin-proposal-nullish-coalescing-operator"),
+            resolve("@babel/plugin-proposal-optional-chaining"),
             ...runtimePlugins,
         ],
     };

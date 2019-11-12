@@ -59,8 +59,8 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     }
 
     public render() {
-        const { className, isMenuVisible, toggleMenu, children, icon } = this.props;
-        if (open) {
+        const { className, isMenuVisible, icon } = this.props;
+        if (this.props.open) {
             const classes = richEditorClasses(this.props.legacyMode);
 
             // If the roving index matches my index, or no roving index is set and we're on the first tab

@@ -185,7 +185,7 @@ describe("ListBlot", () => {
         ]);
     });
     it("list blots of the same type & level are joined together", () => {
-        const testAutoJoining = (depth: number, type: ListType.BULLETED) => {
+        const testAutoJoining = (depth: number, type: ListType) => {
             insertListBlot({ type, depth });
             insertListBlot({ type, depth });
             insertListBlot({ type, depth });

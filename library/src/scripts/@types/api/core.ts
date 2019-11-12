@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { Omit } from "@library/@types/utils";
 import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
 

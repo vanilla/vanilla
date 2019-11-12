@@ -23,8 +23,8 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 const BUTTON_SIZE = richEditorVariables().sizing.emojiSize;
 const COL_SIZE = 8;
 const ROW_SIZE = 8;
-const rowIndexesByGroupId = {};
-const cellIndexesByGroupId = {};
+const rowIndexesByGroupId: { [groupdID: string]: number } = {};
+const cellIndexesByGroupId: { [groupdID: string]: number } = {};
 
 /**
  * Get start positions for each category

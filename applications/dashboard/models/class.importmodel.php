@@ -1582,7 +1582,8 @@ class ImportModel extends Gdn_Model {
         }
 
         $steps = $this->steps();
-        $lastStep = end(array_keys($steps));
+        $stepKeys = array_keys($steps);
+        $lastStep = end($stepKeys);
         if (!isset($steps[$step]) || $step > $lastStep) {
             return 'COMPLETE';
         }

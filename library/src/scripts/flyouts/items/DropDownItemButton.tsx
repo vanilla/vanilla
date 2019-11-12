@@ -8,7 +8,6 @@ import React from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 
@@ -19,8 +18,6 @@ export interface IDropDownItemButton {
     children?: React.ReactNode;
     disabled?: boolean;
     onClick: any;
-    clickData?: ISelectBoxItem;
-    index?: number;
     current?: boolean;
     lang?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
@@ -36,18 +33,15 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
     };
 
     public render() {
-        const { clickData, index, children, name } = this.props;
+        const { children, name } = this.props;
         const buttonContent = children ? children : name;
         const classesDropDown = dropDownClasses();
-        const buttonClick = () => {
-            this.props.onClick(clickData, index);
-        };
         return (
             <DropDownItem className={classNames(this.props.className)}>
                 <Button
                     buttonRef={this.props.buttonRef}
                     title={this.props.name}
-                    onClick={buttonClick}
+                    onClick={this.props.onClick}
                     className={classNames(this.props.buttonClassName, classesDropDown.action)}
                     baseClass={ButtonTypes.CUSTOM}
                     disabled={this.props.disabled}

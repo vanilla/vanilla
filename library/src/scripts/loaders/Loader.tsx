@@ -13,12 +13,12 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { style } from "typestyle";
 import { PaddingProperty } from "csstype";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import classNames from "classnames";
 
 interface IProps {
     minimumTime?: number;
     loaderStyleClass?: string;
-    height?: number;
-    width?: number;
+    size?: number;
     padding?: PaddingProperty<TLength>;
     small?: boolean;
 }
@@ -42,12 +42,14 @@ export default class Loader extends React.Component<IProps, IState> {
         const styleClass = this.props.small
             ? loaderClasses().smallLoader
             : this.props.loaderStyleClass || loaderClasses().fullPageLoader;
-
         return (
             <React.Fragment>
                 <ConditionalWrap
-                    condition={!!this.props.padding}
-                    className={style({ padding: unit(this.props.padding) })}
+                    condition={!!this.props.padding || !!this.props.size}
+                    className={classNames(
+                        this.props.padding && style({ padding: unit(this.props.padding) }),
+                        this.props.size && loaderClasses().loaderContainer(this.props.size),
+                    )}
                 >
                     <div className={styleClass} aria-hidden="true" />
                     <ScreenReaderContent>

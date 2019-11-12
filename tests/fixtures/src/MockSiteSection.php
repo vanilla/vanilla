@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\fixtures;
+namespace VanillaTests\Fixtures;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionSchema;

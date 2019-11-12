@@ -410,6 +410,7 @@ if (!function_exists('c')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function c($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -425,6 +426,7 @@ if (!function_exists('config')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function config($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -3276,6 +3278,7 @@ if (!function_exists('saveToConfig')) {
      *  - Save: If this is false then only the in-memory config is set.
      *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
      * @return bool: Whether or not the save was successful. null if no changes were necessary.
+     * @deprecated
      */
     function saveToConfig($name, $value = '', $options = []) {
         Gdn::config()->saveToConfig($name, $value, $options);
@@ -3525,6 +3528,7 @@ if (!function_exists('t')) {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
+     * @deprecated
      */
     function t($code, $default = false) {
         return Gdn::translate($code, $default);

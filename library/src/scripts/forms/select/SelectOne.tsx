@@ -17,7 +17,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
 
-export interface ISelectOneProps {
+export interface ISelectOneProps extends IMenuPlacement {
     label: string | null;
     id?: string;
     inputID?: string;
@@ -38,6 +38,16 @@ export interface ISelectOneProps {
     inputClassName?: string;
     isClearable?: boolean;
     describedBy?: string;
+}
+
+export enum MenuPlacement {
+    AUTO = "auto",
+    BOTTOM = "bottom",
+    TOP = "top",
+}
+
+export interface IMenuPlacement {
+    menuPlacement?: MenuPlacement;
 }
 
 /**
@@ -95,7 +105,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     isLoading={props.isLoading}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    menuPlacement="auto"
+                    menuPlacement={props.menuPlacement ?? "auto"}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />

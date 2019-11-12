@@ -32,6 +32,7 @@ export default function Message(props: IMessageProps) {
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
+
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>

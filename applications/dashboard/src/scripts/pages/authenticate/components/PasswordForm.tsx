@@ -204,8 +204,5 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 export default withRedux(withRouter(PasswordForm));

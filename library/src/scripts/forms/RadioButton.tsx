@@ -48,7 +48,7 @@ export default function RadioButton(props: IProps) {
                     type="radio"
                     checked={props.checked}
                     tabIndex={0}
-                    aria-describedBy={note ? noteID : undefined}
+                    aria-describedby={note ? noteID : undefined}
                 />
                 <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
                     <span className={classes.state}>

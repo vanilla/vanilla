@@ -7,25 +7,23 @@ import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import SelectOne from "@library/forms/select/SelectOne";
+import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 
-interface IProps {
+interface IProps extends IMenuPlacement {
     options: IComboBoxOption[];
     onChange: (newValue: IComboBoxOption | null) => void;
     value?: IComboBoxOption;
-    className?: string;
+    clas?: string;
+    inputClassName?: string;
     disabled?: boolean;
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType, labelID } = useFormGroup();
-    const classes = classNames("form-control", props.className);
-
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
-
     return (
-        <div className={rootClass}>
+        <div className={classNames(rootClass)}>
             <SelectOne
                 label={null}
                 labelID={labelID}
@@ -33,8 +31,9 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}
-                inputClassName={classes}
+                inputClassName={classNames("form-control", props.inputClassName)}
                 disabled={props.disabled}
+                menuPlacement={props.menuPlacement}
             />
         </div>
     );

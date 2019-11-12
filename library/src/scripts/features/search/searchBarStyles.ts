@@ -192,7 +192,12 @@ export const searchBarClasses = useThemeCache(() => {
                     },
                 },
             },
+            ".suggestedTextInput-menuItems": {
+                margin: 0,
+                padding: 0,
+            },
             ".suggestedTextInput-item": {
+                listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
                         borderTop: `solid 1px ${globalVars.border.color.toString()}`,

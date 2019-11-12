@@ -4,35 +4,35 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { getRequiredID } from "@library/utility/idUtils";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
-import classNames from "classnames";
-import { CheckCompactIcon, DownTriangleIcon, AlertIcon } from "@library/icons/common";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
+import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
+import { useUniqueID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React, { useState, useRef } from "react";
 
 export interface ISelectBoxItem {
+    value: string;
     name: string;
     content?: React.ReactNode;
     className?: string;
-    selected?: boolean;
     icon?: React.ReactNode;
     url?: string;
 }
 
 interface IProps {
     className?: string;
-    id?: string;
-    children: ISelectBoxItem[];
+    options: ISelectBoxItem[];
+    value?: ISelectBoxItem;
+    onChange?: (value: ISelectBoxItem) => void;
     buttonClassName?: string;
     buttonBaseClass?: ButtonTypes;
     widthOfParent?: boolean;
     openAsModal?: boolean;
-    selectedIndex?: number;
     renderLeft?: boolean;
 }
 
@@ -44,107 +44,117 @@ export interface IExternalLabelledProps extends IProps {
     describedBy: string;
 }
 
-interface IState {
-    id: string;
-    selectedIndex: number;
-    selectedItem: any;
-}
-
 /**
  * Generates Select Box component (similar to a select)
  */
-export default class SelectBox extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
-    public static defaultProps = {
-        selectedIndex: 0,
-        buttonBaseClass: ButtonTypes.TEXT,
-    };
-
-    public constructor(props) {
-        super(props);
-
-        this.state = {
-            id: getRequiredID(props, "selectBox-"),
-            selectedIndex: props.selectedIndex,
-            selectedItem: props.children[props.selectedIndex],
-        };
-    }
-
-    /**
-     * Handle click on item in select box.
-     * @param selectedItem data for item
-     * @param index the index of the item
-     */
-    public handleClick = (selectedItem: ISelectBoxItem, index: number) => {
-        this.setState({
-            selectedIndex: index,
-            selectedItem,
+export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledProps) {
+    const id = useUniqueID("selectBox");
+    const firstValue = props.options.length > 0 ? props.options[0] : null;
+    const buttonRef = useRef<HTMLButtonElement | null>(null);
+    const [ownValue, setOwnValue] = useState(firstValue);
+    const selectedOption = props.value || ownValue;
+    const onChange = (value: ISelectBoxItem) => {
+        const funct = props.onChange || setOwnValue;
+        funct(value);
+        setImmediate(() => {
+            buttonRef.current && buttonRef.current.focus();
         });
     };
 
-    public render() {
-        const classes = selectBoxClasses();
-
-        const classesDropDown = dropDownClasses();
-        const selectItems = this.props.children.map((child, i) => {
-            const selected = this.state.selectedIndex === i;
-            return (
-                <DropDownItemLink
-                    key={this.props.id + "-item" + i}
-                    className={classNames({ isSelected: child.selected })}
-                    // name={child.name}
-                    to={child.url || ""}
-                    isModalLink={this.props.openAsModal}
+    const classes = selectBoxClasses();
+    const classesDropDown = dropDownClasses();
+    return (
+        <div
+            aria-describedby={"describedBy" in props ? props.describedBy : undefined}
+            className={classNames("selectBox", props.className)}
+        >
+            {"label" in props && <span className="selectBox-label sr-only">{props.label}</span>}
+            <div className="selectBox-content">
+                <DropDown
+                    key={selectedOption ? selectedOption.value : undefined}
+                    buttonRef={buttonRef}
+                    id={id}
+                    className={classNames(
+                        "selectBox-dropDown",
+                        "dropDownItem-verticalPadding",
+                        classesDropDown.verticalPadding,
+                    )}
+                    buttonContents={<SelectBoxButton activeItem={selectedOption} />}
+                    buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
+                    contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
+                    buttonBaseClass={props.buttonBaseClass}
+                    openAsModal={props.openAsModal}
+                    flyoutType={FlyoutType.LIST}
+                    selfPadded={true}
+                    renderLeft={true}
                 >
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
-                        {child.content || child.name}
-                    </span>
-                    <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
-                        {selected && <CheckCompactIcon className={"selectBox-selectedIcon"} />}
-                        {!selected && (
-                            <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
-                                {` `}
-                            </span>
-                        )}
-                        {child.icon}
-                    </span>
-                </DropDownItemLink>
-            );
-        });
-        const buttonContents =
-            this.state.selectedItem && this.state.selectedItem.name ? (
-                <React.Fragment>
-                    {this.state.selectedItem.content || this.state.selectedItem.name}
-                    <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
-                </React.Fragment>
-            ) : null;
-        return (
-            <div
-                aria-describedby={"describedBy" in this.props ? this.props.describedBy : undefined}
-                className={classNames("selectBox", this.props.className)}
-            >
-                {"label" in this.props && <span className="selectBox-label sr-only">{this.props.label}</span>}
-                <div className="selectBox-content">
-                    <DropDown
-                        id={this.state.id}
-                        className={classNames(
-                            "selectBox-dropDown",
-                            "dropDownItem-verticalPadding",
-                            classesDropDown.verticalPadding,
-                        )}
-                        name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
-                        buttonContents={buttonContents}
-                        buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
-                        contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
-                        buttonBaseClass={this.props.buttonBaseClass}
-                        openAsModal={this.props.openAsModal}
-                        flyoutType={FlyoutType.LIST}
-                        selfPadded={true}
-                        renderLeft={true}
-                    >
-                        {selectItems}
-                    </DropDown>
-                </div>
+                    {props.options.map((option, i) => {
+                        const isSelected = selectedOption && option.value === selectedOption.value;
+                        return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
+                    })}
+                </DropDown>
             </div>
+        </div>
+    );
+}
+
+SelectBox.defaultProps = {
+    selectedIndex: 0,
+    buttonBaseClass: ButtonTypes.TEXT,
+};
+
+function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
+    const { activeItem } = props;
+    const classes = selectBoxClasses();
+
+    return activeItem && activeItem.name ? (
+        <React.Fragment>
+            {activeItem.content || activeItem.name}
+            <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
+        </React.Fragment>
+    ) : null;
+}
+
+function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onClick: (item: ISelectBoxItem) => void }) {
+    const { item, isSelected, onClick } = props;
+    if ("url" in item) {
+        return (
+            <DropDownItemLink className={classNames({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
+                <SelectBoxContents item={item} isSelected={isSelected} />
+            </DropDownItemLink>
+        );
+    } else {
+        const classes = selectBoxClasses();
+        const classesDropDown = dropDownClasses();
+        return (
+            <DropDownItemButton
+                className={classNames({ isSelected: isSelected })}
+                onClick={() => onClick(item)}
+                disabled={isSelected}
+                buttonClassName={classNames(classesDropDown.action, classes.buttonItem)}
+            >
+                <SelectBoxContents item={item} isSelected={isSelected} />
+            </DropDownItemButton>
         );
     }
+}
+
+function SelectBoxContents(props: { item: ISelectBoxItem; isSelected: boolean }) {
+    const { item, isSelected } = props;
+    const classes = selectBoxClasses();
+
+    return (
+        <>
+            <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
+            <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
+                {isSelected && <CheckCompactIcon className={"selectBox-isSelectedIcon"} />}
+                {!isSelected && (
+                    <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
+                        {` `}
+                    </span>
+                )}
+                {item.icon}
+            </span>
+        </>
+    );
 }

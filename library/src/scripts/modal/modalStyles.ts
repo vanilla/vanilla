@@ -186,6 +186,10 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
+            "& .form-group": {
+                marginLeft: unit(-16),
+                marginRight: unit(-16),
+            },
         },
     } as NestedCSSProperties);
 

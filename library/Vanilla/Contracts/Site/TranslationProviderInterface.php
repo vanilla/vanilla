@@ -23,12 +23,14 @@ interface TranslationProviderInterface {
      * Translate some key to the current locale
      *
      * @param string $propertyKey
-     * @param $sourceValue
+     * @param string $sourceValue
      * @return string
      */
-    public function translate(string $propertyKey, $sourceValue): string;
+    public function translate(string $propertyKey, string $sourceValue): string;
 
     /**
+     * Translate content by recordType and recordID or recordKey
+     *
      * @param string $locale
      * @param string $resource
      * @param string $recordType

@@ -117,7 +117,6 @@ export const messagesClasses = useThemeCache(() => {
     const noPadding = style("noPadding", {
         $nest: {
             "&&": {
-                padding: 0,
                 top: 49,
                 minHeight: 48,
             },
@@ -215,12 +214,10 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
     const iconWrap = style("iconWrap", {
-        position: "relative",
         width: percent(100),
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        paddingLeft: 10,
     });
 
     const confirm = style("confirm", {});

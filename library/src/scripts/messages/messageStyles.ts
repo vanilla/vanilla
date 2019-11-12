@@ -22,6 +22,7 @@ import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { inherit } from "highlight.js";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -99,7 +100,8 @@ export const messagesClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 flexDirection: "row",
-                maxWidth: 920,
+                maxWidth: "inherit",
+                width: "auto",
             },
         },
     });
@@ -197,7 +199,7 @@ export const messagesClasses = useThemeCache(() => {
         ...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
         transform: translate(`-100%`),
-        marginLeft: unit(-14),
+        marginLeft: 0,
         $nest: {
             "&&": {
                 color: colorOut(globalVars.mainColors.fg),
@@ -210,6 +212,7 @@ export const messagesClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        paddingLeft: 10,
     });
 
     const confirm = style("confirm", {});

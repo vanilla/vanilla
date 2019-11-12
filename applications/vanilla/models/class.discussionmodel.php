@@ -106,6 +106,11 @@ class DiscussionModel extends Gdn_Model {
     protected $floodGate;
 
     /**
+     * @var DateTimeInterface
+     */
+    private $archiveDate;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
@@ -123,6 +128,12 @@ class DiscussionModel extends Gdn_Model {
             'Sink',
             'Score',
         ]);
+
+        try {
+            $this->setArchiveDate(Gdn::config('Vanilla.Archive.Date', ''));
+        } catch (\Exception $ex) {
+            trigger_error($ex->getMessage(), E_USER_NOTICE);
+        }
     }
 
     /**
@@ -479,8 +490,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('0', '', 'Read')
                 ->select('d.Announce', '', 'IsAnnounce');
         }
-
-        $this->addArchiveWhere($this->SQL);
 
         if ($offset !== false && $limit !== false) {
             $this->SQL->limit($limit, $offset);
@@ -868,9 +877,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.Announce', '', 'IsAnnounce');
         }
 
-        $this->addArchiveWhere($this->SQL);
-
-
         $this->SQL->limit($limit, $offset);
 
         $this->EventArguments['SortField'] = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
@@ -1006,7 +1012,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     public function calculate(&$discussion) {
-        $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
+
 
         // Fix up output
         $discussion->Name = htmlspecialchars($discussion->Name);
@@ -1041,9 +1047,8 @@ class DiscussionModel extends Gdn_Model {
             $discussion->CountCommentWatch = null;
         }
 
-        // Allow for discussions to be archived
-        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
-        if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
+        // Allow for discussions to be archived.
+        if ($this->isArchived($discussion->DateLastComment)) {
             $discussion->Closed = '1';
             if ($discussion->CountCommentWatch) {
                 $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
@@ -1053,7 +1058,6 @@ class DiscussionModel extends Gdn_Model {
             // Allow for discussions to just be new.
         } elseif ($discussion->CountCommentWatch === null) {
             $discussion->CountUnreadComments = true;
-
         } else {
             $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
         }
@@ -1120,23 +1124,11 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Add SQL Where to account for archive date.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param object $sql Gdn_SQLDriver
+     * @param Gdn_SQLDriver $sql
+     * @deprecated
      */
     public function addArchiveWhere($sql = null) {
-        if (is_null($sql)) {
-            $sql = $this->SQL;
-        }
-
-        $exclude = Gdn::config('Vanilla.Archive.Exclude');
-        if ($exclude) {
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
-            if ($archiveDate) {
-                $sql->where('d.DateLastComment >', $archiveDate);
-            }
-        }
+        deprecated('DiscussionModel::addArchiveWhere()');
     }
 
 
@@ -2144,10 +2136,6 @@ class DiscussionModel extends Gdn_Model {
                         $fields['Format'] = c('Garden.InputFormatter', '');
                     }
 
-                    if (c('Vanilla.QueueNotifications')) {
-                        $fields['Notified'] = ActivityModel::SENT_PENDING;
-                    }
-
                     // Check for approval
                     $approvalRequired = checkRestriction('Vanilla.Approval.Require');
                     if ($approvalRequired && !val('Verified', Gdn::session()->User)) {
@@ -2267,6 +2255,7 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
+            "Format" => $format ?? null,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2274,17 +2263,12 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
+            "Story" => $body ?? null,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
             ]
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowDiscussionBody", false)) {
-            $data["Story"] = $body;
-            $data["Format"] = $format;
-        }
 
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];
@@ -2317,11 +2301,9 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments["Activity"] = $data;
 
         // Notify everyone that has advanced notifications.
-        if (!c("Vanilla.QueueNotifications")) {
-            $advancedActivity = $data;
-            $advancedActivity["Data"]["Reason"] = "advanced";
-            $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-        }
+        $advancedActivity = $data;
+        $advancedActivity["Data"]["Reason"] = "advanced";
+        $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
 
         // Throw an event for users to add their own events.
         $this->EventArguments["Discussion"] = $discussion;
@@ -2416,15 +2398,8 @@ class DiscussionModel extends Gdn_Model {
     public function updateDiscussionCount($categoryID, $discussion = false) {
         $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
-            $exclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
             $params = [];
             $where = '';
-
-            if ($exclude && $archiveDate) {
-                $where = 'where d.DateLastComment > :ArchiveDate';
-                $params[':ArchiveDate'] = $archiveDate;
-            }
 
             // Update all categories.
             $sql = "update :_Category c
@@ -2450,8 +2425,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.CountComments', 'sum', 'CountComments')
                 ->from('Discussion d')
                 ->where('d.CategoryID', $categoryID);
-
-            $this->addArchiveWhere();
 
             $data = $this->SQL->get()->firstRow();
             $countDiscussions = (int)getValue('CountDiscussions', $data, 0);
@@ -3092,6 +3065,37 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Get the auto-archive date for discussions.
+     *
+     * @return DateTimeInterface|null
+     */
+    public function getArchiveDate(): ?DateTimeInterface {
+        return $this->archiveDate;
+    }
+
+    /**
+     * Set the archive date.
+     *
+     * @param DateTimeInterface|string $archiveDate A datetime or a string that can be converted to a date.
+     */
+    public function setArchiveDate($archiveDate): void {
+        if (empty($archiveDate)) {
+            $archiveDate = null;
+        } elseif (is_string($archiveDate)) {
+            $utc = new DateTimeZone('UTC');
+            $now = new DateTimeImmutable('now', $utc);
+            $archiveDate = new DateTimeImmutable($archiveDate, $utc);
+            if ($archiveDate > $now) {
+                // The date is in the future. Assume the user entered something like '3 days' instead of '-3 days'.
+                $archiveDate = $now->sub($now->diff($archiveDate));
+            }
+        } elseif (!($archiveDate instanceof DateTimeInterface)) {
+            throw new \InvalidArgumentException("DiscussionModel::setArchiveDate() expects a string or DateTimeInterface");
+        }
+        $this->archiveDate = $archiveDate;
+    }
+
+    /**
      * Takes a collection of filters and returns the corresponding filter key/value array [setKey => filterKey].
      *
      * @param array $filters The filters to get the keys for.
@@ -3398,5 +3402,28 @@ class DiscussionModel extends Gdn_Model {
             $row['Name'] = htmlspecialchars_decode($row['Name']);
         }
         return $row;
+    }
+
+    /**
+     * Determine whether or not the discussion is archived based on its last comment date.
+     *
+     * @param string|null $dateLastComment
+     * @return bool
+     */
+    public function isArchived($dateLastComment): bool {
+        if (empty($dateLastComment) || $this->getArchiveDate() === null) {
+            return false;
+        }
+        try {
+            $dt = new DateTimeImmutable($dateLastComment, $this->getArchiveDate()->getTimezone());
+        } catch (\Exception $ex) {
+            trigger_error('DiscussionModel::isArchived() got an invalid dateLastComment.', E_USER_WARNING);
+            return false;
+        }
+        if ($dt < $this->getArchiveDate()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

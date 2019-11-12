@@ -17,10 +17,11 @@ interface BreadcrumbProviderInterface {
      * Get a breadcrumb array for a particular record.
      *
      * @param RecordInterface $record
+     * @param string $locale
      *
      * @return Breadcrumb[]
      */
-    public function getForRecord(RecordInterface $record): array;
+    public function getForRecord(RecordInterface $record, string $locale = null): array;
 
     /**
      * Get the record type that the provider works for.

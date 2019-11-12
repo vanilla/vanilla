@@ -133,9 +133,13 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const middleColumnWidth = 672;
-    const middleColumn = makeThemeVars("middleColumn", {
+    const middleColumnInit = makeThemeVars("middleColumn", {
         width: middleColumnWidth,
-        paddedWidth: middleColumnWidth + gutter.size * 2,
+    });
+
+    const middleColumn = makeThemeVars("middleColumn", {
+        width: middleColumnInit.width,
+        paddedWidth: middleColumnInit.width + gutter.size * 2,
     });
 
     const content = makeThemeVars("content", {

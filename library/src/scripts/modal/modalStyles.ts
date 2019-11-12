@@ -38,6 +38,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const sizing = makeThemeVars("sizing", {
+        xl: 1022, // from legacy back-end modals
         large: 720,
         medium: 516,
         small: 375,
@@ -111,7 +112,7 @@ export const modalClasses = useThemeCache(() => {
         flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: viewHeight(80),
+        maxHeight: viewHeight(96),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
@@ -139,6 +140,10 @@ export const modalClasses = useThemeCache(() => {
                 transform: "none",
                 left: 0,
                 right: 0,
+            },
+            "&.isXL": {
+                width: unit(vars.sizing.xl),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),

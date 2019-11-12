@@ -30,7 +30,6 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
      */
     public function __construct(DefaultSiteSection $defaultSiteSection) {
         $this->siteSections = array_merge([$defaultSiteSection]);
-        $this->currentSiteSection = $defaultSiteSection;
     }
 
     /**
@@ -109,7 +108,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrentSiteSection(): SiteSectionInterface {
+    public function getCurrentSiteSection(): ?SiteSectionInterface {
         return $this->currentSiteSection;
     }
 

@@ -64,6 +64,7 @@ export const frameClasses = useThemeCache(() => {
     });
     const bodyWrap = style("bodyWrap", {
         background: colorOut(vars.colors.bg),
+        width: percent(100),
     });
     const footerWrap = style("footerWrap", {
         background: colorOut(vars.colors.bg),

@@ -211,7 +211,7 @@ class HtmlFormat extends BaseFormat {
      * @return string
      */
     protected function legacySpoilers(string $html): string {
-        if (strpos($html, '[/spoiler]') !== false) {
+        if ($this->hasLegacySpoilers($html) !== false) {
             $count = 0;
             do {
                 $html = preg_replace(
@@ -224,5 +224,25 @@ class HtmlFormat extends BaseFormat {
             } while ($count > 0);
         }
         return $html;
+    }
+
+    /**
+     * Test whether a bit of HTML has legacy spoilers.
+     *
+     * @param string $html The HTML to test.
+     * @return bool
+     */
+    private function hasLegacySpoilers(string $html): bool {
+        // Check for an inline spoiler.
+        if (preg_match('`(\[spoiler\])[^\n]+(\[\/spoiler\])`', $html)) {
+            return true;
+        }
+
+        // Check for a multi-line spoiler.
+        if (preg_match('`^\[\/?spoiler\]$`m', $html, $m)) {
+            return true;
+        }
+
+        return false;
     }
 }

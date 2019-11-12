@@ -63,6 +63,7 @@ export const frameClasses = useThemeCache(() => {
         willChange: "height",
     });
     const bodyWrap = style("bodyWrap", {
+        position: "relative",
         background: colorOut(vars.colors.bg),
         width: percent(100),
     });

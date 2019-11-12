@@ -35,6 +35,7 @@ interface TranslationProviderInterface {
      * @param int $recordID
      * @param string $recordKey
      * @param string $propertyName
+     * @param string $sourceValue
      * @return string
      */
     public function translateContent(

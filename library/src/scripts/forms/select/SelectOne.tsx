@@ -38,7 +38,6 @@ export interface ISelectOneProps extends IMenuPlacement {
     inputClassName?: string;
     isClearable?: boolean;
     describedBy?: string;
-
 }
 
 export enum MenuPlacement {

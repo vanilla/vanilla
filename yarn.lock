@@ -14883,10 +14883,10 @@ prettier-webpack-plugin@^1.2.0:
   resolved "https://registry.yarnpkg.com/prettier-webpack-plugin/-/prettier-webpack-plugin-1.2.0.tgz#4a5635f054741160936c7f509f0a9b1f928e5550"
   integrity sha512-icoIPxDpOo/q7SUCHSW152dCr83z7QS/6s2V3phweKu1bfJcXSObVAq/Z8OeSX7ykuXrcV2UpZbfljRI2rIOMg==
 
-prettier@1.19.0:
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.0.tgz#3bec4489d5eebcd52b95ddd2c22467b5c852fde1"
-  integrity sha512-GlAIjk6DjkNT6u/Bw5QCWrbzh9YlLKwwmJT//1YiCR3WDpZDnyss64aXHQZgF8VKeGlWnX6+tGsKSVxsZT/gtA==
+prettier@1.19.1:
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
+  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
 prettier@^1.16.4:
   version "1.18.2"

@@ -17,7 +17,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
 
-export interface ISelectOneProps {
+export interface ISelectOneProps extends IMenuPlacement {
     label: string | null;
     id?: string;
     inputID?: string;
@@ -38,7 +38,17 @@ export interface ISelectOneProps {
     inputClassName?: string;
     isClearable?: boolean;
     describedBy?: string;
-    menuPlacement?: "auto" | "bottom" | "top";
+
+}
+
+export enum MenuPlacement {
+    AUTO = "auto",
+    BOTTOM = "bottom",
+    TOP = "top",
+}
+
+export interface IMenuPlacement {
+    menuPlacement?: MenuPlacement;
 }
 
 /**

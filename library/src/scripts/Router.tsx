@@ -9,6 +9,7 @@ import { Router as ReactRouter, Switch, Route } from "react-router-dom";
 import { formatUrl } from "@library/utility/appUtils";
 import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
+import { HistoryDepthContextProvider } from "@library/routing/HistoryDepthContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -37,7 +38,11 @@ export function Router(props: IProps) {
 
     if (!props.disableDynamicRouting) {
         routes = (
-            <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>{routes}</LinkContextProvider>
+            <HistoryDepthContextProvider>
+                <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>
+                    {routes}
+                </LinkContextProvider>
+            </HistoryDepthContextProvider>
         );
     }
 

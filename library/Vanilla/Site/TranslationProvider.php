@@ -9,23 +9,27 @@ namespace Vanilla\Site;
 
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 
+/**
+ * Class TranslationProvider
+ * @package Vanilla\Site
+ */
 class TranslationProvider implements TranslationProviderInterface {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function supportContentTranslation(): bool {
         return false;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function translate(string $propertyKey, $sourceValue): string {
         return Gdn::translate($propertyKey, $sourceValue);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function translateContent(
         string $locale,

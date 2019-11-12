@@ -7,10 +7,10 @@
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { LeftChevronCompactIcon } from "@library/icons/common";
-import { useHistoryDepth } from "@library/routing/HistoryDepthContext";
+import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import { t, siteUrl } from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { useHistory } from "react-router";
@@ -58,7 +58,7 @@ interface IProps {
  */
 export default function BackLink(props: IProps) {
     const history = useHistory();
-    const { canGoBack } = useHistoryDepth();
+    const { canGoBack, backFallbackUrl, navigateBack } = useBackRouting();
 
     const classes = backLinkClasses();
     const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
@@ -100,19 +100,23 @@ export default function BackLink(props: IProps) {
             </Button>
         );
     } else if (props.fallbackElement) {
-        return props.fallbackElement;
+        return <>{props.fallbackElement}</>;
     } else {
-        // Fallback to URL navigation.
-        const routingUrl = props.fallbackUrl ?? siteUrl("/");
         content = (
-            <SmartLink
-                to={routingUrl}
+            <a
+                href={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
+                className={className}
                 aria-label={props.title as string}
                 title={props.title as string}
-                className={className}
+                onClick={(event: React.MouseEvent) => {
+                    // We don't use a real link navigation.
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateBack(props.fallbackUrl);
+                }}
             >
                 {content}
-            </SmartLink>
+            </a>
         );
     }
 

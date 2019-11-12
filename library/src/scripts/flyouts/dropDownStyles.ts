@@ -65,6 +65,7 @@ export const dropDownVariables = useThemeCache(() => {
 
         padding: {
             top: 6,
+            horizontal: 14,
         },
     });
 
@@ -239,7 +240,7 @@ export const dropDownClasses = useThemeCache(() => {
                 lineHeight: unit(globalVars.lineHeights.condensed),
                 ...paddings({
                     vertical: 4,
-                    horizontal: 14,
+                    horizontal: vars.item.padding.horizontal,
                 }),
                 ...borders({
                     color: "transparent",

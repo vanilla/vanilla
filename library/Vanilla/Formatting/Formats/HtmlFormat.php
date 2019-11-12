@@ -163,6 +163,32 @@ class HtmlFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
+    public function parseImageUrls(string $content): array {
+        $rendered = $this->renderHtml($content);
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($rendered);
+
+        $xpath = new \DOMXPath($dom);
+        $domImages = $xpath->query('//img');
+
+        /** @var string[] $headings */
+        $imageUrls = [];
+
+        /** @var \DOMNode $domImages */
+        foreach ($domImages as $domImage) {
+            $src = $domImage->getAttribute('src');
+            if ($src) {
+                $imageUrls[] = $src;
+            }
+        }
+
+        return $imageUrls;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function parseMentions(string $content): array {
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.

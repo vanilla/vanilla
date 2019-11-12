@@ -6,7 +6,7 @@
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 
 export const dashboardFormListClasses = useThemeCache(() => {
-    const style = styleFactory("dashboardFormListClasses");
+    const style = styleFactory("dashboardFormList");
 
     const root = style({
         padding: 0,

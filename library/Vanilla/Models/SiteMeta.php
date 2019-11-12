@@ -59,6 +59,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var Contracts\Site\SiteSectionInterface */
     private $currentSiteSection;
 
+    /** @var string */
+    private $logo;
+
+    /** @var string */
+    private $orgName;
+
     /**
      * SiteMeta constructor.
      *
@@ -90,6 +96,8 @@ class SiteMeta implements \JsonSerializable {
         // For now it needs to come from some where, so I'm putting it here.
         $this->siteTitle = $config->get('Garden.Title', "");
 
+        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
+
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
         $maxSize = $config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize'));
@@ -104,6 +112,10 @@ class SiteMeta implements \JsonSerializable {
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
         }
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
@@ -129,8 +141,10 @@ class SiteMeta implements \JsonSerializable {
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
+                'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
@@ -149,6 +163,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getSiteTitle(): string {
         return $this->siteTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgName(): string {
+        return $this->orgName;
     }
 
     /**
@@ -214,6 +235,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getFavIcon(): ?string {
         return $this->favIcon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): string {
+        return $this->logo;
     }
 
     /**

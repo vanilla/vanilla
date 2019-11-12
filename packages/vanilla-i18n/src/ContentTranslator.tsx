@@ -10,8 +10,7 @@ export interface IContentTranslatorProps {
     isLoading?: boolean;
     isFullScreen?: boolean;
     properties: ITranslationProperty[];
-    afterSave: () => void; // You probably want to re-fetch your resource here, then close the modal.
-    onDismiss: () => void; // You probably just want to close the modal.
+    resource: string;
 }
 
 // Subtypes
@@ -21,8 +20,6 @@ export enum TranslationPropertyType {
 }
 
 export interface ITranslationProperty {
-    translationPropertyKey: string; // Ex. kb.knowledge-bases.1.name
-    resource: string; // Ex. knowledge
     recordType: string; // Ex. knowledgeCategory
     recordID?: number; // Ex. 425
     recordKey?: string; // Ex. Garden.Description

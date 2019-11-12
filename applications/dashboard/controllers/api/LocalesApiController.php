@@ -169,4 +169,23 @@ class LocalesApiController extends Controller {
 
         return $translations;
     }
+
+    /**
+     * Validator for locale field
+     *
+     * @param string $locale
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public function validateLocale(string $locale, \Garden\Schema\ValidationField $validationField): bool {
+        $locales = $this->getEnabledLocales();
+        foreach ($locales as $localePack) {
+            if ($localePack['localeID'] === $locale
+            || $localePack['localeKey'] === $locale
+            || $localePack['regionalKey'] === $locale) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -76,7 +76,7 @@ export function withDevice<T extends IDeviceProps = IDeviceProps>(WrappedCompone
             <DeviceContext.Consumer>
                 {context => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
-                    return <WrappedComponent device={context} {...props as T} />;
+                    return <WrappedComponent device={context} {...(props as T)} />;
                 }}
             </DeviceContext.Consumer>
         );

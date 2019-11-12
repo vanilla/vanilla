@@ -355,11 +355,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 }
 
-const withRedux = connect(
-    UserSuggestionModel.mapStateToProps,
-    dispatch => ({
-        suggestionActions: new UserSuggestionActions(dispatch, apiv2),
-    }),
-);
+const withRedux = connect(UserSuggestionModel.mapStateToProps, dispatch => ({
+    suggestionActions: new UserSuggestionActions(dispatch, apiv2),
+}));
 
 export default withRedux(withEditor(MentionToolbar));

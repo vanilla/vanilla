@@ -102,7 +102,4 @@ function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     };
 }
 
-export const ThemeProvider = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(BaseThemeProvider);
+export const ThemeProvider = connect(mapStateToProps, mapDispatchToProps)(BaseThemeProvider);

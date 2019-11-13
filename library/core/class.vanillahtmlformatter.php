@@ -167,7 +167,7 @@ class VanillaHtmlFormatter {
      */
     public function format($html, $options = []) {
         $attributes = self::c('Garden.Html.BlockedAttributes', 'on*, target, download');
-        $schemes = implode(', ', self::c('Garden.Html.AllowedUrlSchemes'));
+        $schemes = implode(', ', self::c('Garden.Html.AllowedUrlSchemes', []));
 
         $specOverrides = val('spec', $options, []);
         if (!is_array($specOverrides)) {

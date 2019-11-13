@@ -42,6 +42,7 @@ export const modalVariables = useThemeCache(() => {
         large: 720,
         medium: 516,
         small: 375,
+        height: viewHeight(96),
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -112,7 +113,7 @@ export const modalClasses = useThemeCache(() => {
         flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: viewHeight(96),
+        maxHeight: unit(vars.sizing.height),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
@@ -227,11 +228,22 @@ export const modalClasses = useThemeCache(() => {
         }),
     );
 
+    const frameWrapper = style("frameWrapper", {
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        height: percent(100),
+        maxHeight: percent(100),
+        minHeight: percent(0),
+        width: percent(100),
+    });
+
     return {
         root,
         scroll,
         content,
         pageHeader,
         overlay,
+        frameWrapper,
     };
 });

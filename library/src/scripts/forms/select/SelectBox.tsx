@@ -87,6 +87,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                     flyoutType={FlyoutType.LIST}
                     selfPadded={true}
                     renderLeft={true}
+                    horizontalOffset={true}
                 >
                     {props.options.map((option, i) => {
                         const isSelected = selectedOption && option.value === selectedOption.value;

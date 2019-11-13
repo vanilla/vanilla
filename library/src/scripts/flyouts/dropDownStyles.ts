@@ -14,6 +14,7 @@ import {
     buttonStates,
     unit,
     userSelect,
+    negative,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -349,6 +350,15 @@ export const dropDownClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.primary),
     });
 
+    const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
+
+    const contentOffsetLeft = style("contentOffsetLeft", {
+        transform: `translateX(${negative(unit(flyoutOffset))})`,
+    });
+    const contentOffsetRight = style("contentOffsetRight", {
+        transform: `translateX(${unit(flyoutOffset)})`,
+    });
+
     return {
         root,
         contents,
@@ -371,5 +381,7 @@ export const dropDownClasses = useThemeCache(() => {
         noVerticalPadding,
         paddedFrame,
         check,
+        contentOffsetLeft,
+        contentOffsetRight,
     };
 });

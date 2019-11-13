@@ -55,6 +55,7 @@ export interface IProps extends IOpenDirectionProps {
     selfPadded?: boolean;
     isSmall?: boolean;
     id?: string;
+    horizontalOffset?: boolean;
 }
 
 export enum FlyoutType {
@@ -121,6 +122,7 @@ export default function DropDown(props: IProps) {
                                 ? DropDownContentSize.MEDIUM
                                 : DropDownContentSize.SMALL
                         }
+                        horizontalOffset={props.horizontalOffset}
                     >
                         {title ? (
                             <header className={classNames("frameHeader", classesFrameHeader.root)}>

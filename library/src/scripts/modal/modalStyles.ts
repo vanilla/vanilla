@@ -196,6 +196,7 @@ export const modalClasses = useThemeCache(() => {
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),
         width: percent(100),
+        height: percent(100),
         maxHeight: percent(100),
         overflow: "auto",
     });

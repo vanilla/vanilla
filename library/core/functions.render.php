@@ -1296,10 +1296,9 @@ if (!function_exists('searchExcerpt')) {
      * @param string $plainText
      * @param array|string $searchTerms
      * @param int $length
-     * @param bool $mark
      * @return string
      */
-    function searchExcerpt($plainText, $searchTerms, $length = 200, $mark = true) {
+    function searchExcerpt($plainText, $searchTerms, $length = 200) {
         if (empty($searchTerms)) {
             return substrWord($plainText, 0, $length);
         }
@@ -1325,11 +1324,7 @@ if (!function_exists('searchExcerpt')) {
                 if (($pos = mb_stripos($line, $term)) !== false) {
                     $line = substrWord($line, $term, $length);
 
-                    if ($mark) {
-                        return markString($searchTerms, $line);
-                    } else {
-                        return $line;
-                    }
+                    return $line;
                 }
             }
         }

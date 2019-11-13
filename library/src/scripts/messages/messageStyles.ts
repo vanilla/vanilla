@@ -22,6 +22,8 @@ import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { inherit } from "highlight.js";
+import { relative } from "path";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -84,30 +86,60 @@ export const messagesClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
     const shadows = shadowHelper();
 
+    const wrap = style("wrap", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flexWrap: "nowrap",
+        minHeight: unit(vars.sizing.minHeight),
+
+        width: percent(100),
+
+        margin: "auto",
+        color: colorOut(vars.colors.fg),
+        ...paddings({
+            ...vars.spacing.padding,
+            right: vars.spacing.padding.right,
+        }),
+    });
+
     // Fixed wrapper
     const fixed = style("fixed", {
         position: "fixed",
         left: 0,
         top: unit(titleBarVars.sizing.height - 8),
         minHeight: unit(vars.sizing.minHeight),
-        width: percent(100),
-        maxWidth: viewWidth(100),
+        maxWidth: percent(100),
         zIndex: 20,
+        $nest: {
+            [`& .${wrap}`]: {
+                width: unit(950),
+                maxWidth: percent(100),
+            },
+        },
     });
 
     const innerWrapper = style("innerWrapper", {
         $nest: {
             "&&": {
                 flexDirection: "row",
-                maxWidth: 920,
             },
         },
+    });
+    const messageWrapper = style("messageWrapper", {
+        position: "relative",
+        display: "flex",
+        paddingLeft: 30,
+        alignItems: "center",
+        flexDirection: "row",
+        margin: "0 auto",
+        paddingTop: 7,
+        paddingBottom: 7,
     });
 
     const noPadding = style("noPadding", {
         $nest: {
             "&&": {
-                padding: 0,
                 top: 49,
                 minHeight: 48,
             },
@@ -117,32 +149,17 @@ export const messagesClasses = useThemeCache(() => {
     const root = style(
         {
             width: percent(100),
+            backgroundColor: colorOut(vars.colors.bg),
+            ...shadowOrBorderBasedOnLightness(
+                globalVars.body.backgroundImage.color,
+                borders({
+                    color: globalVars.mainColors.fg,
+                }),
+                shadows.embed(),
+            ),
         },
         margins({ horizontal: "auto" }),
     );
-
-    const wrap = style("wrap", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        flexWrap: "nowrap",
-        minHeight: unit(vars.sizing.minHeight),
-        backgroundColor: colorOut(vars.colors.bg),
-        width: percent(100),
-        ...shadowOrBorderBasedOnLightness(
-            globalVars.body.backgroundImage.color,
-            borders({
-                color: globalVars.mainColors.fg,
-            }),
-            shadows.embed(),
-        ),
-        margin: "auto",
-        color: colorOut(vars.colors.fg),
-        ...paddings({
-            ...vars.spacing.padding,
-            right: vars.spacing.padding.right,
-        }),
-    });
 
     const message = style("message", {
         ...userSelect(),
@@ -194,22 +211,18 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const errorIcon = style("errorIcon", {
-        ...absolutePosition.middleLeftOfParent(),
-        maxWidth: percent(100),
-        transform: translate(`-100%`),
-        marginLeft: unit(-14),
         $nest: {
             "&&": {
                 color: colorOut(globalVars.mainColors.fg),
             },
         },
     });
-    const iconWrap = style("iconWrap", {
-        position: "relative",
+    const content = style("content", {
         width: percent(100),
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        position: "relative",
     });
 
     const confirm = style("confirm", {});
@@ -223,9 +236,10 @@ export const messagesClasses = useThemeCache(() => {
         innerWrapper,
         setWidth,
         messageIcon,
-        iconWrap,
+        content,
         confirm,
         errorIcon,
         noPadding,
+        messageWrapper,
     };
 });

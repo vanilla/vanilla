@@ -8,24 +8,36 @@
 namespace Vanilla\Site;
 
 use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Contracts\LocaleInterface;
 
 /**
  * Class TranslationProvider
  * @package Vanilla\Site
  */
 class TranslationProvider implements TranslationProviderInterface {
+    /** @var LocaleInterface $locale */
+    private $locale;
+
+    /**
+     * TranslationProvider constructor.
+     * @param LocaleInterface $locale
+     */
+    public function __construct(LocaleInterface $locale) {
+        $this->locale = $locale;
+    }
+
     /**
      * @inheritdoc
      */
-    public function supportContentTranslation(): bool {
+    public function supportsContentTranslation(): bool {
         return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function translate(string $propertyKey, $sourceValue): string {
-        return Gdn::translate($propertyKey, $sourceValue);
+    public function translate(string $propertyKey, string $sourceValue): string {
+        return $this->locale->translate($propertyKey, $sourceValue);
     }
 
     /**

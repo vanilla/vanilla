@@ -1015,7 +1015,6 @@ class DiscussionModel extends Gdn_Model {
      * Massage the data on a discussion row.
      *
      * @param object $discussion
-     * @throws Exception
      */
     public function calculate(&$discussion) {
         // Fix up output

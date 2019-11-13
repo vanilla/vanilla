@@ -23,39 +23,50 @@ export interface IMessageProps {
     onCancel?: () => void;
     cancelText?: React.ReactNode;
     isFixed?: boolean;
+    isContained?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
     const classes = messagesClasses();
 
     // When fixed we need to apply an extra layer for padding.
-    const WrapperElement = props.isFixed ? Container : React.Fragment;
+    const InnerWrapper = props.isContained ? Container : React.Fragment;
+    const OuterWrapper = props.isFixed ? Container : React.Fragment;
+
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
-                <WrapperElement>
-                    <div className={classNames(classes.wrap)}>
-                        <div className={classes.message}>{props.contents || props.stringContents}</div>
-                        {props.onConfirm && (
-                            <Button
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
-                                onClick={props.onConfirm}
-                                className={classes.actionButton}
-                            >
-                                {props.confirmText || t("OK")}
-                            </Button>
-                        )}
-                        {props.onCancel && (
-                            <Button
-                                baseClass={ButtonTypes.TEXT}
-                                onClick={props.onCancel}
-                                className={classes.actionButton}
-                            >
-                                {props.cancelText || t("Cancel")}
-                            </Button>
-                        )}
+                <OuterWrapper>
+                    <div
+                        className={classNames(classes.wrap, props.className, {
+                            [classes.noPadding]: props.isContained,
+                            [classes.fixed]: props.isContained,
+                        })}
+                    >
+                        <InnerWrapper className={classes.innerWrapper}>
+                            <div className={classes.message}>{props.contents || props.stringContents}</div>
+
+                            {props.onConfirm && (
+                                <Button
+                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    onClick={props.onConfirm}
+                                    className={classes.actionButton}
+                                >
+                                    {props.confirmText || t("OK")}
+                                </Button>
+                            )}
+                            {props.onCancel && (
+                                <Button
+                                    baseClass={ButtonTypes.TEXT}
+                                    onClick={props.onCancel}
+                                    className={classes.actionButton}
+                                >
+                                    {props.cancelText || t("Cancel")}
+                                </Button>
+                            )}
+                        </InnerWrapper>
                     </div>
-                </WrapperElement>
+                </OuterWrapper>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />

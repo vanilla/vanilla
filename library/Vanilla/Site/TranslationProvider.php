@@ -11,7 +11,7 @@ use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Contracts\LocaleInterface;
 
 /**
- * Class TranslationProvider
+ * Class TranslationProvider .
  * @package Vanilla\Site
  */
 class TranslationProvider implements TranslationProviderInterface {

@@ -10,6 +10,7 @@ import { DashboardImageUpload } from "@dashboard/forms/DashboardImageUpload";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n";
+import { IFieldError } from "@library/@types/api/core";
 
 interface IProps {
     value: string | null; // The image url

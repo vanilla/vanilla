@@ -33,7 +33,7 @@ class TranslationModel {
      */
     public function getContentTranslationProvider(): ?TranslationProviderInterface {
         foreach ($this->providers as $provider) {
-            if ($provider->supportContentTranslation()) {
+            if ($provider->supportsContentTranslation()) {
                 return $provider;
             }
         }

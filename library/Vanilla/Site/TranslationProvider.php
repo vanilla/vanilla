@@ -55,4 +55,19 @@ class TranslationProvider implements TranslationProviderInterface {
         // Placeholder (fallback to default value), since this providerdoes not support user content translation
         return $sourceValue;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function translateProperties(
+        string $locale,
+        string $resource,
+        string $recordType,
+        string $idFieldName,
+        array $records,
+        array $properties
+    ): array {
+        // Placeholder (fallback to default value), since this providerdoes not support user content translation
+        return $records;
+    }
 }

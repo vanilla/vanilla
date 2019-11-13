@@ -49,4 +49,24 @@ interface TranslationProviderInterface {
         string $propertyName,
         string $sourceValue
     ): string;
+
+    /**
+     * Translate properties of some recordType items provided
+     *
+     * @param string $locale
+     * @param string $resource
+     * @param string $recordType Ex: discussion, knwoledgeCategory
+     * @param string $idFieldName Ex: discussionID, categoryID, knowldegeCategoryID, etc
+     * @param array $records
+     * @param array $properties Ex: ['name', 'description']
+     * @return array
+     */
+    public function translateProperties(
+        string $locale,
+        string $resource,
+        string $recordType,
+        string $idFieldName,
+        array $records,
+        array $properties
+    ): array;
 }

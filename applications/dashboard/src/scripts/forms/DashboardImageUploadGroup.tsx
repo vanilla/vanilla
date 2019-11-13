@@ -10,6 +10,7 @@ import { DashboardImageUpload } from "@dashboard/forms/DashboardImageUpload";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n";
+import { IFieldError } from "@library/@types/api/core";
 
 interface IProps {
     value: string | null; // The image url
@@ -18,6 +19,7 @@ interface IProps {
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
     disabled?: boolean;
+    errors?: IFieldError[];
 }
 
 export function DashboardImageUploadGroup(props: IProps) {
@@ -25,6 +27,8 @@ export function DashboardImageUploadGroup(props: IProps) {
     const [originalValue] = useState(props.value);
 
     const imagePreviewSrc = previewUrl || props.value;
+    const isStillOriginalValue = originalValue === props.value;
+    const undoTitle = isStillOriginalValue ? t("Delete") : t("Undo");
 
     return (
         <DashboardFormGroup
@@ -39,11 +43,15 @@ export function DashboardImageUploadGroup(props: IProps) {
                                 baseClass={ButtonTypes.TEXT_PRIMARY}
                                 onClick={() => {
                                     setPreviewUrl(null);
-                                    props.onChange(originalValue);
+                                    if (isStillOriginalValue) {
+                                        props.onChange(null);
+                                    } else {
+                                        props.onChange(originalValue);
+                                    }
                                 }}
                                 disabled={props.disabled}
                             >
-                                {t("Undo")}
+                                {undoTitle}
                             </Button>
                         </div>
                     </>
@@ -56,6 +64,7 @@ export function DashboardImageUploadGroup(props: IProps) {
                 onImagePreview={setPreviewUrl}
                 imageUploader={props.imageUploader}
                 disabled={props.disabled}
+                errors={props.errors}
             />
         </DashboardFormGroup>
     );

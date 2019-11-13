@@ -5231,7 +5231,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         $user = $this->getID($userID);
         $preferences = $user->Preferences ?? [];
         $landingPages = $preferences['DashboardNav.SectionLandingPages'] ?? [];
-        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?: '';
+        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?? '';
         $sectionReset = false;
 
         // Run through the user's saved landing page per section and if the url matches the passed url,

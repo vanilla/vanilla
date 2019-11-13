@@ -17,7 +17,7 @@ interface TranslationProviderInterface {
      *
      * @return bool
      */
-    public function supportContentTranslation(): bool;
+    public function supportsContentTranslation(): bool;
 
     /**
      * Translate some key to the current locale

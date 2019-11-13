@@ -270,4 +270,18 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->assertArrayHasKey('insertUser', $row['lastPost']);
         $this->assertArrayNotHasKey('lastUser', $row);
     }
+
+    /**
+     * The API should not fail when the discussion title/body is empty.
+     */
+    public function testEmptyDiscussionTitle() {
+        $row = $this->testPost();
+
+        /* @var \Gdn_SQLDriver $sql */
+        $sql = self::container()->get(\Gdn_SQLDriver::class);
+        $sql->put('Discussion', ['Name' => '', 'Body' => ''], ['DiscussionID' => $row['discussionID']]);
+
+        $discussion = $this->api()->get("$this->baseUrl/{$row['discussionID']}")->getBody();
+        $this->assertNotEmpty($discussion['name']);
+    }
 }

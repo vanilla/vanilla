@@ -1011,11 +1011,15 @@ class DiscussionModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Massage the data on a discussion row.
+     *
+     * @param object $discussion
+     * @throws Exception
+     */
     public function calculate(&$discussion) {
-
-
         // Fix up output
-        $discussion->Name = htmlspecialchars($discussion->Name);
+        $discussion->Name = htmlspecialchars(trim($discussion->Name) ?: t('(Untitled)'));
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
         $discussion->CanonicalUrl = $discussion->Attributes['CanonicalUrl'] ?? $discussion->Url;

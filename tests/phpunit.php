@@ -62,7 +62,7 @@ require_once PATH_LIBRARY_CORE.'/functions.render.php';
 // Include test utilities.
 $utilityFiles = array_merge(
     glob(PATH_ROOT.'/plugins/*/tests/Utils/*.php'),
-    glob(PATH_ROOT.'/applications/*/tests/Utils/*.php'),
+    glob(PATH_ROOT.'/applications/*/tests/Utils/*.php')
 );
 foreach ($utilityFiles as $file) {
     require_once $file;

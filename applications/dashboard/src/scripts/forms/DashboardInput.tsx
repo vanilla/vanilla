@@ -8,8 +8,12 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
-interface IProps extends IInputTextProps {}
+interface IProps extends IInputTextProps {
+    errors?: IFieldError[];
+}
 
 export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType } = useFormGroup();
@@ -25,6 +29,7 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
                 className={classNames(props.inputProps ? props.inputProps.className : null, classes)}
                 noMargin={true}
             />
+            {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
 };

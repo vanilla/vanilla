@@ -11,6 +11,7 @@ export interface IContentTranslatorProps {
     isFullScreen?: boolean;
     properties: ITranslationProperty[];
     resource: string;
+    title: string;
 }
 
 // Subtypes

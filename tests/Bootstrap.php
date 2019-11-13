@@ -125,6 +125,11 @@ class Bootstrap {
             ->addCall('addProvider', [new Reference(SiteSectionProviderInterface::class)])
             ->setShared(true)
 
+            // Translation model
+            ->rule(\Vanilla\Site\TranslationModel::class)
+            ->addCall('addProvider', [new Reference(\Vanilla\Site\TranslationProvider::class)])
+            ->setShared(true)
+
             // Site applications
             ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
             ->setClass(\Vanilla\Site\ApplicationProvider::class)

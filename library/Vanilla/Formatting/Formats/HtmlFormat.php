@@ -69,7 +69,6 @@ class HtmlFormat extends BaseFormat {
     public function renderHtml(string $content, bool $enhance = true): string {
         $result = $this->htmlSanitizer->filter($content);
 
-
         if ($this->shouldCleanupLineBreaks) {
             $result = self::cleanupLineBreaks($result);
         }
@@ -81,7 +80,6 @@ class HtmlFormat extends BaseFormat {
         }
 
         $result = self::cleanupEmbeds($result);
-
 
         return $result;
     }
@@ -401,6 +399,11 @@ HTML;
 
         $content = $dom->getElementsByTagName('body');
         $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
+
+        // The DOM Document added starting body and ending tags. We need to remove them.
+        $htmlBodyString = preg_replace('/^<body>/', '', $htmlBodyString);
+        $htmlBodyString = preg_replace('/<\/body>$/', '', $htmlBodyString);
+
         return $htmlBodyString;
     }
 

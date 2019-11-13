@@ -41,10 +41,10 @@ class MarkdownFormatTest extends AbstractFormatTestCase {
 > [/spoiler]
 EOT;
         $expected = <<<EOT
-<blockquote class="UserQuote"><div class="QuoteText">
-  <p>[spoiler]</p>
+<blockquote class="UserQuote blockquote"><div class="blockquote-content">
+  <p class="blockquote-line">[spoiler]</p>
   
-  <p>[/spoiler]</p>
+  <p class="blockquote-line">[/spoiler]</p>
 </div></blockquote>
 
 EOT;

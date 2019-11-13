@@ -9,6 +9,8 @@ import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps extends IMenuPlacement {
     options: IComboBoxOption[];
@@ -17,6 +19,8 @@ interface IProps extends IMenuPlacement {
     clas?: string;
     inputClassName?: string;
     disabled?: boolean;
+    isClearable?: boolean;
+    errors?: IFieldError[];
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
@@ -34,7 +38,9 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 inputClassName={classNames("form-control", props.inputClassName)}
                 disabled={props.disabled}
                 menuPlacement={props.menuPlacement}
+                isClearable={props.isClearable}
             />
+            {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
 };

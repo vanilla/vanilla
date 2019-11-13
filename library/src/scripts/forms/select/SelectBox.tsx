@@ -68,33 +68,31 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
             aria-describedby={"describedBy" in props ? props.describedBy : undefined}
             className={classNames("selectBox", props.className)}
         >
-            {"label" in props && <span className="selectBox-label sr-only">{props.label}</span>}
-            <div className="selectBox-content">
-                <DropDown
-                    key={selectedOption ? selectedOption.value : undefined}
-                    buttonRef={buttonRef}
-                    id={id}
-                    className={classNames(
-                        "selectBox-dropDown",
-                        "dropDownItem-verticalPadding",
-                        classesDropDown.verticalPadding,
-                    )}
-                    buttonContents={<SelectBoxButton activeItem={selectedOption} />}
-                    buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
-                    contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
-                    buttonBaseClass={props.buttonBaseClass}
-                    openAsModal={props.openAsModal}
-                    flyoutType={FlyoutType.LIST}
-                    selfPadded={true}
-                    renderLeft={true}
-                    horizontalOffset={true}
-                >
-                    {props.options.map((option, i) => {
-                        const isSelected = selectedOption && option.value === selectedOption.value;
-                        return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
-                    })}
-                </DropDown>
-            </div>
+            {"label" in props && <span className=" sr-only">{props.label}</span>}
+            <DropDown
+                key={selectedOption ? selectedOption.value : undefined}
+                buttonRef={buttonRef}
+                id={id}
+                className={classNames(
+                    "selectBox-dropDown",
+                    "dropDownItem-verticalPadding",
+                    classesDropDown.verticalPadding,
+                )}
+                buttonContents={<SelectBoxButton activeItem={selectedOption} />}
+                buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
+                contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
+                buttonBaseClass={props.buttonBaseClass}
+                openAsModal={props.openAsModal}
+                flyoutType={FlyoutType.LIST}
+                selfPadded={true}
+                renderLeft={true}
+                horizontalOffset={true}
+            >
+                {props.options.map((option, i) => {
+                    const isSelected = selectedOption && option.value === selectedOption.value;
+                    return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
+                })}
+            </DropDown>
         </div>
     );
 }

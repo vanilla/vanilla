@@ -5229,8 +5229,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         }
 
         $user = $this->getID($userID);
-        $preferences = val('Preferences', $user, []);
-        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+        $preferences = $user->Preferences ?? [];
+        $landingPages = $preferences['DashboardNav.SectionLandingPages'] ?? [];
+        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?? '';
+        $sectionReset = false;
 
         // Run through the user's saved landing page per section and if the url matches the passed url,
         // remove that preference.
@@ -5238,13 +5240,16 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             $url = strtolower(trim($url, '/'));
             $landingPage = strtolower(trim($landingPage, '/'));
             if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                $sectionReset = true;
                 unset($landingPages[$section]);
             }
         }
 
-        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        if ($sectionReset) {
+            $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        }
 
-        if ($resetSectionPreference) {
+        if ($resetSectionPreference && $sectionPreference !== '') {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
     }

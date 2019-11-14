@@ -62,7 +62,8 @@
         "voku/html-min": "3.0.5",
         "voku/simple_html_dom": "4.1.7",
         "mikey179/vfsstream": "~1.6",
-        "phing/phing": "2.*"
+        "phing/phing": "2.*",
+        "roave/security-advisories": "dev-master"
     },
     "provide": {
         "ext-gd": "*"

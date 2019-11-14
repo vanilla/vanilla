@@ -19,7 +19,6 @@ const stubEmbedData: IEmbedValue = {
     data: {
         embedType: "stub",
         url: "",
-        attributes: [],
     },
     loaderData: {
         type: "link",

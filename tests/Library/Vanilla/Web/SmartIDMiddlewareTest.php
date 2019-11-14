@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\RequestInterface;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Web\SmartIDMiddleware;
@@ -32,13 +33,21 @@ class SmartIDMiddlewareTest extends TestCase {
     protected $userResolver;
 
     /**
+     * @var \Gdn_Session
+     */
+    protected $session;
+
+    /**
      * Create a configured test middleware for each test.
      */
     public function setUp() {
         $this->middleware =  new TestSmartIDMiddleware();
         $this->middleware->addSmartID('CategoryID', 'categories', ['name', 'urlcode'], 'Category');
 
-        $usr = $this->userResolver = new UserSmartIDResolver();
+        $this->session = new \Gdn_Session();
+        $this->session->UserID = 123;
+
+        $usr = $this->userResolver = new UserSmartIDResolver($this->session);
         $usr->setEmailEnabled(true)
             ->setViewEmail(true);
         $this->middleware->addSmartID('UserID', 'users', '*', $usr);
@@ -84,6 +93,7 @@ class SmartIDMiddlewareTest extends TestCase {
             ['/users/$name:baz', '/users/(User.UserID.name:baz)'],
             ['/users/$foozbook:123', '/users/(UserAuthentication.UserID.providerKey:foozbook.foreignUserKey:123)'],
             ['/users/$query:userID?userID=$name:baz', '/users/(User.UserID.name:baz)'],
+            ['/users/$me', '/users/123'],
         ];
 
         return array_column($r, null, 0);
@@ -238,5 +248,17 @@ class SmartIDMiddlewareTest extends TestCase {
      */
     public function testBadResolver() {
         $this->middleware->addSmartID('FooID', 'foo', '*', 123);
+    }
+
+    /**
+     * The `$me` smart ID without a session should be an exception.
+     *
+     * @expectedException \Garden\Web\Exception\ForbiddenException
+     */
+    public function testInvalidMe() {
+        $this->session->UserID = 0;
+
+        $request = new Request('/users/$me');
+        $r = $this->callMiddleware($request);
     }
 }

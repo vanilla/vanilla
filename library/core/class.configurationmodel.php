@@ -26,7 +26,7 @@ class Gdn_ConfigurationModel {
      */
     public $Name;
 
-    /** @var object An object that is used to manage and execute data integrity rules on this object. */
+    /** @var Gdn_Validation An object that is used to manage and execute data integrity rules on this object. */
     public $Validation;
 
     /** @var object The actual array of data being worked on. */

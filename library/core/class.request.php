@@ -109,7 +109,7 @@ class Gdn_Request implements RequestInterface {
             $this->setAssetRoot($assetRoot);
             return $assetRoot;
         } else {
-            deprecated(__FUNCTION__, "addAssetRoot");
+            deprecated(__FUNCTION__, "getAssetRoot");
             $result = $this->getAssetRoot();
         }
         return $result;

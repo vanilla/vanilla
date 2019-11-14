@@ -31,7 +31,7 @@ export interface IUserRoles {
         {
             roleID: number;
             name: string;
-        }
+        },
     ];
 }
 

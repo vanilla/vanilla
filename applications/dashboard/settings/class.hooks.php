@@ -936,6 +936,11 @@ class DashboardHooks extends Gdn_Plugin {
         $parsed['Name'] = str_replace('..', '', $parsed['Name']);
         $remotePath = PATH_ROOT.'/'.$parsed['Name'];
 
+        // Make sure we are copying a file from uploads.
+        if (strpos($remotePath, PATH_UPLOADS) !== 0 || strpos($remotePath, PATH_UPLOADS.'/import/' === 0)) {
+            throw new \Exception("Can only copy from the uploads folder.", 403);
+        }
+
         // Since this is just a temp file we don't want to nest it in a bunch of subfolders.
         $localPath = paths(PATH_UPLOADS, 'tmp-static', str_replace('/', '-', $parsed['Name']));
 

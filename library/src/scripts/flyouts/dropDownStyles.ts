@@ -14,6 +14,7 @@ import {
     buttonStates,
     unit,
     userSelect,
+    negative,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -65,6 +66,7 @@ export const dropDownVariables = useThemeCache(() => {
 
         padding: {
             top: 6,
+            horizontal: 14,
         },
     });
 
@@ -122,7 +124,6 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "auto",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
-        left: 0,
         $nest: {
             "&&": {
                 zIndex: 3,
@@ -132,6 +133,8 @@ export const dropDownClasses = useThemeCache(() => {
             },
             "&.isParentWidth": {
                 minWidth: "initial",
+                left: 0,
+                right: 0,
             },
             "&.isOwnWidth": {
                 width: "initial",
@@ -238,7 +241,7 @@ export const dropDownClasses = useThemeCache(() => {
                 lineHeight: unit(globalVars.lineHeights.condensed),
                 ...paddings({
                     vertical: 4,
-                    horizontal: 14,
+                    horizontal: vars.item.padding.horizontal,
                 }),
                 ...borders({
                     color: "transparent",
@@ -347,6 +350,15 @@ export const dropDownClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.primary),
     });
 
+    const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
+
+    const contentOffsetLeft = style("contentOffsetLeft", {
+        transform: `translateX(${negative(unit(flyoutOffset))})`,
+    });
+    const contentOffsetRight = style("contentOffsetRight", {
+        transform: `translateX(${unit(flyoutOffset)})`,
+    });
+
     return {
         root,
         contents,
@@ -369,5 +381,7 @@ export const dropDownClasses = useThemeCache(() => {
         noVerticalPadding,
         paddedFrame,
         check,
+        contentOffsetLeft,
+        contentOffsetRight,
     };
 });

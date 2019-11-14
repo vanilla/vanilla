@@ -576,3 +576,24 @@ export function GlobeIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
+
+export function TranslateIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.standard, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+            <title>{props.title ? props.title : t("Translate")}</title>
+            <path
+                d="M9.836,13.2l-.455-1.495H7.09L6.635,13.2H5.2L7.417,6.892H9.046L11.27,13.2Zm-.773-2.612q-.359-1.149-.711-2.3-.065-.209-.114-.42-.142.549-.812,2.72Zm9.472,1.626a.5.5,0,0,0,0-1h-2.07V10a.466.466,0,1,0-.93,0v1.214h-1.9c-.256,0-.088.22,0,.5s0,.5.255.5h.216a4.936,4.936,0,0,0,1.164,2.75c-.528.34.31.329-.35.329-.256,0,0,.077,0,.353s.093.508.35.508c.614,0,.01.03.73-.508a4.216,4.216,0,0,0,2.535.854.5.5,0,0,0,0-1,3.319,3.319,0,0,1-1.8-.536,4.936,4.936,0,0,0,1.164-2.75h.641ZM16,14.34a3.893,3.893,0,0,1-.956-2.125h1.912A3.893,3.893,0,0,1,16,14.34Z"
+                style={{ fill: "currentColor" }}
+            />
+            <path
+                d="M11.271,2.709H4.017q-1.418,0-1.417,1.9V16.445q0,1.575,1.733,1.575H16.1Z"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+            <path
+                d="M12.348,6.116h7.7q1.313,0,1.312,1.234v12.7q0,1.47-1.312,1.47H13.635L12,18.02h4.1Zm1.287,15.4,2.817-3.287"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+        </svg>
+    );
+}

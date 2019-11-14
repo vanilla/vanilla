@@ -63,7 +63,9 @@ export const frameClasses = useThemeCache(() => {
         willChange: "height",
     });
     const bodyWrap = style("bodyWrap", {
+        position: "relative",
         background: colorOut(vars.colors.bg),
+        width: percent(100),
     });
     const footerWrap = style("footerWrap", {
         background: colorOut(vars.colors.bg),
@@ -84,7 +86,7 @@ export const frameClasses = useThemeCache(() => {
         $nest: {
             [`.${bodyWrap}`]: {
                 flex: 1,
-                overflow: "auto",
+                overflowY: "auto",
             },
         },
     });

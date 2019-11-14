@@ -14,14 +14,7 @@ echo $this->Form->errors();
         </div>
         <div class="input-wrap">
             <?php
-            echo $this->Form->calendar('Vanilla.Archive.Date', ['placeholder' => t('YYYY-mm-dd')]);
-            ?>
-        </div>
-    </li>
-    <li class="form-group">
-        <div class="input-wrap no-label">
-            <?php
-            echo $this->Form->checkBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
+            echo $this->Form->calendar('Vanilla.Archive.Date', ['placeholder' => t('Ex: 2009-01-01, 6 months, 1 year')]);
             ?>
         </div>
     </li>

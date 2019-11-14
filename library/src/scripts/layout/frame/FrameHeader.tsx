@@ -18,6 +18,7 @@ import { LeftChevronIcon } from "@library/icons/common";
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts
     onBackClick?: () => void;
+    titleClass?: string;
     srOnlyTitle?: boolean;
     titleID?: string;
     children?: React.ReactNode;
@@ -66,7 +67,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     id={this.props.titleID}
                     title={this.props.title}
                     depth={this.props.depth}
-                    className={classNames("frameHeader-heading", classes.heading, {
+                    className={classNames("frameHeader-heading", classes.heading, this.props.titleClass, {
                         "sr-only": this.props.srOnlyTitle,
                     })}
                 >

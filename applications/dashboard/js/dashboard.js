@@ -990,7 +990,7 @@ $(document).on('contentLoad', function(e) {
             '.jcrop-keymgr',
             '.checkbox-painted-wrapper input',
             '.radio-painted-wrapper input',
-            '.exclude-icheck'
+            '.exclude-icheck',
         ];
 
         var selector = 'input';

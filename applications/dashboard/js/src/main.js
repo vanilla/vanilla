@@ -226,7 +226,8 @@
             '.avatar-delete-input',
             '.jcrop-keymgr',
             '.checkbox-painted-wrapper input',
-            '.radio-painted-wrapper input'
+            '.radio-painted-wrapper input',
+            '.exclude-icheck',
         ];
 
         var selector = 'input';

@@ -189,7 +189,7 @@ class DiscussionController extends VanillaController {
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
 
         $pageNumber = (int)pageNumber($this->Offset, $Limit);
-        $this->setData('Page', $pageNumber);trace($pageNumber);
+        $this->setData('Page', $pageNumber);
         if ($pageNumber !== 1) {
             $this->Data['Title'] .= sprintf(t(' - Page %s'), $pageNumber);
         }

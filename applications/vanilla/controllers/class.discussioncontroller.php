@@ -188,38 +188,40 @@ class DiscussionController extends VanillaController {
         // Load the comments
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
 
-        $PageNumber = pageNumber($this->Offset, $Limit);
-        $this->setData('Page', $PageNumber);
-        if ($PageNumber != 1) {
-            $this->Data['Title'] .= sprintf(t(' - Page %s'), pageNumber($this->Offset, $Limit));
+        $pageNumber = (int)pageNumber($this->Offset, $Limit);
+        $this->setData('Page', $pageNumber);trace($pageNumber);
+        if ($pageNumber !== 1) {
+            $this->Data['Title'] .= sprintf(t(' - Page %s'), $pageNumber);
         }
 
         // Set open graph and meta data depending on the page and permalink we are on.
         $this->_SetOpenGraph();
-
+        
+        $formatService = Gdn::formatService();
+        
         // Comment permalink: Use the comment content.
         if (isset($this->commentID)) {
-            $LinkComment = Gdn_DataSet::index($this->data('Comments'), 'CommentID')[$this->commentID];
+            $linkComment = Gdn_DataSet::index($this->Data['Comments'], 'CommentID')[$this->commentID];
 
-            $this->description(sliceParagraph(Gdn_Format::plainText($LinkComment->Body, $LinkComment->Format), 160));
-            $Dom = pQuery::parseStr(Gdn_Format::to($LinkComment->Body, $LinkComment->Format));
+            $this->description(sliceParagraph($formatService->renderPlainText($linkComment->Body, $linkComment->Format), 160));
+            $dom = pQuery::parseStr($formatService->renderHTML($linkComment->Body, $linkComment->Format));
 
         // First page: Use the discussion post.
-        } elseif ($PageNumber == 1) {
-            $this->description(sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
-            $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
+        } elseif ($pageNumber === 1) {
+            $this->description(sliceParagraph($formatService->renderPlainText($this->Discussion->Body, $this->Discussion->Format), 160));
+            $dom = pQuery::parseStr($formatService->renderHTML($this->Discussion->Body, $this->Discussion->Format));
 
         // Any other page: Use the first comment on that page.
         } else {
-            $FirstComment = $this->data('Comments')->firstRow();
+            $firstComment = $this->Data['Comments']->firstRow();
 
-            $this->description(sliceParagraph(Gdn_Format::plainText($FirstComment->Body, $FirstComment->Format), 160));
-            $Dom = pQuery::parseStr(Gdn_Format::to($FirstComment->Body, $FirstComment->Format));
+            $this->description(sliceParagraph($formatService->renderPlainText($firstComment->Body, $firstComment->Format), 160));
+            $dom = pQuery::parseStr($formatService->renderHTML($firstComment->Body, $firstComment->Format));
         }
 
         // Add images to head for open graph.
-        if ($Dom) {
-            foreach ($Dom->query('img') as $img) {
+        if ($dom) {
+            foreach ($dom->query('img') as $img) {
                 if ($img->attr('src')) {
                     $this->image($img->attr('src'));
                 }

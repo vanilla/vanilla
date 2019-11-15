@@ -24,6 +24,9 @@
  */
 class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
+    /** @var string context is registration workflow */
+    const CONTEXT_REGISTER = 'register';
+
     /** @var string token provided by authenticator  */
     protected $accessToken;
 
@@ -349,12 +352,14 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * Redirect to the OAuth redirect page with a verification nonce.
      *
      * @param EntryController $sender The controller initiating the request.
-     * @param  string $state The state to pass along the OAuth2 flow.
+     * @param string $state The state to pass along the OAuth2 flow.
+     * @param string $context The context of the redirect either register or sign in.
      */
-    public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
+    public function entryRedirectEndpoint(\EntryController $sender, $state = '', $context = null) {
+        $provider = $this->provider();
         $state = $this->decodeState($state);
-        $url = $this->realAuthorizeUri($state);
-
+        $baseURL = ($context === self::CONTEXT_REGISTER) ? $provider['RegisterUrl'] : $provider['AuthorizeUrl'];
+        $url = $this->realAuthorizeUri($baseURL, $state);
         \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         redirectTo($url, 302, false);
     }
@@ -444,6 +449,17 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function authorizeUri($state = []) {
         $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state)]);
+        return url("entry/{$this->providerKey}-redirect{$params}", true);
+    }
+
+    /**
+     * Return the URL that sign-in buttons should use.
+     *
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     * @return string Returns the sign-in URL.
+     */
+    public function registerUri($state = []) {
+        $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state), 'context' => self::CONTEXT_REGISTER]);
 
         return url("entry/{$this->providerKey}-redirect{$params}", true);
     }
@@ -455,10 +471,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      *
      * @return string Endpoint of the provider.
      */
-    protected function realAuthorizeUri(array $state = []): string {
+    protected function realAuthorizeUri(string $uri, array $state = []): string {
         $provider = $this->provider();
-
-        $uri = val('AuthorizeUrl', $provider);
 
         $redirect_uri = '/entry/'.$this->getProviderKey();
         $reponse_type = c('OAuth2.ResponseType', 'code');
@@ -481,7 +495,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         return $uri.'?'.http_build_query($get);
     }
-
 
     /**
      * Generic API uses ProxyRequest class to fetch data from remote endpoints.
@@ -814,6 +827,24 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $args['DefaultProvider']['SignInUrl'] = $url;
     }
 
+
+    /**
+     * Redirect to provider's signin page if this is the default behaviour.
+     *
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured.
+     */
+    public function entryController_overrideRegister_handler($sender, $args) {
+        $provider = $args['DefaultProvider'];
+        if (val('AuthenticationSchemeAlias', $provider) != $this->getProviderKey() || !$this->isConfigured()) {
+            return;
+        }
+
+        $url = $this->registerUri(['target' => $args['Target']]);
+        $args['DefaultProvider']['RegisterUrl'] = $url;
+    }
 
     /**
      * Inject a sign-in icon into the ME menu.

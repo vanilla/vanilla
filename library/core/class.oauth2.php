@@ -831,8 +831,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     /**
      * Redirect to provider's signin page if this is the default behaviour.
      *
-     * @param EntryController $sender.
-     * @param EntryController $args.
+     * @param EntryController $sender Entry Controller object.
+     * @param EntryController $args Array of Event Arguments from the Entry Controller.
      *
      * @return mixed|bool Return null if not configured.
      */
@@ -849,8 +849,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     /**
      * Inject a sign-in icon into the ME menu.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param Gdn_Controller $sender Controller object that executes the page the button will be on..
+     * @param Gdn_Controller $args Array of arguments from the host controller.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->isConfigured() || $this->isDefault()) {

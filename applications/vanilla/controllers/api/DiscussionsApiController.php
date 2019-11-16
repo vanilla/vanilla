@@ -430,7 +430,8 @@ class DiscussionsApiController extends AbstractApiController {
                 'pinned',
                 'pinLocation',
             ])->add($this->fullSchema()
-        ), ['DiscussionGetEdit', 'out']);
+        ), ['DiscussionGetEdit', 'out'])
+            ->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);

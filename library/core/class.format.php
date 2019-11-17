@@ -42,7 +42,7 @@ class Gdn_Format {
 
     /** @var array  */
     protected static $SanitizedFormats = [
-        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich'
+        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich', 'display'
     ];
 
     /**
@@ -1221,6 +1221,20 @@ class Gdn_Format {
      * @deprecated 3.2 FormatService::renderHtml
      */
     public static function to($mixed, $formatMethod) {
+        $r = $mixed;
+        $r = self::formatToInternal($r, $formatMethod);
+        return $r;
+    }
+
+    /**
+     * The internal implementation of `Gdn_Format::to()` that does recursion checking.
+     *
+     * @param mixed $mixed
+     * @param string $formatMethod
+     * @param array $seen
+     * @return array|string|object
+     */
+    private static function formatToInternal(&$mixed, $formatMethod, $seen = []) {
         // Process $Mixed based on its type.
         if (is_string($mixed)) {
             if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
@@ -1233,13 +1247,17 @@ class Gdn_Format {
             } else {
                 $mixed = Gdn_Format::text($mixed);
             }
-        } elseif (is_array($mixed)) {
-            foreach ($mixed as $key => $val) {
-                $mixed[$key] = self::to($val, $formatMethod);
+        } elseif (is_array($mixed) && !in_array($mixed, $seen, true)) {
+            $seen[] = &$mixed;
+
+            foreach ($mixed as $key => &$val) {
+                $mixed[$key] = self::formatToInternal($val, $formatMethod, $seen);
             }
-        } elseif (is_object($mixed)) {
+        } elseif (is_object($mixed) && !in_array($mixed, $seen, true)) {
+            $seen[] = $mixed;
+
             foreach (get_object_vars($mixed) as $prop => $val) {
-                $mixed->$prop = self::to($val, $formatMethod);
+                $mixed->$prop = self::formatToInternal($val, $formatMethod, $seen);
             }
         }
         return $mixed;

@@ -189,4 +189,22 @@ EOT;
 
         $this->assertEquals($expected, $sql);
     }
+
+    /**
+     * The `Gdn_Model::delete()` method had a documented return type of `Gdn_Dataset` forever, so I wanted to confirm its return type.
+     */
+    public function testDeleteReturn() {
+        $st = $this->sql->Database->structure();
+        $st
+            ->table('testDelete')
+            ->primaryKey('testDeleteID')
+            ->column('name', 'varchar(50)')
+            ->set();
+
+        $id = $this->sql->insert('testDelete', ['name' => 'foo']);
+        $id2 = $this->sql->insert('testDelete', ['name' => 'foo']);
+
+        $r = $this->sql->delete('testDelete', ['name' => $id]);
+        $this->assertEquals(2, $r);
+    }
 }

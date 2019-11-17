@@ -1157,8 +1157,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @param string $clientID The OAuth client ID (AssociationKey in the db).
      * @param string $oauthAccessToken A valid access token for calling the OAuth server.
      * @return array Returns an array with the access token and expiry date.
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Container\ContainerException Throws an exception if the addon instance was improperly registered.
      */
     protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
         if ($clientID !== $this->provider()['AssociationKey'] ?? null) {

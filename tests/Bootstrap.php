@@ -148,7 +148,7 @@ class Bootstrap {
                     Addon::TYPE_THEME => '/themes',
                     Addon::TYPE_LOCALE => '/locales'
                 ],
-                PATH_CACHE
+                PATH_ROOT.'/tests/cache/bootstrap'
             ])
             ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')

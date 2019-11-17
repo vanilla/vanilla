@@ -27,6 +27,9 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
         return ['vanilla', 'test-oauth'];
     }
 
+    /**
+     * Setup tests.
+     */
     public function setUp() {
         parent::setUp();
         $this->configureProvider(['AssociationKey' => self::CLIENT_ID, 'AssociationSecret' => 'shh...', 'Active' => 1]);

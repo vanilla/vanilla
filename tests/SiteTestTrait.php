@@ -73,6 +73,9 @@ trait SiteTestTrait {
         self::unSymlinkAddonFixtures();
     }
 
+    /**
+     * Symlink all addon fixtures.
+     */
     private static function symlinkAddonFixtures(): void {
         self::mapAddonFixtures(function (string $path, string $dest): void {
             if (file_exists($dest)) {
@@ -85,6 +88,9 @@ trait SiteTestTrait {
         });
     }
 
+    /**
+     * Remove symlinks to all addon fixtures.
+     */
     private static function unSymlinkAddonFixtures(): void {
         self::mapAddonFixtures(function (string $path, string $dest): void {
             if (file_exists($dest) && realpath($dest) === realpath($path)) {
@@ -93,6 +99,11 @@ trait SiteTestTrait {
         });
     }
 
+    /**
+     * Run a callback on all test addon fixtures.
+     *
+     * @param callable $callback
+     */
     private static function mapAddonFixtures(callable $callback): void {
         $testAddonPaths = array_merge(
             glob(PATH_ROOT . '/tests/addons/*', GLOB_ONLYDIR),

@@ -7,9 +7,7 @@
  * @since 2.0
  */
 
-use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
-
 
 /**
  * Class Gdn_OAuth2
@@ -1044,8 +1042,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $in = $sender->schema([
             'clientID:s',
             'oauthAccessToken:s',
-        ], 'in'
-        )->addValidator('clientID', function ($clientID, \Garden\Schema\ValidationField $field) {
+        ], 'in')->addValidator('clientID', function ($clientID, \Garden\Schema\ValidationField $field) {
             if ($clientID !== $this->provider()['AssociationKey'] ?? null) {
                 $field->addError('invalid', [
                     'message' => 'Invalid client ID.',
@@ -1103,7 +1100,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         if (!$userID) {
             $msg = Gdn::userModel()->Validation->resultsText();
-            Gdn::userModel()->Validation->reset();;
+            Gdn::userModel()->Validation->reset();
             throw new ClientException($msg ?: 'There was an error registering the user.', 400);
         }
 

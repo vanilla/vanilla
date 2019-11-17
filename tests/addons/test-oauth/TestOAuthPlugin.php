@@ -13,11 +13,12 @@ use UserModel;
  * Used for testing `Gdn_OAuth2` functionality.
  */
 class TestOAuthPlugin extends \Gdn_OAuth2 {
-    public const PROVIDER_KEY = 'test-oauth';
-    public const GOOD_ACCESS_TOKEN = 'letmein';
+    public const PROVIDER_KEY = 'testOAuth';
     public const GOOD_UNIQUE_ID = '133';
-    public const NO_USER_ACCESS_TOKEN = '456';
-    public const NO_UNIQUEID_ACCESS_TOKEN = '4343';
+
+    public const GOOD_ACCESS_TOKEN = 'good';
+    public const NO_USER_ACCESS_TOKEN = 'no-user';
+    public const NO_ID_ACCESS_TOKEN = 'no-id';
 
     /**
      * @var UserModel
@@ -30,7 +31,7 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
             'Name' => 'Test',
             'Email' => 'test@exmple.com',
         ],
-        self::NO_UNIQUEID_ACCESS_TOKEN => [
+        self::NO_ID_ACCESS_TOKEN => [
             'Name' => 'Foo',
             'Email' => 'foo@example.com',
         ],
@@ -46,6 +47,7 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
      */
     public function __construct(UserModel $userModel) {
         parent::__construct(self::PROVIDER_KEY);
+        $this->settingsView = 'plugins/settings/oauth2';
         $this->userModel = $userModel;
     }
 

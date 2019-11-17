@@ -27,6 +27,11 @@ trait SiteTestTrait {
     protected static $siteInfo;
 
     /**
+     * @var array
+     */
+    private static $symLinkedAddons;
+
+    /**
      * @var array The addons to install. Restored on teardownAfterClass();
      */
     protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
@@ -83,6 +88,8 @@ trait SiteTestTrait {
                     throw new AssertionFailedError("Cannot symlink addon fixture: $path");
                 }
             } else {
+                self::$symLinkedAddons[$path] = $dest;
+
                 symlink($path, $dest);
             }
         });
@@ -93,10 +100,11 @@ trait SiteTestTrait {
      */
     private static function unSymlinkAddonFixtures(): void {
         self::mapAddonFixtures(function (string $path, string $dest): void {
-            if (file_exists($dest) && realpath($dest) === realpath($path)) {
+            if (isset(self::$symLinkedAddons[$path]) && file_exists($dest) && realpath($dest) === realpath($path)) {
                 unlink($dest);
             }
         });
+        self::$symLinkedAddons = [];
     }
 
     /**

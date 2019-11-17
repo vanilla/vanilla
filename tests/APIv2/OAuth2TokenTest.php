@@ -30,7 +30,12 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      */
     public function setUp() {
         parent::setUp();
-        $this->configureProvider(['AssociationKey' => self::CLIENT_ID, 'AssociationSecret' => 'shh...', 'Active' => 1]);
+        $this->configureProvider([
+            'AssociationKey' => self::CLIENT_ID,
+            'AssociationSecret' => 'shh...',
+            'Active' => 1,
+            'AllowAccessTokens' => true,
+        ]);
 
         // Clean out the provider.
         $oauth = $this->container()->get(TestOAuthPlugin::class);
@@ -54,9 +59,13 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      * @expectedExceptionCode 500
      */
     public function testNotConfigured() {
-        $this->configureProvider(['AssociationKey' => '']);
+        $this->configureProvider(['AssociationSecret' => '']);
 
-        $r = $this->postAccessToken();
+        try {
+            $r = $this->postAccessToken();
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
     }
 
     /**
@@ -72,11 +81,24 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     }
 
     /**
+     * An inactive client should not be allowed.
+     *
+     * @expectedException \Garden\Web\Exception\HttpException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage The OAuth client is not allowed to issue access tokens.
+     */
+    public function testNotAllowed() {
+        $this->configureProvider(['AllowAccessTokens' => false]);
+
+        $r = $this->postAccessToken();
+    }
+
+    /**
      * A client ID mismatch should be an error.
      *
      * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 422
-     * @expectedExceptionMessage Invalid client ID.
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage An OAuth client with ID "test123" could not be found.
      */
     public function testBadClientID() {
         $this->configureProvider(['AssociationKey' => 'different']);
@@ -110,7 +132,7 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      */
     public function testBadProfileNoUniqueID() {
         try {
-            $r = $this->postAccessToken(TestOAuthPlugin::NO_UNIQUEID_ACCESS_TOKEN);
+            $r = $this->postAccessToken(TestOAuthPlugin::NO_ID_ACCESS_TOKEN);
         } catch (\Exception $ex) {
             throw $ex;
         }

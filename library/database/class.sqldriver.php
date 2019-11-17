@@ -331,7 +331,8 @@ abstract class Gdn_SQLDriver {
      * @param mixed $table The table (or array of table names) to delete from.
      * @param mixed $where The string on the left side of the where comparison, or an associative
      * array of Field => Value items to compare.
-     * @param int $limit The number of records to limit the query to.
+     * @param int|false $limit The number of records to limit the query to.
+     * @return int|false Returns the number of rows deleted or **false** on failure.
      */
     public function delete($table = '', $where = '', $limit = false) {
         if ($table == '') {

@@ -123,8 +123,17 @@ paths:
               example:
                 accessToken: va.MtVMRtHgB5Hipdb3HI86VqrdBlI4qWMz.QCw5cA.WkNNEV_
                 dateExpires: '2019-08-30T14:37:52Z'
+        '400':
+          description: The user profile was successfully fetched, but was malformed in some way.
         '403':
-          description: Forbidden. The OAuth access token didn't have permission to access the user information or failed in some other way.
+          description: |
+            Forbidden. The OAuth access token didn't have permission to access the user information or failed in some other way.
+
+            If you get this error then make sure that the profile endpoint on **your** site returns a profile the access tokens you are providing to this site.
+        '422':
+          description: The provided client ID did not match the client ID that was configured within Vanilla.
+        '500':
+          description: OAuth is either not enabled or is not configured on Vanilla.
 
 components:
   schemas:

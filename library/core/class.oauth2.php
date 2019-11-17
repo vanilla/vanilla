@@ -1042,6 +1042,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return \Garden\Web\Data
      */
     public function tokensApiController_post_oauth(TokensApiController $sender, array $body): \Garden\Web\Data {
+        $sender->permission();
+
         $in = $sender->schema([
             'clientID:s',
             'oauthAccessToken:s',

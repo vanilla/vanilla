@@ -107,7 +107,7 @@ trait SiteTestTrait {
     private static function mapAddonFixtures(callable $callback): void {
         $testAddonPaths = array_merge(
             glob(PATH_ROOT . '/tests/addons/*', GLOB_ONLYDIR),
-            glob(PATH_ROOT . '/plugins/*/tests/plugins/*', GLOB_ONLYDIR),
+            glob(PATH_ROOT . '/plugins/*/tests/plugins/*', GLOB_ONLYDIR)
         );
         foreach ($testAddonPaths as $path) {
             $dirname = basename($path);

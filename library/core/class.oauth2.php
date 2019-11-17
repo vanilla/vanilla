@@ -1108,9 +1108,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         );
 
         if (!$userID) {
-            $msg = $userModel->Validation->resultsText();
-            $userModel->Validation->reset();
-            throw new ClientException($msg ?: 'There was an error registering the user.', 400);
+            \Vanilla\Utility\ModelUtils::validationResultToValidationException($userModel, $this->container->get(\Gdn_Locale::class));
         }
 
         return (int)$userID;

@@ -109,7 +109,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      * @expectedExceptionCode 400
      */
     public function testBadProfileNoUniqueID() {
-        $r = $this->postAccessToken(TestOAuthPlugin::NO_UNIQUEID_ACCESS_TOKEN);
+        try {
+            $r = $this->postAccessToken(TestOAuthPlugin::NO_UNIQUEID_ACCESS_TOKEN);
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
     }
 
     /**

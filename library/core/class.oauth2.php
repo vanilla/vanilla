@@ -7,6 +7,9 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+
 
 /**
  * Class Gdn_OAuth2
@@ -65,6 +68,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     private $sessionModel;
 
     /**
+     * @var AccessTokenModel
+     */
+    private $tokenModel;
+
+    /**
      * Set up OAuth2 access properties.
      *
      * @param string $providerKey Fixed key set in child class.
@@ -78,7 +86,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             $this->accessToken = $accessToken;
         }
     }
-
 
     /**
      * Setup
@@ -123,6 +130,15 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return (val('AssociationSecret', $provider) && val('AssociationKey', $provider));
     }
 
+    /**
+     * Check if the provider is active.
+     *
+     * @return bool Returns **true** if the provider is active or **false** otherwise.
+     */
+    public function isActive() {
+        $provider = $this->provider();
+        return !empty($provider['Active']);
+    }
 
     /**
      * Check if an access token has been returned from the provider server.
@@ -298,7 +314,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return $this->provider;
     }
 
-
     /**
      *  Get provider key.
      *
@@ -314,7 +329,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
      * initial request to log in to an authentication provider.
      *
-     * @param $sender
+     * @param Gdn_PluginManager $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
         $sender->registerCallback("entryController_{$this->providerKey}Redirect_create", [$this, 'entryRedirectEndpoint']);
@@ -954,10 +969,17 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * Inject dependencies without affecting subclass constructors.
      *
      * @param SsoUtils $ssoUtils Used to generate SSO tokens.
+     * @param SessionModel $sessionModel Used to stash keys.
+     * @param AccessTokenModel $tokenModel Used to exchange access tokens.
      */
-    public function setDependencies(SsoUtils $ssoUtils, SessionModel $sessionModel) {
+    public function setDependencies(
+        SsoUtils $ssoUtils,
+        SessionModel $sessionModel,
+        AccessTokenModel $tokenModel
+    ) {
         $this->ssoUtils = $ssoUtils;
         $this->sessionModel = $sessionModel;
+        $this->tokenModel = $tokenModel;
     }
 
     /**
@@ -1009,5 +1031,82 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 return [];
             }
         }
+    }
+
+    /**
+     * Exchange an OAuth access token for a Vanilla access token.
+     *
+     * @param TokensApiController $sender
+     * @param array $body
+     * @return \Garden\Web\Data
+     */
+    public function tokensApiController_post_oauth(TokensApiController $sender, array $body): \Garden\Web\Data {
+        $in = $sender->schema([
+            'clientID:s',
+            'oauthAccessToken:s',
+        ], 'in'
+        )->addValidator('clientID', function ($clientID, \Garden\Schema\ValidationField $field) {
+            if ($clientID !== $this->provider()['AssociationKey'] ?? null) {
+                $field->addError('invalid', [
+                    'message' => 'Invalid client ID.',
+                    'status' => 422,
+                ]);
+            }
+        });
+
+        if (!$this->isConfigured()) {
+            throw new \Garden\Web\Exception\ServerException('The OAuth client has not been configured.', 500);
+        }
+
+        if (!$this->isActive()) {
+            throw new \Garden\Web\Exception\ServerException('The OAuth client is not active', 500);
+        }
+
+        $valid = $in->validate($body);
+
+        $this->accessToken($valid['oauthAccessToken']);
+        try {
+            $profile = $this->getProfile();
+        } catch (\Exception $ex) {
+            throw new \Garden\Web\Exception\ForbiddenException($ex->getMessage());
+        }
+
+        $userID = $this->sso($profile);
+
+        $expires = new DateTimeImmutable('+24 hours');
+        $token = $this->tokenModel->issue($userID, $expires, 'tokens/oauth');
+        $result = [
+            'accessToken' => $token,
+            'dateExpires' => $expires,
+        ];
+
+        return new \Garden\Web\Data($result);
+    }
+
+    /**
+     * Connect the user payload with a user.
+     *
+     * @param array $payload The user profile.
+     * @return int
+     * @throws ClientException Throws an exception if the user cannot be connected for some reason.
+     * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
+     */
+    private function sso(array $payload): int {
+        unset($payload['UserID']); // safety precaution due to Gdn_UserModel::connect() behaviour
+
+        $userID = Gdn::userModel()->connect(
+            $payload['UniqueID'],
+            static::PROVIDER_KEY,
+            $payload,
+            ['SyncExisting' => false]
+        );
+
+        if (!$userID) {
+            $msg = Gdn::userModel()->Validation->resultsText();
+            Gdn::userModel()->Validation->reset();;
+            throw new ClientException($msg ?: 'There was an error registering the user.', 400);
+        }
+
+        return (int)$userID;
     }
 }

@@ -8,8 +8,6 @@
 namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase;
-use VanillaTests\SiteTestTrait;
 use VanillaTests\TestOAuth\TestOAuthPlugin;
 
 /**
@@ -45,6 +43,8 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
         /* @var TestOAuthPlugin $plugin */
         $plugin = $this->container()->get(TestOAuthPlugin::class);
         $plugin->cleanUp();
+
+        $this->api()->setUserID(0);
     }
 
     /**
@@ -100,6 +100,26 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
         $r = $this->postAccessToken();
 
         $this->assertNotEmpty($r['accessToken']);
+    }
+
+    /**
+     * A profile that doesn't return enough user information should be an error.
+     *
+     * @expectedException \Garden\Web\Exception\HttpException
+     * @expectedExceptionCode 400
+     */
+    public function testBadProfileNoUniqueID() {
+        $r = $this->postAccessToken(TestOAuthPlugin::NO_UNIQUEID_ACCESS_TOKEN);
+    }
+
+    /**
+     * A profile that doesn't return enough user information should be an error.
+     *
+     * @expectedException \Garden\Web\Exception\HttpException
+     * @expectedExceptionCode 400
+     */
+    public function testBadProfileNoUser() {
+        $r = $this->postAccessToken(TestOAuthPlugin::NO_USER_ACCESS_TOKEN);
     }
 
     /**

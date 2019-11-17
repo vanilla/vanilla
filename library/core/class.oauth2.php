@@ -66,9 +66,9 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     private $sessionModel;
 
     /**
-     * @var AccessTokenModel
+     * @var \Psr\Container\ContainerInterface
      */
-    private $tokenModel;
+    private $container;
 
     /**
      * Set up OAuth2 access properties.
@@ -966,18 +966,21 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     /**
      * Inject dependencies without affecting subclass constructors.
      *
+     * Note that injecting the container is an anti-pattern, but is a trade-off in this case since this plugin is
+     * constructed every request.
+     *
      * @param SsoUtils $ssoUtils Used to generate SSO tokens.
      * @param SessionModel $sessionModel Used to stash keys.
-     * @param AccessTokenModel $tokenModel Used to exchange access tokens.
+     * @param \Psr\Container\ContainerInterface $container Used to get dependencies that are rarely used.
      */
     public function setDependencies(
         SsoUtils $ssoUtils,
         SessionModel $sessionModel,
-        AccessTokenModel $tokenModel
+        \Psr\Container\ContainerInterface $container
     ) {
         $this->ssoUtils = $ssoUtils;
         $this->sessionModel = $sessionModel;
-        $this->tokenModel = $tokenModel;
+        $this->container = $container;
     }
 
     /**
@@ -1070,8 +1073,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         $userID = $this->sso($profile);
 
+        /* @var AccessTokenModel $tokenModel */
+        $tokenModel = $this->container->get(AccessTokenModel::class);
+
         $expires = new DateTimeImmutable('+24 hours');
-        $token = $this->tokenModel->issue($userID, $expires, 'tokens/oauth');
+        $token = $tokenModel->issue($userID, $expires, 'tokens/oauth');
         $result = [
             'accessToken' => $token,
             'dateExpires' => $expires,
@@ -1091,16 +1097,19 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     private function sso(array $payload): int {
         unset($payload['UserID']); // safety precaution due to Gdn_UserModel::connect() behaviour
 
-        $userID = Gdn::userModel()->connect(
-            $payload['UniqueID'],
+        /* @var \UserModel $userModel */
+        $userModel = $this->container->get(\UserModel::class);
+
+        $userID = $userModel->connect(
+            $payload['UniqueID'] ?? '',
             static::PROVIDER_KEY,
             $payload,
             ['SyncExisting' => false]
         );
 
         if (!$userID) {
-            $msg = Gdn::userModel()->Validation->resultsText();
-            Gdn::userModel()->Validation->reset();
+            $msg = $userModel->Validation->resultsText();
+            $userModel->Validation->reset();
             throw new ClientException($msg ?: 'There was an error registering the user.', 400);
         }
 

@@ -16,11 +16,28 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
     public const PROVIDER_KEY = 'test-oauth';
     public const GOOD_ACCESS_TOKEN = 'letmein';
     public const GOOD_UNIQUE_ID = '133';
+    public const NO_USER_ACCESS_TOKEN = '456';
+    public const NO_UNIQUEID_ACCESS_TOKEN = '4343';
 
     /**
      * @var UserModel
      */
     private $userModel;
+
+    public $profiles = [
+        self::GOOD_ACCESS_TOKEN => [
+            'UniqueID' => self::GOOD_UNIQUE_ID,
+            'Name' => 'Test',
+            'Email' => 'test@exmple.com',
+        ],
+        self::NO_UNIQUEID_ACCESS_TOKEN => [
+            'Name' => 'Foo',
+            'Email' => 'foo@example.com',
+        ],
+        self::NO_USER_ACCESS_TOKEN => [
+            'UniqueID' => 'dsdssf',
+        ],
+    ];
 
     /**
      * TestOAuthPlugin constructor.
@@ -38,15 +55,10 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
      * @return array
      */
     public function getProfile() {
-        if ($this->accessToken() === self::GOOD_ACCESS_TOKEN) {
-            return [
-                'UniqueID' => self::GOOD_UNIQUE_ID,
-                'Name' => 'Test',
-                'Email' => 'test@exmple.com',
-            ];
-        } else {
-            throw new \Gdn_ErrorException("Invalid access token.");
+        if (isset($this->profiles[$this->accessToken()])) {
+            return $this->profiles[$this->accessToken()];
         }
+        throw new \Gdn_ErrorException("Invalid access token.");
     }
 
     /**

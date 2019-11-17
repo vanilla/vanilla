@@ -868,7 +868,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @param string $providerKey The key of the system providing the authentication.
      * @param array $userData Data to go in the user table.
      * @param array $options Additional connect options.
-     * @return int The new/existing user ID.
+     * @return int|false The new/existing user ID or **false** if there was an error connecting.
      */
     public function connect($uniqueID, $providerKey, $userData, $options = []) {
         trace('UserModel->Connect()');
@@ -879,6 +879,11 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             'NoActivity' => true,
             'SyncExisting' => true,
         ];
+
+        if (empty($uniqueID)) {
+            $this->Validation->addValidationResult('UniqueID', 'ValidateRequired');
+            return false;
+        }
 
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 

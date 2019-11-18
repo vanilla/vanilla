@@ -19,6 +19,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
 import { iconVariables } from "@library/icons/iconClasses";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -190,6 +191,16 @@ export const storyBookClasses = useThemeCache(() => {
         flexWrap: "wrap",
         width: calc(`100% + ${unit(vars.gaps.tile * 8)}`),
         transform: translateX(`-${unit(vars.gaps.tile * 4)}`),
+        ...layoutVariables()
+            .mediaQueries()
+            .oneColumn(
+                {
+                    display: "block",
+                    width: percent(100),
+                    transform: "none",
+                },
+                false,
+            ),
     });
 
     const tile = style("tile", {

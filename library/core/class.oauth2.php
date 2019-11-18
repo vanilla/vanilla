@@ -447,43 +447,42 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     }
 
     /**
-     * Return the URL that sign-in buttons should use.
+     * Return the URL where the browser should be sent with all the necessary params to begin the authorization process.
      *
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      * @return string Returns the sign-in URL.
      */
     final protected function realRegisterUri($state = []) {
-        $r = $this->generateAuthorizeUriWithStateToken($state, $this->provider()['RegisterUrl']);
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['RegisterUrl'], $state);
         return $r;
     }
 
     /**
-     * Create the URI that can return an authorization.
+     * Return the URL where the browser should be sent with all the necessary params to begin the registration process.
      *
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      *
      * @return string Endpoint of the provider.
      */
     protected function realAuthorizeUri(array $state = []): string {
-        $r = $this->generateAuthorizeUriWithStateToken($state, $this->provider()['AuthorizeUrl']);
+        $r = $this->generateAuthorizeUriWithStateToken( $this->provider()['AuthorizeUrl'], $state);
         return $r;
     }
 
     /**
-     * @param array $state
-     * @param string $baseUri
-     * @return string
+     * Add the state other needed params to the Authorize or Register URL.
+     *
+     * @param string $uri Either a RegisterURL or an AuthorizeURL.
+     * @param array $state Data that will be sent to the provider containing, for example, the target URL.
+     * @return string The URI of the provider's registration or authorization page with the state token attached.
      */
-    final protected function generateAuthorizeUriWithStateToken(array $state, string $baseUri = ''): string {
+    final protected function generateAuthorizeUriWithStateToken(string $uri = '', array $state): string {
         $provider = $this->provider();
-
-        $uri = $baseUri;
-        unset($state['context']);
         $redirect_uri = '/entry/' . $this->getProviderKey();
-        $reponse_type = c('OAuth2.ResponseType', 'code');
+        $response_type = c('OAuth2.ResponseType', 'code');
 
         $defaultParams = [
-            'response_type' => $reponse_type,
+            'response_type' => $response_type,
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)

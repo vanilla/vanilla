@@ -9457,8 +9457,7 @@ button.close {
 .category-url-code.isOpen #Form_UrlCode {
   display: inline !important;
   min-width: 140px;
-  padding-top: 0.5px;
-  padding-bottom: 0.5px;
+  padding: 0.5px 4px;
   vertical-align: middle;
   margin-right: 2px;
 }

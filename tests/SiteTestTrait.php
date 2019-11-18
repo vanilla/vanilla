@@ -36,6 +36,9 @@ trait SiteTestTrait {
      */
     protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
 
+    /** @var array $enabledLocales */
+    protected static $enabledLocales = [];
+
     /**
      * Get the names of addons to install.
      *
@@ -63,10 +66,47 @@ trait SiteTestTrait {
             'addons' => static::getAddons(),
         ]);
 
+        self::preparelocales();
+
         // Start Authenticators
         $dic->get('Authenticator')->startAuthenticator();
 
         self::$siteInfo = $result;
+    }
+
+    /**
+     * Create locale directory and locale definitions.php
+     */
+    public static function preparelocales() {
+        foreach(self::$enabledLocales as $localeKey => $locale) {
+            $localeDir = PATH_ROOT."/locales/test_$localeKey";
+            if (!(file_exists($localeDir) && is_dir($localeDir))) {
+                mkdir($localeDir);
+            }
+            $localeFile = $localeDir.'/definitions.php';
+            if (!file_exists($localeFile)) {
+                $localeDefinitions = <<<TEMPLATE
+<?php
+
+ \$LocaleInfo['$localeKey'] = array (
+  'Locale' => '$locale',
+  'Name' => '$locale / locale',
+  'EnName' => '$locale Name',
+  'Description' => 'Official $locale description',
+  'Version' => '000',
+  'Author' => 'Vanilla Community',
+  'AuthorUrl' => 'https://www.transifex.com/projects/p/vanilla/language/$locale/',
+  'License' => 'none',
+  'PercentComplete' => 100,
+  'NumComplete' => 0,
+  'DenComplete' => 0,
+  'Icon' => '$locale.svg',
+);
+
+TEMPLATE;
+                file_put_contents($localeFile, $localeDefinitions);
+            }
+        }
     }
 
     /**

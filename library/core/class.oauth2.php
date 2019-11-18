@@ -95,7 +95,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @param string $providerType The provider type (Gdn_AuthenticationProvider.AuthenticationSchemeAlias).
      * @return string
      */
-    protected static function containerKey($providerType): string {
+    final protected static function containerKey($providerType): string {
         return "@oauth.{$providerType}";
     }
 
@@ -145,7 +145,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      *
      * @return bool Returns **true** if the provider is active or **false** otherwise.
      */
-    public function isActive() {
+    final public function isActive() {
         $provider = $this->provider();
         return !empty($provider['Active']);
     }
@@ -1052,7 +1052,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @param array $body
      * @return \Garden\Web\Data
      */
-    public function tokensApiController_post_oauth(TokensApiController $sender, array $body): \Garden\Web\Data {
+    final public function tokensApiController_post_oauth(TokensApiController $sender, array $body): \Garden\Web\Data {
         $sender->permission(Permissions::BAN_CSRF);
 
         $in = $sender->schema([
@@ -1082,7 +1082,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
      * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
-    private function sso(array $payload): int {
+    final private function sso(array $payload): int {
         unset($payload['UserID']); // safety precaution due to Gdn_UserModel::connect() behaviour
 
         /* @var \UserModel $userModel */
@@ -1116,7 +1116,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return $this
      * @throws \Garden\Container\ContainerException Throws an exception when the instance wasn't properly registered in the container.
      */
-    public function getInstanceFromClientID(string $clientID): self {
+    final public function getInstanceFromClientID(string $clientID): self {
         $type = $this->getProviderTypeFromClientID($clientID);
         $instance = $this->container->get(static::containerKey($type));
 
@@ -1130,7 +1130,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return string
      * @throws NotFoundException Throws an exception if there is no provider with that client ID.
      */
-    private function getProviderTypeFromClientID(string $clientID): string {
+    final private function getProviderTypeFromClientID(string $clientID): string {
         $key = "authenticationPoviderType.clientID.$clientID";
 
         $cachedType = Gdn::cache()->get($key);
@@ -1159,7 +1159,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return array Returns an array with the access token and expiry date.
      * @throws \Garden\Container\ContainerException Throws an exception if the addon instance was improperly registered.
      */
-    protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
+    final protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
         if ($clientID !== $this->provider()['AssociationKey'] ?? null) {
             throw new ClientException('Invalid client ID.', 422);
         }

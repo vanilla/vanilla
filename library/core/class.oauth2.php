@@ -1141,7 +1141,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             foreach ($providers as $provider) {
                 if ($clientID === $provider['AssociationKey'] ?? '') {
                     $cachedType = $provider['AuthenticationSchemeAlias'];
-                    Gdn::cache()->store($key, $cachedType);
+                    Gdn::cache()->store($key, $cachedType, [Gdn_Cache::FEATURE_EXPIRY => 300]);
                     return $cachedType;
                 }
             }

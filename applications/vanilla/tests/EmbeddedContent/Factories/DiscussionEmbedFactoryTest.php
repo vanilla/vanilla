@@ -5,11 +5,11 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\EmbeddedContent\Factories;
+namespace VanillaTests\Forum\EmbeddedContent\Factories;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
-use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
+use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
@@ -18,9 +18,9 @@ use VanillaTests\Fixtures\MockSiteSection;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
- * Tests for the comment/quote embed.
+ * Tests for the discussion/quote embed.
  */
-class CommentEmbedFactoryTest extends AbstractAPIv2Test {
+class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
 
     /**
      * Test that all domain types are supported.
@@ -32,7 +32,7 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
      * @dataProvider supportedDomainsProvider
      */
     public function testSupportedDomains(string $urlToTest, bool $isSupported, string $customRoot = '', array $siteSections = []) {
-        $commentsApi = $this->createMock(\CommentsApiController::class);
+        $discussionApi = $this->createMock(\DiscussionsApiController::class);
 
         /** @var RequestInterface $request */
         $request = self::container()->get(RequestInterface::class);
@@ -43,7 +43,7 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
         $sectionModel = new SiteSectionModel(new MockConfig());
         $sectionModel->addProvider($sectionProvider);
 
-        $factory = new CommentEmbedFactory($request, $sectionModel, $commentsApi);
+        $factory = new DiscussionEmbedFactory($request, $sectionModel, $discussionApi);
 
         $this->assertEquals($isSupported, $factory->canHandleUrl($urlToTest));
     }
@@ -56,46 +56,46 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
         return [
             // Allowed
             'Correct' => [
-                $bootstrapBase . '/discussion/comment/41342',
+                $bootstrapBase . '/discussion/41342',
                 true
             ],
             // Not allowed
             'Correct webroot' => [
-                $bootstrapBase . '/actual-root/discussion/comment/41342',
+                $bootstrapBase . '/actual-root/discussion/41342',
                 true,
                 '/actual-root'
             ],
             'Correct section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/comment/41342',
+                $bootstrapBase . '/actual-root/actual-section/discussion/41342',
                 true,
                 '/actual-root',
                 [new MockSiteSection('test', 'en', '/actual-section', 'test1', 'test1')]
             ],
             // Not allowed
             'Wrong webroot' => [
-                $bootstrapBase . '/wrong-root/discussion/comment/41342',
+                $bootstrapBase . '/wrong-root/discussion/41342',
                 false,
                 '/actual-root'
             ],
             'Wrong section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/comment/41342',
+                $bootstrapBase . '/actual-root/actual-section/discussion/41342',
                 false,
                 '/actual-root',
             ],
             'wrong host' => [
-                'https://otherdomain.com/discussion/comment/41342',
+                'https://otherdomain.com/discussion/41342',
                 false
             ],
             'wrong url (typo)' => [
-                $bootstrapBase . '/discussions/comments/41342',
+                $bootstrapBase . '/discussions/41342',
                 false
             ],
-            'Wrong url (discussion)' => [
-                $bootstrapBase . '/discussion/41342',
+            'Wrong url (is a comment)' => [
+                $bootstrapBase . '/discussion/comment/41342',
                 false
             ],
             'bad ID' => [
-                $bootstrapBase . '/discussion/comment/asdfads',
+                $bootstrapBase . '/discussion/asdfads',
                 false
             ],
         ];

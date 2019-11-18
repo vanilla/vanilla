@@ -56,7 +56,7 @@ class Gdn_Model extends Gdn_Pluggable {
     public $Name;
 
     /**
-     * @var stringThe name of the primary key field of this model. The default is 'id'. If
+     * @var string The name of the primary key field of this model. The default is 'id'. If
      * $this->defineSchema() is called, this value will be automatically changed
      * to any primary key discovered when examining the table schema.
      */
@@ -271,9 +271,9 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @param array $formPostValues An associative array of $Field => $Value pairs that represent data posted
      * from the form in the $_POST or $_GET collection.
-     * @param array $settings If a custom model needs special settings in order to perform a save, they
+     * @param array|false $settings If a custom model needs special settings in order to perform a save, they
      * would be passed in using this variable as an associative array.
-     * @return unknown
+     * @return mixed
      */
     public function save($formPostValues, $settings = false) {
         // Define the primary key in this model's table.
@@ -310,7 +310,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @since 2.1
      * @param int $rowID
      * @param array|string $property
-     * @param atom $value
+     * @param mixed $value
      */
     public function setField($rowID, $property, $value = false) {
         if (!is_array($property)) {
@@ -478,7 +478,7 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      *  - limit: A limit to the number of records to delete.
      *  - reset: Deprecated. Whether or not to reset this SQL statement after the delete. Defaults to false.
-     * @return Gdn_Dataset Returns the result of the delete.
+     * @return int|false Returns the number of deleted records or **false** on failure.
      */
     public function delete($where = [], $options = []) {
         if (is_numeric($where)) {
@@ -563,8 +563,8 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Returns a count of the # of records in the table.
      *
-     * @param array $wheres
-     * @return Gdn_Dataset
+     * @param array|string $wheres
+     * @return int
      */
     public function getCount($wheres = '') {
         $this->_beforeGet();

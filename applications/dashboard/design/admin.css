@@ -8945,8 +8945,9 @@ button.close {
 .table-data-content tbody td {
   vertical-align: top;
 }
+.table-data-content .media + .post-content,
 .table-data-content .media + .userContent {
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .table-data-cell, .table-summary th,
@@ -8964,6 +8965,12 @@ button.close {
 }
 .table-data-body tr:hover, .table-summary tbody tr:hover, .table-data tbody tr:hover {
   background-color: #f9fdfe;
+}
+.table-data-body tr:hover .collapsableContent, .table-summary tbody tr:hover .collapsableContent, .table-data tbody tr:hover .collapsableContent {
+  background-color: #f9fdfe;
+}
+.table-data-body tr:hover .collapsableContent-gradient, .table-summary tbody tr:hover .collapsableContent-gradient, .table-data tbody tr:hover .collapsableContent-gradient {
+  background: linear-gradient(to bottom, rgba(249, 253, 254, 0), #f9fdfe);
 }
 
 .table-data-head tr, .table-data thead tr {

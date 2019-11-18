@@ -453,7 +453,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return string Returns the sign-in URL.
      */
     final protected function realRegisterUri($state = []) {
-        $r = $this->generateAuthorizeUriWithStateToken($state, $this->provider()['RegisterUrl']);
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['RegisterUrl'], $state);
         return $r;
     }
 
@@ -465,18 +465,18 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * @return string Endpoint of the provider.
      */
     protected function realAuthorizeUri(array $state = []): string {
-        $r = $this->generateAuthorizeUriWithStateToken($state, $this->provider()['AuthorizeUrl']);
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['AuthorizeUrl'], $state);
         return $r;
     }
 
     /**
      * Add the state other needed params to the Authorize or Register URL.
      *
-     * @param array $state Data that will be sent to the provider containing, for example, the target URL.
      * @param string $uri Either a RegisterURL or an AuthorizeURL.
+     * @param array $state Data that will be sent to the provider containing, for example, the target URL.
      * @return string The URI of the provider's registration or authorization page with the state token attached.
      */
-    final protected function generateAuthorizeUriWithStateToken(array $state, string $uri = ''): string {
+    final protected function generateAuthorizeUriWithStateToken(string $uri, array $state): string {
         $provider = $this->provider();
         $redirect_uri = '/entry/' . $this->getProviderKey();
         $response_type = c('OAuth2.ResponseType', 'code');

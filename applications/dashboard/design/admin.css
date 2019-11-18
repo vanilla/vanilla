@@ -9439,6 +9439,11 @@ button.close {
   display: inline;
   vertical-align: middle;
 }
+.category-url-code .Edit {
+  padding-top: 0;
+  padding-bottom: 0;
+  vertical-align: middle;
+}
 .category-url-code.isOpen {
   display: block;
 }
@@ -9455,12 +9460,14 @@ button.close {
   padding-top: 0.5px;
   padding-bottom: 0.5px;
   vertical-align: middle;
+  margin-right: 2px;
 }
 
 .category-url {
   word-break: break-word;
   display: inline;
   line-height: 24px;
+  padding-right: 2px;
 }
 
 .radiolist-label[for=Form_Garden-dot-EmojiSet] {

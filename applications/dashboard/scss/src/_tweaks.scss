@@ -13,8 +13,6 @@
   align-items: center;
 }
 
-
-
 .category-url-code {
     display: block;
     vertical-align: middle;
@@ -25,9 +23,14 @@
         vertical-align: middle;
     }
 
+    .Edit {
+        padding-top: 0;
+        padding-bottom: 0;
+        vertical-align: middle;
+    }
+
     &.isOpen {
         display: block;
-        //line-height: 36px;
 
         .form-control {
             width: 140px;
@@ -45,6 +48,7 @@
             padding-top: .5px;
             padding-bottom: .5px;
             vertical-align: middle;
+            margin-right: 2px;
         }
     }
 }
@@ -53,6 +57,7 @@
     word-break: break-word;
     display: inline;
     line-height: 24px;
+    padding-right: 2px;
 }
 
 

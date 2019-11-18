@@ -30,7 +30,7 @@ interface IProps {
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
-    elementToFocusOnExit: HTMLElement;
+    elementToFocusOnExit?: HTMLElement;
     size?: ModalSizes;
 }
 

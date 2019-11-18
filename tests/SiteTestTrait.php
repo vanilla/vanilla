@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Allow a class to test against
@@ -91,6 +92,9 @@ TEMPLATE;
                 fwrite($handle, $localeDefinitions);
                 fclose($handle);
             }
+            /** @var ConfigurationInterface $config */
+            $config = self::container()->get(ConfigurationInterface::class);
+            $config->set('EnabledLocales', static::$enabledLocales, true);
         }
     }
 

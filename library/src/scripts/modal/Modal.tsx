@@ -86,13 +86,9 @@ export default class Modal extends React.Component<IProps, IState> {
         isWholePage: false,
     };
 
-    public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
+    private closeFocusElement: HTMLElement | null = null;
     private selfRef = React.createRef<HTMLDivElement>();
-
-    public state = {
-        exitElementSet: false,
-    };
 
     /**
      * Render the contents into a portal.
@@ -141,6 +137,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             `);
         }
 
+        this.setCloseFocusElement();
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
 
@@ -149,17 +146,12 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
-        this.forceUpdate();
     }
 
-    /**
-     * We need to check again for focus if the focus is by ref
-     */
     public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.elementToFocus !== this.props.elementToFocus) {
-            this.focusInitialElement();
+        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
+            this.setCloseFocusElement();
         }
-        this.setCloseFocusElement();
     }
 
     /**
@@ -178,11 +170,8 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
-        const prevFocussedElement = Modal.focusHistory.pop() || document.body;
-        prevFocussedElement.focus();
-        setImmediate(() => {
-            prevFocussedElement.focus();
-        });
+
+        this.closeFocusElement?.focus();
     }
 
     private getModalContainer(): HTMLElement {
@@ -214,11 +203,11 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      */
     private setCloseFocusElement() {
         // if we need to rerender the component, we don't want to include a bad value in the focus history
-        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
-            Modal.focusHistory.push(this.props.elementToFocusOnExit);
-            this.setState({
-                exitElementSet: true,
-            });
+        if (this.props.elementToFocusOnExit) {
+            this.closeFocusElement = this.props.elementToFocusOnExit;
+        } else {
+            // Get the last focused element
+            this.closeFocusElement = document.activeElement as HTMLElement;
         }
     }
 

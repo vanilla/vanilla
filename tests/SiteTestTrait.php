@@ -63,7 +63,7 @@ trait SiteTestTrait {
      */
     public static function preparelocales() {
         $enabledLocales =[];
-        foreach(static::$enabledLocales as $localeKey => $locale) {
+        foreach (static::$enabledLocales as $localeKey => $locale) {
             $enabledLocales["test_$localeKey"] = $locale;
             $localeDir = PATH_ROOT."/locales/test_$localeKey";
             if (!(file_exists($localeDir) && is_dir($localeDir))) {

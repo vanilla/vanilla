@@ -94,6 +94,8 @@ TEMPLATE;
                 fwrite($handle, $localeDefinitions);
                 fclose($handle);
             }
+        }
+        if (!empty($enabledLocales)) {
             /** @var ConfigurationInterface $config */
             $config = self::container()->get(ConfigurationInterface::class);
             $config->set('EnabledLocales', $enabledLocales, true);

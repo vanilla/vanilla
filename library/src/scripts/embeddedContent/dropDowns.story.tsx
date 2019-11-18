@@ -33,7 +33,12 @@ story.add(
             <StoryContent>
                 <StoryHeading depth={1}>Drop Down</StoryHeading>
                 <StoryParagraph>
-                    Note that these dropdowns are automatically transformed into modals with the `openAsModal` property.
+                    Note that these dropdowns are automatically transformed into modals on mobile, and will
+                    automatically determine the direction they need to open into.
+                </StoryParagraph>
+                <StoryParagraph>They can be forced into being a modal with the `openAsModal` prop.</StoryParagraph>
+                <StoryParagraph>
+                    They can be forced into a particular open direction with the `openDirection` prop.
                 </StoryParagraph>
                 <StoryTiles>
                     <StoryTileAndTextCompact>

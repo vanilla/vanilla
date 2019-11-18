@@ -23,9 +23,6 @@ interface IProps {
     /** The URL to navigate to if we can't do a dynamic browser back navigation. */
     fallbackUrl?: string;
 
-    /** A component to render if we can't do a dynamic browser back navigation. */
-    fallbackElement?: React.ReactNode;
-
     /** An action to if the component is clicked */
     onClick?: (e: React.MouseEvent) => void;
 
@@ -51,7 +48,6 @@ interface IProps {
  * Render priority:
  * - Render a button w/ the provided click handler.
  * - Render a button that navigates back using (dynamic routing, uses real browser history back & preserves scroll).
- * - Render the provided fallbackElement if we can't navigate back.
  * - Render the a link to one of the following if we can't navigate back.
  *   - The `fallbackUrl` prop.
  *   - The site homepage.
@@ -99,8 +95,6 @@ export default function BackLink(props: IProps) {
                 {content}
             </Button>
         );
-    } else if (props.fallbackElement) {
-        return <>{props.fallbackElement}</>;
     } else {
         content = (
             <a

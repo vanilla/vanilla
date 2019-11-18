@@ -57,7 +57,11 @@ export function styleFactory(componentName: string) {
             logDebug(styleObjs);
         }
 
-        return style({ $debugName: debugName }, ...styleObjs);
+        const hasNestedStyles = !!objects.find(obj => typeof obj === "object" && "$nest" in obj);
+
+        // Applying $unique generally gives better consistency, but it can cause issues with nested styles.
+        // As a result we don't apply it if the class has any nested styles.
+        return style({ $debugName: debugName, $unique: !hasNestedStyles }, ...styleObjs);
     }
 
     return styleCreator;

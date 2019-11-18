@@ -85,6 +85,7 @@ trait SiteTestTrait {
             }
             $localeFile = $localeDir.'/definitions.php';
             if (!file_exists($localeFile)) {
+                $handle = fopen($localeFile, "w");
                 $localeDefinitions = <<<TEMPLATE
 <?php
 
@@ -104,7 +105,8 @@ trait SiteTestTrait {
 );
 
 TEMPLATE;
-                file_put_contents($localeFile, $localeDefinitions);
+                fwrite($handle, $localeDefinitions);
+                fclose($handle);
             }
         }
     }

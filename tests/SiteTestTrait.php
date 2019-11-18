@@ -62,7 +62,9 @@ trait SiteTestTrait {
      * Create locale directory and locale definitions.php
      */
     public static function preparelocales() {
+        $enabledLocales =[];
         foreach(static::$enabledLocales as $localeKey => $locale) {
+            $enabledLocales["test_$localeKey"] = $locale;
             $localeDir = PATH_ROOT."/locales/test_$localeKey";
             if (!(file_exists($localeDir) && is_dir($localeDir))) {
                 mkdir($localeDir);
@@ -94,7 +96,7 @@ TEMPLATE;
             }
             /** @var ConfigurationInterface $config */
             $config = self::container()->get(ConfigurationInterface::class);
-            $config->set('EnabledLocales', static::$enabledLocales, true);
+            $config->set('EnabledLocales', $enabledLocales, true);
         }
     }
 

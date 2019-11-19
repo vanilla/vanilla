@@ -24,7 +24,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: boolean) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
@@ -95,7 +95,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         marginLeft: unit(-globalVars.gutter.quarter + (!legacyMode ? -(globalVars.gutter.size + 6) : 0)),
         transform: `translateX(-100%) translateY(-50%)`,
         height: unit(vars.paragraphMenuHandle.size),
-        width: unit(globalVars.icon.sizes.default),
+        width: unit(vars.paragraphMenuHandle.size),
         animationName: vars.pilcrow.animation.name,
         animationDuration: vars.pilcrow.animation.duration,
         animationTimingFunction: vars.pilcrow.animation.timing,
@@ -368,9 +368,11 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const position = style("position", {
-        position: "absolute",
-        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
         $nest: {
+            "&&": {
+                position: "absolute",
+                left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
+            },
             "&.isUp": {
                 bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
             },

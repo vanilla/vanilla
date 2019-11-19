@@ -72,6 +72,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
             );
             return;
         }
+        mountPoint.removeAttribute("data-embedJson");
 
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();

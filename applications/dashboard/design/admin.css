@@ -6694,7 +6694,6 @@ label,
 .input-wrap:not(.inline) label, .color-picker:not(.inline) label {
   display: block;
 }
-
 .input-wrap.inline, .inline.color-picker {
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -9429,6 +9428,45 @@ button.close {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+.category-url-code {
+  display: block;
+  vertical-align: middle;
+}
+.category-url-code .btn, .category-url-code .Button, .category-url-code .file-upload-browse {
+  margin-left: auto;
+  display: inline;
+  vertical-align: middle;
+}
+.category-url-code .Edit {
+  padding-top: 0;
+  padding-bottom: 0;
+  vertical-align: middle;
+}
+.category-url-code.isOpen {
+  display: block;
+}
+.category-url-code.isOpen .form-control, .category-url-code.isOpen .ac_input {
+  width: 140px;
+}
+.category-url-code.isOpen .Save.btn, .category-url-code.isOpen .Save.Button, .category-url-code.isOpen .Save.file-upload-browse {
+  padding-top: 1.5px;
+  padding-bottom: 1.5px;
+}
+.category-url-code.isOpen #Form_UrlCode {
+  display: inline !important;
+  min-width: 140px;
+  padding: 0.5px 4px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.category-url {
+  word-break: break-word;
+  display: inline;
+  line-height: 24px;
+  padding-right: 2px;
 }
 
 .radiolist-label[for=Form_Garden-dot-EmojiSet] {

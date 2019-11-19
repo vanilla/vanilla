@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Allow a class to test against
@@ -29,6 +30,9 @@ trait SiteTestTrait {
      */
     protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
 
+    /** @var array $enabledLocales */
+    protected static $enabledLocales = [];
+
     /**
      * Install the site.
      */
@@ -46,10 +50,56 @@ trait SiteTestTrait {
             'addons' => static::$addons
         ]);
 
+        self::preparelocales();
+
         // Start Authenticators
         $dic->get('Authenticator')->startAuthenticator();
 
         self::$siteInfo = $result;
+    }
+
+    /**
+     * Create locale directory and locale definitions.php
+     */
+    public static function preparelocales() {
+        $enabledLocales =[];
+        foreach (static::$enabledLocales as $localeKey => $locale) {
+            $enabledLocales["test_$localeKey"] = $locale;
+            $localeDir = PATH_ROOT."/locales/test_$localeKey";
+            if (!(file_exists($localeDir) && is_dir($localeDir))) {
+                mkdir($localeDir);
+            }
+            $localeFile = $localeDir.'/definitions.php';
+            if (!file_exists($localeFile)) {
+                $handle = fopen($localeFile, "w");
+                $localeDefinitions = <<<TEMPLATE
+<?php
+
+ \$LocaleInfo['$localeKey'] = array (
+  'Locale' => '$locale',
+  'Name' => '$locale / locale',
+  'EnName' => '$locale Name',
+  'Description' => 'Official $locale description',
+  'Version' => '000',
+  'Author' => 'Vanilla Community',
+  'AuthorUrl' => 'https://www.transifex.com/projects/p/vanilla/language/$locale/',
+  'License' => 'none',
+  'PercentComplete' => 100,
+  'NumComplete' => 0,
+  'DenComplete' => 0,
+  'Icon' => '$locale.svg',
+);
+
+TEMPLATE;
+                fwrite($handle, $localeDefinitions);
+                fclose($handle);
+            }
+        }
+        if (!empty($enabledLocales)) {
+            /** @var ConfigurationInterface $config */
+            $config = self::container()->get(ConfigurationInterface::class);
+            $config->set('EnabledLocales', $enabledLocales, true);
+        }
     }
 
     /**

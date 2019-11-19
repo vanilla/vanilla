@@ -11,6 +11,7 @@ import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelp
 import { em, percent } from "csx";
 import { paddings } from "@library/styles/styleHelpersfPadding";
 import { userContentVariables } from "@library/content/userContentStyles";
+import { unit } from "@library/styles/styleHelpers";
 
 export const codeBlockVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -53,6 +54,7 @@ export const codeBlockVariables = useThemeCache(() => {
         paddings: {
             all: globalVars.userContent.font.sizes.default,
         },
+        maxHeight: variablesUserContent.codeBlock.maxHeight,
     });
 
     return {
@@ -100,6 +102,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 borderRadius: vars.block.border.radius,
                 color: colorOut(vars.block.fg),
                 backgroundColor: colorOut(vars.block.bg),
+                maxHeight: unit(vars.block.maxHeight),
+                overflow: "auto",
             },
         },
     });

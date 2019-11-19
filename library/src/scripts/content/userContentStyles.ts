@@ -61,6 +61,7 @@ export const userContentVariables = useThemeCache(() => {
         lineHeight: 1.45,
         fg: blocks.fg,
         bg: blocks.bg,
+        maxHeight: 500,
     });
 
     const list = makeThemeVars("list", {
@@ -291,6 +292,8 @@ export const userContentClasses = useThemeCache(() => {
                 left: vars.codeBlock.paddingHorizontal,
                 right: vars.codeBlock.paddingHorizontal,
             }),
+            maxHeight: unit(vars.codeBlock.maxHeight),
+            overflow: "auto",
         },
     };
 

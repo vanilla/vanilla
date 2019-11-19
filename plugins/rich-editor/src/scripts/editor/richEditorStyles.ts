@@ -315,7 +315,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         display: "block",
         width: percent(100),
         ...paddings({
-            horizontal: (vars.menuButton.size - globalVars.icon.sizes.small) / 2,
+            horizontal: legacyMode ? 0 : (vars.menuButton.size - globalVars.icon.sizes.small) / 2,
             vertical: vars.embedMenu.padding,
         }),
         background: legacyMode ? undefined : colorOut(vars.colors.bg),

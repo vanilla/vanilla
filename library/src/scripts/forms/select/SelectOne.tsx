@@ -38,6 +38,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     inputClassName?: string;
     isClearable?: boolean;
     describedBy?: string;
+    selectRef?: React.RefObject<Select>;
 }
 
 export enum MenuPlacement {
@@ -106,6 +107,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     menuPlacement={props.menuPlacement ?? "auto"}
+                    ref={props.selectRef}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />

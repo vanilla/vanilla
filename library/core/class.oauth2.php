@@ -372,12 +372,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * Redirect to the OAuth redirect page with a verification nonce.
      *
      * @param EntryController $sender The controller initiating the request.
-     * @param  string $state The state to pass along the OAuth2 flow.
+     * @param string $state The state to pass along the OAuth2 flow.
      */
     public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
         $state = $this->decodeState($state);
         $url = $this->realAuthorizeUri($state);
-
         \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         redirectTo($url, 302, false);
     }
@@ -471,27 +470,46 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function authorizeUri($state = []) {
         $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state)]);
-
         return url("entry/{$this->providerKey}-redirect{$params}", true);
     }
 
     /**
-     * Create the URI that can return an authorization.
+     * Return the URL where the browser should be sent with all the necessary params to begin the authorization process.
+     *
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     * @return string Returns the sign-in URL.
+     */
+    final protected function realRegisterUri($state = []) {
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['RegisterUrl'], $state);
+        return $r;
+    }
+
+    /**
+     * Return the URL where the browser should be sent with all the necessary params to begin the registration process.
      *
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      *
      * @return string Endpoint of the provider.
      */
     protected function realAuthorizeUri(array $state = []): string {
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['AuthorizeUrl'], $state);
+        return $r;
+    }
+
+    /**
+     * Add the state other needed params to the Authorize or Register URL.
+     *
+     * @param string $uri Either a RegisterURL or an AuthorizeURL.
+     * @param array $state Data that will be sent to the provider containing, for example, the target URL.
+     * @return string The URI of the provider's registration or authorization page with the state token attached.
+     */
+    final protected function generateAuthorizeUriWithStateToken(string $uri, array $state): string {
         $provider = $this->provider();
-
-        $uri = val('AuthorizeUrl', $provider);
-
-        $redirect_uri = '/entry/'.$this->getProviderKey();
-        $reponse_type = c('OAuth2.ResponseType', 'code');
+        $redirect_uri = '/entry/' . $this->getProviderKey();
+        $response_type = c('OAuth2.ResponseType', 'code');
 
         $defaultParams = [
-            'response_type' => $reponse_type,
+            'response_type' => $response_type,
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)
@@ -503,12 +521,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $get['state'] = $this->encodeState($state);
 
         if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
-            $get['prompt'] = $provider['Prompt'] ;
+            $get['prompt'] = $provider['Prompt'];
         }
 
-        return $uri.'?'.http_build_query($get);
+        return $uri . '?' . http_build_query($get);
     }
-
 
     /**
      * Generic API uses ProxyRequest class to fetch data from remote endpoints.
@@ -841,10 +858,28 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
 
     /**
+     * Redirect to provider's signin page if this is the default behaviour.
+     *
+     * @param EntryController $sender Entry Controller object.
+     * @param EntryController $args Array of Event Arguments from the Entry Controller.
+     *
+     * @return mixed|bool Return null if not configured.
+     */
+    public function entryController_overrideRegister_handler($sender, $args) {
+        $provider = $args['DefaultProvider'];
+        if (val('AuthenticationSchemeAlias', $provider) != $this->getProviderKey() || !$this->isConfigured()) {
+            return;
+        }
+
+        $url = $this->realRegisterUri(['target' => $args['Target']]);
+        $args['DefaultProvider']['RegisterUrl'] = $url;
+    }
+
+    /**
      * Inject a sign-in icon into the ME menu.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param Gdn_Controller $sender Controller object that executes the page the button will be on..
+     * @param Gdn_Controller $args Array of arguments from the host controller.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->isConfigured() || $this->isDefault()) {

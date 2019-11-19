@@ -24,67 +24,66 @@ import { MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {
     flyoutType: FlyoutType;
+    defaultsOpen?: boolean;
 }
 
 export function StoryExampleDropDown(props: IProps) {
-    const device = useDevice();
+    const [isVisible, setVisible] = useState(!!props.defaultsOpen);
 
     return (
-        <DeviceProvider>
-            <DropDown
-                name={t("Article Options")}
-                renderLeft={true}
-                flyoutType={props.flyoutType}
-                openAsModal={device === Devices.MOBILE || device === Devices.XS}
-            >
-                <InsertUpdateMetas
-                    dateInserted={"2019-03-06 21:21:18"}
-                    dateUpdated={"2019-03-06 21:21:18"}
-                    insertUser={{
-                        userID: 1,
-                        name: "test",
-                        photoUrl: "test",
-                        dateLastActive: null,
-                    }}
-                    updateUser={{
-                        userID: 1,
-                        name: "test",
-                        photoUrl: "test",
-                        dateLastActive: null,
-                    }}
+        <DropDown
+            name={t("Article Options")}
+            flyoutType={props.flyoutType}
+            isVisible={isVisible}
+            onVisibilityChange={setVisible}
+        >
+            <InsertUpdateMetas
+                dateInserted={"2019-03-06 21:21:18"}
+                dateUpdated={"2019-03-06 21:21:18"}
+                insertUser={{
+                    userID: 1,
+                    name: "test",
+                    photoUrl: "test",
+                    dateLastActive: null,
+                }}
+                updateUser={{
+                    userID: 1,
+                    name: "test",
+                    photoUrl: "test",
+                    dateLastActive: null,
+                }}
+            />
+            <DropDownItemSeparator />
+            <DropDownItemLink name={t("Link 1")} to={"#"} />
+            <DropDownItemLink name={t("Link 2")} to={"#"} />
+            <DropDownItemLink name={t("Link 3")} to={"#"} />
+            <DropDownSection title={"Section Title"}>
+                <MeBoxDropDownItemList
+                    emptyMessage={t("You do not have any notifications yet.")}
+                    className="headerDropDown-notifications"
+                    type={MeBoxItemType.NOTIFICATION}
+                    data={[
+                        {
+                            type: MeBoxItemType.NOTIFICATION,
+                            message: "Sample message",
+                            photo: null,
+                            recordID: 1,
+                            timestamp: "2019-03-06 21:21:18",
+                            to: "#",
+                            unread: true,
+                        },
+                        {
+                            type: MeBoxItemType.NOTIFICATION,
+                            message: "Sample message",
+                            photo: null,
+                            recordID: 1,
+                            timestamp: "2019-03-06 21:21:18",
+                            to: "#",
+                            unread: false,
+                        },
+                    ]}
                 />
-                <DropDownItemSeparator />
-                <DropDownItemLink name={t("Link 1")} to={"#"} />
-                <DropDownItemLink name={t("Link 2")} to={"#"} />
-                <DropDownItemLink name={t("Link 3")} to={"#"} />
-                <DropDownSection title={"Section Title"}>
-                    <MeBoxDropDownItemList
-                        emptyMessage={t("You do not have any notifications yet.")}
-                        className="headerDropDown-notifications"
-                        type={MeBoxItemType.NOTIFICATION}
-                        data={[
-                            {
-                                type: MeBoxItemType.NOTIFICATION,
-                                message: "Sample message",
-                                photo: null,
-                                recordID: 1,
-                                timestamp: "2019-03-06 21:21:18",
-                                to: "#",
-                                unread: true,
-                            },
-                            {
-                                type: MeBoxItemType.NOTIFICATION,
-                                message: "Sample message",
-                                photo: null,
-                                recordID: 1,
-                                timestamp: "2019-03-06 21:21:18",
-                                to: "#",
-                                unread: false,
-                            },
-                        ]}
-                    />
-                </DropDownSection>
-            </DropDown>
-        </DeviceProvider>
+            </DropDownSection>
+        </DropDown>
     );
 }

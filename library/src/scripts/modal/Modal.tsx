@@ -6,7 +6,7 @@
 
 import ModalSizes from "@library/modal/ModalSizes";
 import { ModalView } from "@library/modal/ModalView";
-import { logWarning } from "@vanilla/utils";
+import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
@@ -208,6 +208,14 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         } else {
             // Get the last focused element
             this.closeFocusElement = document.activeElement as HTMLElement;
+        }
+
+        if (debug() && (!this.closeFocusElement || this.closeFocusElement === document.documentElement)) {
+            const message = `
+Dev Mode Error: Could not detect an element to focus on <Modal /> close.
+
+It seems auto-detection isn't working, so you'll need to specify the "elementToFocusOnExit" props.`;
+            throw new Error(message);
         }
     }
 

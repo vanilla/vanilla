@@ -1958,7 +1958,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                     }
                 }
 
-                $this->preloadUser();
                 $this->addWebpackAssets();
                 $this->addThemeAssets();
 
@@ -2070,15 +2069,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         if ($themeScript !== null) {
             $this->Head->addScript($themeScript->getWebPath());
         }
-    }
-
-    /**
-     * Preload user data for the frontend.
-     */
-    private function preloadUser() {
-        $usersApi = Gdn::getContainer()->get(UsersApiController::class);
-        $me = $usersApi->get_me([]);
-        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
     }
 
     /**

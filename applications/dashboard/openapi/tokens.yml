@@ -75,6 +75,66 @@ paths:
       tags:
       - Tokens
       summary: Reveal a usable access token.
+  /tokens/oauth:
+    post:
+      summary: Exchange an OAuth access token for a Vanilla access token.
+      description: |-
+        This endpoint takes an access token from your OAuth 2 provider and exchanges it for a Vanilla access token. If no matching user exists in Vanilla, one will be created and an access token will be issued for them.
+
+        In order to use this endpoint, the access token calls out to the API defined in the OAuth connection so it must have a scope that has access to the user's profile or else it will fail.
+
+        The access tokens provided by this endpoint are relatively short lived, so make sure you take note of the `dateExpires` in the response and have a strategy for refreshing the access token for long lived client sessions.
+      tags:
+        - Tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientID:
+                  type: string
+                  description: Your OAuth client ID used to identify the specific OAuth connection.
+                oauthAccessToken:
+                  type: string
+                  description: Your OAuth access token with scope to access the user's profile information.
+              required:
+                - clientID
+                - oauthAccessToken
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: The access token for Vanilla.
+                  dateExpires:
+                    type: string
+                    format: date-time
+                    description: The date/time that the access token will expire.
+                required:
+                  - accessToken
+                  - dateExpires
+              example:
+                accessToken: va.MtVMRtHgB5Hipdb3HI86VqrdBlI4qWMz.QCw5cA.WkNNEV_
+                dateExpires: '2019-08-30T14:37:52Z'
+        '400':
+          description: The user profile was successfully fetched, but was malformed in some way.
+        '403':
+          description: |
+            Forbidden. The OAuth access token didn't have permission to access the user information or failed in some other way.
+
+            If you get this error then make sure that the profile endpoint on **your** site returns a profile the access tokens you are providing to this site.
+        '404':
+          description: The provided client ID did not match the client ID that was configured within Vanilla.
+        '500':
+          description: OAuth is either not enabled or is not configured on Vanilla.
+
 components:
   schemas:
     Token:

@@ -344,10 +344,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Emoji::class)
     ->setShared(true)
 
-    ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
-    ->addCall('addCoreEmbeds')
-    ->setShared(true)
-
     ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)

@@ -9,6 +9,7 @@ import Quill from "quill/core";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { expect } from "chai";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import OpUtils from "@rich-editor/__tests__/OpUtils";
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 
 const MULTI_LINE_FORMATS = [...LINE_FORMATS, CodeBlockBlot.blotName];
@@ -68,32 +69,50 @@ describe("KeyboardBindings", () => {
         });
     });
 
-    it("handleCodeBlockEnter", () => {
-        const delta = new Delta().insert("line\n\n\n", {
-            [CodeBlockBlot.blotName]: true,
-        });
-        quill.setContents(delta);
+    describe("handleCodeBlockEnter", () => {
+        it("enter at the end", () => {
+            const delta = [OpUtils.op("line"), OpUtils.codeBlock("\n\n\n")];
 
-        // Place selection one the second line (newline);
-        const selection = {
-            index: 6,
-            length: 0,
-        };
-        keyboardBindings.handleCodeBlockEnter(selection);
+            quill.setContents(delta);
 
-        const expectedResult = [
-            { insert: "line" },
-            {
-                insert: "\n",
-                attributes: {
-                    [CodeBlockBlot.blotName]: true,
+            // Place selection one the second line (newline);
+            const selection = {
+                index: 6,
+                length: 0,
+            };
+            keyboardBindings.handleCodeBlockEnter(selection);
+
+            const expectedResult = [
+                { insert: "line" },
+                {
+                    insert: "\n",
+                    attributes: {
+                        [CodeBlockBlot.blotName]: true,
+                    },
                 },
-            },
-            {
-                insert: "\n",
-            },
-        ];
-        expect(quill.getContents().ops).deep.equals(expectedResult);
+                {
+                    insert: "\n",
+                },
+            ];
+            expect(quill.getContents().ops).deep.equals(expectedResult);
+        });
+
+        it("ignore enter in the middle", () => {
+            const delta = [OpUtils.op("line"), OpUtils.codeBlock("\n\n\n")];
+
+            quill.setContents(delta);
+
+            // Place selection in the middle of the blot.
+            const selection = {
+                index: 4,
+                length: 0,
+            };
+            keyboardBindings.handleCodeBlockEnter(selection);
+
+            // Nothing changed.
+            const expectedResult = delta;
+            expect(quill.getContents().ops).deep.equals(expectedResult);
+        });
     });
 
     /** ARROW KEYS */

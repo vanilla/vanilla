@@ -60,34 +60,30 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
 
     public render() {
         const { className, isMenuVisible, icon } = this.props;
-        if (this.props.open) {
-            const classes = richEditorClasses(this.props.legacyMode);
+        const classes = richEditorClasses(this.props.legacyMode);
 
-            // If the roving index matches my index, or no roving index is set and we're on the first tab
-            return (
-                <div id={this.componentID} ref={this.selfRef} className={classNames(className)}>
-                    <button
-                        type="button"
-                        role="menuitem"
-                        id={this.buttonID}
-                        aria-label={this.props.accessibleButtonLabel}
-                        title={this.props.accessibleButtonLabel}
-                        aria-controls={this.menuID}
-                        aria-expanded={isMenuVisible}
-                        aria-haspopup="menu"
-                        onClick={this.handleClick}
-                        className={classNames(classes.button, this.props.open ? classes.topLevelButtonActive : "")}
-                        tabIndex={this.props.tabIndex}
-                        ref={this.toggleButtonRef}
-                    >
-                        <IconForButtonWrap icon={icon} />
-                        <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
-                    </button>
-                </div>
-            );
-        } else {
-            return null;
-        }
+        // If the roving index matches my index, or no roving index is set and we're on the first tab
+        return (
+            <div id={this.componentID} ref={this.selfRef} className={classNames(className)}>
+                <button
+                    type="button"
+                    role="menuitem"
+                    id={this.buttonID}
+                    aria-label={this.props.accessibleButtonLabel}
+                    title={this.props.accessibleButtonLabel}
+                    aria-controls={this.menuID}
+                    aria-expanded={isMenuVisible}
+                    aria-haspopup="menu"
+                    onClick={this.handleClick}
+                    className={classNames(classes.button, this.props.open ? classes.topLevelButtonActive : "")}
+                    tabIndex={this.props.tabIndex}
+                    ref={this.toggleButtonRef}
+                >
+                    <IconForButtonWrap icon={icon} />
+                    <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
+                </button>
+            </div>
+        );
     }
 
     public componentDidMount() {

@@ -271,4 +271,53 @@ class RichFormat extends BaseFormat {
             E_USER_WARNING
         );
     }
+
+    /**
+     * Filter a rich body to remove sensitive information.
+     *
+     * @param array $row The row to filter.
+     * @return array Returns the filtered row.
+     */
+    public static function editBodyFilter($row) {
+        if (!is_array($row) || strcasecmp($row['format'] ?? $row['Format'] ?? '', 'rich') !== 0) {
+            return $row;
+        }
+
+        $key = array_key_exists('Body', $row) ? 'Body' : 'body';
+        $row[$key] = self::stripSensitiveInfoRich($row[$key]);
+
+        return $row;
+    }
+
+    /**
+     * Strip sensitive user info from a rich string and rewrite it.
+     *
+     * @param string $input The rich text input.
+     * @return string The string.
+     */
+    private static function stripSensitiveInfoRich(string $input): string {
+        if (strpos($input, "password") === false) {
+            return $input; // Bailout because it doesn't actually have user record.
+        }
+        $operations = json_decode($input, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($operations)) {
+            return $input;
+        }
+        foreach ($operations as &$op) {
+            $insertUser = $op['insert']['embed-external']['data']['insertUser'] ?? null;
+            if (!$insertUser) {
+                // No user.
+                continue;
+            }
+            $op['insert']['embed-external']['data']['insertUser'] = [
+                'userID' => $insertUser['userID'],
+                'name' => $insertUser['name'],
+                'photoUrl' => $insertUser['photoUrl'],
+                'dateLastActive' => $insertUser['dateLastActive'],
+                'label' => $insertUser['label'],
+            ];
+        }
+        $output = json_encode($operations, JSON_UNESCAPED_UNICODE);
+        return $output;
+    }
 }

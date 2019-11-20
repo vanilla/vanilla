@@ -28,6 +28,21 @@ class UserFragmentSchema extends Schema {
         ]));
     }
 
+
+    /** @var UserFragmentSchema */
+    private static $cache = null;
+
+    /**
+     * @return UserFragmentSchema
+     */
+    public static function instance(): UserFragmentSchema {
+        if (self::$cache === null) {
+            self::$cache = new UserFragmentSchema();
+        }
+
+        return self::$cache;
+    }
+
     /**
      * Normalize a user from the DB into a user fragment.
      *
@@ -41,6 +56,7 @@ class UserFragmentSchema extends Schema {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord = self::instance()->validate($schemaRecord);
         return $schemaRecord;
     }
 }

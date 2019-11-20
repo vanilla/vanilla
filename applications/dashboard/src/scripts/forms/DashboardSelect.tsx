@@ -11,6 +11,7 @@ import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import Select from "react-select";
 
 interface IProps extends IMenuPlacement {
     options: IComboBoxOption[];
@@ -21,6 +22,7 @@ interface IProps extends IMenuPlacement {
     disabled?: boolean;
     isClearable?: boolean;
     errors?: IFieldError[];
+    selectRef?: React.RefObject<Select>;
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
@@ -39,6 +41,7 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 disabled={props.disabled}
                 menuPlacement={props.menuPlacement}
                 isClearable={props.isClearable}
+                selectRef={props.selectRef}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}
         </div>

@@ -868,10 +868,23 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @param string $providerKey The key of the system providing the authentication.
      * @param array $userData Data to go in the user table.
      * @param array $options Additional connect options.
-     * @return int The new/existing user ID.
+     * @return int|false The new/existing user ID or **false** if there was an error connecting.
      */
     public function connect($uniqueID, $providerKey, $userData, $options = []) {
         trace('UserModel->Connect()');
+
+        $options += [
+            'CheckCaptcha' => false,
+            'NoConfirmEmail' => isset($userData['Email']) || !UserModel::requireConfirmEmail(),
+            'NoActivity' => true,
+            'SyncExisting' => true,
+        ];
+
+        if (empty($uniqueID)) {
+            $this->Validation->addValidationResult('UniqueID', 'ValidateRequired');
+            return false;
+        }
+
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 
         $isTrustedProvider = $provider['Trusted'] ?? false;
@@ -897,7 +910,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         if ($userID) {
             // Save the user.
-            $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            if ($options['SyncExisting']) {
+                $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            }
             return $userID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -924,9 +939,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     $userData['RoleID'] = $this->lookupRoleIDs($userData['Roles']);
                 }
 
-                $options['CheckCaptcha'] = $options['CheckCaptcha'] ?? false;
-                $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
-                $options['NoActivity'] = $options['NoActivity'] ?? true;
                 $options['SaveRoles'] = $saveRolesRegister;
                 $options['ValidateName'] = !$isTrustedProvider;
 
@@ -5229,8 +5241,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         }
 
         $user = $this->getID($userID);
-        $preferences = val('Preferences', $user, []);
-        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+        $preferences = $user->Preferences ?? [];
+        $landingPages = $preferences['DashboardNav.SectionLandingPages'] ?? [];
+        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?? '';
+        $sectionReset = false;
 
         // Run through the user's saved landing page per section and if the url matches the passed url,
         // remove that preference.
@@ -5238,13 +5252,16 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             $url = strtolower(trim($url, '/'));
             $landingPage = strtolower(trim($landingPage, '/'));
             if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                $sectionReset = true;
                 unset($landingPages[$section]);
             }
         }
 
-        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        if ($sectionReset) {
+            $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        }
 
-        if ($resetSectionPreference) {
+        if ($resetSectionPreference && $sectionPreference !== '') {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
     }

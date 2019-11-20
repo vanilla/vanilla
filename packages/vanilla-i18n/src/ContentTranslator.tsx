@@ -12,6 +12,7 @@ export interface IContentTranslatorProps {
     properties: ITranslationProperty[];
     resource: string;
     title: string;
+    sourceLocale?: string | null;
 }
 
 // Subtypes

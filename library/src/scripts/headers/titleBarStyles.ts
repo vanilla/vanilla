@@ -184,6 +184,12 @@ export const titleBarVariables = useThemeCache(() => {
         bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
     });
 
+    const logo = makeThemeVars("logo", {
+        maxWidth: 200,
+        heightOffset: 18,
+        tablet: {},
+    });
+
     return {
         border,
         sizing,
@@ -201,6 +207,7 @@ export const titleBarVariables = useThemeCache(() => {
         mobileDropDown,
         meBox,
         bottomRow,
+        logo,
     };
 });
 
@@ -708,11 +715,12 @@ export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
     const logoFrame = style("logoFrame", { display: "inline-flex" });
-    const logoHeight = px(vars.sizing.height - 18);
+    const logoHeight = px(vars.sizing.height - vars.logo.heightOffset);
 
     const logo = style("logo", {
         display: "block",
-        height: logoHeight,
+        maxHeight: logoHeight,
+        maxWidth: unit(vars.logo.maxWidth),
         width: "auto",
         $nest: {
             "&.isCentred": {

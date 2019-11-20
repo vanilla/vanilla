@@ -83,13 +83,14 @@ export function _mountComponents(parent: Element) {
         if (typeof props === "string") {
             props = JSON.parse(props);
         }
+        let children = node.innerHTML;
 
         const registeredComponent = getComponent(name);
 
         if (registeredComponent) {
             mountReact(
                 <AppContext variablesOnly noTheme={!useTheme}>
-                    <registeredComponent.Component {...props} />
+                    <registeredComponent.Component {...props} contents={children} />
                 </AppContext>,
                 node,
                 undefined,

@@ -12,7 +12,7 @@ use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 
 /**
- * Page preloader for locale information.
+ * Page preloader for current user.
  */
 class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
 

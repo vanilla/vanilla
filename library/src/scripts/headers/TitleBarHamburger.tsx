@@ -4,5 +4,6 @@ import * as React from "react";
 export function TitleBarHamburger(props) {
     const { contents } = props;
     console.log("contents:", contents);
-    return <TitleBar />;
+    // return <TitleBar />;
+    return "title bar! Woot!";
 }

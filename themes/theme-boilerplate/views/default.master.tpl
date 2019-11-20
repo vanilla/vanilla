@@ -71,8 +71,7 @@
 
     <div class="Frame" id="page">
         <div class="Frame-top">
-
-            {if has_data_driven_header() === true}
+            {if has_data_driven_title_bar === true}
                 <div data-react="title-bar-hamburger" style="display: none!important;">
                     {$smarty.capture.menu}
                 </div>

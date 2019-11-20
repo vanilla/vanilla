@@ -24,6 +24,7 @@ export const bodyCSS = useThemeCache(() => {
         }),
         wordBreak: "break-word",
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+        height: percent(100),
     });
 
     cssRule("*", {

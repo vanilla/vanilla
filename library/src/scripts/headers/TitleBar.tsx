@@ -41,6 +41,7 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     isFixed?: boolean;
+    useMobileBackButton?: boolean;
 }
 
 interface IState {
@@ -73,6 +74,7 @@ export class TitleBar extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         mobileDropDownContent: null,
         isFixed: true,
+        useMobileBackButton: true,
     };
 
     public state = {
@@ -110,17 +112,20 @@ export class TitleBar extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("titleBar-bar", classes.bar)}>
-                            {!this.state.openSearch && isMobile && (
-                                <BackLink
-                                    className={classNames(
-                                        "titleBar-leftFlexBasis",
-                                        "titleBar-backLink",
-                                        classes.leftFlexBasis,
-                                    )}
-                                    linkClassName={classes.button}
-                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                />
-                            )}
+                            {!this.state.openSearch &&
+                                isMobile &&
+                                (this.props.useMobileBackButton ? (
+                                    <BackLink
+                                        className={classNames(
+                                            "titleBar-leftFlexBasis",
+                                            "titleBar-backLink",
+                                            classes.leftFlexBasis,
+                                        )}
+                                        linkClassName={classes.button}
+                                    />
+                                ) : (
+                                    <FlexSpacer className="pageHeading-leftSpacer" />
+                                ))}
                             {!isMobile && (
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}

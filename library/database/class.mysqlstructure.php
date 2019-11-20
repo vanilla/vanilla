@@ -211,6 +211,93 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Generate the DDL for creating a table.
+     *
+     * @return string Returns a DDL statement.
+     */
+    final protected function getCreateTable(): string {
+        $primaryKey = [];
+        $uniqueKey = [];
+        $fullTextKey = [];
+        $indexes = [];
+        $keys = '';
+        $sql = '';
+        $tableName = Gdn_Format::alphaNumeric($this->_TableName);
+
+        foreach ($this->_Columns as $columnName => $column) {
+            if ($sql != '') {
+                $sql .= ',';
+            }
+
+            $sql .= "\n" . $this->_defineColumn($column);
+
+            $columnKeyTypes = (array)$column->KeyType;
+
+            foreach ($columnKeyTypes as $columnKeyType) {
+                $keyTypeParts = explode('.', $columnKeyType, 2);
+                $columnKeyType = $keyTypeParts[0];
+                $indexGroup = val(1, $keyTypeParts, '');
+
+                if ($columnKeyType == 'primary') {
+                    $primaryKey[] = $columnName;
+                } elseif ($columnKeyType == 'key') {
+                    $indexes['FK'][$indexGroup][] = $columnName;
+                } elseif ($columnKeyType == 'index') {
+                    $indexes['IX'][$indexGroup][] = $columnName;
+                } elseif ($columnKeyType == 'unique') {
+                    $uniqueKey[] = $columnName;
+                } elseif ($columnKeyType == 'fulltext') {
+                    $fullTextKey[] = $columnName;
+                }
+            }
+        }
+        // Build primary keys
+        if (count($primaryKey) > 0) {
+            $keys .= ",\nprimary key (`" . implode('`, `', $primaryKey) . "`)";
+        }
+        // Build unique keys.
+        if (count($uniqueKey) > 0) {
+            $keys .= ",\nunique index `UX_{$tableName}` (`" . implode('`, `', $uniqueKey) . "`)";
+        }
+        // Build full text index.
+        if (count($fullTextKey) > 0) {
+            $keys .= ",\nfulltext index `TX_{$tableName}` (`" . implode('`, `', $fullTextKey) . "`)";
+        }
+        // Build the rest of the keys.
+        foreach ($indexes as $indexType => $indexGroups) {
+            $createString = val($indexType, ['FK' => 'key', 'IX' => 'index']);
+            foreach ($indexGroups as $indexGroup => $columnNames) {
+                if (!$indexGroup) {
+                    foreach ($columnNames as $columnName) {
+                        $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$columnName}` (`{$columnName}`)";
+                    }
+                } else {
+                    $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$indexGroup}` (`" . implode('`, `', $columnNames) . '`)';
+                }
+            }
+        }
+
+        $sql = 'create table `' . $this->_DatabasePrefix . $tableName . '` ('
+            . $sql
+            . $keys
+            . "\n)";
+
+        $engine = ($this->_TableStorageEngine ?: Gdn::config('Database.ForceStorageEngine', Gdn::config('Database.DefaultStorageEngine'))) ?: 'innodb';
+        $sql .= ' engine=' . $engine;
+
+        if ($this->_CharacterEncoding !== false && $this->_CharacterEncoding != '') {
+            $sql .= ' default character set ' . $this->_CharacterEncoding;
+        }
+
+        if (array_key_exists('Collate', $this->Database->ExtendedProperties)) {
+            $sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
+        }
+
+        $sql .= ';';
+        return $sql;
+    }
+
+    /**
      * Get the character set for a  collation.
      * @param string $collation The name of the collation.
      * @return string Returns the name of the character set or an empty string if the collation was not found.
@@ -700,92 +787,5 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         } else {
             return "'".str_replace("'", "''", $value)."'";
         }
-    }
-
-    /**
-     * Generate the DDL for creating a table.
-     *
-     * @return string Returns a DDL statement.
-     */
-    final protected function getCreateTable(): string {
-        $primaryKey = [];
-        $uniqueKey = [];
-        $fullTextKey = [];
-        $indexes = [];
-        $keys = '';
-        $sql = '';
-        $tableName = Gdn_Format::alphaNumeric($this->_TableName);
-
-        foreach ($this->_Columns as $columnName => $column) {
-            if ($sql != '') {
-                $sql .= ',';
-            }
-
-            $sql .= "\n" . $this->_defineColumn($column);
-
-            $columnKeyTypes = (array)$column->KeyType;
-
-            foreach ($columnKeyTypes as $columnKeyType) {
-                $keyTypeParts = explode('.', $columnKeyType, 2);
-                $columnKeyType = $keyTypeParts[0];
-                $indexGroup = val(1, $keyTypeParts, '');
-
-                if ($columnKeyType == 'primary') {
-                    $primaryKey[] = $columnName;
-                } elseif ($columnKeyType == 'key') {
-                    $indexes['FK'][$indexGroup][] = $columnName;
-                } elseif ($columnKeyType == 'index') {
-                    $indexes['IX'][$indexGroup][] = $columnName;
-                } elseif ($columnKeyType == 'unique') {
-                    $uniqueKey[] = $columnName;
-                } elseif ($columnKeyType == 'fulltext') {
-                    $fullTextKey[] = $columnName;
-                }
-            }
-        }
-        // Build primary keys
-        if (count($primaryKey) > 0) {
-            $keys .= ",\nprimary key (`" . implode('`, `', $primaryKey) . "`)";
-        }
-        // Build unique keys.
-        if (count($uniqueKey) > 0) {
-            $keys .= ",\nunique index `UX_{$tableName}` (`" . implode('`, `', $uniqueKey) . "`)";
-        }
-        // Build full text index.
-        if (count($fullTextKey) > 0) {
-            $keys .= ",\nfulltext index `TX_{$tableName}` (`" . implode('`, `', $fullTextKey) . "`)";
-        }
-        // Build the rest of the keys.
-        foreach ($indexes as $indexType => $indexGroups) {
-            $createString = val($indexType, ['FK' => 'key', 'IX' => 'index']);
-            foreach ($indexGroups as $indexGroup => $columnNames) {
-                if (!$indexGroup) {
-                    foreach ($columnNames as $columnName) {
-                        $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$columnName}` (`{$columnName}`)";
-                    }
-                } else {
-                    $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$indexGroup}` (`" . implode('`, `', $columnNames) . '`)';
-                }
-            }
-        }
-
-        $sql = 'create table `' . $this->_DatabasePrefix . $tableName . '` ('
-            . $sql
-            . $keys
-            . "\n)";
-
-        $engine = ($this->_TableStorageEngine ?: Gdn::config('Database.ForceStorageEngine', Gdn::config('Database.DefaultStorageEngine'))) ?: 'innodb';
-        $sql .= ' engine=' . $engine;
-
-        if ($this->_CharacterEncoding !== false && $this->_CharacterEncoding != '') {
-            $sql .= ' default character set ' . $this->_CharacterEncoding;
-        }
-
-        if (array_key_exists('Collate', $this->Database->ExtendedProperties)) {
-            $sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
-        }
-
-        $sql .= ';';
-        return $sql;
     }
 }

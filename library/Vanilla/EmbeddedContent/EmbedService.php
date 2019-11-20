@@ -8,8 +8,6 @@ namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
 use Garden\Schema\ValidationException;
-use Vanilla\Addon;
-use Vanilla\AddonManager;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
@@ -189,14 +187,10 @@ class EmbedService implements EmbedCreatorInterface {
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
-            ->registerFilter($dic->get(QuoteEmbedFilter::class));
-
-        /* @var AddonManager $addonManager */
-        $addonManager = $dic->get(AddonManager::class);
-        if ($addonManager->isEnabled('vanilla', Addon::TYPE_ADDON)) {
-            $this->registerFactory($dic->get(DiscussionEmbedFactory::class));
-            $this->registerFactory($dic->get(CommentEmbedFactory::class));
-        }
+            ->registerFilter($dic->get(QuoteEmbedFilter::class))
+            ->registerFactory($dic->get(DiscussionEmbedFactory::class))
+            ->registerFactory($dic->get(CommentEmbedFactory::class))
+        ;
     }
 
     /**

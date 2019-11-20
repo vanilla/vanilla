@@ -667,7 +667,7 @@ class UpdateModel extends Gdn_Model {
         } finally {
             if ($userID && $userID !== Gdn::session()->UserID) {
                 Gdn::session()->start($userID, false, false);
-            } elseif (!$userID) {
+            } elseif (!$userID && null !== c('Garden.Installed', false)) {
                 Gdn::session()->end();
             }
         }

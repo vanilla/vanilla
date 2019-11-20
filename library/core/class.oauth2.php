@@ -1090,7 +1090,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         $userID = $userModel->connect(
             $payload['UniqueID'] ?? '',
-            static::PROVIDER_KEY,
+            $this->getProviderKey(),
             $payload,
             ['SyncExisting' => false]
         );

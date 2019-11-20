@@ -61,7 +61,7 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
             }
         }
         $siteSectionRegex = count($allowedSlugs) > 0 ?
-            '(' . implode('|', $allowedSlugs) . ')'
+            '(' . implode('|', $allowedSlugs) . ')?'
             : '';
         $root = $this->request->getAssetRoot() . $siteSectionRegex;
 

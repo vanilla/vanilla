@@ -97,7 +97,9 @@ class MySQLStructureTest extends TestCase {
     /**
      * A forced engine should override the default.
      *
-     * @param string $expectedEngine
+     * @param array $config Config changes to run the test with.
+     * @param string $explicitEngine The engine to set on the `Gdn_MySQLStructure` class.
+     * @param string $expectedEngine The expected engine in the `create table` statement.
      * @dataProvider provideEngines
      */
     final private function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void {

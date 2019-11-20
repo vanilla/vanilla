@@ -14,6 +14,7 @@ import "@webcomponents/webcomponentsjs";
 polyfillClosest();
 polyfillRemove();
 polyfillCustomEvent();
+polyfillStringNormalize();
 
 /**
  * Polyfill Element.closest() on IE 9+.
@@ -96,4 +97,18 @@ function polyfillCustomEvent() {
     CustomEvent.prototype = window.Event.prototype;
 
     window.CustomEvent = CustomEvent;
+}
+
+/**
+ * A library like unorm would be a lot more robust but is huge!
+ * Users of older browsers just don't get full string normalization.
+ */
+function polyfillStringNormalize() {
+    if (typeof String.prototype.normalize === "function") {
+        return;
+    }
+
+    String.prototype.normalize = function () {
+        return this;
+    }
 }

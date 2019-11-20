@@ -486,7 +486,7 @@
             filename = filename.substring(12);
         }
         if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
+            $(this).parent().find('.file-upload-choose').text(filename);
         }
     });
 

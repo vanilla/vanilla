@@ -149,8 +149,11 @@ function useInitialValue() {
 
     useEffect(() => {
         if (quill && initialValue && initialValue.length > 0) {
-            if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
+            const initializeChangedToTrue = !prevReinitialize && reinitialize;
+            if (prevInitialValue !== initialValue && initializeChangedToTrue) {
                 quill.setContents(initialValue);
+                quill.setSelection(0, 0);
+                quill.history.clear();
             }
         }
     }, [quill, initialValue, reinitialize, prevInitialValue, prevReinitialize]);
@@ -347,20 +350,14 @@ function useUpdateHandler() {
             if (!quill) {
                 return;
             }
-            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+            if (source === Quill.sources.SILENT) {
+                return;
+            }
+            if (onChange && type === Quill.events.TEXT_CHANGE) {
                 onChange(getOperations());
             }
 
-            let shouldDispatch = false;
-            if (type === Quill.events.SELECTION_CHANGE) {
-                shouldDispatch = true;
-            } else if (source !== Quill.sources.SILENT) {
-                shouldDispatch = true;
-            }
-
-            if (shouldDispatch) {
-                updateSelection(quill.getSelection());
-            }
+            updateSelection(quill.getSelection());
         };
         return throttle(updateFn, 1000 / 60); // Throttle to 60 FPS.
     }, [quill, onChange, getOperations, updateSelection]);

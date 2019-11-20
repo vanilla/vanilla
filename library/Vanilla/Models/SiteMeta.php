@@ -53,6 +53,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var string|null */
+    private $shareImage;
+
     /** @var array */
     private $featureFlags;
 
@@ -118,6 +121,10 @@ class SiteMeta implements \JsonSerializable {
             $this->logo = \Gdn_Upload::url($logo);
         }
 
+        if ($shareImage = $config->get("Garden.ShareImage")) {
+            $this->shareImage = \Gdn_Upload::url($shareImage);
+        }
+
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
 
@@ -146,6 +153,7 @@ class SiteMeta implements \JsonSerializable {
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
                 'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
+                'shareImage' => $this->shareImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
@@ -235,6 +243,15 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getFavIcon(): ?string {
         return $this->favIcon;
+    }
+
+    /**
+     * Get the configured "Share Image" for the site.
+     *
+     * @return string|null
+     */
+    public function getShareImage(): ?string {
+        return $this->shareImage;
     }
 
     /**

@@ -582,6 +582,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         foreach ($rows as &$currentRow) {
+            $currentRow['Name'] = !empty($currentRow['Name']) ? $currentRow['Name'] : '--Empty--';
             $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
         $this->expandLastCommentBody($rows, $query['expand']);

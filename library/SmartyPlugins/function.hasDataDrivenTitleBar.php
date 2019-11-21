@@ -9,9 +9,9 @@
 /**
  *
  *
- * @param array $params
- * @param object $smarty
- * @return string
+ * @param array $params The parameters passed into the function.
+ * @param Smarty $smarty The smarty object rendering the template.
+ * @return boolean
  */
 function smarty_function_has_data_driven_title_bar($params, &$smarty) {
     return Gdn::config("Feature.NewFlyouts.Enabled", false);

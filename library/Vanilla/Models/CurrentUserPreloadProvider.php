@@ -33,7 +33,7 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
      * @inheritdoc
      */
     public function createActions(): array {
-        $user = $this->usersApi->index([]);
+        $user = $this->usersApi->get_me([]);
 
         return [
             new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), [])

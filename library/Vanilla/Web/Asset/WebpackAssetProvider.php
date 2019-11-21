@@ -9,11 +9,14 @@ namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class to provide assets from the webpack build process.
  */
 class WebpackAssetProvider {
+
+    use TwigRenderTrait;
 
     /** @var RequestInterface */
     private $request;
@@ -250,24 +253,9 @@ class WebpackAssetProvider {
      * @return string The contents of the script.
      */
     public function getInlinePolyfillContents(): string {
-        $polyfillAsset = new PolyfillAsset($this->request, $this->cacheBustingKey);
-        $debug = debug();
-        $logAdding = $debug ? 'console.log("Older browser detected. Initiating polyfills.");' : '';
-        $logNotAdding = $debug ? 'console.log("Modern browser detected. No polyfills necessary");' : '';
-
-        // Add the polyfill loader.
-        $scriptContent =
-            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
-            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
-            ."&& window.NodeList && NodeList.prototype.forEach;"
-            ."if (!supportsAllFeatures) {"
-            .$logAdding
-            ."var head = document.getElementsByTagName('head')[0];"
-            ."var script = document.createElement('script');"
-            ."script.src = '".$polyfillAsset->getWebPath()."';"
-            ."head.appendChild(script);"
-            ."} else { $logNotAdding }";
-
-        return $scriptContent;
+        return $this->renderTwig("library/Vanilla/Web/Asset/InlinePolyfillContent.js.twig", [
+            'debugModeLiteral' => debug() ? "true" : "false",
+            'polyfillAsset' => new PolyfillAsset($this->request, $this->cacheBustingKey),
+        ]);
     }
 }

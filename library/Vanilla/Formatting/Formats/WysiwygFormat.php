@@ -21,52 +21,25 @@ class WysiwygFormat extends HtmlFormat {
 
     const ALT_FORMAT_KEY = "raw";
 
-    /** @var HtmlSanitizer */
-    private $htmlSanitizer;
-
-    /** @var HtmlEnhancer */
-    private $htmlEnhancer;
-
-    /** @var HtmlPlainTextConverter */
-    private $plainTextConverter;
-
     /**
-     * Constructor for dependency Injection.
+     * Constructor for dependency Injection
      *
-     * @param HtmlSanitizer $htmlSanitizer
-     * @param HtmlEnhancer $htmlEnhancer
-     * @param HtmlPlainTextConverter $plainTextConverter
+     * @inheritdoc
      */
     public function __construct(
         HtmlSanitizer $htmlSanitizer,
         HtmlEnhancer $htmlEnhancer,
         HtmlPlainTextConverter $plainTextConverter
     ) {
-        $this->htmlSanitizer = $htmlSanitizer;
-        $this->htmlEnhancer = $htmlEnhancer;
-        $this->plainTextConverter = $plainTextConverter;
-
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
     }
-
 
     /**
      * @inheritdoc
      */
     public function renderHtml(string $content, bool $enhance = true): string {
-        $result = $this->htmlSanitizer->filter($content);
-
-        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', '', $result);
-
-        $result = $this->legacySpoilers($result);
-
-        if ($enhance) {
-            $result = $this->htmlEnhancer->enhance($result);
-        }
-
-        $result = self::cleanupEmbeds($result);
-
-        return $result;
+        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', '', $content);
+        return parent::renderHtml($result, $enhance);
     }
 
     /**

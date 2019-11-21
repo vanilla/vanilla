@@ -222,6 +222,7 @@ export const searchBarClasses = useThemeCache(() => {
     const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
+        width: percent(100),
         paddingTop: 0,
         paddingBottom: 0,
         paddingRight: 0,

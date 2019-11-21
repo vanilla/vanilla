@@ -19,30 +19,23 @@
 }
 
 {capture name="menu"}
-    <nav class="Navigation needsInitialization js-nav">
-        <div class="Container">
-            {if $User.SignedIn}
-                <div class="Navigation-row NewDiscussion">
-                    <div class="NewDiscussion mobile">
-                        {module name="NewDiscussionModule"}
-                    </div>
-                </div>
-            {else}
-                <div class="Navigation-row">
-                    <div class="SignIn mobile">
-                        {module name="MeModule"}
-                    </div>
-                </div>
-            {/if}
-            {categories_link format=$linkFormat}
-            {discussions_link format=$linkFormat}
-            {activity_link format=$linkFormat}
-            {custom_menu format=$linkFormat}
-            <div class='Navigation-linkContainer'>
-                {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
+    {if $User.SignedIn}
+        <div class="Navigation-row NewDiscussion">
+            <div class="NewDiscussion mobile">
+                {module name="NewDiscussionModule"}
             </div>
         </div>
-    </nav>
+    {else}
+        <div class="Navigation-row">
+            <div class="SignIn mobile">
+                {module name="MeModule"}
+            </div>
+        </div>
+    {/if}
+    {categories_link format=$linkFormat}
+    {discussions_link format=$linkFormat}
+    {activity_link format=$linkFormat}
+    {custom_menu format=$linkFormat}
 {/capture}
 
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -71,11 +64,11 @@
 
     <div class="Frame" id="page">
         <div class="Frame-top">
-            {if has_data_driven_title_bar === true}
-                <div data-react="title-bar-hamburger" style="display: none!important;">
+            {if has_data_driven_title_bar}
+                <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true">
                     {$smarty.capture.menu}
-                </div>
-             { else }
+                </header>
+             {else}
                 <div class="Frame-header">
                     <header id="MainHeader" class="Header">
                         <div class="Container">
@@ -115,7 +108,14 @@
                                 </div>
                             </div>
                         </div>
-                        {$smarty.capture.menu}
+                        <nav class="Navigation needsInitialization js-nav">
+                            <div class="Container">
+                                {$smarty.capture.menu}
+                                <div class='Navigation-linkContainer'>
+                                    {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
+                                </div>
+                            </div>
+                        </nav>
                         <nav class="mobileMebox js-mobileMebox needsInitialization">
                             <div class="Container">
                                 {module name="MeModule"}

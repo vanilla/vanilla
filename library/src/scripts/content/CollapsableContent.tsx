@@ -65,7 +65,6 @@ export function CollapsableContent(props: IProps) {
     useLayoutEffect(() => {
         if (domNodesToAttach && ref.current) {
             domNodesToAttach.forEach(node => {
-                console.log("append node", node);
                 ref.current?.appendChild(node);
             });
         }

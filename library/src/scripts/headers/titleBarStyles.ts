@@ -27,7 +27,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
 enum TitleBarBorderType {
@@ -434,6 +434,7 @@ export const titleBarClasses = useThemeCache(() => {
     const button = style(
         "button",
         {
+            ...buttonResetMixin(),
             color: vars.colors.fg.toString(),
             height: px(vars.button.size),
             minWidth: px(vars.button.size),
@@ -508,6 +509,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const searchCancel = style("searchCancel", {
+        ...buttonResetMixin(),
         ...userSelect(),
         height: px(formElementVars.sizing.height),
         $nest: {

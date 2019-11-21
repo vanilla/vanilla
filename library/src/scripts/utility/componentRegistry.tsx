@@ -83,7 +83,7 @@ export function _mountComponents(parent: Element) {
         if (typeof props === "string") {
             props = JSON.parse(props);
         }
-        let children = node.innerHTML;
+        const children = node.innerHTML;
 
         const registeredComponent = getComponent(name);
 
@@ -93,7 +93,11 @@ export function _mountComponents(parent: Element) {
                     <registeredComponent.Component {...props} contents={children} />
                 </AppContext>,
                 node,
-                undefined,
+                () => {
+                    if (node.getAttribute("data-unhide") === "true") {
+                        node.removeAttribute("style");
+                    }
+                },
                 registeredComponent.mountOptions,
             );
         } else {

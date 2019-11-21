@@ -427,7 +427,7 @@ export const titleBarClasses = useThemeCache(() => {
     const button = style(
         "button",
         {
-            color: vars.colors.fg.toString(),
+            color: colorOut(vars.colors.fg),
             height: px(vars.button.size),
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
@@ -475,6 +475,12 @@ export const titleBarClasses = useThemeCache(() => {
                                 $nest: {
                                     "& .meBox-buttonContent": {
                                         backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                    "&:focus": {
+                                        color: colorOut(vars.colors.fg),
+                                    },
+                                    "&.focus-visible": {
+                                        color: colorOut(vars.colors.fg),
                                     },
                                 },
                             },

@@ -10,7 +10,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
@@ -170,13 +170,14 @@ export const searchBarClasses = useThemeCache(() => {
             "&:empty": {
                 display: important("none"),
             },
-            ".suggestedTextInput__placeholder": {
+            "& .suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),
             },
-            ".suggestedTextInput-noOptions": {
+            "& .suggestedTextInput-noOptions": {
                 padding: px(12),
             },
-            ".suggestedTextInput-option": {
+            "& .suggestedTextInput-option": {
+                ...buttonResetMixin(),
                 width: percent(100),
                 ...paddings({
                     vertical: 9,
@@ -192,11 +193,11 @@ export const searchBarClasses = useThemeCache(() => {
                     },
                 },
             },
-            ".suggestedTextInput-menuItems": {
+            "& .suggestedTextInput-menuItems": {
                 margin: 0,
                 padding: 0,
             },
-            ".suggestedTextInput-item": {
+            "& .suggestedTextInput-item": {
                 listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {

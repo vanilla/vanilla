@@ -71,6 +71,12 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
                 '/actual-root',
                 [new MockSiteSection('test', 'en', '/actual-section', 'test1', 'test1')]
             ],
+            'Correct section w/ regex character in it' => [
+                $bootstrapBase . '/actual-root/regex!^$-()-section/discussion/41342',
+                true,
+                '/actual-root',
+                [new MockSiteSection('test', 'en', '/regex!^$-()-section', 'test1', 'test1')]
+            ],
             // Not allowed
             'Wrong webroot' => [
                 $bootstrapBase . '/wrong-root/discussion/41342',

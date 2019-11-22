@@ -10,13 +10,19 @@ import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import FrameBody from "@library/layout/frame/FrameBody";
+import { HamburgerIcon } from "@library/icons/common";
 
 /**
  * Creates a drop down menu
  */
 export default function Hamburger(props) {
     return (
-        <DropDown name={t("Messages")} buttonContents={"toto"} flyoutType={FlyoutType.FRAME}>
+        <DropDown
+            name={t("Messages")}
+            buttonClassName={props.buttonClassName}
+            buttonContents={<HamburgerIcon />}
+            flyoutType={FlyoutType.FRAME}
+        >
             <Frame
                 body={
                     <FrameBody className={classNames("isSelfPadded")}>

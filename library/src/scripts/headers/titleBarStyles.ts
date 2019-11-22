@@ -290,7 +290,7 @@ export const titleBarClasses = useThemeCache(() => {
         "bar",
         {
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-start",
             flexWrap: "nowrap",
             alignItems: "center",
             height: px(vars.sizing.height),
@@ -397,11 +397,28 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const compactSearchResults = style("compactSearchResults", {
+        position: "absolute",
+        top: unit(formElementVars.sizing.height),
+        maxWidth: px(vars.compactSearch.maxWidth),
+        width: percent(100),
+        $nest: {
+            "&:empty": {
+                display: "none",
+            },
+        },
+    });
+
     const extraMeBoxIcons = style("extraMeBoxIcons", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        flex: 1,
+        marginLeft: "auto",
+        $nest: {
+            [`& + .${compactSearch}`]: {
+                marginLeft: 0,
+            },
+        },
     });
 
     const topElement = style(
@@ -642,18 +659,6 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const compactSearchResults = style("compactSearchResults", {
-        position: "absolute",
-        top: unit(formElementVars.sizing.height),
-        maxWidth: px(vars.compactSearch.maxWidth),
-        width: percent(100),
-        $nest: {
-            "&:empty": {
-                display: "none",
-            },
-        },
-    });
-
     const clearButtonClass = style("clearButtonClass", {
         opacity: 0.7,
         $nest: {
@@ -675,6 +680,25 @@ export const titleBarClasses = useThemeCache(() => {
         position: "relative",
         flexGrow: 1,
         ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
+    });
+
+    const logoCenterer = style("logoCenterer", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexGrow: 1,
+    });
+
+    const hamburger = style("hamburger", {
+        $nest: {
+            "&&": {
+                ...allButtonStates({
+                    allStates: {
+                        color: colorOut(vars.colors.fg),
+                    },
+                }),
+            },
+        },
     });
 
     return {
@@ -710,14 +734,17 @@ export const titleBarClasses = useThemeCache(() => {
         guestButton,
         logoFlexBasis,
         desktopNavWrap,
+        logoCenterer,
+        hamburger,
     };
 });
 
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
-    const logoFrame = style("logoFrame", { display: "inline-flex" });
     const logoHeight = px(vars.sizing.height - vars.logo.heightOffset);
+
+    const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
 
     const logo = style("logo", {
         display: "block",

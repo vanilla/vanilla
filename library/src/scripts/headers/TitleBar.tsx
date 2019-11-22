@@ -157,12 +157,15 @@ export class TitleBar extends React.Component<IProps, IState> {
 
                             {showHamburger && (
                                 <>
-                                    <Hamburger contents={hamburger} />
-                                    <HeaderLogo
-                                        className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                        logoClassName="titleBar-logo"
-                                        logoType={LogoType.MOBILE}
-                                    />
+                                    <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
+                                    <FlexSpacer className="pageHeading-leftSpacer" />
+                                    <div className={classes.logoCenterer}>
+                                        <HeaderLogo
+                                            className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                            logoClassName="titleBar-logo"
+                                            logoType={LogoType.MOBILE}
+                                        />
+                                    </div>
                                 </>
                             )}
 

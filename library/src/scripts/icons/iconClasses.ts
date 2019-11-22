@@ -315,6 +315,11 @@ export const iconClasses = useThemeCache(() => {
         margin: unit(-globalVars.buttonIcon.offset),
     });
 
+    const hamburger = style("alertIconCompact", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -344,5 +349,6 @@ export const iconClasses = useThemeCache(() => {
         alertIcon,
         alertIconCompact,
         globeIcon,
+        hamburger,
     };
 });

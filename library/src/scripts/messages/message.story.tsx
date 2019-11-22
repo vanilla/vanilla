@@ -5,9 +5,8 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-//import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import Message from "@library/messages/Message";
 import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
@@ -85,7 +84,6 @@ story.add("Message", () => {
             onConfirm={() => {
                 setLongMessageFlag(false);
             }}
-            //confirmText={t("Cancel")}
             stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
         />
     );

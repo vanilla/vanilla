@@ -15,14 +15,14 @@ import Translate from "@library/content/Translate";
 import { WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
+import SmartLink from "@library/routing/links/SmartLink";
 
 const story = storiesOf("Messages", module);
-
-// tslint:disable:jsx-use-translation-function
 
 const shortMessage = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 `;
+
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 const longMessage = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
@@ -68,6 +68,27 @@ story.add("Message", () => {
             stringContents={t(longMessage)}
         />
     );
+
+    const _messageWithLink = (
+        <Message
+            contents={
+                <div className={classesMessages.content}>
+                    <WarningIcon className={classNames(classesMessages.messageIcon)} />
+                    <div>
+                        <Translate
+                            source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
+                            c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
+                        />
+                    </div>
+                </div>
+            }
+            onConfirm={() => {
+                setLongMessageFlag(false);
+            }}
+            //confirmText={t("Cancel")}
+            stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+        />
+    );
     const _fixedMessage = fixedMessageFlag && (
         <Message
             isFixed={true}
@@ -91,10 +112,17 @@ story.add("Message", () => {
         <>
             {_fixedMessage}
             <StoryContent>
+                <div
+                    style={{
+                        height: 50,
+                    }}
+                ></div>
                 <StoryHeading>Short message</StoryHeading>
                 {_shortMessage}
                 <StoryHeading>Long message</StoryHeading>
                 {_longMessage}
+                <StoryHeading>Message with link</StoryHeading>
+                {_messageWithLink}
                 <div
                     style={{
                         height: 450,

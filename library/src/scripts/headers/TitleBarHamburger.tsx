@@ -11,11 +11,7 @@ export function TitleBarHamburger(props) {
     return (
         <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
             <MemoryRouter>
-                <TitleBar
-                    title={"test"}
-                    useMobileBackButton={false}
-                    mobileDropDownContent={<div dangerouslySetInnerHTML={{ __html: contents }} />}
-                />
+                <TitleBar useMobileBackButton={false} hamburger={contents} />
             </MemoryRouter>
         </SearchContext.Provider>
     );

@@ -11,22 +11,27 @@ import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { HamburgerIcon } from "@library/icons/common";
+import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 
 /**
  * Creates a drop down menu
  */
 export default function Hamburger(props) {
+    const classes = hamburgerClasses();
     return (
         <DropDown
             name={t("Messages")}
-            buttonClassName={props.buttonClassName}
+            buttonClassName={classNames(props.buttonClassName, classes.root)}
             buttonContents={<HamburgerIcon />}
             flyoutType={FlyoutType.FRAME}
         >
             <Frame
                 body={
                     <FrameBody className={classNames("isSelfPadded")}>
-                        <div className={classNames()} dangerouslySetInnerHTML={{ __html: props.contents }} />
+                        <div
+                            className={classNames(classes.content)}
+                            dangerouslySetInnerHTML={{ __html: props.contents }}
+                        />
                     </FrameBody>
                 }
             />

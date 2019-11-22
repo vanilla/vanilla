@@ -18,7 +18,7 @@ export const dummyNavigationData = {
         },
         {
             to: "/kb",
-            children: t("Help"),
+            children: t("Help Menu"),
         },
     ],
 };

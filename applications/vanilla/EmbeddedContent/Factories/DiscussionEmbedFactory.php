@@ -5,36 +5,37 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\EmbeddedContent\Factories;
+namespace Vanilla\Forum\EmbeddedContent\Factories;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Factories\AbstractOwnSiteEmbedFactory;
 use Vanilla\Site\SiteSectionModel;
 
 /**
  * Quote embed factory for comments.
  */
-final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
+class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
 
-    /** @var \CommentsApiController */
-    private $commentApi;
+    /** @var \DiscussionsApiController */
+    private $discussionApi;
 
     /**
      * DI
      *
      * @param RequestInterface $request
      * @param SiteSectionModel $siteSectionModel
-     * @param \CommentsApiController $commentApi
+     * @param \DiscussionsApiController $discussionApi
      */
     public function __construct(
         RequestInterface $request,
         SiteSectionModel $siteSectionModel,
-        \CommentsApiController $commentApi
+        \DiscussionsApiController $discussionApi
     ) {
         parent::__construct($request, $siteSectionModel);
-        $this->commentApi = $commentApi;
+        $this->discussionApi = $discussionApi;
     }
 
     /**
@@ -42,7 +43,7 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
      */
     protected function getSupportedPathRegex(string $domain = ''): string {
         $regexRoot = $this->getRegexRoot();
-        return "/^$regexRoot\/discussion\/comment\/(?<commentID>\d+)/i";
+        return "/^$regexRoot\/discussion\/(?<discussionID>\d+)/i";
     }
 
     /**
@@ -51,16 +52,16 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $path = parse_url($url, PHP_URL_PATH);
         preg_match($this->getSupportedPathRegex(), $path, $matches);
-        $id = $matches['commentID'] ?? null;
+        $id = $matches['discussionID'] ?? null;
 
         if ($id === null) {
-            throw new NotFoundException('Comment');
+            throw new NotFoundException('Discussion');
         }
 
-        $comment = $this->commentApi->get_quote($id);
-        $data = $comment + [
-            'embedType' => QuoteEmbed::TYPE,
-        ];
+        $discussion = $this->discussionApi->get_quote($id);
+        $data = $discussion + [
+                'embedType' => QuoteEmbed::TYPE,
+            ];
         return new QuoteEmbed($data);
     }
 }

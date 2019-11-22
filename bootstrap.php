@@ -9,6 +9,7 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
@@ -343,10 +344,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Emoji::class)
     ->setShared(true)
 
-    ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
-    ->addCall('addCoreEmbeds')
-    ->setShared(true)
-
     ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
@@ -393,6 +390,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
 ;
 
 // Run through the bootstrap with dependencies.

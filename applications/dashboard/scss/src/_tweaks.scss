@@ -13,6 +13,52 @@
   align-items: center;
 }
 
+.category-url-code {
+    display: block;
+    vertical-align: middle;
+
+    .btn {
+        margin-left: auto;
+        display: inline;
+        vertical-align: middle;
+    }
+
+    .Edit {
+        padding-top: 0;
+        padding-bottom: 0;
+        vertical-align: middle;
+    }
+
+    &.isOpen {
+        display: block;
+
+        .form-control {
+            width: 140px;
+        }
+
+
+        .Save.btn {
+            padding-top: 1.5px;
+            padding-bottom: 1.5px;
+        }
+
+        #Form_UrlCode {
+            display: inline !important;
+            min-width: 140px;
+            padding: .5px 4px;
+            vertical-align: middle;
+            margin-right: 2px;
+        }
+    }
+}
+
+.category-url {
+    word-break: break-word;
+    display: inline;
+    line-height: 24px;
+    padding-right: 2px;
+}
+
 
 // Emoji
 

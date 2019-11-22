@@ -60,13 +60,15 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
                 $allowedSlugs[] = $siteSection->getBasePath();
             }
         }
-        $siteSectionRegex = count($allowedSlugs) > 0 ?
-            '(' . implode('|', $allowedSlugs) . ')'
-            : '';
-        $root = $this->request->getAssetRoot() . $siteSectionRegex;
 
-        // Escape slashes.
-        $root = str_replace('/', '\/', $root);
+        $encodedSlugs = array_map(function ($slug) {
+            return preg_quote($slug, '/');
+        }, $allowedSlugs);
+        $siteSectionRegex = count($encodedSlugs) > 0 ?
+            '(' . implode('|', $encodedSlugs) . ')?'
+            : '';
+        $root = preg_quote($this->request->getAssetRoot(), '/') . $siteSectionRegex;
+
         return $root;
     }
 }

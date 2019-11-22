@@ -5,6 +5,7 @@
 
 import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 
 type HLJS = typeof import("highlight.js");
 
@@ -19,6 +20,8 @@ export async function highlightCodeBlocks(domNode: HTMLElement = document.body) 
     blocks.forEach(hljs.highlightBlock);
 }
 
+let hljsCache: HLJS | null = null;
+
 /**
  * Highlight some text and return HTML for it.
  *
@@ -27,6 +30,20 @@ export async function highlightCodeBlocks(domNode: HTMLElement = document.body) 
 export async function highlightText(text: string): Promise<string> {
     const hljs = await importHLJS();
     return hljs.highlightAuto(text).value;
+}
+
+/**
+ * Like hihglightText, but returns synchronously.
+ *
+ * If null is returned, ignore the result, because the highlighter isn't initialized yet.
+ */
+export function highlightTextSync(text: string): string | null {
+    if (hljsCache) {
+        return hljsCache.highlightAuto(text).value;
+    } else {
+        void importHLJS(); // Don't care when it finishes.
+        return null;
+    }
 }
 
 let requestPromise: Promise<HLJS> | null = null;
@@ -51,6 +68,8 @@ function importHLJS(): Promise<HLJS> {
         } else {
             await import("./_codeDark.scss" /* webpackChunkName: "highlightJs-dark" */ as any); // Sorry typescript.
         }
+
+        hljsCache = hljs;
 
         return hljs;
     };

@@ -2017,6 +2017,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   height: 14px;
 }
 
+.VideoWrap video {
+  max-width: 100%;
+}
+
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.

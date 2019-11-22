@@ -64,7 +64,7 @@
 
     <div class="Frame" id="page">
         <div class="Frame-top">
-            {if has_data_driven_title_bar}
+            {if $DataDrivenTitleBar}
                 <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true">
                     {$smarty.capture.menu}
                 </header>

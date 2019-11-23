@@ -8,8 +8,8 @@
  */
 
 // Environment
-define('ENVIRONMENT_PHP_VERSION', '7.1');
-define('ENVIRONMENT_PHP_NEXT_VERSION', '7.2');
+define('ENVIRONMENT_PHP_VERSION', '7.2');
+define('ENVIRONMENT_PHP_NEXT_VERSION', '7.3');
 
 if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
     die('Vanilla requires PHP '.ENVIRONMENT_PHP_VERSION.' or greater.');

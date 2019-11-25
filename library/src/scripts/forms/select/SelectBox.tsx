@@ -17,7 +17,7 @@ import React, { useState, useRef } from "react";
 
 export interface ISelectBoxItem {
     value: string;
-    name: string;
+    name?: string;
     content?: React.ReactNode;
     className?: string;
     icon?: React.ReactNode;
@@ -106,7 +106,7 @@ function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
     const { activeItem } = props;
     const classes = selectBoxClasses();
 
-    return activeItem && activeItem.name ? (
+    return activeItem && (activeItem.name || activeItem.content) ? (
         <React.Fragment>
             {activeItem.content || activeItem.name}
             <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />

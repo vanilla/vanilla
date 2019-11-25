@@ -54,7 +54,6 @@ export const messagesVariables = useThemeCache(() => {
         font: {
             color: colors.fg,
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
     });
 
@@ -146,20 +145,23 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
-    const root = style(
-        {
-            width: percent(100),
-            backgroundColor: colorOut(vars.colors.bg),
-            ...shadowOrBorderBasedOnLightness(
-                globalVars.body.backgroundImage.color,
-                borders({
-                    color: globalVars.mainColors.fg,
-                }),
-                shadows.embed(),
-            ),
+    const root = style({
+        width: percent(100),
+        backgroundColor: colorOut(vars.colors.bg),
+        ...shadowOrBorderBasedOnLightness(
+            globalVars.body.backgroundImage.color,
+            borders({
+                color: globalVars.mainColors.fg,
+            }),
+            shadows.embed(),
+        ),
+        ...margins({ horizontal: "auto" }),
+        $nest: {
+            "& + &": {
+                marginTop: unit(globalVars.spacer.size),
+            },
         },
-        margins({ horizontal: "auto" }),
-    );
+    });
 
     const message = style("message", {
         ...userSelect(),
@@ -202,10 +204,10 @@ export const messagesClasses = useThemeCache(() => {
         ...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
         transform: translate(`-100%`),
-        marginLeft: unit(-14),
+        marginLeft: unit(-16),
         $nest: {
             "&&": {
-                color: colorOut(globalVars.messageColors.error.fg),
+                color: "#555A62", // hard coded to contrast "yellow"
             },
         },
     });
@@ -227,6 +229,18 @@ export const messagesClasses = useThemeCache(() => {
 
     const confirm = style("confirm", {});
 
+    const main = style("main", {
+        flexGrow: 1,
+    });
+    const text = style("text", {
+        ...margins({
+            top: unit(6),
+            bottom: unit(0),
+        }),
+    });
+
+    const title = style("title", {});
+
     return {
         root,
         wrap,
@@ -241,5 +255,8 @@ export const messagesClasses = useThemeCache(() => {
         errorIcon,
         noPadding,
         messageWrapper,
+        main,
+        text,
+        title,
     };
 });

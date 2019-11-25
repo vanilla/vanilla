@@ -27,6 +27,9 @@ class InvalidAuthenticatorTest extends AbstractAPIv2Test {
         $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setUp(): void {
         $this->startSessionOnSetup(false);
         parent::setUp();

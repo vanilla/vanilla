@@ -90,6 +90,9 @@ class DiscussionsTest extends AbstractResourceTest {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);

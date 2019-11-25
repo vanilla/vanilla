@@ -10,6 +10,9 @@ namespace VanillaTests\Library\Vanilla;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
 
+/**
+ * Test of basic logging.
+ */
 class LoggerTest extends LoggerInterfaceTest {
     /**
      * @var TestLogger $logger;

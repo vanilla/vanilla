@@ -37,6 +37,9 @@ abstract class BaseTest extends SharedBootstrapTestCase {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function tearDownAfterClass(): void {
         self::$api->uninstall();
         self::$api->terminate();

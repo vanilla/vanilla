@@ -21,8 +21,6 @@ export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const ID = useMemo(() => uniqueIDFromPrefix("editor"), []);
-    const descriptionID = ID + "-description";
 
     return (
         <EditorContext.Provider
@@ -31,8 +29,6 @@ export const Editor = (props: IEditorProps) => {
                 quill,
                 setQuillInstance,
                 isMobile,
-                editorID: ID,
-                descriptionID,
             }}
         >
             <EditorContentContextProvider quill={quill}>{props.children}</EditorContentContextProvider>

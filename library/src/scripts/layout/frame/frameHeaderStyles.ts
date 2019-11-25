@@ -107,6 +107,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexBasis: unit(formElVars.sizing.height),
         color: colorOut(vars.colors.fg),
         transform: `translateX(10px)`,
+        marginLeft: "auto",
         $nest: {
             "&:not(.focus-visible)": {
                 outline: 0,

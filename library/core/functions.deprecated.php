@@ -565,6 +565,42 @@ if (!function_exists('parseUrl')) {
     }
 }
 
+if (!function_exists('markString')) {
+    /**
+     * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.
+     *
+     * This method explodes {@link $needle} on spaces and returns {@link $haystack} with replacements.
+     *
+     * @param string|array $needle The strings to search for in {@link $haystack}.
+     * @param string $haystack The string to search for replacements.
+     * @return string Returns a marked version of {@link $haystack}.
+     * @deprecated
+     */
+    function markString($needle, $haystack) {
+        if (!$needle) {
+            return $haystack;
+        }
+        if (!is_array($needle)) {
+            $needle = explode(' ', $needle);
+        }
+
+        foreach ($needle as $n) {
+            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
+                $word = '\b';
+            } else {
+                $word = '';
+            }
+
+            $haystack = preg_replace(
+                '#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i',
+                '<mark>\1</mark>',
+                $haystack
+            );
+        }
+        return $haystack;
+    }
+}
+
 if (!function_exists('prepareArray')) {
     /**
      * Makes sure that the key in question exists and is of the specified type, by default also an array.

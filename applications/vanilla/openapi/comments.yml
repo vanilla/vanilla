@@ -354,19 +354,6 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
       - description: |
           Filter to a specific reaction type by using its URL code.
         in: query

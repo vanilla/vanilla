@@ -112,9 +112,7 @@ export default class Translate extends React.Component<IProps> {
      */
     private logIDNotFound(id) {
         this.props.errorHandler!(
-            `A translation interpolation value #${id} was not provided for source string ${
-                this.props.source
-            }. \nThe translated value of source is ${this.translatedSource}.`,
+            `A translation interpolation value #${id} was not provided for source string ${this.props.source}. \nThe translated value of source is ${this.translatedSource}.`,
         );
     }
 }

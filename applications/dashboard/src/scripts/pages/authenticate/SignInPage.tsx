@@ -86,7 +86,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(SignInPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SignInPage);

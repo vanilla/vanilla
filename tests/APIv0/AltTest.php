@@ -31,11 +31,43 @@ class AltTest extends SharedBootstrapTestCase {
      * @large
      */
     public function testAltInstall() {
+        $this->doAltInstallWithUpdateToken(false, 'xkcd', '');
+    }
+
+    /**
+     * Test an ALT install with a valid update token.
+     */
+    public function testAltInstallWithUpdateToken() {
+        $this->doAltInstallWithUpdateToken(true, 'xkcd', 'xkcd');
+    }
+
+    /**
+     * Test an ALT install with no update token.
+     *
+     * @expectedException Exception
+     * @expectedExceptionCode 403
+     */
+    public function testAltInstallWithNoUpdateToken() {
+        $this->doAltInstallWithUpdateToken(true, 'xkcd', '');
+    }
+
+    /**
+     * Run an alt install with optional update tokens.
+     *
+     * @param bool $enabled Whether the update token feature should be enabled.
+     * @param string $updateToken The update token to use.
+     * @param string $postUpdateToken The update token to post during `utility/update`.
+     */
+    private function doAltInstallWithUpdateToken(bool $enabled, string $updateToken, string $postUpdateToken) {
         $this->api()->uninstall();
         $this->api()->createDatabase();
 
-        $this->api()->saveToConfig($this->getBaseConfig());
-        $this->api()->post('/utility/update');
+        $config = $this->getBaseConfig();
+        $config['Feature']['updateTokens']['Enabled'] = $enabled;
+        $config['Garden']['UpdateToken'] = $updateToken;
+
+        $this->api()->saveToConfig($config);
+        $this->api()->post('/utility/update.json', ['updateToken' => $postUpdateToken]);
         $this->api()->saveToConfig(['Garden.Installed' => true]);
 
         // Do a simple get to make sure there isn't an error.

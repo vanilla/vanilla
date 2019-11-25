@@ -5,12 +5,13 @@
  */
 
 import React from "react";
-import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
+import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { IFieldError } from "@library/@types/api/core";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { capitalizeFirstLetter } from "@vanilla/utils";
 
-interface IProps extends IRequiredComponentID {
+interface IProps extends IOptionalComponentID {
     className?: string;
     errors?: IFieldError[];
 }
@@ -36,7 +37,7 @@ export default class ErrorMessages extends React.Component<IProps, IState> {
             const errorList = (errors as any).map((error: any, index) => {
                 return (
                     <span key={index} className={classesInputBlock.error}>
-                        {error.message}
+                        {capitalizeFirstLetter(error.message)}
                     </span>
                 );
             });

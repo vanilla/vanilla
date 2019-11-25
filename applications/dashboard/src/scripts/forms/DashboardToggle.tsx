@@ -8,12 +8,15 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import classNames from "classnames";
 import { visibility, srOnly } from "@library/styles/styleHelpers";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     checked: boolean;
     onChange: (newValue: boolean) => void;
     inProgress?: boolean;
     disabled?: boolean;
+    errors?: IFieldError[];
 }
 
 export function DashboardToggle(props: IProps) {
@@ -45,6 +48,7 @@ export function DashboardToggle(props: IProps) {
                     <div className="toggle-slider" />
                 </div>
             </label>
+            {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
 }

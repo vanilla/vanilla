@@ -84,9 +84,6 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-const withRedux = connect(
-    mapUsersStoreState,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapUsersStoreState, mapDispatchToProps);
 
 export default withRedux(Permission);

@@ -43,6 +43,7 @@ export function createTrackableRequest(
         return requestFunction(onUploadProgress);
     };
 }
+
 /**
  * Upload an image using Vanilla's API v2.
  *

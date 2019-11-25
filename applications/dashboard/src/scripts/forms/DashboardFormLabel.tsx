@@ -5,10 +5,13 @@
 
 import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     label: string;
     description?: React.ReactNode;
+    afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;
 }
 
@@ -27,6 +30,7 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
         <div className={rootClass} id={labelID}>
             {props.label && <label htmlFor={inputID}>{props.label}</label>}
             {props.description && <div className="info">{props.description}</div>}
+            {props.afterDescription}
         </div>
     );
 };

@@ -13,7 +13,7 @@ export interface IContentTranslatorProps {
     resource: string;
     title: string;
     sourceLocale?: string | null;
-    activeLocale?: string | null;
+    activeLocale?: string | null; // for organizecategories
 }
 
 // Subtypes

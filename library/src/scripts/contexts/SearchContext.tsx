@@ -8,11 +8,34 @@ import * as React from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { formatUrl } from "@library/utility/appUtils";
 
-const SearchContext = React.createContext<IWithSearchProps>({} as any);
+const defaultOptionProvider: ISearchOptionProvider = {
+    supportsAutoComplete: false,
+    autocomplete: () => Promise.resolve([]),
+    makeSearchUrl: query => formatUrl(`/search?search=${query}`),
+};
+
+const SearchContext = React.createContext<IWithSearchProps>({
+    searchOptionProvider: defaultOptionProvider,
+});
 export default SearchContext;
 
+export function SearchContextProvider({ children }) {
+    return (
+        <SearchContext.Provider value={{ searchOptionProvider: SearchContextProvider.optionProvider }}>
+            {children}
+        </SearchContext.Provider>
+    );
+}
+
+SearchContextProvider.optionProvider = defaultOptionProvider as ISearchOptionProvider;
+SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
+    SearchContextProvider.optionProvider = provider;
+};
+
 export interface ISearchOptionProvider {
+    supportsAutoComplete?: boolean;
     autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }

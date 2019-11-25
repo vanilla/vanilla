@@ -17,7 +17,6 @@ use Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvide
 use Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 
-
 /**
  * Some basic tests for the `ContentSecurityPolicyModel`.
  */

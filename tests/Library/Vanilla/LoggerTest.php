@@ -19,6 +19,9 @@ class LoggerTest extends LoggerInterfaceTest {
      */
     private $logger;
 
+    /**
+     * @inheritDoc
+     */
     protected function setUp(): void {
         $this->logger = new TestLogger();
     }

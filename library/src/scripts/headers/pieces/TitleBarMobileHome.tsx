@@ -65,7 +65,7 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                 <div className={classes.bottom}>
                     <div className={titleBarVars.scroll}>
                         <TitleBarNav
-                            {...dummyNavigationData}
+                            {...dummyNavigationData()}
                             className={classNames("titleBar-nav", titleBarVars.nav)}
                             linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
                             linkContentClassName="titleBar-navLinkContent"

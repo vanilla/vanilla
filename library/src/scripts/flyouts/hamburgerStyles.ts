@@ -48,6 +48,22 @@ export const hamburgerClasses = useThemeCache(() => {
                 justifyContent: "center",
                 alignItems: "center",
             },
+            "& .NewDiscussion": {
+                width: percent(100),
+            },
+            "& .BoxButtons": {
+                width: percent(100),
+            },
+            "& .ButtonGroup.Multi": {
+                maxWidth: percent(100),
+            },
+            "& .Dropdown.MenuItems": {
+                $nest: {
+                    "&&": {
+                        top: percent(100),
+                    },
+                },
+            },
         },
     });
 

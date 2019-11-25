@@ -10,7 +10,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
-import { classNames } from "react-select/lib/utils";
+import classNames from "classnames";
 
 export interface IProps extends IInjectableUserState {
     className?: string;
@@ -26,7 +26,7 @@ export class DropDownUserCard extends React.Component<IProps> {
         const profileLink = `${window.location.origin}/profile/${currentUser.name}`;
         const classesUserDropDown = userDropDownClasses();
         return (
-            <li className={classNames("dropDown-userCard", this.props.className)}>
+            <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>
                 <SmartLink
                     to={profileLink}
                     className={classNames("userDropDown-userCardPhotoLink", classesUserDropDown.userCardPhotoLink)}

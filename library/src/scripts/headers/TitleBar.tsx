@@ -140,7 +140,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isMobile && (
                                 <TitleBarNav
-                                    {...dummyNavigationData}
+                                    {...dummyNavigationData()}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"

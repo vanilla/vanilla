@@ -19,23 +19,30 @@
 }
 
 {capture name="menu"}
-    {if $User.SignedIn}
-        <div class="Navigation-row NewDiscussion">
-            <div class="NewDiscussion mobile">
-                {module name="NewDiscussionModule"}
+    {if !$DataDrivenTitleBar}
+        {if $User.SignedIn}
+            <div class="Navigation-row NewDiscussion">
+                <div class="NewDiscussion mobile">
+                    {module name="NewDiscussionModule"}
+                </div>
             </div>
-        </div>
-    {else}
-        <div class="Navigation-row">
-            <div class="SignIn mobile">
-                {module name="MeModule"}
+        {else}
+            <div class="Navigation-row">
+                <div class="SignIn mobile">
+                    {module name="MeModule"}
+                </div>
             </div>
-        </div>
+        {/if}
     {/if}
     {categories_link format=$linkFormat}
     {discussions_link format=$linkFormat}
-    {activity_link format=$linkFormat}
-    {custom_menu format=$linkFormat}
+    {if $DataDrivenTitleBar}
+        {knowledge_link format=$linkFormat}
+    {/if}
+    {if !$DataDrivenTitleBar}
+        {activity_link format=$linkFormat}
+        {custom_menu format=$linkFormat}
+    {/if}
 {/capture}
 
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -139,17 +146,19 @@
                                         </nav>
                                     </div>
                                 {/if}
-                                <div class="Frame-row SearchBoxMobile">
-                                    {if !$SectionGroups && !inSection(["SearchResults"])}
-                                        <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {if $hasAdvancedSearch === true}
-                                                {module name="AdvancedSearchModule"}
-                                            {else}
-                                                {searchbox}
-                                            {/if}
-                                        </div>
-                                    {/if}
-                                </div>
+                                {if !$DataDrivenTitleBar}
+                                    <div class="Frame-row SearchBoxMobile">
+                                        {if !$SectionGroups && !inSection(["SearchResults"])}
+                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                                {if $hasAdvancedSearch === true}
+                                                    {module name="AdvancedSearchModule"}
+                                                {else}
+                                                    {searchbox}
+                                                {/if}
+                                            </div>
+                                        {/if}
+                                    </div>
+                                {/if}
                                 <div class="Frame-row">
                                     <main class="Content MainContent">
                                         {if inSection("Profile")}
@@ -172,7 +181,7 @@
                                         {asset name="Content"}
                                     </main>
                                     <aside class="Panel Panel-main">
-                                        {if !$SectionGroups}
+                                        {if !$SectionGroups && !$DataDrivenTitleBar}
                                             <div class="SearchBox js-sphinxAutoComplete" role="search">
                                                 {searchbox}
                                             </div>

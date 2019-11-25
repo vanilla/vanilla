@@ -106,7 +106,7 @@ function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
     const { activeItem } = props;
     const classes = selectBoxClasses();
 
-    return activeItem && activeItem.name ? (
+    return activeItem && (activeItem.name || activeItem.content) ? (
         <React.Fragment>
             {activeItem.content || activeItem.name}
             <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />

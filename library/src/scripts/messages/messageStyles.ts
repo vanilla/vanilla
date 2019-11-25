@@ -19,10 +19,8 @@ import {
 } from "@library/styles/styleHelpers";
 import { percent, translate, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { inherit } from "highlight.js";
 import { relative } from "path";
 
 export const messagesVariables = useThemeCache(() => {
@@ -235,6 +233,8 @@ export const messagesClasses = useThemeCache(() => {
 
     const text = style("text", {
         ...fonts(vars.text.font),
+        top: unit(6),
+        bottom: unit(0),
     });
 
     const title = style("title", {

@@ -13,6 +13,7 @@ import { important } from "csx/lib/strings";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const layoutVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("globalVariables");
@@ -88,17 +89,17 @@ export const layoutVariables = useThemeCache(() => {
     });
 
     const mediaQueries = () => {
-        const noBleed = styles => {
+        const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.noBleed),
-                    minWidth: px(panelLayoutBreakPoints.twoColumn + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.twoColumn + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const noBleedDown = styles => {
+        const noBleedDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.noBleed),
@@ -107,7 +108,7 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const twoColumnsDown = styles => {
+        const twoColumnsDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.twoColumn),
@@ -116,27 +117,27 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const twoColumns = styles => {
+        const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.twoColumn),
-                    minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.oneColumn + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumn = styles => {
+        const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.oneColumn),
-                    minWidth: px(panelLayoutBreakPoints.xs + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.xs + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumnDown = styles => {
+        const oneColumnDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.oneColumn),
@@ -145,7 +146,7 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const xs = styles => {
+        const xs = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.xs),

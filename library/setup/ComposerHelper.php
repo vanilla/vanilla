@@ -99,7 +99,12 @@ class ComposerHelper {
         }
 
         printf("\nInstalling core node_modules\n");
-        passthru('yarn install --pure-lockfile', $installReturn);
+
+        // --ignore-engines is used until https://github.com/vanilla/dev-inter-ops/issues/38 is resolved.
+        // Node 10.11.0 is run there and our linter has an engine requirement of 10.13.0
+        // We don't even run the linter as part of this process.
+        // It even technically works but many packages that support node 10 only want to support the LTS version (10.13.x).
+        passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
 
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");

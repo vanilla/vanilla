@@ -693,8 +693,10 @@ class Gdn_Session {
              * We are not doing `!empty()` first because that would skip hash_equals and would then enable a possible timing attack.
              */
             // Make sure we're testing a string.
-            $stringToTest = $this->_TransientKey ?: '';
-            $isCorrectHash = (hash_equals($stringToTest, $foreignKey) && !empty($this->_TransientKey));
+            $knownString = $this->_TransientKey ?: '';
+            $userString = $foreignKey ?: '';
+
+            $isCorrectHash = (hash_equals($knownString, $userString) && !empty($this->_TransientKey));
 
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $return = ($forceValid && Gdn::request()->isPostBack()) || $isCorrectHash;

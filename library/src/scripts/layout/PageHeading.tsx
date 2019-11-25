@@ -42,7 +42,7 @@ export function PageHeading(props: IPageHeading) {
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(fontSize)} />}
+                {includeBackLink && <BackLink className={linkClasses.inHeading(fontSize)} />}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
                     <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
                         {children}

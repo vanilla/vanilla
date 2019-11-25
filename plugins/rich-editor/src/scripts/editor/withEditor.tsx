@@ -18,7 +18,7 @@ export function withEditor<T extends IWithEditorProps = IWithEditorProps>(Wrappe
     function ComponentWithEditor(props: Omitted) {
         const context = useEditor();
         const content = useEditorContents();
-        return <WrappedComponent {...context} {...content} {...props as T} />;
+        return <WrappedComponent {...context} {...content} {...(props as T)} />;
     }
     ComponentWithEditor.displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
     return ComponentWithEditor as React.ComponentType<Omitted>;

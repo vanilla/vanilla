@@ -33,6 +33,7 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+
 jobs:
     frontend_setup:
         executor: core/node
@@ -168,26 +169,32 @@ jobs:
     php_73_integration:
         executor: core/php73
         steps: *php_integration_test_steps
-    php_71_lint:
-        executor: core/php71
-        steps: *php_lint_steps
-    php_71_tests:
-        executor: core/php71
-        steps: *php_unit_test_steps
-    php_71_integration:
-        executor: core/php71
-        steps: *php_integration_test_steps
     dependency_audit:
         executor: core/php72
         steps:
             - core/checkout
             - run: yarn audit
+    chromatic_test:
+        executor: core/node
+        steps:
+            - run:
+                command: |
+                    if [ -z "$CHROMATIC_APP_CODE" ]; then
+                        echo "No Chromatic app code detected. Exiting."
+                        circleci-agent step halt
+                    else
+                        echo "Chromatic app code detected. Proceeding..."
+                    fi
+                name: "Conditionally perform Chromatic test"
+            - checkout
+            - chromatic/load-node-modules
+            - chromatic/test-exit-cleanly-on-changes
 
 workflows:
     version: 2
     commit:
         jobs:
-            - chromatic/test:
+            - chromatic_test:
                 filters:
                     branches:
                         ignore: master
@@ -230,19 +237,12 @@ workflows:
             - dependency_audit
             # PHP and serverside
             - php_setup
-            - php_71_lint
             - php_72_lint
             - php_73_lint
-            - php_71_integration:
-                requires:
-                    - php_setup
             - php_72_integration:
                 requires:
                     - php_setup
             - php_73_integration:
-                requires:
-                    - php_setup
-            - php_71_tests:
                 requires:
                     - php_setup
             - php_72_tests:

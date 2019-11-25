@@ -63,9 +63,6 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export default withRedux(CommunityCategoryInput);

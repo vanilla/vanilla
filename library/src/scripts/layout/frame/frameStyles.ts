@@ -63,7 +63,9 @@ export const frameClasses = useThemeCache(() => {
         willChange: "height",
     });
     const bodyWrap = style("bodyWrap", {
+        position: "relative",
         background: colorOut(vars.colors.bg),
+        width: percent(100),
     });
     const footerWrap = style("footerWrap", {
         background: colorOut(vars.colors.bg),
@@ -83,8 +85,8 @@ export const frameClasses = useThemeCache(() => {
         minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
         $nest: {
             [`.${bodyWrap}`]: {
-                flex: 1,
-                overflow: "auto",
+                flex: "1 0 auto",
+                overflowY: "auto",
             },
         },
     });

@@ -32,6 +32,7 @@ module.exports = {
         "no-case-declarations": "off",
         "prefer-const": "off",
         "require-atomic-updates": "off",
+        "react/prop-types": "off", // We use typescript
 
         // We have typescript for these.
         "no-undef": "off",

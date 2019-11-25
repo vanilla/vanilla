@@ -255,7 +255,9 @@ class CommentsApiController extends AbstractApiController {
             'discussionID',
             'body',
             'format:s' => 'The input format of the comment.',
-        ])->add($this->fullSchema()), 'out');
+        ])
+            ->add($this->fullSchema()), 'out')
+            ->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
 
         $comment = $this->commentByID($id);
         $comment['Url'] = commentUrl($comment);

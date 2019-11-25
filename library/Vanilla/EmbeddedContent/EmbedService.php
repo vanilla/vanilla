@@ -18,8 +18,6 @@ use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
-use Vanilla\EmbeddedContent\Factories\CommentEmbedFactory;
-use Vanilla\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\GiphyEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\ImgurEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
@@ -188,8 +186,6 @@ class EmbedService implements EmbedCreatorInterface {
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
             ->registerFilter($dic->get(QuoteEmbedFilter::class))
-            ->registerFactory($dic->get(DiscussionEmbedFactory::class))
-            ->registerFactory($dic->get(CommentEmbedFactory::class))
         ;
     }
 

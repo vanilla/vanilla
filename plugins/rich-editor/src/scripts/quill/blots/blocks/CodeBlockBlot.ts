@@ -6,7 +6,7 @@
 
 import BaseCodeBlock from "quill/formats/code";
 import { CodeBlock } from "quill/modules/syntax";
-import { highlightText } from "@library/content/code";
+import { highlightTextSync } from "@library/content/code";
 
 export default class CodeBlockBlot extends CodeBlock {
     public static create(value) {
@@ -26,11 +26,15 @@ export default class CodeBlockBlot extends CodeBlock {
         let text = this.domNode.textContent;
         if (text && this.cachedText !== text) {
             if (text.trim().length > 0 || this.cachedText == null) {
-                highlightText(text).then(result => {
+                const result = highlightTextSync(text);
+                if (result !== null) {
                     this.domNode.innerHTML = result;
                     this.domNode.normalize();
                     this.attach();
-                });
+                } else {
+                    // Highlighter loads asynchonrously but we need to return synchrously.
+                    // Do nothing because the highlighter isn't loaded yet.
+                }
             }
             this.cachedText = text;
         }

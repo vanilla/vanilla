@@ -1515,20 +1515,20 @@ if (!function_exists('_formatStringCallback')) {
                                     continue;
                                 }
 
+                                $separator = '';
                                 if ($i == $count - 1) {
-                                    $result .= ' '.t('sep and', 'and').' ';
+                                    $separator = ' '.t('sep and', 'and').' ';
                                 } elseif ($i > 0) {
-                                    $result .= ', ';
+                                    $separator = ', ';
                                 }
-
                                 $special = [-1 => t('everyone'), -2 => t('moderators'), -3 => t('administrators')];
                                 if (isset($special[$iD])) {
-                                    $result .= $special[$iD];
+                                    $result .= $separator.$special[$iD];
                                 } else {
                                     $user = Gdn::userModel()->getID($iD);
-                                    if ($user) {
+                                    if ($user && $user->Deleted == 0) {
                                         $user->Name = formatUsername($user, $format, $contextUserID);
-                                        $result .= userAnchor($user);
+                                        $result .= $separator.userAnchor($user);
                                     }
                                 }
                             }
@@ -2157,41 +2157,6 @@ if (!function_exists('isWritable')) {
         }
 
         return true;
-    }
-}
-
-if (!function_exists('markString')) {
-    /**
-     * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.
-     *
-     * This method explodes {@link $needle} on spaces and returns {@link $haystack} with replacements.
-     *
-     * @param string|array $needle The strings to search for in {@link $haystack}.
-     * @param string $haystack The string to search for replacements.
-     * @return string Returns a marked version of {@link $haystack}.
-     */
-    function markString($needle, $haystack) {
-        if (!$needle) {
-            return $haystack;
-        }
-        if (!is_array($needle)) {
-            $needle = explode(' ', $needle);
-        }
-
-        foreach ($needle as $n) {
-            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
-                $word = '\b';
-            } else {
-                $word = '';
-            }
-
-            $haystack = preg_replace(
-                '#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i',
-                '<mark>\1</mark>',
-                $haystack
-            );
-        }
-        return $haystack;
     }
 }
 

@@ -4,7 +4,7 @@ $desc = t('Roles determine user\'s permissions.', 'Every user in your site is as
 
 $links = '<ul>';
 $links .= wrap(anchor(t("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
-$links .= wrap(anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
+$links .= wrap(anchor('Default Role Types', 'https://success.vanillaforums.com/kb/articles/39-roles-permissions#default-types'), 'li');
 $links .= '</ul>';
 
 helpAsset(sprintf(t('About %s'), t('Roles & Permissions')), $desc);

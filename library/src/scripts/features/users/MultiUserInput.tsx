@@ -59,11 +59,8 @@ export class MultiUserInput extends React.Component<IProps> {
     };
 }
 
-const withRedux = connect(
-    UserSuggestionModel.mapStateToProps,
-    dispatch => ({
-        suggestionActions: new UserSuggestionActions(dispatch, apiv2),
-    }),
-);
+const withRedux = connect(UserSuggestionModel.mapStateToProps, dispatch => ({
+    suggestionActions: new UserSuggestionActions(dispatch, apiv2),
+}));
 
 export default withRedux(MultiUserInput);

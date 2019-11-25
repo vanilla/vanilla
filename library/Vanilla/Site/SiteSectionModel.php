@@ -44,6 +44,9 @@ class SiteSectionModel {
      */
     public function addProvider(SiteSectionProviderInterface $provider) {
         $this->providers[] = $provider;
+        if (!empty($current = $provider->getCurrentSiteSection())) {
+            $this->currentSiteSection = $current;
+        }
     }
 
     /**

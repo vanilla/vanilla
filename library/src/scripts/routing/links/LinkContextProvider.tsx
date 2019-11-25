@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { formatUrl } from "@library/utility/appUtils";
 import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
 import { RouteComponentProps, withRouter } from "react-router";
+import { useContentTranslator } from "@vanilla/i18n";
 
 export interface IWithLinkContext {
     linkContext: string;
@@ -81,6 +82,10 @@ export const LinkContextProvider = withRouter((props: IProps) => {
         </LinkContext.Provider>
     );
 });
+
+export function useLinkContext() {
+    return useContext(LinkContext);
+}
 
 /**
  * Create a new LocationDescriptor with a "relative" path.

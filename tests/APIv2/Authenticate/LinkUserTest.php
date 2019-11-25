@@ -33,7 +33,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
         /** @var \Gdn_Configuration $config */
@@ -44,7 +44,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $uniqueID = self::randomUsername('lu');
@@ -79,7 +79,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
         $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
 

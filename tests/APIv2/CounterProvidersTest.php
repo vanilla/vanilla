@@ -16,13 +16,13 @@ class CounterProvidersTest extends AbstractAPIv2Test {
     /**
     * {@inheritdoc}
     */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
     }
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
     }
 

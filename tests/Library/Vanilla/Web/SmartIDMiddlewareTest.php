@@ -40,7 +40,7 @@ class SmartIDMiddlewareTest extends TestCase {
     /**
      * Create a configured test middleware for each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->middleware =  new TestSmartIDMiddleware();
         $this->middleware->addSmartID('CategoryID', 'categories', ['name', 'urlcode'], 'Category');
 

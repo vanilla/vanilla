@@ -15,7 +15,7 @@ class ConversationsAllowModerationTest extends ConversationsTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         /** @var \Gdn_Configuration $config */

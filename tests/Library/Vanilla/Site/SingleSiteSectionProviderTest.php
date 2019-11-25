@@ -26,7 +26,7 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setConfig('Garden.Locale', self::LOCALE_KEY);
         $config = self::container()->get(ConfigurationInterface::class);

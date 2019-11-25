@@ -39,7 +39,7 @@ class ApplicantsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get('Config');

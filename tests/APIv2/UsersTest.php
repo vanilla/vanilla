@@ -47,7 +47,7 @@ class UsersTest extends AbstractResourceTest {
     /**
      * Disable email before running tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');

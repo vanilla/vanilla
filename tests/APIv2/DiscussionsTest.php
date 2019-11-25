@@ -74,7 +74,7 @@ class DiscussionsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         /** @var CategoryModel $categoryModel */
@@ -90,7 +90,7 @@ class DiscussionsTest extends AbstractResourceTest {
         }
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
     }

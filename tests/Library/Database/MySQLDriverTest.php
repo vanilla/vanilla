@@ -29,7 +29,7 @@ class MySQLDriverTest extends TestCase {
     /**
      * Rest the SQL driver before every test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $sql = static::container()->get(\Gdn_MySQLDriver::class);
         $sql->reset();
@@ -48,7 +48,7 @@ class MySQLDriverTest extends TestCase {
     /**
      * Make sure the SQL object isn't polluted.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->sql->reset();
         parent::tearDown();
     }

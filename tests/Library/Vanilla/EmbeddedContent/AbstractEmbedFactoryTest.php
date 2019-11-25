@@ -19,7 +19,7 @@ class AbstractEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
     }
 

@@ -28,7 +28,7 @@ class AddonManagerTest extends SharedBootstrapTestCase {
     /**
      * Clear the cache before doing tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache/am');
         parent::setUpBeforeClass();
     }

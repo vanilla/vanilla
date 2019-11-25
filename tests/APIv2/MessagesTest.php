@@ -28,7 +28,7 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setupBeforeClass();
 
         /**

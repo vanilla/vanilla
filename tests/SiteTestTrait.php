@@ -50,7 +50,7 @@ trait SiteTestTrait {
     /**
      * Install the site.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 
@@ -120,7 +120,7 @@ TEMPLATE;
     /**
      * Cleanup the container after testing is done.
      */
-    public static function teardownAfterClass() {
+    public static function teardownAfterClass(): void {
         self::$addons = ['vanilla', 'conversations', 'stubcontent'];
         static::bootstrapAfterClass();
         self::unSymlinkAddonFixtures();

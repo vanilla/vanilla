@@ -30,7 +30,7 @@ class TokensTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->accessTokenModel = static::container()->get(AccessTokenModel::class);
     }

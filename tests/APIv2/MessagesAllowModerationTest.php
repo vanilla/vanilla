@@ -15,7 +15,7 @@ class MessagesAllowModerationTest extends MessagesTest {
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setupBeforeClass();
 
         // Allow moderator/admins to moderate the conversations.

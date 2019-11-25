@@ -22,7 +22,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         /** @var AuthenticatorModel $authenticatorModel */
@@ -37,7 +37,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         if (!self::$authenticators) {
             $this->markTestSkipped('No Authenticator found.');

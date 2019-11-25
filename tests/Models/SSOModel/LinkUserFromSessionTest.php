@@ -37,7 +37,7 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::siteSetUpBeforeClass();
 
         /** @var \UserModel $userModel */
@@ -56,7 +56,7 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // Let's get a new SSOModel for this test.
@@ -70,7 +70,7 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Gdn_SQLDriver $driver */
         $driver = self::container()->get('SqlDriver');
         $driver->truncate('UserAuthentication');

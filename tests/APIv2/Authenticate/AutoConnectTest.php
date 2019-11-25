@@ -37,7 +37,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
 
@@ -49,7 +49,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $uniqueID = self::randomUsername('ac');
@@ -81,7 +81,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
         $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
 

@@ -24,7 +24,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
         /** @var \Gdn_Configuration $config */
@@ -35,7 +35,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
 

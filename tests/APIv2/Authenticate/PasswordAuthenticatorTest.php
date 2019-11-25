@@ -36,7 +36,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $uniqueID = self::randomUsername('pa');
@@ -59,7 +59,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);

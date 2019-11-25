@@ -24,7 +24,7 @@ class UrlUtilsTest extends TestCase {
     /**
      * Set $_SERVER values that are required for http_build_url().
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$originalServer = $_SERVER;
         $_SERVER['SERVER_PORT'] = '80';
@@ -35,7 +35,7 @@ class UrlUtilsTest extends TestCase {
     /**
      * Reset $_SERVER values.
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
         $_SERVER = self::$originalServer;
     }

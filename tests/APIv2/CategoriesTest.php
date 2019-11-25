@@ -91,7 +91,7 @@ class CategoriesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::$categoryModel = self::container()->get(CategoryModel::class);
     }

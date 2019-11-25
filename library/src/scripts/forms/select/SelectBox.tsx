@@ -17,7 +17,7 @@ import React, { useState, useRef } from "react";
 
 export interface ISelectBoxItem {
     value: string;
-    name: string;
+    name?: string;
     content?: React.ReactNode;
     className?: string;
     icon?: React.ReactNode;

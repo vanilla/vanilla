@@ -12,6 +12,7 @@ import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
 import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
 export interface IMessageProps {
     className?: string;
@@ -24,6 +25,9 @@ export interface IMessageProps {
     cancelText?: React.ReactNode;
     isFixed?: boolean;
     isContained?: boolean;
+    title?: string;
+    isActionLoading?: boolean;
+    noIcon?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
@@ -33,26 +37,32 @@ export default function Message(props: IMessageProps) {
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
 
+    const contents = props.contents || props.stringContents;
+
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap, props.className, {
+                        className={classNames(classes.wrap(props.noIcon), props.className, {
                             [classes.noPadding]: props.isContained,
                             [classes.fixed]: props.isContained,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
-                            <div className={classes.message}>{props.contents || props.stringContents}</div>
+                            <div className={classes.message}>
+                                {props.title && <h2 className={classes.title}>{props.title}</h2>}
+                                {contents && <p className={classes.text}>{contents}</p>}
+                            </div>
 
                             {props.onConfirm && (
                                 <Button
                                     baseClass={ButtonTypes.TEXT_PRIMARY}
                                     onClick={props.onConfirm}
                                     className={classes.actionButton}
+                                    disabled={!!props.isActionLoading}
                                 >
-                                    {props.confirmText || t("OK")}
+                                    {props.isActionLoading ? <ButtonLoader /> : props.confirmText || t("OK")}
                                 </Button>
                             )}
                             {props.onCancel && (
@@ -60,8 +70,9 @@ export default function Message(props: IMessageProps) {
                                     baseClass={ButtonTypes.TEXT}
                                     onClick={props.onCancel}
                                     className={classes.actionButton}
+                                    disabled={!!props.isActionLoading}
                                 >
-                                    {props.cancelText || t("Cancel")}
+                                    {props.isActionLoading ? <ButtonLoader /> : props.cancelText || t("Cancel")}
                                 </Button>
                             )}
                         </InnerWrapper>

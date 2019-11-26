@@ -20,12 +20,12 @@ class ApiFilterMiddleware {
     /**
      * @var array The blacklisted fields.
      */
-    protected $blacklist = ['password', 'email', 'insertipaddress', 'updateipaddress'];
+    private $blacklist = ['password', 'email', 'insertipaddress', 'updateipaddress'];
 
     /**
      * @var string
      */
-    protected $basePath;
+    private $basePath;
 
     /**
      * ApiMiddleware constructor.
@@ -45,12 +45,13 @@ class ApiFilterMiddleware {
     public function __invoke(RequestInterface $request, callable $next) {
         $response = $next($request);
         $data = $response->getData();
+        //$this->data = $data;
         // Make sure filtering is done for apiv2.
         if (is_array($data) && strcasecmp(substr($request->getPath(), 0, strlen($this->basePath)), $this->basePath) === 0) {
             // Check if the api sent some fields to override the blacklist.
             $this->checkSentWhitelist($data);
             // Check for blacklisted fields.
-            array_walk_recursive($response->getData(), function (&$value, $key) {
+            array_walk_recursive($data, function (&$value, $key) {
                 if (in_array(strtolower($key), $this->blacklist)) {
                     throw new ServerException('Validation failed for field'.' '.$key);
                 }
@@ -65,7 +66,7 @@ class ApiFilterMiddleware {
      * @param array $data The array to check for fields to whitelist.
      */
     private function checkSentWhitelist($data) {
-        if ($data['api-allow']) {
+        if (isset($data['api-allow'])) {
             foreach ($data['api-allow'] as $key => $value) {
                 $searchKey = array_search($value, $this->blacklist);
                 if ($searchKey !== false) {

@@ -117,7 +117,7 @@ HTML;
     class="js-embed embedResponsive"
     data-embedJson="{&quot;url&quot;:&quot;http:\/\/test.com&quot;,&quot;embedType&quot;:&quot;testEmbedType&quot;}"
 >
-    <a href="http://test.com">
+    <a href="http://test.com" rel="nofollow noreferrer ugc">
         http://test.com
     </a>
 </div><p>After Embed</p>

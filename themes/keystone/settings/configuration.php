@@ -13,3 +13,4 @@ $Configuration['Garden']['ThemeOptions']['Styles']['Value'] = '%s_default';
 $Configuration['Garden']['ThemeOptions']['Options']['hasHeroBanner'] = false;
 $Configuration['Garden']['ThemeOptions']['Options']['hasFeatureSearchbox'] = false;
 $Configuration['Garden']['ThemeOptions']['Options']['panelToLeft'] = false;
+$Configuration['Vanilla']['DataDrivenTitleBar']['Enabled'] = false;

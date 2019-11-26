@@ -29,7 +29,7 @@ function expandElement(element) {
  * @param {HTMLElement} element
  */
 function prepareElement(element) {
-    if (element && element.classList) {
+    if (!!element && element.classList) {
         element.classList.add(INIT_CLASS);
         element.style.height = "auto";
         const calcedHeight = element.getBoundingClientRect().height;
@@ -50,6 +50,17 @@ export function setupMobileNavigation() {
     const mobileMeBoxBtn = document.querySelector(".mobileMeBox-button");
     const mobileMeboxBtnClose = document.querySelector(".mobileMebox-buttonClose");
     const mainHeader = document.querySelector("#MainHeader");
+
+    /**
+     * @param {HTMLElement} element
+     */
+    function toggleElement(element) {
+        if (element.style.height === COLLAPSED_HEIGHT) {
+            expandElement(element);
+        } else {
+            collapseElement(element);
+        }
+    }
 
     // Calculate the values initially.
     prepareElement(mobileMebox);
@@ -83,17 +94,4 @@ export function setupMobileNavigation() {
     mobileMeboxBtnClose && mobileMeboxBtnClose.addEventListener("click", () => {
         collapseElement(mobileMebox);
     });
-
-    /**
-     * @param {HTMLElement} element
-     */
-    function toggleElement(element) {
-        if (element.style.height === COLLAPSED_HEIGHT) {
-            expandElement(element);
-        } else {
-            collapseElement(element);
-        }
-    }
-
-
 }

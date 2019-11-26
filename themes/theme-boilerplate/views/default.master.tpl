@@ -19,14 +19,14 @@
 }
 
 {capture name="menu"}
-    {if !$DataDrivenTitleBar}
-        {if $User.SignedIn}
-            <div class="Navigation-row NewDiscussion">
-                <div class="NewDiscussion mobile">
-                    {module name="NewDiscussionModule"}
-                </div>
+    {if $User.SignedIn}
+        <div class="Navigation-row NewDiscussion">
+            <div class="NewDiscussion mobile">
+                {module name="NewDiscussionModule"}
             </div>
-        {else}
+        </div>
+    {else}
+        {if !$DataDrivenTitleBar}
             <div class="Navigation-row">
                 <div class="SignIn mobile">
                     {module name="MeModule"}
@@ -157,12 +157,6 @@
                                                 {/if}
                                             </div>
                                         {/if}
-                                    </div>
-                                {else}
-                                    <div class="Navigation-row NewDiscussionMobile">
-                                        <div class="NewDiscussion mobile">
-                                            {module name="NewDiscussionModule"}
-                                        </div>
                                     </div>
                                 {/if}
                                 <div class="Frame-row">

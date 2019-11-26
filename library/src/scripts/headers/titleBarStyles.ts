@@ -312,6 +312,9 @@ export const titleBarClasses = useThemeCache(() => {
             color: colorOut(vars.colors.fg),
             marginRight: unit(globalVars.gutter.size),
             $nest: {
+                "&&": {
+                    color: colorOut(vars.colors.fg),
+                },
                 "&.focus-visible": {
                     $nest: {
                         "&.headerLogo-logoFrame": {

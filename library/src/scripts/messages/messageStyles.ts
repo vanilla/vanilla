@@ -84,6 +84,7 @@ export const messagesClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
     const wrap = style("wrap", {
@@ -104,20 +105,27 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     // Fixed wrapper
-    const fixed = style("fixed", {
-        position: "fixed",
-        left: 0,
-        top: unit(titleBarVars.sizing.height + 1),
-        minHeight: unit(vars.sizing.minHeight),
-        maxWidth: percent(100),
-        zIndex: 20,
-        $nest: {
-            [`& .${wrap}`]: {
-                width: unit(950),
-                maxWidth: percent(100),
+    const fixed = style(
+        "fixed",
+        {
+            position: "fixed",
+            left: 0,
+            top: unit(titleBarVars.sizing.height + 1),
+            minHeight: unit(vars.sizing.minHeight),
+            maxWidth: percent(100),
+            zIndex: 20,
+
+            $nest: {
+                [`& .${wrap}`]: {
+                    width: unit(950),
+                    maxWidth: percent(100),
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            top: unit(titleBarVars.sizing.height - 3),
+        }),
+    );
 
     const innerWrapper = style("innerWrapper", {
         $nest: {

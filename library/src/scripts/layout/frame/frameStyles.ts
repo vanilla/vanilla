@@ -85,7 +85,7 @@ export const frameClasses = useThemeCache(() => {
         minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
         $nest: {
             [`.${bodyWrap}`]: {
-                flex: "1 0 auto",
+                flexGrow: 1,
                 overflowY: "auto",
             },
         },

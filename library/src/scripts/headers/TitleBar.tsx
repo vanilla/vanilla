@@ -144,7 +144,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             {showMobileDropDown && (
                                 <MobileDropDown
                                     title={this.props.title!}
-                                    buttonClass={classNames("titleBar-mobileDropDown", classes.topElement)}
+                                    buttonClass={classNames("titleBar-mobileDropDown")}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>

@@ -1,3 +1,5 @@
+import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
+
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -8,6 +10,22 @@ interface ITranslations {
 }
 
 let translationStore: ITranslations = {};
+
+let internalTranslationDebugValue = false;
+
+/**
+ * Get or set the debug flag.
+ *
+ * @param newValue - The new value of debug.
+ * @returns the current debug setting.
+ */
+export function translationDebug(newValue?: boolean): boolean {
+    if (newValue !== undefined) {
+        internalTranslationDebugValue = newValue;
+    }
+
+    return internalTranslationDebugValue;
+}
 
 /**
  * Load a set of key value pairs as translation resources.
@@ -39,6 +57,12 @@ export function translate(str: string, defaultTranslation?: string): string {
 
     if (translationStore[str] !== undefined) {
         return translationStore[str];
+    }
+    console.log(translationDebug(getMeta("context.translationDebug")));
+
+    if (defaultTranslation === undefined && translationDebug(getMeta("context.translationDebug"))) {
+        console.log("hello");
+        return "☢️☢️☢️" + str;
     }
 
     return defaultTranslation !== undefined ? defaultTranslation : str;

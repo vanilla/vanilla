@@ -4,7 +4,7 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { em } from "csx";
+import { em, scale } from "csx";
 import { margins, unit, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -289,6 +289,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.deleteIcon.height),
     });
 
+    const isSmall = style("isSmall", {
+        transform: scale(0.85),
+        transformOrigin: "50% 50%",
+    });
+
     const editIcon = style("editIcon", {
         width: unit(vars.editIcon.width),
         height: unit(vars.editIcon.height),
@@ -344,5 +349,6 @@ export const iconClasses = useThemeCache(() => {
         alertIcon,
         alertIconCompact,
         globeIcon,
+        isSmall,
     };
 });

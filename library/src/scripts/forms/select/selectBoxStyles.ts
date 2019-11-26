@@ -7,6 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
+import { unit } from "@library/styles/styleHelpers";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -70,8 +71,7 @@ export const selectBoxClasses = useThemeCache(() => {
         color: globalVars.mainColors.primary.toString(),
         width: percent(100),
         height: px(18),
-        flexBasis: px(18),
-        marginRight: px(2),
+        flexBasis: unit(globalVars.icon.sizes.default),
         marginLeft: px(50),
     });
 
@@ -82,7 +82,12 @@ export const selectBoxClasses = useThemeCache(() => {
     });
 
     const itemLabel = style("itemLabel", {
-        width: percent(100),
+        display: "block",
+        flexGrow: 1,
+    });
+
+    const noTopPadding = style("noTopPadding", {
+        paddingTop: unit(0),
     });
 
     return {
@@ -94,5 +99,6 @@ export const selectBoxClasses = useThemeCache(() => {
         checkContainer,
         spacer,
         itemLabel,
+        noTopPadding,
     };
 });

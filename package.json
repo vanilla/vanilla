@@ -184,7 +184,7 @@
         "lint": "eslint \"**/*.{ts,tsx}\"",
         "storybook": "start-storybook -p 9001 -c build/.storybook",
         "build-storybook": "build-storybook -c build/.storybook -o build/.out",
-        "bootstrap": "lerna bootstrap",
+        "bootstrap": "YARN_IGNORE_ENGINES=true lerna bootstrap",
         "chromatic": "chromatic test"
     }
 }

@@ -5,10 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { paddings, unit } from "@library/styles/styleHelpers";
+import { negative, paddings, unit } from "@library/styles/styleHelpers";
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import { calc, percent } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const hamburgerVariables = useThemeCache(() => {
@@ -28,6 +28,7 @@ export const hamburgerClasses = useThemeCache(() => {
     const style = styleFactory("hamburger");
 
     const root = style({});
+    const formElVars = formElementsVariables();
     const content = style({
         ...paddings({
             vertical: 9,
@@ -51,6 +52,32 @@ export const hamburgerClasses = useThemeCache(() => {
                 $nest: {
                     "&&": {
                         top: percent(100),
+                    },
+                },
+            },
+
+            "& .ButtonGroup.NewDiscussion.Multi": {
+                display: "flex",
+                flexWrap: "wrap",
+                $nest: {
+                    "& .Button.Primary": {
+                        position: "relative",
+                    },
+                    "& .Button.Handle": {
+                        position: "relative",
+                        width: unit(formElVars.sizing.height),
+                        height: unit(formElVars.sizing.height),
+                        marginLeft: unit(negative(formElVars.sizing.height)),
+                    },
+                    "& .Dropdown.MenuItems": {
+                        position: "relative",
+                        maxWidth: percent(100),
+                        marginTop: unit(negative(formElVars.border.width)),
+                    },
+                    "& .mobileFlyoutOverlay": {
+                        position: "relative",
+                        height: "auto",
+                        background: "none",
                     },
                 },
             },

@@ -22,7 +22,7 @@
     {if $User.SignedIn}
         <div class="Navigation-row NewDiscussion">
             <div class="NewDiscussion mobile">
-                {module name="NewDiscussionModule"}
+                {module name="NewDiscussionModule" reorder=$DataDrivenTitleBar}
             </div>
         </div>
     {else}

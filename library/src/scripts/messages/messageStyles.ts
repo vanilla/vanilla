@@ -22,6 +22,7 @@ import { FontWeightProperty } from "csstype";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { relative } from "path";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();

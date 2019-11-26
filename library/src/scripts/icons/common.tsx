@@ -487,18 +487,20 @@ export function accessibleImageMenu(message?: string, className?: string) {
     );
 }
 
-export function EditIcon(props: { className?: string; title?: string }) {
+export function EditIcon(props: { className?: string; title?: string; small?: boolean }) {
     const classes = iconClasses();
     return (
         <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
             <title>{props.title ? props.title : t("Edit")}</title>
-            <g transform="translate(4, 3)">
-                <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
-                <path
-                    d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
-                    stroke="currentColor"
-                    fill="none"
-                />
+            <g className={classNames({ [classes.isSmall]: props.small })}>
+                <g transform="translate(4, 3)">
+                    <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
+                    <path
+                        d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
+                        stroke="currentColor"
+                        fill="none"
+                    />
+                </g>
             </g>
         </svg>
     );

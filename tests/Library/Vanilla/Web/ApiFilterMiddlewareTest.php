@@ -4,6 +4,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
@@ -36,8 +37,8 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     protected $testFailureArray;
 
-    /*
-     *  Setup
+    /**
+     * Setup
      */
     public function setUp() {
         $this->path = '/api/v2/discussions';
@@ -53,7 +54,6 @@ class ApiFilterMiddlewareTest extends TestCase {
             'api-allow' =>[0 => 'discussionid', 1 =>'password']];
         $this->callMiddlewareSuccess($request);
         $this->addToAssertionCount(1);
-
     }
 
     /**
@@ -66,7 +66,6 @@ class ApiFilterMiddlewareTest extends TestCase {
         $request = new Request($this->path);
         $this->testFailureArray = ['insertuserid' => ['discussionid' => 1,'password' => 123]];
         $this->callMiddlewareFail($request);
-
     }
     /**
      * Call the middleware with a valid data array.

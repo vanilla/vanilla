@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyProviderInterface;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
@@ -43,7 +44,28 @@ class ContentSecurityPolicyModelTest extends TestCase {
         /** @var ContentSecurityPolicyProviderInterface $defaultProvider */
         $defaultProvider = $this->container()->get(DefaultContentSecurityPolicyProvider::class);
         $this->cspModel->addProvider($defaultProvider);
-        $this->assertStringEndsWith('\'self\'', $this->cspModel->getHeaderString());
+        $header = $this->cspModel->getHeaderString();
+        $this->assertStringEndsWith('\'self\'', $header);
+        $this->assertNotContains('frame-ancestors ', $header);
+        $this->assertNotContains('unsafe-eval', $header);
+    }
+
+    /**
+     * Test CSP model with DefaultContentSecurityPolicyProvider with Garden.Embed.Allow
+     *
+     * @depends testCspModelDefaultProvider
+     */
+    public function testCspModelDefaultProviderEmbedEnabled() {
+        /** @var \Gdn_Configuration $config */
+        $config = $this->container()->get(ConfigurationInterface::class);
+        $config->set("Garden.Embed.Allow", true);
+        /** @var ContentSecurityPolicyProviderInterface $defaultProvider */
+        $defaultProvider = $this->container()->get(DefaultContentSecurityPolicyProvider::class);
+        $this->cspModel->addProvider($defaultProvider);
+        $header = $this->cspModel->getHeaderString();
+        $this->assertStringEndsWith('\'self\'', $header);
+        $this->assertContains('frame-ancestors ', $header);
+        $this->assertNotContains('unsafe-eval', $header);
     }
 
     /**
@@ -53,7 +75,10 @@ class ContentSecurityPolicyModelTest extends TestCase {
         /** @var ContentSecurityPolicyProviderInterface $embedWhiteListProvider */
         $embedWhiteListProvider = $this->container()->get(EmbedWhitelistContentSecurityPolicyProvider::class);
         $this->cspModel->addProvider($embedWhiteListProvider);
-        $this->assertStringEndsWith('embed.js', $this->cspModel->getHeaderString());
+        $header = $this->cspModel->getHeaderString();
+        $this->assertStringEndsWith('https://www.instagram.com/embed.js', $header);
+        $this->assertNotContains('unsafe-eval', $header);
+        $this->assertNotContains('frame-ancestors ', $header);
     }
 
     /**
@@ -71,6 +96,8 @@ class ContentSecurityPolicyModelTest extends TestCase {
     /**
      * Test CSP model with DefaultContentSecurityPolicyProvider, EmbedWhitelistContentSecurityPolicyProvider, WebpackAssetProvider
      *     all enabled together
+     *
+     * @depends testCspModelDefaultProviderEmbedEnabled
      */
     public function testCspModelAllProviders() {
         /** @var ContentSecurityPolicyProviderInterface $defaultProvider */
@@ -86,9 +113,10 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $assetProvider->setHotReloadEnabled(true);
         $webpackProvider = new WebpackContentSecurityPolicyProvider($assetProvider);
         $this->cspModel->addProvider($webpackProvider);
-
-        $this->assertContains('\'self\'', $this->cspModel->getHeaderString());
-        $this->assertContains('embed.js', $this->cspModel->getHeaderString());
-        $this->assertContains('unsafe-eval', $this->cspModel->getHeaderString());
+        $header = $this->cspModel->getHeaderString();
+        $this->assertContains('\'self\'', $header);
+        $this->assertContains('https://www.instagram.com/embed.js', $header);
+        $this->assertContains('frame-ancestors ', $header);
+        $this->assertContains('unsafe-eval', $header);
     }
 }

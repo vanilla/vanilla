@@ -80,7 +80,7 @@ class QuoteEmbedFilterTest extends MinimalContainerTestCase {
         );
 
         $expectedRendered = <<<HTML
-    <p><a href="http://test.com/replaced" rel="nofollow">http://test.com/replaced</a></p>
+    <p><a href="http://test.com/replaced" rel="nofollow noreferrer ugc">http://test.com/replaced</a></p>
     <p>After Embed</p>
 HTML;
 

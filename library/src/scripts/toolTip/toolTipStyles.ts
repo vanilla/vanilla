@@ -10,6 +10,7 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { borders, paddings, singleBorder, unit, userSelect } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX } from "csx";
+import { modalVariables } from "@library/modal/modalStyles";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");
@@ -56,6 +57,7 @@ export const toolTipClasses = useThemeCache(() => {
             all: globalVars.fonts.size.medium,
         }),
         ...shadow.dropDown(),
+        zIndex: modalVariables().sizing.zIndex + 1,
     });
 
     const nubPosition = style("nubPosition", {
@@ -69,7 +71,7 @@ export const toolTipClasses = useThemeCache(() => {
         transform: translateX("-50%"),
         marginLeft: unit(vars.nub.width),
         pointerEvents: "none",
-        zIndex: 1,
+        zIndex: modalVariables().sizing.zIndex + 2,
         ...userSelect(),
     });
 

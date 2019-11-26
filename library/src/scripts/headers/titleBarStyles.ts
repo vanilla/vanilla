@@ -503,7 +503,8 @@ export const titleBarClasses = useThemeCache(() => {
                                     },
                                     "&:focus": {
                                         color: colorOut(vars.colors.fg),
-                                        "&.focus-visible": {},
+                                    },
+                                    "&.focus-visible": {
                                         color: colorOut(vars.colors.fg),
                                     },
                                 },

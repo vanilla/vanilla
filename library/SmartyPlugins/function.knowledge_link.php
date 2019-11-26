@@ -7,7 +7,7 @@
  */
 
 /**
- *
+ *  Adds link to KB
  *
  * @param array $params
  * @param object $smarty

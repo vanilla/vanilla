@@ -43,6 +43,8 @@ export const modalVariables = useThemeCache(() => {
         medium: 516,
         small: 375,
         height: viewHeight(96),
+        zIndex: 1050, // Sorry it's so high. Our dashboard uses some bootstrap which specifies 1040 for the old modals.
+        // When nesting our modals on top we need to be higher.
     });
 
     const spacing = makeThemeVars("spacing", {

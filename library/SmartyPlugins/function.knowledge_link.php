@@ -7,7 +7,7 @@
  */
 
 /**
- *  Adds link to KB
+ * Adds link to KB
  *
  * @param array $params
  * @param object $smarty
@@ -15,7 +15,5 @@
  */
 function smarty_function_knowledge_link($params, &$smarty) {
     $wrap = val('wrap', $params, 'li');
-    return Gdn_Theme::link('kb',
-        val('text', $params, t('Help Menu')),
-        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+    return Gdn_Theme::link('kb', val('text', $params, t('Help Menu')), val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
 }

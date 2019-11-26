@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     {asset name="Head"}
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700,700i" rel="stylesheet">
 </head>
 
 {assign
@@ -75,7 +75,7 @@
                 <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true">
                     {$smarty.capture.menu}
                 </header>
-             {else}
+            {else}
                 <div class="Frame-header">
                     <header id="MainHeader" class="Header">
                         <div class="Container">

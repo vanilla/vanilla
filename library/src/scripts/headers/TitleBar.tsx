@@ -160,7 +160,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 <>
                                     <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
                                     <FlexSpacer
-                                        className={hamburgerClasses().spacer(2 + TitleBar.extraMeBoxComponents.length)}
+                                        className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
                                     />
                                     <div className={classes.logoCenterer}>
                                         <HeaderLogo

@@ -36,6 +36,8 @@ class ApiFilterMiddleware {
         $this->basePath = $basePath;
     }
     /**
+     * Validate an api v2 response.
+     *
      * @param RequestInterface $request
      * @param callable $next
      * @return Data
@@ -51,7 +53,8 @@ class ApiFilterMiddleware {
             array_walk_recursive($response->getData(), function (&$value, $key) {
                 if (in_array(strtolower($key), $this->blacklist)) {
                     throw new ServerException('Validation failed for field'.' '.$key);
-                }});
+                }
+            });
         }
         return $response;
     }
@@ -59,11 +62,11 @@ class ApiFilterMiddleware {
     /**
      * Check if an endpoint sent a record to be whitelisted.
      *
-     * @param $response
+     * @param $data
      */
     private function checkSentWhitelist($data) {
         if ($data['api-allow']) {
-            foreach($data['api-allow'] as $key => $value) {
+            foreach ($data['api-allow'] as $key => $value) {
                 $searchKey = array_search($value, $this->blacklist);
                 if ($searchKey !== false) {
                     unset($this->blacklist[$searchKey]);

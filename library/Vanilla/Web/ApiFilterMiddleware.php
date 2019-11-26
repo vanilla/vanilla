@@ -62,7 +62,7 @@ class ApiFilterMiddleware {
     /**
      * Check if an endpoint sent a record to be whitelisted.
      *
-     * @param $data
+     * @param array $data The array to check for fields to whitelist.
      */
     private function checkSentWhitelist($data) {
         if ($data['api-allow']) {

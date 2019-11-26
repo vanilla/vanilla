@@ -235,6 +235,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)

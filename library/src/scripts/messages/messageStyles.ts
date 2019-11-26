@@ -19,10 +19,8 @@ import {
 } from "@library/styles/styleHelpers";
 import { percent, translate, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { inherit } from "highlight.js";
 import { relative } from "path";
 
 export const messagesVariables = useThemeCache(() => {
@@ -54,6 +52,7 @@ export const messagesVariables = useThemeCache(() => {
         font: {
             color: colors.fg,
             size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.normal as FontWeightProperty,
         },
     });
 
@@ -85,22 +84,26 @@ export const messagesClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
     const shadows = shadowHelper();
 
-    const wrap = style("wrap", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        flexWrap: "nowrap",
-        minHeight: unit(vars.sizing.minHeight),
-
-        width: percent(100),
-
-        margin: "auto",
-        color: colorOut(vars.colors.fg),
-        ...paddings({
-            ...vars.spacing.padding,
-            right: vars.spacing.padding.right,
-        }),
-    });
+    const wrap = (noIcon?: boolean) => {
+        const padding = noIcon
+            ? {
+                  vertical: vars.spacing.padding.vertical,
+                  left: vars.spacing.padding.right,
+                  right: vars.spacing.padding.right,
+              }
+            : { ...vars.spacing.padding, right: vars.spacing.padding.right };
+        return style("wrap", {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            flexWrap: "nowrap",
+            minHeight: unit(vars.sizing.minHeight),
+            width: percent(100),
+            margin: "auto",
+            color: colorOut(vars.colors.fg),
+            ...paddings(padding),
+        });
+    };
 
     // Fixed wrapper
     const fixed = style("fixed", {
@@ -158,7 +161,7 @@ export const messagesClasses = useThemeCache(() => {
         ...margins({ horizontal: "auto" }),
         $nest: {
             "& + &": {
-                marginTop: unit(globalVars.spacer.size),
+                marginTop: unit(globalVars.spacer.size / 2),
             },
         },
     });
@@ -166,9 +169,6 @@ export const messagesClasses = useThemeCache(() => {
     const message = style("message", {
         ...userSelect(),
         ...fonts(vars.text.font),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flexStart",
         width: percent(100),
         flex: 1,
     });
@@ -204,10 +204,10 @@ export const messagesClasses = useThemeCache(() => {
         ...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
         transform: translate(`-100%`),
-        marginLeft: unit(-16),
+        marginLeft: unit(-14),
         $nest: {
             "&&": {
-                color: "#555A62", // hard coded to contrast "yellow"
+                color: colorOut(globalVars.messageColors.error.fg),
             },
         },
     });
@@ -229,17 +229,23 @@ export const messagesClasses = useThemeCache(() => {
 
     const confirm = style("confirm", {});
 
-    const main = style("main", {
-        flexGrow: 1,
-    });
+    const main = style("title", {});
+
     const text = style("text", {
-        ...margins({
-            top: unit(6),
-            bottom: unit(0),
-        }),
+        ...fonts(vars.text.font),
+        top: unit(6),
+        bottom: unit(0),
     });
 
-    const title = style("title", {});
+    const title = style("title", {
+        ...fonts(vars.text.font),
+        fontWeight: globalVars.fonts.weights.bold,
+        $nest: {
+            [`& + .${text}`]: {
+                marginTop: unit(6),
+            },
+        },
+    });
 
     return {
         root,

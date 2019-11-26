@@ -159,7 +159,9 @@ export class TitleBar extends React.Component<IProps, IState> {
                             {showHamburger && (
                                 <>
                                     <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
-                                    <FlexSpacer className={hamburgerClasses().spacer(2.5)} />
+                                    <FlexSpacer
+                                        className={hamburgerClasses().spacer(2 + TitleBar.extraMeBoxComponents.length)}
+                                    />
                                     <div className={classes.logoCenterer}>
                                         <HeaderLogo
                                             className={classNames("titleBar-logoContainer", classes.logoContainer)}
@@ -169,7 +171,6 @@ export class TitleBar extends React.Component<IProps, IState> {
                                     </div>
                                 </>
                             )}
-
                             <ConditionalWrap
                                 className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
                                 condition={!!showMobileDropDown}

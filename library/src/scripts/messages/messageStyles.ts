@@ -107,7 +107,7 @@ export const messagesClasses = useThemeCache(() => {
     const fixed = style("fixed", {
         position: "fixed",
         left: 0,
-        top: unit(titleBarVars.sizing.height - 8),
+        top: unit(titleBarVars.sizing.height + 1),
         minHeight: unit(vars.sizing.minHeight),
         maxWidth: percent(100),
         zIndex: 20,

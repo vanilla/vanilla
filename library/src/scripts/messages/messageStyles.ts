@@ -123,7 +123,7 @@ export const messagesClasses = useThemeCache(() => {
             },
         },
         mediaQueries.oneColumnDown({
-            top: unit(titleBarVars.sizing.height - 3),
+            top: unit(titleBarVars.sizing.mobile.height + 1),
         }),
     );
 

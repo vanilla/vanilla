@@ -35,7 +35,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         // Get an ID for the body.
         $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName.'_'.Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod)));
         $smarty->assign('BodyID', htmlspecialchars($bodyIdentifier));
-        $smarty->assign('DataDrivenTitleBar', Gdn::config("Vanilla.DataDrivenTitleBar.Enabled", false));
+        $smarty->assign('DataDrivenTitleBar', Gdn::config("Feature.DataDrivenTitleBar.Enabled", false));
         //$Smarty->assign('Config', Gdn::config());
 
         // Assign some information about the user.

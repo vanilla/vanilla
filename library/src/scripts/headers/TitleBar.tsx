@@ -36,6 +36,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { SignInIcon } from "@library/icons/common";
 import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
+import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -158,7 +159,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             {showHamburger && (
                                 <>
                                     <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
-                                    <FlexSpacer className="pageHeading-leftSpacer" />
+                                    <FlexSpacer className={hamburgerClasses().spacer(2.5)} />
                                     <div className={classes.logoCenterer}>
                                         <HeaderLogo
                                             className={classNames("titleBar-logoContainer", classes.logoContainer)}

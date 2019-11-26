@@ -8,4 +8,5 @@
 $Configuration['Garden']['MobileTheme'] = 'keystone';
 $Configuration['Badges']['BadgesModule']['Target'] = 'AfterUserInfo';
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
-$Configuration['Vanilla']['DataDrivenTitleBar']['Enabled'] = false;
+$Configuration['Feature']['DataDrivenTitleBar']['Enabled'] = true;
+

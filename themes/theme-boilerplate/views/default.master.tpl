@@ -158,6 +158,12 @@
                                             </div>
                                         {/if}
                                     </div>
+                                {else}
+                                    <div class="Navigation-row NewDiscussionMobile">
+                                        <div class="NewDiscussion mobile">
+                                            {module name="NewDiscussionModule"}
+                                        </div>
+                                    </div>
                                 {/if}
                                 <div class="Frame-row">
                                     <main class="Content MainContent">

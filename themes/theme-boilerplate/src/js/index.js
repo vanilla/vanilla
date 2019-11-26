@@ -8,7 +8,7 @@
 import { setupMobileNavigation } from "./mobileNavigation";
 
 $(() => {
-    if (!window.gdn.getMeta("Vanilla.DataDrivenTitleBar.Enabled", false)) {
+    if (!window.gdn.getMeta("featureFlags.DataDrivenTitleBar.Enabled", false)) {
         setupMobileNavigation();
     }
     $("select").wrap('<div class="SelectWrapper"></div>');

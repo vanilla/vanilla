@@ -5,23 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    fonts,
-    margins,
-    paddings,
-    buttonStates,
-    unit,
-    userSelect,
-    negative,
-} from "@library/styles/styleHelpers";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { paddings, unit } from "@library/styles/styleHelpers";
+
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { percent } from "csx";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const hamburgerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -41,7 +29,9 @@ export const hamburgerClasses = useThemeCache(() => {
 
     const root = style({});
     const content = style({
-        paddingBottom: unit(9),
+        ...paddings({
+            vertical: 9,
+        }),
         $nest: {
             "& .Navigation-row": {
                 display: "flex",
@@ -67,8 +57,17 @@ export const hamburgerClasses = useThemeCache(() => {
         },
     });
 
+    const spacer = (count: number) => {
+        const formElVars = formElementsVariables();
+        return style("spacer", {
+            height: unit(1),
+            width: count ? unit(count * formElVars.sizing.height) : unit(formElVars.sizing.height * 2),
+        });
+    };
+
     return {
         root,
         content,
+        spacer,
     };
 });

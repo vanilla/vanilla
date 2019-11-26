@@ -50,7 +50,6 @@
 
 .Frame-details {
     @include clearfix;
-
     .SearchBoxMobile {
         display: none;
 
@@ -71,6 +70,21 @@
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
+}
+
+.Navigation-row.NewDiscussionMobile {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 9px;
+    display: none;
+
+    .ButtonGroup {
+        margin: auto;
+    }
+
+    @include maxWidth($theme-breakpoint_tablet) {
+        display: block;
+    }
 }
 
 .MainContent.Content {

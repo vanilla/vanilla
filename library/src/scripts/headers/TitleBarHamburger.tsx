@@ -6,6 +6,8 @@
 import TitleBar from "@library/headers/TitleBar";
 import * as React from "react";
 import { MemoryRouter } from "react-router";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 
 interface IProps {
     contents: string; // HTML content
@@ -13,6 +15,7 @@ interface IProps {
 
 export function TitleBarHamburger(props: IProps) {
     const { contents } = props;
+    const classes = hamburgerClasses();
     return (
         <MemoryRouter>
             <TitleBar useMobileBackButton={false} hamburger={contents} />

@@ -9,6 +9,8 @@ import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import Permission from "@library/features/users/Permission";
+import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -43,7 +45,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
         const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
         const content = this.props.data
             ? this.props.data.map((item, key) => {
-                  return (
+                  const component = (
                       <TitleBarNavItem
                           {...item}
                           className={classNames(
@@ -58,6 +60,12 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                           key={`headerNavItem-${key}`}
                       />
                   );
+
+                  if (item.permission) {
+                      return <Permission permission={item.permission}>{component}</Permission>;
+                  } else {
+                      return component;
+                  }
               })
             : null;
 

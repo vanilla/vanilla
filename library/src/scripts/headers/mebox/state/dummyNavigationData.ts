@@ -20,6 +20,7 @@ export const dummyNavigationData = () => {
             {
                 to: "/kb",
                 children: t("Help Menu", "Help"),
+                permission: "kb.view",
             },
         ],
     };

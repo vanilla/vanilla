@@ -22,6 +22,7 @@ import { FontWeightProperty } from "csstype";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { relative } from "path";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -82,6 +83,7 @@ export const messagesClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
     const wrap = (noIcon?: boolean) => {
@@ -106,20 +108,27 @@ export const messagesClasses = useThemeCache(() => {
     };
 
     // Fixed wrapper
-    const fixed = style("fixed", {
-        position: "fixed",
-        left: 0,
-        top: unit(titleBarVars.sizing.height - 8),
-        minHeight: unit(vars.sizing.minHeight),
-        maxWidth: percent(100),
-        zIndex: 20,
-        $nest: {
-            [`& .${wrap}`]: {
-                width: unit(950),
-                maxWidth: percent(100),
+    const fixed = style(
+        "fixed",
+        {
+            position: "fixed",
+            left: 0,
+            top: unit(titleBarVars.sizing.height + 1),
+            minHeight: unit(vars.sizing.minHeight),
+            maxWidth: percent(100),
+            zIndex: 20,
+
+            $nest: {
+                [`& .${wrap}`]: {
+                    width: unit(950),
+                    maxWidth: percent(100),
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            top: unit(titleBarVars.sizing.mobile.height + 1),
+        }),
+    );
 
     const innerWrapper = style("innerWrapper", {
         $nest: {

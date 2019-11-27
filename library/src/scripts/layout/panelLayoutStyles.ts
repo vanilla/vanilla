@@ -23,7 +23,7 @@ export const layoutVariables = useThemeCache(() => {
         fullGutter: 48,
         panelWidth: 216,
         middleColumnWidth: 672,
-        minimalMiddleColumnWidth: 500, // Will break if middle column width is smaller than this value.
+        minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
         breakPoints: {
             // Other break points are calculated

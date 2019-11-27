@@ -67,7 +67,7 @@ class AltTest extends SharedBootstrapTestCase {
         $config['Garden']['UpdateToken'] = $updateToken;
 
         $this->api()->saveToConfig($config);
-        $this->api()->post('/utility/update.json', ['updateToken' => $postUpdateToken]);
+        $r = $this->api()->post('/utility/update.json', ['updateToken' => $postUpdateToken])->getBody();
         $this->api()->saveToConfig(['Garden.Installed' => true]);
 
         // Do a simple get to make sure there isn't an error.

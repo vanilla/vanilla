@@ -667,7 +667,9 @@ class UpdateModel extends Gdn_Model {
         } finally {
             if ($userID && $userID !== Gdn::session()->UserID) {
                 Gdn::session()->start($userID, false, false);
-            } elseif (!$userID) {
+            } elseif (!$userID && null !== c('Garden.Installed', false)) {
+            // Vanilla has an alternate install method where this config value is set to null.
+            // When this using this alternate install method we don't have authenticators configured and can't end the session.
                 Gdn::session()->end();
             }
         }

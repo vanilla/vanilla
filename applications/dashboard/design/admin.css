@@ -11403,7 +11403,7 @@ body {
 .userContent > *:not(.emoji):not(:last-child):not(br) {
   margin-bottom: 14px;
 }
-.userContent > *:not(.emoji):first-child:not(br) {
+.userContent > *:not(.emoji):first-child:not(br):not(.embedExternal) {
   margin-top: -0.25em !important;
 }
 .userContent,
@@ -11792,7 +11792,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedExternal-content {
   position: relative;
   margin: auto;
-  width: 640px;
+  width: 100%;
   max-width: 100%;
   text-align: center;
   box-sizing: border-box;
@@ -12036,7 +12036,7 @@ body.isMobile .Popup.hasRichEditor .Border {
  */
 .embedImage {
   width: 100%;
-  max-width: 640px;
+  max-width: 100%;
   display: inline-block;
 }
 
@@ -12047,7 +12047,13 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
-  max-height: 400px;
+  max-height: none;
+}
+
+.embedImage-link {
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
 }
 
 .richEditor .embedImage-img:hover {
@@ -12483,6 +12489,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 .icon-folderClosed {
   width: 16px;
   height: 14px;
+}
+
+.VideoWrap video {
+  max-width: 100%;
 }
 
 /**

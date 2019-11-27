@@ -257,7 +257,7 @@ class SiteMeta implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getLogo(): string {
+    public function getLogo(): ?string {
         return $this->logo;
     }
 

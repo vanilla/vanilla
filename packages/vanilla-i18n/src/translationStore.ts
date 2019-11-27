@@ -58,11 +58,10 @@ export function translate(str: string, defaultTranslation?: string): string {
     if (translationStore[str] !== undefined) {
         return translationStore[str];
     }
-    console.log(translationDebug(getMeta("context.translationDebug")));
 
+    // report any untranslated strings when in translation debug mode
     if (defaultTranslation === undefined && translationDebug(getMeta("context.translationDebug"))) {
-        console.log("hello");
-        return "☢️☢️☢️" + str;
+        return "☢️☢️☢️" + str + "☢️☢️☢️";
     }
 
     return defaultTranslation !== undefined ? defaultTranslation : str;

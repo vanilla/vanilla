@@ -4,6 +4,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
@@ -27,8 +28,8 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     protected $path;
 
-    /*
-     *  Setup
+    /**
+     * Setup
      */
     public function setUp() {
         $this->path = '/api/v2/discussions';

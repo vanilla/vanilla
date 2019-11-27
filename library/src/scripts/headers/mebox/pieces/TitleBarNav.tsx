@@ -20,6 +20,7 @@ export interface ITitleBarNavProps {
     data?: ITitleBarNav[];
     children?: React.ReactNode;
     wrapper?: JSX.Element;
+    excludeExtraNavItems?: boolean;
 }
 
 /**
@@ -57,12 +58,16 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                               key === dataLength ? classes.lastItem : false,
                           )}
                           linkClassName={this.props.linkClassName}
-                          key={`headerNavItem-${key}`}
+                          key={key}
                       />
                   );
 
                   if (item.permission) {
-                      return <Permission permission={item.permission}>{component}</Permission>;
+                      return (
+                          <Permission key={key} permission={item.permission}>
+                              {component}
+                          </Permission>
+                      );
                   } else {
                       return component;
                   }
@@ -72,10 +77,15 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
         return (
             <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
                 <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
-                    {this.props.children ? this.props.children : content}
-                    {TitleBarNav.extraNavItems.map((ComponentClass, i) => (
-                        <ComponentClass key={i} />
-                    ))}
+                    {this.props.children ? <React.Fragment key={"-1"}>{this.props.children}</React.Fragment> : content}
+                    {this.props.excludeExtraNavItems ??
+                        TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                            return (
+                                <React.Fragment key={i}>
+                                    <ComponentClass />
+                                </React.Fragment>
+                            );
+                        })}
                 </ul>
             </nav>
         );

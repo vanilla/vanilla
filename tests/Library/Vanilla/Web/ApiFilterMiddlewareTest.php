@@ -50,7 +50,6 @@ class ApiFilterMiddlewareTest extends TestCase {
 
     /**
      * Test ApiFilterMiddleware with a blacklisted field.
-     *
      */
     public function testValidationFail() {
         $this->expectException(ServerException::class);

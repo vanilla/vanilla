@@ -21,7 +21,7 @@ import { bootstrapLocales } from "@library/locales/localeBootstrap";
 const debugValue = getMeta("context.debug", getMeta("debug", false));
 debug(debugValue);
 
-const translationDebugValue = getMeta("context.translationDebug", getMeta("translationDebug", false));
+const translationDebugValue = getMeta("context.translationDebug", false);
 translationDebug(translationDebugValue);
 
 bootstrapLocales();

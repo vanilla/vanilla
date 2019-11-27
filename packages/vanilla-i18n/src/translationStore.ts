@@ -1,5 +1,3 @@
-import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
-
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -19,7 +17,7 @@ let internalTranslationDebugValue = false;
  * @param newValue - The new value of debug.
  * @returns the current debug setting.
  */
-export function translationDebug(newValue?: boolean): boolean {
+export async function translationDebug(newValue?: boolean): Promise<boolean> {
     if (newValue !== undefined) {
         internalTranslationDebugValue = newValue;
     }
@@ -60,7 +58,7 @@ export function translate(str: string, defaultTranslation?: string): string {
     }
 
     // report any untranslated strings when in translation debug mode
-    if (defaultTranslation === undefined && translationDebug(getMeta("context.translationDebug"))) {
+    if (defaultTranslation === undefined && translationDebug()) {
         return "☢️☢️☢️" + str + "☢️☢️☢️";
     }
 

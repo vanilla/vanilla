@@ -7,6 +7,7 @@
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import { importAll } from "@library/__tests__/utility";
+import { setCurrentLocale, loadTranslations } from "@vanilla/i18n";
 
 // Setup enzyme
 Enzyme.configure({ adapter: new Adapter() });

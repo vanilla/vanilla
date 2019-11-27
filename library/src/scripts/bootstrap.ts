@@ -7,6 +7,7 @@
 
 import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
 import { logDebug, logError, debug } from "@vanilla/utils";
+import { translationDebug } from "@vanilla/i18n";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
@@ -19,6 +20,9 @@ import { bootstrapLocales } from "@library/locales/localeBootstrap";
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
 debug(debugValue);
+
+const translationDebugValue = getMeta("context.translationDebug", false);
+translationDebug(translationDebugValue);
 
 bootstrapLocales();
 

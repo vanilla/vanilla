@@ -58,11 +58,12 @@ export default function BackLink(props: IProps) {
 
     const classes = backLinkClasses();
     const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
+    const title = props.title || t("Back");
 
     let content = (
         <>
             <LeftChevronCompactIcon className={classes.icon} />
-            {props.visibleLabel && <span className={classes.label}>{props.title}</span>}
+            {props.visibleLabel && <span className={classes.label}>{title}</span>}
         </>
     );
 
@@ -71,8 +72,8 @@ export default function BackLink(props: IProps) {
             <Button
                 baseClass={ButtonTypes.RESET}
                 className={className}
-                aria-label={props.title as string}
-                title={props.title as string}
+                aria-label={title as string}
+                title={title as string}
                 onClick={props.onClick}
             >
                 {content}
@@ -84,8 +85,8 @@ export default function BackLink(props: IProps) {
             <Button
                 baseClass={ButtonTypes.RESET}
                 className={className}
-                aria-label={props.title as string}
-                title={props.title as string}
+                aria-label={title as string}
+                title={title as string}
                 onClick={(event: React.MouseEvent) => {
                     event.preventDefault();
                     event.stopPropagation();
@@ -100,8 +101,8 @@ export default function BackLink(props: IProps) {
             <a
                 href={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
                 className={className}
-                aria-label={props.title as string}
-                title={props.title as string}
+                aria-label={title as string}
+                title={title as string}
                 onClick={(event: React.MouseEvent) => {
                     // We don't use a real link navigation.
                     event.preventDefault();
@@ -118,6 +119,5 @@ export default function BackLink(props: IProps) {
 }
 
 BackLink.defaultProps = {
-    title: t("Back"),
     visibleLabel: false,
 };

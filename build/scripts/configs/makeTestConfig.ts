@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { Configuration } from "webpack";
+import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
 
@@ -19,6 +19,11 @@ export async function makeTestConfig(entryModel: EntryModel) {
         splitChunks: false,
         minimize: false,
     };
+    baseConfig.plugins?.push(
+        new webpack.DefinePlugin({
+            ["process.env.NODE_ENV"]: "'test'",
+        }),
+    );
 
     return baseConfig;
 }

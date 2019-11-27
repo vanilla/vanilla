@@ -58,8 +58,12 @@ export function translate(str: string, defaultTranslation?: string): string {
     const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
 
     if (!translationStore) {
-        logError("Attempted to translate a value before the translation store was initialized");
-        return "☢️☢️☢️" + fallback + "☢️☢️☢️";
+        if (process.env.NODE_ENV !== "test") {
+            logError("Attempted to translate a value before the translation store was initialized");
+            return "☢️☢️☢️" + fallback + "☢️☢️☢️";
+        } else {
+            return fallback;
+        }
     }
 
     if (translationStore[str] !== undefined) {

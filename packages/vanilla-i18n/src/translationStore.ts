@@ -1,3 +1,5 @@
+import { logError } from "@vanilla/utils";
+
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -7,7 +9,7 @@ interface ITranslations {
     [key: string]: string;
 }
 
-let translationStore: ITranslations = {};
+let translationStore: ITranslations | null = null;
 
 let internalTranslationDebugValue = false;
 
@@ -17,7 +19,7 @@ let internalTranslationDebugValue = false;
  * @param newValue - The new value of debug.
  * @returns the current debug setting.
  */
-export async function translationDebug(newValue?: boolean): Promise<boolean> {
+export function translationDebug(newValue?: boolean): boolean {
     if (newValue !== undefined) {
         internalTranslationDebugValue = newValue;
     }
@@ -53,16 +55,24 @@ export function translate(str: string, defaultTranslation?: string): string {
         return str.substr(1);
     }
 
+    const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
+
+    if (!translationStore) {
+        logError("Attempted to translate a value before the translation store was initialized");
+        return "☢️☢️☢️" + fallback + "☢️☢️☢️";
+    }
+
     if (translationStore[str] !== undefined) {
         return translationStore[str];
     }
 
-    // report any untranslated strings when in translation debug mode
-    if (defaultTranslation === undefined && translationDebug()) {
-        return "☢️☢️☢️" + str + "☢️☢️☢️";
-    }
+    console.log(translationDebug());
 
-    return defaultTranslation !== undefined ? defaultTranslation : str;
+    if (translationDebug()) {
+        return "☢️☢️☢️" + fallback + "☢️☢️☢️";
+    } else {
+        return fallback;
+    }
 }
 
 /**

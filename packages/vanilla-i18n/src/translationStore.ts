@@ -66,8 +66,6 @@ export function translate(str: string, defaultTranslation?: string): string {
         return translationStore[str];
     }
 
-    console.log(translationDebug());
-
     if (translationDebug()) {
         return "☢️☢️☢️" + fallback + "☢️☢️☢️";
     } else {

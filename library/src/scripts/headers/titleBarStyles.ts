@@ -421,6 +421,9 @@ export const titleBarClasses = useThemeCache(() => {
             [`& + .${compactSearch}`]: {
                 marginLeft: 0,
             },
+            li: {
+                listStyle: "none",
+            },
         },
     });
 

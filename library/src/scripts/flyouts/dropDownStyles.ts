@@ -114,6 +114,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        listStyle: "none",
     });
 
     const contents = style("contents", {

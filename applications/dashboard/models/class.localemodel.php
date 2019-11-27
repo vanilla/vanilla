@@ -114,7 +114,7 @@ class LocaleModel {
      */
     public function enabledLocalePacks($getInfo = false) {
         $result = (array)c('EnabledLocales', []);
-
+        $translationDebug = c("TranslationDebug");
         if ($getInfo) {
             foreach ($result as $key => $locale) {
                 $infoPath = PATH_ROOT."/locales/$key/definitions.php";
@@ -124,6 +124,11 @@ class LocaleModel {
                     $result[$key] = $localeInfo;
                 } else {
                     unset($result[$key]);
+                }
+                if ($localeInfo['Debug'] ?? null) {
+                    if (!$translationDebug) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }

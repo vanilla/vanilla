@@ -45,7 +45,6 @@ class ApiFilterMiddleware {
     public function __invoke(RequestInterface $request, callable $next) {
         $response = $next($request);
         $data = $response->getData();
-        //$this->data = $data;
         // Make sure filtering is done for apiv2.
         if (is_array($data) && strcasecmp(substr($request->getPath(), 0, strlen($this->basePath)), $this->basePath) === 0) {
             // Check if the api sent some fields to override the blacklist.

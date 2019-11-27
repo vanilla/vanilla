@@ -35,6 +35,7 @@ class ApiFilterMiddleware {
     public function __construct(string $basePath = '/api/v2') {
         $this->basePath = $basePath;
     }
+
     /**
      * Validate an api v2 response.
      *
@@ -47,11 +48,13 @@ class ApiFilterMiddleware {
         $data = $response->getData();
         // Make sure filtering is done for apiv2.
         if (is_array($data) && strcasecmp(substr($request->getPath(), 0, strlen($this->basePath)), $this->basePath) === 0) {
-            // Check if the api sent some fields to override the blacklist.
-            $this->checkSentWhitelist($data);
             // Check for blacklisted fields.
-            array_walk_recursive($data, function (&$value, $key) {
-                if (in_array(strtolower($key), $this->blacklist)) {
+            array_walk_recursive($data, function (&$value, $key) use ($data) {
+                $result = false;
+                if (isset($data['api-allow'])) {
+                    $result = in_array(strtolower($key), $data['api-allow']);
+                }
+                if (in_array(strtolower($key), $this->blacklist) && !$result) {
                     throw new ServerException('Validation failed for field'.' '.$key);
                 }
             });
@@ -60,18 +63,11 @@ class ApiFilterMiddleware {
     }
 
     /**
-     * Check if an endpoint sent a record to be whitelisted.
+     * Modify the blacklist.
      *
-     * @param array $data The array to check for fields to whitelist.
+     * @param array $fields The fields to add to the blacklist.
      */
-    private function checkSentWhitelist($data) {
-        if (isset($data['api-allow'])) {
-            foreach ($data['api-allow'] as $key => $value) {
-                $searchKey = array_search($value, $this->blacklist);
-                if ($searchKey !== false) {
-                    unset($this->blacklist[$searchKey]);
-                }
-            }
-        }
+    protected function modifyBlacklist(array $fields) {
+        $this->blacklist = array_merge($this->blacklist, $fields);
     }
 }

@@ -27,7 +27,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 
 enum TitleBarBorderType {
@@ -688,7 +688,7 @@ export const titleBarClasses = useThemeCache(() => {
     const desktopNavWrap = style("desktopNavWrap", {
         position: "relative",
         flexGrow: 1,
-        ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
+        $nest: addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any,
     });
 
     const logoCenterer = style("logoCenterer", {
@@ -790,20 +790,18 @@ export const titleBarHomeClasses = useThemeCache(() => {
         flexBasis: vars.button.size,
     });
 
-    const bottom = style(
-        "bottom",
-        {
-            position: "relative",
-            backgroundColor: colorOut(vars.bottomRow.bg),
-            height: unit(vars.sizing.height),
-            width: percent(100),
-            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
-        },
-        mediaQueries.oneColumnDown({
-            height: px(vars.sizing.mobile.height),
+    const bottom = style("bottom", {
+        position: "relative",
+        backgroundColor: colorOut(vars.bottomRow.bg),
+        width: percent(100),
+        height: px(vars.sizing.mobile.height),
+        $nest: {
             ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any),
-        }),
-    );
+            [`.${titleBarClasses().linkButton}`]: {
+                backgroundColor: colorOut(globalVars.elementaryColors.transparent),
+            },
+        },
+    });
 
     return {
         root,
@@ -832,22 +830,20 @@ export const addGradientsToHintOverflow = (width: number | string, color: ColorH
         )} 20%, ${colorOut(color)} 90%)`;
     };
     return {
-        $nest: {
-            "&:after": {
-                ...absolutePosition.topRight(),
-                background: gradient("right"),
-            },
-            "&:before": {
-                ...absolutePosition.topLeft(),
-                background: gradient("left"),
-            },
-            "&:before, &:after": {
-                ...pointerEvents(),
-                content: quote(``),
-                height: percent(100),
-                width: unit(width),
-                zIndex: 1,
-            },
+        "&:after": {
+            ...absolutePosition.topRight(),
+            background: gradient("right"),
+        },
+        "&:before": {
+            ...absolutePosition.topLeft(),
+            background: gradient("left"),
+        },
+        "&:before, &:after": {
+            ...pointerEvents(),
+            content: quote(``),
+            height: percent(100),
+            width: unit(width),
+            zIndex: 1,
         },
     };
 };

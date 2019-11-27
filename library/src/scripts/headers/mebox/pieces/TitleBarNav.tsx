@@ -77,15 +77,13 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
         return (
             <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
                 <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
-                    {this.props.children ? <React.Fragment key={"-1"}>{this.props.children}</React.Fragment> : content}
-                    {this.props.excludeExtraNavItems ??
-                        TitleBarNav.extraNavItems.map((ComponentClass, i) => {
-                            return (
-                                <React.Fragment key={i}>
-                                    <ComponentClass />
-                                </React.Fragment>
-                            );
-                        })}
+                    {this.props.children ? this.props.children : content}
+                    <>
+                        {this.props.excludeExtraNavItems ??
+                            TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                                return <ComponentClass key={i} />;
+                            })}
+                    </>
                 </ul>
             </nav>
         );

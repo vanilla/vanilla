@@ -41,15 +41,8 @@ export const meBoxClasses = useThemeCache(() => {
         borderRadius: unit(globalVars.border.radius),
     });
 
-    const rootFlexClass = (count: number) => {
-        return style("footFlexClass", {
-            flexBasis: unit(count * formElementsVariables().sizing.height),
-        });
-    };
-
     return {
         root,
         buttonContent,
-        rootFlexClass,
     };
 });

@@ -599,3 +599,17 @@ export function TranslateIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
+
+export function HamburgerIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.hamburger, props.className)} viewBox="0 0 21.999 15.871" aria-hidden="true">
+            <title>{props.title ? props.title : t("Menu")}</title>
+            <path
+                d="M21.111,8.9H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849m0-7.012H.89A.906.906,0,0,1,0,.97.907.907,0,0,1,.889.045H21.11A.907.907,0,0,1,22,.969a.907.907,0,0,1-.889.924m0,14.023H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849"
+                transform="translate(0 -0.045)"
+                style={{ fill: "currentcolor" }}
+            />
+        </svg>
+    );
+}

@@ -27,7 +27,7 @@
 .embedExternal-content {
     position: relative;
     margin: auto;
-    width: $embed_width;
+    width: $embed_image_max_width;
     max-width: 100%;
     text-align: center;
     box-sizing: border-box;

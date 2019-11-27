@@ -314,9 +314,10 @@ if (!function_exists('buttonGroup')) {
      *  - Url: The url of the link.
      * @param string|array $cssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
      * @param string|false $default The url of the default link.
+     * @param bool $reorder Reorder HTML for easier styling
      * @since 2.1
      */
-    function buttonGroup($links, $cssClass = 'Button', $default = false) {
+    function buttonGroup($links, $cssClass = 'Button', $default = false, bool $reorder = false) {
         if (!is_array($links) || count($links) < 1) {
             return;
         }
@@ -355,19 +356,27 @@ if (!function_exists('buttonGroup')) {
         } else {
             // NavButton or Button?
             $buttonClass = concatSep(' ', $buttonClass, strpos($cssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
+            $toggleButton = anchor(sprite('SpDropdownHandle', 'Sprite', t('Expand for more options.')), '#', $buttonClass.' Handle');
             if (strpos($cssClass, 'Primary') !== false) {
                 $buttonClass .= ' Primary';
             }
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup Multi '.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
+
             echo anchor($text, $url, $buttonClass);
+            if ($reorder) {
+                echo $toggleButton;
+            }
 
             echo '<ul class="Dropdown MenuItems">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
             echo '</ul>';
-            echo anchor(sprite('SpDropdownHandle', 'Sprite', t('Expand for more options.')), '#', $buttonClass.' Handle');
+
+            if (!$reorder) {
+                echo $toggleButton;
+            }
 
             echo '</div>';
         }

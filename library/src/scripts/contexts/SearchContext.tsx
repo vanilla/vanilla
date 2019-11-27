@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -42,6 +42,10 @@ export interface ISearchOptionProvider {
 
 export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
+}
+
+export function useSearch() {
+    return useContext(SearchContext);
 }
 
 /**

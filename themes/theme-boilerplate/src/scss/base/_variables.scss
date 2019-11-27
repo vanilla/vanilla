@@ -75,7 +75,7 @@ $userContent-fontSizeH6:                .85em !default;
 $global-heading_topMargin:              1.5 * $global-medium_fontSize;
 $global-block_margin:                   $userContent_fontSize !default;
 
-$global-main_width:                     1272px !default;
+$global-main_width:                     1236px !default; // To match KB
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
 $global-default_timing:                 0.35s !default;
 

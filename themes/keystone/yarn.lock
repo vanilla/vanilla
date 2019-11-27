@@ -3,9 +3,9 @@
 
 
 "@vanillaforums/theme-boilerplate@^1.0.10":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.1.1.tgz#b9867dd785067f7e858e49e55181de8d3c154559"
-  integrity sha512-cANsRdPr5ksh6jRlOlDnZIot3feXfxMehjyLl/jr/nnSpfqLVlabwUbiOGOni2yupDlpGUcHdu59PXVzrKTdcw==
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.2.5.tgz#693bf53e631ce211ebffa91bd16e958601ac3100"
+  integrity sha512-jj5UuUZVU+ZBjJA7J4VYmFlkAvpvDeUxa0XGrhcef7j1Zf5PGsecKjoe6GdIQCo5jcnGtC9TzoYWM+j3G/otwg==
   dependencies:
     fs-extra "^7.0.0"
 
@@ -19,9 +19,9 @@ fs-extra@^7.0.0:
     universalify "^0.1.0"
 
 graceful-fs@^4.1.2, graceful-fs@^4.1.6:
-  version "4.1.15"
-  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
-  integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
+  integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
 jsonfile@^4.0.0:
   version "4.0.0"

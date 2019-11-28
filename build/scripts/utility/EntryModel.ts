@@ -88,13 +88,13 @@ export default class EntryModel {
         for (const entryDir of this.entryDirs) {
             const commonEntry = await this.lookupEntry(entryDir, "common");
             if (commonEntry !== null) {
-                const addonName = path.basename(commonEntry.addonPath);
+                const addonName = path.basename(commonEntry.addonPath).toLowerCase();
                 entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
             }
 
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
-                const addonName = path.basename(entry.addonPath);
+                const addonName = path.basename(entry.addonPath).toLowerCase();
                 entries[`addons/${addonName}`] = [PUBLIC_PATH_SOURCE_FILE, entry.entryPath];
             }
         }
@@ -211,11 +211,11 @@ export default class EntryModel {
         // Filter only the enabled addons for a development build.
         if (this.options.mode === BuildMode.DEVELOPMENT) {
             addonKeyList = addonKeyList.filter(addonPath => {
-                const addonKey = path.basename(addonPath);
+                const addonKey = path.basename(addonPath).toLowerCase();
 
                 // Check if we have a case-insensitive addon key match.
                 return this.options.enabledAddonKeys.some(val => {
-                    if (val.toLowerCase() === addonKey.toLowerCase()) {
+                    if (val.toLowerCase() === addonKey) {
                         return true;
                     }
                     return false;

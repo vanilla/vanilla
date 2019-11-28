@@ -61,7 +61,7 @@ class ActivityController extends Gdn_Controller {
         // Add Modules
         $this->addModule('GuestModule');
         $this->addModule('SignedInModule');
-
+        $this->canonicalUrl('/activity');
         parent::initialize();
         Gdn_Theme::section('ActivityList');
         $this->setData('Breadcrumbs', [['Name' => t('Activity'), 'Url' => '/activity']]);
@@ -106,7 +106,7 @@ class ActivityController extends Gdn_Controller {
      *
      * @param int $offset Number of activity items to skip.
      */
-    public function index($filter = false, $page = false) {
+    public function index($filter = 'feed', $page = false) {
         switch (strtolower($filter)) {
             case 'mods':
                 $this->title(t('Recent Moderator Activity'));

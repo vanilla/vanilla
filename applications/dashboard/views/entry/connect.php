@@ -122,17 +122,15 @@ if (!$hasUserID) {
                     // Found User's Name in GDN_User.
                     if (count($ExistingUsers) >= 1 && !$NoConnectName){
                         echo $this->Form->label('Username', 'ConnectName');
-                        if (count($ExistingUsers) > 0 && !$NoConnectName) {
-                            $connectInstructions = (count($ExistingUsers) > 1) ? \Gdn::translate('If you created one of these users, log in as them. If not choose a new name.') :  \Gdn::translate('If you created this user, log in as them. If not choose a new name.');
-                            echo $connectInstructions;
-                            $connectNameMessage = (!$allowConnect) ? '' : \Gdn::translate(' <span class="FinePrint">(Requires a password)</span>');
-                            foreach ($ExistingUsers as $Row) {
-                                echo wrap($this->Form->radio('UserSelect', $Row['Name'] . $connectNameMessage, ['value' => $Row['UserID'], 'class' => 'existingConnectName']), 'div');
-                            }
-                            $connectChooseName = ' <span class="FinePrint">('.\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.').')</span>';
-                            echo wrap($this->Form->radio('UserSelect', 'Other'.$connectChooseName, ['value' => 'other']), 'div');
-                            echo $this->Form->textbox('ConnectName');
+                        $connectInstructions = \Gdn::translate('One or more users with your name already exist, would you like to connect as them?');
+                        echo $connectInstructions;
+                        $connectNameMessage = (!$allowConnect) ? '' : \Gdn::translate(' <span class="FinePrint">(Requires a password)</span>');
+                        foreach ($ExistingUsers as $Row) {
+                            echo wrap($this->Form->radio('UserSelect', $Row['Name'] . $connectNameMessage, ['value' => $Row['UserID'], 'class' => 'existingConnectName']), 'div');
                         }
+                        $connectChooseName = ' <span class="FinePrint">('.\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.').')</span>';
+                        echo wrap($this->Form->radio('UserSelect', 'Other'.$connectChooseName, ['value' => 'other']), 'div');
+                        echo $this->Form->textbox('ConnectName');
                     }
 
                     // No Name was passed over SSO and...

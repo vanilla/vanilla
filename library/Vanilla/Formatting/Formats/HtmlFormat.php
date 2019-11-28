@@ -404,6 +404,9 @@ HTML;
         $htmlBodyString = preg_replace('/^<body>/', '', $htmlBodyString);
         $htmlBodyString = preg_replace('/<\/body>$/', '', $htmlBodyString);
 
+        $htmlBodyString = preg_replace('/<\/br>/', '', $htmlBodyString);
+
+
         return $htmlBodyString;
     }
 

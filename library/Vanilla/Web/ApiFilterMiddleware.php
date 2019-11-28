@@ -12,11 +12,12 @@ use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
 
 /**
- * Class ApiFilterMiddleWare A middleware to filter api v2 response.
+ * Class ApiFilterMiddleWare A middleware to filter api v2 responses.
  *
  * @package Vanilla\Web
  */
 class ApiFilterMiddleware {
+    
     /**
      * @var array The blacklisted fields.
      */

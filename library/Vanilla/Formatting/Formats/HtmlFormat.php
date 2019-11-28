@@ -403,9 +403,8 @@ HTML;
         // The DOM Document added starting body and ending tags. We need to remove them.
         $htmlBodyString = preg_replace('/^<body>/', '', $htmlBodyString);
         $htmlBodyString = preg_replace('/<\/body>$/', '', $htmlBodyString);
-
+        // saveXML adds closing <br> tags, which breaks formatting.
         $htmlBodyString = preg_replace('/<\/br>/', '', $htmlBodyString);
-
 
         return $htmlBodyString;
     }

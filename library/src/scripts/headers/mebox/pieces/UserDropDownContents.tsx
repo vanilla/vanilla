@@ -47,9 +47,18 @@ function UserDropDownContents(props: IProps) {
                     name={t("Bookmarks")}
                     count={getCountByName("Bookmarks")}
                 />
-                <Permission permission="articles.add">
-                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
-                </Permission>
+                {props.draftLinkToForum ? (
+                    <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} />
+                ) : (
+                    <Permission permission="articles.add">
+                        <DropDownItemLinkWithCount
+                            to="/kb/drafts"
+                            name={t("Drafts")}
+                            count={getCountByName("Drafts")}
+                        />
+                    </Permission>
+                )}
+
                 <DropDownItemLinkWithCount
                     to="/discussions/mine"
                     name={t("My Discussions")}
@@ -86,6 +95,7 @@ function UserDropDownContents(props: IProps) {
 
 interface IOwnProps {
     className?: string;
+    draftLinkToForum?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

@@ -61,7 +61,6 @@ class ActivityController extends Gdn_Controller {
         // Add Modules
         $this->addModule('GuestModule');
         $this->addModule('SignedInModule');
-        $this->canonicalUrl('/activity');
         parent::initialize();
         Gdn_Theme::section('ActivityList');
         $this->setData('Breadcrumbs', [['Name' => t('Activity'), 'Url' => '/activity']]);

@@ -154,6 +154,19 @@ storiesOf("User Content", module).add("Text", () => {
            <a href="https://vanillaforums.com/" rel="nofollow"><strong>link</strong></a><strong>.</strong>
          </li>
        </ol>
+                       
+        <div class="bbcode_left">
+            <img src="https://dev.vanilla.localhost/uploads/editor/37/vzq1szkp3y6o.jpg" class="embedImage-img importedEmbed-img"/>
+        </div>
+        
+        <div class="bbcode_center">
+            <img src="https://dev.vanilla.localhost/uploads/editor/37/vzq1szkp3y6o.jpg" class="embedImage-img importedEmbed-img"/>
+        </div>
+        
+        <div class="bbcode_right">
+            <img src="https://dev.vanilla.localhost/uploads/editor/37/vzq1szkp3y6o.jpg" class="embedImage-img importedEmbed-img"/>
+        </div>
+
        `;
     return (
         <StoryContent>

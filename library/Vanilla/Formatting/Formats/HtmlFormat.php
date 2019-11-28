@@ -398,7 +398,7 @@ HTML;
         self::cleanupInlineCodeBlocks($inlineCodeBlocks);
 
         $content = $dom->getElementsByTagName('body');
-        $htmlBodyString = @$dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
+        $htmlBodyString = @$dom->saveXML($content[0]);
 
         // The DOM Document added starting body and ending tags. We need to remove them.
         $htmlBodyString = preg_replace('/^<body>/', '', $htmlBodyString);

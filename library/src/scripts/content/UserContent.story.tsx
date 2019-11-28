@@ -155,6 +155,9 @@ storiesOf("User Content", module).add("Text", () => {
          </li>
        </ol>
                        
+                       
+       <h2>Legacy Code - BB Code</h2>
+                       
         <div class="bbcode_left">
             <img src="https://dev.vanilla.localhost/uploads/editor/37/vzq1szkp3y6o.jpg" class="embedImage-img importedEmbed-img"/>
         </div>
@@ -166,7 +169,24 @@ storiesOf("User Content", module).add("Text", () => {
         <div class="bbcode_right">
             <img src="https://dev.vanilla.localhost/uploads/editor/37/vzq1szkp3y6o.jpg" class="embedImage-img importedEmbed-img"/>
         </div>
-
+        
+        <h2>Legacy Code - Quote</h2>
+        
+        <blockquote class="Quote UserQuote blockquote">
+            <div class="blockquote-content">
+                <a rel="nofollow" href="/en-hutch/profile/jungleroomx">jungleroomx</a> wrote: <a rel="nofollow" href="/en-hutch/discussion/comment/41906549#Comment_41906549" class="QuoteLink">»</a>
+            </div>
+            <div class="blockquote-content">
+                <blockquote class="Quote UserQuote blockquote">
+                    <div class="blockquote-content">
+                        <a rel="nofollow" href="/en-hutch/profile/jungleroomx">jungleroomx</a> wrote: <a rel="nofollow" href="/en-hutch/discussion/231710" class="QuoteLink">»</a>
+                    </div>
+                    <div class="blockquote-content">Looks like quote trees aren't working properly, and the little indicator that a thread has been read is no longer functional.  Both Firefox and Chrome desktop.</div>
+                </blockquote>
+                <br><br>
+                Just as an example
+            </div>
+        </blockquote>
        `;
     return (
         <StoryContent>

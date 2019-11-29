@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { borders, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
+import { percent, px, em } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const embedContainerVariables = useThemeCache(() => {
@@ -105,7 +105,7 @@ export const embedContainerClasses = useThemeCache(() => {
 
     const title = style("title", {
         $nest: {
-            "&&": {
+            "&&&": {
                 // Nested for compatibility.
                 fontSize: unit(vars.title.size),
                 fontWeight: vars.title.weight,

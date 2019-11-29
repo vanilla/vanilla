@@ -52,7 +52,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
                 vendors: {
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /[\\/]node_modules[\\/](?!quill)/,
                     minSize: 30000,
                     reuseExistingChunk: true,
                     // If name is explicitly specified many different vendors~someOtherChunk combined
@@ -63,7 +63,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 },
                 shared: {
                     // Our library files currently only come from the dashboard.
-                    test: /[\\/]library[\\/]src[\\/]scripts[\\/]/,
+                    test: /([\\/]library[\\/]src[\\/]scripts[\\/]|@vanilla[\\/])/,
                     minSize: 30000,
                     // If name is explicitly specified many different shared~someOtherChunk combined
                     // chunk bundles will get outputted.
@@ -91,6 +91,9 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                       terserOptions: {
                           warnings: false,
                           ie8: false,
+                          output: {
+                              comments: false,
+                          },
                       },
                       parallel: true,
                       sourceMap: true, // set to true if you want JS source maps

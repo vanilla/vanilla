@@ -30,6 +30,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac 
 story.add("Message", () => {
     const classesMessages = messagesClasses();
     const [shortMessageFlag, setShortMessageFlag] = useState(true);
+    const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
     const [longMessageFlag, setLongMessageFlag] = useState(true);
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
     const _shortMessage = shortMessageFlag && (
@@ -87,6 +88,25 @@ story.add("Message", () => {
             stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
         />
     );
+    const _messageWithTitle = messageWithTitleFlag && (
+        <Message
+            title="Vanilla Forums"
+            contents={
+                <div className={classesMessages.content}>
+                    <AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />
+                    <div>
+                        <Translate source={message} />
+                    </div>
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
+            stringContents={t(message)}
+        />
+    );
+
     const _fixedMessage = fixedMessageFlag && (
         <Message
             isFixed={true}
@@ -121,6 +141,8 @@ story.add("Message", () => {
                 {_longMessage}
                 <StoryHeading>Message with link</StoryHeading>
                 {_messageWithLink}
+                <StoryHeading>Message with Title</StoryHeading>
+                {_messageWithTitle}
                 <div
                     style={{
                         height: 450,

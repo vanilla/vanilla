@@ -46,8 +46,8 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $this->cspModel->addProvider($defaultProvider);
         $header = $this->cspModel->getHeaderString();
         $this->assertStringEndsWith('\'self\'', $header);
-        $this->assertContains('frame-ancestors ', $header);
-        $this->assertNotContains('unsafe-eval', $header);
+        $this->assertStringContainsString('frame-ancestors ', $header);
+        $this->assertStringNotContainsString('unsafe-eval', $header);
     }
 
     /**
@@ -64,8 +64,8 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $this->cspModel->addProvider($defaultProvider);
         $header = $this->cspModel->getHeaderString();
         $this->assertStringEndsWith('\'self\'', $header);
-        $this->assertContains('frame-ancestors ', $header);
-        $this->assertNotContains('unsafe-eval', $header);
+        $this->assertStringContainsString('frame-ancestors ', $header);
+        $this->assertStringNotContainsString('unsafe-eval', $header);
     }
 
     /**
@@ -77,8 +77,8 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $this->cspModel->addProvider($embedWhiteListProvider);
         $header = $this->cspModel->getHeaderString();
         $this->assertStringEndsWith('https://www.instagram.com/embed.js', $header);
-        $this->assertNotContains('unsafe-eval', $header);
-        $this->assertNotContains('frame-ancestors ', $header);
+        $this->assertStringNotContainsString('unsafe-eval', $header);
+        $this->assertStringNotContainsString('frame-ancestors ', $header);
     }
 
     /**
@@ -90,7 +90,7 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $assetProvider->setHotReloadEnabled(true);
         $webpackProvider = new WebpackContentSecurityPolicyProvider($assetProvider);
         $this->cspModel->addProvider($webpackProvider);
-        $this->assertContains('unsafe-eval', $this->cspModel->getHeaderString());
+        $this->assertStringContainsString('unsafe-eval', $this->cspModel->getHeaderString());
     }
 
     /**
@@ -114,9 +114,9 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $webpackProvider = new WebpackContentSecurityPolicyProvider($assetProvider);
         $this->cspModel->addProvider($webpackProvider);
         $header = $this->cspModel->getHeaderString();
-        $this->assertContains('\'self\'', $header);
-        $this->assertContains('https://www.instagram.com/embed.js', $header);
-        $this->assertContains('frame-ancestors ', $header);
-        $this->assertContains('unsafe-eval', $header);
+        $this->assertStringContainsString('\'self\'', $header);
+        $this->assertStringContainsString('https://www.instagram.com/embed.js', $header);
+        $this->assertStringContainsString('frame-ancestors ', $header);
+        $this->assertStringContainsString('unsafe-eval', $header);
     }
 }

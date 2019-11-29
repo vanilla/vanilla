@@ -52,7 +52,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
                 vendors: {
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /[\\/]node_modules[\\/](?!quill)/,
                     minSize: 30000,
                     reuseExistingChunk: true,
                     // If name is explicitly specified many different vendors~someOtherChunk combined
@@ -63,7 +63,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 },
                 shared: {
                     // Our library files currently only come from the dashboard.
-                    test: /[\\/]library[\\/]src[\\/]scripts[\\/]/,
+                    test: /([\\/]library[\\/]src[\\/]scripts[\\/]|@vanilla[\\/])/,
                     minSize: 30000,
                     // If name is explicitly specified many different shared~someOtherChunk combined
                     // chunk bundles will get outputted.
@@ -118,9 +118,11 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {
-        baseConfig.plugins!.push(new BundleAnalyzerPlugin({
-            analyzerPort: analyzePort,
-        }) as any);
+        baseConfig.plugins!.push(
+            new BundleAnalyzerPlugin({
+                analyzerPort: analyzePort,
+            }) as any,
+        );
         analyzePort++;
     }
 

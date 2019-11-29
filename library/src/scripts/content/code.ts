@@ -57,7 +57,7 @@ function importHLJS(): Promise<HLJS> {
 
     const innerImport = async () => {
         // Lazily initialize this because it can be rather heavy.
-        const hljs = await import("@library/content/highlightJS" /* webpackChunkName: "highlightJs" */);
+        const hljs = await import("@library/content/highlightJs" /* webpackChunkName: "highlightJs" */);
 
         // Start fetching the styles.
         const vars = globalVariables();

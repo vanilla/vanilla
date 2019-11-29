@@ -6,12 +6,24 @@
 const { resolve } = require;
 
 module.exports = api => {
+    const isTest = api.env("test");
     const isJest = !!process.env.JEST;
 
     let envOptions = {
         useBuiltIns: false,
         modules: false,
     };
+
+    const runtimePlugins = isTest || isJest
+        ? []
+        : [
+              [
+                  resolve("@babel/plugin-transform-runtime"),
+                  {
+                      useESModules: true,
+                  },
+              ],
+          ];
 
     if ((process.env.NODE_ENV = "production" || process.env.DEV_COMPAT === "compat")) {
         envOptions.targets = "ie > 10, last 4 versions, not dead, safari 8";
@@ -37,6 +49,7 @@ module.exports = api => {
             resolve("@babel/plugin-syntax-dynamic-import"),
             resolve("@babel/plugin-proposal-nullish-coalescing-operator"),
             resolve("@babel/plugin-proposal-optional-chaining"),
+            ...runtimePlugins,
         ],
     };
 

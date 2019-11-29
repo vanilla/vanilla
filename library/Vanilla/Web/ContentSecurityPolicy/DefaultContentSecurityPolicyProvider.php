@@ -30,10 +30,7 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
     public function getPolicies(): array {
         $policies = [];
         $policies = array_merge($policies, $this->getScriptSources());
-
-        if ($this->config->get("Garden.Embed.Allow")) {
-            $policies = array_merge($policies, $this->getFrameAncestors());
-        }
+        $policies = array_merge($policies, $this->getFrameAncestors());
 
         return $policies;
     }
@@ -55,15 +52,17 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
     */
     private function getFrameAncestors(): array {
         $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, '\'self\'');
-        $whitelist = $this->config->get('Garden.TrustedDomains', false);
-        $trusteddDomains = is_string($whitelist) ? array_filter(explode("\n", $whitelist)) : [];
-        if (count($trusteddDomains) > 0) {
-            $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, implode(' ', $trusteddDomains));
-        } else {
-            $remoteUrl = $this->config->get("Garden.Embed.RemoteUrl", false);
-            $remoteDomain = is_string($remoteUrl) ? parse_url($remoteUrl, PHP_URL_HOST) : false;
-            if (is_string($remoteDomain)) {
-                $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, $remoteDomain);
+        if ($this->config->get("Garden.Embed.Allow")) {
+            $whitelist = $this->config->get('Garden.TrustedDomains', false);
+            $trusteddDomains = is_string($whitelist) ? array_filter(explode("\n", $whitelist)) : [];
+            if (count($trusteddDomains) > 0) {
+                $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, implode(' ', $trusteddDomains));
+            } else {
+                $remoteUrl = $this->config->get("Garden.Embed.RemoteUrl", false);
+                $remoteDomain = is_string($remoteUrl) ? parse_url($remoteUrl, PHP_URL_HOST) : false;
+                if (is_string($remoteDomain)) {
+                    $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, $remoteDomain);
+                }
             }
         }
         return $scriptSrcPolicies;

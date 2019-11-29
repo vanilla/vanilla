@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 
-storiesOf("User Content", module).add("Text", () => {
+storiesOf("User Content", module).add("Content", () => {
     const content = `
         <h1>h1</h1>
         <h2>h2</h2>
@@ -159,21 +159,6 @@ storiesOf("User Content", module).add("Text", () => {
            <a href="https://vanillaforums.com/" rel="nofollow"><strong>link</strong></a><strong>.</strong>
          </li>
        </ol>
-                       
-                       
-       <h2>Legacy Code - BB Code</h2>
-                       
-        <div class="bbcode_left">
-            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
-        </div>
-        
-        <div class="bbcode_center">
-            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
-        </div>
-        
-        <div class="bbcode_right">
-            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
-        </div>
        `;
     return <UserContent content={content} />;
 });

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models\SSOModel;
 
+use Garden\Web\Exception\ForbiddenException;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
@@ -113,7 +114,7 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
             $this->createSSOData($user['Name'], $user['Email'])
         );
 
-        $this->assertInternalType('array', $linkedUser);
+        $this->assertIsArray($linkedUser);
 
         foreach($user as $field => $value) {
             if ($field === 'Password') {
@@ -126,11 +127,11 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
 
     /**
      * Try to link a user using the session while there's no user signed in.
-     *
-     * @expectedException \Garden\Web\Exception\ForbiddenException
-     * @expectedExceptionMessage Cannot link user from session while not signed in.
      */
     public function testLinkUserWNoSession() {
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('Cannot link user from session while not signed in.');
+
         $user = self::$users['default'];
 
         /** @var \Gdn_Session $session */

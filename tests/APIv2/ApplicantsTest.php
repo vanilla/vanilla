@@ -51,11 +51,11 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * Approving a user application.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The applicant specified is already an active user.
      */
     public function testApprove() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The applicant specified is already an active user.');
+
         $row = $this->testPost();
 
         // This user isn't in the Member role...

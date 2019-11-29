@@ -64,10 +64,10 @@ class DiscussionModelTest extends TestCase {
 
     /**
      * An invalid archive date should throw an exception.
-     *
-     * @expectedException \Exception
      */
     public function testInvalidArchiveDate() {
+        $this->expectException(\Exception::class);
+
         $this->model->setArchiveDate('dnsfids');
     }
 

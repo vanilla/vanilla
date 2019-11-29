@@ -226,11 +226,11 @@ class CategoriesTest extends AbstractResourceTest {
 
     /**
      * Verify the proper exception is thrown when moving to a category that doesn't exist.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The new parent category could not be found.
      */
     public function testMoveParentDoesNotExist() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The new parent category could not be found.');
+
         $row = $this->api()->post(
             $this->baseUrl,
             [

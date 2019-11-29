@@ -7,6 +7,9 @@
 
 namespace VanillaTests\Models\SSOModel;
 
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
@@ -122,7 +125,7 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
             $user['Password']
         );
 
-        $this->assertInternalType('array', $linkedUser);
+        $this->assertIsArray($linkedUser);
 
         foreach($user as $field => $value) {
             if ($field === 'Password') {
@@ -135,11 +138,11 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
 
     /**
      * Try to link a user with bad credentials.
-     *
-     * @expectedException \Garden\Web\Exception\ClientException
-     * @expectedExceptionMessage The password validation failed.
      */
     public function testLinkUserBadPassword() {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('The password validation failed.');
+
         $user = self::$users['default'];
 
         self::$ssoModel->linkUserFromCredentials(
@@ -153,9 +156,6 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     /**
      * Test linking a user with Garden.Registration.AllowConnect = false.
      *
-     * @expectedException \Garden\Web\Exception\ServerException
-     * @expectedExceptionMessage Liking user is not allowed.
-     *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Schema\ValidationException
@@ -164,6 +164,9 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
      * @throws \Garden\Web\Exception\ServerException
      */
     public function testAllowConnectDisabled() {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage('Liking user is not allowed.');
+
         /** @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
         $config->set('Garden.Registration.AllowConnect', false);
@@ -183,10 +186,12 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * @expectedException \Garden\Schema\ValidationException
-     * @expectedExceptionMessageRegExp /^You need to reset your password\./
+     * You need to reset your password.
      */
     public function testUserHashMethodReset() {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('You need to reset your password.');
+
         $user = self::$users['reset'];
 
         self::$ssoModel->linkUserFromCredentials(
@@ -198,10 +203,12 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * @expectedException \Garden\Schema\ValidationException
-     * @expectedExceptionMessageRegExp /^Your account does not have a password assigned to it yet\./
+     * Your account does not have a password assigned to it yet.
      */
     public function testUserHashMethodRandom() {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Your account does not have a password assigned to it yet.');
+
         $user = self::$users['random'];
 
         self::$ssoModel->linkUserFromCredentials(

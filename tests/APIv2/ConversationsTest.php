@@ -60,12 +60,12 @@ class ConversationsTest extends AbstractAPIv2Test {
     /**
      * Test GET /conversations/<id>.
      *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
-     *
      * @return array
      */
     public function testGet() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+
         $postedConversation = $this->testPost();
 
         $result = $this->api()->get(
@@ -100,12 +100,12 @@ class ConversationsTest extends AbstractAPIv2Test {
 
     /**
      * Test GET /conversations/<id>/participants.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testGetParticipants() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(403);
+        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+
         $conversation = $this->testPostParticipants();
 
         $result = $this->api()->get(
@@ -129,12 +129,12 @@ class ConversationsTest extends AbstractAPIv2Test {
 
     /**
      * Test GET /conversations.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testIndex() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(403);
+        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+
         $nbsInsert = 3;
 
         // Insert a few rows.
@@ -247,13 +247,13 @@ class ConversationsTest extends AbstractAPIv2Test {
     /**
      * Test POST /conversations/<id>/participants.
      *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
-     *
      * @return array The conversation.
      */
     public function testPostParticipants() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(403);
+        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+
         $conversation = $this->testPost();
 
         $postData = [

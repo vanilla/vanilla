@@ -121,7 +121,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('authenticationStep', $body);
 
         if ($expectedResults['authenticationStep'] === 'authenticated') {

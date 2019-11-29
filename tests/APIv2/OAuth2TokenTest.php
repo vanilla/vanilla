@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\HttpException;
 use PHPUnit\Framework\AssertionFailedError;
 use VanillaTests\TestOAuth\TestOAuthPlugin;
 
@@ -54,11 +55,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * An unconfigured client should not be allowed.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 500
      */
     public function testNotConfigured() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(500);
+
         $this->configureProvider(['AssociationSecret' => '']);
 
         try {
@@ -70,11 +71,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * An inactive client should not be allowed.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 500
      */
     public function testNotActive() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(500);
+
         $this->configureProvider(['Active' => 0]);
 
         $r = $this->postAccessToken();
@@ -82,12 +83,12 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * An inactive client should not be allowed.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage The OAuth client is not allowed to issue access tokens.
      */
     public function testNotAllowed() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The OAuth client is not allowed to issue access tokens.');
+
         $this->configureProvider(['AllowAccessTokens' => false]);
 
         $r = $this->postAccessToken();
@@ -95,23 +96,23 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * A client ID mismatch should be an error.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage An OAuth client with ID "test123" could not be found.
      */
     public function testBadClientID() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('An OAuth client with ID "test123" could not be found.');
+
         $this->configureProvider(['AssociationKey' => 'different']);
         $r = $this->postAccessToken();
     }
 
     /**
      * A bad access token should be forbidden.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 403
      */
     public function testBadToken() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(403);
+
         $r = $this->postAccessToken('foo');
     }
 
@@ -126,11 +127,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * A profile that doesn't return enough user information should be an error.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 400
      */
     public function testBadProfileNoUniqueID() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(400);
+
         try {
             $r = $this->postAccessToken(TestOAuthPlugin::NO_ID_ACCESS_TOKEN);
         } catch (\Exception $ex) {
@@ -140,11 +141,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
     /**
      * A profile that doesn't return enough user information should be an error.
-     *
-     * @expectedException \Garden\Web\Exception\HttpException
-     * @expectedExceptionCode 400
      */
     public function testBadProfileNoUser() {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionCode(400);
+
         $r = $this->postAccessToken(TestOAuthPlugin::NO_USER_ACCESS_TOKEN);
     }
 

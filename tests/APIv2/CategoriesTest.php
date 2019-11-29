@@ -247,11 +247,11 @@ class CategoriesTest extends AbstractResourceTest {
 
     /**
      * Verify the proper exception is thrown when trying to make a category the parent of itself.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage A category cannot be the parent of itself.
      */
     public function testMoveSelfParent() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A category cannot be the parent of itself.');
+
         $row = $this->api()->post(
             $this->baseUrl,
             [
@@ -268,11 +268,11 @@ class CategoriesTest extends AbstractResourceTest {
 
     /**
      * Verify the proper exception is thrown when trying to move a parent under one of its own children.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot move a category under one of its own children.
      */
     public function testMoveUnderChild() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot move a category under one of its own children.');
+
         $row = $this->api()->post(
             $this->baseUrl,
             [

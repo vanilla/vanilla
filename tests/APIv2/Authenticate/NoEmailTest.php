@@ -92,7 +92,7 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('authenticationStep', $body);
         $this->assertEquals('authenticated', $body['authenticationStep']);
 
@@ -105,7 +105,7 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('isUserLinked', $body);
         $this->assertEquals(true, $body['isUserLinked']);
 

@@ -24,6 +24,14 @@ class MessagesAllowModerationTest extends MessagesTest {
     }
 
     /**
+     * Set up tests.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->moderationAllowed = true;
+    }
+
+    /**
      * Test GET /resource/<id>.
      */
     public function testGet() {

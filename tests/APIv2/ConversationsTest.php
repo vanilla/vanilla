@@ -22,6 +22,11 @@ class ConversationsTest extends AbstractAPIv2Test {
     protected $pk = 'conversationID';
 
     /**
+     * @var bool
+     */
+    protected $moderationAllowed = false;
+
+    /**
      * {@inheritdoc}
      */
     public static function setupBeforeClass(): void {
@@ -58,13 +63,20 @@ class ConversationsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test setup.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->moderationAllowed = false;
+    }
+
+    /**
      * Test GET /conversations/<id>.
      *
      * @return array
      */
     public function testGet() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        $this->expectModerationException();
 
         $postedConversation = $this->testPost();
 
@@ -102,9 +114,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test GET /conversations/<id>/participants.
      */
     public function testGetParticipants() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
-        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        $this->expectModerationException();
 
         $conversation = $this->testPostParticipants();
 
@@ -131,9 +141,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test GET /conversations.
      */
     public function testIndex() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
-        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        $this->expectModerationException();
 
         $nbsInsert = 3;
 
@@ -250,9 +258,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      * @return array The conversation.
      */
     public function testPostParticipants() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
-        $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        $this->expectModerationException();
 
         $conversation = $this->testPost();
 
@@ -276,5 +282,16 @@ class ConversationsTest extends AbstractAPIv2Test {
         );
 
         return $updatedConversation;
+    }
+
+    /**
+     * Expect exceptions if conversation moderation isn't allowed.
+     */
+    private function expectModerationException(): void {
+        if (!$this->moderationAllowed) {
+            $this->expectException(\Exception::class);
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        }
     }
 }

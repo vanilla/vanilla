@@ -84,7 +84,7 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testGetHidden($key) {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(404);
+        $this->expectExceptionCode(404);
 
         $this->api()->get("/addons/$key");
     }

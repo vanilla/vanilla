@@ -25,36 +25,10 @@ class ConversationsAllowModerationTest extends ConversationsTest {
     }
 
     /**
-     * Test GET /conversations/<id>.
-     *
-     * @return array
+     * Test setup.
      */
-    public function testGet() {
-        return parent::testGet();
-    }
-
-    /**
-     * Test GET /conversations/<id>/participants.
-     */
-    public function testGetParticipants() {
-        parent::testGetParticipants();
-    }
-
-    /**
-     * Test GET /conversations.
-     *
-     * @return array Returns the fetched data.
-     */
-    public function testIndex() {
-        parent::testIndex();
-    }
-
-    /**
-     * Test POST /conversations/<id>/participants.
-     *
-     * @return array The conversation.
-     */
-    public function testPostParticipants() {
-        return parent::testPostParticipants();
+    public function setUp(): void {
+        parent::setUp();
+        $this->moderationAllowed = true;
     }
 }

@@ -191,11 +191,11 @@ class LinkUserTest extends AbstractAPIv2Test {
 
     /**
      * Test POST /authenticate/link-user with method = register and agreeToTerm = false.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You must agree to the terms of service.
      */
     public function testPostLinkUserMethodRegisterWAgreeToTermFalse() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You must agree to the terms of service.');
+
         $authSessionID = $this->createAuthSessionID();
 
         $result = $this->api()->post($this->baseUrl, [
@@ -211,10 +211,11 @@ class LinkUserTest extends AbstractAPIv2Test {
      * Test DELETE /authenticate/link-user/:authSessionID
      *
      * @depends testGetLinkUser
-     * @expectedException \Exception
-     * @expectedExceptionMessage AuthenticationSession not found.
      */
     public function testDeleteLinkUser() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('AuthenticationSession not found.');
+
         $authSessionID = $this->createAuthSessionID();
 
         $result = $this->api()->delete($this->baseUrl.'/'.$authSessionID);
@@ -245,7 +246,7 @@ class LinkUserTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('authenticationStep', $body);
 
         $this->assertEquals('linkUser', $body['authenticationStep']);

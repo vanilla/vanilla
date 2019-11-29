@@ -83,12 +83,12 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * Approving a user application.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Applicant not found.
      */
     public function testDecline() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Applicant not found.');
+
         $row = $this->testPost();
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}",

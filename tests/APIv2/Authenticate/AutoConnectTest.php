@@ -142,7 +142,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('isUserLinked', $body);
         $this->assertEquals($expectedResults['isUserLinked'], $body['isUserLinked']);
     }

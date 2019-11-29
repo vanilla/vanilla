@@ -4,12 +4,14 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import UserContent from "@library/content/UserContent";
 import { storiesOf } from "@storybook/react";
-import React from "react";
+import { legacyCssDecorator } from "@dashboard/__tests__/legacyCssDecorator";
 
-storiesOf("User Content", module).add("Legacy Content", () => {
-    const content = `  
+storiesOf("User Content", module)
+    .add("Legacy Content", () => {
+        const content = `  
        <h2>Legacy Code - BB Code</h2>
                        
         <div class="bbcode_left">
@@ -42,5 +44,6 @@ storiesOf("User Content", module).add("Legacy Content", () => {
             </div>
         </blockquote>
        `;
-    return <UserContent content={content} />;
-});
+        return <UserContent content={content} />;
+    })
+    .addDecorator(legacyCssDecorator);

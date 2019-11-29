@@ -92,6 +92,7 @@ class ComposerHelper {
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
     public static function postUpdate() {
+        $vanillaRoot = realpath(__DIR__ . "/../../");
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
         if ($skipBuild) {
             printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.\n");
@@ -106,16 +107,19 @@ class ComposerHelper {
         // It even technically works but many packages that support node 10 only want to support the LTS version (10.13.x).
         passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
 
+        // Generate our vendor license file.
+        $licensePath = $vanillaRoot . "/dist/VENDOR_LICENSES.txt";
+        printf("\nGererating Vendor Licenses for build\n");
+        passthru("yarn licenses generate-disclaimer --prod --ignore-engines > $licensePath");
+
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");
             exit($installReturn);
         }
 
-        $vanillaRoot = realpath(__DIR__ . "/../../");
         $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
         $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
         $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
-
 
         // Build bootstrap can be used to configure this build if env variables are not available.
         $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");

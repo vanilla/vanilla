@@ -14,7 +14,7 @@ use Vanilla\Invalid;
 /**
  * Tests for the **Gdn_Validation** object.
  */
-class ValidationTest extends SharedBootstrapTestCase {
+class ValidationTest extends MinimalContainerTestCase {
 
     /**
      * Test the ability to validate a post body's formatting.

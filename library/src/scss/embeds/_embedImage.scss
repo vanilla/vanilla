@@ -22,6 +22,17 @@
     max-height: $embed_image_max_height;
 }
 
+.bbcode_left {
+    .embedImage-img {
+        margin-left: 0,
+    }
+}
+.bbcode_right {
+    .embedImage-img {
+        margin-right: 0,
+    }
+}
+
 .embedImage-link {
     display: inline-flex;
 }

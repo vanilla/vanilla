@@ -17,7 +17,7 @@ import React, { useState, useRef } from "react";
 
 export interface ISelectBoxItem {
     value: string;
-    name: string;
+    name?: string;
     content?: React.ReactNode;
     className?: string;
     icon?: React.ReactNode;
@@ -34,6 +34,7 @@ interface IProps {
     widthOfParent?: boolean;
     openAsModal?: boolean;
     renderLeft?: boolean;
+    offsetPaddingTop?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -52,6 +53,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     const firstValue = props.options.length > 0 ? props.options[0] : null;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const [ownValue, setOwnValue] = useState(firstValue);
+    const { renderLeft = true } = props;
     const selectedOption = props.value || ownValue;
     const onChange = (value: ISelectBoxItem) => {
         const funct = props.onChange || setOwnValue;
@@ -77,6 +79,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                     "selectBox-dropDown",
                     "dropDownItem-verticalPadding",
                     classesDropDown.verticalPadding,
+                    { [classes.noTopPadding]: props.offsetPaddingTop },
                 )}
                 buttonContents={<SelectBoxButton activeItem={selectedOption} />}
                 buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
@@ -85,7 +88,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
                 selfPadded={true}
-                renderLeft={true}
+                renderLeft={renderLeft}
                 horizontalOffset={true}
             >
                 {props.options.map((option, i) => {
@@ -106,7 +109,7 @@ function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
     const { activeItem } = props;
     const classes = selectBoxClasses();
 
-    return activeItem && activeItem.name ? (
+    return activeItem && (activeItem.name || activeItem.content) ? (
         <React.Fragment>
             {activeItem.content || activeItem.name}
             <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />

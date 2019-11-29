@@ -3,10 +3,12 @@
  * @license GPL-2.0-only
  */
 
-$embedded-error_bg: $global-error_bg !default;
-$embed_width: 640px !default;
-$embed_focus_color: $global-color_primary !default;
-$embed-overlay_hover_color: rgba($global-color_bg, .5) !default;
-$embeddedText_padding                               : $global-medium_fontSize;
-$embedded-select_borderWidth                        : 2px;
-$embedded-small_spacing                             : 4px;
+$embedded-error_bg               : $global-error_bg !default;
+$embed_width                     : 640px !default;
+$embed_image_max_width           : 100% !default;
+$embed_image_max_height          : none !default;
+$embed_focus_color               : $global-color_primary !default;
+$embed-overlay_hover_color       : rgba($global-color_bg, .5) !default;
+$embeddedText_padding            : $global-medium_fontSize !default;
+$embedded-select_borderWidth     : 2px !default;
+$embedded-small_spacing          : 4px !default;

@@ -11,6 +11,7 @@ import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
+import KeyboardModule from "quill/modules/keyboard";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */
@@ -52,6 +53,28 @@ export default class VanillaTheme extends ThemeBase {
 
         // Create the newline insertion module.
         void new NewLineClickInsertionModule(this.quill);
+    }
+
+    /**
+     * Override to ensure we get a public update event after the enter key is pressed.
+     * Prevents a "lagging" paragraph menu that doesn't listen to silent events.
+     */
+    public init() {
+        super.init();
+
+        const keyboard = this.quill.getModule("keyboard") as KeyboardModule;
+        keyboard.addBinding(
+            {
+                key: KeyboardModule.keys.ENTER,
+            },
+            {},
+            () => {
+                const selection = this.quill.getSelection();
+                selection.index += 1;
+                this.quill.setSelection(selection, Quill.sources.USER);
+                return true;
+            },
+        );
     }
 
     /**

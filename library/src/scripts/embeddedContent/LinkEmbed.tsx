@@ -33,7 +33,7 @@ export function LinkEmbed(props: IProps) {
     return (
         <EmbedContainer className="embedText embedLink">
             <EmbedContent type="link" inEditor={props.inEditor}>
-                <SmartLink className="embedLink-link" to={url} rel="noreferrer">
+                <SmartLink className="embedLink-link" to={url} rel="nofollow noreferrer ugc">
                     <article className="embedText-body embedLink-body">
                         {linkImage}
                         <div className="embedText-main embedLink-main">

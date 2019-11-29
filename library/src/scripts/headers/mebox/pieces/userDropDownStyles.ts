@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
 export const userDropDownVariables = useThemeCache(() => {
@@ -49,22 +49,24 @@ export const userDropDownVariables = useThemeCache(() => {
 export const userDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = userDropDownVariables();
-    const debug = debugHelper("userDropDown");
+    const style = styleFactory("userDropDown");
 
-    const userCardPhotoLink = style({
-        display: "block",
-        ...debug.name("userCardPhotoLink"),
+    const userCard = style("userCard", {
+        listStyle: "none",
     });
 
-    const userCardPhoto = style({
+    const userCardPhotoLink = style("userCardPhotoLink", {
+        display: "block",
+    });
+
+    const userCardPhoto = style("userCardPhoto", {
         border: `solid 1px ${globalVars.mixBgAndFg(0.3)}`,
         marginTop: unit(vars.userCard.topMargin),
         marginLeft: "auto",
         marginRight: "auto",
-        ...debug.name("userCardPhoto"),
     });
 
-    const userCardName = style({
+    const userCardName = style("userCardName", {
         display: "block",
         color: "inherit",
         fontWeight: vars.userName.fontWeight,
@@ -77,13 +79,17 @@ export const userDropDownClasses = useThemeCache(() => {
         marginLeft: "auto",
         paddingRight: unit(vars.userName.paddingRight),
         paddingLeft: unit(vars.userName.paddingLeft),
-        ...debug.name("userCardName"),
     });
 
-    const contents = style({
+    const contents = style("contents", {
         width: unit(vars.contents.width),
-        ...debug.name("contents"),
     });
 
-    return { userCardPhotoLink, userCardPhoto, userCardName, contents };
+    return {
+        userCardPhotoLink,
+        userCardPhoto,
+        userCardName,
+        contents,
+        userCard,
+    };
 });

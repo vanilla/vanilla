@@ -56,6 +56,7 @@ export interface IProps extends IOpenDirectionProps {
     isSmall?: boolean;
     id?: string;
     horizontalOffset?: boolean;
+    tag?: string;
 }
 
 export enum FlyoutType {
@@ -99,6 +100,7 @@ export default function DropDown(props: IProps) {
             onVisibilityChange={props.onVisibilityChange}
             openAsModal={openAsModal}
             initialFocusElement={props.initialFocusElement}
+            tag={props.tag}
         >
             {params => {
                 return (

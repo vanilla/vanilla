@@ -40,7 +40,9 @@ export function InstagramEmbed(props: IProps): JSX.Element {
                             data-instgrm-permalink={permaLink}
                             data-instgrm-version={props.version}
                         >
-                            <a href={permaLink}>{permaLink}</a>
+                            <a href={permaLink} rel="nofollow noreferrer ugc">
+                                {permaLink}
+                            </a>
                         </blockquote>
                     </div>
                 </div>

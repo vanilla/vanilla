@@ -12,10 +12,9 @@ export async function bootstrapLocales() {
     // Fetch the current locale from meta.
     const currentLocaleValue = getMeta("ui.localeKey", getMeta("ui.locale", null));
     setCurrentLocale(currentLocaleValue);
-
+    loadTranslations(gdn.translations);
     // Register the redux reducer for locales and attempt to fetch them.
     // They may already be preloaded.
     const locales = await fetchLocalesFromApi();
     loadLocales(locales);
-    loadTranslations(gdn.translations);
 }

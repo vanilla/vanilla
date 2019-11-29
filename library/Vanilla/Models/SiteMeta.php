@@ -29,6 +29,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var bool */
     private $debugModeEnabled;
 
+    /** @var bool */
+    private $translationDebugModeEnabled;
+
     /** @var string */
     private $siteTitle;
 
@@ -89,6 +92,7 @@ class SiteMeta implements \JsonSerializable {
         $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+        $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
 
         $this->featureFlags = $config->get('Feature', []);
 
@@ -145,6 +149,7 @@ class SiteMeta implements \JsonSerializable {
                 'basePath' => $this->basePath,
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
+                'translationDebug' => $this->translationDebugModeEnabled,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
@@ -257,7 +262,7 @@ class SiteMeta implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getLogo(): string {
+    public function getLogo(): ?string {
         return $this->logo;
     }
 

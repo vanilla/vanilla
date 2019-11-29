@@ -487,18 +487,20 @@ export function accessibleImageMenu(message?: string, className?: string) {
     );
 }
 
-export function EditIcon(props: { className?: string; title?: string }) {
+export function EditIcon(props: { className?: string; title?: string; small?: boolean }) {
     const classes = iconClasses();
     return (
         <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
             <title>{props.title ? props.title : t("Edit")}</title>
-            <g transform="translate(4, 3)">
-                <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
-                <path
-                    d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
-                    stroke="currentColor"
-                    fill="none"
-                />
+            <g className={classNames({ [classes.isSmall]: props.small })}>
+                <g transform="translate(4, 3)">
+                    <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
+                    <path
+                        d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
+                        stroke="currentColor"
+                        fill="none"
+                    />
+                </g>
             </g>
         </svg>
     );
@@ -593,6 +595,20 @@ export function TranslateIcon(props: { className?: string; title?: string }) {
             <path
                 d="M12.348,6.116h7.7q1.313,0,1.312,1.234v12.7q0,1.47-1.312,1.47H13.635L12,18.02h4.1Zm1.287,15.4,2.817-3.287"
                 style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+        </svg>
+    );
+}
+
+export function HamburgerIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.hamburger, props.className)} viewBox="0 0 21.999 15.871" aria-hidden="true">
+            <title>{props.title ? props.title : t("Menu")}</title>
+            <path
+                d="M21.111,8.9H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849m0-7.012H.89A.906.906,0,0,1,0,.97.907.907,0,0,1,.889.045H21.11A.907.907,0,0,1,22,.969a.907.907,0,0,1-.889.924m0,14.023H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849"
+                transform="translate(0 -0.045)"
+                style={{ fill: "currentcolor" }}
             />
         </svg>
     );

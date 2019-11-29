@@ -66,19 +66,29 @@ class LocalesApiController extends Controller {
      * @return array[]
      */
     private function getEnabledLocales(): array {
-        $locales = [];
-        $locales += $this->localeModel->enabledLocalePacks(true);
-        $result = [[
-            'localeID' => 'en',
-            'localeKey' => 'en',
-            'regionalKey' => 'en',
-        ]];
+        $locales = $this->localeModel->enabledLocalePacks(true);
+
+        $hasEnLocale = false;
+        $result = [];
         foreach ($locales as $localeID => $locale) {
-            $result[] = [
+            $localeItem = [
                 'localeID' => $localeID,
                 'localeKey' => substr($locale['Locale'], 0, 2),
                 'regionalKey' => $locale['Locale'],
             ];
+
+            if ($localeItem['localeKey'] === 'en') {
+                $hasEnLocale = true;
+            }
+            $result[] = $localeItem;
+        }
+
+        if (!$hasEnLocale) {
+            $result = array_merge([[
+                'localeID' => 'en',
+                'localeKey' => 'en',
+                'regionalKey' => 'en',
+            ]], $result);
         }
 
         return $result;

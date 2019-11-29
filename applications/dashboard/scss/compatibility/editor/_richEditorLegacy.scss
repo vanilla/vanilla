@@ -65,7 +65,7 @@ body {
             margin-bottom: $global-block_margin;
         }
 
-        &:first-child:not(br) {
+        &:first-child:not(br):not(.embedExternal) {
             margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }

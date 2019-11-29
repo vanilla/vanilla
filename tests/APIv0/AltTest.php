@@ -43,11 +43,10 @@ class AltTest extends SharedBootstrapTestCase {
 
     /**
      * Test an ALT install with no update token.
-     *
-     * @expectedException Exception
-     * @expectedExceptionCode 403
      */
     public function testAltInstallWithNoUpdateToken() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(403);
         $this->doAltInstallWithUpdateToken(true, 'xkcd', '');
     }
 

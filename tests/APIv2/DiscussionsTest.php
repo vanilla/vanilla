@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
+use Garden\Web\Exception\ForbiddenException;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -205,11 +206,11 @@ class DiscussionsTest extends AbstractResourceTest {
 
     /**
      * The discussion index should fail on a private community with a guest.
-     *
-     * @expectedException Garden\Web\Exception\ForbiddenException
-     * @expectedExceptionMessage You must sign in to the private community.
      */
     public function testIndexPrivateCommunity() {
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You must sign in to the private community.');
+
         $this->runWithPrivateCommunity([$this, 'testIndex']);
     }
 

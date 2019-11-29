@@ -98,7 +98,7 @@ class LinkUserTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('ssoUser', $body);
         $this->assertArrayHasKey('authenticator', $body);
         $this->assertArrayHasKey('config', $body);
@@ -268,7 +268,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertEquals(201, $result->getStatusCode());
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertEquals(1, count($body));
         $this->assertArrayHasKey('user', $body);
         $this->assertEquals($this->currentUser['userID'], $body['user']['userID']);

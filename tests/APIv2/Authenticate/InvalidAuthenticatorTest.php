@@ -37,11 +37,11 @@ class InvalidAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * Test POST /authenticate with an invalid authenticator
-     *
-     * @expectedException Exception
-     * @expectedExceptionMessage Authenticator not found.
      */
     public function testAuthenticate() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Authenticator not found.');
+
         $postData = [
             'authenticate' => [
                 'authenticatorType' => 'invalid',

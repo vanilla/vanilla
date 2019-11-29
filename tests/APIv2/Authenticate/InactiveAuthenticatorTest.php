@@ -56,10 +56,12 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Cannot authenticate with an inactive authenticator.
+     * Cannot authenticate with an inactive authenticator.
      */
     public function testInactiveAuth() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot authenticate with an inactive authenticator.');
+
         $postData = [
             'authenticate' => [
                 'authenticatorType' => $this->authenticator::getType(),

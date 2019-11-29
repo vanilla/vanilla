@@ -61,14 +61,12 @@ export function UserDropDown(props: IProps) {
             flyoutType={FlyoutType.FRAME}
             onVisibilityChange={setOpen}
         >
-            <UserDropDownContents draftLinkToForum={props.draftLinkToForum} />
+            <UserDropDownContents />
         </DropDown>
     );
 }
 
-interface IOwnProps {
-    draftLinkToForum?: boolean;
-}
+interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 

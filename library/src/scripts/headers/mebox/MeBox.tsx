@@ -18,7 +18,6 @@ export interface IMeBoxProps extends IInjectableUserState {
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
-    draftLinkToForum?: boolean;
 }
 
 /**
@@ -35,7 +34,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
             <div className={classNames("meBox", this.props.className, classes.root)}>
                 <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
                 <MessagesDropDown />
-                <UserDropdown draftLinkToForum={this.props.draftLinkToForum} />
+                <UserDropdown />
             </div>
         );
     }

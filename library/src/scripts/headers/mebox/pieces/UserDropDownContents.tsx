@@ -13,7 +13,6 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -47,18 +46,9 @@ function UserDropDownContents(props: IProps) {
                     name={t("Bookmarks")}
                     count={getCountByName("Bookmarks")}
                 />
-                {props.draftLinkToForum ? (
-                    <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} />
-                ) : (
-                    <Permission permission="articles.add">
-                        <DropDownItemLinkWithCount
-                            to="/kb/drafts"
-                            name={t("Drafts")}
-                            count={getCountByName("Drafts")}
-                        />
-                    </Permission>
-                )}
-
+                <Permission permission="articles.add">
+                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                </Permission>
                 <DropDownItemLinkWithCount
                     to="/discussions/mine"
                     name={t("My Discussions")}
@@ -95,7 +85,6 @@ function UserDropDownContents(props: IProps) {
 
 interface IOwnProps {
     className?: string;
-    draftLinkToForum?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

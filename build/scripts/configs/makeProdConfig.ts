@@ -115,9 +115,11 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {
-        baseConfig.plugins!.push(new BundleAnalyzerPlugin({
-            analyzerPort: analyzePort,
-        }) as any);
+        baseConfig.plugins!.push(
+            new BundleAnalyzerPlugin({
+                analyzerPort: analyzePort,
+            }) as any,
+        );
         analyzePort++;
     }
 

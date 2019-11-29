@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
 
@@ -870,7 +871,7 @@ class CommentModel extends Gdn_Model {
                     'UserID' => $userID,
                     'DiscussionID' => $discussion->DiscussionID,
                     'CountComments' => $countWatch,
-                    'DateLastViewed' => Gdn_Format::toDateTime()
+                    'DateLastViewed' => DateTimeFormatter::timeStampToDateTime(time())
                 ]
             );
         }

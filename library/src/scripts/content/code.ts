@@ -6,7 +6,7 @@
 import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
-type HLJS = typeof import("@library/content/highlightJS").default;
+type HLJS = typeof import("@library/content/highlightJs").default;
 
 export function initCodeHighlighting() {
     void highlightCodeBlocks();

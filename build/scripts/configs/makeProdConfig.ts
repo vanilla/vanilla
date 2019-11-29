@@ -91,6 +91,9 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                       terserOptions: {
                           warnings: false,
                           ie8: false,
+                          output: {
+                              comments: false,
+                          },
                       },
                       parallel: true,
                       sourceMap: true, // set to true if you want JS source maps

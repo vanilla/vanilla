@@ -73,11 +73,11 @@ class UrlUtilsTest extends TestCase {
 
     /**
      * Test the domainAsAscii() function using a domain with invalid character.
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Domain Invalid.
      */
     public function testInvalidDomainAsAscii() {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Domain Invalid.');
+
         UrlUtils::domainAsAscii('//goo�gle.com/');
     }
 }

@@ -12,6 +12,8 @@ import { IUsersStoreState, usersReducer } from "@library/features/users/userMode
 import { Reducer, ReducersMapObject, combineReducers } from "redux";
 import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
 import getStore from "@library/redux/getStore";
+import NotificationsModel from "@library/features/notifications/NotificationsModel";
+import ConversationsModel from "@library/features/conversations/ConversationsModel";
 
 const dynamicReducers = {};
 
@@ -31,6 +33,8 @@ export function getReducers(): ReducersMapObject<any, any> {
         users: usersReducer,
         theme: themeReducer,
         locales: localeReducer,
+        notifications: new NotificationsModel().reducer,
+        conversations: new ConversationsModel().reducer,
         ...dynamicReducers,
     };
 }

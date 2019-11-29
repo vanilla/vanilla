@@ -75,6 +75,11 @@ storiesOf("User Content", module).add("Text", () => {
        <h2>Block quote</h2>
        <div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">asfasdfadsfa</p></div></div>
        
+       <img src="https://us.v-cdn.net/5022541/uploads/493/OPK8CPQYAYBB.jpg" class="embedImage-img"/>
+       <img src="https://us.v-cdn.net/5022541/uploads/207/3HWDW6ZRRH0Q.png" class="embedImage-img"/>
+       
+       <img src="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" class="embedImage-img"/>
+       
        <h2>Inline operations</h2>
        <p>
          Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxy rise the sky calls to us! Descended from astronomers?</p><p>Some Text Here. <code class="code codeInline" spellcheck="false">Code Inline</code> Some More Text
@@ -154,10 +159,21 @@ storiesOf("User Content", module).add("Text", () => {
            <a href="https://vanillaforums.com/" rel="nofollow"><strong>link</strong></a><strong>.</strong>
          </li>
        </ol>
+                       
+                       
+       <h2>Legacy Code - BB Code</h2>
+                       
+        <div class="bbcode_left">
+            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
+        </div>
+        
+        <div class="bbcode_center">
+            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
+        </div>
+        
+        <div class="bbcode_right">
+            <img src="https://us.v-cdn.net/5022541/uploads/166/54V2AXRD4C0R.jpg" class="embedImage-img"/>
+        </div>
        `;
-    return (
-        <StoryContent>
-            <UserContent content={content} />{" "}
-        </StoryContent>
-    );
+    return <UserContent content={content} />;
 });

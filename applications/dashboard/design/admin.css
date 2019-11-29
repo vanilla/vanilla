@@ -12050,6 +12050,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-height: none;
 }
 
+.bbcode_left .embedImage-img {
+  margin-left: 0;
+}
+
+.bbcode_right .embedImage-img {
+  margin-right: 0;
+}
+
 .embedImage-link {
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;

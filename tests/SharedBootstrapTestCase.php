@@ -20,6 +20,7 @@ class SharedBootstrapTestCase extends TestCase {
 
     use BootstrapTrait {
         setUpBeforeClass as bootstrapSetupBeforeClass;
+        teardownAfterClass as bootstrapTeardownAfterClass;
     }
 
     /**
@@ -73,5 +74,6 @@ class SharedBootstrapTestCase extends TestCase {
      */
     public static function tearDownAfterClass(): void {
         Bootstrap::cleanUpGlobals();
+        self::bootstrapTeardownAfterClass();
     }
 }

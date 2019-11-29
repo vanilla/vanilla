@@ -20,7 +20,7 @@ trait ExpectErrorTrait {
      * @param callable $test The test to run.
      * @param callable $onError An optional event handler to inspect the error thrown.
      */
-    protected function expectError(callable $test, ?callable $onError = null): void {
+    protected function runWithExpectedError(callable $test, ?callable $onError = null): void {
         try {
             $hasError = false;
 

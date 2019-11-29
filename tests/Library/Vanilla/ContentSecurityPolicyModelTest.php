@@ -32,7 +32,7 @@ class ContentSecurityPolicyModelTest extends TestCase {
     /**
      * Get a new model for each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->cspModel = $this->container()->get(ContentSecurityPolicyModel::class);
     }

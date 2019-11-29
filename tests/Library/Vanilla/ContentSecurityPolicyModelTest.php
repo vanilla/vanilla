@@ -46,7 +46,7 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $this->cspModel->addProvider($defaultProvider);
         $header = $this->cspModel->getHeaderString();
         $this->assertStringEndsWith('\'self\'', $header);
-        $this->assertNotContains('frame-ancestors ', $header);
+        $this->assertContains('frame-ancestors ', $header);
         $this->assertNotContains('unsafe-eval', $header);
     }
 

@@ -335,6 +335,19 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
+    const legacy: NestedCSSSelectors = {
+        "& .bbcode_left": {
+            $nest: {
+                ".embedImage-img": {
+                    marginRight: "auto",
+                },
+            },
+        },
+        "& .bbcode_right .embedImage-img": {
+            marginLeft: "auto",
+        },
+    };
+
     const root = style({
         // These CAN'T be flexed. That breaks margin collapsing.
         display: important("block"),
@@ -354,6 +367,7 @@ export const userContentClasses = useThemeCache(() => {
             ...linkStyles,
             ...codeStyles,
             ...spoilersAndQuotes,
+            ...legacy,
         },
     });
 

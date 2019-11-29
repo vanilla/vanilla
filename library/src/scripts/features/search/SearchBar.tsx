@@ -21,10 +21,9 @@ import { InputActionMeta, ActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
-import { components } from "react-select";
+import { AsyncCreatable, components } from "react-select";
 import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";
-import AsyncCreatable from "react-select/lib/AsyncCreatable";
 import { SearchIcon } from "@library/icons/titleBar";
 
 export interface IComboBoxOption<T = any> {

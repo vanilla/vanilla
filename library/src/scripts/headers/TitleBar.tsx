@@ -271,7 +271,6 @@ export class TitleBar extends React.Component<IProps, IState> {
                     className={classNames("titleBar-meBox", classes.meBox)}
                     buttonClassName={classes.button}
                     contentClassName={classNames("titleBar-dropDownContents", classes.dropDownContents)}
-                    draftLinkToForum={!!this.props.hamburger}
                 />
             );
         }

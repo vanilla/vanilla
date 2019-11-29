@@ -5,9 +5,8 @@
 
 import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
 
-type HLJS = typeof import("highlight.js");
+type HLJS = typeof import("@library/content/highlightJS").default;
 
 export function initCodeHighlighting() {
     void highlightCodeBlocks();
@@ -58,7 +57,7 @@ function importHLJS(): Promise<HLJS> {
 
     const innerImport = async () => {
         // Lazily initialize this because it can be rather heavy.
-        const hljs = await import("highlight.js" /* webpackChunkName: "highlightJs" */);
+        const hljs = await import("@library/content/highlightJS" /* webpackChunkName: "highlightJs" */);
 
         // Start fetching the styles.
         const vars = globalVariables();
@@ -69,9 +68,9 @@ function importHLJS(): Promise<HLJS> {
             await import("./_codeDark.scss" /* webpackChunkName: "highlightJs-dark" */ as any); // Sorry typescript.
         }
 
-        hljsCache = hljs;
+        hljsCache = hljs.default;
 
-        return hljs;
+        return hljs.default;
     };
 
     requestPromise = innerImport();

@@ -47,7 +47,7 @@ class UsersTest extends AbstractResourceTest {
     /**
      * Disable email before running tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');
@@ -163,12 +163,11 @@ class UsersTest extends AbstractResourceTest {
 
     /**
      * Test confirm email fails.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage We couldn't confirm your email.
-     * Check the link in the email we sent you or try sending another confirmation email.
      */
     public function testConfirmEmailFail() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.');
+
         /** @var \UserModel $userModel */
         $userModel = self::container()->get('UserModel');
 
@@ -404,7 +403,7 @@ class UsersTest extends AbstractResourceTest {
         $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/photo", ['photo' => $photo]);
 
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertInternalType('array', $response->getBody());
+        $this->assertIsArray($response->getBody());
 
         $responseBody = $response->getBody();
         $this->assertArrayHasKey('photoUrl', $responseBody);

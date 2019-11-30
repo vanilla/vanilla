@@ -81,10 +81,11 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @param string $key The key of an addon that exists, but should be hidden.
      * @dataProvider provideHiddenAddons
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
      */
     public function testGetHidden($key) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+
         $this->api()->get("/addons/$key");
     }
 
@@ -93,10 +94,11 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @param string $key The key of an addon that exists, but should be hidden.
      * @dataProvider provideHiddenAddons
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
      */
     public function testPatchHidden($key) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+
         $this->api()->patch("/addons/$key", ['enabled' => false]);
     }
 

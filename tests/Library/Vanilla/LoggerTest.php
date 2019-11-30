@@ -7,16 +7,23 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
 
+/**
+ * Test of basic logging.
+ */
 class LoggerTest extends LoggerInterfaceTest {
     /**
      * @var TestLogger $logger;
      */
     private $logger;
 
-    protected function setUp() {
+    /**
+     * @inheritDoc
+     */
+    protected function setUp(): void {
         $this->logger = new TestLogger();
     }
 
@@ -40,6 +47,14 @@ class LoggerTest extends LoggerInterfaceTest {
         foreach ($loggers as $logger) {
             $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
         }
+    }
+
+    /**
+     * Should throw when an invalid level is given.
+     */
+    public function testThrowsOnInvalidLevel() {
+        $this->expectException(InvalidArgumentException::class);
+        parent::testThrowsOnInvalidLevel();
     }
 
     protected function assertLog(TestLogger $logger, $level, $message, $context) {

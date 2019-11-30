@@ -54,10 +54,6 @@ trait BootstrapTrait {
      */
     public static function tearDownAfterClass(): void {
         Bootstrap::cleanup(self::$container);
-
-        if (php_sapi_name() == "cli" && isset($_SERVER["SCRIPT_FILENAME"])) {
-            $_SERVER["SCRIPT_NAME"] = $_SERVER["SCRIPT_FILENAME"];
-        }
     }
 
     /**

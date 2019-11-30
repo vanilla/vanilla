@@ -166,8 +166,7 @@ class UsersTest extends AbstractResourceTest {
      */
     public function testConfirmEmailFail() {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('We couldn\'t confirm your email.
-Check the link in the email we sent you or try sending another confirmation email.');
+        $this->expectExceptionMessage('We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.');
 
         /** @var \UserModel $userModel */
         $userModel = self::container()->get('UserModel');

@@ -17,25 +17,11 @@ use Garden\Web\RequestInterface;
  * @package Vanilla\Web
  */
 class ApiFilterMiddleware {
-    
+
     /**
      * @var array The blacklisted fields.
      */
     private $blacklist = ['password', 'email', 'insertipaddress', 'updateipaddress'];
-
-    /**
-     * @var string
-     */
-    private $basePath;
-
-    /**
-     * ApiMiddleware constructor.
-     *
-     * @param string $basePath
-     */
-    public function __construct(string $basePath = '/api/v2') {
-        $this->basePath = $basePath;
-    }
 
     /**
      * Validate an api v2 response.
@@ -45,15 +31,17 @@ class ApiFilterMiddleware {
      * @return Data
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        $response = $next($request);
-        $data = $response->getData();
+        $response  = Data::box($next($request));
+        $responseData = $response->getData();
+        $responseMeta = $response->getMetaArray();
+
         // Make sure filtering is done for apiv2.
-        if (is_array($data) && strcasecmp(substr($request->getPath(), 0, strlen($this->basePath)), $this->basePath) === 0) {
+        if (is_array($responseData)) {
             // Check for blacklisted fields.
-            array_walk_recursive($data, function (&$value, $key) use ($data) {
+            array_walk_recursive($responseData, function (&$value, $key) use ($responseMeta) {
                 $result = false;
-                if (isset($data['api-allow'])) {
-                    $result = in_array(strtolower($key), $data['api-allow']);
+                if (isset($responseMeta['api-allow'])) {
+                    $result = in_array(strtolower($key), $responseMeta['api-allow']);
                 }
                 if (in_array(strtolower($key), $this->blacklist) && !$result) {
                     throw new ServerException('Validation failed for field'.' '.$key);
@@ -68,7 +56,7 @@ class ApiFilterMiddleware {
      *
      * @param array $fields The fields to add to the blacklist.
      */
-    protected function modifyBlacklist(array $fields) {
+    protected function addBlacklistFields(array $fields) {
         $this->blacklist = array_merge($this->blacklist, $fields);
     }
 }

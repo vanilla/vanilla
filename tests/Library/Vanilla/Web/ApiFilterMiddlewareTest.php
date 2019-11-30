@@ -24,29 +24,22 @@ class ApiFilterMiddlewareTest extends TestCase {
     protected $middleware;
 
     /**
-     * @var string
-     */
-    protected $path;
-
-    /**
      * Setup
      */
     public function setUp() {
-        $this->path = '/api/v2/discussions';
-        $this->middleware = new ApiFilterMiddleware($this->path);
+        $this->middleware = new ApiFilterMiddleware();
     }
 
     /**
      * Test ApiFilterMiddleware with a whitelisted field.
      */
     public function testValidationSuccess() {
-        $request = new Request($this->path);
-        $testSuccessArray = ['discussionid' => ['discussionid' => 1, 'password' => 123],
-            'api-allow' => [0 => 'discussionid', 1 => 'password']];
+        $request = new Request();
+        $testSuccessArray = [0 => ['discussionid' => 1]];
         $response =  call_user_func($this->middleware, $request, function ($request) use ($testSuccessArray) {
-            return new Data($testSuccessArray, ['request' => $request]);
+            return new Data($testSuccessArray , ['request' => $request, 'api-allow' => ['discussionid']]);
         });
-        $this->assertEquals($testSuccessArray, $response->getData());
+        $this->assertEquals([0 => ['discussionid' => 1]] , $response->getData());
     }
 
     /**
@@ -55,7 +48,7 @@ class ApiFilterMiddlewareTest extends TestCase {
     public function testValidationFail() {
         $this->expectException(ServerException::class);
         $this->expectExceptionMessage('Validation failed for field password');
-        $request = new Request($this->path);
+        $request = new Request();
         $testFailureArray = ['insertuserid' => ['discussionid' => 1,'password' => 123]];
         call_user_func($this->middleware, $request, function ($request) use ($testFailureArray) {
             return new Data($testFailureArray, ['request' => $request]);

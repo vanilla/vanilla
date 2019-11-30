@@ -127,6 +127,11 @@ class InstallModel {
 
         foreach ($data['addons'] as $addonKey) {
             $addon = $this->addonModel->getAddonManager()->lookupAddon($addonKey);
+
+            if ($addon === null) {
+                throw new \InvalidArgumentException("Could not find addon with key: $addonKey", 404);
+            }
+
             // TODO: Once we are using this addon model we can remove the force and tweak the config defaults.
             $this->addonModel->enable($addon, ['force' => true]);
         }

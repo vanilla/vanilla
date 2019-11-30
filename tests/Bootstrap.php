@@ -431,8 +431,14 @@ class Bootstrap {
      * @return mixed Returns the previous value.
      */
     private function setServerGlobal(string $key, $value) {
-        $r = $_SERVER['__BAK'][$key] = $_SERVER[$key];
-        $_SERVER[$key] = $value;
+        if (empty($_SERVER['__BAK'][$key]) && array_key_exists($key, $_SERVER)) {
+            if (!array_key_exists('__BAK', $_SERVER)) {
+                $_SERVER['__BAK'] = [];
+            }
+
+            $_SERVER['__BAK'][$key] = $_SERVER[$key];
+        }
+        $r = $_SERVER[$key] = $value;
         return $r;
     }
 

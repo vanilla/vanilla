@@ -352,54 +352,6 @@ if (!function_exists('markString')) {
     }
 }
 
-if (!function_exists('prepareArray')) {
-    /**
-     * Makes sure that the key in question exists and is of the specified type, by default also an array.
-     *
-     * @param string $key Key to prepare.
-     * @param array &$array Array to prepare.
-     * @param string $prepareType Optional.
-     * @deprecated
-     */
-    function prepareArray($key, &$array, $prepareType = 'array') {
-        if (!array_key_exists($key, $array)) {
-            $array[$key] = null;
-        }
-
-        switch ($prepareType) {
-            case 'array':
-                if (!is_array($array[$key])) {
-                    $array[$key] = [];
-                }
-                break;
-
-            case 'integer':
-                if (!is_integer($array[$key])) {
-                    $array[$key] = 0;
-                }
-                break;
-
-            case 'float':
-                if (!is_float($array[$key])) {
-                    $array[$key] = 0.0;
-                }
-                break;
-
-            case 'null':
-                if (!is_null($array[$key])) {
-                    $array[$key] = null;
-                }
-                break;
-
-            case 'string':
-                if (!is_string($array[$key])) {
-                    $array[$key] = '';
-                }
-                break;
-        }
-    }
-}
-
 if (!function_exists('redirect')) {
     /**
      * Redirect to another URL.

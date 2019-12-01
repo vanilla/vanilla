@@ -437,41 +437,6 @@ if (!function_exists('removeValueFromArray')) {
     }
 }
 
-if (!function_exists('safeParseStr')) {
-    /**
-     * An alternate implementation of {@link parse_str()}.
-     *
-     * @param string $str The query string to parse.
-     * @param array &$output The array of results.
-     * @param array|null $original Do not use.
-     * @deprecated
-     * @see parse_str()
-     */
-    function safeParseStr($str, &$output, $original = null) {
-        \Vanilla\Utility\Deprecation::log();
-        $exploded = explode('&', $str);
-        $output = [];
-        if (is_array($original)) {
-            $firstValue = reset($original);
-            $firstKey = key($original);
-            unset($original[$firstKey]);
-        }
-        foreach ($exploded as $parameter) {
-            $parts = explode('=', $parameter);
-            $key = $parts[0];
-            $value = count($parts) > 1 ? $parts[1] : '';
-
-            if (!is_null($original)) {
-                $output[$key] = $firstValue;
-                $output = array_merge($output, $original);
-                break;
-            }
-
-            $output[$key] = $value;
-        }
-    }
-}
-
 if (!function_exists('safeRedirect')) {
     /**
      * Redirect, but only to a safe domain.

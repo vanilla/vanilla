@@ -418,20 +418,6 @@ if (!function_exists('redirectUrl')) {
     }
 }
 
-if (!function_exists('removeQuoteSlashes')) {
-    /**
-     * Remove the slashes from escaped quotes in a string.
-     *
-     * @param string $string The input string.
-     * @return string Returns a copy of {@link $string} with the slashes removed.
-     * @deprecated
-     */
-    function removeQuoteSlashes($string) {
-        deprecated('removeQuoteSlashes()');
-        return str_replace("\\\"", '"', $string);
-    }
-}
-
 if (!function_exists('removeValueFromArray')) {
     /**
      * Remove a value from an array.

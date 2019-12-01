@@ -222,43 +222,6 @@ if (!function_exists('forceNoSSL')) {
     }
 }
 
-if (!function_exists('formatArrayAssignment')) {
-    /**
-     * Formats values to be saved as PHP arrays.
-     *
-     * @param array &$array The array to format.
-     * @param string $prefix The prefix on the assignment for recursive calls.
-     * @param mixed $value The value in the final assignment.
-     * @deprecated
-     */
-    function formatArrayAssignment(&$array, $prefix, $value) {
-        if (is_array($value)) {
-            // If $Value doesn't contain a key of "0" OR it does and it's value IS
-            // an array, this should be treated as an associative array.
-            $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
-            if ($isAssociativeArray === true) {
-                foreach ($value as $k => $v) {
-                    formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
-                }
-            } else {
-                // If $Value is not an associative array, just write it like a simple array definition.
-                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
-                $f2 = var_export($value, true);
-
-                $array[] = $prefix .= ' = '.var_export($value, true).';';
-            }
-        } elseif (is_int($value)) {
-            $array[] = $prefix .= ' = '.$value.';';
-        } elseif (is_bool($value)) {
-            $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-        } elseif (in_array($value, ['true', 'false'])) {
-            $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
-        } else {
-            $array[] = $prefix .= ' = '.var_export($value, true).';';
-        }
-    }
-}
-
 if (!function_exists('formatDottedAssignment')) {
     /**
      * Formats values to be saved in dotted notation.

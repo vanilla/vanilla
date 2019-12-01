@@ -418,32 +418,6 @@ if (!function_exists('redirectUrl')) {
     }
 }
 
-// Functions relating to data/variable types and type casting
-if (!function_exists('removeKeyFromArray')) {
-    /**
-     * Remove a value from an array at a certain key.
-     *
-     * @param array $array The input array.
-     * @param string|int $key The key to remove.
-     * @return mixed Returns a copy of {@link $array} with the key removed.
-     * @deprecated Use unset() instead.
-     */
-    function removeKeyFromArray($array, $key) {
-        if (!is_array($key)) {
-            $key = [$key];
-        }
-
-        $count = count($key);
-        for ($i = 0; $i < $count; $i++) {
-            $keyIndex = array_keys(array_keys($array), $key[$i]);
-            if (count($keyIndex) > 0) {
-                array_splice($array, $keyIndex[0], 1);
-            }
-        }
-        return $array;
-    }
-}
-
 if (!function_exists('removeQuoteSlashes')) {
     /**
      * Remove the slashes from escaped quotes in a string.

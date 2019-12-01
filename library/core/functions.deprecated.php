@@ -5,32 +5,6 @@
  * @license GPL-2.0-only
  */
 
-if (!function_exists('addActivity')) {
-    /**
-     * A convenience function that allows adding to the activity table with a single line.
-     *
-     * @param int $activityUserID The user committing the activity.
-     * @param string $activityType The type of activity.
-     * @param string $story The story section of the activity.
-     * @param string $regardingUserID The user the activity is being performed on.
-     * @param string $route The path of the data the activity is for.
-     * @param string $sendEmail Whether or not to send an email with the activity.
-     * @return int The ID of the new activity or zero on error.
-     * @deprecated
-     */
-    function addActivity(
-        $activityUserID,
-        $activityType,
-        $story = '',
-        $regardingUserID = '',
-        $route = '',
-        $sendEmail = ''
-    ) {
-        $activityModel = new ActivityModel();
-        return $activityModel->add($activityUserID, $activityType, $story, $regardingUserID, '', $route, $sendEmail);
-    }
-}
-
 if (!function_exists('arrayInArray')) {
     /**
      * Check to see if an array contains another array.

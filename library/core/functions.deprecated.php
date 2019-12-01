@@ -53,19 +53,6 @@ if (!function_exists('arrayValue')) {
     }
 }
 
-if (!function_exists('arrayValuesToKeys')) {
-    /**
-     * Take an array's values and apply them to a new array as both the keys and values.
-     *
-     * @param array $array The array to combine.
-     * @deprecated
-     * @see array_combine()
-     */
-    function arrayValuesToKeys($array) {
-        return array_combine(array_values($array), $array);
-    }
-}
-
 if (!function_exists('checkRequirements')) {
     /**
      * Check an addon's requirements.

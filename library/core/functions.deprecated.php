@@ -123,23 +123,6 @@ if (!function_exists('arrayCombine')) {
     }
 }
 
-if (!function_exists('compareHashDigest')) {
-    /**
-     * Determine whether or not two strings are equal in a time that is independent of partial matches.
-     *
-     * This snippet prevents HMAC Timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
-     * Thanks to Eric Karulf (ekarulf @ github) for this fix.
-     *
-     * @param string $digest1 The first digest to compare.
-     * @param string $digest2 The second digest to compare.
-     * @return bool Returns true if the digests match or false otherwise.
-     */
-    function compareHashDigest($digest1, $digest2) {
-        deprecated('compareHashDigest', 'hash_equals');
-        return hash_equals($digest1, $digest2);
-    }
-}
-
 if (!function_exists('ConsolidateArrayValuesByKey')) {
     /**
      * Return the values from a single column in the input array.

@@ -284,7 +284,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $byLine = val('ByLine', $options, false);
         $headings = val('Headings', $options, true);
         $formatStyle = val('FormatStyle', $options);
-        $formatter = "Format{$formatStyle}Assignment";
+        $formatter = [self::class, "format{$formatStyle}Assignment"];
 
         $firstLine = '';
         $lines = [];
@@ -330,6 +330,75 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         $result = implode(PHP_EOL, $lines);
         return $result;
+    }
+
+    /**
+     * Formats values to be saved as PHP arrays.
+     *
+     * @param array &$array The array to format.
+     * @param string $prefix The prefix on the assignment for recursive calls.
+     * @param mixed $value The value in the final assignment.
+     */
+    private static function formatArrayAssignment(&$array, $prefix, $value) {
+        if (is_array($value)) {
+            // If $Value doesn't contain a key of "0" OR it does and it's value IS
+            // an array, this should be treated as an associative array.
+            $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
+            if ($isAssociativeArray === true) {
+                foreach ($value as $k => $v) {
+                    self::formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
+                }
+            } else {
+                // If $Value is not an associative array, just write it like a simple array definition.
+                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
+                $f2 = var_export($value, true);
+                $array[] = $prefix .= ' = '.var_export($value, true).';';
+            }
+        } elseif (is_int($value)) {
+            $array[] = $prefix .= ' = '.$value.';';
+        } elseif (is_bool($value)) {
+            $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
+        } elseif (in_array($value, ['true', 'false'])) {
+            $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
+        } else {
+            $array[] = $prefix .= ' = '.var_export($value, true).';';
+        }
+    }
+
+    /**
+     * Formats values to be saved in dotted notation.
+     *
+     * @param array &$array The array to format.
+     * @param string $prefix A prefix for recursive calls.
+     * @param mixed $value The value to assign.
+     */
+    private static function formatDottedAssignment(&$array, $prefix, $value) {
+        if (is_array($value)) {
+            // If $Value doesn't contain a key of "0" OR it does and it's value IS
+            // an array, this should be treated as an associative array.
+            $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
+            if ($isAssociativeArray === true) {
+                foreach ($value as $k => $v) {
+                    self::formatDottedAssignment($array, "{$prefix}.{$k}", $v);
+                }
+            } else {
+                // If $Value is not an associative array, just write it like a simple array definition.
+                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
+                $prefix .= "']";
+                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
+            }
+        } else {
+            $prefix .= "']";
+            if (is_int($value)) {
+                $array[] = $prefix .= ' = '.$value.';';
+            } elseif (is_bool($value)) {
+                $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
+            } elseif (in_array($value, ['true', 'false'])) {
+                $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
+            } else {
+                $array[] = $prefix .= ' = '.var_export($value, true).';';
+            }
+        }
     }
 
     /**

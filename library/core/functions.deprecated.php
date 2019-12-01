@@ -246,23 +246,6 @@ if (!function_exists('getIncomingValue')) {
     }
 }
 
-if (!function_exists('getObject')) {
-    /**
-     * Get a value off of an object.
-     *
-     * @param string $property The name of the property on the object.
-     * @param object $object The object that contains the value.
-     * @param mixed $default The default to return if the object doesn't contain the property.
-     * @return mixed
-     * @deprecated getObject() is deprecated. Use val() instead.
-     */
-    function getObject($property, $object, $default) {
-        trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
-        $result = val($property, $object, $default);
-        return $result;
-    }
-}
-
 if (!function_exists('getPostValue')) {
     /**
      * Return the value for $fieldName from the $_POST collection.

@@ -316,63 +316,6 @@ if (!function_exists('mergeArrays')) {
     }
 }
 
-if (!function_exists('parseUrl')) {
-    /**
-     * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
-     *
-     * @param string $url The url to parse.
-     * @param int $component Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH,
-     * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
-     * @deprecated
-     */
-    function parseUrl($url, $component = -1) {
-        \Vanilla\Utility\Deprecation::log();
-        $defaults = [
-            'scheme' => 'http',
-            'host' => '',
-            'port' => null,
-            'user' => '',
-            'pass' => '',
-            'path' => '',
-            'query' => '',
-            'fragment' => ''
-        ];
-
-        $parts = parse_url($url);
-        if (is_array($parts)) {
-            $parts = array_replace($defaults, $parts);
-        } else {
-            $parts = $defaults;
-        }
-
-        if ($parts['port'] === null) {
-            $parts['port'] = $parts['scheme'] === 'https' ? '443' : '80';
-        }
-
-        // Return
-        switch ($component) {
-            case PHP_URL_SCHEME:
-                return $parts['scheme'];
-            case PHP_URL_HOST:
-                return $parts['host'];
-            case PHP_URL_PORT:
-                return $parts['port'];
-            case PHP_URL_USER:
-                return $parts['user'];
-            case PHP_URL_PASS:
-                return $parts['pass'];
-            case PHP_URL_PATH:
-                return $parts['path'];
-            case PHP_URL_QUERY:
-                return $parts['query'];
-            case PHP_URL_FRAGMENT:
-                return $parts['fragment'];
-            default:
-                return $parts;
-        }
-    }
-}
-
 if (!function_exists('markString')) {
     /**
      * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.

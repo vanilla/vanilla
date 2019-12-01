@@ -89,6 +89,23 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
+     * Return the method used to format the config.
+     *
+     * @param string $formatStyle The format style to use.
+     * @return callable Returns a callback that will format the array.
+     */
+    private static function getFormatCallback(string $formatStyle): callable {
+        switch (strtolower($formatStyle)) {
+            case 'array':
+                return [self::class, 'formatArrayAssignment'];
+            case 'dotted':
+                return [self::class, 'formatDottedAssignment'];
+            default:
+                throw new \InvalidArgumentException('Invalid config format: '.$formatStyle, 500);
+        }
+    }
+
+    /**
      * Format a string as a PHP comment.
      *
      * @param string $str The string to format.
@@ -284,7 +301,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $byLine = val('ByLine', $options, false);
         $headings = val('Headings', $options, true);
         $formatStyle = val('FormatStyle', $options);
-        $formatter = [self::class, "format{$formatStyle}Assignment"];
+        $formatter = self::getFormatCallback($formatStyle);
 
         $firstLine = '';
         $lines = [];
@@ -335,7 +352,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Formats values to be saved as PHP arrays.
      *
-     * @param array &$array The array to format.
+     * @param array $array The array to format.
      * @param string $prefix The prefix on the assignment for recursive calls.
      * @param mixed $value The value in the final assignment.
      */
@@ -368,7 +385,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Formats values to be saved in dotted notation.
      *
-     * @param array &$array The array to format.
+     * @param array $array The array to format.
      * @param string $prefix A prefix for recursive calls.
      * @param mixed $value The value to assign.
      */

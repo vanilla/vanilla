@@ -1141,6 +1141,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     /**
      * @inheritdoc
      */
+    public function expandFragments(array &$records, array $columnNames): void {
+        $this->expandUsers($records, $columnNames);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAllowedGeneratedRecordKeys(): array {
         return [self::GENERATED_FRAGMENT_KEY_GUEST, self::GENERATED_FRAGMENT_KEY_UNKNOWN];
     }

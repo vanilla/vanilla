@@ -185,6 +185,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'favIcon' => $this->siteMeta->getFavIcon(),
             'jsonLD' => $this->getJsonLDScriptContent(),
         ];
+
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = \Gdn::getContainer()->get(\Garden\EventManager::class);
+        $eventManager->fireArray('BeforeRenderMasterView', [&$viewData]);
+
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);

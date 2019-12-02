@@ -8,7 +8,6 @@
 namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Contracts;
 
 /**
  * An asset representing a script containing data for a particular locale.
@@ -34,10 +33,18 @@ class ThemeScriptAsset extends SiteAsset {
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return self::makeWebPath(
+
+        return $this->makeWebPath(
             '/api/v2/themes',
             $this->themeKey,
             '/assets/javascript.js'
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStatic(): bool {
+        return true;
     }
 }

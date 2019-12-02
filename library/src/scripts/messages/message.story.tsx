@@ -18,13 +18,9 @@ import SmartLink from "@library/routing/links/SmartLink";
 
 const story = storiesOf("Messages", module);
 
-const shortMessage = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-`;
-
+const shortMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`;
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
-const longMessage = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+const longMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
 `;
 
 story.add("Message", () => {
@@ -33,41 +29,29 @@ story.add("Message", () => {
     const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
     const [longMessageFlag, setLongMessageFlag] = useState(true);
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
-    const _shortMessage = shortMessageFlag && (
-        <Message
-            contents={
-                <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
-                    <div>
-                        <Translate source={shortMessage} />
-                    </div>
-                </div>
-            }
-            onConfirm={() => {
-                setShortMessageFlag(false);
-            }}
-            stringContents={t(shortMessage)}
-        />
+    const [iconMessageFlag, setIconMessageFlag] = useState(true);
+    const WarningIcon1 = <WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />;
+    const AttachmentErrorIcon1 = (
+        <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />
     );
-    const _longMessage = longMessageFlag && (
-        <Message
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classNames(classesMessages.messageIcon)} />
-                    <div>
-                        <Translate source={longMessage} />
+    const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
+        return (
+            <Message
+                contents={
+                    <div className={classesMessages.content}>
+                        {icon}
+                        <div>
+                            <Translate source={val} />
+                        </div>
                     </div>
-                </div>
-            }
-            onConfirm={() => {
-                setLongMessageFlag(false);
-            }}
-            confirmText={t("Cancel")}
-            stringContents={t(longMessage)}
-        />
-    );
+                }
+                onConfirm={() => {
+                    setFlag(false);
+                }}
+                stringContents={t(val)}
+            />
+        );
+    };
 
     const _messageWithLink = (
         <Message
@@ -93,7 +77,7 @@ story.add("Message", () => {
             title="Vanilla Forums"
             contents={
                 <div className={classesMessages.content}>
-                    <AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />
+                    <AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />`
                     <div>
                         <Translate source={message} />
                     </div>
@@ -136,9 +120,11 @@ story.add("Message", () => {
                     }}
                 ></div>
                 <StoryHeading>Short message</StoryHeading>
-                {_shortMessage}
+                {shortMessageFlag && renderMessage(shortMessage, AttachmentErrorIcon1, setShortMessageFlag)}
                 <StoryHeading>Long message</StoryHeading>
-                {_longMessage}
+                {longMessageFlag && renderMessage(longMessage, AttachmentErrorIcon1, setLongMessageFlag)}
+                <StoryHeading>Message with icon</StoryHeading>
+                {iconMessageFlag && renderMessage(message, WarningIcon1, setIconMessageFlag)}
                 <StoryHeading>Message with link</StoryHeading>
                 {_messageWithLink}
                 <StoryHeading>Message with Title</StoryHeading>

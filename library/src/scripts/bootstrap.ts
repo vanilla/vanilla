@@ -17,7 +17,7 @@ import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
 
-if (!gdn.getMeta("Feature.UseFocusVisible.Enabled", true)) {
+if (!gdn.getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
 }
 

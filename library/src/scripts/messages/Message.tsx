@@ -13,6 +13,7 @@ import Button from "@library/forms/Button";
 import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 export interface IMessageProps {
     className?: string;
@@ -27,7 +28,7 @@ export interface IMessageProps {
     isContained?: boolean;
     title?: string;
     isActionLoading?: boolean;
-    noIcon?: boolean;
+    icon?: React.ReactNode | false;
 }
 
 export default function Message(props: IMessageProps) {
@@ -36,22 +37,26 @@ export default function Message(props: IMessageProps) {
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
-
     const contents = props.contents || props.stringContents;
+    const condition = props.title ? true : false;
 
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap(props.noIcon), props.className, {
+                        className={classNames(classes.wrap(!!props.icon), props.className, {
                             [classes.noPadding]: props.isContained,
                             [classes.fixed]: props.isContained,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
-                                {props.title && <h2 className={classes.title}>{props.title}</h2>}
+                                <ConditionalWrap condition={condition}>
+                                    {props.icon ?? null}
+                                    {props.title && <h2 className={classes.title}>{props.title}</h2>}
+                                </ConditionalWrap>
+
                                 {contents && <p className={classes.text}>{contents}</p>}
                             </div>
 

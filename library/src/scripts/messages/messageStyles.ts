@@ -90,7 +90,7 @@ export const messagesClasses = useThemeCache(() => {
         const padding = noIcon
             ? {
                   vertical: vars.spacing.padding.vertical,
-                  left: vars.spacing.padding.right,
+                  left: vars.spacing.padding.right + 30,
                   right: vars.spacing.padding.right,
               }
             : { ...vars.spacing.padding, right: vars.spacing.padding.right };
@@ -180,6 +180,7 @@ export const messagesClasses = useThemeCache(() => {
         ...fonts(vars.text.font),
         width: percent(100),
         flex: 1,
+        position: "relative",
     });
 
     const setWidth = style("setWidth", {
@@ -265,6 +266,7 @@ export const messagesClasses = useThemeCache(() => {
         innerWrapper,
         setWidth,
         messageIcon,
+
         content,
         confirm,
         errorIcon,

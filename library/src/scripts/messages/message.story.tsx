@@ -30,8 +30,8 @@ story.add("Message", () => {
     const [longMessageFlag, setLongMessageFlag] = useState(true);
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
     const [iconMessageFlag, setIconMessageFlag] = useState(true);
-    const WarningIcon1 = <WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />;
-    const AttachmentErrorIcon1 = (
+    const _warningIcon = <WarningIcon className={classNames(classesMessages.messageIcon)} />;
+    const _attachmentErrorIcon = (
         <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />
     );
     const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
@@ -39,7 +39,6 @@ story.add("Message", () => {
             <Message
                 contents={
                     <div className={classesMessages.content}>
-                        {icon}
                         <div>
                             <Translate source={val} />
                         </div>
@@ -57,7 +56,6 @@ story.add("Message", () => {
         <Message
             contents={
                 <div className={classesMessages.content}>
-                    <WarningIcon className={classNames(classesMessages.messageIcon)} />
                     <div>
                         <Translate
                             source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
@@ -72,15 +70,61 @@ story.add("Message", () => {
             stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
         />
     );
-    const _messageWithTitle = messageWithTitleFlag && (
+    const _messageWithIcon = iconMessageFlag && (
         <Message
-            title="Vanilla Forums"
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon)} />}
             contents={
                 <div className={classesMessages.content}>
-                    <AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />`
                     <div>
                         <Translate source={message} />
                     </div>
+                </div>
+            }
+            onConfirm={() => {
+                setIconMessageFlag(false);
+            }}
+            stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+        />
+    );
+    const _message_longTitle = messageWithTitleFlag && (
+        <Message
+            title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+            // icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
+            stringContents={t(message)}
+        />
+    );
+    const _message_Title_Icon = messageWithTitleFlag && (
+        <Message
+            title="Vanilla Forums"
+            icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
+            stringContents={t(message)}
+        />
+    );
+    const _message_Title_noIcon = messageWithTitleFlag && (
+        <Message
+            title="Vanilla Forums"
+            icon={false}
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
                 </div>
             }
             onConfirm={() => {
@@ -120,15 +164,26 @@ story.add("Message", () => {
                     }}
                 ></div>
                 <StoryHeading>Short message</StoryHeading>
-                {shortMessageFlag && renderMessage(shortMessage, AttachmentErrorIcon1, setShortMessageFlag)}
+                {shortMessageFlag && renderMessage(shortMessage, null, setShortMessageFlag)}
+
                 <StoryHeading>Long message</StoryHeading>
-                {longMessageFlag && renderMessage(longMessage, AttachmentErrorIcon1, setLongMessageFlag)}
-                <StoryHeading>Message with icon</StoryHeading>
-                {iconMessageFlag && renderMessage(message, WarningIcon1, setIconMessageFlag)}
+                {longMessageFlag && renderMessage(longMessage, null, setLongMessageFlag)}
+
                 <StoryHeading>Message with link</StoryHeading>
                 {_messageWithLink}
-                <StoryHeading>Message with Title</StoryHeading>
-                {_messageWithTitle}
+
+                <StoryHeading>Message with icon</StoryHeading>
+                {_messageWithIcon}
+
+                <StoryHeading>Message with long title</StoryHeading>
+                {_message_longTitle}
+
+                <StoryHeading>Message with title and icon</StoryHeading>
+                {_message_Title_Icon}
+
+                <StoryHeading>Message with title and no icon</StoryHeading>
+                {_message_Title_noIcon}
+
                 <div
                     style={{
                         height: 450,

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f52824785731c7f3afa4c1666f79b35",
+    "content-hash": "270ace422d8f2db35947268abd5809a7",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -129,16 +129,16 @@
         },
         {
             "name": "michelf/php-markdown",
-            "version": "dev-lib",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michelf/php-markdown.git",
-                "reference": "90e0f5f0c9863901a7972964d3b2262779b9dc53"
+                "reference": "c83178d49e372ca967d1a8c77ae4e051b3a3c75c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/90e0f5f0c9863901a7972964d3b2262779b9dc53",
-                "reference": "90e0f5f0c9863901a7972964d3b2262779b9dc53",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/c83178d49e372ca967d1a8c77ae4e051b3a3c75c",
+                "reference": "c83178d49e372ca967d1a8c77ae4e051b3a3c75c",
                 "shasum": ""
             },
             "require": {
@@ -174,7 +174,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2019-11-05T11:37:43+00:00"
+            "time": "2019-12-02T02:32:27+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -3499,7 +3499,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "michelf/php-markdown": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,

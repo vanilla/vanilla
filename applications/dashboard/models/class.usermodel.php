@@ -1234,7 +1234,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
                     } else {
-                        $user = self::getUnknownFragment();
+                        $user = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
                     }
                 }
 

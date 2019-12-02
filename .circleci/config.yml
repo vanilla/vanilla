@@ -2,6 +2,7 @@ version: 2.1
 orbs:
     core: vanilla/core@2.1.0
     chromatic: wave/chromatic@1.0.1
+    codecov: codecov/codecov@1.0.5
 aliases:
     - &run_yarn
         run:
@@ -13,6 +14,14 @@ aliases:
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
+    - &upload_coverage
+        run:
+            name: Upload Coverage
+            command: |
+                curl -s https://codecov.io/bash | bash -s -- \
+                    -s "$HOME/workspace/repo" \
+                    -y "$HOME/workspace/repo/.codecov.yml"\
+                    -Z || echo 'Codecov upload failed'
     - &run_composer
         run:
             name: Install Composer Packages
@@ -138,12 +147,30 @@ jobs:
                 name: Library Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="Library" \
+                        --coverage-clover=library-coverage.xml
             - run:
                 name: APIv2 Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="APIv2" \
+                        --coverage-clover=apiv2-coverage.xml
+            - run:
+                name: Models Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="Models" \
+                        --coverage-clover=models-coverage.xml
+            - *upload_coverage
     php_72_integration:
         executor: core/php72
         steps: &php_integration_test_steps
@@ -154,12 +181,12 @@ jobs:
                 name: APIv0 Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="APIv0" \
+                        --coverage-clover=apiv0-coverage.xml
+            - *upload_coverage
     php_73_lint:
         executor: core/php73
         steps: *php_lint_steps

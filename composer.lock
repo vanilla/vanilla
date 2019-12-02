@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d17a7c45aff843d50cf5b1cfd05e0f79",
+    "content-hash": "4f52824785731c7f3afa4c1666f79b35",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -129,30 +129,28 @@
         },
         {
             "name": "michelf/php-markdown",
-            "version": "1.7.0",
+            "version": "dev-lib",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michelf/php-markdown.git",
-                "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220"
+                "reference": "90e0f5f0c9863901a7972964d3b2262779b9dc53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/1f51cc520948f66cd2af8cbc45a5ee175e774220",
-                "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/90e0f5f0c9863901a7972964d3b2262779b9dc53",
+                "reference": "90e0f5f0c9863901a7972964d3b2262779b9dc53",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-lib": "1.4.x-dev"
-                }
+            "require-dev": {
+                "phpunit/phpunit": ">=4.3 <5.8"
             },
+            "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Michelf": ""
+                "psr-4": {
+                    "Michelf\\": "Michelf/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -176,7 +174,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2016-10-29T18:58:20+00:00"
+            "time": "2019-11-05T11:37:43+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -1036,16 +1034,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.10.1",
+            "version": "v1.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "41376725dde90e8a83aeb3ade1d70851265166dc"
+                "reference": "dded82253087836adc8c3274f75dcad185f10f67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/41376725dde90e8a83aeb3ade1d70851265166dc",
-                "reference": "41376725dde90e8a83aeb3ade1d70851265166dc",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/dded82253087836adc8c3274f75dcad185f10f67",
+                "reference": "dded82253087836adc8c3274f75dcad185f10f67",
                 "shasum": ""
             },
             "require": {
@@ -1071,7 +1069,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2019-03-14T22:30:40+00:00"
+            "time": "2019-12-01T20:32:59+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -3501,6 +3499,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "michelf/php-markdown": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,

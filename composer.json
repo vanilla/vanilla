@@ -34,7 +34,7 @@
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
         "firebase/php-jwt": "~5.0",
-        "michelf/php-markdown": "~1.7.0",
+        "michelf/php-markdown": "dev-lib#90e0f5f0c9863901a7972964d3b2262779b9dc53",
         "pclzip/pclzip": "~2.0",
         "phpmailer/phpmailer": "~5.2",
         "psr/log": "~1.0",

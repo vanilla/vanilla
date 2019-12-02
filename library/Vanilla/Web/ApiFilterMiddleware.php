@@ -31,19 +31,21 @@ class ApiFilterMiddleware {
      * @return Data
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        $response  = Data::box($next($request));
-        $responseData = $response->getData();
-        $responseMeta = $response->getMetaArray();
+        /** @var Data $response */
+        $response = $next($request);
+        $data = $response->getData();
+        $apiAllow = $response->getMeta('api-allow');
+        if (!is_array($apiAllow)) {
+            $apiAllow = [];
+        }
 
         // Make sure filtering is done for apiv2.
-        if (is_array($responseData)) {
+        if (is_array($data)) {
             // Check for blacklisted fields.
-            array_walk_recursive($responseData, function (&$value, $key) use ($responseMeta) {
-                $result = false;
-                if (isset($responseMeta['api-allow'])) {
-                    $result = in_array(strtolower($key), $responseMeta['api-allow']);
-                }
-                if (in_array(strtolower($key), $this->blacklist) && !$result) {
+            array_walk_recursive($data, function (&$value, $key) use ($apiAllow) {
+                $isBlacklisted = in_array(strtolower($key), $this->blacklist);
+                $isAllowedField = in_array(strtolower($key), $apiAllow);
+                if ($isBlacklisted && !$isAllowedField) {
                     throw new ServerException('Validation failed for field'.' '.$key);
                 }
             });

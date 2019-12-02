@@ -24,7 +24,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
         /** @var \Gdn_Configuration $config */
@@ -35,7 +35,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
 
@@ -56,10 +56,12 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Cannot authenticate with an inactive authenticator.
+     * Cannot authenticate with an inactive authenticator.
      */
     public function testInactiveAuth() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot authenticate with an inactive authenticator.');
+
         $postData = [
             'authenticate' => [
                 'authenticatorType' => $this->authenticator::getType(),

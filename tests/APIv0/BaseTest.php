@@ -18,7 +18,7 @@ abstract class BaseTest extends SharedBootstrapTestCase {
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         $api = new APIv0();
 
@@ -37,7 +37,10 @@ abstract class BaseTest extends SharedBootstrapTestCase {
         }
     }
 
-    public static function tearDownAfterClass() {
+    /**
+     * @inheritDoc
+     */
+    public static function tearDownAfterClass(): void {
         self::$api->uninstall();
         self::$api->terminate();
         parent::tearDownAfterClass();

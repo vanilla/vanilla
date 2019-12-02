@@ -28,7 +28,7 @@ class AddonManagerTest extends SharedBootstrapTestCase {
     /**
      * Clear the cache before doing tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache/am');
         parent::setUpBeforeClass();
     }
@@ -747,12 +747,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test **AddonManager::checkConflicts()**.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessage Parent conflicts with: Grandparent.
      */
     public function testCheckConflicts() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(409);
+        $this->expectExceptionMessage('Parent conflicts with: Grandparent.');
+
         $am = $this->makeConflictedAddonManager();
         $am->startAddon($am->lookupAddon('grand-parent'));
 
@@ -805,10 +805,9 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test addon type checking.
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testBadType() {
+        $this->expectException(\InvalidArgumentException::class);
         $am = $this->createTestManager();
 
         $addons = $am->lookupAllByType('../../../fixtures/error');
@@ -816,10 +815,10 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test a bad theme key.
-     *
-     * @expectedException PHPUnit\Framework\Error\Notice
      */
     public function testBadThemeKey() {
+        $this->expectNotice();
+
         $am = $this->createTestManager();
 
         $theme = $am->lookupTheme('../../../../fixtures/error-index');

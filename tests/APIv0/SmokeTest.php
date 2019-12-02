@@ -202,11 +202,12 @@ class SmokeTest extends BaseTest {
      * @param array $user The user to test against.
      * @depends testAddAdminUser
      * @depends testRegisterBasic
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid photo URL.
      * @large
      */
     public function testSetInvalidPhoto($admin, $user) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid photo URL.');
+
         $this->api()->setUser($admin);
 
         $photo = 'javascript: alert("Xss");';
@@ -298,7 +299,7 @@ class SmokeTest extends BaseTest {
 
         $postedDiscussion = $r->getBody();
         $postedDiscussion = $postedDiscussion['Discussion'];
-        $this->assertArraySubset($discussion, $postedDiscussion);
+        $this->assertEquals($discussion, array_intersect_assoc($discussion, $postedDiscussion));
 
         return $postedDiscussion;
     }
@@ -334,18 +335,19 @@ class SmokeTest extends BaseTest {
 
         $postedComment = $r->getBody();
         $postedComment = $postedComment['Comment'];
-        $this->assertArraySubset($comment, $postedComment);
+        $this->assertEquals($comment, array_intersect_assoc($comment, $postedComment));
     }
 
     /**
      * Test posting a discussion in a restricted category.
      *
      * @depends testCreateRestrictedCategory
-     * @expectedException \Exception
-     * @expectedExceptionMessage You do not have permission to post in this category.
      * @large
      */
     public function testPostRestrictedDiscussion() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You do not have permission to post in this category.');
+
         $categoryID = $this->getRestrictedCategoryID();
 
         if (!is_numeric($categoryID)) {
@@ -602,11 +604,12 @@ class SmokeTest extends BaseTest {
      * Test viewing a restricted category.
      *
      * @depends testCreateRestrictedCategory
-     * @expectedException \Exception
-     * @expectedExceptionMessage You don't have permission to do that.
      * @large
      */
     public function testViewRestrictedCategory() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+
         $categoryID = $this->getRestrictedCategoryID();
 
         if (!is_numeric($categoryID)) {

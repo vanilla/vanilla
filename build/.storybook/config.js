@@ -10,7 +10,6 @@
 
 import { configure, addDecorator, addParameters } from '@storybook/react';
 import {checkA11y, withA11y} from '@storybook/addon-a11y';
-import { withKnobs } from '@storybook/addon-knobs';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
@@ -45,7 +44,6 @@ addParameters({
 
 addDecorator(checkA11y);
 addDecorator(withA11y);
-addDecorator(withKnobs);
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 

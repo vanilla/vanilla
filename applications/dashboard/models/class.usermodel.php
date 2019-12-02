@@ -1189,7 +1189,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @param array $options Additional options. Passed to filter event.
      *        [bool asFragments] - Expand as user fragments.
      */
-    public function expandUsers(array &$rows, array $columns, array $options = []) {
+    public function expandUsers(array &$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
@@ -1245,9 +1245,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     }
                 }
 
-                if ($options['asFragments'] ?? false) {
-                    $user =  UserFragmentSchema::normalizeUserFragment($user);
-                }
+                $user =  UserFragmentSchema::normalizeUserFragment($user);
                 setValue($destination, $row, $user);
             }
         };
@@ -1259,15 +1257,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             foreach ($rows as &$row) {
                 $populate($row);
             }
-        }
-
-        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
-        if ($single) {
-            $rows = [$rows];
-        }
-        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $options);
-        if ($single) {
-            $rows = reset($rows);
         }
     }
 

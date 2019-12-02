@@ -1142,7 +1142,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @inheritdoc
      */
     public function expandFragments(array &$records, array $columnNames): void {
-        $this->expandUsers($records, $columnNames, ['asFragments' => true]);
+        $this->expandUsers($records, $columnNames);
     }
 
     /**

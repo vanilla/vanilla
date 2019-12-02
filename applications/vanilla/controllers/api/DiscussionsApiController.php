@@ -274,7 +274,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
         $row = $this->normalizeOutput($row, $query["expand"] ?? []);
         $rows = [&$row];
         $this->expandLastCommentBody($rows, $query['expand'] ?? []);
@@ -384,7 +384,7 @@ class DiscussionsApiController extends AbstractApiController {
         $isRich = $discussion['Format'] === 'Rich';
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
 
-        $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);
         return $result;
     }
@@ -574,8 +574,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
         );
         if ($this->isExpandField('category', $query['expand'])) {
             $this->categoryModel->expandCategories($rows);

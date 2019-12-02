@@ -1251,6 +1251,15 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                 $populate($row);
             }
         }
+
+        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
+        if ($single) {
+            $rows = [$rows];
+        }
+
+        if ($single) {
+            $rows = reset($rows);
+        }
     }
 
     /**

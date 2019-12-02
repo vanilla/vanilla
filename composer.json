@@ -23,11 +23,11 @@
     ],
     "config": {
         "platform": {
-            "php": "7.1"
+            "php": "7.2"
         }
     },
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.2.0",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-fileinfo": "*",
@@ -57,7 +57,7 @@
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
-        "phpunit/phpunit": "~6.0",
+        "phpunit/phpunit": "~8.0",
         "vanilla/standards": "~1.3",
         "voku/html-min": "3.0.5",
         "voku/simple_html_dom": "4.1.7",

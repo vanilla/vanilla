@@ -6,11 +6,13 @@
 
 import React from "react";
 import { logError } from "@vanilla/utils";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import apiv2 from "@library/apiv2";
 import UserActions from "@library/features/users/UserActions";
 import { connect } from "react-redux";
+import { IMe } from "@library/@types/api/users";
+import getStore from "@library/redux/getStore";
 
 interface IProps extends IInjectableUserState {
     permission: string | string[];
@@ -26,7 +28,9 @@ interface IProps extends IInjectableUserState {
  */
 export class Permission extends React.Component<IProps> {
     public render(): React.ReactNode {
-        return this.hasPermission() ? this.props.children : this.props.fallback || null;
+        return hasPermission(this.props.permission, this.props.currentUser)
+            ? this.props.children
+            : this.props.fallback || null;
     }
 
     /**
@@ -44,37 +48,38 @@ export class Permission extends React.Component<IProps> {
     public componentDidCatch(error, info) {
         logError(error, info);
     }
+}
 
-    /**
-     * Determine if the user has one of the given permissions.
-     *
-     * - Always false if the data isn't loaded yet.
-     * - Always true if the user has the admin flag set.
-     * - Only 1 one of the provided permissions needs to match.
-     */
-    private hasPermission(): boolean {
-        const { currentUser, permission } = this.props;
-        let lookupPermissions = permission;
-        if (!Array.isArray(lookupPermissions)) {
-            lookupPermissions = [lookupPermissions];
-        }
-
-        return (
-            currentUser.status === LoadStatus.SUCCESS &&
-            !!currentUser.data &&
-            (currentUser.data.isAdmin || this.arrayContainsOneOf(lookupPermissions, currentUser.data.permissions))
-        );
+/**
+ * Determine if the user has one of the given permissions.
+ *
+ * - Always false if the data isn't loaded yet.
+ * - Always true if the user has the admin flag set.
+ * - Only 1 one of the provided permissions needs to match.
+ */
+export function hasPermission(permission: string | string[], currentUser?: ILoadable<IMe>) {
+    if (!currentUser) {
+        currentUser = getStore().getState().users.current;
+    }
+    let lookupPermissions = permission;
+    if (!Array.isArray(lookupPermissions)) {
+        lookupPermissions = [lookupPermissions];
     }
 
-    /**
-     * Check if an a haystack contains 1 of the passed needles.
-     *
-     * @param needles The strings to check for.
-     * @param haystack The place to look for them.
-     */
-    private arrayContainsOneOf(needles: string[], haystack: string[]) {
-        return needles.some(val => haystack.indexOf(val) >= 0);
-    }
+    return (
+        currentUser.status === LoadStatus.SUCCESS &&
+        !!currentUser.data &&
+        (currentUser.data.isAdmin || arrayContainsOneOf(lookupPermissions, currentUser.data.permissions))
+    );
+}
+/**
+ * Check if an a haystack contains 1 of the passed needles.
+ *
+ * @param needles The strings to check for.
+ * @param haystack The place to look for them.
+ */
+function arrayContainsOneOf(needles: string[], haystack: string[]) {
+    return needles.some(val => haystack.indexOf(val) >= 0);
 }
 
 function mapDispatchToProps(dispatch) {

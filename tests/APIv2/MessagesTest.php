@@ -17,6 +17,11 @@ class MessagesTest extends AbstractResourceTest {
     protected static $conversationID;
 
     /**
+     * @var bool
+     */
+    protected $moderationAllowed = false;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
@@ -28,7 +33,7 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setupBeforeClass();
 
         /**
@@ -98,12 +103,10 @@ class MessagesTest extends AbstractResourceTest {
 
     /**
      * Test GET /resource/<id>.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testGet() {
+        $this->expectModerationException();
+
         parent::testGet();
     }
 
@@ -133,12 +136,10 @@ class MessagesTest extends AbstractResourceTest {
 
     /**
      * Test GET /messages.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 403
-     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testIndex() {
+        $this->expectModerationException();
+
         parent::testIndex();
     }
 
@@ -182,5 +183,16 @@ class MessagesTest extends AbstractResourceTest {
      */
     public function testPatchFull() {
         $this->fail(__METHOD__.' needs to be implemented');
+    }
+
+    /**
+     * Expect exceptions if conversation moderation isn't allowed.
+     */
+    private function expectModerationException(): void {
+        if (!$this->moderationAllowed) {
+            $this->expectException(\Exception::class);
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+        }
     }
 }

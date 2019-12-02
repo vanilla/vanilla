@@ -7,6 +7,11 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
+use Psr\Container\ContainerExceptionInterface;
+use Vanilla\Permissions;
 
 /**
  * Class Gdn_OAuth2
@@ -65,6 +70,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     private $sessionModel;
 
     /**
+     * @var \Garden\Container\Container
+     */
+    private $container;
+
+    /**
      * Set up OAuth2 access properties.
      *
      * @param string $providerKey Fixed key set in child class.
@@ -79,6 +89,15 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         }
     }
 
+    /**
+     * Generate a container key from a provider type.
+     *
+     * @param string $providerType The provider type (Gdn_AuthenticationProvider.AuthenticationSchemeAlias).
+     * @return string
+     */
+    final protected static function containerKey($providerType): string {
+        return "@oauth.{$providerType}";
+    }
 
     /**
      * Setup
@@ -86,7 +105,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     public function setup() {
         $this->structure();
     }
-
 
     /**
      * Create the structure in the database.
@@ -112,7 +130,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         }
     }
 
-
     /**
      * Check if there is enough data to connect to an authentication provider.
      *
@@ -123,6 +140,15 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return (val('AssociationSecret', $provider) && val('AssociationKey', $provider));
     }
 
+    /**
+     * Check if the provider is active.
+     *
+     * @return bool Returns **true** if the provider is active or **false** otherwise.
+     */
+    final public function isActive() {
+        $provider = $this->provider();
+        return !empty($provider['Active']);
+    }
 
     /**
      * Check if an access token has been returned from the provider server.
@@ -136,7 +162,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return true;
     }
 
-
     /**
      * Check authentication provider table to see if this is the default method for logging in.
      *
@@ -146,7 +171,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $provider = $this->provider();
         return val('IsDefault', $provider);
     }
-
 
     /**
      * Renew or return access token.
@@ -298,7 +322,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return $this->provider;
     }
 
-
     /**
      *  Get provider key.
      *
@@ -314,7 +337,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
      * initial request to log in to an authentication provider.
      *
-     * @param $sender
+     * @param Gdn_PluginManager $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
         $sender->registerCallback("entryController_{$this->providerKey}Redirect_create", [$this, 'entryRedirectEndpoint']);
@@ -349,12 +372,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      * Redirect to the OAuth redirect page with a verification nonce.
      *
      * @param EntryController $sender The controller initiating the request.
-     * @param  string $state The state to pass along the OAuth2 flow.
+     * @param string $state The state to pass along the OAuth2 flow.
      */
     public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
         $state = $this->decodeState($state);
         $url = $this->realAuthorizeUri($state);
-
         \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         redirectTo($url, 302, false);
     }
@@ -413,7 +435,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         $formFields = $formFields + $this->getSettingsFormFields();
 
-        $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+        $formFields['AllowAccessTokens'] = [
+            'LabelCode' => 'Allow this connection to issue API access tokens.',
+            'Control' => 'toggle'
+        ];
+        $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'toggle'];
 
         $sender->setData('_Form', $formFields);
 
@@ -444,27 +470,46 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function authorizeUri($state = []) {
         $params = empty($state) ? '' : '?'.http_build_query(['state' => $this->encodeState($state)]);
-
         return url("entry/{$this->providerKey}-redirect{$params}", true);
     }
 
     /**
-     * Create the URI that can return an authorization.
+     * Return the URL where the browser should be sent with all the necessary params to begin the authorization process.
+     *
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     * @return string Returns the sign-in URL.
+     */
+    final protected function realRegisterUri($state = []) {
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['RegisterUrl'], $state);
+        return $r;
+    }
+
+    /**
+     * Return the URL where the browser should be sent with all the necessary params to begin the registration process.
      *
      * @param array $state Optionally provide an array of variables to be sent to the provider.
      *
      * @return string Endpoint of the provider.
      */
     protected function realAuthorizeUri(array $state = []): string {
+        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['AuthorizeUrl'], $state);
+        return $r;
+    }
+
+    /**
+     * Add the state other needed params to the Authorize or Register URL.
+     *
+     * @param string $uri Either a RegisterURL or an AuthorizeURL.
+     * @param array $state Data that will be sent to the provider containing, for example, the target URL.
+     * @return string The URI of the provider's registration or authorization page with the state token attached.
+     */
+    final protected function generateAuthorizeUriWithStateToken(string $uri, array $state): string {
         $provider = $this->provider();
-
-        $uri = val('AuthorizeUrl', $provider);
-
-        $redirect_uri = '/entry/'.$this->getProviderKey();
-        $reponse_type = c('OAuth2.ResponseType', 'code');
+        $redirect_uri = '/entry/' . $this->getProviderKey();
+        $response_type = c('OAuth2.ResponseType', 'code');
 
         $defaultParams = [
-            'response_type' => $reponse_type,
+            'response_type' => $response_type,
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)
@@ -476,12 +521,11 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $get['state'] = $this->encodeState($state);
 
         if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
-            $get['prompt'] = $provider['Prompt'] ;
+            $get['prompt'] = $provider['Prompt'];
         }
 
-        return $uri.'?'.http_build_query($get);
+        return $uri . '?' . http_build_query($get);
     }
-
 
     /**
      * Generic API uses ProxyRequest class to fetch data from remote endpoints.
@@ -684,7 +728,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $sender->setData('Verified', true);
     }
 
-
     /**
      * Request access token from provider.
      *
@@ -722,7 +765,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
         return $this->accessTokenResponse;
     }
-
 
     /**
      *   Allow the admin to input the keys that their service uses to send data.
@@ -816,10 +858,28 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
 
     /**
+     * Redirect to provider's signin page if this is the default behaviour.
+     *
+     * @param EntryController $sender Entry Controller object.
+     * @param EntryController $args Array of Event Arguments from the Entry Controller.
+     *
+     * @return mixed|bool Return null if not configured.
+     */
+    public function entryController_overrideRegister_handler($sender, $args) {
+        $provider = $args['DefaultProvider'];
+        if (val('AuthenticationSchemeAlias', $provider) != $this->getProviderKey() || !$this->isConfigured()) {
+            return;
+        }
+
+        $url = $this->realRegisterUri(['target' => $args['Target']]);
+        $args['DefaultProvider']['RegisterUrl'] = $url;
+    }
+
+    /**
      * Inject a sign-in icon into the ME menu.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param Gdn_Controller $sender Controller object that executes the page the button will be on..
+     * @param Gdn_Controller $args Array of arguments from the host controller.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->isConfigured() || $this->isDefault()) {
@@ -870,7 +930,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         return $result;
     }
 
-
     /**
      * Insert css file for generic styling of signin button/icon.
      *
@@ -880,8 +939,6 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     public function assetModel_styleCss_handler($sender, $args) {
         $sender->addCssFile('oauth2.css', 'plugins/oauth2');
     }
-
-
 
     /** ------------------- Helper functions --------------------- */
 
@@ -953,11 +1010,23 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     /**
      * Inject dependencies without affecting subclass constructors.
      *
+     * Note that injecting the container is an anti-pattern, but is a trade-off in this case since this plugin is
+     * constructed every request.
+     *
      * @param SsoUtils $ssoUtils Used to generate SSO tokens.
+     * @param SessionModel $sessionModel Used to stash keys.
+     * @param \Psr\Container\ContainerInterface $container Used to get dependencies that are rarely used.
      */
-    public function setDependencies(SsoUtils $ssoUtils, SessionModel $sessionModel) {
+    public function setDependencies(
+        SsoUtils $ssoUtils,
+        SessionModel $sessionModel,
+        \Garden\Container\Container $container
+    ) {
         $this->ssoUtils = $ssoUtils;
         $this->sessionModel = $sessionModel;
+        $this->container = $container;
+
+        $this->container->setInstance(static::containerKey($this->providerKey), $this);
     }
 
     /**
@@ -1009,5 +1078,157 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 return [];
             }
         }
+    }
+
+    /**
+     * Exchange an OAuth access token for a Vanilla access token.
+     *
+     * @param TokensApiController $sender
+     * @param array $body
+     * @return \Garden\Web\Data
+     */
+    final public function tokensApiController_post_oauth(TokensApiController $sender, array $body): \Garden\Web\Data {
+        $sender->permission(Permissions::BAN_CSRF);
+
+        $in = $sender->schema([
+            'clientID:s',
+            'oauthAccessToken:s',
+        ], 'in');
+
+        $valid = $in->validate($body);
+
+        // Look up the specific addon that owns this client ID.
+        $instance = $this->getInstanceFromClientID($valid['clientID']);
+
+        try {
+            $result = $instance->issueAccessToken($valid['clientID'], $valid['oauthAccessToken']);
+        } catch (ContainerExceptionInterface $ex) {
+            throw new ServerException("There was an error getting the OAuth client instance.");
+        }
+
+        return new \Garden\Web\Data($result);
+    }
+
+    /**
+     * Connect the user payload with a user.
+     *
+     * @param array $payload The user profile.
+     * @return int
+     * @throws ClientException Throws an exception if the user cannot be connected for some reason.
+     * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
+     */
+    final private function sso(array $payload): int {
+        unset($payload['UserID']); // safety precaution due to Gdn_UserModel::connect() behaviour
+
+        /* @var \UserModel $userModel */
+        $userModel = $this->container->get(\UserModel::class);
+
+        $userID = $userModel->connect(
+            $payload['UniqueID'] ?? '',
+            $this->getProviderKey(),
+            $payload,
+            ['SyncExisting' => false]
+        );
+
+        if (!$userID) {
+            \Vanilla\Utility\ModelUtils::validationResultToValidationException($userModel, $this->container->get(\Gdn_Locale::class));
+        }
+
+        return (int)$userID;
+    }
+
+    /**
+     * Get the specific plugin instance from a client ID.
+     *
+     * This class stores the client ID in the attributes field, which makes it quite difficult to look up. Furthermore,
+     * There is no information in the `Gdn_AuthenticationProvider` table that lets us know which class controlls that
+     * row.
+     *
+     * To get around that this method loops through all of the providers to find a match and then gets the instance from
+     * the container.
+     *
+     * @param string $clientID
+     * @return $this
+     * @throws \Garden\Container\ContainerException Throws an exception when the instance wasn't properly registered in the container.
+     */
+    final public function getInstanceFromClientID(string $clientID): self {
+        $type = $this->getProviderTypeFromClientID($clientID);
+        $instance = $this->container->get(static::containerKey($type));
+
+        return $instance;
+    }
+
+    /**
+     * Get the provider type from a client ID.
+     *
+     * @param string $clientID
+     * @return string
+     * @throws NotFoundException Throws an exception if there is no provider with that client ID.
+     */
+    final private function getProviderTypeFromClientID(string $clientID): string {
+        $key = "authenticationPoviderType.clientID.$clientID";
+
+        $cachedType = Gdn::cache()->get($key);
+
+        if ($cachedType === Gdn_Cache::CACHEOP_FAILURE) {
+            $providers = Gdn_AuthenticationProviderModel::getWhereStatic();
+
+            foreach ($providers as $provider) {
+                if ($clientID === $provider['AssociationKey'] ?? '') {
+                    $cachedType = $provider['AuthenticationSchemeAlias'];
+                    Gdn::cache()->store($key, $cachedType, [Gdn_Cache::FEATURE_EXPIRY => 300]);
+                    return $cachedType;
+                }
+            }
+
+            throw new NotFoundException("An OAuth client with ID \"$clientID\" could not be found.");
+        }
+        return $cachedType;
+    }
+
+    /**
+     * Exchange an OAuth access token for a client ID.
+     *
+     * @param string $clientID The OAuth client ID (AssociationKey in the db).
+     * @param string $oauthAccessToken A valid access token for calling the OAuth server.
+     * @return array Returns an array with the access token and expiry date.
+     * @throws \Garden\Container\ContainerException Throws an exception if the addon instance was improperly registered.
+     */
+    final protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
+        if ($clientID !== $this->provider()['AssociationKey'] ?? null) {
+            throw new ClientException('Invalid client ID.', 422);
+        }
+
+        if (!$this->isConfigured()) {
+            throw new ServerException('The OAuth client has not been configured.', 500);
+        }
+
+        if (!$this->isActive()) {
+            throw new ServerException('The OAuth client is not active', 500);
+        }
+
+        if (!($this->provider()['AllowAccessTokens'] ?? false)) {
+            throw new ServerException('The OAuth client is not allowed to issue access tokens.', 500);
+        }
+
+        $this->accessToken($oauthAccessToken);
+        try {
+            $profile = $this->getProfile();
+        } catch (\Exception $ex) {
+            throw new \Garden\Web\Exception\ForbiddenException($ex->getMessage());
+        }
+
+        $userID = $this->sso($profile);
+
+        /* @var AccessTokenModel $tokenModel */
+        $tokenModel = $this->container->get(AccessTokenModel::class);
+
+        $expires = new DateTimeImmutable('+24 hours');
+        $token = $tokenModel->issue($userID, $expires, 'tokens/oauth');
+        $result = [
+            'accessToken' => $token,
+            'dateExpires' => $expires,
+        ];
+        return $result;
     }
 }

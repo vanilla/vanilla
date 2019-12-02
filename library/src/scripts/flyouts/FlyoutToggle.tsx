@@ -42,6 +42,7 @@ interface IProps {
     buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
     initialFocusElement?: HTMLElement | null;
+    tag?: string;
 }
 
 export default function FlyoutToggle(props: IProps) {
@@ -165,8 +166,9 @@ export default function FlyoutToggle(props: IProps) {
     };
 
     const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
+    const Tag = (props.tag ?? `div`) as "div";
     return (
-        <div
+        <Tag
             id={ID}
             className={classNames(classesDropDown, props.className, {
                 asModal: props.openAsModal,
@@ -205,6 +207,6 @@ export default function FlyoutToggle(props: IProps) {
                     )}
                 </React.Fragment>
             )}
-        </div>
+        </Tag>
     );
 }

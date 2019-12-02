@@ -6,7 +6,7 @@
 
 import ModalSizes from "@library/modal/ModalSizes";
 import { ModalView } from "@library/modal/ModalView";
-import { logWarning } from "@vanilla/utils";
+import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
@@ -86,13 +86,9 @@ export default class Modal extends React.Component<IProps, IState> {
         isWholePage: false,
     };
 
-    public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
+    private closeFocusElement: HTMLElement | null = null;
     private selfRef = React.createRef<HTMLDivElement>();
-
-    public state = {
-        exitElementSet: false,
-    };
 
     /**
      * Render the contents into a portal.
@@ -141,6 +137,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             `);
         }
 
+        this.setCloseFocusElement();
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
 
@@ -149,17 +146,12 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
-        this.forceUpdate();
     }
 
-    /**
-     * We need to check again for focus if the focus is by ref
-     */
     public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.elementToFocus !== this.props.elementToFocus) {
-            this.focusInitialElement();
+        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
+            this.setCloseFocusElement();
         }
-        this.setCloseFocusElement();
     }
 
     /**
@@ -178,11 +170,8 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
-        const prevFocussedElement = Modal.focusHistory.pop() || document.body;
-        prevFocussedElement.focus();
-        setImmediate(() => {
-            prevFocussedElement.focus();
-        });
+
+        this.closeFocusElement?.focus();
     }
 
     private getModalContainer(): HTMLElement {
@@ -214,11 +203,19 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      */
     private setCloseFocusElement() {
         // if we need to rerender the component, we don't want to include a bad value in the focus history
-        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
-            Modal.focusHistory.push(this.props.elementToFocusOnExit);
-            this.setState({
-                exitElementSet: true,
-            });
+        if (this.props.elementToFocusOnExit) {
+            this.closeFocusElement = this.props.elementToFocusOnExit;
+        } else {
+            // Get the last focused element
+            this.closeFocusElement = document.activeElement as HTMLElement;
+        }
+
+        if (debug() && (!this.closeFocusElement || this.closeFocusElement === document.documentElement)) {
+            const message = `
+Dev Mode Error: Could not detect an element to focus on <Modal /> close.
+
+It seems auto-detection isn't working, so you'll need to specify the "elementToFocusOnExit" props.`;
+            throw new Error(message);
         }
     }
 

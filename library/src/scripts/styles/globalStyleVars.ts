@@ -172,7 +172,7 @@ export const globalVariables = useThemeCache(() => {
         },
         alignment: {
             headings: {
-                capitalLetterRatio: 0.715, // Calibrated for Open Sans
+                capitalLetterRatio: 0.73, // Calibrated for Open Sans
                 verticalOffset: 1, // Calibrated for Open Sans
                 horizontal: -0.03, // Calibrated for Open Sans
                 verticalOffsetForAdjacentElements: "-.13em", // Calibrated for Open Sans

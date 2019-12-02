@@ -307,7 +307,6 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
             <DropDown
                 id={this.id}
                 name={t("Messages")}
-                renderLeft={true}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<MessagesCount open={this.state.open} compact={false} />}

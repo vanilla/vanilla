@@ -17,18 +17,20 @@ export interface IWithLinkContext {
     makeHref(location: LocationDescriptor): string;
 }
 
+const defaultMakeHref = (location: LocationDescriptor) => {
+    const stringUrl = typeof location === "string" ? location : createPath(location);
+    return formatUrl(stringUrl, true);
+};
 export const LinkContext = React.createContext<IWithLinkContext>({
     linkContext: formatUrl("/"),
-    pushSmartLocation: () => {
-        return;
+    pushSmartLocation: location => {
+        const href = defaultMakeHref(location);
+        window.location.href = href;
     },
     isDynamicNavigation: () => {
         return false;
     },
-    makeHref: (location: LocationDescriptor) => {
-        const stringUrl = typeof location === "string" ? location : createPath(location);
-        return formatUrl(stringUrl, true);
-    },
+    makeHref: defaultMakeHref,
 });
 
 interface IProps extends RouteComponentProps<any> {

@@ -1515,20 +1515,20 @@ if (!function_exists('_formatStringCallback')) {
                                     continue;
                                 }
 
+                                $separator = '';
                                 if ($i == $count - 1) {
-                                    $result .= ' '.t('sep and', 'and').' ';
+                                    $separator = ' '.t('sep and', 'and').' ';
                                 } elseif ($i > 0) {
-                                    $result .= ', ';
+                                    $separator = ', ';
                                 }
-
                                 $special = [-1 => t('everyone'), -2 => t('moderators'), -3 => t('administrators')];
                                 if (isset($special[$iD])) {
-                                    $result .= $special[$iD];
+                                    $result .= $separator.$special[$iD];
                                 } else {
                                     $user = Gdn::userModel()->getID($iD);
-                                    if ($user) {
+                                    if ($user && $user->Deleted == 0) {
                                         $user->Name = formatUsername($user, $format, $contextUserID);
-                                        $result .= userAnchor($user);
+                                        $result .= $separator.userAnchor($user);
                                     }
                                 }
                             }
@@ -2137,7 +2137,7 @@ if (!function_exists('isWritable')) {
      * @return bool Returns true if {@link $path} is writable or false otherwise.
      */
     function isWritable($path) {
-        if ($path{strlen($path) - 1} == DS) {
+        if (substr($path, -1) === DS) {
             // Recursively return a temporary file path
             return isWritable($path.uniqid(mt_rand()).'.tmp');
         } elseif (is_dir($path)) {

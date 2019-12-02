@@ -51,7 +51,10 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                                 logoType={LogoType.MOBILE}
                             />
                             {isGuest ? (
-                                <TitleBarNav className={classNames(titleBarVars.nav, "titleBar-guest")}>
+                                <TitleBarNav
+                                    className={classNames(titleBarVars.nav, "titleBar-guest")}
+                                    excludeExtraNavItems={true}
+                                >
                                     <TitleBarNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         <SignInIcon className={"titleBar-signInIcon"} />
                                     </TitleBarNavItem>
@@ -65,7 +68,7 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                 <div className={classes.bottom}>
                     <div className={titleBarVars.scroll}>
                         <TitleBarNav
-                            {...dummyNavigationData}
+                            {...dummyNavigationData()}
                             className={classNames("titleBar-nav", titleBarVars.nav)}
                             linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
                             linkContentClassName="titleBar-navLinkContent"

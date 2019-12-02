@@ -114,6 +114,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        listStyle: "none",
     });
 
     const contents = style("contents", {
@@ -353,10 +354,10 @@ export const dropDownClasses = useThemeCache(() => {
     const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
 
     const contentOffsetLeft = style("contentOffsetLeft", {
-        transform: `translateX(${negative(unit(flyoutOffset))})`,
+        transform: `translateX(${unit(flyoutOffset)})`,
     });
     const contentOffsetRight = style("contentOffsetRight", {
-        transform: `translateX(${unit(flyoutOffset)})`,
+        transform: `translateX(${negative(unit(flyoutOffset))})`,
     });
 
     return {

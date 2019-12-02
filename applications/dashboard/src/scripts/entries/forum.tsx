@@ -19,6 +19,7 @@ import NotificationsModel from "@library/features/notifications/NotificationsMod
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent } from "@library/utility/componentRegistry";
+import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -39,3 +40,5 @@ addComponent("App", () => (
         <Router disableDynamicRouting />
     </AppContext>
 ));
+
+addComponent("title-bar-hamburger", TitleBarHamburger);

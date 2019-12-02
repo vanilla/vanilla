@@ -557,7 +557,7 @@ export const titleBarClasses = useThemeCache(() => {
     const desktopNavWrap = style("desktopNavWrap", {
         position: "relative",
         flexGrow: 1,
-        ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
+        $nest: addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any,
     });
 
     return {
@@ -635,11 +635,11 @@ export const titleBarHomeClasses = useThemeCache(() => {
             backgroundColor: colorOut(vars.bottomRow.bg),
             height: unit(vars.sizing.height),
             width: percent(100),
-            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
+            $nest: addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any,
         },
         mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
-            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any),
+            $nest: addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any,
         }),
     );
 

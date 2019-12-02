@@ -37,7 +37,7 @@ class NoEmailTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
 
@@ -49,7 +49,7 @@ class NoEmailTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->startSessionOnSetup(false);
         parent::setUp();
 
@@ -92,7 +92,7 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('authenticationStep', $body);
         $this->assertEquals('authenticated', $body['authenticationStep']);
 
@@ -105,7 +105,7 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('isUserLinked', $body);
         $this->assertEquals(true, $body['isUserLinked']);
 

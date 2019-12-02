@@ -34,13 +34,18 @@ import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SignInIcon } from "@library/icons/common";
+import DropDown from "@library/flyouts/DropDown";
+import Hamburger from "@library/flyouts/Hamburger";
+import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
-    mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
+    mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
     isFixed?: boolean;
+    useMobileBackButton?: boolean;
+    hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
 }
 
 interface IState {
@@ -73,6 +78,8 @@ export class TitleBar extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         mobileDropDownContent: null,
         isFixed: true,
+        useMobileBackButton: true,
+        hamburger: false,
     };
 
     public state = {
@@ -81,10 +88,11 @@ export class TitleBar extends React.Component<IProps, IState> {
         isScrolledOff: false,
     };
     public render() {
-        const { isFixed } = this.props;
+        const { isFixed, hamburger } = this.props;
         const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
+        const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
 
         const fixedClass = style({
@@ -110,17 +118,20 @@ export class TitleBar extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("titleBar-bar", classes.bar)}>
-                            {!this.state.openSearch && isMobile && (
-                                <BackLink
-                                    className={classNames(
-                                        "titleBar-leftFlexBasis",
-                                        "titleBar-backLink",
-                                        classes.leftFlexBasis,
-                                    )}
-                                    linkClassName={classes.button}
-                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                />
-                            )}
+                            {!this.state.openSearch &&
+                                isMobile &&
+                                (this.props.useMobileBackButton ? (
+                                    <BackLink
+                                        className={classNames(
+                                            "titleBar-leftFlexBasis",
+                                            "titleBar-backLink",
+                                            classes.leftFlexBasis,
+                                        )}
+                                        linkClassName={classes.button}
+                                    />
+                                ) : (
+                                    !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
+                                ))}
                             {!isMobile && (
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
@@ -130,21 +141,36 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isMobile && (
                                 <TitleBarNav
-                                    {...dummyNavigationData}
+                                    {...dummyNavigationData()}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"
                                 />
                             )}
-                            {showMobileDropDown && (
+                            {showMobileDropDown && !showHamburger && (
                                 <MobileDropDown
                                     title={this.props.title!}
-                                    buttonClass={classNames("titleBar-mobileDropDown", classes.topElement)}
+                                    buttonClass={classNames("titleBar-mobileDropDown")}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>
                             )}
 
+                            {showHamburger && (
+                                <>
+                                    <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
+                                    <FlexSpacer
+                                        className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
+                                    />
+                                    <div className={classes.logoCenterer}>
+                                        <HeaderLogo
+                                            className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                            logoClassName="titleBar-logo"
+                                            logoType={LogoType.MOBILE}
+                                        />
+                                    </div>
+                                </>
+                            )}
                             <ConditionalWrap
                                 className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
                                 condition={!!showMobileDropDown}

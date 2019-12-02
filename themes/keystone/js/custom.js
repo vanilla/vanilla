@@ -4,11 +4,11 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-var o="needsInitialization",i="data-height",r="0px";
+var o="needsInitialization",i="data-height",r="0px";function u(e){e.style.height=r}function c(e){if(e&&e.classList){e.classList.add(o),e.style.height="auto";var t=e.getBoundingClientRect().height;e.setAttribute(i,t.toString()),u(e),e.classList.remove(o)}}
 /*!
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-$(function(){(function(){var e=document.querySelector("#menu-button"),t=document.querySelector(".js-nav"),n=document.querySelector(".js-mobileMebox"),u=document.querySelector(".mobileMeBox-button"),c=document.querySelector(".mobileMebox-buttonClose"),l=document.querySelector("#MainHeader");function s(e){e.style.height===r?function(e){e.style.height=e.getAttribute(i)+"px"}(e):a(e)}function a(e){e.style.height=r}function d(e){e.classList.add(o),e.style.height="auto";var t=e.getBoundingClientRect().height;e.setAttribute(i,t.toString()),a(e),e.classList.remove(o)}d(n),d(t),window.addEventListener("resize",function(){requestAnimationFrame(function(){d(n),d(t)})}),e.addEventListener("click",function(){e.classList.toggle("isToggled"),l.classList.toggle("hasOpenNavigation"),a(n),s(t)}),u&&u.addEventListener("click",function(){u.classList.toggle("isToggled"),l.classList.remove("hasOpenNavigation"),e.classList.remove("isToggled"),a(t),s(n)}),c&&c.addEventListener("click",function(){a(n)})})(),$("select").wrap('<div class="SelectWrapper"></div>')})}]);
+$(function(){window.gdn.getMeta("featureFlags.DataDrivenTitleBar.Enabled",!1)||function(){var e=document.querySelector("#menu-button"),t=document.querySelector(".js-nav"),n=document.querySelector(".js-mobileMebox"),o=document.querySelector(".mobileMeBox-button"),l=document.querySelector(".mobileMebox-buttonClose"),a=document.querySelector("#MainHeader");function s(e){e.style.height===r?function(e){e.style.height=e.getAttribute(i)+"px"}(e):u(e)}c(n),c(t),window.addEventListener("resize",function(){requestAnimationFrame(function(){c(n),c(t)})}),e&&e.addEventListener("click",function(){e.classList.toggle("isToggled"),a.classList.toggle("hasOpenNavigation"),u(n),s(t)}),o&&o.addEventListener("click",function(){o.classList.toggle("isToggled"),a.classList.remove("hasOpenNavigation"),e.classList.remove("isToggled"),u(t),s(n)}),l&&l.addEventListener("click",function(){u(n)})}(),$("select").wrap('<div class="SelectWrapper"></div>')})}]);
 //# sourceMappingURL=custom.js.map

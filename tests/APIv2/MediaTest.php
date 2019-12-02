@@ -36,7 +36,7 @@ class MediaTest extends AbstractAPIv2Test {
             "{$this->baseUrl}/{$mediaID}/attachment",
             $updatedAttachment
         );
-        $this->assertArraySubset($updatedAttachment, $result->getBody());
+        $this->assertEquals($updatedAttachment, array_intersect_assoc($updatedAttachment, $result->getBody()));
     }
 
     /**
@@ -144,7 +144,7 @@ class MediaTest extends AbstractAPIv2Test {
      */
     private function validateMedia(UploadedFile $uploadedFile, HttpResponse $result) {
         $body = $result->getBody();
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
 
         $this->assertArrayHasKey('mediaID', $body);
         $this->assertTrue(is_int($body['mediaID']));

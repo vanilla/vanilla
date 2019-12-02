@@ -37,9 +37,9 @@ class ApiFilterMiddlewareTest extends TestCase {
         $request = new Request();
         $testSuccessArray = [0 => ['discussionid' => 1]];
         $response =  call_user_func($this->middleware, $request, function ($request) use ($testSuccessArray) {
-            return new Data($testSuccessArray , ['request' => $request, 'api-allow' => ['discussionid']]);
+            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['discussionid']]);
         });
-        $this->assertEquals([0 => ['discussionid' => 1]] , $response->getData());
+        $this->assertEquals([0 => ['discussionid' => 1]], $response->getData());
     }
 
     /**

@@ -53,7 +53,17 @@ class ApiFilterMiddlewareTest extends TestCase {
         $this->expectExceptionMessage('Validation failed for field email');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
-        $testFailureArray = [['discussionid' => 1, 'name' => 'testuser', 'photo' => 'http://test.localhost', 'insertUser' => ['userID'=> 1, 'name' => 'testuser', 'email' => 'test@test.com']]];
+        $testFailureArray = [
+            [
+                'discussionid' => 1,
+                'name' => 'testuser',
+                'photo' => 'http://test.localhost',
+                'insertUser' => [
+                    'userID'=> 1,
+                    'name' => 'testuser',
+                    'email' => 'test@test.com']
+            ]
+        ];
         call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
             return new Data($testFailureArray, ['request' => $request]);
         });

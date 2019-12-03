@@ -36,10 +36,10 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     public function testValidationFail() {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Validation failed for field password');
+        $this->expectExceptionMessage('Validation failed for field insertipaddress');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
-        $testFailureArray = [['discussionid' => 1, 'name' => 'testuser', 'photo' => 'http://test.localhost', 'password' => 123]];
+        $testFailureArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
         call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
             return new Data($testFailureArray, ['request' => $request]);
         });
@@ -56,8 +56,8 @@ class ApiFilterMiddlewareTest extends TestCase {
         $testFailureArray = [
             [
                 'discussionid' => 1,
-                'name' => 'testuser',
-                'photo' => 'http://test.localhost',
+                'name' => 'testdiscussion',
+                'type' => 'discussion',
                 'insertUser' => [
                     'userID'=> 1,
                     'name' => 'testuser',

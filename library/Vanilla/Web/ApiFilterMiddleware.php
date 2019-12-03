@@ -34,6 +34,7 @@ class ApiFilterMiddleware {
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
+        $this->addBlacklistField('String');
         $apiAllow = $response->getMeta('api-allow');
         if (!is_array($apiAllow)) {
             $apiAllow = [];
@@ -44,8 +45,9 @@ class ApiFilterMiddleware {
             $apiAllow = array_flip($apiAllow);
             $blacklist = array_flip($this->blacklist);
             array_walk_recursive($data, function (&$value, $key) use ($apiAllow, $blacklist) {
-                $isBlacklisted = isset($blacklist[strtolower($key)]);
-                $isAllowedField = isset($apiAllow[strtolower($key)]);
+                $key = strtolower($key);
+                $isBlacklisted = isset($blacklist[$key]);
+                $isAllowedField = isset($apiAllow[$key]);
                 if ($isBlacklisted && !$isAllowedField) {
                     throw new ServerException('Validation failed for field'.' '.$key);
                 }
@@ -60,8 +62,9 @@ class ApiFilterMiddleware {
      * @param string $field The field to add to the blacklist.
      */
     protected function addBlacklistField(string $field) {
-        if (!in_array(strtolower($field), $this->blacklist)) {
-            array_push($this->blacklist, strtolower($field));
+        $field = strtolower($field);
+        if (!in_array($field, $this->blacklist)) {
+            $this->blacklist[] = $field;
         }
     }
 

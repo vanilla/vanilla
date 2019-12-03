@@ -41,14 +41,19 @@ function UserDropDownContents(props: IProps) {
             <DropDownUserCard className="userDropDown-userCard" />
             <DropDownItemSeparator />
             <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+            <DropDownSection title={t("Articles")}>
+                <Permission permission="articles.add">
+                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("ArticleDrafts")} />
+                </Permission>
+            </DropDownSection>
             <DropDownSection title={t("Discussions")}>
                 <DropDownItemLinkWithCount
                     to={"/discussions/bookmarked"}
                     name={t("Bookmarks")}
                     count={getCountByName("Bookmarks")}
                 />
-                <Permission permission="articles.add">
-                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                <Permission permission="Discussions.Add">
+                    <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
                 </Permission>
                 <DropDownItemLinkWithCount
                     to="/discussions/mine"

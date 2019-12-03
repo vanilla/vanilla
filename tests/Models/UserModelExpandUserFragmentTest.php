@@ -42,7 +42,7 @@ class UserModelExpandUserFragmentTest extends TestCase {
     /**
      * Get a new model for each test.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->model = $this->container()->get(\UserModel::class);

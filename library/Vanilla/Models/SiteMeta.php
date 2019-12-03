@@ -11,6 +11,7 @@ use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\Addon;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * A class for gathering particular data about the site.
@@ -65,18 +66,26 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $orgName;
 
+    /** @var string */
+    private $cacheBuster;
+
+    /** @var string */
+    private $staticPathFolder = '';
+
     /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
+     * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
         RequestInterface $request,
         Contracts\ConfigurationInterface $config,
         SiteSectionModel $siteSectionModel,
+        DeploymentCacheBuster $deploymentCacheBuster,
         ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
@@ -106,6 +115,9 @@ class SiteMeta implements \JsonSerializable {
 
         // localization
         $this->localeKey = $this->currentSiteSection->getContentLocale();
+
+        // DeploymentCacheBuster
+        $this->cacheBuster = $deploymentCacheBuster->value();
 
         // Theming
         $this->activeTheme = $activeTheme;
@@ -138,6 +150,8 @@ class SiteMeta implements \JsonSerializable {
                 'basePath' => $this->basePath,
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
+                'cacheBuster' => $this->cacheBuster,
+                'staticPathFolder' => $this->staticPathFolder,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
@@ -251,5 +265,12 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getMobileAddressBarColor(): ?string {
         return $this->mobileAddressBarColor;
+    }
+
+    /**
+     * @param string $staticPathFolder
+     */
+    public function setStaticPathFolder(string $staticPathFolder) {
+        $this->staticPathFolder = $staticPathFolder;
     }
 }

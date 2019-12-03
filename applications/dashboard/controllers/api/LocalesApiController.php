@@ -129,13 +129,6 @@ class LocalesApiController extends Controller {
     public function index_translations(string $locale, array $query = []) {
         $this->permission();
 
-        $in = $this->schema([
-            'etag:s?' => 'Whether or not output is cached.'
-        ], 'in');
-        $out = $this->schema([':o'], 'out');
-
-        $query = $in->validate($query);
-
         $this->locale->set($locale);
 
         // Don't bother validating the translations since they are a free-form array.
@@ -145,10 +138,7 @@ class LocalesApiController extends Controller {
             $translations = (object)[];
         }
         $r = new Data($translations);
-        if (!empty($query['etag'])) {
-            $r->setHeader('Cache-Control', 'public, max-age=604800');
-        }
-
+        $r->setHeader('Cache-Control', 'public, max-age=1800');
         return $r;
     }
 

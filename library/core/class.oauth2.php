@@ -524,7 +524,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             $get['prompt'] = $provider['Prompt'];
         }
 
-        return $uri . '?' . http_build_query($get);
+        return $uri.(strpos($uri, '?') !== false ? '&' : '?').http_build_query($get);
     }
 
     /**

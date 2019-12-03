@@ -6,18 +6,13 @@
 
 namespace Vanilla\Web;
 
-use Garden\Web\Data;
-use Garden\Web\Exception\ServerException;
+use Garden\EventManager;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Theme\JavascriptAsset;
-use Vanilla\Theme\JsonAsset;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\JsInterpop\ReduxAction;
-use Vanilla\Theme\FontsAsset;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -38,9 +33,10 @@ abstract class ThemedPage extends Page {
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
-        ThemePreloadProvider $themeProvider = null // Default required to conform to interface
+        ThemePreloadProvider $themeProvider = null, // Default required to conform to interface
+        EventManager $eventManager
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $eventManager);
         $this->themeProvider = $themeProvider;
         $this->initAssets();
     }

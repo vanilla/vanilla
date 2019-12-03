@@ -94,7 +94,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      *
      * @param string $uri The URL with or without a query string already attached.
      * @param array $get Array of key/value pairs to be passed as GET params.
-     * @return string URL with
+     * @return string URL with or without param string attached.
      */
     public static function concatUriQueryString(string $uri, array $get = []): string {
         if (!$get) {

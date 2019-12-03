@@ -91,7 +91,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
     /**
      * Add a query to a URL without checking if there is already a query attached.
-     * 
+     *
      * @param string $uri The URL with or without a query string already attached.
      * @param array $get Array of key/value pairs to be passed as GET params.
      * @return string URL with

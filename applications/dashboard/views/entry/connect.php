@@ -123,7 +123,7 @@ if (!$hasUserID) {
                     if (count($ExistingUsers) >= 1 && !$NoConnectName){
                         echo $this->Form->label('Username', 'ConnectName');
                         echo \Gdn::translate('ConnectWithExistingUser', 'One or more users with your name already exist, would you like to connect as them?');
-                        $connectNameMessage = (!$allowConnect) ? '' : ' <span class="FinePrint">('.\Gdn::translate('Requires a password').')</span>';
+                        $connectNameMessage = (!$allowConnect) ? '' : ' <span class="FinePrint">'.\Gdn::translate('Requires a password').'</span>';
                         foreach ($ExistingUsers as $Row) {
                             echo wrap($this->Form->radio('UserSelect', $Row['Name'] . $connectNameMessage, ['value' => $Row['UserID'], 'class' => 'existingConnectName']), 'div');
                         }

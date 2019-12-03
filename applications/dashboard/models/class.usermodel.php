@@ -1558,7 +1558,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         $record = $this->getID($id, DATASET_TYPE_ARRAY);
         if ($record === false) {
             if ($useUnknownFallback) {
-                return $this->getUnknownFragment();
+                $record = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
             } else {
                 throw new NoResultsException("No user found for ID: " . $id);
             }

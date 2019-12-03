@@ -38,13 +38,14 @@ class ApiFilterMiddleware {
         if (!is_array($apiAllow)) {
             $apiAllow = [];
         }
-
         // Make sure filtering is done for apiv2.
         if (is_array($data)) {
             // Check for blacklisted fields.
-            array_walk_recursive($data, function (&$value, $key) use ($apiAllow) {
-                $isBlacklisted = in_array(strtolower($key), $this->blacklist);
-                $isAllowedField = in_array(strtolower($key), $apiAllow);
+            $apiAllow = array_flip($apiAllow);
+            $blacklist = array_flip($this->blacklist);
+            array_walk_recursive($data, function (&$value, $key) use ($apiAllow, $blacklist) {
+                $isBlacklisted = isset($blacklist[strtolower($key)]);
+                $isAllowedField = isset($apiAllow[strtolower($key)]);
                 if ($isBlacklisted && !$isAllowedField) {
                     throw new ServerException('Validation failed for field'.' '.$key);
                 }
@@ -56,9 +57,22 @@ class ApiFilterMiddleware {
     /**
      * Modify the blacklist.
      *
-     * @param array $fields The fields to add to the blacklist.
+     * @param string $field The field to add to the blacklist.
      */
-    protected function addBlacklistFields(array $fields) {
-        $this->blacklist = array_merge($this->blacklist, $fields);
+    protected function addBlacklistField(string $field) {
+        if (!in_array(strtolower($field), $this->blacklist)) {
+            array_push($this->blacklist, strtolower($field));
+        }
+    }
+
+    /**
+     * Remove a blacklisted field.
+     *
+     * @param string $field The field to remove from the blacklist.
+     */
+    protected function removeBlacklistField(string $field) {
+        if (($key = array_search(strtolower($field), $this->blacklist)) !== false) {
+            unset($this->blacklist[$key]);
+        }
     }
 }

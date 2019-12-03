@@ -19,27 +19,16 @@ use VanillaTests\Fixtures\Request;
 class ApiFilterMiddlewareTest extends TestCase {
 
     /**
-     * @var ApiFilterMiddleware
-     */
-    protected $middleware;
-
-    /**
-     * Setup
-     */
-    public function setUp(): void {
-        $this->middleware = new ApiFilterMiddleware();
-    }
-
-    /**
      * Test ApiFilterMiddleware with a whitelisted field.
      */
     public function testValidationSuccess() {
         $request = new Request();
-        $testSuccessArray = [0 => ['discussionid' => 1]];
-        $response =  call_user_func($this->middleware, $request, function ($request) use ($testSuccessArray) {
-            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['discussionid']]);
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testSuccessArray = ['discussionid' => 1];
+        $response =  call_user_func($apiMiddleware, $request, function ($request) use ($testSuccessArray) {
+            return new Data($testSuccessArray, ['request' => $request]);
         });
-        $this->assertEquals([0 => ['discussionid' => 1]], $response->getData());
+        $this->assertEquals(['discussionid' => 1], $response->getData());
     }
 
     /**
@@ -49,8 +38,23 @@ class ApiFilterMiddlewareTest extends TestCase {
         $this->expectException(ServerException::class);
         $this->expectExceptionMessage('Validation failed for field password');
         $request = new Request();
-        $testFailureArray = ['insertuserid' => ['discussionid' => 1,'password' => 123]];
-        call_user_func($this->middleware, $request, function ($request) use ($testFailureArray) {
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testFailureArray = [['discussionid' => 1, 'name' => 'testuser', 'photo' => 'http://test.localhost', 'password' => 123]];
+        call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
+            return new Data($testFailureArray, ['request' => $request]);
+        });
+    }
+
+    /**
+     * Test ApiFilterMiddleware with multiple layered test data.
+     */
+    public function testLayeredValidationFail() {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage('Validation failed for field email');
+        $request = new Request();
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testFailureArray = [['discussionid' => 1, 'name' => 'testuser', 'photo' => 'http://test.localhost', 'insertUser' => ['userID'=> 1, 'name' => 'testuser', 'email' => 'test@test.com']]];
+        call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
             return new Data($testFailureArray, ['request' => $request]);
         });
     }

@@ -43,7 +43,11 @@ function UserDropDownContents(props: IProps) {
             <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
             <DropDownSection title={t("Articles")}>
                 <Permission permission="articles.add">
-                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("ArticleDrafts")} />
+                    <DropDownItemLinkWithCount
+                        to="/kb/drafts"
+                        name={t("Drafts")}
+                        count={getCountByName("ArticleDrafts")}
+                    />
                 </Permission>
             </DropDownSection>
             <DropDownSection title={t("Discussions")}>

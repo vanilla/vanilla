@@ -140,6 +140,7 @@ jobs:
             - *run_php_lint
     php_72_tests:
         executor: core/php72
+        resource_class: large
         steps: &php_unit_test_steps
             - *attach_workspace
             - run:
@@ -172,10 +173,9 @@ jobs:
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
-            - store_artifacts:
-                path: ~/phpunit
     php_72_integration:
         executor: core/php72
+        resource_class: large
         steps: &php_integration_test_steps
             - *attach_workspace
             - core/prepare_php_tests
@@ -200,6 +200,8 @@ jobs:
                         --log-junit ~/phpunit/models-junit.xml \
                         --coverage-clover=models-coverage.xml
             - *upload_coverage
+            - store_test_results:
+                path: ~/phpunit
     php_73_lint:
         executor: core/php73
         steps: *php_lint_steps

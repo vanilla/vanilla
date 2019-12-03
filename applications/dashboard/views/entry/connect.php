@@ -122,8 +122,7 @@ if (!$hasUserID) {
                     // Found User's Name in GDN_User.
                     if (count($ExistingUsers) >= 1 && !$NoConnectName){
                         echo $this->Form->label('Username', 'ConnectName');
-                        $connectInstructions = \Gdn::translate('One or more users with your name already exist, would you like to connect as them?');
-                        echo $connectInstructions;
+                        echo \Gdn::translate('ConnectWithExistingUser', 'One or more users with your name already exist, would you like to connect as them?');
                         $connectNameMessage = (!$allowConnect) ? '' : \Gdn::translate(' <span class="FinePrint">(Requires a password)</span>');
                         foreach ($ExistingUsers as $Row) {
                             echo wrap($this->Form->radio('UserSelect', $Row['Name'] . $connectNameMessage, ['value' => $Row['UserID'], 'class' => 'existingConnectName']), 'div');

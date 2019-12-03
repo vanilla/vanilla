@@ -290,9 +290,8 @@ export default class MarkdownModule {
         {
             name: "bold",
             type: MarkdownMacroType.INLINE,
-            pattern: /(\*{2})(.*?)\*{2}\1/g,
+            pattern: /(?:\*|_){2}(.+?)(?:\*|_){2}$/g,
             handler: (text, selection, pattern, lineStart) => {
-                console.log("bold" + text);
                 const match = pattern.exec(text);
                 if (!match) {
                     return;
@@ -307,7 +306,7 @@ export default class MarkdownModule {
 
                 this.quill.deleteText(startIndex, annotatedText.length);
                 this.quill.insertText(startIndex, matchedText, { bold: true });
-                this.quill.format("bold: ", false);
+                this.quill.format("bold", false);
             },
         },
         {
@@ -315,17 +314,15 @@ export default class MarkdownModule {
             type: MarkdownMacroType.INLINE,
             pattern: /(?:\*|_){1}(.+?)(?:\*|_){1}$/g,
             handler: (text, selection, pattern, lineStart) => {
-                console.log("italic: " + text);
                 const match = pattern.exec(text);
                 if (!match) {
                     return;
                 }
-
                 const annotatedText = match[0];
                 const matchedText = match[1];
                 const startIndex = lineStart + match.index;
 
-                if (text.match(/^([*_ \n]+)$/g) || text.match(/\*(.*?)\*/g)) {
+                if (text.match(/^([*_ \n]+)$/g)) {
                     return;
                 }
 

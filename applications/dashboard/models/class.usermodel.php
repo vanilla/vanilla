@@ -1154,6 +1154,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             'name' => 'unknown',
             'email' => 'unknown@example.com',
             'photoUrl' => self::getDefaultAvatarUrl(),
+            'dateLastActive' => time(0),
         ];
         switch ($key) {
             case self::GENERATED_FRAGMENT_KEY_GUEST:
@@ -1233,11 +1234,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
-                    } else {
-                        $user = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
                     }
                 }
-
+                $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
                 $user =  UserFragmentSchema::normalizeUserFragment($user);
                 setValue($destination, $row, $user);
             }

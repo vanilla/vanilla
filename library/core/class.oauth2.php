@@ -90,6 +90,20 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     }
 
     /**
+     * Add a query to a URL without checking if there is already a query attached.
+     * 
+     * @param string $uri The URL with or without a query string already attached.
+     * @param array $get Array of key/value pairs to be passed as GET params.
+     * @return string URL with
+     */
+    public static function concatUriQueryString(string $uri, array $get = []): string {
+        if (!$get) {
+            return $uri;
+        }
+        return $uri . (strpos($uri, '?') !== false ? '&' : '?') . http_build_query($get);
+    }
+
+    /**
      * Generate a container key from a provider type.
      *
      * @param string $providerType The provider type (Gdn_AuthenticationProvider.AuthenticationSchemeAlias).
@@ -523,8 +537,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         if (array_key_exists('Prompt', $provider) && isset($provider['Prompt'])) {
             $get['prompt'] = $provider['Prompt'];
         }
-
-        return $uri.(strpos($uri, '?') !== false ? '&' : '?').http_build_query($get);
+        return self::concatUriQueryString($uri, $get);
     }
 
     /**

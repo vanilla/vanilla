@@ -44,7 +44,6 @@ export const blockQuoteCSS = useThemeCache(() => {
         boxSizing: "border-box",
         width: percent(100),
         verticalAlign: "middle",
-        color: colorOut(vars.colors.fg),
     });
     cssRule(".blockquote-content", {
         $nest: {

@@ -18,9 +18,10 @@ aliases:
         run:
             name: Upload Coverage
             command: |
+                cd ~/workspace/repo
                 curl -s https://codecov.io/bash | bash -s -- \
                     -s "$HOME/workspace/repo" \
-                    -y "$HOME/workspace/repo/.codecov.yml"\
+                    -y ".codecov.yml"\
                     -Z || echo 'Codecov upload failed'
     - &run_composer
         run:

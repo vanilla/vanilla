@@ -30,4 +30,12 @@ class ExternalAsset implements AssetInterface {
     public function getWebPath(): string {
         return $this->url;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStatic(): bool
+    {
+        return false;
+    }
 }

@@ -14,6 +14,10 @@ aliases:
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
+    - &prepare_coverage
+        run:
+            name: Prepare Coverage
+            command: mkdir ~/phpunit
     - &upload_coverage
         run:
             name: Upload Coverage
@@ -144,6 +148,7 @@ jobs:
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
             - core/prepare_php_tests
+            - *prepare_coverage
             - run:
                 name: Library Tests
                 command: |
@@ -152,6 +157,7 @@ jobs:
                         -c phpunit.xml.dist \
                         --exclude-group=ignore \
                         --testsuite="Library" \
+                        --log-junit ~/phpunit/library-junit.xml \
                         --coverage-clover=library-coverage.xml
             - run:
                 name: APIv2 Tests
@@ -161,17 +167,13 @@ jobs:
                         -c phpunit.xml.dist \
                         --exclude-group=ignore \
                         --testsuite="APIv2" \
+                        --log-junit ~/phpunit/apiv2-junit.xml \
                         --coverage-clover=apiv2-coverage.xml
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="Models" \
-                        --coverage-clover=models-coverage.xml
             - *upload_coverage
+            - store_test_results:
+                path: ~/phpunit
+            - store_artifacts:
+                path: ~/phpunit
     php_72_integration:
         executor: core/php72
         steps: &php_integration_test_steps
@@ -187,6 +189,16 @@ jobs:
                         --exclude-group=ignore \
                         --testsuite="APIv0" \
                         --coverage-clover=apiv0-coverage.xml
+            - run:
+                name: Models Tests
+                command: |
+                    cd ~/workspace/repo
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="Models" \
+                        --log-junit ~/phpunit/models-junit.xml \
+                        --coverage-clover=models-coverage.xml
             - *upload_coverage
     php_73_lint:
         executor: core/php73

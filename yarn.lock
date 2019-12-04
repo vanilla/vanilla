@@ -15227,9 +15227,9 @@ quill-delta@^3.6.2:
     extend "^3.0.2"
     fast-diff "1.1.2"
 
-"quill@https://github.com/vanilla/quill.git#1.3.7":
-  version "1.3.7"
-  resolved "https://github.com/vanilla/quill.git#d4eafda13c49ba43fc3152abdc4afd37d46eb153"
+"quill@https://github.com/vanilla/quill.git#1.3.10":
+  version "1.3.10"
+  resolved "https://github.com/vanilla/quill.git#b43ef4105ae8c02008cfec24e0eca1dc503cca73"
   dependencies:
     clone "^2.1.1"
     deep-equal "^1.0.1"

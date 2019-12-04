@@ -56,28 +56,6 @@ export default class VanillaTheme extends ThemeBase {
     }
 
     /**
-     * Override to ensure we get a public update event after the enter key is pressed.
-     * Prevents a "lagging" paragraph menu that doesn't listen to silent events.
-     */
-    public init() {
-        super.init();
-
-        const keyboard = this.quill.getModule("keyboard") as KeyboardModule;
-        keyboard.addBinding(
-            {
-                key: KeyboardModule.keys.ENTER,
-            },
-            {},
-            () => {
-                const selection = this.quill.getSelection();
-                selection.index += 1;
-                this.quill.setSelection(selection, Quill.sources.USER);
-                return true;
-            },
-        );
-    }
-
-    /**
      * Apply a hacky method of tracking the last good selection in quill.
      *
      * This should be handled properly after forking.

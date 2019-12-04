@@ -19,7 +19,6 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
-use Vanilla\Contracts\Addons\EventListenerAddonInterface;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;

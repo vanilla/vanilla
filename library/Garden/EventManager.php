@@ -461,7 +461,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function dispatch(object $event) {
         foreach ($this->getListenersForEvent($event) as $listener) {
@@ -474,7 +474,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getListenersForEvent(object $event): iterable {
         $class = new \ReflectionClass($event);
@@ -486,7 +486,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function addListenerMethod(string $class, string $method): EventListenerConfigInterface {
         $method = new \ReflectionMethod($class, $method);

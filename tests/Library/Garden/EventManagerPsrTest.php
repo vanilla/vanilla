@@ -97,16 +97,24 @@ class EventManagerPsrTest extends TestCase {
         $this->assertSame(3, $this->testEventChild->getNum());
     }
 
+    /**
+     * An event handler without a type hint should fail.
+     */
     public function testBadEventHandler() {
         $this->expectException(\InvalidArgumentException::class);
         $this->config->addListenerMethod(self::class, 'badListener');
     }
 
+    /**
+     * A bad event listener.
+     */
     public function badListener() {
         //
     }
 
     /**
+     * A test listener that increments the counter.
+     *
      * @param TestEvent $e
      * @return TestEvent
      */
@@ -115,12 +123,24 @@ class EventManagerPsrTest extends TestCase {
         return $e;
     }
 
+    /**
+     * A test listener that increments twice.
+     *
+     * @param TestEventChild $e
+     * @return TestEventChild
+     */
     public function incEventChild(TestEventChild $e): TestEventChild {
         $e->incNum();
         $e->incNum();
         return $e;
     }
 
+    /**
+     * An event listener that stops propagation.
+     *
+     * @param TestEvent $e
+     * @return TestEvent
+     */
     public function incEventStop(TestEvent $e): TestEvent {
         $e->incNum();
         $e->stopPropagation();

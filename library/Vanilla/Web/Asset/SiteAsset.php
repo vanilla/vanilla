@@ -129,8 +129,9 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
     }
 
     /**
-     * @inheritDoc
      * The default behaviour is to be non-static
+     *
+     * @inheritDoc
      *
      * @return bool
      */

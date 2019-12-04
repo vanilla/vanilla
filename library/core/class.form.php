@@ -371,7 +371,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {
-        Gdn::controller()->addJsFile('colorpicker.js', 'dashboard');
+        $controller = Gdn::controller();
+        if ($controller) {
+            $controller->addJsFile('colorpicker.js', 'dashboard');
+        }
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';

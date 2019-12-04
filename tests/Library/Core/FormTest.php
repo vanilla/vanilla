@@ -11,6 +11,9 @@ use VanillaTests\MinimalContainerTestCase;
 use Gdn;
 use Gdn_Form;
 
+/**
+ * Tests for Gdn_Form.
+ */
 class FormTest extends MinimalContainerTestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.

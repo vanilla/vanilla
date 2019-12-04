@@ -44,7 +44,6 @@ export const blockQuoteCSS = useThemeCache(() => {
             width: 6,
         }),
         boxSizing: "border-box",
-        width: percent(100),
         verticalAlign: "middle",
     });
     cssRule(".blockquote-content", {

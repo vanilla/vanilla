@@ -43,8 +43,6 @@ class TestEvent implements StoppableEventInterface {
 
     /**
      * Set the stop propagation property.
-     *
-     * @param bool $stop
      */
     public function stopPropagation() {
         $this->stopPropagation = true;

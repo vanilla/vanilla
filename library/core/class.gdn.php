@@ -139,7 +139,7 @@ class Gdn {
      * @return Gdn_Configuration|mixed The configuration setting.
      */
     public static function config($name = false, $default = false) {
-        $config = static::getContainer()->get(self::AliasConfig);;
+        $config = static::getContainer()->get(self::AliasConfig);
 
         if ($name === false) {
             $result = $config;

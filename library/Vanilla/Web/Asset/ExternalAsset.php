@@ -34,8 +34,7 @@ class ExternalAsset implements AssetInterface {
     /**
      * @inheritdoc
      */
-    public function isStatic(): bool
-    {
+    public function isStatic(): bool {
         return false;
     }
 }

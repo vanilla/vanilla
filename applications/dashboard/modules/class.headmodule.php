@@ -76,7 +76,7 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Adds a "link" tag to the head containing a reference to a stylesheet.
          * By default a stylesheet is considered as a static-asset
-         * 
+         *
          * @param string $hRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
          * @param string $media Type media for the stylesheet. ie. "screen", "print", etc.
          * @param bool $addVersion Whether to append version number as query string.
@@ -144,7 +144,7 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Adds a "script" tag to the head.
          * By default a script is considered as a static-asset
-         * 
+         *
          * @param string $src The location of the script relative to the web root. ie. "/js/jquery.js"
          * @param string $type The type of script being added. ie. "text/javascript"
          * @param bool $addVersion Whether to append version number as query string.

@@ -40,7 +40,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
     /**
      * Utility function for calculating a relative asset URL
      *
-     * @param string ...$pieces The pieces of the web path.
+     * @param string[] $pieces The pieces of the web path.
      * @return string The relative web path.
      */
     protected function makeAssetPath(string ...$pieces): string {
@@ -57,7 +57,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * Create a web-root url, not an asset URL. This is useful for application level resources like ones created from
      * API endpoints.
      *
-     * @param string ...$pieces The pieces to join together.
+     * @param string[] $pieces The pieces to join together.
      *
      * @return string The relative web path.
      */
@@ -88,7 +88,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
     /**
      * Utility for joining together path pieces with a `/` (such as a web url).
      *
-     * @param string ...$pieces The pieces of the url.
+     * @param string[] $pieces The pieces of the url.
      * @return string A joined version of the pieces with no duplicate `/`s
      */
     public static function joinWebPath(string ...$pieces): string {
@@ -130,7 +130,6 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
 
     /**
      * @inheritDoc
-     *
      * The default behaviour is to be non-static
      *
      * @return bool

@@ -449,7 +449,10 @@ body.Section-EditProfile {
     }
 
     .Preferences > form > div {
-        overflow-x: auto;
+
+        @include maxWidth {
+            overflow-x: scroll;
+        }
     }
 
     table.PreferenceGroup {

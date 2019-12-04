@@ -29,7 +29,7 @@ class MySQLDriverTest extends TestCase {
     /**
      * Rest the SQL driver before every test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $sql = static::container()->get(\Gdn_MySQLDriver::class);
         $sql->reset();
@@ -48,7 +48,7 @@ class MySQLDriverTest extends TestCase {
     /**
      * Make sure the SQL object isn't polluted.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->sql->reset();
         parent::tearDown();
     }
@@ -64,10 +64,9 @@ class MySQLDriverTest extends TestCase {
 
     /**
      * Make sure the table is escaped in **fetchTableSchema()**.
-     *
-     * @expectedException PHPUnit\Framework\Error\Error
      */
     public function testFetchTableSchemeInjection() {
+        $this->expectError();
         $schema = $this->sql->fetchTableSchema("User/**/where/**/1=(select/**/1/**/from(select/**/sleep(/**/1/**/))a)");
     }
 
@@ -79,7 +78,7 @@ class MySQLDriverTest extends TestCase {
             ->where(["1=sleep(1) and 1" => "world"])
             ->getDelete('Foo', $this->dumpSql()['where']);
 
-        $this->assertContains('`1=sleep(1) and 1`', $sql);
+        $this->assertStringContainsString('`1=sleep(1) and 1`', $sql);
     }
 
     public function provideAliasData() {

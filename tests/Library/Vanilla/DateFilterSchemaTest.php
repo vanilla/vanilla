@@ -121,9 +121,10 @@ class DateFilterSchemaTest extends SharedBootstrapTestCase {
      * @param string $dateFilter
      * @param string $errorMessage
      * @dataProvider provideInvalidDateFilters
-     * @expectedException Garden\Schema\ValidationException
      */
     public function testStringErrors($dateFilter, $errorMessage) {
+        $this->expectException(\Garden\Schema\ValidationException::class);
+
         $data = ['myDate' => $dateFilter];
         $schema = Schema::parse([
             'myDate' => new DateFilterSchema()

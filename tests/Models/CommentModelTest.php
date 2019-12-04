@@ -22,7 +22,7 @@ class CommentModelTest extends SharedBootstrapTestCase {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::baseSetupBeforeClass();
 
         // Test as an admin

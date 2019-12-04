@@ -91,10 +91,10 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      * Make sure we have a bad string for {@link dbdecode()}.
      *
      * @param string $str The bad string to decode.
-     * @expectedException \PHPUnit\Framework\Error\Notice
      * @dataProvider provideBadDbDecodeStrings
      */
     public function testBadDbDecodeString($str) {
+        $this->expectNotice();
         $decoded = unserialize($str);
     }
 

@@ -7,6 +7,9 @@
 
 namespace VanillaTests\Vanilla\Library\Scheduler;
 
+use Garden\Container\MissingArgumentException;
+use Garden\Container\NotFoundException;
+
 /**
  * Class BootstrapTest
  */
@@ -14,22 +17,22 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test scheduler injection with missing rule throws NotFoundException.
-     *
-     * @expectedException \Garden\Container\NotFoundException
-     * @expectedExceptionMessage Class Vanilla\Scheduler\SchedulerInterface does not exist.
      */
     public function testSchedulerInjectionWithMissingRule() {
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('Class Vanilla\Scheduler\SchedulerInterface does not exist.');
+
         $container = new \Garden\Container\Container();
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
     /**
      * Test scheduler injection with missing dependencies throws MissingArgumentException.
-     *
-     * @expectedException \Garden\Container\MissingArgumentException
-     * @expectedExceptionMessage Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().
      */
     public function testSchedulerInjectionWithMissingDependencies() {
+        $this->expectException(MissingArgumentException::class);
+        $this->expectExceptionMessage('Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().');
+
         $container = (new \Garden\Container\Container())
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
@@ -44,11 +47,11 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test scheduler injection wit missing logger throws MissingArgumentException.
-     *
-     * @expectedException \Garden\Container\MissingArgumentException
-     * @expectedExceptionMessage Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().
      */
     public function testSchedulerInjectionWithMissingLogger() {
+        $this->expectException(MissingArgumentException::class);
+        $this->expectExceptionMessage('Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().');
+
         $container = new \Garden\Container\Container();
         $container
             ->setInstance(\Psr\Container\ContainerInterface::class, $container)

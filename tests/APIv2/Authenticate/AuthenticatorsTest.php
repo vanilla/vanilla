@@ -26,7 +26,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
         /** @var \Gdn_Configuration $config */
@@ -37,7 +37,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
@@ -58,7 +58,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
         $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
 
@@ -69,13 +69,13 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      * @param array $record
      */
     public function assertIsAuthenticator(array $record) {
-        $this->assertInternalType('array', $record);
+        $this->assertIsArray($record);
 
         $this->assertArrayHasKey('authenticatorID', $record);
         $this->assertArrayHasKey('type', $record);
 
         $this->assertArrayHasKey('ui', $record);
-        $this->assertInternalType('array', $record['ui']);
+        $this->assertIsArray($record['ui']);
         $this->assertArrayHasKey('url', $record['ui']);
         $this->assertArrayHasKey('buttonName', $record['ui']);
         $this->assertArrayHasKey('backgroundColor', $record['ui']);
@@ -84,12 +84,12 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         // They also have to enable SignIn.
         if (isset($record['sso'])) {
             $this->assertArrayHasKey('canSignIn', $record['sso']);
-            $this->assertInternalType('bool', $record['sso']['canSignIn']);
+            $this->assertIsBool($record['sso']['canSignIn']);
             // Must be true or something is wrong.
             $this->assertTrue($record['sso']['canSignIn']);
 
             $this->assertArrayHasKey('canAutoLinkUser', $record['sso']);
-            $this->assertInternalType('bool', $record['sso']['canAutoLinkUser']);
+            $this->assertIsBool($record['sso']['canAutoLinkUser']);
         }
     }
 
@@ -103,7 +103,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
 
         $body = $response->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertTrue(count($body) > 1);
 
         foreach ($body as $record) {
@@ -115,7 +115,6 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      * Test GET /authenticators/:id
      */
     public function testGetAuthenticators() {
-
         $response = $this->api()->get($this->baseUrl.'/'.$this->authenticator->getID());
 
         $this->assertEquals(200, $response->getStatusCode());

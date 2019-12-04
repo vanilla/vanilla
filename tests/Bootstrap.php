@@ -11,12 +11,15 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
@@ -179,6 +182,9 @@ class Bootstrap {
 
             // EventManager
             ->rule(\Garden\EventManager::class)
+            ->addAlias(EventListenerConfigInterface::class)
+            ->addAlias(EventDispatcherInterface::class)
+            ->addAlias(ListenerProviderInterface::class)
             ->setShared(true)
 
             ->rule(InjectableInterface::class)
@@ -410,17 +416,36 @@ class Bootstrap {
     public function setGlobals(Container $container) {
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
-        $_SERVER['X_REWRITE'] = true;
-        $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
-        $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
-        $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;
-        $_SERVER['SCRIPT_NAME'] = parse_url($baseUrl, PHP_URL_PATH);
-        $_SERVER['PATH_INFO'] = '';
-        $_SERVER['HTTPS'] = parse_url($baseUrl, PHP_URL_SCHEME) === 'https';
 
+        $this->setServerGlobal('X_REWRITE', true);
+        $this->setServerGlobal('REMOTE_ADDR', '::1'); // Simulate requests from local IPv6 address.
+        $this->setServerGlobal('HTTP_HOST', parse_url($baseUrl, PHP_URL_HOST));
+        $this->setServerGlobal('SERVER_PORT', parse_url($baseUrl, PHP_URL_PORT) ?: null);
+        $this->setServerGlobal('SCRIPT_NAME', parse_url($baseUrl, PHP_URL_PATH));
+        $this->setServerGlobal('PATH_INFO', '');
+        $this->setServerGlobal('HTTPS', parse_url($baseUrl, PHP_URL_SCHEME) === 'https');
 
         $GLOBALS['dic'] = $container;
         Gdn::setContainer($container);
+    }
+
+    /**
+     * Set a `$_SERVER` global variable and backup its previous value.
+     *
+     * @param string $key The key to set.
+     * @param mixed $value The new value.
+     * @return mixed Returns the previous value.
+     */
+    private function setServerGlobal(string $key, $value) {
+        if (empty($_SERVER['__BAK'][$key]) && array_key_exists($key, $_SERVER)) {
+            if (!array_key_exists('__BAK', $_SERVER)) {
+                $_SERVER['__BAK'] = [];
+            }
+
+            $_SERVER['__BAK'][$key] = $_SERVER[$key];
+        }
+        $r = $_SERVER[$key] = $value;
+        return $r;
     }
 
     /**
@@ -434,6 +459,13 @@ class Bootstrap {
     public static function cleanup(Container $container) {
         self::cleanUpContainer($container);
         self::cleanUpGlobals();
+
+        if (!empty($_SERVER['__BAK']) && is_array($_SERVER['__BAK'])) {
+            foreach ($_SERVER['__BAK'] as $key => $value) {
+                $_SERVER[$key] = $value;
+            }
+            unset($_SERVER['__BAK']);
+        }
     }
 
     /**

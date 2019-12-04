@@ -1273,11 +1273,11 @@ class CommentModel extends Gdn_Model {
                     $this->fireEvent('AfterSaveComment');
                 }
             }
-        }
 
         // Update discussion's comment count.
         if (isset($formPostValues['DiscussionID'])) {
             $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+            }
         }
 
         return $commentID;

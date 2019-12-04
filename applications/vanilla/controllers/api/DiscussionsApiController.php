@@ -161,7 +161,7 @@ class DiscussionsApiController extends AbstractApiController {
                 Schema::parse([
                     'name',
                     'body',
-                    'format:s' => 'The input format of the discussion.',
+                    'format:s' => new \Vanilla\Models\FormatSchema(),
                     'categoryID',
                     'closed?',
                     'sink?',

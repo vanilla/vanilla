@@ -79,7 +79,7 @@ class CommentsApiController extends AbstractApiController {
             $this->commentPostSchema = $this->schema(
                 Schema::parse([
                     'body',
-                    'format:s' => 'The input format of the comment.',
+                    'format:s' => new \Vanilla\Models\FormatSchema(),
                     'discussionID'
                 ])->add($this->fullSchema()),
                 'CommentPost'

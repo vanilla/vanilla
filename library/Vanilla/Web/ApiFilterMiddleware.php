@@ -34,7 +34,6 @@ class ApiFilterMiddleware {
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
-        $this->addBlacklistField('String');
         $apiAllow = $response->getMeta('api-allow');
         if (!is_array($apiAllow)) {
             $apiAllow = [];
@@ -46,6 +45,7 @@ class ApiFilterMiddleware {
             $blacklist = array_flip($this->blacklist);
             array_walk_recursive($data, function (&$value, $key) use ($apiAllow, $blacklist) {
                 $key = strtolower($key);
+                $apiAllow = array_change_key_case($apiAllow);
                 $isBlacklisted = isset($blacklist[$key]);
                 $isAllowedField = isset($apiAllow[$key]);
                 if ($isBlacklisted && !$isAllowedField) {

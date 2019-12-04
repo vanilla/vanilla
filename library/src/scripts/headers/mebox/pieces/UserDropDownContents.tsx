@@ -102,7 +102,7 @@ interface IExtraDropDownProps {
  */
 UserDropDownContents.registerBeforeUserDropDown = (component: React.ComponentType<IExtraDropDownProps>) => {
     UserDropDownContents.extraUserDropDownComponents.push(component);
-}
+};
 
 interface IOwnProps {
     className?: string;

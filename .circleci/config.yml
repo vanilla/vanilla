@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    core: vanilla/core@2.1.0
+    core: vanilla/core@2.2.2
     chromatic: wave/chromatic@1.0.1
     codecov: codecov/codecov@1.0.5
 aliases:
@@ -211,6 +211,15 @@ jobs:
     php_73_integration:
         executor: core/php73
         steps: *php_integration_test_steps
+    php_74_lint:
+        executor: core/php74
+        steps: *php_lint_steps
+    php_74_tests:
+        executor: core/php74
+        steps: *php_unit_test_steps
+    php_74_integration:
+        executor: core/php74
+        steps: *php_integration_test_steps
     dependency_audit:
         executor: core/php72
         steps:
@@ -236,63 +245,47 @@ workflows:
     version: 2
     commit:
         jobs:
-            - chromatic_test:
-                filters:
+            - dependency_audit:
+                filters: &only_master_filter
                     branches:
-                        ignore: master
-            - chromatic/run-and-accept-all:
-                filters:
-                    branches:
-                        only: master
-            # PHP 7.2 jobs are only nightly until we move upwards on infra.
-            - php_setup
-            - php_72_lint
-            - php_72_integration:
-                requires:
-                    - php_setup
-            - php_72_tests:
-                requires:
-                    - php_setup
-            # JS and browsers
-            - frontend_setup
-            - frontend_lint:
-                requires:
-                    - frontend_setup
-            - frontend_typechecker:
-                requires:
-                    - frontend_setup
-            - frontend_build:
-                requires:
-                    - frontend_setup
-            - frontend_test:
-                requires:
-                    - frontend_setup
-    nightly:
-        triggers:
-            - schedule:
-                cron: "0 0 * * *" # Once a day.
-                filters:
-                    branches:
-                        only:
-                            - master
-        jobs:
-            - dependency_audit
+                    only:  # only branches matching the below regex filters will run
+                        - master
             # PHP and serverside
             - php_setup
+
+            # Lint
             - php_72_lint
-            - php_73_lint
+            - php_73_lint:
+                filters: *only_master_filter
+            - php_74_lint:
+                filters: *only_master_filter
+
+            # Integration Tests
             - php_72_integration:
                 requires:
                     - php_setup
             - php_73_integration:
+                filters: *only_master_filter
                 requires:
                     - php_setup
+            - php_74_integration:
+                filters: *only_master_filter
+                requires:
+                    - php_setup
+
+            # Unit tests
             - php_72_tests:
                 requires:
                     - php_setup
             - php_73_tests:
+                filters: *only_master_filter
                 requires:
                     - php_setup
+            - php_74_tests:
+                filters: *only_master_filter
+                requires:
+                    - php_setup
+
             ## JS & browsers
             - frontend_setup
             - frontend_lint:

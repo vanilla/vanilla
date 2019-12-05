@@ -10664,7 +10664,7 @@ em {
   font-style: italic;
 }
 
-.js-focus-visible :focus:not(.focus-visible) {
+body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {
   outline: none;
 }
 

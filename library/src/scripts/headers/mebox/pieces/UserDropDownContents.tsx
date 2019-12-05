@@ -13,7 +13,6 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -41,14 +40,17 @@ function UserDropDownContents(props: IProps) {
             <DropDownUserCard className="userDropDown-userCard" />
             <DropDownItemSeparator />
             <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+            {UserDropDownContents.extraUserDropDownComponents.map((ComponentName, index) => {
+                return <ComponentName key={index} getCountByName={getCountByName} />;
+            })}
             <DropDownSection title={t("Discussions")}>
                 <DropDownItemLinkWithCount
                     to={"/discussions/bookmarked"}
                     name={t("Bookmarks")}
                     count={getCountByName("Bookmarks")}
                 />
-                <Permission permission="articles.add">
-                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                <Permission permission="discussions.add">
+                    <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
                 </Permission>
                 <DropDownItemLinkWithCount
                     to="/discussions/mine"
@@ -83,6 +85,23 @@ function UserDropDownContents(props: IProps) {
         </div>
     );
 }
+
+/** Hold the extra user dropdown menu components before rendering. */
+UserDropDownContents.extraUserDropDownComponents = [];
+
+interface IExtraDropDownProps {
+    getCountByName: (name: string) => number;
+}
+
+/**
+ * Register an extra component to be rendered before the user dropdown menu.
+ * This will only affect larger screen sizes.
+ *
+ * @param component The component class to be render.
+ */
+UserDropDownContents.registerBeforeUserDropDown = (component: React.ComponentType<IExtraDropDownProps>) => {
+    UserDropDownContents.extraUserDropDownComponents.push(component);
+};
 
 interface IOwnProps {
     className?: string;

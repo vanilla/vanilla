@@ -16,9 +16,8 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { relative } from "path";
+
 import { unit, negative } from "@library/styles/styleHelpers";
-import { translateY } from "csx";
 
 const story = storiesOf("Messages", module);
 
@@ -92,7 +91,6 @@ story.add("Message", () => {
     const _message_longTitle = messageWithTitleFlag && (
         <Message
             title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
-            // icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
             contents={
                 <div className={classesMessages.content}>
                     <Translate source={message} />

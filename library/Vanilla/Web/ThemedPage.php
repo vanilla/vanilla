@@ -33,8 +33,8 @@ abstract class ThemedPage extends Page {
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
-        ThemePreloadProvider $themeProvider = null, // Default required to conform to interface
-        EventManager $eventManager
+        EventManager $eventManager,
+        ThemePreloadProvider $themeProvider = null // Default required to conform to interface
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $eventManager);
         $this->themeProvider = $themeProvider;

@@ -133,9 +133,13 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const middleColumnWidth = 672;
-    const middleColumn = makeThemeVars("middleColumn", {
+    const middleColumnInit = makeThemeVars("middleColumn", {
         width: middleColumnWidth,
-        paddedWidth: middleColumnWidth + gutter.size * 2,
+    });
+
+    const middleColumn = makeThemeVars("middleColumn", {
+        width: middleColumnInit.width,
+        paddedWidth: middleColumnInit.width + gutter.size * 2,
     });
 
     const content = makeThemeVars("content", {
@@ -168,7 +172,7 @@ export const globalVariables = useThemeCache(() => {
         },
         alignment: {
             headings: {
-                capitalLetterRatio: 0.715, // Calibrated for Open Sans
+                capitalLetterRatio: 0.73, // Calibrated for Open Sans
                 verticalOffset: 1, // Calibrated for Open Sans
                 horizontal: -0.03, // Calibrated for Open Sans
                 verticalOffsetForAdjacentElements: "-.13em", // Calibrated for Open Sans

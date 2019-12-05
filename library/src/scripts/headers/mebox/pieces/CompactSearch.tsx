@@ -4,23 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
-import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import { useSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { RouteComponentProps, withRouter } from "react-router";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
-import { t } from "@library/utility/appUtils";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import classNames from "classnames";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { SearchIcon } from "@library/icons/titleBar";
+import { useLinkContext } from "@library/routing/links/LinkContextProvider";
+import { t } from "@library/utility/appUtils";
+import { useUniqueID } from "@library/utility/idUtils";
+import { useEscapeListener, useLastValue } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useLayoutEffect, useRef, useState } from "react";
 
-export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
+export interface ICompactSearchProps {
     className?: string;
     placeholder?: string;
     open: boolean;
@@ -37,150 +38,136 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     clearButtonClass?: string;
 }
 
-interface IState {
-    query: string;
-}
-
 /**
  * Implements Compact Search component for header
  */
-export class CompactSearch extends React.Component<ICompactSearchProps, IState> {
-    private id = uniqueIDFromPrefix("compactSearch");
-    private openSearchButton = React.createRef<HTMLButtonElement>();
-    private selfRef = React.createRef<HTMLDivElement>();
-    private searchInputRef = React.createRef<SearchBar>();
-    private resultsRef = React.createRef<HTMLDivElement>();
-    public state: IState = {
-        query: "",
+export function CompactSearch(props: ICompactSearchProps) {
+    const [query, setQuery] = useState("");
+    const id = useUniqueID("compactSearch");
+    const selfRef = useRef<HTMLDivElement | null>(null);
+    const searchInputRef = useRef<SearchBar | null>(null);
+    const resultsRef = useRef<HTMLDivElement | null>(null);
+    const openSearchButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    const { focusOnMount, open } = props;
+    const prevOpen = useLastValue(open);
+
+    // Focus button on mount.
+    useLayoutEffect(() => {
+        if (focusOnMount) {
+            searchInputRef.current?.focus();
+        }
+    }, [focusOnMount]);
+
+    // Focus when opening/closing
+    useLayoutEffect(() => {
+        if (prevOpen === false && open === true) {
+            searchInputRef.current?.focus();
+        } else if (prevOpen === true && open === false) {
+            openSearchButtonRef.current?.focus();
+        }
+    });
+
+    const { searchOptionProvider } = useSearch();
+    const { pushSmartLocation } = useLinkContext();
+
+    const handleSubmit = () => {
+        const searchUrl = searchOptionProvider.makeSearchUrl(query);
+        pushSmartLocation(searchOptionProvider.makeSearchUrl(query));
     };
 
-    public render() {
-        const classesTitleBar = titleBarClasses();
-        const classes = compactSearchClasses();
-        const classesSearchBar = searchBarClasses();
-        const classesDropDown = dropDownClasses();
-        return (
-            <div
-                ref={this.selfRef}
-                className={classNames("compactSearch", this.props.className, classes.root, { isOpen: this.props.open })}
-            >
-                {!this.props.open && (
+    // Close with the escape key.
+    useEscapeListener({
+        root: selfRef.current,
+        callback: () => {
+            if (!props.showingSuggestions) {
+                props.onCloseSearch();
+            }
+        },
+    });
+
+    const classesTitleBar = titleBarClasses();
+    const classes = compactSearchClasses();
+    const classesSearchBar = searchBarClasses();
+    const classesDropDown = dropDownClasses();
+    return (
+        <div
+            ref={selfRef}
+            className={classNames("compactSearch", props.className, classes.root, { isOpen: props.open })}
+        >
+            {!props.open && (
+                <Button
+                    onClick={props.onSearchButtonClick}
+                    className={classNames(classesTitleBar.centeredButtonClass, props.buttonClass)}
+                    title={t("Search")}
+                    aria-expanded={false}
+                    aria-haspopup="true"
+                    baseClass={ButtonTypes.CUSTOM}
+                    aria-controls={id}
+                    buttonRef={openSearchButtonRef}
+                >
+                    <div className={classNames(props.buttonContentClassName)}>
+                        <SearchIcon />
+                    </div>
+                </Button>
+            )}
+            {props.open && (
+                <div className={classNames("compactSearch-contents", classes.contents)}>
+                    <div className={classes.searchAndResults}>
+                        <SearchBar
+                            id={id}
+                            placeholder={props.placeholder}
+                            optionComponent={SearchOption}
+                            noHeading={true}
+                            title={t("Search")}
+                            value={query}
+                            disabled={!props.open}
+                            hideSearchButton={true}
+                            onChange={setQuery}
+                            onSearch={handleSubmit}
+                            loadOptions={searchOptionProvider.autocomplete}
+                            ref={searchInputRef}
+                            triggerSearchOnClear={false}
+                            resultsRef={resultsRef}
+                            onOpenSuggestions={props.onOpenSuggestions}
+                            onCloseSuggestions={props.onCloseSuggestions}
+                            className={"compactSearch-searchBar"}
+                            clearButtonClass={props.clearButtonClass}
+                        />
+
+                        <div
+                            ref={resultsRef}
+                            className={classNames({
+                                [classesTitleBar.compactSearchResults]: props.showingSuggestions,
+                                [classesSearchBar.results]: props.showingSuggestions,
+                                [classesDropDown.contents]: props.showingSuggestions,
+                            })}
+                        />
+                    </div>
+
                     <Button
-                        onClick={this.props.onSearchButtonClick}
-                        className={classNames(classesTitleBar.centeredButtonClass, this.props.buttonClass)}
+                        onClick={props.onCloseSearch}
+                        className={classNames("compactSearch-close", props.cancelButtonClassName, classes.close)}
                         title={t("Search")}
-                        aria-expanded={false}
+                        aria-expanded={true}
                         aria-haspopup="true"
+                        aria-controls={id}
                         baseClass={ButtonTypes.CUSTOM}
-                        aria-controls={this.id}
-                        buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames(this.props.buttonContentClassName)}>
-                            <SearchIcon />
+                        <div
+                            className={classNames(
+                                "compactSearch-cancelContents",
+                                props.cancelContentClassName,
+                                classes.cancelContents,
+                            )}
+                        >
+                            {t("Cancel")}
                         </div>
                     </Button>
-                )}
-                {this.props.open && (
-                    <div className={classNames("compactSearch-contents", classes.contents)}>
-                        <div className={classes.searchAndResults}>
-                            <SearchBar
-                                id={this.id}
-                                placeholder={this.props.placeholder}
-                                optionComponent={SearchOption}
-                                noHeading={true}
-                                title={t("Search")}
-                                value={this.state.query}
-                                disabled={!this.props.open}
-                                hideSearchButton={true}
-                                onChange={this.handleSearchChange}
-                                onSearch={this.handleSubmit}
-                                loadOptions={this.props.searchOptionProvider.autocomplete}
-                                ref={this.searchInputRef}
-                                triggerSearchOnClear={false}
-                                resultsRef={this.resultsRef}
-                                handleOnKeyDown={this.handleKeyDown}
-                                onOpenSuggestions={this.props.onOpenSuggestions}
-                                onCloseSuggestions={this.props.onCloseSuggestions}
-                                className={"compactSearch-searchBar"}
-                                clearButtonClass={this.props.clearButtonClass}
-                            />
-
-                            <div
-                                ref={this.resultsRef}
-                                className={classNames({
-                                    [classesTitleBar.compactSearchResults]: this.props.showingSuggestions,
-                                    [classesSearchBar.results]: this.props.showingSuggestions,
-                                    [classesDropDown.contents]: this.props.showingSuggestions,
-                                })}
-                            />
-                        </div>
-
-                        <Button
-                            onClick={this.props.onCloseSearch}
-                            className={classNames(
-                                "compactSearch-close",
-                                this.props.cancelButtonClassName,
-                                classes.close,
-                            )}
-                            title={t("Search")}
-                            aria-expanded={true}
-                            aria-haspopup="true"
-                            aria-controls={this.id}
-                            baseClass={ButtonTypes.CUSTOM}
-                        >
-                            <div
-                                className={classNames(
-                                    "compactSearch-cancelContents",
-                                    this.props.cancelContentClassName,
-                                    classes.cancelContents,
-                                )}
-                            >
-                                {t("Cancel")}
-                            </div>
-                        </Button>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    public componentDidMount() {
-        if (this.props.focusOnMount && this.props.open) {
-            this.searchInputRef.current!.focus();
-        }
-    }
-
-    private handleSearchChange = (newQuery: string) => {
-        this.setState({ query: newQuery });
-    };
-
-    private handleSubmit = () => {
-        const { searchOptionProvider, history } = this.props;
-        const { query } = this.state;
-        this.props.history.push(searchOptionProvider.makeSearchUrl(query));
-    };
-
-    public componentDidUpdate(prevProps) {
-        if (!prevProps.open && this.props.open) {
-            this.searchInputRef.current!.focus();
-        } else if (prevProps.open && !this.props.open) {
-            this.openSearchButton.current!.focus();
-        }
-    }
-
-    /**
-     * Keyboard handler
-     * @param event
-     */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (!this.props.showingSuggestions) {
-            switch (event.key) {
-                case "Escape":
-                    this.props.onCloseSearch();
-                    break;
-            }
-        }
-    };
+                </div>
+            )}
+        </div>
+    );
 }
 
-export default withSearch(withRouter(CompactSearch));
+export default CompactSearch;

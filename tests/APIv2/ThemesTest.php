@@ -26,7 +26,7 @@ class ThemesTest extends AbstractAPIv2Test {
     /**
      * Undocumented function
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");

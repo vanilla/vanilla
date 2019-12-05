@@ -398,10 +398,10 @@ class PermissionsTest extends SharedBootstrapTestCase {
 
     /**
      * Ban names must start with "!".
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testInvalidBanName() {
+        $this->expectException(\InvalidArgumentException::class);
+
         $perm = new Permissions();
         $perm->addBan('foo');
     }

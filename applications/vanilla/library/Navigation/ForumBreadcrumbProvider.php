@@ -32,7 +32,7 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getForRecord(RecordInterface $record): array {
+    public function getForRecord(RecordInterface $record, string $locale = null): array {
         $ancestors = $this->categoryCollection->getAncestors($record->getRecordID());
 
         $crumbs = [

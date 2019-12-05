@@ -5,11 +5,14 @@
  */
 
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
+use Garden\StaticCacheConfigTrait;
 
 /**
  * Class VanillaHtmlFormatter
  */
 class VanillaHtmlFormatter {
+
+    use StaticCacheConfigTrait;
 
     /** @var array Classes users may have in their content. */
     protected $allowedClasses = [
@@ -163,7 +166,8 @@ class VanillaHtmlFormatter {
      * @return string Returns the filtered HTML.
      */
     public function format($html, $options = []) {
-        $attributes = c('Garden.Html.BlockedAttributes', 'on*, target, download');
+        $attributes = self::c('Garden.Html.BlockedAttributes', 'on*, target, download');
+        $schemes = implode(', ', self::c('Garden.Html.AllowedUrlSchemes', []));
 
         $specOverrides = val('spec', $options, []);
         if (!is_array($specOverrides)) {
@@ -180,13 +184,13 @@ class VanillaHtmlFormatter {
             'direct_list_nest' => 1,
             'elements' => '*-applet-button-embed-fieldset-form-iframe-input-legend-link-object-optgroup-option-script-select-style-textarea',
             'keep_bad' => 0,
-            'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, rapidminer, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+            'schemes' => 'classid:clsid; href: '.$schemes.'; style: nil; *:file, http, https', // clsid allowed in class
             'unique_ids' => 1,
             'valid_xhtml' => 0
         ];
 
         // If we don't allow URL embeds, don't allow HTML media embeds, either.
-        if (c('Garden.Format.DisableUrlEmbeds')) {
+        if (self::c('Garden.Format.DisableUrlEmbeds')) {
             if (!array_key_exists('elements', $config) || !is_string($config['elements'])) {
                 $config['elements'] = '';
             }

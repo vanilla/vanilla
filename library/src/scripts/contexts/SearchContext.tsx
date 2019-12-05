@@ -4,21 +4,48 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { formatUrl } from "@library/utility/appUtils";
 
-const SearchContext = React.createContext<IWithSearchProps>({} as any);
+const defaultOptionProvider: ISearchOptionProvider = {
+    supportsAutoComplete: false,
+    autocomplete: () => Promise.resolve([]),
+    makeSearchUrl: query => formatUrl(`/search?search=${query}`),
+};
+
+const SearchContext = React.createContext<IWithSearchProps>({
+    searchOptionProvider: defaultOptionProvider,
+});
 export default SearchContext;
 
+export function SearchContextProvider({ children }) {
+    return (
+        <SearchContext.Provider value={{ searchOptionProvider: SearchContextProvider.optionProvider }}>
+            {children}
+        </SearchContext.Provider>
+    );
+}
+
+SearchContextProvider.optionProvider = defaultOptionProvider as ISearchOptionProvider;
+SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
+    SearchContextProvider.optionProvider = provider;
+};
+
 export interface ISearchOptionProvider {
+    supportsAutoComplete?: boolean;
     autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }
 
 export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
+}
+
+export function useSearch() {
+    return useContext(SearchContext);
 }
 
 /**
@@ -35,7 +62,7 @@ export function withSearch<T extends IWithSearchProps = IWithSearchProps>(Wrappe
                 <SearchContext.Consumer>
                     {context => {
                         // https://github.com/Microsoft/TypeScript/issues/28938
-                        return <WrappedComponent {...context} {...this.props as T} />;
+                        return <WrappedComponent {...context} {...(this.props as T)} />;
                     }}
                 </SearchContext.Consumer>
             );

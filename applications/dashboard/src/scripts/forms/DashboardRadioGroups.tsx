@@ -8,11 +8,13 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { useThrowError } from "@vanilla/react-utils";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { IFieldError } from "@library/@types/api/core";
 
 interface IRadioGroupContext {
     isInline?: boolean;
     onChange?: (value: string) => void;
     value?: string;
+    errors?: IFieldError[];
 }
 
 const RadioGroupContext = React.createContext<IRadioGroupContext | null>(null);

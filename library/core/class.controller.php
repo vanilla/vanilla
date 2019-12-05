@@ -12,11 +12,13 @@
  * @abstract
  */
 
+use Garden\Web\Data;
 use Vanilla\Models\ThemePreloadProvider;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
+use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 
 /**
@@ -2065,7 +2067,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->registerReduxActionProvider($themeProvider);
         $themeScript = $themeProvider->getThemeScript();
         if ($themeScript !== null) {
-            $this->Head->addScript($themeScript->getWebPath());
+            $this->Head->addScript(
+                $themeScript->getWebPath(),
+                'text/javascript',
+                true,
+                ['static' => $themeScript->isStatic()]
+            );
         }
     }
 
@@ -2084,7 +2091,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
         $jsAssets = $webpackAssetProvider->getScripts($section);
         foreach ($jsAssets as $asset) {
-            $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'defer']);
+            $this->Head->addScript(
+                $asset->getWebPath(),
+                'text/javascript',
+                false,
+                ['defer' => 'defer', 'static' => $asset->isStatic()]
+            );
         }
 
         // The the built stylesheets

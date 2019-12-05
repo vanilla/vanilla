@@ -22,7 +22,7 @@ class WebpackAssetTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->fs = vfsStream::setup();
     }
 
@@ -59,6 +59,20 @@ class WebpackAssetTest extends TestCase {
     }
 
     /**
+     * Test our static property.
+     */
+    public function testStatic() {
+        $asset = new WebpackAsset(
+            new Request(),
+            ".min.js",
+            "test",
+            "asset"
+        );
+
+        $this->assertTrue($asset->isStatic());
+    }
+
+    /**
      * Test that web patches are properly generated.
      *
      * @param Request $req
@@ -84,19 +98,19 @@ class WebpackAssetTest extends TestCase {
     public function webPathProvider(): array {
         return [
             [
-                (new Request()),
+                (new Request())->setHost("http://example.com"),
                 "",
-                "http://example.com/dist/testSec/test.min.js",
+                "/dist/testSec/test.min.js",
             ],
             [
-                (new Request())->setAssetRoot("/someRoot"),
+                (new Request())->setHost("http://example.com")->setAssetRoot("/someRoot"),
                 "",
-                "http://example.com/someRoot/dist/testSec/test.min.js",
+                "/someRoot/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setHost("me.com"),
                 "cacheBuster",
-                "http://me.com/dist/testSec/test.min.js?h=cacheBuster",
+                "/dist/testSec/test.min.js?h=cacheBuster",
             ],
             [
                 (new Request())->setHost("me.com")
@@ -104,7 +118,7 @@ class WebpackAssetTest extends TestCase {
                     ->setRoot("/root-should-be-ignored")
                     ->setAssetRoot("/assetRoot"),
                 "cacheBuster",
-                "http://me.com/assetRoot/dist/testSec/test.min.js?h=cacheBuster",
+                "/assetRoot/dist/testSec/test.min.js?h=cacheBuster",
             ],
         ];
     }

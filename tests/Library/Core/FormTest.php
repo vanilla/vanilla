@@ -7,15 +7,18 @@
 
 namespace VanillaTests\Library\Core;
 
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\MinimalContainerTestCase;
 use Gdn;
 use Gdn_Form;
 
-class FormTest extends SharedBootstrapTestCase {
+/**
+ * Tests for Gdn_Form.
+ */
+class FormTest extends MinimalContainerTestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
@@ -30,6 +33,16 @@ class FormTest extends SharedBootstrapTestCase {
 
         $input = $frm->textBox('foo');
         $this->assertSame('<input type="text" id="Form_foo" name="foo" value="" class="form-control" />', $input);
+    }
+
+    /**
+     * Test that placeholders can be applied to color inputs.
+     */
+    public function testColorInputPlaceholder() {
+        $frm = new Gdn_Form('', 'bootstrap');
+        $input = $frm->color('test', ['placeholder' => 'My placeholder!']);
+
+        $this->assertStringContainsString('placeholder="My placeholder!"', $input);
     }
 
     /**

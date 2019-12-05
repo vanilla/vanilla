@@ -108,7 +108,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(UserDropDownContents);
+export default connect(mapStateToProps, mapDispatchToProps)(UserDropDownContents);

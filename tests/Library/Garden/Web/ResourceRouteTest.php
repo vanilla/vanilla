@@ -252,10 +252,9 @@ class ResourceRouteTest extends TestCase {
 
     /**
      * Test that correct casing on method names is enforced.
-     *
-     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testMethodCaseSensitivity() {
+        $this->expectNotice();
 //        post_noMap($query, $body, $data)
         $route = $this->createRoute();
         $request = new Request('/discussions/nomap/1/a/b/c', 'POST');

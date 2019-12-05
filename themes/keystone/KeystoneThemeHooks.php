@@ -91,6 +91,7 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
         echo    '<li class="form-group">';
         echo        $sender->Form->toggle("ThemeOptions.Options.panelToLeft", t("Panel to the left"), [], t("Change the main panel's position to the left side."));
         echo    '</li>';
+
         echo '</section>';
         echo '<div class="form-footer js-modal-footer">';
         echo    $form->button('Save');

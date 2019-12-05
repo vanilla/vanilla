@@ -100,8 +100,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
         );
 
         foreach ($rows as &$currentRow) {
@@ -223,6 +222,7 @@ class DiscussionsApiController extends AbstractApiController {
             'category?' => $this->getCategoryFragmentSchema(),
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'lastUser?' => $this->getUserFragmentSchema(),
@@ -273,7 +273,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
         $row = $this->normalizeOutput($row, $query["expand"] ?? []);
         $rows = [&$row];
         $this->expandLastCommentBody($rows, $query['expand'] ?? []);
@@ -334,6 +334,11 @@ class DiscussionsApiController extends AbstractApiController {
             $dbRecord['lastPost'] = $lastPost;
         }
 
+        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
+        if (empty($dbRecord['DateLastComment'])) {
+            $dbRecord['DateLastComment'] = $dbRecord['DateInserted'];
+        }
+
         // The Category key will hold a category fragment in API responses. Ditch the default string.
         if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
             unset($dbRecord['Category']);
@@ -378,7 +383,7 @@ class DiscussionsApiController extends AbstractApiController {
         $isRich = $discussion['Format'] === 'Rich';
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
 
-        $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);
         return $result;
     }
@@ -423,8 +428,9 @@ class DiscussionsApiController extends AbstractApiController {
                 'closed',
                 'pinned',
                 'pinLocation',
-            ])->add($this->fullSchema()
-        ), ['DiscussionGetEdit', 'out']);
+            ])->add($this->fullSchema()),
+            ['DiscussionGetEdit', 'out']
+        )->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -481,6 +487,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'description' => 'When the discussion was updated.',
                 'x-filter' => [
                     'field' => 'd.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateLastComment?' => new DateFilterSchema([
+                'description' => 'When the last comment was posted.',
+                'x-filter' => [
+                    'field' => 'd.DateLastComment',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
@@ -560,8 +573,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
         );
         if ($this->isExpandField('category', $query['expand'])) {
             $this->categoryModel->expandCategories($rows);

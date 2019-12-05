@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
 
@@ -567,6 +568,7 @@ class CommentModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Comment",
             "ActivityUserID" => $comment["InsertUserID"] ?? null,
+            "Format" => $comment["Format"] ?? null,
             "HeadlineFormat" => t(
                 "HeadlineFormat.Comment",
                 '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>'
@@ -574,17 +576,12 @@ class CommentModel extends Gdn_Model {
             "RecordType" => "Comment",
             "RecordID" => $commentID,
             "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
+            "Story" => $comment["Body"] ?? null,
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
             ]
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowCommentBody", false)) {
-            $data["Story"] = $comment["Body"] ?? null;
-            $data["Format"] = $comment["Format"] ?? null;
-        }
 
         // Pass generic activity to events.
         $this->EventArguments["Activity"] = $data;
@@ -865,25 +862,18 @@ class CommentModel extends Gdn_Model {
                     ]
                 );
             }
-
         } else {
-            // Make sure the discussion isn't archived.
-            $archiveDate = Gdn::config('Vanilla.Archive.Date', false);
-            if (!$archiveDate || (Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($archiveDate))) {
-                $newComments = true;
-
-                // Insert watch data.
-                $this->SQL->options('Ignore', true);
-                $this->SQL->insert(
-                    'UserDiscussion',
-                    [
-                        'UserID' => $userID,
-                        'DiscussionID' => $discussion->DiscussionID,
-                        'CountComments' => $countWatch,
-                        'DateLastViewed' => Gdn_Format::toDateTime()
-                    ]
-                );
-            }
+            // Insert watch data.
+            $this->SQL->options('Ignore', true);
+            $this->SQL->insert(
+                'UserDiscussion',
+                [
+                    'UserID' => $userID,
+                    'DiscussionID' => $discussion->DiscussionID,
+                    'CountComments' => $countWatch,
+                    'DateLastViewed' => DateTimeFormatter::timeStampToDateTime(time())
+                ]
+            );
         }
 
         /**
@@ -902,7 +892,7 @@ class CommentModel extends Gdn_Model {
             return;
         }
         $wheres = ['CategoryID' => $categoryID];
-        $dateMarkedRead = $category->DateMarkedRead ?? null;
+        $dateMarkedRead = $category['DateMarkedRead'];
         if ($dateMarkedRead) {
             $wheres['DateLastComment>'] = $dateMarkedRead;
         }

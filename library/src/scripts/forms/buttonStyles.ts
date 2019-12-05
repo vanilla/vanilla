@@ -255,6 +255,7 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     "-webkit-appearance": "none",
     appearance: "none",
     border: 0,
+    padding: 0,
     background: "none",
     cursor: "pointer",
     color: "inherit",
@@ -375,12 +376,14 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
-        color: colorOut(globalVars.mainColors.primary),
         $nest: {
-            "&:not(.focus-visible)": {
+            "&&": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            "&&:not(.focus-visible)": {
                 outline: 0,
             },
-            "&:hover, &:focus, &:active": {
+            "&&:hover, &&:focus, &&:active": {
                 color: colorOut(globalVars.mainColors.secondary),
             },
         },

@@ -181,8 +181,9 @@
         }
     }
 
+    .media + .post-content,
     .media + .userContent {
-        margin-top: $table-padding-y;
+        margin-top: $table-padding-y * 2;
     }
 }
 
@@ -199,7 +200,16 @@
 
     tr {
         &:hover {
+            $hoverColor: #f9fdfe;
             background-color: #f9fdfe;
+
+            .collapsableContent {
+                background-color: $hoverColor;
+            }
+
+            .collapsableContent-gradient {
+                background: linear-gradient(to bottom, rgba($hoverColor, 0), $hoverColor);
+            }
         }
     }
 }

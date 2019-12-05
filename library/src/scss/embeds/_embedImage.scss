@@ -6,7 +6,7 @@
 
 .embedImage {
     width: 100%;
-    max-width: $embed_width;
+    max-width: 100%;
     display: inline-block;
 }
 
@@ -19,7 +19,22 @@
         right: auto;
     }
     max-width: 100%;
-    max-height: 400px;
+    max-height: $embed_image_max_height;
+}
+
+.bbcode_left {
+    .embedImage-img {
+        margin-left: 0,
+    }
+}
+.bbcode_right {
+    .embedImage-img {
+        margin-right: 0,
+    }
+}
+
+.embedImage-link {
+    display: inline-flex;
 }
 
 .richEditor .embedImage-img {

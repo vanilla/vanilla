@@ -63,7 +63,7 @@ class ContentSecurityPolicyModel {
         $policies = $this->getPolicies();
         foreach ($policies as $policy) {
             $directive = $policy->getDirective();
-            if ($directive === 'all' || $directive === $filter) {
+            if ($filter === 'all' || $directive === $filter) {
                 if (array_key_exists($directive, $directives)) {
                     $directives[$directive] .= ' ' . $policy->getArgument();
                 } else {

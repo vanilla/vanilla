@@ -100,12 +100,15 @@ export default function titleBarNavClasses() {
         textDecoration: "none",
         $nest: {
             "&.focus-visible": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:focus": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:hover": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
         },

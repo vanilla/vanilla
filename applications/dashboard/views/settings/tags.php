@@ -18,9 +18,11 @@ echo $this->Form->errors();
             ?>
         </li>
         <?php if ($this->data('MergeTagVisible')): ?>
-            <li>
+            <li class="form-group">
                 <?php
-                echo $this->Form->checkBox('MergeTag', 'Merge this tag with the existing one');
+                echo '<div class="label-wrap"></div><div class="input-wrap">'.
+                    $this->Form->checkBox('MergeTag', 'Merge this tag with the existing one').
+                    '</div>';
                 ?>
             </li>
         <?php endif; ?>

@@ -83,16 +83,21 @@ export function _mountComponents(parent: Element) {
         if (typeof props === "string") {
             props = JSON.parse(props);
         }
+        const children = node.innerHTML;
 
         const registeredComponent = getComponent(name);
 
         if (registeredComponent) {
             mountReact(
                 <AppContext variablesOnly noTheme={!useTheme}>
-                    <registeredComponent.Component {...props} />
+                    <registeredComponent.Component {...props} contents={children} />
                 </AppContext>,
                 node,
-                undefined,
+                () => {
+                    if (node.getAttribute("data-unhide") === "true") {
+                        node.removeAttribute("style");
+                    }
+                },
                 registeredComponent.mountOptions,
             );
         } else {

@@ -110,10 +110,15 @@ export default class KeyboardBindings {
      */
     public handleCodeBlockEnter = (range: RangeStatic) => {
         const [line] = this.quill.getLine(range.index);
+        if (!(line instanceof CodeBlockBlot)) {
+            return;
+        }
 
         const { textContent } = line.domNode;
-        const currentLineIsEmpty = /\n\n\n$/.test(textContent);
-        if (!currentLineIsEmpty) {
+        const codeEndsWithNewlines = /\n\n\n$/.test(textContent ?? "");
+        const endOfLine = line.offset(this.quill.scroll) + line.length() - 1;
+
+        if (!codeEndsWithNewlines || range.index !== endOfLine) {
             return true;
         }
 

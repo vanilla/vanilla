@@ -85,7 +85,6 @@ export default class OpUtils {
                 embedType: "image",
                 url,
                 name: alt,
-                attributes: {},
             },
         };
         return OpUtils.op({

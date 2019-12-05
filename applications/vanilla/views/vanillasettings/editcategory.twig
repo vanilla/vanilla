@@ -32,15 +32,15 @@ dashboardHeading({
             <strong>{{ t('Category Url:') }}</strong>
         </div>
         <div id="UrlCode" class="input-wrap category-url-code">
-            <div class="category-url">
-                {{ url('/categories', true) }}
-                {{- '/' -}}
-                <span>{{ form.getValue('UrlCode') }}</span>
-            </div>
-            {{ form.textBox('UrlCode')}}
-            {{ form.getValue('UrlCode') ? '/' : '' }}
-            <a class="Edit btn btn-link" href="#">{{ t('edit') }}</a>
-            <a class="Save btn btn-primary" href="#">{{ t('OK') }}</a>
+            {% apply spaceless %}
+                <div class="category-url">
+                    {{ url('/categories', true) }}{{- '/' -}}
+                    <span>{{ form.getValue('UrlCode') }}</span>
+                </div>
+                {{- form.textBox('UrlCode') -}}
+                {{- form.getValue('UrlCode') ? '/' : '' -}}
+                <a class="Edit btn btn-link" href="#">{{ t('edit') }}</a>&nbsp;<a class="Save btn btn-primary" href="#">{{ t('OK') }}</a>&nbsp;
+            {% endapply %}
         </div>
     </li>
     <li class="form-group">

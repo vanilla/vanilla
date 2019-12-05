@@ -10,11 +10,10 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { inputVariables } from "@library/forms/inputStyles";
 import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
@@ -27,7 +26,7 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const sizing = themeVars("sizing", {
-        height: 40,
+        height: formElementVars.sizing.height,
     });
 
     const placeholder = themeVars("placeholder", {
@@ -170,13 +169,14 @@ export const searchBarClasses = useThemeCache(() => {
             "&:empty": {
                 display: important("none"),
             },
-            ".suggestedTextInput__placeholder": {
+            "& .suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),
             },
-            ".suggestedTextInput-noOptions": {
+            "& .suggestedTextInput-noOptions": {
                 padding: px(12),
             },
-            ".suggestedTextInput-option": {
+            "& .suggestedTextInput-option": {
+                ...buttonResetMixin(),
                 width: percent(100),
                 ...paddings({
                     vertical: 9,
@@ -192,7 +192,12 @@ export const searchBarClasses = useThemeCache(() => {
                     },
                 },
             },
-            ".suggestedTextInput-item": {
+            "& .suggestedTextInput-menuItems": {
+                margin: 0,
+                padding: 0,
+            },
+            "& .suggestedTextInput-item": {
+                listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
                         borderTop: `solid 1px ${globalVars.border.color.toString()}`,
@@ -217,6 +222,7 @@ export const searchBarClasses = useThemeCache(() => {
     const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
+        width: percent(100),
         paddingTop: 0,
         paddingBottom: 0,
         paddingRight: 0,
@@ -352,7 +358,6 @@ export const searchBarClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        minHeight: unit(vars.sizing.height),
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {
                 borderColor: colorOut(globalVars.mainColors.primary),

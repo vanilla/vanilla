@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
+use Garden\Web\Exception\ForbiddenException;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -74,7 +75,7 @@ class DiscussionsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         /** @var CategoryModel $categoryModel */
@@ -90,7 +91,10 @@ class DiscussionsTest extends AbstractResourceTest {
         }
     }
 
-    public function setUp() {
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
     }
@@ -202,12 +206,27 @@ class DiscussionsTest extends AbstractResourceTest {
 
     /**
      * The discussion index should fail on a private community with a guest.
-     *
-     * @expectedException Garden\Web\Exception\ForbiddenException
-     * @expectedExceptionMessage You must sign in to the private community.
      */
     public function testIndexPrivateCommunity() {
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You must sign in to the private community.');
+
         $this->runWithPrivateCommunity([$this, 'testIndex']);
+    }
+
+    /**
+     * Test the new dateLastComment filter.
+     */
+    public function testDateLastCommentFilter() {
+        $this->generateIndexRows();
+        sleep(1);
+        $rows = $this->generateIndexRows();
+        $row0 = $rows[0];
+        $this->assertNotEmpty($row0['dateLastComment']);
+
+        $filteredRows = $this->api()->get('/discussions', ['dateLastComment' => '<'.$row0['dateLastComment']])->getBody();
+        $filteredRow0 = $filteredRows[0];
+        $this->assertNotSame($row0['discussionID'], $filteredRow0['discussionID']);
     }
 
     /**
@@ -254,5 +273,19 @@ class DiscussionsTest extends AbstractResourceTest {
         $row = $this->api()->get($url, ['expand' => 'lastPost,lastPost.insertUser']);
         $this->assertArrayHasKey('insertUser', $row['lastPost']);
         $this->assertArrayNotHasKey('lastUser', $row);
+    }
+
+    /**
+     * The API should not fail when the discussion title/body is empty.
+     */
+    public function testEmptyDiscussionTitle() {
+        $row = $this->testPost();
+
+        /* @var \Gdn_SQLDriver $sql */
+        $sql = self::container()->get(\Gdn_SQLDriver::class);
+        $sql->put('Discussion', ['Name' => '', 'Body' => ''], ['DiscussionID' => $row['discussionID']]);
+
+        $discussion = $this->api()->get("$this->baseUrl/{$row['discussionID']}")->getBody();
+        $this->assertNotEmpty($discussion['name']);
     }
 }

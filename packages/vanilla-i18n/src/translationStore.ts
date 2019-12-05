@@ -1,3 +1,5 @@
+import { logError } from "@vanilla/utils";
+
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -7,7 +9,23 @@ interface ITranslations {
     [key: string]: string;
 }
 
-let translationStore: ITranslations = {};
+let translationStore: ITranslations | null = null;
+
+let internalTranslationDebugValue = false;
+
+/**
+ * Get or set the debug flag.
+ *
+ * @param newValue - The new value of debug.
+ * @returns the current debug setting.
+ */
+export function translationDebug(newValue?: boolean): boolean {
+    if (newValue !== undefined) {
+        internalTranslationDebugValue = newValue;
+    }
+
+    return internalTranslationDebugValue;
+}
 
 /**
  * Load a set of key value pairs as translation resources.
@@ -37,11 +55,24 @@ export function translate(str: string, defaultTranslation?: string): string {
         return str.substr(1);
     }
 
+    const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
+
+    if (!translationStore) {
+        if (process.env.NODE_ENV !== "test") {
+            logError("Attempted to translate a value before the translation store was initialized");
+        }
+        return fallback;
+    }
+
     if (translationStore[str] !== undefined) {
         return translationStore[str];
     }
 
-    return defaultTranslation !== undefined ? defaultTranslation : str;
+    if (translationDebug()) {
+        return "☢️☢️☢️" + fallback + "☢️☢️☢️";
+    } else {
+        return fallback;
+    }
 }
 
 /**

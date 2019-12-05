@@ -169,7 +169,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Do some pre-test setup.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setGlobals();
         $this->configureContainer();
@@ -200,7 +200,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Reset the container.
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         \Gdn::setContainer(new NullContainer());
     }
 

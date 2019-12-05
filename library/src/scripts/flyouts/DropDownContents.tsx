@@ -22,6 +22,7 @@ export interface IProps {
     openAsModal?: boolean;
     selfPadded?: boolean;
     size: DropDownContentSize;
+    horizontalOffset?: boolean;
 }
 
 export enum DropDownContentSize {
@@ -53,6 +54,10 @@ export default class DropDownContents extends React.Component<IProps> {
                         asModalClasses,
                         this.props.className,
                         !this.props.selfPadded ? classes.verticalPadding : "",
+                        {
+                            [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
+                            [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
+                        },
                     )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.doNothing}

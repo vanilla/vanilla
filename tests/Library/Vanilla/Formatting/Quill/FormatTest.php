@@ -76,7 +76,7 @@ class FormatTest extends SharedBootstrapTestCase {
     private $italicOpeningTag = "<em>";
     private $italicClosingTag = "</em>";
     private $boldClosingTag   = "</strong>";
-    private $linkOpeningTag   = "<a href=\"https://google.com\" rel=\"nofollow\">";
+    private $linkOpeningTag   = "<a href=\"https://google.com\" rel=\"nofollow noreferrer ugc\">";
     private $emptyTag         = "";
 
     /**

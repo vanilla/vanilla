@@ -66,7 +66,8 @@ jQuery(document).ready(function ($) {
     $('#UrlCode a, #UrlCode span').click(function() {
         $('#UrlCode').find('input,span,a').toggle();
         $('#UrlCode span').text($('#UrlCode input').val());
-        $('#UrlCode input').focus();
+        $('#UrlCode').toggleClass('isOpen');
+        $('#UrlCode input').select();
         return false;
     });
 

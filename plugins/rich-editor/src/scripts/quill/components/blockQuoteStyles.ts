@@ -6,19 +6,17 @@
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { cssRule } from "typestyle";
 import { colorOut } from "@library/styles/styleHelpersColors";
-import { borders, singleBorder } from "@library/styles/styleHelpersBorders";
-import { absolutePosition, margins, paddings, unit, userSelect } from "@library/styles/styleHelpers";
+import { singleBorder } from "@library/styles/styleHelpersBorders";
+import { paddings, unit, userSelect } from "@library/styles/styleHelpers";
 import { percent } from "csx";
 
 export const blockQuoteVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("blockQuote");
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mixBgAndFg(0.7),
+        fg: globalVars.mainColors.fg,
         border: {
             color: globalVars.mixBgAndFg(0.23),
         },
@@ -44,9 +42,7 @@ export const blockQuoteCSS = useThemeCache(() => {
             width: 6,
         }),
         boxSizing: "border-box",
-        width: percent(100),
         verticalAlign: "middle",
-        color: colorOut(vars.colors.fg),
     });
     cssRule(".blockquote-content", {
         $nest: {

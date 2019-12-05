@@ -86,8 +86,9 @@ export const selectBoxClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    const noTopPadding = style("noTopPadding", {
+    const offsetPadding = style("offsetPadding", {
         paddingTop: unit(0),
+        paddingBottom: unit(0),
     });
 
     return {
@@ -99,6 +100,6 @@ export const selectBoxClasses = useThemeCache(() => {
         checkContainer,
         spacer,
         itemLabel,
-        noTopPadding,
+        offsetPadding,
     };
 });

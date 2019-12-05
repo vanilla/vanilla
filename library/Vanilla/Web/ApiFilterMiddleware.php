@@ -41,11 +41,10 @@ class ApiFilterMiddleware {
         // Make sure filtering is done for apiv2.
         if (is_array($data)) {
             // Check for blacklisted fields.
-            $apiAllow = array_flip($apiAllow);
             $blacklist = array_flip($this->blacklist);
+            $apiAllow = array_change_key_case(array_flip($apiAllow));
             array_walk_recursive($data, function (&$value, $key) use ($apiAllow, $blacklist) {
                 $key = strtolower($key);
-                $apiAllow = array_change_key_case($apiAllow);
                 $isBlacklisted = isset($blacklist[$key]);
                 $isAllowedField = isset($apiAllow[$key]);
                 if ($isBlacklisted && !$isAllowedField) {

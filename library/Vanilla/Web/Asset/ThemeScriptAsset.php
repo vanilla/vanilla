@@ -33,8 +33,7 @@ class ThemeScriptAsset extends SiteAsset {
      * @inheritdoc
      */
     public function getWebPath(): string {
-
-        return $this->makeWebPath(
+        return $this->makeAssetPath(
             '/api/v2/themes',
             $this->themeKey,
             '/assets/javascript.js'

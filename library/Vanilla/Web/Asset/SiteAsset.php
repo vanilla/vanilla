@@ -54,24 +54,6 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
     }
 
     /**
-     * Create a web-root url, not an asset URL. This is useful for application level resources like ones created from
-     * API endpoints.
-     *
-     * @param string[] $pieces The pieces to join together.
-     *
-     * @return string The relative web path.
-     */
-    protected function makeWebPath(string ...$pieces): string {
-        $path = self::joinWebPath(
-            '/',
-            $this->request->getRoot(),
-            ...$pieces
-        );
-
-        return $this->addCacheBuster($path);
-    }
-
-    /**
      * Add a cache busting query parameter if one is available.
      *
      * @param string $url The URL to modify.

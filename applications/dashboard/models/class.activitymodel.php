@@ -1337,10 +1337,9 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Mark activities as notified
      *
      * @param array $activityIDs
-     * @throws Exception
      */
     public function setNotified($activityIDs) {
         if (!is_array($activityIDs) || count($activityIDs) == 0) {

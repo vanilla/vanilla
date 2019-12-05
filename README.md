@@ -2,6 +2,7 @@
 
 [![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/master/LICENSE)
 [![CircleCI](https://circleci.com/gh/vanilla/vanilla/tree/master.svg?style=svg)](https://circleci.com/gh/vanilla/vanilla/tree/master)
+[![codecov](https://codecov.io/gh/vanilla/vanilla/branch/master/graph/badge.svg)](https://codecov.io/gh/vanilla/vanilla)
 ![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_3.3.svg)
 
 ## Howdy, Stranger!
@@ -66,12 +67,12 @@ Our open source release branches are named by version number, e.g. `release/3.3`
 
 The `release/VERSION+BUILD` branches are production-ready branches for our cloud product but are not yet vetted for open source release (alternate platforms & configurations).
 
-|                     | Active Release |
-| ------------------- | -------------- |
-| **Version**         | `3.3`          |
+|                     | Active Release  |
+| ------------------- | --------------- |
+| **Version**         | `3.3`           |
 | **Initial Release** | 28 October 2019 |
 | **Last Updated**    | 28 October 2019 |
-| **EOL**             | Next release   |
+| **EOL**             | Next release    |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
 

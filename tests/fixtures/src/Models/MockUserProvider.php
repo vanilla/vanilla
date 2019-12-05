@@ -38,7 +38,7 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function expandFragments(array &$records, array $columnNames): void {
+    public function expandUsers(array &$records, array $columnNames): void {
         foreach ($columnNames as $column) {
             $noIDName = str_replace('ID', '', $column);
             foreach ($records as $record) {

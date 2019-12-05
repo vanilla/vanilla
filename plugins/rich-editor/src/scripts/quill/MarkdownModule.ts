@@ -36,7 +36,6 @@ export enum MarkdownInlineTriggers {
     ESCLAME_INVERT = "¡",
     QUOTE = '"',
     APOSTOPH = "'",
-    STAR = "*",
     COLON = ":",
     SEMI_COLON = ";",
 }

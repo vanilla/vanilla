@@ -574,7 +574,7 @@ if (!function_exists('combinePaths')) {
      *
      * @param array $paths The array of paths to concatenate.
      * @param string $delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
-     * @returns string Returns the concatenated path.
+     * @return string Returns the concatenated path.
      */
     function combinePaths($paths, $delimiter = DS) {
         if (is_array($paths)) {

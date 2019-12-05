@@ -494,7 +494,11 @@ class SettingsController extends DashboardController {
                 'Control' => 'textbox',
                 'Description' => t("The banner title appears on your site's banner and in your browser's title bar.",
                     "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
-
+            ],
+            'Garden.OrgName' => [
+                'LabelCode' => t('Organization'),
+                'Control' => 'textbox',
+                'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
             ],
             'Garden.Logo' => [
                 'LabelCode' => t('Banner Logo'),
@@ -1577,9 +1581,9 @@ class SettingsController extends DashboardController {
             $configurationModel->Validation->applyRule('Garden.Registration.Method', 'Required');
 
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
-            $invitationRoleIDs = $this->Form->getValue('InvitationRoleID');
-            $invitationCounts = $this->Form->getValue('InvitationCount');
-            $this->ExistingRoleInvitations = arrayCombine($invitationRoleIDs, $invitationCounts);
+            $invitationRoleIDs = (array)$this->Form->getValue('InvitationRoleID');
+            $invitationCounts = (array)$this->Form->getValue('InvitationCount');
+            $this->ExistingRoleInvitations = array_combine($invitationRoleIDs, $invitationCounts);
             $configurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
             if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {

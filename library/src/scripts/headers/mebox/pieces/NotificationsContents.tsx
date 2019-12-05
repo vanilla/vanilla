@@ -91,11 +91,7 @@ export class NotificationsContents extends React.Component<IProps> {
         const { notifications } = this.props;
 
         if (notifications.status !== LoadStatus.SUCCESS || !notifications.data) {
-            // This is the height that it happens to be right now.
-            // This will be calculated better once we finish the CSS in JS transition.
-            const height = this.props.device === Devices.MOBILE || this.props.device === Devices.XS ? 80 : 69;
-            const loaders = loaderClasses();
-            return <Loader loaderStyleClass={loaders.smallLoader} height={height} minimumTime={0} padding={10} />;
+            return <Loader small minimumTime={0} padding={10} />;
         }
 
         return (
@@ -185,7 +181,4 @@ function mapStateToProps(state: INotificationsStoreState) {
 }
 
 // Connect Redux to the React component.
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(withDevice(NotificationsContents));
+export default connect(mapStateToProps, mapDispatchToProps)(withDevice(NotificationsContents));

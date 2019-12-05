@@ -20,12 +20,13 @@ class SharedBootstrapTestCase extends TestCase {
 
     use BootstrapTrait {
         setUpBeforeClass as bootstrapSetupBeforeClass;
+        teardownAfterClass as bootstrapTeardownAfterClass;
     }
 
     /**
      * Bootstrap the first test cases and reuse the same container/bootstrap for subsequent test cases.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         /** @var Container $currentContainer */
         $currentContainer = Gdn::getContainer();
 
@@ -71,7 +72,8 @@ class SharedBootstrapTestCase extends TestCase {
     /**
      * Cleanup the container after testing is done.
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         Bootstrap::cleanUpGlobals();
+        self::bootstrapTeardownAfterClass();
     }
 }

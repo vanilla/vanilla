@@ -88,6 +88,13 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
+    public function parseImageUrls(string $content): array {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function parseMentions(string $content): array {
         return [];
     }

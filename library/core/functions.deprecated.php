@@ -175,6 +175,35 @@ if (!function_exists('checkRequirements')) {
     }
 }
 
+if (!function_exists('arrayCombine')) {
+    /**
+     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
+     *
+     * @param array $keys Array of keys to be used. Illegal values for key will be converted to string.
+     * @param array $values Array of values to be used.
+     * @return array
+     * @deprecated
+     */
+    function arrayCombine($keys, $values) {
+        deprecated('arrayCombine', 'array_combine');
+        if (!is_array($keys)) {
+            $keys = [];
+        }
+
+        if (!is_array($values)) {
+            $values = [];
+        }
+
+        if (count($keys) > 0 && count($values) > 0) {
+            return array_combine($keys, $values);
+        } elseif (count($keys) == 0) {
+            return $values;
+        } else {
+            return $keys;
+        }
+    }
+}
+
 if (!function_exists('compareHashDigest')) {
     /**
      * Determine whether or not two strings are equal in a time that is independent of partial matches.
@@ -536,6 +565,42 @@ if (!function_exists('parseUrl')) {
     }
 }
 
+if (!function_exists('markString')) {
+    /**
+     * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.
+     *
+     * This method explodes {@link $needle} on spaces and returns {@link $haystack} with replacements.
+     *
+     * @param string|array $needle The strings to search for in {@link $haystack}.
+     * @param string $haystack The string to search for replacements.
+     * @return string Returns a marked version of {@link $haystack}.
+     * @deprecated
+     */
+    function markString($needle, $haystack) {
+        if (!$needle) {
+            return $haystack;
+        }
+        if (!is_array($needle)) {
+            $needle = explode(' ', $needle);
+        }
+
+        foreach ($needle as $n) {
+            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
+                $word = '\b';
+            } else {
+                $word = '';
+            }
+
+            $haystack = preg_replace(
+                '#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i',
+                '<mark>\1</mark>',
+                $haystack
+            );
+        }
+        return $haystack;
+    }
+}
+
 if (!function_exists('prepareArray')) {
     /**
      * Makes sure that the key in question exists and is of the specified type, by default also an array.
@@ -779,26 +844,6 @@ if (!function_exists('safeRedirect')) {
             ]);
 
             redirectTo("/home/leaving?Target=".urlencode($destination));
-        }
-    }
-}
-
-if (!function_exists('trueStripSlashes')) {
-    if (get_magic_quotes_gpc()) {
-        /**
-         * @deprecated
-         */
-        function trueStripSlashes($string) {
-            \Vanilla\Utility\Deprecation::log();
-            return stripslashes($string);
-        }
-    } else {
-        /**
-         * @deprecated
-         */
-        function trueStripSlashes($string) {
-            \Vanilla\Utility\Deprecation::log();
-            return $string;
         }
     }
 }

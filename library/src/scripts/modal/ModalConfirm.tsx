@@ -30,7 +30,7 @@ interface IProps {
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
-    elementToFocusOnExit: HTMLElement;
+    elementToFocusOnExit?: HTMLElement;
     size?: ModalSizes;
 }
 
@@ -44,7 +44,6 @@ interface IState {
 export default class ModalConfirm extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         srOnlyTitle: false,
-        confirmTitle: t("OK"),
     };
 
     private cancelRef;
@@ -107,7 +106,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                                 baseClass={ButtonTypes.TEXT_PRIMARY}
                                 disabled={isConfirmLoading}
                             >
-                                {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}
+                                {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
                             </Button>
                         </FrameFooter>
                     }

@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
+import { allButtonStates, colorOut, debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -41,15 +41,8 @@ export const meBoxClasses = useThemeCache(() => {
         borderRadius: unit(globalVars.border.radius),
     });
 
-    const rootFlexClass = (count: number) => {
-        return style("footFlexClass", {
-            flexBasis: unit(count * formElementsVariables().sizing.height),
-        });
-    };
-
     return {
         root,
         buttonContent,
-        rootFlexClass,
     };
 });

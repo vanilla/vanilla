@@ -23,8 +23,7 @@ class RichFormatTest extends AbstractFormatTestCase {
      * @inheritDoc
      */
     protected function prepareFormatter(): FormatInterface {
-        self::container()->rule(Parser::class)
-            ->addCall('addCoreBlotsAndFormats')
+        self::container()
             ->rule(EmbedService::class)
             ->addCall('registerEmbed', [ImageEmbed::class, ImageEmbed::TYPE]);
         return self::container()->get(RichFormat::class);

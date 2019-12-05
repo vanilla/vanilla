@@ -8,6 +8,9 @@
  * @since 2.0
  */
 
+use Psr\Log\LoggerInterface;
+use Vanilla\Dashboard\Models\ActivityEmail;
+
 /**
  * Activity data management.
  */
@@ -54,6 +57,12 @@ class ActivityModel extends Gdn_Model {
     /** @var int Limit on number of activity to combine. */
     public static $MaxMergeCount = 10;
 
+    /** @var ActivityEmail[] Emails pending sending. */
+    private static $emailQueue = [];
+
+    /** @var Psr\Log\LoggerInterface */
+    private $logger;
+
     /**
      * @var string The amount of time to delete logs after.
      */
@@ -63,14 +72,17 @@ class ActivityModel extends Gdn_Model {
      * Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
+     * @param LoggerInterface $logger
      */
-    public function __construct(Gdn_Validation $validation = null) {
+    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null) {
         parent::__construct('Activity', $validation);
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
+
+        $this->logger = $logger instanceof LoggerInterface ? $logger : Gdn::getContainer()->get(LoggerInterface::class);
     }
 
     /**
@@ -997,7 +1009,7 @@ class ActivityModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function email(&$activity,  $options = []) {
+    public function email(&$activity, $options = []) {
         // The $options parameter used to be $noDelete bool, this is the backwards compat.
         if (is_bool($options)) {
             $options = ['NoDelete' => $options];
@@ -1025,11 +1037,66 @@ class ActivityModel extends Gdn_Model {
             return false;
         }
 
+        $activity["Headline"] = $this->getActivityHeadline($activity, $user);
+
+        // Build the email to send.
+        $email = new Gdn_Email();
+        $email->subject($this->getEmailSubjectFormatted($activity, $options));
+        $email->to($user);
+
+        $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
+
+        $emailTemplate = $email->getEmailTemplate()
+            ->setButton($url, val('ActionText', $activity, t('Check it out')))
+            ->setTitle($this->getEmailSubject($activity, $options));
+
+        if ($message = $this->getEmailMessage($activity)) {
+            $emailTemplate->setMessage($message, true);
+        }
+
+        $email->setEmailTemplate($emailTemplate);
+
+        // Fire an event for the notification.
+        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
+        $this->EventArguments = $notification;
+        $this->fireEvent('BeforeSendNotification');
+
+        // Only send if the user is not banned
+        if (!val('Banned', $user)) {
+            $activity['Emailed'] = $this->sendEmail($email, $activity, $options);
+            if ($activity['Emailed'] === self::SENT_OK) {
+                // Delete the activity now that it has been emailed.
+                if (!$options['NoDelete'] && !$activity['Notified']) {
+                    if (val('ActivityID', $activity)) {
+                        $this->delete($activity['ActivityID']);
+                    } else {
+                        $activity['_Delete'] = true;
+                    }
+                }
+            }
+        } else {
+            $activity['Emailed'] = self::SENT_SKIPPED;
+        }
+
+        if ($activityID) {
+            // Save the emailed flag back to the activity.
+            $this->SQL->put('Activity', ['Emailed' => $emailed], ['ActivityID' => $activityID]);
+        }
+        return true;
+    }
+
+    /**
+     * Given an activity, generate a fully-formatted headline.
+     *
+     * @param array $activity
+     * @return string
+     */
+    private function getActivityHeadline(array $activity, array $user): string {
         // Format the activity headline based on the user being emailed.
         if (val('HeadlineFormat', $activity)) {
             $sessionUserID = Gdn::session()->UserID;
             Gdn::session()->UserID = $user['UserID'];
-            $activity['Headline'] = formatString($activity['HeadlineFormat'], $activity);
+            $result = formatString($activity['HeadlineFormat'], $activity);
             Gdn::session()->UserID = $sessionUserID;
         } else {
             if (!isset($activity['ActivityGender'])) {
@@ -1043,76 +1110,40 @@ class ActivityModel extends Gdn_Model {
                 $activity['ProfileHeadline'] = val('ProfileHeadline', $aT);
             }
 
-            $activity['Headline'] = Gdn_Format::activityHeadline($activity, '', $user['UserID']);
+            $result = Gdn_Format::activityHeadline($activity, '', $user['UserID']);
         }
 
-        $subject = $options['EmailSubject'] ?: Gdn_Format::plainText($activity['Headline']);
+        return $result;
+    }
 
-        // Build the email to send.
-        $email = new Gdn_Email();
-        $email->subject(sprintf(
-            t('[%1$s] %2$s'),
-            c('Garden.Title'),
+    /**
+     * Get the unformatted subject line for an activity email.
+     *
+     * @param array $activity
+     * @param array $options
+     * @return string
+     */
+    private function getEmailSubject(array $activity, array $options): string {
+        $emailSubject = $options["EmailSubject"] ?? null;
+        $result = $emailSubject ?: Gdn_Format::plainText($activity["Headline"]);
+        return $result;
+    }
+
+    /**
+     * Get the subject line for an activity email, formatted per the activity data.
+     *
+     * @param array $activity
+     * @param array $options
+     * @return string
+     */
+    private function getEmailSubjectFormatted(array $activity, array $options): string {
+        $subject = $this->getEmailSubject($activity, $options);
+        $result = sprintf(
+            t("[%1\$s] %2\$s"),
+            c("Garden.Title"),
             $subject
-        ));
-        $email->to($user);
-
-        $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
-
-        $emailTemplate = $email->getEmailTemplate()
-            ->setButton($url, val('ActionText', $activity, t('Check it out')))
-            ->setTitle($subject);
-
-        if ($message = $this->getEmailMessage($activity)) {
-            $emailTemplate->setMessage($message, true);
-        }
-
-        $email->setEmailTemplate($emailTemplate);
-
-        // Fire an event for the notification.
-        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
-        $this->EventArguments = $notification;
-        $this->fireEvent('BeforeSendNotification');
-
-        // Send the email.
-        try {
-            // Only send if the user is not banned
-            if (!val('Banned', $user)) {
-                $email->send();
-                $emailed = self::SENT_OK;
-            } else {
-                $emailed = self::SENT_SKIPPED;
-            }
-
-            // Delete the activity now that it has been emailed.
-            if (!$options['NoDelete'] && !$activity['Notified']) {
-                if (val('ActivityID', $activity)) {
-                    $this->delete($activity['ActivityID']);
-                } else {
-                    $activity['_Delete'] = true;
-                }
-            }
-        } catch (phpmailerException $pex) {
-            if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$email->PhpMailer->isServerError($pex)) {
-                $emailed = self::SENT_FAIL;
-            } else {
-                $emailed = self::SENT_ERROR;
-            }
-        } catch (Exception $ex) {
-            switch ($ex->getCode()) {
-                case Gdn_Email::ERR_SKIPPED:
-                    $emailed = self::SENT_SKIPPED;
-                    break;
-                default:
-                    $emailed = self::SENT_FAIL; // similar to http 5xx
-            }
-        }
-        $activity['Emailed'] = $emailed;
-        if ($activityID) {
-            // Save the emailed flag back to the activity.
-            $this->SQL->put('Activity', ['Emailed' => $emailed], ['ActivityID' => $activityID]);
-        }
-        return true;
+        );
+        return $result;
     }
 
     /**
@@ -1459,6 +1490,7 @@ class ActivityModel extends Gdn_Model {
         trace('ActivityModel->save()');
         $activity = $data;
         $this->_touch($activity);
+        $queueEmail = $options["QueueEmail"] ?? false;
 
         if ($activity['ActivityUserID'] == $activity['NotifyUserID'] && !val('Force', $options)) {
             trace('Skipping activity because it would notify the user of something they did.');
@@ -1550,7 +1582,7 @@ class ActivityModel extends Gdn_Model {
         }
 
         $delete = false;
-        if ($activity['Emailed'] == self::SENT_PENDING) {
+        if ($activity['Emailed'] == self::SENT_PENDING && !$queueEmail) {
             $this->email($activity, $options);
             $delete = val('_Delete', $activity);
         }
@@ -1610,6 +1642,10 @@ class ActivityModel extends Gdn_Model {
 
                 $activityID = $this->SQL->insert('Activity', $activity);
                 $activity['ActivityID'] = $activityID;
+
+                if ($activity['Emailed'] == self::SENT_PENDING) {
+                    $this->queueEmail($activity, $options);
+                }
 
                 $this->prune();
             }
@@ -1797,18 +1833,24 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Save all queued activity rows.
      *
-     *
+     * @param bool $batchEmails Should emails be sent to multiple recipients when possible?
      * @return array
      */
-    public function saveQueue() {
+    public function saveQueue(bool $batchEmails = false) {
         $result = [];
-        foreach (self::$Queue as $userID => $activities) {
-            foreach ($activities as $activityType => $row) {
-                $result[] = $this->save($row[0], false, ['DisableFloodControl' => true] + $row[1]);
+        $options = [
+            "DisableFloodControl" => true,
+            "QueueEmail" => $batchEmails,
+        ];
+        foreach (self::$Queue as $activities) {
+            foreach ($activities as $row) {
+                $result[] = $this->save($row[0], false, $options + $row[1]);
             }
         }
         self::$Queue = [];
+        $this->sendEmailQueue();
         return $result;
     }
 
@@ -1895,5 +1937,173 @@ class ActivityModel extends Gdn_Model {
             ['DateUpdated <' => Gdn_Format::toDateTime($date->getTimestamp())],
             10
         );
+    }
+
+    /**
+     * Queue up an activity email notification.
+     *
+     * @param array $activity
+     * @param array $options
+     */
+    private function queueEmail(array $activity, array $options = []) {
+        $activityID = $activity["ActivityID"] ?? null;
+        $notifyUserID = $activity["NotifyUserID"] ?? null;
+        if (filter_var($activityID, FILTER_VALIDATE_INT) === false || filter_var($notifyUserID, FILTER_VALIDATE_INT) === false) {
+            return;
+        }
+
+        $user = Gdn::userModel()->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        if (!is_array($user) || !array_key_exists("Email", $user)) {
+            return;
+        }
+
+        if (!array_key_exists("Banned", $user) || $user["Banned"]) {
+            return;
+        }
+
+        $address = $user["Email"] ?? null;
+        if (!is_string($address) || empty($address)) {
+            return;
+        }
+
+        $decodedData = false;
+        if (array_key_exists("Data", $activity) && is_string($activity["Data"])) {
+            $activity["Data"] = dbdecode($activity["Data"]);
+            $decodedData = true;
+        }
+        $activity["Headline"] = $this->getActivityHeadline($activity, $user);
+        $subject = $this->getEmailSubjectFormatted($activity, $options);
+        $body = $this->getEmailMessage($activity);
+        $key = implode(".", [
+            $activity["ActivityTypeID"] ?? "",
+            $activity["RecordID"] ?? "",
+            $activity["RecordType"] ?? "",
+            md5($subject),
+            md5($body),
+        ]);
+        if ($decodedData === true && array_key_exists("Data", $activity) && is_array($activity["Data"])) {
+            $activity["Data"] = dbencode($activity["Data"]);
+        }
+
+        if (!array_key_exists($key, static::$emailQueue) || !(static::$emailQueue[$key] instanceof ActivityEmail)) {
+            $activityEmail = new ActivityEmail();
+            $activityEmail->setBody($body);
+            $activityEmail->setSubject($subject);
+            $activityEmail->setActionText($activity["ActionText"] ?? t("Check it out"));
+            $activityEmail->setActivityTypeID($activity["ActivityTypeID"] ?? null);
+            $activityEmail->setInternalRoute($activity["Route"] ?? "");
+            $activityEmail->setRecordID($activity["RecordID"] ?? null);
+            $activityEmail->setRecordType($activity["RecordType"] ?? null);
+            static::$emailQueue[$key] = $activityEmail;
+        } else {
+            $activityEmail = &static::$emailQueue[$key];
+        }
+
+        $activityEmail->addActivityID($activityID);
+        $activityEmail->addRecipient($address, $user["Name"] ?? null);
+    }
+
+    /**
+     * Send any queued emails.
+     */
+    private function sendEmailQueue() {
+        foreach (static::$emailQueue as $activityEmail) {
+            try {
+                $this->sendActivityEmail($activityEmail);
+            } catch (Exception $e) {
+                $this->logger->error("An exception occurred while processing the notification email queue.", [
+                    "event" => "activity_email_failed",
+                    "exception" => $e,
+                ]);
+            }
+        }
+        static::$emailQueue = [];
+    }
+
+    /**
+     * Invoke send on an instance of Gdn_Email and return its status.
+     *
+     * @param Gdn_Email $email
+     * @return integer
+     */
+    private function sendEmail(Gdn_Email $email): int {
+        // Send the email.
+        try {
+            $email->send();
+            return self::SENT_OK;
+        } catch (phpmailerException $pex) {
+            $this->logger->error("A PHPMailer exception occurred while sending a notification.", [
+                "event" => "activity_email_failed",
+                "exception" => $pex,
+            ]);
+            if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$email->PhpMailer->isServerError($pex)) {
+                return self::SENT_FAIL;
+            } else {
+                return self::SENT_ERROR;
+            }
+        } catch (Exception $ex) {
+            $this->logger->error("An exception occurred while sending a notification.", [
+                "event" => "activity_email_failed",
+                "exception" => $ex,
+            ]);
+            switch ($ex->getCode()) {
+                case Gdn_Email::ERR_SKIPPED:
+                    return self::SENT_SKIPPED;
+                default:
+                    return self::SENT_FAIL; // similar to http 5xx
+            }
+        }
+    }
+
+    /**
+     * Given an ActivityEmail instance, create and send the email it represents.
+     *
+     * @param ActivityEmail $activityEmail
+     */
+    private function sendActivityEmail(ActivityEmail $activityEmail) {
+        $batchSize = c("Garden.Email.BatchSize", 50);
+        $email = new Gdn_Email();
+        $recipients = $activityEmail->getRecipients();
+
+        $activityType = static::getActivityType($activityEmail->getActivityTypeID());
+        $route = $activityEmail->getInternalRoute() ?? "/";
+        $notification = [
+            "Activity" => [
+                "ActivityType" => $activityType["Name"] ?? null,
+                "RecordID" => $activityEmail->getRecordID(),
+                "RecordType" => $activityEmail->getRecordType(),
+                "Route" => $route,
+            ],
+            "Email" => $email,
+            "Route" => $route,
+            "UserAuthorized" => true, // Let anything hooking in know we've already authorized user access to the resources.
+        ];
+
+        $batchOffset = 0;
+        while ($batch = array_slice($recipients, $batchOffset, $batchSize)) {
+            $email->subject($activityEmail->getSubject());
+            $email->to($email->getNoReplyAddress(), t("Notifications Postmaster"));
+
+            foreach ($batch as $recipient) {
+                [$address, $name] = $recipient;
+                $email->bcc($address, $name ?? "");
+            }
+
+            $actionUrl = externalUrl($route);
+            $emailTemplate = $email->getEmailTemplate()
+                ->setButton($actionUrl, $activityEmail->getActionText())
+                ->setTitle($activityEmail->getSubject());
+            if ($message = $activityEmail->getBody()) {
+                $emailTemplate->setMessage($message, true);
+            }
+            $email->setEmailTemplate($emailTemplate);
+
+            $this->EventArguments = $notification;
+            $this->fireEvent("BeforeSendNotification");
+            $this->sendEmail($email);
+
+            $email->clear();
+            $batchOffset += $batchSize;
+        }
     }
 }

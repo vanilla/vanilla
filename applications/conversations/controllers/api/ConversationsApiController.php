@@ -449,7 +449,6 @@ class ConversationsApiController extends AbstractApiController {
             false
         );
         $data = array_values($conversationMembers);
-
         $this->userModel->expandUsers($data, ['UserID']);
         $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
@@ -576,7 +575,7 @@ class ConversationsApiController extends AbstractApiController {
         if (isset($dbRecord["User"]) && is_array($dbRecord["User"])) {
             $dbRecord["User"] = array_intersect_key(
                 $dbRecord["User"],
-                array_flip(["UserID", "Name", "PhotoUrl", "DateLastActive"])
+                array_flip(["userID", "name", "photoUrl", "dateLastActive"])
             );
         } elseif (isset($dbRecord["UserID"]) && isset($dbRecord["Name"])) {
             $dbRecord['User'] = [

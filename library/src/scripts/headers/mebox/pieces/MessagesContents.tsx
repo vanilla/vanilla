@@ -78,12 +78,8 @@ export class MessagesContents extends React.Component<IProps> {
 
     private renderContents(): React.ReactNode {
         const { status, data } = this.props;
-        const classesLoader = loaderClasses();
         if (status !== LoadStatus.SUCCESS || !data) {
-            // This is the height that it happens to be right now.
-            // This will be calculated better once we finish the CSS in JS transition.
-            const height = this.props.device === Devices.MOBILE || this.props.device === Devices.XS ? 80 : 69;
-            return <Loader loaderStyleClass={classesLoader.smallLoader} height={height} minimumTime={0} padding={10} />;
+            return <Loader small minimumTime={0} padding={10} />;
         }
 
         return (
@@ -175,7 +171,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Connect Redux to the React component.
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(withDevice(MessagesContents));
+export default connect(mapStateToProps, mapDispatchToProps)(withDevice(MessagesContents));

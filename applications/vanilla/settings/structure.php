@@ -134,7 +134,7 @@ $Construct
     ->column('CountBookmarks', 'int', null)
     ->column('CountViews', 'int', '1')
     ->column('Closed', 'tinyint(1)', '0')
-    ->column('Announce', 'tinyint(1)', '0')
+    ->column('Announce', 'tinyint(1)', '0', 'index')
     ->column('Sink', 'tinyint(1)', '0')
     ->column('DateInserted', 'datetime', false, ['index', 'index.CategoryInserted'])
     ->column('DateUpdated', 'datetime', true)
@@ -146,10 +146,6 @@ $Construct
     ->column('Attributes', 'text', true)
     ->column('RegardingID', 'int(11)', true, 'index');
 //->column('Source', 'varchar(20)', true)
-
-if (c('Vanilla.QueueNotifications')) {
-    $Construct->column('Notified', 'tinyint', ActivityModel::SENT_ARCHIVE);
-}
 
 $Construct
     ->set($Explicit, $Drop);

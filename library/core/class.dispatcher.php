@@ -236,7 +236,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     public function dispatch($importRequest = null, $permanent = true) {
 
         if ($importRequest && is_string($importRequest)) {
-            $importRequest = Gdn_Request::create()->fromEnvironment()->withURI($importRequest);
+            $importRequest = Gdn_Request::create()->fromEnvironment()->setURI($importRequest);
         }
 
         if (is_a($importRequest, 'Gdn_Request') && $permanent) {
@@ -252,7 +252,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // If we're in update mode and aren't explicitly prevented from blocking, block.
         if (inMaintenanceMode() && $this->getCanBlock($request) > self::BLOCK_NEVER) {
-            $request->withURI(Gdn::router()->getDestination('UpdateMode'));
+            $request->setURI(Gdn::router()->getDestination('UpdateMode'));
         }
 
         // Check for URL rewrites.

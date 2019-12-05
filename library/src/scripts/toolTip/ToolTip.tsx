@@ -5,11 +5,12 @@
  */
 
 import classNames from "classnames";
-import React, { cloneElement, ReactElement, useState } from "react";
+import React, { cloneElement, ReactElement, useState, useEffect, useRef } from "react";
 import { useTooltip, TooltipPopup } from "@reach/tooltip";
 import Portal from "@reach/portal";
 import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import throttle from "lodash/throttle";
 
 const nubPosition = (triggerRect, hasOverflow) => {
     const toolTipVars = tooltipVariables();
@@ -25,7 +26,7 @@ const nubPosition = (triggerRect, hasOverflow) => {
     };
 };
 
-function TriangleTooltip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
+function TriangleTooltip(props: { children: React.ReactNode; label: React.ReactNode; ariaLabel?: React.ReactNode }) {
     const globalVars = globalVariables();
     const { children, label, ariaLabel } = props;
 
@@ -58,31 +59,59 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
             top: hasOverflow ? overTriggerPosition : underTriggerPosition,
         };
     };
+    const isScrolling = useIsScrolling();
 
     return (
         <>
             {cloneElement(children as any, trigger)}
-            {isVisible && triggerRect && (
+            {isVisible && !isScrolling && triggerRect && (
                 // The Triangle. We position it relative to the trigger, not the popup
                 // so that collisions don't have a triangle pointing off to nowhere.
                 // Using a Portal may seem a little extreme, but we can keep the
                 // positioning logic simpler here instead of needing to consider
                 // the popup's position relative to the trigger and collisions
-                <Portal>
-                    <div className={classes.nubPosition} style={nubPosition(triggerRect, hasOverflow) as any}>
-                        <div className={classNames(classes.nub, hasOverflow ? "isDown" : "isUp")} />
-                    </div>
-                </Portal>
+                <>
+                    <Portal>
+                        <div className={classes.nubPosition} style={nubPosition(triggerRect, hasOverflow) as any}>
+                            <div className={classNames(classes.nub, hasOverflow ? "isDown" : "isUp")} />
+                        </div>
+                    </Portal>
+                    <TooltipPopup
+                        {...tooltip}
+                        label={label}
+                        ariaLabel={ariaLabel ? ariaLabel : label}
+                        position={toolBoxPosition}
+                        className={classes.box}
+                    />
+                </>
             )}
-            <TooltipPopup
-                {...tooltip}
-                label={label}
-                ariaLabel={ariaLabel ? ariaLabel : label}
-                position={toolBoxPosition}
-                className={classes.box}
-            />
         </>
     );
+}
+
+function useIsScrolling() {
+    let scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [isScrolling, setIsScrolling] = useState(false);
+
+    useEffect(() => {
+        const listener = throttle(() => {
+            if (scrollTimeout.current) {
+                clearTimeout(scrollTimeout.current);
+            }
+
+            setIsScrolling(true);
+            scrollTimeout.current = setTimeout(() => {
+                setIsScrolling(false);
+            }, 200);
+        }, 100);
+
+        window.addEventListener("scroll", listener);
+        return () => {
+            window.removeEventListener("scroll", listener);
+        };
+    }, []);
+
+    return isScrolling;
 }
 
 /**
@@ -90,11 +119,11 @@ function TriangleTooltip(props: { children: React.ReactNode; label: string; aria
  *
  * Custom children (not base dom nodes), must use React.forwardRef().
  */
-export function ToolTip(props: { children: React.ReactNode; label: string; ariaLabel?: string }) {
+export function ToolTip(props: { children: React.ReactNode; label: React.ReactNode; ariaLabel?: React.ReactNode }) {
     const { children, label, ariaLabel } = props;
 
     return (
-        <TriangleTooltip label={label} ariaLabel={ariaLabel ? ariaLabel : label}>
+        <TriangleTooltip label={label} ariaLabel={ariaLabel}>
             {children}
         </TriangleTooltip>
     );

@@ -96,3 +96,4 @@ yarn-error.log
 lerna-debug.log
 git-diff.txt
 phpcs-diff.json
+phpunit.xml.dist

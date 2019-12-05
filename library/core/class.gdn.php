@@ -70,22 +70,22 @@ class Gdn {
      */
     private static $container;
 
-    /** @var object  */
+    /** @var Gdn_Configuration  */
     protected static $_Config = null;
 
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
     protected static $_FactoryOverwrite = true;
 
-    /** @var object  */
+    /** @var Gdn_Locale  */
     protected static $_Locale = null;
 
-    /** @var object  */
+    /** @var Gdn_Request  */
     protected static $_Request = null;
 
-    /** @var object  */
+    /** @var Gdn_PluginManager  */
     protected static $_PluginManager = null;
 
-    /** @var object  */
+    /** @var Gdn_Session  */
     protected static $_Session = null;
 
     /**
@@ -426,7 +426,7 @@ class Gdn {
         $request = self::$_Request; //self::factory(self::AliasRequest);
         if (!is_null($newRequest)) {
             if (is_string($newRequest)) {
-                $request->withURI($newRequest);
+                $request->setURI($newRequest);
             } elseif (is_object($newRequest))
                 $request->fromImport($newRequest);
         }

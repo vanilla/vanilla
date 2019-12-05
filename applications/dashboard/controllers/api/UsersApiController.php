@@ -512,7 +512,7 @@ class UsersApiController extends AbstractApiController {
     protected function normalizeOutput(array $dbRecord) {
         if (array_key_exists('UserID', $dbRecord)) {
             $userID = $dbRecord['UserID'];
-            $roles = $this->userModel->getRoles($userID)->resultArray();
+            $roles = $this->userModel->getRoles($userID, false)->resultArray();
             $dbRecord['roles'] = $roles;
         }
         if (array_key_exists('Photo', $dbRecord)) {

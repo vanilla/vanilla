@@ -580,9 +580,7 @@ class PermissionModel extends Gdn_Model {
                     $disabledWhere[] = $tableName;
                 }
             }
-            if (count($disabledWhere) > 0) {
-                $sQL->whereNotIn('JunctionTable', $disabledWhere);
-            }
+            $sQL->whereNotIn('JunctionTable', $disabledWhere);
         }
 
         $data = $sQL->get()->resultArray();
@@ -897,7 +895,7 @@ class PermissionModel extends Gdn_Model {
         if (!($value & 2)) {
             return false;
         }
-        if (!empty($limitToSuffix) && substr($permissionName, -strlen($limitToSuffix)) != $limitToSuffix) {
+        if (!empty($limitToSuffix) && strtolower(substr($permissionName, -strlen($limitToSuffix))) != strtolower($limitToSuffix)) {
             return false;
         }
         if ($index = strpos($permissionName, '.')) {

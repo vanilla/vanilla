@@ -14,7 +14,7 @@ class AddonsTest extends AbstractAPIv2Test {
     private $coreAddons = [
         'conversations', // applications
         'allviewed', 'emojiextender', 'facebook', 'flagging',
-        'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'profileextender', 'quotes',
+        'googleprettify', 'gravatar', 'indexphotos', 'profileextender', 'quotes',
         'splitmerge', 'stopforumspam', 'twitter', 'vanillainthisdiscussion', 'vanillastats', 'editor', 'oauth2',
         'recaptcha', 'stubcontent', 'vanillicon', 'googlesignin'// plugins
     ];
@@ -24,7 +24,7 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $hiddenAddons = [
-        'dashboard', 'vanilla', 'gettingstarted'
+        'dashboard', 'vanilla', 'gettingstarted', 'googleplus'
     ];
 
     /**
@@ -81,10 +81,11 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @param string $key The key of an addon that exists, but should be hidden.
      * @dataProvider provideHiddenAddons
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
      */
     public function testGetHidden($key) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+
         $this->api()->get("/addons/$key");
     }
 
@@ -93,10 +94,11 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @param string $key The key of an addon that exists, but should be hidden.
      * @dataProvider provideHiddenAddons
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
      */
     public function testPatchHidden($key) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+
         $this->api()->patch("/addons/$key", ['enabled' => false]);
     }
 

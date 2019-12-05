@@ -21,10 +21,9 @@ import { InputActionMeta, ActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
-import { components } from "react-select";
+import { AsyncCreatable, components } from "react-select";
 import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";
-import AsyncCreatable from "react-select/lib/AsyncCreatable";
 import { SearchIcon } from "@library/icons/titleBar";
 
 export interface IComboBoxOption<T = any> {
@@ -81,11 +80,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
         disabled: false,
         isBigInput: false,
         noHeading: false,
-        title: t("Search"),
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
         triggerSearchOnClear: false,
-        buttonText: t("Search"),
         disableAutocomplete: false,
         placeholder: "",
     };
@@ -253,7 +250,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         <Heading
                             depth={1}
                             className={classNames("searchBar-heading", classes.heading)}
-                            title={this.props.title}
+                            title={this.props.title || t("Search")}
                         >
                             <label
                                 className={classNames("searchBar-label", classes.label)}
@@ -313,7 +310,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                         buttonType={this.props.buttonBaseClass}
                                     />
                                 ) : (
-                                    this.props.buttonText
+                                    this.props.buttonText || t("Search")
                                 )}
                             </Button>
                         </ConditionalWrap>

@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { Omit } from "@library/@types/utils";
 import React from "react";
 import { IWithEditorProps, useEditor } from "@rich-editor/editor/context";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
@@ -19,7 +18,7 @@ export function withEditor<T extends IWithEditorProps = IWithEditorProps>(Wrappe
     function ComponentWithEditor(props: Omitted) {
         const context = useEditor();
         const content = useEditorContents();
-        return <WrappedComponent {...context} {...content} {...props as T} />;
+        return <WrappedComponent {...context} {...content} {...(props as T)} />;
     }
     ComponentWithEditor.displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
     return ComponentWithEditor as React.ComponentType<Omitted>;

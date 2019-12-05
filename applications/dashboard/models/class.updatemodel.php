@@ -656,6 +656,7 @@ class UpdateModel extends Gdn_Model {
     public function runStructure($captureOnly = false) {
         $this->saveStatus(self::STATUS_RUNNING);
 
+        $userID = Gdn::session()->UserID;
         try {
             $r = $this->runStructureInternal($captureOnly);
             $this->saveStatus(self::STATUS_SUCCESS);
@@ -663,6 +664,14 @@ class UpdateModel extends Gdn_Model {
         } catch (\Throwable $ex) {
             $this->saveStatus(self::STATUS_ERROR, $ex->getMessage());
             throw $ex;
+        } finally {
+            if ($userID && $userID !== Gdn::session()->UserID) {
+                Gdn::session()->start($userID, false, false);
+            } elseif (!$userID && null !== c('Garden.Installed', false)) {
+            // Vanilla has an alternate install method where this config value is set to null.
+            // When this using this alternate install method we don't have authenticators configured and can't end the session.
+                Gdn::session()->end();
+            }
         }
     }
 

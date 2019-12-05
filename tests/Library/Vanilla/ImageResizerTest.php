@@ -19,7 +19,7 @@ class ImageResizerTest extends SharedBootstrapTestCase {
     /**
      * Clear the test cache before tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         if (file_exists(self::$cachePath)) {

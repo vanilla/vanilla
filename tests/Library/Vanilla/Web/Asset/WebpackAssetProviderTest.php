@@ -23,7 +23,7 @@ class WebpackAssetProviderTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         vfsStream::setup();
     }
 

@@ -66,19 +66,29 @@ class LocalesApiController extends Controller {
      * @return array[]
      */
     private function getEnabledLocales(): array {
-        $locales = [];
-        $locales += $this->localeModel->enabledLocalePacks(true);
-        $result = [[
-            'localeID' => 'en',
-            'localeKey' => 'en',
-            'regionalKey' => 'en',
-        ]];
+        $locales = $this->localeModel->enabledLocalePacks(true);
+
+        $hasEnLocale = false;
+        $result = [];
         foreach ($locales as $localeID => $locale) {
-            $result[] = [
+            $localeItem = [
                 'localeID' => $localeID,
                 'localeKey' => substr($locale['Locale'], 0, 2),
                 'regionalKey' => $locale['Locale'],
             ];
+
+            if ($localeItem['localeKey'] === 'en') {
+                $hasEnLocale = true;
+            }
+            $result[] = $localeItem;
+        }
+
+        if (!$hasEnLocale) {
+            $result = array_merge([[
+                'localeID' => 'en',
+                'localeKey' => 'en',
+                'regionalKey' => 'en',
+            ]], $result);
         }
 
         return $result;
@@ -168,5 +178,24 @@ class LocalesApiController extends Controller {
             ->setHeader('Content-Type', 'application/javascript; charset=utf-8');
 
         return $translations;
+    }
+
+    /**
+     * Validator for locale field
+     *
+     * @param string $locale
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public function validateLocale(string $locale, \Garden\Schema\ValidationField $validationField): bool {
+        $locales = $this->getEnabledLocales();
+        foreach ($locales as $localePack) {
+            if ($localePack['localeID'] === $locale
+            || $localePack['localeKey'] === $locale
+            || $localePack['regionalKey'] === $locale) {
+                return true;
+            }
+        }
+        return false;
     }
 }

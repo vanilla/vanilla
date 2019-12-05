@@ -31,11 +31,11 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test receiving an invalid job.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The job class 'VanillaTests\Fixtures\Scheduler\NonDroveJob' doesn't implement LocalJobInterface.
      */
     public function testInvalidReceive() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The job class \'VanillaTests\Fixtures\Scheduler\NonDroveJob\' doesn\'t implement LocalJobInterface.');
+
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -49,11 +49,11 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test executing an invalid job.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriverSlip` doesn't implement LocalDriverSlip.
      */
     public function testExecute() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriverSlip` doesn\'t implement LocalDriverSlip.');
+
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 

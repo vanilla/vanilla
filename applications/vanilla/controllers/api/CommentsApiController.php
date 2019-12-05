@@ -179,7 +179,7 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($comment, ['InsertUserID']);
         $comment = $this->normalizeOutput($comment);
         $result = $out->validate($comment);
 
@@ -218,7 +218,7 @@ class CommentsApiController extends AbstractApiController {
         $isRich = $comment['Format'] === 'Rich';
         $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
 
-        $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
     }
@@ -255,7 +255,9 @@ class CommentsApiController extends AbstractApiController {
             'discussionID',
             'body',
             'format:s' => 'The input format of the comment.',
-        ])->add($this->fullSchema()), 'out');
+        ])
+            ->add($this->fullSchema()), 'out')
+            ->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
 
         $comment = $this->commentByID($id);
         $comment['Url'] = commentUrl($comment);
@@ -356,8 +358,7 @@ class CommentsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
         );
 
         foreach ($rows as &$currentRow) {
@@ -433,7 +434,7 @@ class CommentsApiController extends AbstractApiController {
         $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
@@ -463,7 +464,7 @@ class CommentsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);

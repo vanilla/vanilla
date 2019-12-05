@@ -104,6 +104,11 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const fieldsetGroup = style("fieldsetGroup", {
         marginTop: unit(formElementVars.spacing.margin),
+        $nest: {
+            "&.noMargin": {
+                marginTop: unit(0),
+            },
+        },
     });
 
     const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {

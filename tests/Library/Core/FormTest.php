@@ -15,7 +15,7 @@ class FormTest extends SharedBootstrapTestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');

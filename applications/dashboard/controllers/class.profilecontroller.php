@@ -65,9 +65,11 @@ class ProfileController extends Gdn_Controller {
         $this->ProfileTabs = [];
         $this->editMode(true);
 
-        touchConfig('Vanilla.Password.SpamCount', 2);
-        touchConfig('Vanilla.Password.SpamTime', 1);
-        touchConfig('Vanilla.Password.SpamLock', 120);
+        \Gdn::config()->touch([
+            'Vanilla.Password.SpamCount' => 2,
+            'Vanilla.Password.SpamTime' => 1,
+            'Vanilla.Password.SpamLock' => 120
+        ]);
 
         parent::__construct();
     }

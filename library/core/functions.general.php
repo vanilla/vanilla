@@ -92,31 +92,6 @@ if (!function_exists('anonymizeIP')) {
     }
 }
 
-if (!function_exists('arrayCombine')) {
-    /**
-     * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
-     *
-     * @param array $array1 Array of keys to be used. Illegal values for key will be converted to string.
-     * @param array $array2 Array of values to be used.
-     */
-    function arrayCombine($array1, $array2) {
-        if (!is_array($array1)) {
-            $array1 = [];
-        }
-
-        if (!is_array($array2)) {
-            $array2 = [];
-        }
-
-        if (count($array1) > 0 && count($array2) > 0) {
-            return array_combine($array1, $array2);
-        } elseif (count($array1) == 0) {
-            return $array2;
-        } else {
-            return $array1;
-        }
-    }
-}
 /*
  We now support PHP 5.2.0 - Which should make this declaration unnecessary.
 if (!function_exists('array_fill_keys')) {
@@ -435,6 +410,7 @@ if (!function_exists('c')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function c($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -450,6 +426,7 @@ if (!function_exists('config')) {
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return mixed The configuration setting.
      * @see Gdn::config()
+     * @deprecated
      */
     function config($name = false, $default = false) {
         return Gdn::config($name, $default);
@@ -1538,20 +1515,20 @@ if (!function_exists('_formatStringCallback')) {
                                     continue;
                                 }
 
+                                $separator = '';
                                 if ($i == $count - 1) {
-                                    $result .= ' '.t('sep and', 'and').' ';
+                                    $separator = ' '.t('sep and', 'and').' ';
                                 } elseif ($i > 0) {
-                                    $result .= ', ';
+                                    $separator = ', ';
                                 }
-
                                 $special = [-1 => t('everyone'), -2 => t('moderators'), -3 => t('administrators')];
                                 if (isset($special[$iD])) {
-                                    $result .= $special[$iD];
+                                    $result .= $separator.$special[$iD];
                                 } else {
                                     $user = Gdn::userModel()->getID($iD);
-                                    if ($user) {
+                                    if ($user && $user->Deleted == 0) {
                                         $user->Name = formatUsername($user, $format, $contextUserID);
-                                        $result .= userAnchor($user);
+                                        $result .= $separator.userAnchor($user);
                                     }
                                 }
                             }
@@ -2160,7 +2137,7 @@ if (!function_exists('isWritable')) {
      * @return bool Returns true if {@link $path} is writable or false otherwise.
      */
     function isWritable($path) {
-        if ($path{strlen($path) - 1} == DS) {
+        if (substr($path, -1) === DS) {
             // Recursively return a temporary file path
             return isWritable($path.uniqid(mt_rand()).'.tmp');
         } elseif (is_dir($path)) {
@@ -2180,41 +2157,6 @@ if (!function_exists('isWritable')) {
         }
 
         return true;
-    }
-}
-
-if (!function_exists('markString')) {
-    /**
-     * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.
-     *
-     * This method explodes {@link $needle} on spaces and returns {@link $haystack} with replacements.
-     *
-     * @param string|array $needle The strings to search for in {@link $haystack}.
-     * @param string $haystack The string to search for replacements.
-     * @return string Returns a marked version of {@link $haystack}.
-     */
-    function markString($needle, $haystack) {
-        if (!$needle) {
-            return $haystack;
-        }
-        if (!is_array($needle)) {
-            $needle = explode(' ', $needle);
-        }
-
-        foreach ($needle as $n) {
-            if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
-                $word = '\b';
-            } else {
-                $word = '';
-            }
-
-            $haystack = preg_replace(
-                '#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i',
-                '<mark>\1</mark>',
-                $haystack
-            );
-        }
-        return $haystack;
     }
 }
 
@@ -3301,6 +3243,7 @@ if (!function_exists('saveToConfig')) {
      *  - Save: If this is false then only the in-memory config is set.
      *  - RemoveEmpty: If this is true then empty/false values will be removed from the config.
      * @return bool: Whether or not the save was successful. null if no changes were necessary.
+     * @deprecated
      */
     function saveToConfig($name, $value = '', $options = []) {
         Gdn::config()->saveToConfig($name, $value, $options);
@@ -3550,6 +3493,7 @@ if (!function_exists('t')) {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
+     * @deprecated
      */
     function t($code, $default = false) {
         return Gdn::translate($code, $default);

@@ -7,9 +7,11 @@
 
 namespace VanillaTests\Library\Vanilla\Site;
 
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\MinimalContainerTestCase;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Tests for SingleSiteSectionProvider.
@@ -18,46 +20,37 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
 
     const LOCALE_KEY = 'en_US';
 
-    /** @var SingleSiteSectionProvider */
-    private $provider;
+    /** @var SiteSectionModel $model */
+    private static $siteSectionModel;
 
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setConfig('Garden.Locale', self::LOCALE_KEY);
-        $this->provider = self::container()->get(SingleSiteSectionProvider::class);
+        $config = self::container()->get(ConfigurationInterface::class);
+        $provider = new SingleSiteSectionProvider(new DefaultSiteSection($config));
+        static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
+        $model = new SiteSectionModel($config);
+        $model->addProvider($provider);
+        self::$siteSectionModel = $model;
     }
 
     /**
      * Test for the getAll.
      */
     public function testGetAll() {
-        $this->assertCount(1, $this->provider->getAll());
-        $this->assertInstanceOf(DefaultSiteSection::class, $this->provider->getAll()[0]);
+        $this->assertCount(1, self::$siteSectionModel->getAll());
+        $this->assertInstanceOf(DefaultSiteSection::class, self::$siteSectionModel->getAll()[0]);
     }
 
     /**
      * Test for the getForLocale.
      */
     public function testGetForLocale() {
-        $this->assertCount(1, $this->provider->getForLocale(self::LOCALE_KEY));
-        $this->assertCount(0, $this->provider->getForLocale('notlocalekey'));
-    }
-
-    /**
-     * Test for the getByID.
-     */
-    public function getGetByID() {
-        $this->assertInstanceOf(
-            DefaultSiteSection::class,
-            $this->provider->getByID(DefaultSiteSection::DEFAULT_ID)
-        );
-
-        $this->assertNull(
-            $this->provider->getByID(5)
-        );
+        $this->assertCount(1, self::$siteSectionModel->getForLocale(self::LOCALE_KEY));
+        $this->assertCount(0, self::$siteSectionModel->getForLocale('notlocalekey'));
     }
 
     /**
@@ -66,11 +59,11 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
     public function getByBasePath() {
         $this->assertInstanceOf(
             DefaultSiteSection::class,
-            $this->provider->getByBasePath(DefaultSiteSection::EMPTY_BASE_PATH)
+            self::$siteSectionModel->getByBasePath(DefaultSiteSection::EMPTY_BASE_PATH)
         );
 
         $this->assertNull(
-            $this->provider->getByBasePath('asdf')
+            self::$siteSectionModel->getByBasePath('asdf')
         );
     }
 }

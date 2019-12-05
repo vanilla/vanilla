@@ -32,7 +32,7 @@ class ValidationFunctionsTest extends TestCase {
     public function testValidateTime($value, $isValid) {
         $result = validateTime($value);
         if ($isValid) {
-            $this->assertInternalType('string', $value);
+            $this->assertIsString('string', $value);
         } else {
             $this->assertInvalid($result);
         }

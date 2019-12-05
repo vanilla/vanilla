@@ -137,6 +137,9 @@ $Configuration['Garden']['SignIn']['Popup'] = true; // Should the sign-in link p
 $Configuration['Garden']['InputFormatter'] = 'Rich'; // Html, BBCode, Markdown, Text, Rich
 $Configuration['Garden']['MobileInputFormatter'] = 'Rich';
 $Configuration['Garden']['Html']['AllowedElements'] = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";
+$Configuration['Garden']['Html']['AllowedUrlSchemes'] = [
+    'aim', 'feed', 'file', 'ftp', 'gopher', 'http', 'https', 'irc', 'mailto', 'news', 'nntp', 'rapidminer', 'sftp', 'ssh', 'telnet'
+];
 $Configuration['Garden']['Search']['Mode'] = 'boolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['EditContentTimeout'] = 3600; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds. 60 * 60 = 3600 (aka 1hr)
 $Configuration['Garden']['Format']['Mentions'] = true;

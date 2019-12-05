@@ -242,17 +242,19 @@ export function NewFolderIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function WarningIcon(props: { className?: string; warningMessage: string }) {
+export function WarningIcon(props: { className?: string; warningMessage?: string; hidden?: boolean }) {
     const classes = iconClasses();
+    const { className, warningMessage = t("Warning"), hidden = true } = props;
 
     return (
         <svg
-            className={classNames(classes.warning, props.className)}
-            aria-label={props.warningMessage}
+            className={classNames(classes.warning, className)}
+            aria-label={warningMessage}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
+            aria-hidden={hidden ? "true" : "false"}
         >
-            <title>{props.warningMessage}</title>
+            <title>{warningMessage}</title>
             <circle cx="8" cy="8" r="8" style={currentColorFill} />
             <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
             <path
@@ -485,18 +487,20 @@ export function accessibleImageMenu(message?: string, className?: string) {
     );
 }
 
-export function EditIcon(props: { className?: string; title?: string }) {
+export function EditIcon(props: { className?: string; title?: string; small?: boolean }) {
     const classes = iconClasses();
     return (
         <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
             <title>{props.title ? props.title : t("Edit")}</title>
-            <g transform="translate(4, 3)">
-                <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
-                <path
-                    d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
-                    stroke="currentColor"
-                    fill="none"
-                />
+            <g className={classNames({ [classes.isSmall]: props.small })}>
+                <g transform="translate(4, 3)">
+                    <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
+                    <path
+                        d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
+                        stroke="currentColor"
+                        fill="none"
+                    />
+                </g>
             </g>
         </svg>
     );
@@ -570,6 +574,41 @@ export function GlobeIcon(props: { className?: string; title?: string }) {
             <path
                 d="M18.75,6.055A8.983,8.983,0,0,0,12.082,3l-.019,0H12a8.994,8.994,0,0,0-.035,17.988.415.415,0,0,0,.207,0A8.979,8.979,0,0,0,18.689,18a.382.382,0,0,0,.045-.052,8.966,8.966,0,0,0,.016-11.9ZM18.3,17.089a10.836,10.836,0,0,0-1.975-.815,15.225,15.225,0,0,0,.593-4.06h3.215A7.994,7.994,0,0,1,18.3,17.089ZM3.868,12.214H7.083A15.44,15.44,0,0,0,7.676,16.3a10.707,10.707,0,0,0-1.975.762A7.924,7.924,0,0,1,3.868,12.214ZM5.7,6.794a10.707,10.707,0,0,0,1.975.762,15.667,15.667,0,0,0-.589,3.8H3.879A8.027,8.027,0,0,1,5.7,6.794Zm5.844.577a16.12,16.12,0,0,1-2.829-.33C9.4,5.3,10.47,4.108,11.545,3.893Zm0,.857v3.13h-3.6A13.983,13.983,0,0,1,8.478,7.8,15.459,15.459,0,0,0,11.545,8.228Zm0,3.986v3.547a15.492,15.492,0,0,0-3.066.32,14.064,14.064,0,0,1-.537-3.867Zm0,4.4V20.1c-1.075-.215-2.15-1.41-2.829-3.148A16.312,16.312,0,0,1,11.545,16.618Zm.86,0a13.668,13.668,0,0,1,2.7.327c-.653,1.672-1.628,2.842-2.7,3.119V16.62Zm0-.857v-3.55h3.653a13.891,13.891,0,0,1-.625,3.867,15.962,15.962,0,0,0-3.029-.318Zm0-4.407V8.225A15.634,15.634,0,0,0,15.433,7.8a13.924,13.924,0,0,1,.62,3.555H12.405Zm0-3.99V3.922c1.074.277,2.049,1.446,2.7,3.118a13.521,13.521,0,0,1-2.7.327Zm2.153-3.1A8.164,8.164,0,0,1,17.7,6.19a10.084,10.084,0,0,1-1.648.633A7.94,7.94,0,0,0,14.558,4.271ZM7.95,6.823A10.016,10.016,0,0,1,6.3,6.19a8.166,8.166,0,0,1,3.14-1.92A7.95,7.95,0,0,0,7.95,6.823Zm0,10.342a7.952,7.952,0,0,0,1.492,2.553A8.14,8.14,0,0,1,6.3,17.8,10.177,10.177,0,0,1,7.95,17.165Zm8.1,0A10.129,10.129,0,0,1,17.7,17.8a8.14,8.14,0,0,1-3.14,1.919A7.91,7.91,0,0,0,16.05,17.165Zm.863-5.808a15.454,15.454,0,0,0-.589-3.775A10.7,10.7,0,0,0,18.3,6.767a8.107,8.107,0,0,1,1.822,4.59Z"
                 style={{ fill: "currentColor" }}
+            />
+        </svg>
+    );
+}
+
+export function TranslateIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.standard, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+            <title>{props.title ? props.title : t("Translate")}</title>
+            <path
+                d="M9.836,13.2l-.455-1.495H7.09L6.635,13.2H5.2L7.417,6.892H9.046L11.27,13.2Zm-.773-2.612q-.359-1.149-.711-2.3-.065-.209-.114-.42-.142.549-.812,2.72Zm9.472,1.626a.5.5,0,0,0,0-1h-2.07V10a.466.466,0,1,0-.93,0v1.214h-1.9c-.256,0-.088.22,0,.5s0,.5.255.5h.216a4.936,4.936,0,0,0,1.164,2.75c-.528.34.31.329-.35.329-.256,0,0,.077,0,.353s.093.508.35.508c.614,0,.01.03.73-.508a4.216,4.216,0,0,0,2.535.854.5.5,0,0,0,0-1,3.319,3.319,0,0,1-1.8-.536,4.936,4.936,0,0,0,1.164-2.75h.641ZM16,14.34a3.893,3.893,0,0,1-.956-2.125h1.912A3.893,3.893,0,0,1,16,14.34Z"
+                style={{ fill: "currentColor" }}
+            />
+            <path
+                d="M11.271,2.709H4.017q-1.418,0-1.417,1.9V16.445q0,1.575,1.733,1.575H16.1Z"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+            <path
+                d="M12.348,6.116h7.7q1.313,0,1.312,1.234v12.7q0,1.47-1.312,1.47H13.635L12,18.02h4.1Zm1.287,15.4,2.817-3.287"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+        </svg>
+    );
+}
+
+export function HamburgerIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.hamburger, props.className)} viewBox="0 0 21.999 15.871" aria-hidden="true">
+            <title>{props.title ? props.title : t("Menu")}</title>
+            <path
+                d="M21.111,8.9H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849m0-7.012H.89A.906.906,0,0,1,0,.97.907.907,0,0,1,.889.045H21.11A.907.907,0,0,1,22,.969a.907.907,0,0,1-.889.924m0,14.023H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849"
+                transform="translate(0 -0.045)"
+                style={{ fill: "currentcolor" }}
             />
         </svg>
     );

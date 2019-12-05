@@ -17,7 +17,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
 
-export interface ISelectOneProps {
+export interface ISelectOneProps extends IMenuPlacement {
     label: string | null;
     id?: string;
     inputID?: string;
@@ -36,10 +36,19 @@ export interface ISelectOneProps {
     noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
     inputClassName?: string;
+    isClearable?: boolean;
+    describedBy?: string;
+    selectRef?: React.RefObject<Select>;
 }
 
-interface IState {
-    focus: boolean;
+export enum MenuPlacement {
+    AUTO = "auto",
+    BOTTOM = "bottom",
+    TOP = "top",
+}
+
+export interface IMenuPlacement {
+    menuPlacement?: MenuPlacement;
 }
 
 /**
@@ -82,7 +91,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     inputId={inputID}
                     onChange={props.onChange}
                     onInputChange={props.onInputChange}
-                    isClearable={true}
+                    isClearable={props.isClearable}
                     isDisabled={disabled}
                     classNamePrefix={prefix}
                     className={classNames(prefix, className)}
@@ -97,7 +106,8 @@ export default function SelectOne(props: ISelectOneProps) {
                     isLoading={props.isLoading}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    menuPlacement="auto"
+                    menuPlacement={props.menuPlacement ?? "auto"}
+                    ref={props.selectRef}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />
@@ -105,6 +115,10 @@ export default function SelectOne(props: ISelectOneProps) {
         </div>
     );
 }
+
+SelectOne.defaultProps = {
+    isClearable: true,
+};
 
 /**
  * Hook to create react-select override props.

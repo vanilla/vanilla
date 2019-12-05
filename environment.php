@@ -7,8 +7,12 @@
  * @license GPL-2.0-only
  */
 
-if (PHP_VERSION_ID < 70100) {
-    die('Vanilla requires PHP 7.1 or greater.');
+// Environment
+define('ENVIRONMENT_PHP_VERSION', '7.2');
+define('ENVIRONMENT_PHP_NEXT_VERSION', '7.3');
+
+if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
+    die('Vanilla requires PHP '.ENVIRONMENT_PHP_VERSION.' or greater.');
 }
 
 // Define the constants we need to get going.
@@ -18,7 +22,7 @@ if (!defined('APPLICATION')) {
 if (!defined('APPLICATION_VERSION')) {
     // Rules for the versioning
     // {OSS version}-{Cloud release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', '3.3-2019.016-SNAPSHOT');
+    define('APPLICATION_VERSION', '4.0-2019.018-SNAPSHOT');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

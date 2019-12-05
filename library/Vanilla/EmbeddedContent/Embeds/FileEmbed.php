@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent\Embeds;
 
 use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\Formatting\Attachment;
 use Vanilla\Models\VanillaMediaSchema;
 
 /**
@@ -57,6 +58,15 @@ class FileEmbed extends AbstractEmbed {
      * @inheritdoc
      */
     protected function schema(): Schema {
-        return new VanillaMediaSchema(false);
+        return new VanillaMediaSchema(true);
+    }
+
+    /**
+     * Get the embed as an attachment.
+     *
+     * @return Attachment
+     */
+    public function asAttachment(): Attachment {
+        return Attachment::fromArray($this->getData());
     }
 }

@@ -50,7 +50,7 @@ abstract class AbstractAPIv2Test extends TestCase {
     /**
      * Create a fresh API client for the test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
@@ -67,7 +67,7 @@ abstract class AbstractAPIv2Test extends TestCase {
     /**
      * Destroy the API client that was just used for the test.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
         \Logger::removeLogger($this->logger);
@@ -230,37 +230,6 @@ abstract class AbstractAPIv2Test extends TestCase {
             return $r;
         } finally {
             $this->api()->setUserID($userID);
-        }
-    }
-
-    /**
-     * Run a callback with the following config and restore the config after.
-     *
-     * @param array $config The config to set.
-     * @param callable $callback The code to run.
-     * @return mixed Returns the result of the callback.
-     */
-    protected function runWithConfig(array $config, callable $callback) {
-        /* @var \Gdn_Configuration $c */
-        $c = $this->container()->get(\Gdn_Configuration::class);
-
-        // Create a backup of the config.
-        $bak = [];
-        foreach ($config as $key => $value) {
-            $bak[$key] = $c->get($key, null);
-        }
-
-        try {
-            foreach ($config as $key => $value) {
-                $c->set($key, $value);
-            }
-
-            $r = $callback();
-            return $r;
-        } finally {
-            foreach ($bak as $key => $value) {
-                $c->set($key, $value);
-            }
         }
     }
 }

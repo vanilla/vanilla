@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { formatUrl } from "@library/utility/appUtils";
 import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
 import { RouteComponentProps, withRouter } from "react-router";
+import { useContentTranslator } from "@vanilla/i18n";
 
 export interface IWithLinkContext {
     linkContext: string;
@@ -16,18 +17,20 @@ export interface IWithLinkContext {
     makeHref(location: LocationDescriptor): string;
 }
 
+const defaultMakeHref = (location: LocationDescriptor) => {
+    const stringUrl = typeof location === "string" ? location : createPath(location);
+    return formatUrl(stringUrl, true);
+};
 export const LinkContext = React.createContext<IWithLinkContext>({
     linkContext: formatUrl("/"),
-    pushSmartLocation: () => {
-        return;
+    pushSmartLocation: location => {
+        const href = defaultMakeHref(location);
+        window.location.href = href;
     },
     isDynamicNavigation: () => {
         return false;
     },
-    makeHref: (location: LocationDescriptor) => {
-        const stringUrl = typeof location === "string" ? location : createPath(location);
-        return formatUrl(stringUrl, true);
-    },
+    makeHref: defaultMakeHref,
 });
 
 interface IProps extends RouteComponentProps<any> {
@@ -81,6 +84,10 @@ export const LinkContextProvider = withRouter((props: IProps) => {
         </LinkContext.Provider>
     );
 });
+
+export function useLinkContext() {
+    return useContext(LinkContext);
+}
 
 /**
  * Create a new LocationDescriptor with a "relative" path.

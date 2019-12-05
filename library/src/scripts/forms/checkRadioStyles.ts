@@ -93,6 +93,8 @@ export const checkRadioClasses = useThemeCache(() => {
     const style = styleFactory("checkRadio");
     const flexes = flexHelper();
 
+    const isDashboard = style("isDashboard", {});
+
     //.radioButton-label,
     // .checkbox-label
     const label = style("label", {
@@ -241,6 +243,12 @@ export const checkRadioClasses = useThemeCache(() => {
                 all: 0,
                 right: px(globalVars.spacer.size / 2),
             }),
+            [`&.${isDashboard} + .info`]: {
+                ...margins({
+                    top: unit(2),
+                    bottom: unit(6),
+                }),
+            },
         },
     });
 
@@ -260,5 +268,6 @@ export const checkRadioClasses = useThemeCache(() => {
         diskIcon,
         input,
         group,
+        isDashboard,
     };
 });

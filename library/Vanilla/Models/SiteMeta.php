@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\Addon;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * A class for gathering particular data about the site.
@@ -27,6 +28,9 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var bool */
     private $debugModeEnabled;
+
+    /** @var bool */
+    private $translationDebugModeEnabled;
 
     /** @var string */
     private $siteTitle;
@@ -52,24 +56,33 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var string|null */
+    private $shareImage;
+
     /** @var array */
     private $featureFlags;
 
     /** @var Contracts\Site\SiteSectionInterface */
     private $currentSiteSection;
 
+    /** @var string */
+    private $logo;
+
+    /** @var string */
+    private $orgName;
+
     /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param Contracts\Site\SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
         RequestInterface $request,
         Contracts\ConfigurationInterface $config,
-        Contracts\Site\SiteSectionProviderInterface $siteSectionProvider,
+        SiteSectionModel $siteSectionModel,
         ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
@@ -79,15 +92,18 @@ class SiteMeta implements \JsonSerializable {
         $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+        $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
 
         $this->featureFlags = $config->get('Feature', []);
 
-        $this->currentSiteSection = $siteSectionProvider->getCurrentSiteSection();
+        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
         $this->siteTitle = $config->get('Garden.Title', "");
+
+        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
 
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
@@ -103,6 +119,14 @@ class SiteMeta implements \JsonSerializable {
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
+        }
+
+        if ($shareImage = $config->get("Garden.ShareImage")) {
+            $this->shareImage = \Gdn_Upload::url($shareImage);
         }
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
@@ -125,12 +149,16 @@ class SiteMeta implements \JsonSerializable {
                 'basePath' => $this->basePath,
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
+                'translationDebug' => $this->translationDebugModeEnabled,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
+                'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
+                'shareImage' => $this->shareImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
@@ -148,6 +176,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getSiteTitle(): string {
         return $this->siteTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgName(): string {
+        return $this->orgName;
     }
 
     /**
@@ -213,6 +248,22 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getFavIcon(): ?string {
         return $this->favIcon;
+    }
+
+    /**
+     * Get the configured "Share Image" for the site.
+     *
+     * @return string|null
+     */
+    public function getShareImage(): ?string {
+        return $this->shareImage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): ?string {
+        return $this->logo;
     }
 
     /**

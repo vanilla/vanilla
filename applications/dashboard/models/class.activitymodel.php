@@ -1318,6 +1318,25 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Get total notifications for a user.
+     *
+     * @param integer $notifyUser Enum: NOTIFY_PUBLIC, NOTIFY_MODS, NOTIFY_ADMINS
+     * @return integer
+     */
+    public function getUserTotal(int $notifyUser): int {
+        $notifications = $this->SQL
+            ->select("ActivityID", "count", "total")
+            ->from($this->Name)
+            ->where("NotifyUserID", $notifyUser)
+            ->get()
+            ->resultArray();
+        if (!is_array($notifications) || !isset($notifications[0])) {
+            return 0;
+        }
+        return $notifications[0]["total"] ?? 0;
+    }
+
+    /**
      *
      *
      * @param $activityIDs

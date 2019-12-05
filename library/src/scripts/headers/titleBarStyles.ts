@@ -19,6 +19,7 @@ import {
     absolutePosition,
     pointerEvents,
     singleBorder,
+    sticky,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent, px, quote, viewHeight } from "csx";
@@ -29,6 +30,7 @@ import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { buttonClasses, buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
+import classNames from "classnames";
 
 enum TitleBarBorderType {
     BORDER = "border",
@@ -713,6 +715,12 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
+    const isFixed = style("isFixed", {
+        ...sticky(),
+        top: 0,
+        zIndex: 10,
+    });
+
     return {
         root,
         spacer,
@@ -748,6 +756,7 @@ export const titleBarClasses = useThemeCache(() => {
         desktopNavWrap,
         logoCenterer,
         hamburger,
+        isFixed,
     };
 });
 

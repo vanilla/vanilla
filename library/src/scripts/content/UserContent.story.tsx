@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 
-storiesOf("User Content", module).add("Text", () => {
+storiesOf("User Content", module).add("Content", () => {
     const content = `
         <h1>h1</h1>
         <h2>h2</h2>
@@ -74,6 +74,11 @@ storiesOf("User Content", module).add("Text", () => {
        </div>
        <h2>Block quote</h2>
        <div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">asfasdfadsfa</p></div></div>
+       
+       <img src="https://us.v-cdn.net/5022541/uploads/493/OPK8CPQYAYBB.jpg" class="embedImage-img"/>
+       <img src="https://us.v-cdn.net/5022541/uploads/207/3HWDW6ZRRH0Q.png" class="embedImage-img"/>
+       
+       <img src="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" class="embedImage-img"/>
        
        <h2>Inline operations</h2>
        <p>
@@ -155,9 +160,5 @@ storiesOf("User Content", module).add("Text", () => {
          </li>
        </ol>
        `;
-    return (
-        <StoryContent>
-            <UserContent content={content} />{" "}
-        </StoryContent>
-    );
+    return <UserContent content={content} />;
 });

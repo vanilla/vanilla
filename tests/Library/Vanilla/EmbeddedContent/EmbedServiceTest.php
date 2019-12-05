@@ -25,7 +25,7 @@ class EmbedServiceTest extends MinimalContainerTestCase {
     /**
      * Setup the container with a null cache.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $container = \Gdn::getContainer();
         $container->rule(\Gdn_Cache::class)

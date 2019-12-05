@@ -22,7 +22,7 @@ class AbstractApiControllerTest extends TestCase {
     /**
      * Include the abstract controller because it's in an addon.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         require_once __DIR__.'/../../applications/dashboard/controllers/api/AbstractApiController.php';
     }
@@ -32,7 +32,7 @@ class AbstractApiControllerTest extends TestCase {
      *
      * This can be modified later if injection is required.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->controller = new TestApiController();
     }

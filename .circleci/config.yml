@@ -2,6 +2,7 @@ version: 2.1
 orbs:
     core: vanilla/core@2.1.0
     chromatic: wave/chromatic@1.0.1
+    codecov: codecov/codecov@1.0.5
 aliases:
     - &run_yarn
         run:
@@ -13,6 +14,19 @@ aliases:
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
+    - &prepare_coverage
+        run:
+            name: Prepare Coverage
+            command: mkdir ~/phpunit
+    - &upload_coverage
+        run:
+            name: Upload Coverage
+            command: |
+                cd ~/workspace/repo
+                curl -s https://codecov.io/bash | bash -s -- \
+                    -s "$HOME/workspace/repo" \
+                    -y ".codecov.yml"\
+                    -Z || echo 'Codecov upload failed'
     - &run_composer
         run:
             name: Install Composer Packages
@@ -126,6 +140,7 @@ jobs:
             - *run_php_lint
     php_72_tests:
         executor: core/php72
+        resource_class: large
         steps: &php_unit_test_steps
             - *attach_workspace
             - run:
@@ -134,18 +149,33 @@ jobs:
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
             - core/prepare_php_tests
+            - *prepare_coverage
             - run:
                 name: Library Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="Library" \
+                        --log-junit ~/phpunit/library-junit.xml \
+                        --coverage-clover=library-coverage.xml
             - run:
                 name: APIv2 Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="APIv2" \
+                        --log-junit ~/phpunit/apiv2-junit.xml \
+                        --coverage-clover=apiv2-coverage.xml
+            - *upload_coverage
+            - store_test_results:
+                path: ~/phpunit
     php_72_integration:
         executor: core/php72
+        resource_class: large
         steps: &php_integration_test_steps
             - *attach_workspace
             - core/prepare_php_tests
@@ -154,12 +184,24 @@ jobs:
                 name: APIv0 Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="APIv0" \
+                        --coverage-clover=apiv0-coverage.xml
             - run:
                 name: Models Tests
                 command: |
                     cd ~/workspace/repo
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
+                    ./vendor/bin/phpunit \
+                        -c phpunit.xml.dist \
+                        --exclude-group=ignore \
+                        --testsuite="Models" \
+                        --log-junit ~/phpunit/models-junit.xml \
+                        --coverage-clover=models-coverage.xml
+            - *upload_coverage
+            - store_test_results:
+                path: ~/phpunit
     php_73_lint:
         executor: core/php73
         steps: *php_lint_steps

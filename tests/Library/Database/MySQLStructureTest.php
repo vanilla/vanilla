@@ -25,7 +25,7 @@ class MySQLStructureTest extends TestCase {
     /**
      * Set up a fixture for use in tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $st = new TestMySQLStructure($this->container()->get(\Gdn_Database::class));

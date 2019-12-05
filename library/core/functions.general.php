@@ -2137,7 +2137,7 @@ if (!function_exists('isWritable')) {
      * @return bool Returns true if {@link $path} is writable or false otherwise.
      */
     function isWritable($path) {
-        if ($path{strlen($path) - 1} == DS) {
+        if (substr($path, -1) === DS) {
             // Recursively return a temporary file path
             return isWritable($path.uniqid(mt_rand()).'.tmp');
         } elseif (is_dir($path)) {

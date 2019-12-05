@@ -137,6 +137,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     // EventManager
     ->rule(\Garden\EventManager::class)
+    ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
+    ->addAlias(\Psr\EventDispatcher\EventDispatcherInterface::class)
+    ->addAlias(\Psr\EventDispatcher\ListenerProviderInterface::class)
     ->setShared(true)
 
     // Locale
@@ -262,6 +265,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
     ->rule('@view-application/json')
     ->setClass(\Vanilla\Web\JsonView::class)

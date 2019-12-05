@@ -22,7 +22,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         /** @var AuthenticatorModel $authenticatorModel */
@@ -37,7 +37,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         if (!self::$authenticators) {
             $this->markTestSkipped('No Authenticator found.');
@@ -48,26 +48,26 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      * @param array $record
      */
     public function assertIsAuthenticator(array $record) {
-        $this->assertInternalType('array', $record);
+        $this->assertIsArray($record);
 
         $this->assertArrayHasKey('authenticatorID', $record);
         $this->assertArrayHasKey('type', $record);
         $this->assertArrayHasKey('resourceUrl', $record);
 
         $this->assertArrayHasKey('ui', $record);
-        $this->assertInternalType('array', $record['ui']);
+        $this->assertIsArray($record['ui']);
         $this->assertArrayHasKey('url', $record['ui']);
         $this->assertArrayHasKey('buttonName', $record['ui']);
         $this->assertArrayHasKey('backgroundColor', $record['ui']);
         $this->assertArrayHasKey('foregroundColor', $record['ui']);
 
         $this->assertArrayHasKey('isActive', $record);
-        $this->assertInternalType('bool', $record['isActive']);
+        $this->assertIsBool($record['isActive']);
 
         // They also have to enable SignIn.
         if (isset($record['sso'])) {
             $this->assertArrayHasKey('canSignIn', $record['sso']);
-            $this->assertInternalType('bool', $record['sso']['canSignIn']);
+            $this->assertIsBool($record['sso']['canSignIn']);
             $this->assertTrue($record['sso']['canSignIn']);
         }
     }
@@ -129,7 +129,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
 
         $body = $response->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertCount(count(self::$authenticators), $body);
 
         foreach ($body as $record) {

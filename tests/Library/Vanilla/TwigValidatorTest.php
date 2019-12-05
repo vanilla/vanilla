@@ -58,7 +58,7 @@ class TwigValidatorTest extends MinimalContainerTestCase {
     public function provideTemplatePaths(): array {
         $paramSets = [];
 
-        $paths = glob(PATH_ROOT . "/{,*/,*/*/,*/*/*/}*.twig", GLOB_BRACE);
+        $paths = glob(PATH_ROOT . "/{,*/,*/*/,*/*/*/}*.twig", \GLOB_BRACE);
         foreach ($paths as $path) {
             $shortPath = str_replace(PATH_ROOT, "", $path);
             $paramSets[$shortPath] = [$path];

@@ -93,4 +93,11 @@ class WebpackAsset extends SiteAsset {
     public function setFsRoot(string $assetRoot) {
         $this->fsRoot = $assetRoot;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStatic(): bool {
+        return true;
+    }
 }

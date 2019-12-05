@@ -1339,7 +1339,7 @@ class ActivityModel extends Gdn_Model {
     /**
      *
      *
-     * @param $activityIDs
+     * @param array $activityIDs
      * @throws Exception
      */
     public function setNotified($activityIDs) {

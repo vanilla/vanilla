@@ -136,42 +136,9 @@ story.add("Message", () => {
         />
     );
 
-    const _fixedMessage = fixedMessageFlag && (
-        <div
-            style={{
-                height: unit(titleBarVariables().sizing.height),
-                position: "relative",
-                marginTop: negative(unit(titleBarVariables().sizing.height)),
-            }}
-        >
-            <Message
-                isFixed={true}
-                contents={
-                    <div className={classesMessages.content}>
-                        <AttachmentErrorIcon
-                            className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                        />
-                        <div>
-                            <Translate source={message} />
-                        </div>
-                    </div>
-                }
-                onConfirm={() => {
-                    setFixedMessageFlag(false);
-                }}
-                stringContents={t(message)}
-            />
-        </div>
-    );
     return (
         <>
-            {_fixedMessage}
             <StoryContent>
-                <div
-                    style={{
-                        height: 50,
-                    }}
-                ></div>
                 <StoryHeading>Short message</StoryHeading>
                 {shortMessageFlag && renderMessage(shortMessage, null, setShortMessageFlag)}
 

@@ -14,7 +14,6 @@ import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { inputVariables } from "@library/forms/inputStyles";
 import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
@@ -27,7 +26,7 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const sizing = themeVars("sizing", {
-        height: 40,
+        height: formElementVars.sizing.height,
     });
 
     const placeholder = themeVars("placeholder", {
@@ -359,7 +358,6 @@ export const searchBarClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        minHeight: unit(vars.sizing.height),
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {
                 borderColor: colorOut(globalVars.mainColors.primary),

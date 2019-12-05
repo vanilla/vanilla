@@ -20,7 +20,6 @@ import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps {
     onSave: (meta: IImageMeta) => void;
-    onVisibilityChange: (newIsVisible: boolean) => void;
     className?: string;
     initialAlt: string;
 }
@@ -48,11 +47,9 @@ export function ImageEmbedMenu(props: IProps) {
         }
     }, []);
 
-    const { onVisibilityChange } = props;
     const setVisible = (newVisibility: boolean, resetValue = true) => {
         internalSetVisible(newVisibility);
-        onVisibilityChange(newVisibility);
-        if (resetValue && !newVisibility) {
+        if (resetValue && newVisibility) {
             setAlt(props.initialAlt);
         }
     };
@@ -63,9 +60,10 @@ export function ImageEmbedMenu(props: IProps) {
         if (!prevVisibility && isVisible && inputRef.current) {
             inputRef.current && inputRef.current.focus();
         }
-    }, [prevVisibility, isVisible, inputRef, onVisibilityChange, setAlt, props.initialAlt]);
+    }, [prevVisibility, isVisible, inputRef, setAlt, props.initialAlt]);
 
     const saveAndClose = () => {
+        setAlt(alt);
         props.onSave({
             alt,
         });

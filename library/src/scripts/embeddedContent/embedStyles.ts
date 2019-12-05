@@ -52,7 +52,7 @@ export const embedContainerClasses = useThemeCache(() => {
                 0.5,
             )} inset`,
         },
-        ".embed-isFocused &": {
+        ".embed-isSelected &": {
             boxShadow: `0 0 0 ${px(
                 globalVars.embed.select.borderWidth,
             )} ${globalVars.embed.focus.color.toString()} inset`,

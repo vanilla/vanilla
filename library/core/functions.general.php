@@ -210,7 +210,7 @@ if (!function_exists('arraySearchI')) {
     /**
      * Case-insensitive version of array_search.
      *
-     * @param array $value The value to find in array.
+     * @param string $value The value to find in array.
      * @param array $search The array to search in for $value.
      * @return mixed Key of $value in the $search array.
      */

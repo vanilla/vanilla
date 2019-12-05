@@ -38,7 +38,9 @@ export default function Message(props: IMessageProps) {
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
     const contents = props.contents || props.stringContents;
-    const condition = props.title ? true : false;
+    const isTitle = props.title ? true : false;
+    const isIcon = props.icon ? true : false;
+    // const tagName = <div className={classes.tag1}></div>;
 
     return (
         <>
@@ -48,14 +50,18 @@ export default function Message(props: IMessageProps) {
                         className={classNames(classes.wrap(!!props.icon), props.className, {
                             [classes.noPadding]: props.isContained,
                             [classes.fixed]: props.isContained,
+                            [classes.setPaddingLeft]: !props.icon,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
-                                <ConditionalWrap condition={condition}>
-                                    {props.icon ?? null}
-                                    {props.title && <h2 className={classes.title}>{props.title}</h2>}
-                                </ConditionalWrap>
+                                {isTitle && (
+                                    <div className={classes.titleContent}>
+                                        {props.icon && props.icon}
+                                        {props.title && <h2 className={classes.title}>{props.title}</h2>}
+                                    </div>
+                                )}
+                                {!isTitle && props.icon && props.icon}
 
                                 {contents && <p className={classes.text}>{contents}</p>}
                             </div>
@@ -88,4 +94,15 @@ export default function Message(props: IMessageProps) {
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />
         </>
     );
+    {
+        /*
+     <ConditionalWrap condition={!!props.title} tag="div">
+                                    {props.icon && props.icon}
+                                    {props.title && <h2 className={classes.title}>{props.title}</h2>}
+                                </ConditionalWrap>
+                                <ConditionalWrap condition={!!props.title}>
+                                    {contents && <p className={classes.text}>{contents}</p>}
+                                </ConditionalWrap>
+    */
+    }
 }

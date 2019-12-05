@@ -156,6 +156,13 @@ export const messagesClasses = useThemeCache(() => {
             },
         },
     });
+    const setPaddingLeft = style("setPaddingLeft", {
+        $nest: {
+            "&&": {
+                paddingLeft: unit(25),
+            },
+        },
+    });
 
     const root = style({
         width: percent(100),
@@ -211,10 +218,12 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const messageIcon = style("messageIcon", {
-        ...absolutePosition.middleLeftOfParent(),
+        // ...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
-        transform: translate(`-100%`),
-        marginLeft: unit(-14),
+        // transform: translate(`-100%`),
+        // marginLeft: unit(-14),
+        marginLeft: unit(-33),
+        marginRight: unit(12),
         $nest: {
             "&&": {
                 color: colorOut(globalVars.messageColors.error.fg),
@@ -250,11 +259,16 @@ export const messagesClasses = useThemeCache(() => {
     const title = style("title", {
         ...fonts(vars.text.font),
         fontWeight: globalVars.fonts.weights.bold,
-        $nest: {
+        marginBottom: unit(6),
+        /*$nest: {
             [`& + .${text}`]: {
                 marginTop: unit(6),
             },
-        },
+        },*/
+    });
+    const titleContent = style("titleContent", {
+        display: "flex",
+        justifyContent: "start",
     });
 
     return {
@@ -266,11 +280,12 @@ export const messagesClasses = useThemeCache(() => {
         innerWrapper,
         setWidth,
         messageIcon,
-
+        titleContent,
         content,
         confirm,
         errorIcon,
         noPadding,
+        setPaddingLeft,
         messageWrapper,
         main,
         text,

@@ -34,7 +34,6 @@ class ApiFilterMiddleware {
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
-        $this->addBlacklistField('String');
         $apiAllow = $response->getMeta('api-allow');
         if (!is_array($apiAllow)) {
             $apiAllow = [];
@@ -42,14 +41,14 @@ class ApiFilterMiddleware {
         // Make sure filtering is done for apiv2.
         if (is_array($data)) {
             // Check for blacklisted fields.
-            $apiAllow = array_flip($apiAllow);
             $blacklist = array_flip($this->blacklist);
+            $apiAllow = array_change_key_case(array_flip($apiAllow));
             array_walk_recursive($data, function (&$value, $key) use ($apiAllow, $blacklist) {
                 $key = strtolower($key);
                 $isBlacklisted = isset($blacklist[$key]);
                 $isAllowedField = isset($apiAllow[$key]);
                 if ($isBlacklisted && !$isAllowedField) {
-                    throw new ServerException('Validation failed for field'.' '.$key);
+                    throw new ServerException("Unexpected field in content: {$key}");
                 }
             });
         }

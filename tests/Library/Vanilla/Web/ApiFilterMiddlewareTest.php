@@ -36,7 +36,7 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     public function testValidationFail() {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Validation failed for field insertipaddress');
+        $this->expectExceptionMessage('Unexpected field in content: insertipaddress');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
         $testFailureArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
@@ -50,7 +50,7 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     public function testLayeredValidationFail() {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Validation failed for field email');
+        $this->expectExceptionMessage('Unexpected field in content: email');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
         $testFailureArray = [
@@ -67,5 +67,31 @@ class ApiFilterMiddlewareTest extends TestCase {
         call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
             return new Data($testFailureArray, ['request' => $request]);
         });
+    }
+
+    /**
+     * Test ApiFilterMiddleware with an allowed blacklisted field.
+     */
+    public function testValidationAllowed() {
+        $request = new Request();
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testSuccessArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
+        $response = call_user_func($apiMiddleware, $request, function ($request) use ($testSuccessArray) {
+            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['insertIPAddress']]);
+        });
+        $this->assertEquals($testSuccessArray, $response->getData());
+    }
+
+    /**
+     * Test ApiFilterMiddleware with an allowed uppercased blacklisted field.
+     */
+    public function testValidationAllowedCasing() {
+        $request = new Request();
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testSuccessArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
+        $response = call_user_func($apiMiddleware, $request, function ($request) use ($testSuccessArray) {
+            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['InsertIPAddress']]);
+        });
+        $this->assertEquals($testSuccessArray, $response->getData());
     }
 }

@@ -14,7 +14,7 @@ const EDITOR_EVENT_WALL_CLASS = "editorEventWall";
  * A react component that prevents events from propagating up to quill.
  *
  * This marks events so they can be ignored by our own event handlers in quill.
- * Currently this is only implemented for the FocusModule. See usages of isEditorWalledEvent
+ * Currently this is only implemented for the EmbedSelectionModule. See usages of isEditorWalledEvent
  */
 export function EditorEventWall(props: IProps) {
     const ref = useRef<HTMLDivElement>(null);

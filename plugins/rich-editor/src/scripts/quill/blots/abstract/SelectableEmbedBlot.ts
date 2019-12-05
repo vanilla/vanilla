@@ -8,7 +8,7 @@ import { BlockEmbed } from "quill/blots/block";
 import { logWarning } from "@vanilla/utils";
 import Parchment from "parchment";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
-import EmbedFocusModule from "@rich-editor/quill/FocusModule";
+import EmbedSelectionModule from "@rich-editor/quill/EmbedSelectionModule";
 
 /**
  * A blot that can be selectable in Quill and still behave as part of the Quill editor.
@@ -96,7 +96,7 @@ export class SelectableEmbedBlot extends BlockEmbed {
             return logWarning("Attempted to select a an embed blot that has not been mounted yet.");
         }
 
-        EmbedFocusModule.clearEmbedSelections(this.quill);
+        EmbedSelectionModule.clearEmbedSelections(this.quill);
     }
 
     public clearSelection() {

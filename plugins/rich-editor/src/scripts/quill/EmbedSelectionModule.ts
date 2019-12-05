@@ -13,7 +13,6 @@ import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/Selectabl
 import {
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
-    getBlotAtIndex,
     rangeContainsBlot,
     forceSelectionUpdate,
     isEmbedSelected,
@@ -25,9 +24,9 @@ import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall"
  * A module for managing focus of Embeds. For this to work for a new Embed,
  * ensure that your embed extends FocusEmbedBlot
  *
- * @see {FocusableEmbedBlot}
+ * @see {SelectableEmbedBlot}
  */
-export default class EmbedFocusModule extends Module {
+export default class EmbedSelectionModule extends Module {
     /**
      * @param quill - The quill instance to tie into.
      * @param options - The quill options.
@@ -40,7 +39,7 @@ export default class EmbedFocusModule extends Module {
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.quill.on("selection-change", (newRange: RangeStatic) => {
             if (!isEmbedSelected(this.quill, newRange)) {
-                EmbedFocusModule.clearEmbedSelections(this.quill);
+                EmbedSelectionModule.clearEmbedSelections(this.quill);
             }
         });
     }

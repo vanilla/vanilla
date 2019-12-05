@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import FocusModule from "@rich-editor/quill/FocusModule";
+import EmbedSelectionModule from "@rich-editor/quill/EmbedSelectionModule";
 import Quill, { Blot } from "quill/core";
 import Parchment from "parchment";
 import { expect } from "chai";
@@ -26,9 +26,9 @@ const stubEmbedData: IEmbedValue = {
     },
 };
 
-describe("FocusModule", () => {
+describe("EmbedSelectionModule", () => {
     let quill: Quill;
-    let embedFocusModule: FocusModule;
+    let embedEmbedSelectionModule: EmbedSelectionModule;
 
     before(() => {
         Quill.register("formats/embed-loading", LoadingBlot, true);
@@ -49,18 +49,18 @@ describe("FocusModule", () => {
         </div>`;
 
         quill = new Quill("#quill");
-        embedFocusModule = new FocusModule(quill);
+        embedEmbedSelectionModule = new EmbedSelectionModule(quill);
     });
 
     it("throws an error if it can't find its needed surrounding HTML", () => {
         const createNoEditor = () => {
             const badQuill = new Quill("#quillNoEditor");
-            const badFocusModule = new FocusModule(badQuill);
+            const badEmbedSelectionModule = new EmbedSelectionModule(badQuill);
         };
 
         const createNoForm = () => {
             const badQuill = new Quill("#quillNoForm");
-            const badFocusModule = new FocusModule(badQuill);
+            const badEmbedSelectionModule = new EmbedSelectionModule(badQuill);
         };
         expect(createNoEditor).to.throw();
         expect(createNoForm).to.throw();
@@ -73,7 +73,7 @@ describe("FocusModule", () => {
     describe("handleTab()", () => {
         it("handles a tab keypress when the quill root is focused", () => {
             quill.focus();
-            const wasHandled = embedFocusModule.handleTab();
+            const wasHandled = embedEmbedSelectionModule.handleTab();
             expect(wasHandled).eq(true);
         });
 
@@ -82,7 +82,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(blot);
             blot.focus();
 
-            const wasHandled = embedFocusModule.handleTab();
+            const wasHandled = embedEmbedSelectionModule.handleTab();
             expect(wasHandled).eq(true);
         });
 
@@ -95,7 +95,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(blot2);
             blot.focus();
 
-            embedFocusModule.handleTab();
+            embedEmbedSelectionModule.handleTab();
             expect(document.activeElement === button1).eq(true);
         });
 
@@ -103,7 +103,7 @@ describe("FocusModule", () => {
             const button1 = document.getElementById("button1")!;
             button1.focus();
 
-            const wasHandled = embedFocusModule.handleTab();
+            const wasHandled = embedEmbedSelectionModule.handleTab();
             expect(wasHandled).eq(false);
         });
     });
@@ -112,7 +112,7 @@ describe("FocusModule", () => {
         // We want natural tabbing here.
         it("will handle the keypress if the editor root is focused", () => {
             quill.focus();
-            const wasHandled = embedFocusModule.handleShiftTab();
+            const wasHandled = embedEmbedSelectionModule.handleShiftTab();
             expect(wasHandled).eq(true);
         });
 
@@ -122,7 +122,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(blot);
             blot.focus();
 
-            const wasHandled = embedFocusModule.handleShiftTab();
+            const wasHandled = embedEmbedSelectionModule.handleShiftTab();
             expect(wasHandled).eq(true);
         });
     });
@@ -133,7 +133,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(quill.scroll.length(), "test");
 
-            embedFocusModule.focusLastLine();
+            embedEmbedSelectionModule.focusLastLine();
 
             expect(quill.hasFocus()).eq(true);
             expect(quill.getSelection().index, "The quill selection was incorrect").eq(quill.scroll.length() - 1);
@@ -144,7 +144,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(0, "test");
 
-            embedFocusModule.focusLastLine();
+            embedEmbedSelectionModule.focusLastLine();
 
             expect(embed.domNode.contains(document.activeElement) || document.activeElement === embed.domNode).eq(true);
             expect(quill.getSelection().index, "The quill selection was incorrect").eq(quill.scroll.length() - 1);
@@ -156,7 +156,7 @@ describe("FocusModule", () => {
             const embed = Parchment.create("embed-loading", stubEmbedData) as LoadingBlot;
             quill.scroll.insertBefore(embed);
 
-            embedFocusModule.focusFirstLine();
+            embedEmbedSelectionModule.focusFirstLine();
 
             expect(quill.hasFocus()).eq(true);
             expect(quill.getSelection().index, "The quill selection was incorrect").eq(0);
@@ -167,7 +167,7 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(embed, quill.scroll.children.tail!);
             const test = quill.insertText(quill.scroll.length(), "test");
 
-            embedFocusModule.focusFirstLine();
+            embedEmbedSelectionModule.focusFirstLine();
 
             expect(embed.domNode.contains(document.activeElement) || document.activeElement === embed.domNode).eq(true);
             expect(quill.getSelection().index, "The quill selection was incorrect").eq(0);
@@ -184,14 +184,14 @@ describe("FocusModule", () => {
         });
         [KeyboardModule.keys.UP, KeyboardModule.keys.LEFT].forEach(key => {
             it("can insert a newline at the beginning of the scroll", async () => {
-                embedFocusModule.handleArrowKeyFromEmbed(key, embed);
+                embedEmbedSelectionModule.handleArrowKeyFromEmbed(key, embed);
                 expect(quill.scroll.children.head!.domNode.textContent).eq("");
             });
         });
 
         [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].forEach(key => {
             it("can insert a newline at the end of the scroll", async () => {
-                embedFocusModule.handleArrowKeyFromEmbed(key, embed);
+                embedEmbedSelectionModule.handleArrowKeyFromEmbed(key, embed);
                 expect(quill.scroll.children.tail!.domNode.textContent).eq("");
             });
         });
@@ -202,7 +202,7 @@ describe("FocusModule", () => {
             const embed = Parchment.create("embed-loading", stubEmbedData) as LoadingBlot;
             quill.scroll.insertBefore(embed);
 
-            embedFocusModule.arrowToBlot(embed);
+            embedEmbedSelectionModule.arrowToBlot(embed);
         });
 
         it("places selection at the start of a line of text by default", async () => {
@@ -213,7 +213,7 @@ describe("FocusModule", () => {
 
             const expectedPosition = embed.next.offset(quill.scroll);
 
-            embedFocusModule.arrowToBlot(embed.next as Blot);
+            embedEmbedSelectionModule.arrowToBlot(embed.next as Blot);
             expect(quill.getSelection().index).eq(expectedPosition);
         });
     });
@@ -223,7 +223,7 @@ describe("FocusModule", () => {
             const button1 = document.getElementById("button1")!;
             button1.focus();
 
-            const wasHandled = embedFocusModule.handleDeleteOnQuill();
+            const wasHandled = embedEmbedSelectionModule.handleDeleteOnQuill();
             expect(wasHandled).eq(false);
         });
 
@@ -232,18 +232,18 @@ describe("FocusModule", () => {
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(quill.scroll.length(), "\n");
             quill.setSelection(quill.scroll.length() - 1, 0);
-            let wasHandled = embedFocusModule.handleDeleteOnQuill();
+            let wasHandled = embedEmbedSelectionModule.handleDeleteOnQuill();
             expect(wasHandled).eq(true);
 
             quill.insertText(quill.scroll.length(), "test");
             quill.setSelection(3, 0);
-            wasHandled = embedFocusModule.handleDeleteOnQuill();
+            wasHandled = embedEmbedSelectionModule.handleDeleteOnQuill();
             expect(wasHandled).eq(false);
 
             quill.setContents([]);
             quill.insertText(quill.scroll.length(), "\n\n\n\n\n");
             quill.setSelection(3, 0);
-            wasHandled = embedFocusModule.handleDeleteOnQuill();
+            wasHandled = embedEmbedSelectionModule.handleDeleteOnQuill();
             expect(wasHandled).eq(false);
         });
     });

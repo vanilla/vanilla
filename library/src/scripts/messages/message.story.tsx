@@ -15,9 +15,6 @@ import { WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-
-import { unit, negative } from "@library/styles/styleHelpers";
 
 const story = storiesOf("Messages", module);
 

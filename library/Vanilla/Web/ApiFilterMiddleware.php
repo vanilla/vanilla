@@ -48,7 +48,7 @@ class ApiFilterMiddleware {
                 $isBlacklisted = isset($blacklist[$key]);
                 $isAllowedField = isset($apiAllow[$key]);
                 if ($isBlacklisted && !$isAllowedField) {
-                    throw new ServerException('Validation failed for field'.' '.$key);
+                    throw new ServerException("Unexpected field in content: {$key}");
                 }
             });
         }

@@ -36,7 +36,7 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     public function testValidationFail() {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Validation failed for field insertipaddress');
+        $this->expectExceptionMessage('Unexpected field in content: insertipaddress');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
         $testFailureArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
@@ -50,7 +50,7 @@ class ApiFilterMiddlewareTest extends TestCase {
      */
     public function testLayeredValidationFail() {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Validation failed for field email');
+        $this->expectExceptionMessage('Unexpected field in content: email');
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
         $testFailureArray = [

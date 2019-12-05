@@ -14,6 +14,7 @@ export interface IContentTranslatorProps {
     title: string;
     sourceLocale?: string | null;
     activeLocale?: string | null; // for organizecategories
+    renderNavigationData?: () => void;
 }
 
 // Subtypes

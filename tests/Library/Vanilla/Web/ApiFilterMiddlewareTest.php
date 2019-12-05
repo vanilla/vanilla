@@ -68,4 +68,30 @@ class ApiFilterMiddlewareTest extends TestCase {
             return new Data($testFailureArray, ['request' => $request]);
         });
     }
+
+    /**
+     * Test ApiFilterMiddleware with an allowed blacklisted field.
+     */
+    public function testValidationAllowed() {
+        $request = new Request();
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testSuccessArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
+        $response = call_user_func($apiMiddleware, $request, function ($request) use ($testSuccessArray) {
+            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['insertIPAddress']]);
+        });
+        $this->assertEquals($testSuccessArray, $response->getData());
+    }
+
+    /**
+     * Test ApiFilterMiddleware with an allowed uppercased blacklisted field.
+     */
+    public function testValidationAllowedCasing() {
+        $request = new Request();
+        $apiMiddleware = new ApiFilterMiddleware();
+        $testSuccessArray = [['discussionid' => 1, 'type' => 'Discussion', 'name' => 'testdiscussion', 'insertIPAddress' => '10.10.10.10']];
+        $response = call_user_func($apiMiddleware, $request, function ($request) use ($testSuccessArray) {
+            return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['InsertIPAddress']]);
+        });
+        $this->assertEquals($testSuccessArray, $response->getData());
+    }
 }

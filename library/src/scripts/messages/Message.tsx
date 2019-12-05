@@ -39,23 +39,30 @@ export default function Message(props: IMessageProps) {
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
     const contents = props.contents || props.stringContents;
     const isTitle = props.title ? true : false;
+    const content = <p className={classes.text}>{contents}</p>;
+    const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
     const isIcon = props.icon ? true : false;
-    // const tagName = <div className={classes.tag1}></div>;
+    const icon_content = !isTitle && isIcon;
+    const icon_title_content = isTitle && isIcon;
+    const noIcon = !isIcon;
 
     return (
         <>
-            <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
+            <div
+                className={classNames(classes.root, props.className, {
+                    [classes.fixed]: props.isFixed,
+                })}
+            >
                 <OuterWrapper>
                     <div
                         className={classNames(classes.wrap(!!props.icon), props.className, {
-                            [classes.noPadding]: props.isContained,
                             [classes.fixed]: props.isContained,
-                            [classes.setPaddingLeft]: !props.icon,
+                            [classes.noIcon]: noIcon,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
-                                {isTitle && (
+                                {/*isTitle && (
                                     <div className={classes.titleContent}>
                                         {props.icon && props.icon}
                                         {props.title && <h2 className={classes.title}>{props.title}</h2>}
@@ -63,7 +70,27 @@ export default function Message(props: IMessageProps) {
                                 )}
                                 {!isTitle && props.icon && props.icon}
 
-                                {contents && <p className={classes.text}>{contents}</p>}
+                                {contents && <p className={classes.text}>{contents}</p>*/}
+
+                                {icon_content && (
+                                    <div className={classes.titleContent}>
+                                        {props.icon} {content}
+                                    </div>
+                                )}
+                                {icon_title_content && (
+                                    <>
+                                        <div className={classes.titleContent}>
+                                            {props.icon} {title}
+                                        </div>
+                                        {content}
+                                    </>
+                                )}
+                                {noIcon && (
+                                    <>
+                                        {title}
+                                        {content}
+                                    </>
+                                )}
                             </div>
 
                             {props.onConfirm && (

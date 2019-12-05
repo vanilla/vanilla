@@ -23,6 +23,7 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { relative } from "path";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -47,6 +48,9 @@ export const messagesVariables = useThemeCache(() => {
         states: {
             fg: globalVars.messageColors.warning.state,
         },
+    });
+    const title = themeVars("title", {
+        marginTop: 6,
     });
 
     const text = themeVars("text", {
@@ -74,6 +78,7 @@ export const messagesVariables = useThemeCache(() => {
         spacing,
         colors,
         text,
+        title,
         actionButton,
     };
 });
@@ -144,22 +149,14 @@ export const messagesClasses = useThemeCache(() => {
         alignItems: "center",
         flexDirection: "row",
         margin: "0 auto",
-        paddingTop: 7,
-        paddingBottom: 7,
+        paddingTop: unit(vars.spacing.padding.vertical),
+        paddingBottom: unit(vars.spacing.padding.vertical),
     });
 
-    const noPadding = style("noPadding", {
+    const noIcon = style("setPaddingLeft", {
         $nest: {
             "&&": {
-                top: 49,
-                minHeight: 48,
-            },
-        },
-    });
-    const setPaddingLeft = style("setPaddingLeft", {
-        $nest: {
-            "&&": {
-                paddingLeft: unit(25),
+                paddingLeft: unit(vars.spacing.padding.right),
             },
         },
     });
@@ -218,10 +215,9 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const messageIcon = style("messageIcon", {
-        // ...absolutePosition.middleLeftOfParent(),
+        //...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
-        // transform: translate(`-100%`),
-        // marginLeft: unit(-14),
+        position: "absolute",
         marginLeft: unit(-33),
         marginRight: unit(12),
         $nest: {
@@ -248,23 +244,20 @@ export const messagesClasses = useThemeCache(() => {
 
     const confirm = style("confirm", {});
 
-    const main = style("title", {});
+    const main = style("main", {});
 
     const text = style("text", {
         ...fonts(vars.text.font),
-        top: unit(6),
-        bottom: unit(0),
     });
 
     const title = style("title", {
         ...fonts(vars.text.font),
         fontWeight: globalVars.fonts.weights.bold,
-        marginBottom: unit(6),
-        /*$nest: {
+        $nest: lineHeightAdjustment({
             [`& + .${text}`]: {
-                marginTop: unit(6),
+                marginTop: unit(vars.title.marginTop),
             },
-        },*/
+        }),
     });
     const titleContent = style("titleContent", {
         display: "flex",
@@ -284,11 +277,10 @@ export const messagesClasses = useThemeCache(() => {
         content,
         confirm,
         errorIcon,
-        noPadding,
-        setPaddingLeft,
         messageWrapper,
         main,
         text,
+        noIcon,
         title,
     };
 });

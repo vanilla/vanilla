@@ -15,6 +15,10 @@ import { WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { relative } from "path";
+import { unit, negative } from "@library/styles/styleHelpers";
+import { translateY } from "csx";
 
 const story = storiesOf("Messages", module);
 
@@ -136,23 +140,31 @@ story.add("Message", () => {
     );
 
     const _fixedMessage = fixedMessageFlag && (
-        <Message
-            isFixed={true}
-            contents={
-                <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
-                    <div>
-                        <Translate source={message} />
-                    </div>
-                </div>
-            }
-            onConfirm={() => {
-                setFixedMessageFlag(false);
+        <div
+            style={{
+                height: unit(titleBarVariables().sizing.height),
+                position: "relative",
+                marginTop: negative(unit(titleBarVariables().sizing.height)),
             }}
-            stringContents={t(message)}
-        />
+        >
+            <Message
+                isFixed={true}
+                contents={
+                    <div className={classesMessages.content}>
+                        <AttachmentErrorIcon
+                            className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
+                        />
+                        <div>
+                            <Translate source={message} />
+                        </div>
+                    </div>
+                }
+                onConfirm={() => {
+                    setFixedMessageFlag(false);
+                }}
+                stringContents={t(message)}
+            />
+        </div>
     );
     return (
         <>

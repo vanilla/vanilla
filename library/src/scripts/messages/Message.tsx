@@ -62,16 +62,6 @@ export default function Message(props: IMessageProps) {
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
-                                {/*isTitle && (
-                                    <div className={classes.titleContent}>
-                                        {props.icon && props.icon}
-                                        {props.title && <h2 className={classes.title}>{props.title}</h2>}
-                                    </div>
-                                )}
-                                {!isTitle && props.icon && props.icon}
-
-                                {contents && <p className={classes.text}>{contents}</p>*/}
-
                                 {icon_content && (
                                     <div className={classes.titleContent}>
                                         {props.icon} {content}
@@ -121,15 +111,4 @@ export default function Message(props: IMessageProps) {
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />
         </>
     );
-    {
-        /*
-     <ConditionalWrap condition={!!props.title} tag="div">
-                                    {props.icon && props.icon}
-                                    {props.title && <h2 className={classes.title}>{props.title}</h2>}
-                                </ConditionalWrap>
-                                <ConditionalWrap condition={!!props.title}>
-                                    {contents && <p className={classes.text}>{contents}</p>}
-                                </ConditionalWrap>
-    */
-    }
 }

@@ -226,6 +226,9 @@ export const messagesClasses = useThemeCache(() => {
             },
         },
     });
+    const icon = style("icon", {
+        top: unit(vars.spacing.padding.vertical),
+    });
 
     const errorIcon = style("errorIcon", {
         $nest: {
@@ -249,7 +252,15 @@ export const messagesClasses = useThemeCache(() => {
     const text = style("text", {
         ...fonts(vars.text.font),
     });
-
+    const titleContent = style("titleContent", {
+        display: "flex",
+        justifyContent: "start",
+        $nest: {
+            [`& + .${text}`]: {
+                marginTop: unit(vars.title.marginTop),
+            },
+        },
+    });
     const title = style("title", {
         ...fonts(vars.text.font),
         fontWeight: globalVars.fonts.weights.bold,
@@ -258,10 +269,6 @@ export const messagesClasses = useThemeCache(() => {
                 marginTop: unit(vars.title.marginTop),
             },
         }),
-    });
-    const titleContent = style("titleContent", {
-        display: "flex",
-        justifyContent: "start",
     });
 
     return {
@@ -281,6 +288,7 @@ export const messagesClasses = useThemeCache(() => {
         main,
         text,
         noIcon,
+        icon,
         title,
     };
 });

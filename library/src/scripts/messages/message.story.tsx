@@ -34,7 +34,6 @@ story.add("Message", () => {
     const [longMessageFlag, setLongMessageFlag] = useState(true);
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
     const [iconMessageFlag, setIconMessageFlag] = useState(true);
-    const _warningIcon = <WarningIcon className={classNames(classesMessages.messageIcon)} />;
     const _attachmentErrorIcon = (
         <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />
     );
@@ -76,7 +75,7 @@ story.add("Message", () => {
     );
     const _messageWithIcon = iconMessageFlag && (
         <Message
-            icon={<WarningIcon className={classNames(classesMessages.messageIcon)} />}
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.icon)} />}
             contents={
                 <div className={classesMessages.content}>
                     <div>

@@ -8,7 +8,6 @@
 import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
 import { logDebug, logError, debug } from "@vanilla/utils";
 import { translationDebug } from "@vanilla/i18n";
-import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
@@ -16,6 +15,10 @@ import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
+
+if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
+    document.body.classList.add("hasNativeFocus");
+}
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -27,7 +30,7 @@ translationDebug(translationDebugValue);
 bootstrapLocales();
 
 // Export the API to the global object.
-gdn.apiv2 = apiv2;
+window.gdn.apiv2 = apiv2;
 
 // Record the page view.
 onPageView((params: { history: History }) => {

@@ -28,7 +28,6 @@ import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -37,6 +36,7 @@ import { SignInIcon } from "@library/icons/common";
 import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
+import { styleFactory } from "@library/styles/styleUtils";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -95,23 +95,14 @@ export class TitleBar extends React.Component<IProps, IState> {
         const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
 
-        const fixedClass = style({
-            ...sticky(),
-            $debugName: "isFixed",
-            top: 0,
-            zIndex: 2,
-        });
-
-        const outerCssClasses = classNames(
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
+        containerElement.classList.value = classNames(
             "titleBar",
             classes.root,
             this.props.className,
-            { [fixedClass]: isFixed },
+            { [classes.isFixed]: isFixed },
             this.context.offsetClass,
         );
-
-        const containerElement = this.props.container || document.getElementById("titleBar")!;
-        containerElement.classList.value = outerCssClasses;
 
         return ReactDOM.createPortal(
             <HashOffsetReporter>

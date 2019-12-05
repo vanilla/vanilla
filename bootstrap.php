@@ -137,6 +137,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     // EventManager
     ->rule(\Garden\EventManager::class)
+    ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
+    ->addAlias(\Psr\EventDispatcher\EventDispatcherInterface::class)
+    ->addAlias(\Psr\EventDispatcher\ListenerProviderInterface::class)
     ->setShared(true)
 
     // Locale

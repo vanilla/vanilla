@@ -163,7 +163,7 @@ ${chalk.green(aliases)}`;
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
-                filename: "[name].min.css",
+                filename: "[name].min.css?[chunkhash]",
             }),
         );
     }

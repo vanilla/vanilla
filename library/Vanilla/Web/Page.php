@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\EventManager;
 use Garden\Web\Exception\HttpException;
 use Gdn_Upload;
 use Garden\CustomExceptionHandler;
@@ -108,6 +109,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var AssetPreloadModel */
     protected $preloadModel;
 
+    /** @var EventManager */
+    protected $eventManager;
+
     /**
      * Dependendency Injection.
      *
@@ -118,6 +122,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param BreadcrumbModel $breadcrumbModel
      * @param ContentSecurityPolicyModel $cspModel
      * @param AssetPreloadModel $preloadModel
+     * @param EventManager $eventManager
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -126,7 +131,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel
+        AssetPreloadModel $preloadModel,
+        EventManager $eventManager
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
@@ -135,6 +141,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
         $this->preloadModel = $preloadModel;
+        $this->eventManager = $eventManager;
 
         if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
             $this->addMetaTag(["name" => "theme-color", "content" => $mobileAddressBarColor]);
@@ -185,6 +192,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'favIcon' => $this->siteMeta->getFavIcon(),
             'jsonLD' => $this->getJsonLDScriptContent(),
         ];
+
+        $this->eventManager->fireArray('BeforeRenderMasterView', [&$viewData]);
+
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);

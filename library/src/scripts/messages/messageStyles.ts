@@ -41,7 +41,11 @@ export const messagesVariables = useThemeCache(() => {
             right: 25,
         },
     });
-
+    const iconPadding = themeVars("iconPadding", {
+        padding: {
+            left: spacing.padding.right + 30,
+        },
+    });
     const colors = themeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
         bg: globalVars.messageColors.warning.bg,
@@ -50,7 +54,9 @@ export const messagesVariables = useThemeCache(() => {
         },
     });
     const title = themeVars("title", {
-        marginTop: 6,
+        margin: {
+            top: 6,
+        },
     });
 
     const text = themeVars("text", {
@@ -79,6 +85,7 @@ export const messagesVariables = useThemeCache(() => {
         colors,
         text,
         title,
+        iconPadding,
         actionButton,
     };
 });
@@ -95,7 +102,7 @@ export const messagesClasses = useThemeCache(() => {
         const padding = noIcon
             ? {
                   vertical: vars.spacing.padding.vertical,
-                  left: vars.spacing.padding.right + 30,
+                  left: vars.iconPadding.padding.left,
                   right: vars.spacing.padding.right,
               }
             : { ...vars.spacing.padding, right: vars.spacing.padding.right };
@@ -215,7 +222,6 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const messageIcon = style("messageIcon", {
-        //...absolutePosition.middleLeftOfParent(),
         maxWidth: percent(100),
         position: "absolute",
         marginLeft: unit(-33),
@@ -257,7 +263,7 @@ export const messagesClasses = useThemeCache(() => {
         justifyContent: "start",
         $nest: {
             [`& + .${text}`]: {
-                marginTop: unit(vars.title.marginTop),
+                marginTop: unit(vars.title.margin.top),
             },
         },
     });
@@ -266,7 +272,7 @@ export const messagesClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.bold,
         $nest: lineHeightAdjustment({
             [`& + .${text}`]: {
-                marginTop: unit(vars.title.marginTop),
+                marginTop: unit(vars.title.margin.top),
             },
         }),
     });

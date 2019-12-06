@@ -29,9 +29,7 @@ story.add("Message", () => {
     const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
     const [longMessageFlag, setLongMessageFlag] = useState(true);
     const [iconMessageFlag, setIconMessageFlag] = useState(true);
-    const _attachmentErrorIcon = (
-        <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />
-    );
+
     const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
         return (
             <Message

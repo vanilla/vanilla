@@ -52,8 +52,8 @@ story.add("fixedMessage", () => {
     );
     return (
         <>
-            {_fixedMessage}
             <StoryContent>
+                {_fixedMessage}
                 <div
                     style={{
                         paddingTop: unit(70),

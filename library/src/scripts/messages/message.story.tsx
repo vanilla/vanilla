@@ -28,7 +28,6 @@ story.add("Message", () => {
     const [shortMessageFlag, setShortMessageFlag] = useState(true);
     const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
     const [longMessageFlag, setLongMessageFlag] = useState(true);
-    const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
     const [iconMessageFlag, setIconMessageFlag] = useState(true);
     const _attachmentErrorIcon = (
         <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />

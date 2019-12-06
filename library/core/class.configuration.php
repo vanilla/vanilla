@@ -377,7 +377,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
                 $value = $value[$keys[$i]];
             } else {
                 if ($this->Data["TranslationDebug"] ?? false) {
-                   $defaultValue =  "☢️☢️".$defaultValue."☢️☢️";
+                    $defaultValue =  "☢️☢️".$defaultValue."☢️☢️";
                 }
                 return $defaultValue;
             }

@@ -93,6 +93,7 @@ interface SearchRecordTypeInterface {
     /**
      * Check if search type is enabled
      *
+     * @param \Gdn_Session $session
      * @return bool
      */
     public function isEnabled(\Gdn_Session $session): bool;

@@ -83,7 +83,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
         }
-
     }
 
     /**
@@ -371,7 +370,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         $keys = $this->splitConfigKey((string) $name);
         $keyCount = count($keys);
-
 
         $value = $this->Data;
         for ($i = 0; $i < $keyCount; ++$i) {

@@ -38,13 +38,16 @@ export default function Message(props: IMessageProps) {
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
     const contents = props.contents || props.stringContents;
+
     const isTitle = props.title ? true : false;
+    const isIcon = props.icon ? true : false;
+
     const content = <p className={classes.text}>{contents}</p>;
     const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
-    const isIcon = props.icon ? true : false;
-    const icon_content = !isTitle && isIcon;
-    const icon_title_content = isTitle && isIcon;
-    const noIcon = !isIcon;
+
+    const icon_content = !isTitle && isIcon; //case - if message has icon and content.
+    const icon_title_content = isTitle && isIcon; //case - if message has icon, title and content.
+    const noIcon = !isIcon; // //case - if message has title, content and no icon
 
     return (
         <>

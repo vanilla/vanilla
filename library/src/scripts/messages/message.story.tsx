@@ -18,61 +18,40 @@ import SmartLink from "@library/routing/links/SmartLink";
 
 const story = storiesOf("Messages", module);
 
-const shortMessage = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-`;
-
+const shortMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`;
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
-const longMessage = `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+const longMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
 `;
 
 story.add("Message", () => {
     const classesMessages = messagesClasses();
     const [shortMessageFlag, setShortMessageFlag] = useState(true);
+    const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
     const [longMessageFlag, setLongMessageFlag] = useState(true);
-    const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
-    const _shortMessage = shortMessageFlag && (
-        <Message
-            contents={
-                <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
-                    <div>
-                        <Translate source={shortMessage} />
+    const [iconMessageFlag, setIconMessageFlag] = useState(true);
+
+    const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
+        return (
+            <Message
+                contents={
+                    <div className={classesMessages.content}>
+                        <div>
+                            <Translate source={val} />
+                        </div>
                     </div>
-                </div>
-            }
-            onConfirm={() => {
-                setShortMessageFlag(false);
-            }}
-            stringContents={t(shortMessage)}
-        />
-    );
-    const _longMessage = longMessageFlag && (
-        <Message
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classNames(classesMessages.messageIcon)} />
-                    <div>
-                        <Translate source={longMessage} />
-                    </div>
-                </div>
-            }
-            onConfirm={() => {
-                setLongMessageFlag(false);
-            }}
-            confirmText={t("Cancel")}
-            stringContents={t(longMessage)}
-        />
-    );
+                }
+                onConfirm={() => {
+                    setFlag(false);
+                }}
+                stringContents={t(val)}
+            />
+        );
+    };
 
     const _messageWithLink = (
         <Message
             contents={
                 <div className={classesMessages.content}>
-                    <WarningIcon className={classNames(classesMessages.messageIcon)} />
                     <div>
                         <Translate
                             source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
@@ -87,40 +66,94 @@ story.add("Message", () => {
             stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
         />
     );
-    const _fixedMessage = fixedMessageFlag && (
+    const _messageWithIcon = iconMessageFlag && (
         <Message
-            isFixed={true}
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.icon)} />}
             contents={
                 <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
                     <div>
                         <Translate source={message} />
                     </div>
                 </div>
             }
             onConfirm={() => {
-                setFixedMessageFlag(false);
+                setIconMessageFlag(false);
             }}
+            stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+        />
+    );
+    const _message_longTitle = messageWithTitleFlag && (
+        <Message
+            title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
             stringContents={t(message)}
         />
     );
+    const _message_Title_Icon = messageWithTitleFlag && (
+        <Message
+            title="Vanilla Forums"
+            icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
+            stringContents={t(message)}
+        />
+    );
+    const _message_Title_noIcon = messageWithTitleFlag && (
+        <Message
+            title="Vanilla Forums"
+            icon={false}
+            contents={
+                <div className={classesMessages.content}>
+                    <Translate source={message} />
+                </div>
+            }
+            onConfirm={() => {
+                setMessageWithTitleFlag(false);
+            }}
+            confirmText={t("Cancel")}
+            stringContents={t(message)}
+        />
+    );
+
     return (
         <>
-            {_fixedMessage}
             <StoryContent>
-                <div
-                    style={{
-                        height: 50,
-                    }}
-                ></div>
                 <StoryHeading>Short message</StoryHeading>
-                {_shortMessage}
+                {shortMessageFlag && renderMessage(shortMessage, null, setShortMessageFlag)}
+
                 <StoryHeading>Long message</StoryHeading>
-                {_longMessage}
+                {longMessageFlag && renderMessage(longMessage, null, setLongMessageFlag)}
+
                 <StoryHeading>Message with link</StoryHeading>
                 {_messageWithLink}
+
+                <StoryHeading>Message with icon</StoryHeading>
+                {_messageWithIcon}
+
+                <StoryHeading>Message with long title</StoryHeading>
+                {_message_longTitle}
+
+                <StoryHeading>Message with title and icon</StoryHeading>
+                {_message_Title_Icon}
+
+                <StoryHeading>Message with title and no icon</StoryHeading>
+                {_message_Title_noIcon}
+
                 <div
                     style={{
                         height: 450,

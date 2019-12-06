@@ -89,4 +89,11 @@ interface SearchRecordTypeInterface {
      * @return bool
      */
     public function equal(SearchRecordTypeInterface $searchType): bool;
+
+    /**
+     * Check if search type is enabled
+     *
+     * @return bool
+     */
+    public function isEnabled(\Gdn_Session $session): bool;
 }

@@ -36,6 +36,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      */
     private $addonManager = null;
 
+    /** @var \Vanilla\Contracts\ConfigurationInterface $gdnConfig */
+    private $gdnConfig;
+
     /** @var array  */
     public static $SetLocales = [
         'ar' => 'ar_SA',
@@ -96,14 +99,14 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param $PluginWhiteList
      * @param bool $ForceRemapping
      */
-    public function __construct($localeName, AddonManager $addonManager = null) {
+    public function __construct($localeName, AddonManager $addonManager = null, \Vanilla\Contracts\ConfigurationInterface $gdnConfig) {
         parent::__construct();
         $this->ClassName = __CLASS__;
 
         if ($addonManager instanceof AddonManager) {
             $this->addonManager = $addonManager;
         }
-
+        $this->gdnConfig = $gdnConfig;
         $this->set($localeName);
     }
 
@@ -379,6 +382,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         $this->LocaleContainer = new Gdn_Configuration();
         $this->LocaleContainer->splitting(false);
         $this->LocaleContainer->caching(false);
+        $this->LocaleContainer->Data['TranslationDebug'] = $this->gdnConfig->get("TranslationDebug");
     }
 
     /**

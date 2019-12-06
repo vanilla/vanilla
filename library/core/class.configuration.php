@@ -83,6 +83,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
         }
+
     }
 
     /**
@@ -371,11 +372,15 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $keys = $this->splitConfigKey((string) $name);
         $keyCount = count($keys);
 
+
         $value = $this->Data;
         for ($i = 0; $i < $keyCount; ++$i) {
             if (is_array($value) && array_key_exists($keys[$i], $value)) {
                 $value = $value[$keys[$i]];
             } else {
+                if ($this->Data["TranslationDebug"] ?? false) {
+                   $defaultValue =  "☢️☢️".$defaultValue."☢️☢️";
+                }
                 return $defaultValue;
             }
         }

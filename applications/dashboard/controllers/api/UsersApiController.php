@@ -896,7 +896,7 @@ class UsersApiController extends AbstractApiController {
 
         if ($schema === null) {
             $schema = $this->schema(Schema::parse([
-                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?', 'password?',
                 'roleID?' => [
                     'type' => 'array',
                     'items' => ['type' => 'integer'],

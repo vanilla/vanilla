@@ -198,7 +198,7 @@ abstract class Route {
             $constraint = $this->constraints[strtolower($parameter->getName())];
 
             // Look for specific rules for the type.
-            $type = $parameter->hasType() ? $parameter->getType()->__toString() : 'notype';
+            $type = $parameter->hasType() && $parameter->getType() instanceof \ReflectionNamedType ? $parameter->getType()->getName() : 'notype';
             if (!empty($constraint["$type"])) {
                 $constraint = $constraint["$type"] + $constraint;
             }
@@ -310,13 +310,15 @@ abstract class Route {
         }
 
         // Test against the built in types.
-        switch ($type->__toString()) {
-            case 'bool':
-                return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
-            case 'int':
-                return filter_var($value, FILTER_VALIDATE_INT) !== false;
-            case 'float':
-                return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
+        if ($type instanceof \ReflectionNamedType) {
+            switch ($type->getName()) {
+                case 'bool':
+                    return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
+                case 'int':
+                    return filter_var($value, FILTER_VALIDATE_INT) !== false;
+                case 'float':
+                    return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
+            }
         }
         return true;
     }

@@ -17,6 +17,7 @@ import {
     margins,
     absolutePosition,
     negative,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { percent, translate, translateX, translateY, viewWidth, em } from "csx";
 import { FontWeightProperty } from "csstype";
@@ -63,6 +64,7 @@ export const messagesVariables = useThemeCache(() => {
             color: colors.fg,
             size: globalVars.fonts.size.medium,
             weight: globalVars.fonts.weights.normal as FontWeightProperty,
+            lineHeight: globalVars.lineHeights.condensed,
         },
     });
 
@@ -115,7 +117,7 @@ export const messagesClasses = useThemeCache(() => {
         color: colorOut(vars.colors.fg),
         ...paddings({
             vertical: vars.spacing.padding.vertical,
-            left: vars.spacing.padding.withoutIcon,
+            left: vars.spacing.padding.withoutIcon * 1.5,
             right: vars.spacing.padding.withoutIcon,
         }),
         $nest: {
@@ -182,14 +184,6 @@ export const messagesClasses = useThemeCache(() => {
         paddingTop: unit(vars.spacing.padding.vertical),
         paddingBottom: unit(vars.spacing.padding.vertical),
     });
-
-    // const noIcon = style("setPaddingLeft", {
-    //     $nest: {
-    //         "&&": {
-    //             paddingLeft: unit(vars.spacing.padding.withoutIcon),
-    //         },
-    //     },
-    // });
 
     const root = style({
         width: percent(100),
@@ -274,10 +268,19 @@ export const messagesClasses = useThemeCache(() => {
     });
     const content = style("content", {
         width: percent(100),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
         position: "relative",
+        $nest: {
+            a: allLinkStates({
+                noState: {
+                    color: colorOut(vars.colors.fg),
+                    textDecoration: "underline",
+                },
+                allStates: {
+                    color: colorOut(vars.colors.states.fg),
+                    textDecoration: "underline",
+                },
+            }),
+        },
     });
 
     const confirm = style("confirm", {});

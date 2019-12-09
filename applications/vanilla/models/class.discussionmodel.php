@@ -25,6 +25,9 @@ class DiscussionModel extends Gdn_Model {
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
+    /** @var string Closed by moderator attribute. */
+    const CLOSED_BY_AUTHOR = 'ClosedByAuthor';
+
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
 
@@ -262,6 +265,40 @@ class DiscussionModel extends Gdn_Model {
             }
             $this->refreshMediaAttachments($discussionID, $discussionRow["Body"], $discussionRow["Format"]);
         }
+    }
+
+    /**
+     * Determines whether or not the current user can close a discussion.
+     *
+     * @param object|array $discussion
+     * @return bool Returns true if the user can close or false otherwise.
+     */
+    public static function canClose($discussion) {
+        if (is_object($discussion)) {
+            $categoryID = $discussion->CategoryID ?? null;
+            $insertUserID = $discussion->InsertUserID ?? 0;
+            $isClosed = $discussion->Closed ?? null;
+            $attributes = $discussion->Attributes ?? [];
+        } else {
+            $categoryID = $discussion['CategoryID'] ?? null;
+            $insertUserID = $discussion['InsertUserID'] ?? 0;
+            $isClosed = $discussion['Closed'] ?? null;
+            $attributes = $discussion['Attributes'] ?? [];
+        }
+
+        if (CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close')) {
+            return true;
+        }
+
+        if ($isClosed && empty($attributes[self::CLOSED_BY_AUTHOR])) {
+            return false;
+        }
+
+        if (Gdn::session()->UserID === $insertUserID) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

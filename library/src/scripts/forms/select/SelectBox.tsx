@@ -148,7 +148,7 @@ function SelectBoxContents(props: { item: ISelectBoxItem; isSelected: boolean })
     return (
         <>
             <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
-            <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
+            <span className={classNames("sc-only", classes.checkContainer)}>
                 {isSelected && <CheckCompactIcon className={"selectBox-isSelectedIcon"} />}
                 {!isSelected && (
                     <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>

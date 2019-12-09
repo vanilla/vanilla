@@ -54,6 +54,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var array */
     private $metaTags = [];
 
+    /** @var array */
+    private $linkTags = [];
+
     /** @var AssetInterface[] */
     protected $scripts = [];
 
@@ -185,6 +188,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'inlineStyles' => $this->inlineStyles,
             'seoContent' => $this->seoContent,
             'metaTags' => $this->metaTags,
+            'linkTags' => $this->linkTags,
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
             'preloadModel' => $this->preloadModel,
@@ -248,6 +252,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
         if ($this->canonicalUrl) {
             $this->addOpenGraphTag('og:url', $this->canonicalUrl);
+            $this->addLinkTag(['rel' => 'canonical', 'href' => $this->canonicalUrl]);
         }
 
         // Twitter specific tags
@@ -381,6 +386,19 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         }
 
         $this->seoContent = $this->renderTwig($viewPathOrView, $viewData);
+
+        return $this;
+    }
+
+    /**
+     * Set page link tag attributes.
+     *
+     * @param array $attributes Array of attributes to set for tag.
+     *
+     * @return $this Own instance for chaining.
+     */
+    protected function addLinkTag(array $attributes): self {
+        $this->linkTags[] = $attributes;
 
         return $this;
     }

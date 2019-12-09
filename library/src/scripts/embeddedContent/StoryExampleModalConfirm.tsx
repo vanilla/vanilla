@@ -9,7 +9,6 @@ import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
 import { useUniqueID } from "@library/utility/idUtils";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { Omit } from "@library/@types/utils";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
 

@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ServerException;
 use Gdn_Locale as LocaleInterface;
 use Gdn_Session as SessionInterface;
 use Gdn_Upload as Upload;
@@ -80,7 +81,7 @@ abstract class Controller implements InjectableInterface {
      */
     public function permission($permission = null, $id = null) {
         if (!$this->session instanceof SessionInterface) {
-            throw new \Exception("Session not available.", 500);
+            throw new ServerException("Session not available.", 500);
         }
         $permissions = (array)$permission;
 

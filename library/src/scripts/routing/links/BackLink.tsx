@@ -4,71 +4,120 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { formatUrl, t } from "@library/utility/appUtils";
-import { RouteComponentProps, withRouter } from "react-router";
-import { Link } from "react-router-dom";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { LeftChevronCompactIcon } from "@library/icons/common";
+import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
+import { useHistory } from "react-router";
 
-interface IProps extends RouteComponentProps<{}> {
+interface IProps {
+    ///
+    /// Routing options.
+    ///
+
+    /** The URL to navigate to if we can't do a dynamic browser back navigation. */
     fallbackUrl?: string;
+
+    /** An action to if the component is clicked */
+    onClick?: (e: React.MouseEvent) => void;
+
+    ///
+    /// Display options
+    ///
+    /** Title contents for the backlink */
     title?: React.ReactNode;
+
+    /** CSS class to apply to the container */
     className?: string;
+
+    /** CSS class to apply to the contents. */
     linkClassName?: string;
+
+    /** Whether or not to display the label visibly. */
     visibleLabel?: boolean;
-    clickHandler?: () => void;
-    fallbackElement?: React.ReactNode;
 }
 
 /**
  * A link button for navigating backwards. Uses a back arrow icon.
+ *
+ * Render priority:
+ * - Render a button w/ the provided click handler.
+ * - Render a button that navigates back using (dynamic routing, uses real browser history back & preserves scroll).
+ * - Render the a link to one of the following if we can't navigate back.
+ *   - The `fallbackUrl` prop.
+ *   - The site homepage.
  */
-export class BackLink extends React.Component<IProps> {
-    public static defaultProps = {
-        title: t("Back"),
-        visibleLabel: false,
-    };
-    public render() {
-        if (this.props.history.length === 0 && !this.props.fallbackUrl && this.props.fallbackElement) {
-            // Optional fallback element to render if no history exists and no fallback url given
-            return this.props.fallbackElement;
-        } else {
-            const classes = backLinkClasses();
-            const routingUrl = this.props.fallbackUrl ? this.props.fallbackUrl : formatUrl("/kb");
-            return (
-                <div className={classNames(classes.root, this.props.className)}>
-                    <Link
-                        to={routingUrl}
-                        aria-label={this.props.title as string}
-                        title={this.props.title as string}
-                        onClick={this.clickHandler}
-                        className={classNames(
-                            classes.link,
-                            { hasVisibleLabel: !!this.props.visibleLabel },
-                            this.props.linkClassName,
-                        )}
-                    >
-                        <LeftChevronCompactIcon className={classes.icon} />
-                        {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
-                    </Link>
-                </div>
-            );
-        }
+export default function BackLink(props: IProps) {
+    const history = useHistory();
+    const { canGoBack, backFallbackUrl, navigateBack } = useBackRouting();
+
+    const classes = backLinkClasses();
+    const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
+    const title = props.title || t("Back");
+
+    let content = (
+        <>
+            <LeftChevronCompactIcon className={classes.icon} />
+            {props.visibleLabel && <span className={classes.label}>{title}</span>}
+        </>
+    );
+
+    if (props.onClick) {
+        content = (
+            <Button
+                baseClass={ButtonTypes.RESET}
+                className={className}
+                aria-label={title as string}
+                title={title as string}
+                onClick={props.onClick}
+            >
+                {content}
+            </Button>
+        );
+    } else if (canGoBack) {
+        // We can go back.
+        content = (
+            <Button
+                baseClass={ButtonTypes.RESET}
+                className={className}
+                aria-label={title as string}
+                title={title as string}
+                onClick={(event: React.MouseEvent) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    history.goBack();
+                }}
+            >
+                {content}
+            </Button>
+        );
+    } else {
+        content = (
+            <a
+                href={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
+                className={className}
+                aria-label={title as string}
+                title={title as string}
+                onClick={(event: React.MouseEvent) => {
+                    // We don't use a real link navigation.
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateBack(props.fallbackUrl);
+                }}
+            >
+                {content}
+            </a>
+        );
     }
 
-    /**
-     * If we can do an actual back action on the history object we should.
-     * Otherwise fallback to the default behaviour.
-     */
-    private clickHandler = (event: React.MouseEvent) => {
-        if (!this.props.fallbackUrl) {
-            event.preventDefault();
-            event.stopPropagation();
-            this.props.history.goBack();
-        }
-    };
+    return <div className={classNames(classes.root, props.className)}>{content}</div>;
 }
 
-export default withRouter(BackLink);
+BackLink.defaultProps = {
+    visibleLabel: false,
+};

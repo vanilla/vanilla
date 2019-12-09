@@ -4,7 +4,6 @@
  */
 
 import React from "react";
-import { hasPermission } from "@library/features/users/permissionUtils";
 import getStore from "@library/redux/getStore";
 import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
@@ -16,6 +15,7 @@ import classNames from "classnames";
 import { Provider } from "react-redux";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { useUniqueID } from "@library/utility/idUtils";
+import { hasPermission } from "@library/features/users/Permission";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;

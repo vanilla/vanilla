@@ -112,7 +112,6 @@ export default class ClipboardModule extends ClipboardBase {
                     embedType: "image",
                     url: src,
                     name: alt,
-                    attributes: {},
                 },
             };
             return new Delta().insert({

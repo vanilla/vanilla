@@ -255,6 +255,7 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     "-webkit-appearance": "none",
     appearance: "none",
     border: 0,
+    padding: 0,
     background: "none",
     cursor: "pointer",
     color: "inherit",

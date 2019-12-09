@@ -868,10 +868,23 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @param string $providerKey The key of the system providing the authentication.
      * @param array $userData Data to go in the user table.
      * @param array $options Additional connect options.
-     * @return int The new/existing user ID.
+     * @return int|false The new/existing user ID or **false** if there was an error connecting.
      */
     public function connect($uniqueID, $providerKey, $userData, $options = []) {
         trace('UserModel->Connect()');
+
+        $options += [
+            'CheckCaptcha' => false,
+            'NoConfirmEmail' => isset($userData['Email']) || !UserModel::requireConfirmEmail(),
+            'NoActivity' => true,
+            'SyncExisting' => true,
+        ];
+
+        if (empty($uniqueID)) {
+            $this->Validation->addValidationResult('UniqueID', 'ValidateRequired');
+            return false;
+        }
+
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 
         $isTrustedProvider = $provider['Trusted'] ?? false;
@@ -897,7 +910,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         if ($userID) {
             // Save the user.
-            $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            if ($options['SyncExisting']) {
+                $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            }
             return $userID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -924,9 +939,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     $userData['RoleID'] = $this->lookupRoleIDs($userData['Roles']);
                 }
 
-                $options['CheckCaptcha'] = $options['CheckCaptcha'] ?? false;
-                $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
-                $options['NoActivity'] = $options['NoActivity'] ?? true;
                 $options['SaveRoles'] = $saveRolesRegister;
                 $options['ValidateName'] = !$isTrustedProvider;
 
@@ -1129,13 +1141,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function expandFragments(array &$records, array $columnNames): void {
-        $this->expandUsers($records, $columnNames, ['asFragments' => true]);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getAllowedGeneratedRecordKeys(): array {
         return [self::GENERATED_FRAGMENT_KEY_GUEST, self::GENERATED_FRAGMENT_KEY_UNKNOWN];
     }
@@ -1149,6 +1154,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             'name' => 'unknown',
             'email' => 'unknown@example.com',
             'photoUrl' => self::getDefaultAvatarUrl(),
+            'dateLastActive' => time(0),
         ];
         switch ($key) {
             case self::GENERATED_FRAGMENT_KEY_GUEST:
@@ -1177,7 +1183,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @param array $options Additional options. Passed to filter event.
      *        [bool asFragments] - Expand as user fragments.
      */
-    public function expandUsers(array &$rows, array $columns, array $options = []) {
+    public function expandUsers(array &$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
@@ -1228,14 +1234,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
-                    } else {
-                        $user = self::getUnknownFragment();
                     }
                 }
-
-                if ($options['asFragments'] ?? false) {
-                    $user =  UserFragmentSchema::normalizeUserFragment($user);
-                }
+                $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
+                $user =  UserFragmentSchema::normalizeUserFragment($user);
                 setValue($destination, $row, $user);
             }
         };
@@ -1247,15 +1249,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             foreach ($rows as &$row) {
                 $populate($row);
             }
-        }
-
-        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
-        if ($single) {
-            $rows = [$rows];
-        }
-        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $options);
-        if ($single) {
-            $rows = reset($rows);
         }
     }
 
@@ -1565,7 +1558,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         $record = $this->getID($id, DATASET_TYPE_ARRAY);
         if ($record === false) {
             if ($useUnknownFallback) {
-                return $this->getUnknownFragment();
+                $record = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
             } else {
                 throw new NoResultsException("No user found for ID: " . $id);
             }
@@ -5229,8 +5222,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         }
 
         $user = $this->getID($userID);
-        $preferences = val('Preferences', $user, []);
-        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+        $preferences = $user->Preferences ?? [];
+        $landingPages = $preferences['DashboardNav.SectionLandingPages'] ?? [];
+        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?? '';
+        $sectionReset = false;
 
         // Run through the user's saved landing page per section and if the url matches the passed url,
         // remove that preference.
@@ -5238,13 +5233,16 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             $url = strtolower(trim($url, '/'));
             $landingPage = strtolower(trim($landingPage, '/'));
             if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                $sectionReset = true;
                 unset($landingPages[$section]);
             }
         }
 
-        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        if ($sectionReset) {
+            $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        }
 
-        if ($resetSectionPreference) {
+        if ($resetSectionPreference && $sectionPreference !== '') {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
     }

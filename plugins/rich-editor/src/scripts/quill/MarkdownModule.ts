@@ -36,7 +36,6 @@ export enum MarkdownInlineTriggers {
     ESCLAME_INVERT = "¡",
     QUOTE = '"',
     APOSTOPH = "'",
-    STAR = "*",
     COLON = ":",
     SEMI_COLON = ";",
 }
@@ -160,7 +159,7 @@ export default class MarkdownModule {
      * Handle a keydown event and trigger markdown actions.
      */
     private keyDownHandler = (event: KeyboardEvent) => {
-        if (!allTriggerKeys.includes(event.key)) {
+        if (!allTriggerKeys.includes(event.key as MarkdownInlineTriggers | MarkdownInlineTriggers)) {
             return;
         }
         const result = this.getFormattableText();
@@ -173,12 +172,12 @@ export default class MarkdownModule {
         for (const match of this.matchers) {
             switch (match.type) {
                 case MarkdownMacroType.INLINE:
-                    if (!Object.values(MarkdownInlineTriggers).includes(event.key)) {
+                    if (!Object.values(MarkdownInlineTriggers).includes(event.key as MarkdownInlineTriggers)) {
                         continue;
                     }
                     break;
                 case MarkdownMacroType.BLOCK:
-                    if (!Object.values(MarkdownBlockTriggers).includes(event.key)) {
+                    if (!Object.values(MarkdownBlockTriggers).includes(event.key as MarkdownBlockTriggers)) {
                         continue;
                     }
                     break;

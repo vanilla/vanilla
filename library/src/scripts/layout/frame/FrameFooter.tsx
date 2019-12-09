@@ -13,6 +13,7 @@ export interface IFrameFooterProps {
     children: React.ReactNode;
     selfPadded?: boolean;
     justifyRight?: boolean;
+    forDashboard?: boolean;
 }
 
 /**
@@ -33,6 +34,7 @@ export default class FrameFooter extends React.PureComponent<IFrameFooterProps> 
                     classes.root,
                     this.props.justifyRight && classes.justifiedRight,
                     this.props.selfPadded ? classes.selfPadded : "",
+                    this.props.forDashboard ? classes.forDashboard : "",
                 )}
             >
                 {this.props.children}

@@ -14,6 +14,7 @@ import {
     buttonStates,
     unit,
     userSelect,
+    negative,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -65,13 +66,14 @@ export const dropDownVariables = useThemeCache(() => {
 
         padding: {
             top: 6,
+            horizontal: 14,
         },
     });
 
     const sectionTitle = makeThemeVars("sectionTitle", {
         padding: {
-            top: 6,
-            bottom: 6,
+            top: 0,
+            bottom: 0,
         },
     });
 
@@ -112,6 +114,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        listStyle: "none",
     });
 
     const contents = style("contents", {
@@ -239,7 +242,7 @@ export const dropDownClasses = useThemeCache(() => {
                 lineHeight: unit(globalVars.lineHeights.condensed),
                 ...paddings({
                     vertical: 4,
-                    horizontal: 14,
+                    horizontal: vars.item.padding.horizontal,
                 }),
                 ...borders({
                     color: "transparent",
@@ -348,6 +351,15 @@ export const dropDownClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.primary),
     });
 
+    const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
+
+    const contentOffsetLeft = style("contentOffsetLeft", {
+        transform: `translateX(${unit(flyoutOffset)})`,
+    });
+    const contentOffsetRight = style("contentOffsetRight", {
+        transform: `translateX(${negative(unit(flyoutOffset))})`,
+    });
+
     return {
         root,
         contents,
@@ -370,5 +382,7 @@ export const dropDownClasses = useThemeCache(() => {
         noVerticalPadding,
         paddedFrame,
         check,
+        contentOffsetLeft,
+        contentOffsetRight,
     };
 });

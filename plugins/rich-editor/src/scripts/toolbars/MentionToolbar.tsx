@@ -66,7 +66,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     /**
      * When this component updates we need to see if the selection state has changed and trigger a lookup.
      */
-    public componentDidUpdate(prevProps: IProps) {
+    public componentDidUpdate(prevProps: IProps, prevState: IMentionState) {
         const { mentionSelection } = this.props;
         const prevMentionSelection = prevProps.mentionSelection;
 
@@ -87,7 +87,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 suggestions.data.length > 0;
 
             if (mentionSelection && (isLoading || isSuccess)) {
-                if (!this.state.autoCompleteBlot) {
+                if (!prevState.autoCompleteBlot && !this.state.autoCompleteBlot) {
                     const autoCompleteBlot = this.createAutoCompleteBlot();
                     this.setState({ autoCompleteBlot });
                 }
@@ -282,9 +282,11 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             this.state.autoCompleteBlot.cancel();
         }
         this.isConvertingMention = false;
-        this.setState({
-            autoCompleteBlot: null,
-        });
+        if (this.state.autoCompleteBlot) {
+            this.setState({
+                autoCompleteBlot: null,
+            });
+        }
     }
 
     /**
@@ -346,20 +348,15 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             // Autocomplete the mention if certain conditions occur.
 
             if (isASingleExactMatch) {
-                window.requestAnimationFrame(() => {
-                    this.confirmActiveMention(lastOperation.insert);
-                });
+                this.confirmActiveMention(lastOperation.insert);
                 return;
             }
         }
     };
 }
 
-const withRedux = connect(
-    UserSuggestionModel.mapStateToProps,
-    dispatch => ({
-        suggestionActions: new UserSuggestionActions(dispatch, apiv2),
-    }),
-);
+const withRedux = connect(UserSuggestionModel.mapStateToProps, dispatch => ({
+    suggestionActions: new UserSuggestionActions(dispatch, apiv2),
+}));
 
 export default withRedux(withEditor(MentionToolbar));

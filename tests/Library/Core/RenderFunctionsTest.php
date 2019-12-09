@@ -24,7 +24,7 @@ class RenderFunctionsTest extends TestCase {
     /**
      * Make sure the render functions are included.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$addons = ['dashboard']; // Needed for render paths.
         self::siteTestBeforeClass();
         require_once PATH_ROOT.'/library/core/functions.render.php';
@@ -33,7 +33,7 @@ class RenderFunctionsTest extends TestCase {
     /**
      * Cleanup the html normalize trait.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->shouldReplaceSVGs = true;
     }

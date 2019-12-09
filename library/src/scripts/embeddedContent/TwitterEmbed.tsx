@@ -62,7 +62,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
                     data-tweeturl={props.url}
                     data-tweetid={props.statusID}
                 >
-                    <a href={props.url} className="tweet-url" rel="nofollow">
+                    <a href={props.url} className="tweet-url" rel="nofollow noreferrer ugc">
                         {props.url}
                     </a>
                 </div>

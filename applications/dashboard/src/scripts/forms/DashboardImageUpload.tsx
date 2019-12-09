@@ -9,6 +9,8 @@ import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
 import { uploadFile } from "@library/apiv2";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     value: string | null; // The image url
@@ -17,6 +19,8 @@ interface IProps {
     className?: string;
     placeholder?: string;
     imageUploader?: typeof uploadFile;
+    disabled?: boolean;
+    errors?: IFieldError[];
 }
 
 export function DashboardImageUpload(props: IProps) {
@@ -43,6 +47,7 @@ export function DashboardImageUpload(props: IProps) {
                     type="file"
                     id={inputID}
                     className={classes}
+                    disabled={props.disabled}
                     onChange={async event => {
                         const file = event.target.files && event.target.files[0];
                         if (!file) {
@@ -62,6 +67,7 @@ export function DashboardImageUpload(props: IProps) {
                 <span className="file-upload-choose">{name || props.placeholder || t("Choose")}</span>
                 <span className="file-upload-browse">{t("Browse")}</span>
             </label>
+            {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
 }

@@ -202,27 +202,34 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * Creates the table defined with $this->table() and $this->column().
      */
     protected function _create() {
+        $sql = $this->getCreateTable();
+
+        $result = $this->executeQuery($sql);
+        $this->reset();
+
+        return $result;
+    }
+
+    /**
+     * Generate the DDL for creating a table.
+     *
+     * @return string Returns a DDL statement.
+     */
+    final protected function getCreateTable(): string {
         $primaryKey = [];
         $uniqueKey = [];
         $fullTextKey = [];
-        $allowFullText = true;
         $indexes = [];
         $keys = '';
         $sql = '';
         $tableName = Gdn_Format::alphaNumeric($this->_TableName);
-
-        $forceDatabaseEngine = c('Database.ForceStorageEngine');
-        if ($forceDatabaseEngine && !$this->_TableStorageEngine) {
-            $this->_TableStorageEngine = $forceDatabaseEngine;
-            $allowFullText = $this->_supportsFulltext();
-        }
 
         foreach ($this->_Columns as $columnName => $column) {
             if ($sql != '') {
                 $sql .= ',';
             }
 
-            $sql .= "\n".$this->_defineColumn($column);
+            $sql .= "\n" . $this->_defineColumn($column);
 
             $columnKeyTypes = (array)$column->KeyType;
 
@@ -233,27 +240,28 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
                 if ($columnKeyType == 'primary') {
                     $primaryKey[] = $columnName;
-                } elseif ($columnKeyType == 'key')
+                } elseif ($columnKeyType == 'key') {
                     $indexes['FK'][$indexGroup][] = $columnName;
-                elseif ($columnKeyType == 'index')
+                } elseif ($columnKeyType == 'index') {
                     $indexes['IX'][$indexGroup][] = $columnName;
-                elseif ($columnKeyType == 'unique')
+                } elseif ($columnKeyType == 'unique') {
                     $uniqueKey[] = $columnName;
-                elseif ($columnKeyType == 'fulltext' && $allowFullText)
+                } elseif ($columnKeyType == 'fulltext') {
                     $fullTextKey[] = $columnName;
+                }
             }
         }
         // Build primary keys
         if (count($primaryKey) > 0) {
-            $keys .= ",\nprimary key (`".implode('`, `', $primaryKey)."`)";
+            $keys .= ",\nprimary key (`" . implode('`, `', $primaryKey) . "`)";
         }
         // Build unique keys.
         if (count($uniqueKey) > 0) {
-            $keys .= ",\nunique index `UX_{$tableName}` (`".implode('`, `', $uniqueKey)."`)";
+            $keys .= ",\nunique index `UX_{$tableName}` (`" . implode('`, `', $uniqueKey) . "`)";
         }
         // Build full text index.
         if (count($fullTextKey) > 0) {
-            $keys .= ",\nfulltext index `TX_{$tableName}` (`".implode('`, `', $fullTextKey)."`)";
+            $keys .= ",\nfulltext index `TX_{$tableName}` (`" . implode('`, `', $fullTextKey) . "`)";
         }
         // Build the rest of the keys.
         foreach ($indexes as $indexType => $indexGroups) {
@@ -264,56 +272,29 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                         $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$columnName}` (`{$columnName}`)";
                     }
                 } else {
-                    $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$indexGroup}` (`".implode('`, `', $columnNames).'`)';
+                    $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$indexGroup}` (`" . implode('`, `', $columnNames) . '`)';
                 }
             }
         }
 
-        $sql = 'create table `'.$this->_DatabasePrefix.$tableName.'` ('
-            .$sql
-            .$keys
-            ."\n)";
+        $sql = 'create table `' . $this->_DatabasePrefix . $tableName . '` ('
+            . $sql
+            . $keys
+            . "\n)";
 
-        // Check to see if there are any fulltext columns, otherwise use innodb.
-        if (!$this->_TableStorageEngine) {
-            $hasFulltext = false;
-            foreach ($this->_Columns as $column) {
-                $columnKeyTypes = (array)$column->KeyType;
-                array_map('strtolower', $columnKeyTypes);
-                if (in_array('fulltext', $columnKeyTypes)) {
-                    $hasFulltext = true;
-                    break;
-                }
-            }
-            if ($hasFulltext) {
-                $this->_TableStorageEngine = 'myisam';
-            } else {
-                $this->_TableStorageEngine = c('Database.DefaultStorageEngine', 'innodb');
-            }
-
-            if (!$this->hasEngine($this->_TableStorageEngine)) {
-                $this->_TableStorageEngine = 'myisam';
-            }
-        }
-
-        if ($this->_TableStorageEngine) {
-            $sql .= ' engine='.$this->_TableStorageEngine;
-        }
+        $engine = ($this->_TableStorageEngine ?: Gdn::config('Database.ForceStorageEngine', Gdn::config('Database.DefaultStorageEngine'))) ?: 'innodb';
+        $sql .= ' engine=' . $engine;
 
         if ($this->_CharacterEncoding !== false && $this->_CharacterEncoding != '') {
-            $sql .= ' default character set '.$this->_CharacterEncoding;
+            $sql .= ' default character set ' . $this->_CharacterEncoding;
         }
 
         if (array_key_exists('Collate', $this->Database->ExtendedProperties)) {
-            $sql .= ' collate '.$this->Database->ExtendedProperties['Collate'];
+            $sql .= ' collate ' . $this->Database->ExtendedProperties['Collate'];
         }
 
         $sql .= ';';
-
-        $result = $this->executeQuery($sql);
-        $this->reset();
-
-        return $result;
+        return $sql;
     }
 
     /**
@@ -381,11 +362,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $indexGroup = val(1, $parts, '');
 
                 if (!$columnKeyType || ($keyType && $keyType != $columnKeyType)) {
-                    continue;
-                }
-
-                // Don't add a fulltext if we don't support.
-                if ($columnKeyType == 'fulltext' && !$this->_supportsFulltext()) {
                     continue;
                 }
 
@@ -529,18 +505,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $currentEngine = val('engine', $tableInfo);
 
             if (strcasecmp($currentEngine, $this->_TableStorageEngine)) {
-                // Check to drop a fulltext index if we don't support it.
-                if (!$this->_supportsFulltext()) {
-                    foreach ($indexesDb as $indexName => $indexSql) {
-                        if (stringBeginsWith($indexSql, 'fulltext', true)) {
-                            $dropIndexQuery = "$alterSqlPrefix drop index $indexName;\n";
-                            if (!$this->executeQuery($dropIndexQuery)) {
-                                throw new Exception(sprintf(t('Failed to drop the index `%1$s` on table `%2$s`.'), $indexName, $this->_TableName));
-                            }
-                        }
-                    }
-                }
-
                 $engineQuery = $alterSqlPrefix.' engine = '.$this->_TableStorageEngine;
                 if (!$this->executeQuery($engineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
@@ -823,14 +787,5 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         } else {
             return "'".str_replace("'", "''", $value)."'";
         }
-    }
-
-    /**
-     *
-     *
-     * @return bool
-     */
-    protected function _supportsFulltext() {
-        return strcasecmp($this->_TableStorageEngine, 'myisam') == 0;
     }
 }

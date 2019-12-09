@@ -38,9 +38,13 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const sizing = makeThemeVars("sizing", {
+        xl: 1022, // from legacy back-end modals
         large: 720,
         medium: 516,
         small: 375,
+        height: viewHeight(96),
+        zIndex: 1050, // Sorry it's so high. Our dashboard uses some bootstrap which specifies 1040 for the old modals.
+        // When nesting our modals on top we need to be higher.
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -111,7 +115,7 @@ export const modalClasses = useThemeCache(() => {
         flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: viewHeight(80),
+        maxHeight: unit(vars.sizing.height),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
@@ -139,6 +143,10 @@ export const modalClasses = useThemeCache(() => {
                 transform: "none",
                 left: 0,
                 right: 0,
+            },
+            "&.isXL": {
+                width: unit(vars.sizing.xl),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
@@ -181,12 +189,17 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
+            "& .form-group": {
+                marginLeft: unit(-16),
+                marginRight: unit(-16),
+            },
         },
     } as NestedCSSProperties);
 
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),
         width: percent(100),
+        height: percent(100),
         maxHeight: percent(100),
         overflow: "auto",
     });
@@ -218,11 +231,22 @@ export const modalClasses = useThemeCache(() => {
         }),
     );
 
+    const frameWrapper = style("frameWrapper", {
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        height: percent(100),
+        maxHeight: percent(100),
+        minHeight: percent(0),
+        width: percent(100),
+    });
+
     return {
         root,
         scroll,
         content,
         pageHeader,
         overlay,
+        frameWrapper,
     };
 });

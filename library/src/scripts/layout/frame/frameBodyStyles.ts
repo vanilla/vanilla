@@ -9,6 +9,7 @@ import { paddings, unit, importantUnit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { percent } from "csx";
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -18,6 +19,7 @@ export const frameBodyClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        width: percent(100),
         ...paddings({
             left: vars.spacing.padding,
             right: vars.spacing.padding,

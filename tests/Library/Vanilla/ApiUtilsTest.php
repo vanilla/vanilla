@@ -74,9 +74,11 @@ class ApiUtilsTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * @expectedException \Exception
+     * Test the `x-filter` schema modifier.
      */
     public function testQueryToFiltersWInvalidProcessor() {
+        $this->expectException(\Exception::class);
+
         $schema = Schema::parse([
             'parameter:s' => [
                 'x-filter' => [

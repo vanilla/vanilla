@@ -117,7 +117,6 @@ export function QuoteEmbed(props: IProps) {
                     <CollapsableContent
                         className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
                         isExpandedDefault={!!expandByDefault}
-                        firstChild={!showUserLabel && !name && !showCompactUserInfo}
                     >
                         <blockquote className={classes.blockquote} cite={url}>
                             <UserContent content={body} />

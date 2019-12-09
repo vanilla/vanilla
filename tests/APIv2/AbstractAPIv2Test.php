@@ -50,7 +50,7 @@ abstract class AbstractAPIv2Test extends TestCase {
     /**
      * Create a fresh API client for the test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
@@ -67,7 +67,7 @@ abstract class AbstractAPIv2Test extends TestCase {
     /**
      * Destroy the API client that was just used for the test.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
         \Logger::removeLogger($this->logger);

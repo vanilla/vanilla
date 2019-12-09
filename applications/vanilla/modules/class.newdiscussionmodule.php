@@ -34,6 +34,9 @@ class NewDiscussionModule extends Gdn_Module {
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
     public $GuestUrl = '/entry/signin';
 
+    /** @var boolean Reorder HTML for easier syling */
+    public $reorder = false;
+
     /**
      * Set default button.
      *

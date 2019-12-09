@@ -11,6 +11,7 @@ use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\Addon;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * A class for gathering particular data about the site.
@@ -28,6 +29,9 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var bool */
     private $debugModeEnabled;
+
+    /** @var bool */
+    private $translationDebugModeEnabled;
 
     /** @var string */
     private $siteTitle;
@@ -53,11 +57,29 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var string|null */
+    private $shareImage;
+
     /** @var array */
     private $featureFlags;
 
     /** @var Contracts\Site\SiteSectionInterface */
     private $currentSiteSection;
+
+    /** @var string */
+    private $logo;
+
+    /** @var string */
+    private $orgName;
+
+    /** @var string */
+    private $cacheBuster;
+
+    /** @var string */
+    private $staticPathFolder = '';
+
+    /** @var string */
+    private $dynamicPathFolder = '';
 
     /**
      * SiteMeta constructor.
@@ -65,12 +87,14 @@ class SiteMeta implements \JsonSerializable {
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
+     * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
         RequestInterface $request,
         Contracts\ConfigurationInterface $config,
         SiteSectionModel $siteSectionModel,
+        DeploymentCacheBuster $deploymentCacheBuster,
         ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
@@ -80,6 +104,7 @@ class SiteMeta implements \JsonSerializable {
         $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+        $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
 
         $this->featureFlags = $config->get('Feature', []);
 
@@ -90,6 +115,8 @@ class SiteMeta implements \JsonSerializable {
         // For now it needs to come from some where, so I'm putting it here.
         $this->siteTitle = $config->get('Garden.Title', "");
 
+        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
+
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
         $maxSize = $config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize'));
@@ -99,11 +126,22 @@ class SiteMeta implements \JsonSerializable {
         // localization
         $this->localeKey = $this->currentSiteSection->getContentLocale();
 
+        // DeploymentCacheBuster
+        $this->cacheBuster = $deploymentCacheBuster->value();
+
         // Theming
         $this->activeTheme = $activeTheme;
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
+        }
+
+        if ($shareImage = $config->get("Garden.ShareImage")) {
+            $this->shareImage = \Gdn_Upload::url($shareImage);
         }
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
@@ -126,12 +164,19 @@ class SiteMeta implements \JsonSerializable {
                 'basePath' => $this->basePath,
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
+                'translationDebug' => $this->translationDebugModeEnabled,
+                'cacheBuster' => $this->cacheBuster,
+                'staticPathFolder' => $this->staticPathFolder,
+                'dynamicPathFolder' => $this->dynamicPathFolder,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
+                'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
+                'shareImage' => $this->shareImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
@@ -149,6 +194,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getSiteTitle(): string {
         return $this->siteTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgName(): string {
+        return $this->orgName;
     }
 
     /**
@@ -217,6 +269,22 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
+     * Get the configured "Share Image" for the site.
+     *
+     * @return string|null
+     */
+    public function getShareImage(): ?string {
+        return $this->shareImage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): ?string {
+        return $this->logo;
+    }
+
+    /**
      * Get the configured "theme color" for the site.
      *
      * @return string|null
@@ -224,4 +292,19 @@ class SiteMeta implements \JsonSerializable {
     public function getMobileAddressBarColor(): ?string {
         return $this->mobileAddressBarColor;
     }
+
+    /**
+     * @param string $staticPathFolder
+     */
+    public function setStaticPathFolder(string $staticPathFolder) {
+        $this->staticPathFolder = $staticPathFolder;
+    }
+
+    /**
+     * @param string $dynamicPathFolder
+     */
+    public function setDynamicPathFolder(string $dynamicPathFolder) {
+        $this->dynamicPathFolder = $dynamicPathFolder;
+    }
+
 }

@@ -36,7 +36,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $uniqueID = self::randomUsername('pa');
@@ -59,7 +59,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
@@ -103,11 +103,11 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * An incorrect username should return 404.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
      */
     public function testInvalidEmail() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+
         $this->api()->post("{$this->baseUrl}", [
             'authenticate' => [
                 'authenticatorType' => 'password',
@@ -120,11 +120,11 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * An incorrect password should return 401.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 401
      */
     public function testInvalidPassword() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+
         $this->api()->post("{$this->baseUrl}", [
             'authenticate' => [
                 'authenticatorType' => 'password',
@@ -137,11 +137,11 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * /authenticate with password/password should not work if the PasswordAuthenticator is inactive.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot authenticate with an inactive authenticator.
      */
     public function testPasswordAuthenticatorInactive() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot authenticate with an inactive authenticator.');
+
         $this->assertNoSession();
 
         /** @var \Gdn_Configuration $config */
@@ -163,11 +163,11 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * A banned user should not be able to log in.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 401
      */
     public function testUserBanned() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(401);
+
         /** @var \UserModel $userModel */
         $userModel = $this->container()->get(\UserModel::class);
         $userModel->ban($this->currentUser['userID'], ['AddActivity' => false]);

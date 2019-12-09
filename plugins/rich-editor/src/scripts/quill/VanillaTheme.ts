@@ -11,6 +11,7 @@ import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
+import KeyboardModule from "quill/modules/keyboard";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */

@@ -30,7 +30,7 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Initialize configuration.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::bootstrapSetupBefore();
         self::$config = new MockConfig();
         self::$container
@@ -40,7 +40,7 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Reset config before every test.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         self::$config->reset();
     }
@@ -48,7 +48,7 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Restore various static Gdn_Format values.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         Gdn_Format::$FormatLinks = true;
         Gdn_Format::$DisplayNoFollow = true;

@@ -31,7 +31,7 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     /**
      * Back up the config before each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         /* @var \Gdn_Configuration $config */
@@ -47,7 +47,7 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     /**
      * Restore the config after each test.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
 
         foreach ($this->configBak as $key => $value) {

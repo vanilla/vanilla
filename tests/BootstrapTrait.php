@@ -21,7 +21,7 @@ trait BootstrapTrait {
     /**
      * Bootstrap the site.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::createContainer();
     }
 
@@ -52,7 +52,7 @@ trait BootstrapTrait {
     /**
      * Cleanup the container after testing is done.
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         Bootstrap::cleanup(self::$container);
     }
 

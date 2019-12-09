@@ -10,7 +10,6 @@
 
 import { configure, addDecorator, addParameters } from '@storybook/react';
 import {checkA11y, withA11y} from '@storybook/addon-a11y';
-import { withKnobs } from '@storybook/addon-knobs';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
@@ -37,7 +36,7 @@ function loadStories() {
 addParameters({
     chromatic: {
         delay: 2000, // Add a slight delay to ensure everything has rendered properly.
-        diffThreshold: 1, // Default is 0.67. Lower numbers are more accurate.
+        diffThreshold: 0.75, // Default is 0.67. Lower numbers are more accurate.
                             // Set to prevent diffs like this https://www.chromaticqa.com/snapshot?appId=5d5eba16c782b600204ba187&id=5d8cef8dbc622e00202a6edd
                             // From triggering
     }
@@ -45,7 +44,6 @@ addParameters({
 
 addDecorator(checkA11y);
 addDecorator(withA11y);
-addDecorator(withKnobs);
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 

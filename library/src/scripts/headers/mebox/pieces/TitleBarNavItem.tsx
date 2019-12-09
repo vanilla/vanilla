@@ -20,6 +20,7 @@ export interface ITitleBarNav {
     linkClassName?: string;
     linkContentClassName?: string;
     buttonType?: ButtonTypes;
+    permission?: string;
 }
 
 interface IProps extends ITitleBarNav, RouteComponentProps<{}> {}

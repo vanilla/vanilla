@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    core: vanilla/core@2.1.0
+    core: vanilla/core@2
     chromatic: wave/chromatic@1.0.1
     codecov: codecov/codecov@1.0.5
 aliases:

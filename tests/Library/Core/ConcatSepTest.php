@@ -7,9 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
-
 
 /**
  * Tests for concatSep().
@@ -21,8 +19,9 @@ class ConcatSepTest extends TestCase {
      *
      * @param string $expected Expected result
      * @param string $testSep The separator string to insert between concatenated strings.
-     * @param string $testStr1 The first string in the concatenation chain.
-     * @param $testStr2 The second string in the concatenation chain.
+     * @param string|array $args The string or strings to concatenate.
+     *  -The arguments after $testSep can be an indefinite number of strings.
+     *  -Alternately, the function can take 1 additional argument that is an array of strings.
      *  -$testStr2 can actually be an array. If it is a string, the function will look for further parameters.
      * @dataProvider provideConcatSepArrays
      */
@@ -64,6 +63,12 @@ class ConcatSepTest extends TestCase {
                 'str1',
                 ['str2', 'str3'],
                 'str4',
+            ],
+            'oneEmptyString' => [
+                'str2',
+                '+',
+                '',
+                'str2',
             ],
         ];
 

@@ -78,6 +78,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $staticPathFolder = '';
 
+    /** @var string */
+    private $dynamicPathFolder = '';
+
     /**
      * SiteMeta constructor.
      *
@@ -164,6 +167,7 @@ class SiteMeta implements \JsonSerializable {
                 'translationDebug' => $this->translationDebugModeEnabled,
                 'cacheBuster' => $this->cacheBuster,
                 'staticPathFolder' => $this->staticPathFolder,
+                'dynamicPathFolder' => $this->dynamicPathFolder,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
@@ -295,4 +299,12 @@ class SiteMeta implements \JsonSerializable {
     public function setStaticPathFolder(string $staticPathFolder) {
         $this->staticPathFolder = $staticPathFolder;
     }
+
+    /**
+     * @param string $dynamicPathFolder
+     */
+    public function setDynamicPathFolder(string $dynamicPathFolder) {
+        $this->dynamicPathFolder = $dynamicPathFolder;
+    }
+
 }

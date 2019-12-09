@@ -942,6 +942,11 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
     }
 
+    /**
+     * Set a fallback decorator.
+     * 
+     * @param string $decorator
+     */
     public function setFallbackDecorator(string $decorator) {
         $this->fallBackDecorator = $decorator;
     }

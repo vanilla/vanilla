@@ -36,7 +36,7 @@ export const messagesVariables = useThemeCache(() => {
 
     const spacing = themeVars("spacing", {
         padding: {
-            vertical: 8,
+            vertical: 12,
             left: 50,
             right: 25,
         },

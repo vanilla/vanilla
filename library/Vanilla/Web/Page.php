@@ -397,7 +397,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @return $this Own instance for chaining.
      */
-    protected function addLinkTag(array $attributes): self {
+    public function addLinkTag(array $attributes): self {
         $this->linkTags[] = $attributes;
 
         return $this;
@@ -410,7 +410,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @return $this Own instance for chaining.
      */
-    protected function addMetaTag(array $attributes): self {
+    public function addMetaTag(array $attributes): self {
         $this->metaTags[] = $attributes;
 
         return $this;
@@ -423,7 +423,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param string $content
      * @return $this
      */
-    protected function addOpenGraphTag(string $property, string $content): self {
+    public function addOpenGraphTag(string $property, string $content): self {
         return $this->addMetaTag(['property' => $property, 'content' => $content]);
     }
 

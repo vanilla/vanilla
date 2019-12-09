@@ -29,7 +29,7 @@ story.add("Message", () => {
     return (
         <>
             <StoryContent>
-                <StoryHeading>Short message</StoryHeading>
+                <StoryHeading>Short messages</StoryHeading>
                 <Message
                     contents={
                         <div className={classesMessages.content}>
@@ -42,7 +42,20 @@ story.add("Message", () => {
                     stringContents={shortMessage}
                 />
 
-                <StoryHeading>Long message</StoryHeading>
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={shortMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
+                    stringContents={shortMessage}
+                />
+
+                <StoryHeading>Long messages</StoryHeading>
                 <Message
                     contents={
                         <div className={classesMessages.content}>
@@ -52,6 +65,18 @@ story.add("Message", () => {
                     onConfirm={() => {
                         return;
                     }}
+                    stringContents={longMessage}
+                />
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={longMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
                     stringContents={longMessage}
                 />
 
@@ -112,7 +137,6 @@ story.add("Message", () => {
                     stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
                 />
 
-                <StoryHeading>Message with long title</StoryHeading>
                 <Message
                     title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
                     contents={
@@ -123,11 +147,23 @@ story.add("Message", () => {
                     onConfirm={() => {
                         return;
                     }}
-                    confirmText={t("Cancel")}
                     stringContents={t(message)}
                 />
 
-                <StoryHeading>Message with long title</StoryHeading>
+                <Message
+                    title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
+                    stringContents={t(message)}
+                />
+
                 <Message
                     icon={<WarningIcon className={classNames(classesMessages.icon)} />}
                     title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
@@ -139,11 +175,9 @@ story.add("Message", () => {
                     onConfirm={() => {
                         return;
                     }}
-                    confirmText={t("Cancel")}
                     stringContents={t(message)}
                 />
 
-                <StoryHeading>Message with title and icon</StoryHeading>
                 <Message
                     title="Vanilla Forums"
                     icon={<AttachmentErrorIcon className={classNames(classesMessages.icon)} />}
@@ -155,11 +189,9 @@ story.add("Message", () => {
                     onConfirm={() => {
                         return;
                     }}
-                    confirmText={t("Cancel")}
                     stringContents={t(message)}
                 />
 
-                <StoryHeading>Message with title and no icon</StoryHeading>
                 <Message
                     title="Vanilla Forums"
                     icon={false}
@@ -169,9 +201,25 @@ story.add("Message", () => {
                         </div>
                     }
                     onConfirm={() => {
-                        setMessageWithTitleFlag(false);
+                        return;
                     }}
-                    confirmText={t("Cancel")}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    title="Vanilla Forums"
+                    icon={false}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {
+                        return;
+                    }}
                     stringContents={t(message)}
                 />
             </StoryContent>

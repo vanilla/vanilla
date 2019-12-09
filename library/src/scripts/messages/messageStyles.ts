@@ -41,7 +41,7 @@ export const messagesVariables = useThemeCache(() => {
         padding: {
             vertical: 8,
             withIcon: 44,
-            withoutIcon: 25,
+            withoutIcon: 18,
         },
     });
 
@@ -78,7 +78,7 @@ export const messagesVariables = useThemeCache(() => {
         },
         font: {
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.bold as FontWeightProperty,
+            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             color: globalVars.mainColors.fg,
         },
         minHeight: formElVars.sizing.height,
@@ -203,6 +203,8 @@ export const messagesClasses = useThemeCache(() => {
         maxWidth: percent(100),
     });
 
+    const actionButtonPrimary = style("actionButtonPrimary", {});
+
     const actionButton = style("actionButton", {
         $nest: {
             "&&": {
@@ -223,6 +225,9 @@ export const messagesClasses = useThemeCache(() => {
                         outline: 0,
                     },
                 }),
+                [`&.${actionButtonPrimary}`]: {
+                    fontWeight: globalVars.fonts.weights.bold,
+                },
             },
         },
     });
@@ -295,6 +300,7 @@ export const messagesClasses = useThemeCache(() => {
         root,
         wrap,
         actionButton,
+        actionButtonPrimary,
         message,
         fixed,
         innerWrapper,

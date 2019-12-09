@@ -90,9 +90,9 @@ export default function Message(props: IMessageProps) {
 
                             {props.onConfirm && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    baseClass={ButtonTypes.TEXT}
                                     onClick={props.onConfirm}
-                                    className={classes.actionButton}
+                                    className={classNames(classes.actionButton, classes.actionButtonPrimary)}
                                     disabled={!!props.isActionLoading}
                                 >
                                     {props.isActionLoading ? <ButtonLoader /> : props.confirmText || t("OK")}

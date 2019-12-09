@@ -16,17 +16,21 @@ import {
     allButtonStates,
     margins,
     absolutePosition,
+    negative,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
-import { percent, translate, viewWidth } from "csx";
+import { percent, translate, translateX, translateY, viewWidth, em } from "csx";
 import { FontWeightProperty } from "csstype";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { relative } from "path";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const formElVars = formElementsVariables();
     const themeVars = variableFactory("messages");
 
     const sizing = themeVars("sizing", {
@@ -37,15 +41,11 @@ export const messagesVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         padding: {
             vertical: 8,
-            left: 50,
-            right: 25,
+            withIcon: 44,
+            withoutIcon: 18,
         },
     });
-    const iconPadding = themeVars("iconPadding", {
-        padding: {
-            left: spacing.padding.right + 30,
-        },
-    });
+
     const colors = themeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
         bg: globalVars.messageColors.warning.bg,
@@ -64,19 +64,26 @@ export const messagesVariables = useThemeCache(() => {
             color: colors.fg,
             size: globalVars.fonts.size.medium,
             weight: globalVars.fonts.weights.normal as FontWeightProperty,
+            lineHeight: globalVars.lineHeights.condensed,
         },
     });
 
     const actionButton = themeVars("actionButton", {
+        position: "relative",
         padding: {
-            vertical: spacing.padding.vertical,
-            horizontal: spacing.padding.right / 2,
+            vertical: 0,
+            left: spacing.padding.withoutIcon / 2,
+            right: spacing.padding.withoutIcon / 2,
+        },
+        margin: {
+            left: spacing.padding.withoutIcon / 2,
         },
         font: {
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.bold as FontWeightProperty,
+            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
+            color: globalVars.mainColors.fg,
         },
-        minHeight: 36,
+        minHeight: formElVars.sizing.height,
     });
 
     return {
@@ -85,7 +92,6 @@ export const messagesVariables = useThemeCache(() => {
         colors,
         text,
         title,
-        iconPadding,
         actionButton,
     };
 });
@@ -98,26 +104,39 @@ export const messagesClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const wrap = (noIcon?: boolean) => {
-        const padding = noIcon
-            ? {
-                  vertical: vars.spacing.padding.vertical,
-                  left: vars.iconPadding.padding.left,
-                  right: vars.spacing.padding.right,
-              }
-            : { ...vars.spacing.padding, right: vars.spacing.padding.right };
-        return style("wrap", {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            flexWrap: "nowrap",
-            minHeight: unit(vars.sizing.minHeight),
-            width: percent(100),
-            margin: "auto",
-            color: colorOut(vars.colors.fg),
-            ...paddings(padding),
-        });
-    };
+    const hasIcon = style("hasIcon", {});
+
+    const wrap = style("wrap", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flexWrap: "nowrap",
+        minHeight: unit(vars.sizing.minHeight),
+        width: percent(100),
+        margin: "auto",
+        color: colorOut(vars.colors.fg),
+        ...paddings({
+            vertical: vars.spacing.padding.vertical,
+            left: vars.spacing.padding.withoutIcon * 1.5,
+            right: vars.spacing.padding.withoutIcon,
+        }),
+        $nest: {
+            [`&.${hasIcon}`]: {
+                paddingLeft: vars.spacing.padding.withIcon,
+            },
+        },
+    });
+
+    const message = style("message", {
+        ...userSelect(),
+        ...fonts(vars.text.font),
+        width: percent(100),
+        flex: 1,
+        position: "relative",
+        ...paddings({
+            vertical: 6,
+        }),
+    });
 
     // Fixed wrapper
     const fixed = style(
@@ -132,8 +151,14 @@ export const messagesClasses = useThemeCache(() => {
 
             $nest: {
                 [`& .${wrap}`]: {
-                    width: unit(950),
                     maxWidth: percent(100),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "auto",
+                },
+                [`& .${message}`]: {
+                    width: "auto",
                 },
             },
         },
@@ -160,14 +185,6 @@ export const messagesClasses = useThemeCache(() => {
         paddingBottom: unit(vars.spacing.padding.vertical),
     });
 
-    const noIcon = style("setPaddingLeft", {
-        $nest: {
-            "&&": {
-                paddingLeft: unit(vars.spacing.padding.right),
-            },
-        },
-    });
-
     const root = style({
         width: percent(100),
         backgroundColor: colorOut(vars.colors.bg),
@@ -186,23 +203,19 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
-    const message = style("message", {
-        ...userSelect(),
-        ...fonts(vars.text.font),
-        width: percent(100),
-        flex: 1,
-        position: "relative",
-    });
-
     const setWidth = style("setWidth", {
         width: unit(vars.sizing.width),
         maxWidth: percent(100),
     });
 
+    const actionButtonPrimary = style("actionButtonPrimary", {});
+
     const actionButton = style("actionButton", {
         $nest: {
             "&&": {
+                position: "relative",
                 ...paddings(vars.actionButton.padding),
+                marginLeft: vars.actionButton.padding.left,
                 minHeight: unit(vars.actionButton.minHeight),
                 whiteSpace: "nowrap",
                 ...fonts(vars.actionButton.font),
@@ -217,23 +230,28 @@ export const messagesClasses = useThemeCache(() => {
                         outline: 0,
                     },
                 }),
+                [`&.${actionButtonPrimary}`]: {
+                    fontWeight: globalVars.fonts.weights.bold,
+                },
             },
         },
     });
 
-    const messageIcon = style("messageIcon", {
-        maxWidth: percent(100),
+    const iconPosition = style("iconPosition", {
         position: "absolute",
-        marginLeft: unit(-33),
-        marginRight: unit(12),
-        $nest: {
-            "&&": {
-                color: colorOut(globalVars.messageColors.error.fg),
-            },
-        },
+        left: 0,
+        top: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: percent(100),
+        maxHeight: em(2),
+        transform: translate(`${negative(unit(vars.spacing.padding.withIcon))}`),
+        width: unit(vars.spacing.padding.withIcon),
     });
+
     const icon = style("icon", {
-        top: unit(vars.spacing.padding.vertical),
+        // top: unit(vars.spacing.padding.vertical),
     });
 
     const errorIcon = style("errorIcon", {
@@ -245,10 +263,19 @@ export const messagesClasses = useThemeCache(() => {
     });
     const content = style("content", {
         width: percent(100),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
         position: "relative",
+        $nest: {
+            a: allLinkStates({
+                noState: {
+                    color: colorOut(vars.colors.fg),
+                    textDecoration: "underline",
+                },
+                allStates: {
+                    color: colorOut(vars.colors.states.fg),
+                    textDecoration: "underline",
+                },
+            }),
+        },
     });
 
     const confirm = style("confirm", {});
@@ -261,6 +288,7 @@ export const messagesClasses = useThemeCache(() => {
     const titleContent = style("titleContent", {
         display: "flex",
         justifyContent: "start",
+        position: "relative",
         $nest: {
             [`& + .${text}`]: {
                 marginTop: unit(vars.title.margin.top),
@@ -281,11 +309,12 @@ export const messagesClasses = useThemeCache(() => {
         root,
         wrap,
         actionButton,
+        actionButtonPrimary,
         message,
         fixed,
         innerWrapper,
         setWidth,
-        messageIcon,
+        iconPosition,
         titleContent,
         content,
         confirm,
@@ -293,7 +322,8 @@ export const messagesClasses = useThemeCache(() => {
         messageWrapper,
         main,
         text,
-        noIcon,
+        hasIcon,
+        // noIcon,
         icon,
         title,
     };

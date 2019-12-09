@@ -11,7 +11,7 @@ import { IButtonStates } from "@library/styles/styleHelpersButtons";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
-    default?: object;
+    noState?: object;
     hover?: object;
     focus?: object;
     accessibleFocus?: object;

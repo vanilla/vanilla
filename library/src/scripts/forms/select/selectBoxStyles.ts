@@ -71,8 +71,8 @@ export const selectBoxClasses = useThemeCache(() => {
         color: globalVars.mainColors.primary.toString(),
         width: percent(100),
         height: px(18),
-        flexBasis: unit(globalVars.icon.sizes.default),
-        marginLeft: px(50),
+        flexBasis: px(18),
+        marginLeft: "auto",
     });
 
     const spacer = style("spacer", {

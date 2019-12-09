@@ -190,7 +190,7 @@ export const storyBookClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         flexWrap: "wrap",
         width: calc(`100% + ${unit(vars.gaps.tile * 8)}`),
-        transform: translateX(`-${unit(vars.gaps.tile * 4)}`),
+        transform: translateX(`-${unit(vars.gaps.tile * 3.5)}`),
         ...layoutVariables()
             .mediaQueries()
             .oneColumn(

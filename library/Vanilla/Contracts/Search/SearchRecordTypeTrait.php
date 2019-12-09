@@ -158,4 +158,11 @@ trait SearchRecordTypeTrait {
     public function getProviderGroup(): string {
         return self::PROVIDER_GROUP;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isEnabled(\Gdn_Session $session): bool {
+        return true;
+    }
 }

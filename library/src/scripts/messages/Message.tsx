@@ -37,17 +37,23 @@ export default function Message(props: IMessageProps) {
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
-    const contents = props.contents || props.stringContents;
+    const contents = (
+        <div className={classes.content}>
+            <div>{props.contents || props.stringContents}</div>
+        </div>
+    );
 
-    const isTitle = props.title ? true : false;
-    const isIcon = props.icon ? true : false;
+    const hasTitle = !!props.title;
+    const hasIcon = !!props.icon;
 
     const content = <p className={classes.text}>{contents}</p>;
     const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
 
-    const icon_content = !isTitle && isIcon; //case - if message has icon and content.
-    const icon_title_content = isTitle && isIcon; //case - if message has icon, title and content.
-    const noIcon = !isIcon; // //case - if message has title, content and no icon
+    const icon_content = !hasTitle && hasIcon; //case - if message has icon and content.
+    const icon_title_content = hasTitle && hasIcon; //case - if message has icon, title and content.
+    const noIcon = !hasIcon; // //case - if message has title, content and no icon
+
+    const iconMarkup = <div className={classes.iconPosition}>{props.icon}</div>;
 
     return (
         <>
@@ -58,22 +64,22 @@ export default function Message(props: IMessageProps) {
             >
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap(!!props.icon), props.className, {
+                        className={classNames(classes.wrap, props.className, {
                             [classes.fixed]: props.isContained,
-                            [classes.noIcon]: noIcon,
+                            [classes.hasIcon]: !!props.icon,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
                                 {icon_content && (
                                     <div className={classes.titleContent}>
-                                        {props.icon} {content}
+                                        {iconMarkup} {content}
                                     </div>
                                 )}
                                 {icon_title_content && (
                                     <>
                                         <div className={classes.titleContent}>
-                                            {props.icon} {title}
+                                            {iconMarkup} {title}
                                         </div>
                                         {content}
                                     </>
@@ -88,9 +94,9 @@ export default function Message(props: IMessageProps) {
 
                             {props.onConfirm && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    baseClass={ButtonTypes.TEXT}
                                     onClick={props.onConfirm}
-                                    className={classes.actionButton}
+                                    className={classNames(classes.actionButton, classes.actionButtonPrimary)}
                                     disabled={!!props.isActionLoading}
                                 >
                                     {props.isActionLoading ? <ButtonLoader /> : props.confirmText || t("OK")}

@@ -7,19 +7,19 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
-import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { unit, negative } from "@library/styles/styleHelpers";
+import { ErrorIcon } from "@library/icons/common";
 
 const story = storiesOf("Messages", module);
 
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 
-story.add("fixedMessage", () => {
+story.add("Fixed Message", () => {
     const classesMessages = messagesClasses();
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
 
@@ -33,14 +33,10 @@ story.add("fixedMessage", () => {
         >
             <Message
                 isFixed={true}
+                icon={<ErrorIcon className={classNames(classesMessages.errorIcon)} />}
                 contents={
                     <div className={classesMessages.content}>
-                        <AttachmentErrorIcon
-                            className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                        />
-                        <div>
-                            <Translate source={message} />
-                        </div>
+                        <Translate source={message} />
                     </div>
                 }
                 onConfirm={() => {

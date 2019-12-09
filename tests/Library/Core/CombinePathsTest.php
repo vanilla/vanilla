@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +22,6 @@ class CombinePathsTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideCombinePathsArrays
      */
-
     public function testCombinePaths($testPaths, string $testDelimiter, string $expected) {
         $actual = combinePaths($testPaths, $testDelimiter);
         $this->assertSame($expected, $actual);
@@ -60,6 +58,4 @@ class CombinePathsTest extends TestCase {
 
         return $r;
     }
-
-
 }

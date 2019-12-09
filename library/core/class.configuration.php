@@ -953,7 +953,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     *
+     * Shutdown.
      */
     public function shutdown() {
         foreach ($this->sources as $source) {
@@ -962,7 +962,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     *
+     * Destruct.
      */
     public function __destruct() {
         if ($this->autoSave) {

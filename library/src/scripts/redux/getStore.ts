@@ -29,6 +29,10 @@ const enhancer = composeEnhancers(applyMiddleware(...middleware));
 // Build the store, add devtools extension support if it's available.
 let store;
 
+export function resetStore() {
+    store = undefined;
+}
+
 export default function getStore<S = ICoreStoreState>(initialState?: DeepPartial<S>, force?: boolean): Store<S, any> {
     if (store === undefined || force) {
         // Get our reducers.

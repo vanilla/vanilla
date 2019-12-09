@@ -32,11 +32,12 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
      * Test revoking a token.
      *
      * @param string $token A valid access token to revoke.
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your access token was revoked.
      * @depends testIssueAndVerify
      */
     public function testRevoke($token) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Your access token was revoked.');
+
         $model = new AccessTokenModel('sss');
         $this->assertTrue($model->revoke($token));
         $model->verify($token, true);
@@ -44,11 +45,11 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
 
     /**
      * A deleted token shouldn't verify.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Access token not found.
      */
     public function testVerifyDeletedToken() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Access token not found.');
+
         $model = new AccessTokenModel('sss');
         $token = $model->issue(1);
         $model->verify($token, true);

@@ -11,6 +11,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
+import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
 
 export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -335,6 +336,27 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
+    const legacy: NestedCSSSelectors = {
+        "& .bbcode_left": {
+            $nest: {
+                ".embedImage-img": {
+                    marginRight: "auto",
+                },
+            },
+        },
+        "& .bbcode_right .embedImage-img": {
+            marginLeft: "auto",
+        },
+    };
+
+    const blockQuoteVars = blockQuoteVariables();
+
+    const blockquotes: NestedCSSSelectors = {
+        ".blockquote": {
+            color: colorOut(blockQuoteVars.colors.fg),
+        },
+    };
+
     const root = style({
         // These CAN'T be flexed. That breaks margin collapsing.
         display: important("block"),
@@ -354,6 +376,8 @@ export const userContentClasses = useThemeCache(() => {
             ...linkStyles,
             ...codeStyles,
             ...spoilersAndQuotes,
+            ...blockquotes,
+            ...legacy,
         },
     });
 

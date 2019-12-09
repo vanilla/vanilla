@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
 
@@ -861,6 +862,18 @@ class CommentModel extends Gdn_Model {
                     ]
                 );
             }
+        } else {
+            // Insert watch data.
+            $this->SQL->options('Ignore', true);
+            $this->SQL->insert(
+                'UserDiscussion',
+                [
+                    'UserID' => $userID,
+                    'DiscussionID' => $discussion->DiscussionID,
+                    'CountComments' => $countWatch,
+                    'DateLastViewed' => DateTimeFormatter::timeStampToDateTime(time())
+                ]
+            );
         }
 
         /**
@@ -1262,9 +1275,10 @@ class CommentModel extends Gdn_Model {
             }
         }
 
-        // Update discussion's comment count
-        $discussionID = val('DiscussionID', $formPostValues);
-        $this->updateCommentCount($discussionID, ['Slave' => false]);
+        // Update discussion's comment count.
+        if (isset($formPostValues['DiscussionID'])) {
+            $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+        }
 
         return $commentID;
     }

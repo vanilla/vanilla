@@ -20,7 +20,7 @@ class UserAgentTypeTest extends TestCase {
     /**
      * Clean up before each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         userAgentType(false);
     }
@@ -28,7 +28,7 @@ class UserAgentTypeTest extends TestCase {
     /**
      * Clean up the user agent cache at the end of each test.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         userAgentType(false);
     }

@@ -23,7 +23,7 @@ class WebpackAssetProviderTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         vfsStream::setup();
     }
 
@@ -69,7 +69,7 @@ class WebpackAssetProviderTest extends TestCase {
         $scripts = $provider->getScripts('someSection');
         $this->assertInstanceOf(LocaleAsset::class, $scripts[0]);
         $this->assertEquals(
-            'http://example.com/api/v2/locales/en/translations.js',
+            '/api/v2/locales/en/translations.js',
             $scripts[0]->getWebPath(),
             "Creates a valid API js file"
         );
@@ -78,7 +78,7 @@ class WebpackAssetProviderTest extends TestCase {
         $provider->setCacheBusterKey($buster);
         $scripts = $provider->getScripts('someSection');
         $this->assertEquals(
-            "http://example.com/api/v2/locales/en/translations.js?h=$buster",
+            "/api/v2/locales/en/translations.js?h=$buster",
             $scripts[0]->getWebPath(),
             "Uses the cache buster key"
         );
@@ -117,7 +117,7 @@ class WebpackAssetProviderTest extends TestCase {
         $provider->setFsRoot($fileSystem->url());
         $buster = 'buster12345';
         $provider->setCacheBusterKey($buster);
-        $root = 'http://example.com/dist/test/';
+        $root = '/dist/test/';
         $addonRoot = $root . 'addons/';
 
         // Stylesheets

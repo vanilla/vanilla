@@ -200,7 +200,7 @@ em {
   font-style: italic;
 }
 
-.js-focus-visible :focus:not(.focus-visible) {
+body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {
   outline: none;
 }
 
@@ -1580,6 +1580,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-right: auto;
   max-width: 100%;
   max-height: none;
+}
+
+.bbcode_left .embedImage-img {
+  margin-left: 0;
+}
+
+.bbcode_right .embedImage-img {
+  margin-right: 0;
 }
 
 .embedImage-link {

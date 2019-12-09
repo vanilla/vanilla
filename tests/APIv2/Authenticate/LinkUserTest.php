@@ -33,7 +33,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
         /** @var \Gdn_Configuration $config */
@@ -44,7 +44,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $uniqueID = self::randomUsername('lu');
@@ -79,7 +79,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
         $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
 
@@ -98,7 +98,7 @@ class LinkUserTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('ssoUser', $body);
         $this->assertArrayHasKey('authenticator', $body);
         $this->assertArrayHasKey('config', $body);
@@ -191,11 +191,11 @@ class LinkUserTest extends AbstractAPIv2Test {
 
     /**
      * Test POST /authenticate/link-user with method = register and agreeToTerm = false.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You must agree to the terms of service.
      */
     public function testPostLinkUserMethodRegisterWAgreeToTermFalse() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You must agree to the terms of service.');
+
         $authSessionID = $this->createAuthSessionID();
 
         $result = $this->api()->post($this->baseUrl, [
@@ -211,10 +211,11 @@ class LinkUserTest extends AbstractAPIv2Test {
      * Test DELETE /authenticate/link-user/:authSessionID
      *
      * @depends testGetLinkUser
-     * @expectedException \Exception
-     * @expectedExceptionMessage AuthenticationSession not found.
      */
     public function testDeleteLinkUser() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('AuthenticationSession not found.');
+
         $authSessionID = $this->createAuthSessionID();
 
         $result = $this->api()->delete($this->baseUrl.'/'.$authSessionID);
@@ -245,7 +246,7 @@ class LinkUserTest extends AbstractAPIv2Test {
 
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertArrayHasKey('authenticationStep', $body);
 
         $this->assertEquals('linkUser', $body['authenticationStep']);
@@ -268,7 +269,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertEquals(201, $result->getStatusCode());
         $body = $result->getBody();
 
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertEquals(1, count($body));
         $this->assertArrayHasKey('user', $body);
         $this->assertEquals($this->currentUser['userID'], $body['user']['userID']);

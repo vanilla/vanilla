@@ -848,26 +848,6 @@ if (!function_exists('safeRedirect')) {
     }
 }
 
-if (!function_exists('trueStripSlashes')) {
-    if (get_magic_quotes_gpc()) {
-        /**
-         * @deprecated
-         */
-        function trueStripSlashes($string) {
-            \Vanilla\Utility\Deprecation::log();
-            return stripslashes($string);
-        }
-    } else {
-        /**
-         * @deprecated
-         */
-        function trueStripSlashes($string) {
-            \Vanilla\Utility\Deprecation::log();
-            return $string;
-        }
-    }
-}
-
 if (!function_exists('viewLocation')) {
     /**
      * Get the path of a view.

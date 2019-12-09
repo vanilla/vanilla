@@ -19,7 +19,7 @@ class AltTest extends SharedBootstrapTestCase {
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         $api = new APIv0();
         self::$api = $api;
@@ -43,11 +43,10 @@ class AltTest extends SharedBootstrapTestCase {
 
     /**
      * Test an ALT install with no update token.
-     *
-     * @expectedException Exception
-     * @expectedExceptionCode 403
      */
     public function testAltInstallWithNoUpdateToken() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(403);
         $this->doAltInstallWithUpdateToken(true, 'xkcd', '');
     }
 

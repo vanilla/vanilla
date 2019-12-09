@@ -24,7 +24,7 @@ class FiltererTest extends MinimalContainerTestCase {
     /**
      * Do some container registration.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         self::container()->rule(EmbedService::class)
             ->addCall('registerEmbed', [QuoteEmbed::class, QuoteEmbed::TYPE])

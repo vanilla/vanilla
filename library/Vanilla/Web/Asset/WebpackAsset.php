@@ -8,7 +8,6 @@
 namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Contracts;
 
 /**
  * An asset representing a file created by the webpack build process.
@@ -93,5 +92,12 @@ class WebpackAsset extends SiteAsset {
      */
     public function setFsRoot(string $assetRoot) {
         $this->fsRoot = $assetRoot;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStatic(): bool {
+        return true;
     }
 }

@@ -707,11 +707,6 @@ class EntryController extends Gdn_Controller {
                 );
             }
 
-            // Pre-populate our ConnectName field with the passed name if we couldn't match it.
-            if (!isset($nameFound) && !$isPostBack) {
-                $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
-            }
-
             // Block connecting to an existing user if it's disallowed.
             if (!$allowConnect) {
                 // Make sure photo of existing user doesn't show on the form.

@@ -26,7 +26,7 @@ class RouterTest extends SharedBootstrapTestCase {
     /**
      * Basic setup.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // New up a router without default routes to load.

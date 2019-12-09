@@ -31,7 +31,7 @@ class DiscussionModelTest extends TestCase {
     /**
      * Get a new model for each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->model = $this->container()->get(\DiscussionModel::class);
@@ -64,10 +64,10 @@ class DiscussionModelTest extends TestCase {
 
     /**
      * An invalid archive date should throw an exception.
-     *
-     * @expectedException \Exception
      */
     public function testInvalidArchiveDate() {
+        $this->expectException(\Exception::class);
+
         $this->model->setArchiveDate('dnsfids');
     }
 
@@ -91,7 +91,7 @@ class DiscussionModelTest extends TestCase {
     public function testIsArchivedInvalidDate() {
         $this->model->setArchiveDate('2019-10-26');
 
-        $this->expectError(function () {
+        $this->runWithExpectedError(function () {
             $actual = $this->model->isArchived('fldjsjs');
             $this->assertFalse($actual);
         }, self::assertErrorNumber(E_USER_WARNING));

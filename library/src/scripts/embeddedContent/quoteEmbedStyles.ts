@@ -102,6 +102,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
             all: embedVars.spacing.padding,
         }),
         width: percent(100),
+        boxSizing: "border-box",
         $nest: {
             [`&.${paddingAdjustment}`]: {
                 ...paddings({

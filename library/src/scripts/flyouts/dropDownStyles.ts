@@ -72,8 +72,8 @@ export const dropDownVariables = useThemeCache(() => {
 
     const sectionTitle = makeThemeVars("sectionTitle", {
         padding: {
-            top: 6,
-            bottom: 6,
+            top: 0,
+            bottom: 0,
         },
     });
 

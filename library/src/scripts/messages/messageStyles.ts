@@ -102,23 +102,39 @@ export const messagesClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const wrap = (hasIcon?: boolean) => {
-        return style("wrap", {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            flexWrap: "nowrap",
-            minHeight: unit(vars.sizing.minHeight),
-            width: percent(100),
-            margin: "auto",
-            color: colorOut(vars.colors.fg),
-            ...paddings({
-                vertical: vars.spacing.padding.vertical,
-                left: hasIcon ? vars.spacing.padding.withIcon : vars.spacing.padding.withoutIcon,
-                right: vars.spacing.padding.withoutIcon,
-            }),
-        });
-    };
+    const hasIcon = style("hasIcon", {});
+
+    const wrap = style("wrap", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flexWrap: "nowrap",
+        minHeight: unit(vars.sizing.minHeight),
+        width: percent(100),
+        margin: "auto",
+        color: colorOut(vars.colors.fg),
+        ...paddings({
+            vertical: vars.spacing.padding.vertical,
+            left: vars.spacing.padding.withoutIcon,
+            right: vars.spacing.padding.withoutIcon,
+        }),
+        $nest: {
+            [`&.${hasIcon}`]: {
+                paddingLeft: vars.spacing.padding.withIcon,
+            },
+        },
+    });
+
+    const message = style("message", {
+        ...userSelect(),
+        ...fonts(vars.text.font),
+        width: percent(100),
+        flex: 1,
+        position: "relative",
+        ...paddings({
+            vertical: 6,
+        }),
+    });
 
     // Fixed wrapper
     const fixed = style(
@@ -133,8 +149,14 @@ export const messagesClasses = useThemeCache(() => {
 
             $nest: {
                 [`& .${wrap}`]: {
-                    width: unit(950),
                     maxWidth: percent(100),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "auto",
+                },
+                [`& .${message}`]: {
+                    width: "auto",
                 },
             },
         },
@@ -185,17 +207,6 @@ export const messagesClasses = useThemeCache(() => {
                 marginTop: unit(globalVars.spacer.size / 2),
             },
         },
-    });
-
-    const message = style("message", {
-        ...userSelect(),
-        ...fonts(vars.text.font),
-        width: percent(100),
-        flex: 1,
-        position: "relative",
-        ...paddings({
-            vertical: 6,
-        }),
     });
 
     const setWidth = style("setWidth", {
@@ -313,6 +324,7 @@ export const messagesClasses = useThemeCache(() => {
         messageWrapper,
         main,
         text,
+        hasIcon,
         // noIcon,
         icon,
         title,

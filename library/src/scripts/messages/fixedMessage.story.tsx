@@ -19,7 +19,7 @@ const story = storiesOf("Messages", module);
 
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 
-story.add("fixedMessage", () => {
+story.add("Fixed Message", () => {
     const classesMessages = messagesClasses();
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
 
@@ -33,12 +33,10 @@ story.add("fixedMessage", () => {
         >
             <Message
                 isFixed={true}
+                icon={<AttachmentErrorIcon className={classNames(classesMessages.errorIcon)} />}
                 contents={
                     <div className={classesMessages.content}>
-                        <AttachmentErrorIcon className={classNames(classesMessages.errorIcon)} />
-                        <div>
-                            <Translate source={message} />
-                        </div>
+                        <Translate source={message} />
                     </div>
                 }
                 onConfirm={() => {

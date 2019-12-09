@@ -60,9 +60,9 @@ export default function Message(props: IMessageProps) {
             >
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap(!!props.icon), props.className, {
+                        className={classNames(classes.wrap, props.className, {
                             [classes.fixed]: props.isContained,
-                            // [classes.noIcon]: noIcon,
+                            [classes.hasIcon]: !!props.icon,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>

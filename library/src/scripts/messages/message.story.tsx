@@ -29,7 +29,7 @@ story.add("Message", () => {
     return (
         <>
             <StoryContent>
-                <StoryHeading>Short messages</StoryHeading>
+                <StoryHeading depth={1}>Messages</StoryHeading>
                 <Message
                     contents={
                         <div className={classesMessages.content}>
@@ -54,8 +54,6 @@ story.add("Message", () => {
                     onCancel={() => {}}
                     stringContents={shortMessage}
                 />
-
-                <StoryHeading>Long messages</StoryHeading>
                 <Message
                     contents={
                         <div className={classesMessages.content}>
@@ -79,8 +77,6 @@ story.add("Message", () => {
                     onCancel={() => {}}
                     stringContents={longMessage}
                 />
-
-                <StoryHeading>Message with link</StoryHeading>
                 <Message
                     contents={
                         <div className={classesMessages.content}>
@@ -95,8 +91,6 @@ story.add("Message", () => {
                     }}
                     stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
                 />
-
-                <StoryHeading>Message with icon </StoryHeading>
                 <Message
                     icon={<WarningIcon className={classNames(classesMessages.icon)} />}
                     contents={

@@ -305,7 +305,7 @@ class DiscussionModel extends Gdn_Model {
      * Determines whether or not the current user can edit a discussion.
      *
      * @param object|array $discussion The discussion to examine.
-     * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
+     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
      * @return bool Returns true if the user can edit or false otherwise.
      */
     public static function canEdit($discussion, &$timeLeft = 0) {
@@ -411,6 +411,7 @@ class DiscussionModel extends Gdn_Model {
      * @access public
      *
      * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+     * @param bool $join
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
@@ -1302,6 +1303,8 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Get announcement cache key.
+     *
      * @param int $categoryID Category ID,
      * @return string $key CacheKey name to be used for cache.
      */
@@ -1332,7 +1335,6 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
      * Get discussions for a user.
      *
      * Events: BeforeGetByUser
@@ -1450,6 +1452,7 @@ class DiscussionModel extends Gdn_Model {
 
     /**
      * Get all the users that have participated in the discussion.
+     *
      * @param int $discussionID
      * @return Gdn_DataSet
      */
@@ -1871,7 +1874,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get views fallback.
      *
      * @param int $discussionID
      * @return mixed|null

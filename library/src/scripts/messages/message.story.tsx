@@ -33,13 +33,7 @@ story.add("Message", () => {
     const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
         return (
             <Message
-                contents={
-                    <div className={classesMessages.content}>
-                        <div>
-                            <Translate source={val} />
-                        </div>
-                    </div>
-                }
+                contents={<Translate source={val} />}
                 onConfirm={() => {
                     setFlag(false);
                 }}
@@ -51,14 +45,10 @@ story.add("Message", () => {
     const _messageWithLink = (
         <Message
             contents={
-                <div className={classesMessages.content}>
-                    <div>
-                        <Translate
-                            source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
-                            c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
-                        />
-                    </div>
-                </div>
+                <Translate
+                    source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
+                    c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
+                />
             }
             onConfirm={() => {
                 setLongMessageFlag(false);
@@ -69,13 +59,7 @@ story.add("Message", () => {
     const _messageWithIcon = iconMessageFlag && (
         <Message
             icon={<WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.icon)} />}
-            contents={
-                <div className={classesMessages.content}>
-                    <div>
-                        <Translate source={message} />
-                    </div>
-                </div>
-            }
+            contents={<Translate source={message} />}
             onConfirm={() => {
                 setIconMessageFlag(false);
             }}
@@ -85,11 +69,7 @@ story.add("Message", () => {
     const _message_longTitle = messageWithTitleFlag && (
         <Message
             title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
-            contents={
-                <div className={classesMessages.content}>
-                    <Translate source={message} />
-                </div>
-            }
+            contents={<Translate source={message} />}
             onConfirm={() => {
                 setMessageWithTitleFlag(false);
             }}
@@ -101,11 +81,7 @@ story.add("Message", () => {
         <Message
             title="Vanilla Forums"
             icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
-            contents={
-                <div className={classesMessages.content}>
-                    <Translate source={message} />
-                </div>
-            }
+            contents={<Translate source={message} />}
             onConfirm={() => {
                 setMessageWithTitleFlag(false);
             }}
@@ -117,11 +93,7 @@ story.add("Message", () => {
         <Message
             title="Vanilla Forums"
             icon={false}
-            contents={
-                <div className={classesMessages.content}>
-                    <Translate source={message} />
-                </div>
-            }
+            contents={<Translate source={message} />}
             onConfirm={() => {
                 setMessageWithTitleFlag(false);
             }}

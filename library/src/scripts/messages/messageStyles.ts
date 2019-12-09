@@ -16,17 +16,20 @@ import {
     allButtonStates,
     margins,
     absolutePosition,
+    negative,
 } from "@library/styles/styleHelpers";
-import { percent, translate, viewWidth } from "csx";
+import { percent, translate, translateX, translateY, viewWidth, em } from "csx";
 import { FontWeightProperty } from "csstype";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { relative } from "path";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const formElVars = formElementsVariables();
     const themeVars = variableFactory("messages");
 
     const sizing = themeVars("sizing", {
@@ -36,16 +39,12 @@ export const messagesVariables = useThemeCache(() => {
 
     const spacing = themeVars("spacing", {
         padding: {
-            vertical: 12,
-            left: 50,
-            right: 25,
+            vertical: 8,
+            withIcon: 44,
+            withoutIcon: 25,
         },
     });
-    const iconPadding = themeVars("iconPadding", {
-        padding: {
-            left: spacing.padding.right + 30,
-        },
-    });
+
     const colors = themeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
         bg: globalVars.messageColors.warning.bg,
@@ -68,15 +67,21 @@ export const messagesVariables = useThemeCache(() => {
     });
 
     const actionButton = themeVars("actionButton", {
+        position: "relative",
         padding: {
-            vertical: spacing.padding.vertical,
-            horizontal: spacing.padding.right / 2,
+            vertical: 0,
+            left: spacing.padding.withoutIcon / 2,
+            right: spacing.padding.withoutIcon / 2,
+        },
+        margin: {
+            left: spacing.padding.withoutIcon / 2,
         },
         font: {
             size: globalVars.fonts.size.medium,
             weight: globalVars.fonts.weights.bold as FontWeightProperty,
+            color: globalVars.mainColors.fg,
         },
-        minHeight: 36,
+        minHeight: formElVars.sizing.height,
     });
 
     return {
@@ -85,7 +90,6 @@ export const messagesVariables = useThemeCache(() => {
         colors,
         text,
         title,
-        iconPadding,
         actionButton,
     };
 });
@@ -98,14 +102,7 @@ export const messagesClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const wrap = (noIcon?: boolean) => {
-        const padding = noIcon
-            ? {
-                  vertical: vars.spacing.padding.vertical,
-                  left: vars.iconPadding.padding.left,
-                  right: vars.spacing.padding.right,
-              }
-            : { ...vars.spacing.padding, right: vars.spacing.padding.right };
+    const wrap = (hasIcon?: boolean) => {
         return style("wrap", {
             display: "flex",
             alignItems: "center",
@@ -115,7 +112,11 @@ export const messagesClasses = useThemeCache(() => {
             width: percent(100),
             margin: "auto",
             color: colorOut(vars.colors.fg),
-            ...paddings(padding),
+            ...paddings({
+                vertical: vars.spacing.padding.vertical,
+                left: hasIcon ? vars.spacing.padding.withIcon : vars.spacing.padding.withoutIcon,
+                right: vars.spacing.padding.withoutIcon,
+            }),
         });
     };
 
@@ -160,13 +161,13 @@ export const messagesClasses = useThemeCache(() => {
         paddingBottom: unit(vars.spacing.padding.vertical),
     });
 
-    const noIcon = style("setPaddingLeft", {
-        $nest: {
-            "&&": {
-                paddingLeft: unit(vars.spacing.padding.right),
-            },
-        },
-    });
+    // const noIcon = style("setPaddingLeft", {
+    //     $nest: {
+    //         "&&": {
+    //             paddingLeft: unit(vars.spacing.padding.withoutIcon),
+    //         },
+    //     },
+    // });
 
     const root = style({
         width: percent(100),
@@ -192,6 +193,9 @@ export const messagesClasses = useThemeCache(() => {
         width: percent(100),
         flex: 1,
         position: "relative",
+        ...paddings({
+            vertical: 6,
+        }),
     });
 
     const setWidth = style("setWidth", {
@@ -202,7 +206,9 @@ export const messagesClasses = useThemeCache(() => {
     const actionButton = style("actionButton", {
         $nest: {
             "&&": {
+                position: "relative",
                 ...paddings(vars.actionButton.padding),
+                marginLeft: vars.actionButton.padding.left,
                 minHeight: unit(vars.actionButton.minHeight),
                 whiteSpace: "nowrap",
                 ...fonts(vars.actionButton.font),
@@ -221,19 +227,26 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
-    const messageIcon = style("messageIcon", {
-        maxWidth: percent(100),
+    const iconPosition = style("iconPosition", {
         position: "absolute",
-        marginLeft: unit(-33),
-        marginRight: unit(12),
+        left: 0,
+        top: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: percent(100),
+        maxHeight: em(2),
+        transform: translate(`${negative(unit(vars.spacing.padding.withIcon))}`),
+        width: unit(vars.spacing.padding.withIcon),
         $nest: {
             "&&": {
                 color: colorOut(globalVars.messageColors.error.fg),
             },
         },
     });
+
     const icon = style("icon", {
-        top: unit(vars.spacing.padding.vertical),
+        // top: unit(vars.spacing.padding.vertical),
     });
 
     const errorIcon = style("errorIcon", {
@@ -261,6 +274,7 @@ export const messagesClasses = useThemeCache(() => {
     const titleContent = style("titleContent", {
         display: "flex",
         justifyContent: "start",
+        position: "relative",
         $nest: {
             [`& + .${text}`]: {
                 marginTop: unit(vars.title.margin.top),
@@ -285,7 +299,7 @@ export const messagesClasses = useThemeCache(() => {
         fixed,
         innerWrapper,
         setWidth,
-        messageIcon,
+        iconPosition,
         titleContent,
         content,
         confirm,
@@ -293,7 +307,7 @@ export const messagesClasses = useThemeCache(() => {
         messageWrapper,
         main,
         text,
-        noIcon,
+        // noIcon,
         icon,
         title,
     };

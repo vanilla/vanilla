@@ -35,9 +35,7 @@ story.add("fixedMessage", () => {
                 isFixed={true}
                 contents={
                     <div className={classesMessages.content}>
-                        <AttachmentErrorIcon
-                            className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                        />
+                        <AttachmentErrorIcon className={classNames(classesMessages.errorIcon)} />
                         <div>
                             <Translate source={message} />
                         </div>

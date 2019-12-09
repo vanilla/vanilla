@@ -7,13 +7,13 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
-import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { unit, negative } from "@library/styles/styleHelpers";
+import { ErrorIcon } from "@library/icons/common";
 
 const story = storiesOf("Messages", module);
 
@@ -33,7 +33,7 @@ story.add("Fixed Message", () => {
         >
             <Message
                 isFixed={true}
-                icon={<AttachmentErrorIcon className={classNames(classesMessages.errorIcon)} />}
+                icon={<ErrorIcon className={classNames(classesMessages.errorIcon)} />}
                 contents={
                     <div className={classesMessages.content}>
                         <Translate source={message} />

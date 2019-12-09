@@ -8,10 +8,9 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
-import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
-import { WarningIcon } from "@library/icons/common";
+import { ErrorIcon, InformationIcon, WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -31,6 +30,7 @@ story.add("Message", () => {
             <StoryContent>
                 <StoryHeading depth={1}>Messages</StoryHeading>
                 <Message
+                    icon={<ErrorIcon />}
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={shortMessage} />
@@ -174,7 +174,7 @@ story.add("Message", () => {
 
                 <Message
                     title="Vanilla Forums"
-                    icon={<AttachmentErrorIcon className={classNames(classesMessages.icon)} />}
+                    icon={<ErrorIcon className={classNames(classesMessages.icon)} />}
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={message} />
@@ -202,7 +202,7 @@ story.add("Message", () => {
 
                 <Message
                     title="Vanilla Forums"
-                    icon={false}
+                    icon={<InformationIcon />}
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={message} />

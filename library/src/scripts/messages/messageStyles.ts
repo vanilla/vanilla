@@ -248,11 +248,6 @@ export const messagesClasses = useThemeCache(() => {
         maxHeight: em(2),
         transform: translate(`${negative(unit(vars.spacing.padding.withIcon))}`),
         width: unit(vars.spacing.padding.withIcon),
-        $nest: {
-            "&&": {
-                color: colorOut(globalVars.messageColors.error.fg),
-            },
-        },
     });
 
     const icon = style("icon", {

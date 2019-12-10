@@ -16,5 +16,5 @@
  * @deprecated 4.0
  */
 function smarty_function_hero_image_link($params, &$smarty) {
-    return smarty_function_banner_image_link($params, $smarty);
+    return smarty_function_banner_image_url($params, $smarty);
 }

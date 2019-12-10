@@ -39,14 +39,13 @@ import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { styleFactory } from "@library/styles/styleUtils";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
-    container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
+    container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
     isFixed?: boolean;
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
-    logoUrl?: string;
 }
 
 interface IState {
@@ -96,7 +95,9 @@ export class TitleBar extends React.Component<IProps, IState> {
         const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
 
-        const headerContent = (
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
+
+        return ReactDOM.createPortal(
             <HashOffsetReporter>
                 <Container>
                     <PanelWidgetHorizontalPadding>
@@ -196,43 +197,30 @@ export class TitleBar extends React.Component<IProps, IState> {
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-            </HashOffsetReporter>
+            </HashOffsetReporter>,
+            containerElement,
         );
-
-        if (this.containerElement) {
-            return ReactDOM.createPortal(headerContent, this.containerElement);
-        } else {
-            return <header className={this.containerClasses}>{headerContent}</header>;
-        }
     }
 
     public componentDidMount() {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
-        if (this.containerElement) {
-            // this.containerElement.classList.add(this.containerClasses);
-            this.containerElement.classList.value = this.containerClasses;
-        }
+        const { isFixed } = this.props;
+        const classes = titleBarClasses();
+
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
+        containerElement.className = classNames(
+            "titleBar",
+            classes.root,
+            this.props.className,
+            { [classes.isFixed]: isFixed },
+            this.context.offsetClass,
+            containerElement.className,
+        );
     }
 
     public componentWillUnmount() {
         this.context.resetScrollOffset();
-    }
-
-    private get containerClasses() {
-        const classes = titleBarClasses();
-
-        return classNames(
-            "titleBar",
-            classes.root,
-            this.props.className,
-            { [classes.isFixed]: this.props.isFixed },
-            this.context.offsetClass,
-        );
-    }
-
-    public get containerElement(): HTMLElement | null {
-        return this.props.container || document.getElementById("titleBar")!;
     }
 
     private renderMobileMeBox() {

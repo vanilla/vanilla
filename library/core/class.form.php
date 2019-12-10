@@ -2297,6 +2297,8 @@ PASSWORDMETER;
                     '## '.$error->getFile().'('.$error->getLine().")".$fileSuffix."\n".
                     htmlspecialchars($error->getTraceAsString()).
                     '</pre>';
+            } elseif ($error instanceof \Gdn_SanitizedUserException) {
+                $errorCode = '@'.$error->getMessage();
             } else {
                 $errorCode = '@'.htmlspecialchars(strip_tags($error->getMessage()));
             }

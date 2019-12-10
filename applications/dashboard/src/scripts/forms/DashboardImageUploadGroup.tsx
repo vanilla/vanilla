@@ -35,7 +35,6 @@ export function DashboardImageUploadGroup(props: IProps) {
     const [ownValue, ownOnChange] = useState<string | null>(props.initialValue || null);
     const [wantsDelete, setWantsDelete] = useState(false);
 
-    console.log(props);
     const value = props.value ?? ownValue;
     const onChange = props.onChange ?? ownOnChange;
 

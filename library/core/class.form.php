@@ -1778,7 +1778,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $value = $attributes['value'] ?? $this->getValue($fieldName);
         $props = $props + [
             'initialValue' => $value,
-            'fieldName'  => $fieldName,
+            'fieldName'  => $this->escapeFieldName($fieldName),
         ];
         $props = htmlspecialchars(json_encode($props), ENT_QUOTES);
 

@@ -165,7 +165,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['header'] ?? '');
+        return $this->getThemeInlineCss() . ($themeData['assets']['footer'] ?? '');
     }
 
     /**
@@ -178,6 +178,6 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['footer'] ?? '');
+        return $this->getThemeInlineCss() . ($themeData['assets']['header'] ?? '');
     }
 }

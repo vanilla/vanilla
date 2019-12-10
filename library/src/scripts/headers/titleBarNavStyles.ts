@@ -53,7 +53,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     };
 });
 
-export default function titleBarNavClasses() {
+const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
@@ -132,6 +132,10 @@ export default function titleBarNavClasses() {
 
     const linkContent = style("linkContent", {
         position: "relative",
+        display: "flex",
+        alignItems: "center",
+        minHeight: unit(vars.item.size),
+        height: 0, // IE11 Fix.
     });
 
     const firstItem = style("lastItem", {
@@ -152,4 +156,6 @@ export default function titleBarNavClasses() {
         lastItem,
         firstItem,
     };
-}
+});
+
+export default titleBarNavClasses;

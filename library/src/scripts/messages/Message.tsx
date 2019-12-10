@@ -13,6 +13,7 @@ import Button from "@library/forms/Button";
 import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 export interface IMessageProps {
     className?: string;
@@ -27,7 +28,7 @@ export interface IMessageProps {
     isContained?: boolean;
     title?: string;
     isActionLoading?: boolean;
-    noIcon?: boolean;
+    icon?: React.ReactNode | false;
 }
 
 export default function Message(props: IMessageProps) {
@@ -36,23 +37,57 @@ export default function Message(props: IMessageProps) {
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
+    const contents = (
+        <div className={classes.content}>
+            <div>{props.contents || props.stringContents}</div>
+        </div>
+    );
 
-    const contents = props.contents || props.stringContents;
+    const isTitle = props.title ? true : false;
+    const isIcon = props.icon ? true : false;
+
+    const content = <p className={classes.text}>{contents}</p>;
+    const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
+
+    const icon_content = !isTitle && isIcon; //case - if message has icon and content.
+    const icon_title_content = isTitle && isIcon; //case - if message has icon, title and content.
+    const noIcon = !isIcon; // //case - if message has title, content and no icon
 
     return (
         <>
-            <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
+            <div
+                className={classNames(classes.root, props.className, {
+                    [classes.fixed]: props.isFixed,
+                })}
+            >
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap(props.noIcon), props.className, {
-                            [classes.noPadding]: props.isContained,
+                        className={classNames(classes.wrap(!!props.icon), props.className, {
                             [classes.fixed]: props.isContained,
+                            [classes.noIcon]: noIcon,
                         })}
                     >
                         <InnerWrapper className={classes.innerWrapper}>
                             <div className={classes.message}>
-                                {props.title && <h2 className={classes.title}>{props.title}</h2>}
-                                {contents && <p className={classes.text}>{contents}</p>}
+                                {icon_content && (
+                                    <div className={classes.titleContent}>
+                                        {props.icon} {content}
+                                    </div>
+                                )}
+                                {icon_title_content && (
+                                    <>
+                                        <div className={classes.titleContent}>
+                                            {props.icon} {title}
+                                        </div>
+                                        {content}
+                                    </>
+                                )}
+                                {noIcon && (
+                                    <>
+                                        {title}
+                                        {content}
+                                    </>
+                                )}
                             </div>
 
                             {props.onConfirm && (

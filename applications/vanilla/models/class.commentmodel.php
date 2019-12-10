@@ -1275,9 +1275,10 @@ class CommentModel extends Gdn_Model {
             }
         }
 
-        // Update discussion's comment count
-        $discussionID = val('DiscussionID', $formPostValues);
-        $this->updateCommentCount($discussionID, ['Slave' => false]);
+        // Update discussion's comment count.
+        if (isset($formPostValues['DiscussionID'])) {
+            $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+        }
 
         return $commentID;
     }

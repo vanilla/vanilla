@@ -3471,7 +3471,7 @@ if (!function_exists('setValue')) {
      * Set the value on an object/array.
      *
      * @param string $needle The key or property name of the value.
-     * @param mixed &$haystack The array or object to set.
+     * @param mixed $haystack The array or object to set.
      * @param mixed $value The value to set.
      */
     function setValue($needle, &$haystack, $value) {

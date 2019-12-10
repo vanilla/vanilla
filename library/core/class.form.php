@@ -784,7 +784,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function imageUploadReact(string $fieldName, string $label = '', string $labelDescription = ''): string {
-        $value = $this->getValue($fieldName);
+        $value = $this->getValue($fieldName, null);
         if ($value) {
             $value = Gdn_Upload::url($value);
         }

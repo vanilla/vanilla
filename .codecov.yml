@@ -22,7 +22,7 @@ parsers:
       macro: no
 
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: "diff,flags,tree"
   behavior: default
   require_changes: no
 

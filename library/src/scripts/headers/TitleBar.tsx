@@ -96,7 +96,11 @@ export class TitleBar extends React.Component<IProps, IState> {
         const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
-        const navLinks = navigationLinks ? [dummyNavigationData, dummyStorybookNavigationData] : dummyNavigationData();
+
+        const navLinks = navigationLinks
+            ? dummyNavigationData().data.concat(dummyStorybookNavigationData().data)
+            : dummyNavigationData().data;
+
         const classesMeBox = meBoxClasses();
 
         const headerContent = (
@@ -127,7 +131,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isMobile && (
                                 <TitleBarNav
-                                    {...dummyNavigationData()}
+                                    data={navLinks}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"

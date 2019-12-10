@@ -9,15 +9,15 @@ export const dummyStorybookNavigationData = () => {
     return {
         data: [
             {
-                to: "/categories",
-                children: t("Home"),
+                to: "/",
+                children: t("Link 1"),
             },
             {
-                to: "/categories",
-                children: t("Articles"),
+                to: "/",
+                children: t("Link 2"),
             },
             {
-                to: "/categories",
+                to: "/",
                 children: t("Latest Discussions"),
             },
         ],

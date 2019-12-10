@@ -8,129 +8,214 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
-import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
-import { WarningIcon } from "@library/icons/common";
+import { ErrorIcon, InformationIcon, WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 
 const story = storiesOf("Messages", module);
 
-const shortMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`;
+const shortMessage = `Something went wrong while contacting the server.`;
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 const longMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
 `;
 
 story.add("Message", () => {
     const classesMessages = messagesClasses();
-    const [shortMessageFlag, setShortMessageFlag] = useState(true);
-    const [messageWithTitleFlag, setMessageWithTitleFlag] = useState(true);
-    const [longMessageFlag, setLongMessageFlag] = useState(true);
-    const [iconMessageFlag, setIconMessageFlag] = useState(true);
-
-    const renderMessage = (val: string, icon: React.ReactNode, setFlag) => {
-        return (
-            <Message
-                contents={<Translate source={val} />}
-                onConfirm={() => {
-                    setFlag(false);
-                }}
-                stringContents={t(val)}
-            />
-        );
-    };
-
-    const _messageWithLink = (
-        <Message
-            contents={
-                <Translate
-                    source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
-                    c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
-                />
-            }
-            onConfirm={() => {
-                setLongMessageFlag(false);
-            }}
-            stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
-        />
-    );
-    const _messageWithIcon = iconMessageFlag && (
-        <Message
-            icon={<WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.icon)} />}
-            contents={<Translate source={message} />}
-            onConfirm={() => {
-                setIconMessageFlag(false);
-            }}
-            stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
-        />
-    );
-    const _message_longTitle = messageWithTitleFlag && (
-        <Message
-            title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
-            contents={<Translate source={message} />}
-            onConfirm={() => {
-                setMessageWithTitleFlag(false);
-            }}
-            confirmText={t("Cancel")}
-            stringContents={t(message)}
-        />
-    );
-    const _message_Title_Icon = messageWithTitleFlag && (
-        <Message
-            title="Vanilla Forums"
-            icon={<AttachmentErrorIcon className={classNames(classesMessages.messageIcon)} />}
-            contents={<Translate source={message} />}
-            onConfirm={() => {
-                setMessageWithTitleFlag(false);
-            }}
-            confirmText={t("Cancel")}
-            stringContents={t(message)}
-        />
-    );
-    const _message_Title_noIcon = messageWithTitleFlag && (
-        <Message
-            title="Vanilla Forums"
-            icon={false}
-            contents={<Translate source={message} />}
-            onConfirm={() => {
-                setMessageWithTitleFlag(false);
-            }}
-            confirmText={t("Cancel")}
-            stringContents={t(message)}
-        />
-    );
 
     return (
         <>
             <StoryContent>
-                <StoryHeading>Short message</StoryHeading>
-                {shortMessageFlag && renderMessage(shortMessage, null, setShortMessageFlag)}
-
-                <StoryHeading>Long message</StoryHeading>
-                {longMessageFlag && renderMessage(longMessage, null, setLongMessageFlag)}
-
-                <StoryHeading>Message with link</StoryHeading>
-                {_messageWithLink}
-
-                <StoryHeading>Message with icon</StoryHeading>
-                {_messageWithIcon}
-
-                <StoryHeading>Message with long title</StoryHeading>
-                {_message_longTitle}
-
-                <StoryHeading>Message with title and icon</StoryHeading>
-                {_message_Title_Icon}
-
-                <StoryHeading>Message with title and no icon</StoryHeading>
-                {_message_Title_noIcon}
-
-                <div
-                    style={{
-                        height: 450,
+                <StoryHeading depth={1}>Messages</StoryHeading>
+                <Message
+                    icon={<ErrorIcon />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={shortMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
                     }}
-                ></div>
+                    stringContents={shortMessage}
+                />
+
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={shortMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
+                    stringContents={shortMessage}
+                />
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={longMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={longMessage}
+                />
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={longMessage} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
+                    stringContents={longMessage}
+                />
+                <Message
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate
+                                source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
+                                c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
+                            />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+                />
+                <Message
+                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={"Lorem ipsum dolor sit amet, consectetur"} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t("Lorem ipsum dolor sit amet, consectetur.")}
+                />
+
+                <Message
+                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+                />
+
+                <Message
+                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
+                />
+
+                <Message
+                    title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {}}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    title="Vanilla Forums"
+                    icon={<ErrorIcon className={classNames(classesMessages.icon)} />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    title="Vanilla Forums"
+                    icon={false}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                />
+
+                <Message
+                    title="Vanilla Forums"
+                    icon={<InformationIcon />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    onCancel={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                />
             </StoryContent>
         </>
     );

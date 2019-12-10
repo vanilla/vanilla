@@ -96,13 +96,6 @@ export class TitleBar extends React.Component<IProps, IState> {
         const classesMeBox = meBoxClasses();
 
         const containerElement = this.props.container || document.getElementById("titleBar")!;
-        containerElement.classList.value = classNames(
-            "titleBar",
-            classes.root,
-            this.props.className,
-            { [classes.isFixed]: isFixed },
-            this.context.offsetClass,
-        );
 
         return ReactDOM.createPortal(
             <HashOffsetReporter>
@@ -212,6 +205,18 @@ export class TitleBar extends React.Component<IProps, IState> {
     public componentDidMount() {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
+        const { isFixed } = this.props;
+        const classes = titleBarClasses();
+
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
+        containerElement.className = classNames(
+            "titleBar",
+            classes.root,
+            this.props.className,
+            { [classes.isFixed]: isFixed },
+            this.context.offsetClass,
+            containerElement.className,
+        );
     }
 
     public componentWillUnmount() {

@@ -29,6 +29,11 @@ interface TranslationProviderInterface {
     public function translate(string $propertyKey, string $sourceValue): string;
 
     /**
+     * @param TranslationResourceInterface $resource
+     */
+    public function initializeResource(TranslationResourceInterface $resource);
+
+    /**
      * Translate content by recordType and recordID or recordKey
      *
      * @param string $locale

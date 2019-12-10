@@ -15,7 +15,7 @@ import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
-import { AttachmentErrorIcon } from "@library/icons/fileTypes";
+import { ErrorIcon } from "@library/icons/common";
 
 interface IProps extends IFileAttachment {
     message: string;
@@ -50,7 +50,7 @@ export default class AttachmentError extends React.Component<IProps> {
             >
                 <div className={classNames("attachment-box", classes.box)}>
                     <div className={classNames("attachment-format", classes.format)}>
-                        <AttachmentErrorIcon className={iconClasses.error} />
+                        <ErrorIcon className={iconClasses.error} />
                     </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div id={this.descrID} className={classNames("attachment-title", classes.title)}>

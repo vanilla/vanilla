@@ -21,6 +21,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
@@ -91,6 +92,12 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(MockLocale::class)
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
+
+            ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setShared(true)
+            ->setConstructorArgs([
+                'deploymentTime' => null,
+            ])
 
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)

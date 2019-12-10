@@ -67,6 +67,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** @var array Format option overrides. */
     private $formatOptions = [];
 
+    /** @var string use for translationDebug */
+    private $fallBackDecorator = "";
+
     /**
      * Initialize a new instance of the {@link Gdn_Configuration} class.
      *
@@ -376,6 +379,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             if (is_array($value) && array_key_exists($keys[$i], $value)) {
                 $value = $value[$keys[$i]];
             } else {
+                if ($this->fallBackDecorator ?? false) {
+                    $defaultValue =  $this->fallBackDecorator . $defaultValue . $this->fallBackDecorator;
+                }
                 return $defaultValue;
             }
         }
@@ -938,7 +944,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
+     * Set a fallback decorator.
      *
+     * @param string $decorator
+     */
+    public function setFallbackDecorator(string $decorator) {
+        $this->fallBackDecorator = $decorator;
+    }
+
+    /**
+     * Shutdown.
      */
     public function shutdown() {
         foreach ($this->sources as $source) {
@@ -947,7 +962,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     *
+     * Destruct.
      */
     public function __destruct() {
         if ($this->autoSave) {

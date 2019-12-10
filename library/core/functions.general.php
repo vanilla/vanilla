@@ -3292,7 +3292,7 @@ if (!function_exists('sliceParagraph')) {
      * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
      *
      * Note that you should not expect this function to return a string that is always shorter than max-length.
-     * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
+     * The purpose of this function is to provide a string that is reasonably easy to consume by a human.
      *
      * @param string $string The string to slice.
      * @param int|array $limits Either int $maxLength or array($maxLength, $minLength); whereas $maxLength The maximum length of the string; $minLength The intended minimum length of the string (slice on sentence if paragraph is too short).

@@ -3,11 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import { PasswordForm } from "@dashboard/auth/PasswordForm";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import PasswordForm from "@dashboard/pages/authenticate/components/PasswordForm";
+import * as React from "react";
 
 export default class PasswordPage extends React.Component {
     private id = uniqueIDFromPrefix("PasswordPage");

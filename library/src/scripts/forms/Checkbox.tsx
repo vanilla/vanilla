@@ -15,7 +15,7 @@ interface IProps extends IOptionalComponentID {
     className?: string;
     checked?: boolean;
     disabled?: boolean;
-    onChange?: any;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label: string;
     isHorizontal?: boolean;
 }

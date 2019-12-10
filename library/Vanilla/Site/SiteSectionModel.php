@@ -17,7 +17,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
  */
 class SiteSectionModel {
     /** @var SiteSectionProviderInterface[] $providers */
-    private $providers;
+    private $providers = [];
 
     /** @var SiteSectionInterface[] $siteSections */
     private $siteSections;

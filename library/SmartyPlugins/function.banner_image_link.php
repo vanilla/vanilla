@@ -14,6 +14,6 @@
  *
  * @return string
  */
-function smarty_function_hero_image_link($params, &$smarty) {
+function smarty_function_banner_image_link($params, &$smarty) {
     return HeroImagePlugin::getCurrentHeroImageLink();
 }

@@ -34,7 +34,7 @@ interface IProps {
     widthOfParent?: boolean;
     openAsModal?: boolean;
     renderLeft?: boolean;
-    offsetPaddingTop?: boolean;
+    offsetPadding?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -79,7 +79,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                     "selectBox-dropDown",
                     "dropDownItem-verticalPadding",
                     classesDropDown.verticalPadding,
-                    { [classes.noTopPadding]: props.offsetPaddingTop },
+                    { [classes.offsetPadding]: props.offsetPadding },
                 )}
                 buttonContents={<SelectBoxButton activeItem={selectedOption} />}
                 buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}

@@ -51,6 +51,7 @@ class TwigFormWrapper {
         'radio',
         'radioList',
         'imageUploadPreview',
+        'imageUploadReact',
         'date',
         'currentImage',
         'imageUpload',

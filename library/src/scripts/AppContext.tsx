@@ -24,6 +24,7 @@ interface IProps {
     children: React.ReactNode;
     variablesOnly?: boolean;
     noTheme?: boolean;
+    noWrap?: boolean;
     errorComponent?: React.ReactNode;
 }
 
@@ -38,33 +39,36 @@ export function AppContext(props: IProps) {
         width: percent(100),
     });
 
-    return (
-        <div className={classNames("js-appContext", rootStyle, inheritHeightClass())}>
-            {/* A wrapper div is required or will cause error when no routes match or in hot reload */}
-            <Provider store={store}>
-                <LocaleProvider>
-                    <SearchContextProvider>
-                        <ContentTranslationProvider>
-                            <LiveAnnouncer>
-                                <ThemeProvider
-                                    disabled={props.noTheme}
-                                    errorComponent={props.errorComponent || null}
-                                    themeKey={getMeta("ui.themeKey", "keystone")}
-                                    variablesOnly={props.variablesOnly}
-                                >
-                                    <FontSizeCalculatorProvider>
-                                        <SearchFilterContextProvider>
-                                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                                <DeviceProvider>{props.children}</DeviceProvider>
-                                            </ScrollOffsetProvider>
-                                        </SearchFilterContextProvider>
-                                    </FontSizeCalculatorProvider>
-                                </ThemeProvider>
-                            </LiveAnnouncer>
-                        </ContentTranslationProvider>
-                    </SearchContextProvider>
-                </LocaleProvider>
-            </Provider>
-        </div>
+    const content = (
+        <Provider store={store}>
+            <LocaleProvider>
+                <SearchContextProvider>
+                    <ContentTranslationProvider>
+                        <LiveAnnouncer>
+                            <ThemeProvider
+                                disabled={props.noTheme}
+                                errorComponent={props.errorComponent || null}
+                                themeKey={getMeta("ui.themeKey", "keystone")}
+                                variablesOnly={props.variablesOnly}
+                            >
+                                <FontSizeCalculatorProvider>
+                                    <SearchFilterContextProvider>
+                                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                            <DeviceProvider>{props.children}</DeviceProvider>
+                                        </ScrollOffsetProvider>
+                                    </SearchFilterContextProvider>
+                                </FontSizeCalculatorProvider>
+                            </ThemeProvider>
+                        </LiveAnnouncer>
+                    </ContentTranslationProvider>
+                </SearchContextProvider>
+            </LocaleProvider>
+        </Provider>
     );
+
+    if (props.noWrap) {
+        return content;
+    } else {
+        return <div className={classNames("js-appContext", rootStyle, inheritHeightClass())}>{content}</div>;
+    }
 }

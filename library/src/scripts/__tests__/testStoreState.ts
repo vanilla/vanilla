@@ -2,8 +2,6 @@ import { DeepPartial } from "redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import merge from "lodash/merge";
 import { INITIAL_USERS_STATE, INITIAL_THEMES_STATE, INITIAL_LOCALE_STATE } from "@library/features/users/userModel";
-import { IThemeState, themeReducer } from "@library/theming/themeReducer";
-import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
 
 const DEFAULT_STATE: ICoreStoreState = {
     users: INITIAL_USERS_STATE,

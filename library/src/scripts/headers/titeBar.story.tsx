@@ -23,11 +23,33 @@ import { CommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { DownTriangleIcon } from "@library/icons/common";
-import { ThemeProvider } from "@library/theming/ThemeProvider";
+import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
+import TitleBarNav from "./mebox/pieces/TitleBarNav";
+import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
+import classNames from "classnames";
+
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
 const story = storiesOf("TitleBar", module);
-
+const classes = titleBarClasses();
+const makeMockUnRegisterUser: IMe = {
+    name: "test",
+    userID: 0,
+    permissions: [],
+    isAdmin: true,
+    photoUrl: "",
+    dateLastActive: "",
+    countUnreadNotifications: 1,
+};
+const makeMockRegisterUser: IMe = {
+    name: "Neena",
+    userID: 1,
+    permissions: [],
+    isAdmin: true,
+    photoUrl: "",
+    dateLastActive: "",
+    countUnreadNotifications: 1,
+};
 const providerArgs = {
     hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
     linkSuffix: "/kb",
@@ -40,30 +62,11 @@ const ChooserWithProvider = props => (
 
 addComponent("subcommunity-chooser", ChooserWithProvider);
 
-const makeMockUser: IMe = {
-    name: "test",
-    userID: 0,
-    permissions: [],
-    isAdmin: true,
-    photoUrl: "",
-    dateLastActive: "",
-    countUnreadNotifications: 1,
-};
-const makeMockUser1: IMe = {
-    name: "Neena",
-    userID: 1,
-    permissions: [],
-    isAdmin: true,
-    photoUrl: "",
-    dateLastActive: "",
-    countUnreadNotifications: 1,
-};
-
 TitleBarStatic.registerBeforeMeBox(() => {
     return (
         <Button baseClass={ButtonTypes.TITLEBAR_LINK}>
             <>
-                Extra Icon
+                English
                 <DownTriangleIcon />
             </>
         </Button>
@@ -71,13 +74,13 @@ TitleBarStatic.registerBeforeMeBox(() => {
 });
 
 story.add(
-    "TitleBar",
+    "TitleBar-Guest",
     () => {
         const initialState = testStoreState({
             users: {
                 current: {
                     status: LoadStatus.SUCCESS,
-                    data: makeMockUser1,
+                    data: makeMockUnRegisterUser,
                 },
             },
             theme: {
@@ -104,13 +107,62 @@ story.add(
                 <MemoryRouter>
                     <Provider store={getStore()}>
                         <DeviceProvider>
-                            <StoryHeading>TitleBar</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} />
-                            <StoryHeading>TitleBar- openSearch</StoryHeading>
-                            <TitleBar useMobileBackButton={true} isFixed={false} />
-                            <StoryHeading>TitleBar- hamburger menu</StoryHeading>
+                            <StoryHeading>Hamburger menu</StoryHeading>
                             <TitleBar useMobileBackButton={true} isFixed={false} hamburger={true} />
-                            <StoryHeading>TitleBar- product dropdown</StoryHeading>
+                            <StoryHeading>Big Logo</StoryHeading>
+                            <TitleBar useMobileBackButton={true} isFixed={false} hamburger={true} />
+                            <StoryHeading>Navigation links</StoryHeading>
+                            <TitleBar useMobileBackButton={true} isFixed={false} navigationLinks={true} />
+                        </DeviceProvider>
+                    </Provider>
+                </MemoryRouter>
+            </PageContext.Provider>
+        );
+    },
+    {
+        chromatic: {
+            viewports: [layoutVariables().panelLayoutBreakPoints.noBleed, layoutVariables().panelLayoutBreakPoints.xs],
+        },
+    },
+);
+story.add(
+    "TitleBar-RegisteredUser",
+    () => {
+        const initialState = testStoreState({
+            users: {
+                current: {
+                    status: LoadStatus.SUCCESS,
+                    data: makeMockRegisterUser,
+                },
+            },
+            theme: {
+                assets: {
+                    data: {
+                        logo: {
+                            type: "image",
+                            url: localLogoUrl,
+                        },
+                    },
+                },
+            },
+        });
+
+        return (
+            <PageContext.Provider
+                value={{
+                    pages: {
+                        // search?: IPageLoader;
+                        // drafts?: IPageLoader;
+                    },
+                }}
+            >
+                <MemoryRouter>
+                    <Provider store={getStore()}>
+                        <DeviceProvider>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Hamburger menu</StoryHeading>
+                            <TitleBar useMobileBackButton={true} isFixed={false} hamburger={true} />
                         </DeviceProvider>
                     </Provider>
                 </MemoryRouter>

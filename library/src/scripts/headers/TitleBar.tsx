@@ -37,6 +37,7 @@ import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { styleFactory } from "@library/styles/styleUtils";
+import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -47,6 +48,7 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
     logoUrl?: string;
+    navigationLinks?: boolean;
 }
 
 interface IState {
@@ -89,7 +91,7 @@ export class TitleBar extends React.Component<IProps, IState> {
         isScrolledOff: false,
     };
     public render() {
-        const { isFixed, hamburger } = this.props;
+        const { isFixed, hamburger, navigationLinks } = this.props;
         const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
@@ -124,6 +126,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isMobile && (
                                 <TitleBarNav
+                                    {...(navigationLinks && { ...dummyStorybookNavigationData() })}
                                     {...dummyNavigationData()}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}

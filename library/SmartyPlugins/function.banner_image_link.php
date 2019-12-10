@@ -6,6 +6,8 @@
  * @since 1.0
  */
 
+use Vanilla\Dashboard\Models\BannerImageModel;
+
 /**
  * Get the hero image for the page.
  *
@@ -15,5 +17,5 @@
  * @return string
  */
 function smarty_function_banner_image_link($params, &$smarty) {
-    return HeroImagePlugin::getCurrentHeroImageLink();
+    return BannerImageModel::getCurrentBannerImageLink();
 }

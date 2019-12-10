@@ -176,8 +176,8 @@
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
                     <div class="Herobanner">
-                        {if $heroImageUrl}
-                            <div class="Herobanner-bgImage" style="background-image:url('{$heroImageUrl}')"></div>
+                        {if {banner_image_link}}
+                            <div class="Herobanner-bgImage" style="background-image:url('{banner_image_link}')"></div>
                         {/if}
                         <div class="Container">
                             {if $ThemeOptions.Options.hasFeatureSearchbox}

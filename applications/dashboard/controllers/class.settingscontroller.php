@@ -48,7 +48,7 @@ class SettingsController extends DashboardController {
         // Many dashboard pages display a pretty style flash when deferring all scripts.
         // Disable deferred scripts on these pages until this is resolved.
         // This is also less signficant here because these pages are not indexed by search engines.
-        $this->useDeferredLegacyScripts = false;
+        $this->useDeferredLegacyScripts = \Vanilla\FeatureFlagHelper::featureEnabled('DeferredLegacyScripts');
     }
 
     /**
@@ -558,6 +558,13 @@ class SettingsController extends DashboardController {
                 'Options' => [
                     'AllowEmpty' => true,
                 ]
+            ],
+            'Feature.DeferredLegacyScripts.Enabled' => [
+                'LabelCode' => t('Defer Javascript Loading'),
+                'Control' => 'toggle',
+                'Default' => true,
+                'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.' .
+                    "**Warning: Enabling this feature may cause Javascript errors on your site.**". anchor(t("More information"), "https://success.vanillaforums.com/entry/signin?Target=categories")),
             ]
         ]);
         $this->setData('ConfigurationModule', $configurationModule);

@@ -96,6 +96,10 @@ export class TitleBar extends React.Component<IProps, IState> {
         const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
+        const defaultLinks = dummyNavigationData().data;
+        const customLinks = dummyStorybookNavigationData().data;
+        const navLinks = navigationLinks ? defaultLinks.push(...customLinks) : dummyNavigationData();
+
         const classesMeBox = meBoxClasses();
 
         const headerContent = (
@@ -126,8 +130,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isMobile && (
                                 <TitleBarNav
-                                    {...(navigationLinks && { ...dummyStorybookNavigationData() })}
-                                    {...dummyNavigationData()}
+                                    {...navLinks}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"
@@ -213,7 +216,6 @@ export class TitleBar extends React.Component<IProps, IState> {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
         if (this.containerElement) {
-            // this.containerElement.classList.add(this.containerClasses);
             this.containerElement.classList.value = this.containerClasses;
         }
     }

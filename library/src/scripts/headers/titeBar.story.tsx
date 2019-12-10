@@ -27,9 +27,10 @@ import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
 import TitleBarNav from "./mebox/pieces/TitleBarNav";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import classNames from "classnames";
+import { loadTranslations } from "@vanilla/i18n";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
-
+loadTranslations({});
 const story = storiesOf("TitleBar", module);
 const classes = titleBarClasses();
 const makeMockUnRegisterUser: IMe = {

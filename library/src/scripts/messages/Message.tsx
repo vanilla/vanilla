@@ -37,16 +37,12 @@ export default function Message(props: IMessageProps) {
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
-    const contents = (
-        <div className={classes.content}>
-            <div>{props.contents || props.stringContents}</div>
-        </div>
-    );
+    const contents = <p className={classes.content}>{props.contents || props.stringContents}</p>;
 
     const hasTitle = !!props.title;
     const hasIcon = !!props.icon;
 
-    const content = <p className={classes.text}>{contents}</p>;
+    const content = <div className={classes.text}>{contents}</div>;
     const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
 
     const icon_content = !hasTitle && hasIcon; //case - if message has icon and content.
@@ -69,7 +65,7 @@ export default function Message(props: IMessageProps) {
                             [classes.hasIcon]: !!props.icon,
                         })}
                     >
-                        <InnerWrapper className={classes.innerWrapper}>
+                        <InnerWrapper>
                             <div className={classes.message}>
                                 {icon_content && (
                                     <div className={classes.titleContent}>

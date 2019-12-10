@@ -166,14 +166,6 @@ export const messagesClasses = useThemeCache(() => {
             top: unit(titleBarVars.sizing.mobile.height + 1),
         }),
     );
-
-    const innerWrapper = style("innerWrapper", {
-        $nest: {
-            "&&": {
-                flexDirection: "row",
-            },
-        },
-    });
     const messageWrapper = style("messageWrapper", {
         position: "relative",
         display: "flex",
@@ -312,7 +304,6 @@ export const messagesClasses = useThemeCache(() => {
         actionButtonPrimary,
         message,
         fixed,
-        innerWrapper,
         setWidth,
         iconPosition,
         titleContent,
@@ -323,7 +314,6 @@ export const messagesClasses = useThemeCache(() => {
         main,
         text,
         hasIcon,
-        // noIcon,
         icon,
         title,
     };

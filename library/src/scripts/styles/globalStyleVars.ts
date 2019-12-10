@@ -194,6 +194,10 @@ export const globalVariables = useThemeCache(() => {
         size: fonts.size.medium * lineHeights.base,
     });
 
+    const fullScreenModalTitle = makeThemeVars("fullScreenModalTitle", {
+        gap: 52,
+    });
+
     const animation = makeThemeVars("animation", {
         defaultTiming: ".15s",
         defaultEasing: "ease-out",
@@ -383,6 +387,7 @@ export const globalVariables = useThemeCache(() => {
         separator,
         userContentHyphenation,
         findColorMatch,
+        fullScreenModalTitle,
     };
 });
 

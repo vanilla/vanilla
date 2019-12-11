@@ -28,7 +28,7 @@ class DebugTest extends TestCase {
     }
 
     /**
-     * Provide test data for (@link debug()}.
+     * Provide test data for {@link debug()}.
      *
      * @return array Returns an array of test data.
      */

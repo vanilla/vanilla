@@ -20,6 +20,7 @@ import Button from "@library/forms/Button";
 import { DownTriangleIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
+import { StoryFullPage } from "@library/storybook/StoryFullPage";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -81,17 +82,19 @@ story.add(
                 <MemoryRouter>
                     <Provider store={getStore()}>
                         <TitleBarDeviceProvider>
-                            <StoryHeading>Hamburger menu</StoryHeading>
-                            <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
-                            <StoryHeading>Big Logo</StoryHeading>
-                            <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
-                            <StoryHeading>Extra Navigation links</StoryHeading>
-                            <TitleBar
-                                useMobileBackButton={false}
-                                isFixed={false}
-                                navigationLinks={true}
-                                hamburger={true}
-                            />
+                            <StoryFullPage>
+                                <StoryHeading>Hamburger menu</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <StoryHeading>Big Logo</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <StoryHeading>Extra Navigation links</StoryHeading>
+                                <TitleBar
+                                    useMobileBackButton={false}
+                                    isFixed={false}
+                                    navigationLinks={true}
+                                    hamburger={true}
+                                />
+                            </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </Provider>
                 </MemoryRouter>

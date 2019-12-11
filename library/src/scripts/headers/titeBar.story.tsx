@@ -21,6 +21,7 @@ import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import Container from "@library/layout/components/Container";
+import { StoryFullPage } from "@library/storybook/StoryFullPage";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -84,11 +85,7 @@ story.add(
                 <MemoryRouter>
                     <Provider store={getStore()}>
                         <TitleBarDeviceProvider>
-                            <div
-                                style={{
-                                    margin: "-35px",
-                                }}
-                            >
+                            <StoryFullPage>
                                 <StoryHeading>Hamburger menu</StoryHeading>
                                 <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                                 <StoryHeading>Big Logo</StoryHeading>
@@ -100,7 +97,7 @@ story.add(
                                     isFixed={false}
                                     navigationLinks={true}
                                 />
-                            </div>
+                            </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </Provider>
                 </MemoryRouter>

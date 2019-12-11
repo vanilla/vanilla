@@ -1397,7 +1397,7 @@ if (!function_exists('jsonFilter')) {
     function jsonFilter(&$value) {
         $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
             if (is_array($value)) {
-                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
                     $fn($childValue, $childKey, $key);
                 });
             } elseif ($value instanceof \DateTimeInterface) {

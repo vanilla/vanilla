@@ -1523,9 +1523,9 @@ if (!function_exists('t')) {
 
 if (!function_exists('TagUrl')) {
     /**
+     * Get a URL to a list of discussions with the specified tag.
      *
-     *
-     * @param $row
+     * @param array|object $row
      * @param string $page
      * @param mixed $withDomain
      * @see url() for $withDomain docs.

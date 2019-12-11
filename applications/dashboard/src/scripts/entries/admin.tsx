@@ -10,6 +10,9 @@ import { onContent } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
+
+addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 disableComponentTheming();
 onContent(() => initAllUserContent());

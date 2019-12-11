@@ -89,7 +89,7 @@ export function _mountComponents(parent: Element) {
 
         if (registeredComponent) {
             mountReact(
-                <AppContext variablesOnly noTheme={!useTheme}>
+                <AppContext variablesOnly noTheme={!useTheme} noWrap={registeredComponent?.mountOptions?.overwrite}>
                     <registeredComponent.Component {...props} contents={children} />
                 </AppContext>,
                 node,

@@ -1056,7 +1056,7 @@ class EntryController extends Gdn_Controller {
             $this->Form->validateRule('Email', 'ValidateRequired', sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
             $this->Form->validateRule('Password', 'ValidateRequired');
 
-            $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('LegacyEmbedLogin') ?? false;
+            $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
             if (!$legacyLogin) {
                 if (!$this->Request->isAuthenticatedPostBack()) {
                     $this->Form->addError('Please try again.');

@@ -7,19 +7,18 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
-
 
 /**
  * Tests for arraySearchI().
  */
+
 class ArraySearchTestI extends TestCase {
 
     /**
      * Test {@link arraySearchI()} against several scenarios.
      *
-     * @param $testValue Value to find in array.
+     * @param string $testValue Value to find in array.
      * @param array $testSearch Array to search for $testValue.
      * @param string|int $expected Expected result.
      * @dataProvider provideSearchTestIArrays

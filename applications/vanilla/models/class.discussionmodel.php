@@ -1027,7 +1027,12 @@ class DiscussionModel extends Gdn_Model {
         // Join in the category.
         $category = CategoryModel::categories($discussion->CategoryID);
         if (empty($category)) {
-            $category = false;
+            $category = [
+                'Name' => '',
+                'UrlCode' => '',
+                'PermissionCategoryID' => -1,
+                'DateMarkedRead' => null,
+            ];
         }
         $discussion->Category = $category['Name'];
         $discussion->CategoryUrlCode = $category['UrlCode'];
@@ -1067,7 +1072,7 @@ class DiscussionModel extends Gdn_Model {
 
         if (!property_exists($discussion, 'Read')) {
             $discussion->Read = !(bool)$discussion->CountUnreadComments;
-            if ($category && !is_null($category['DateMarkedRead'])) {
+            if (!is_null($category['DateMarkedRead'])) {
                 // If the category was marked explicitly read at some point, see if that applies here
                 if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
                     $discussion->Read = true;

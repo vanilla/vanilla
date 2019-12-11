@@ -8,7 +8,7 @@
  * @license GPL-2.0-only
  */
 
-import { assetUrl } from "@library/utility/appUtils";
+import { assetUrl, getMeta } from "@library/utility/appUtils";
 
 /**
  * This needs to be a free variable.

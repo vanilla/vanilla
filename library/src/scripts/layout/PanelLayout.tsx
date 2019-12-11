@@ -97,7 +97,7 @@ class PanelLayout extends React.Component<IProps> {
         return (
             <div className={panelClasses}>
                 {childComponents.breadcrumbs && (
-                    <div className={classes.container}>
+                    <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
                         {shouldRenderLeftPanel && (
                             <Panel className={classNames(classes.leftColumn)} ariaHidden={true} />
                         )}

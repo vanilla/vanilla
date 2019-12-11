@@ -135,7 +135,6 @@ export default function DropDown(props: IProps) {
                                 )}
                                 {openAsModal && (
                                     <SmartAlign>
-                                        (
                                         <Heading
                                             title={title}
                                             className={classNames(

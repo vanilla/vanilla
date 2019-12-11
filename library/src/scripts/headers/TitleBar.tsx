@@ -16,7 +16,6 @@ import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { ScrollOffsetContext, HashOffsetReporter } from "@library/layout/ScrollOffsetContext";
 import BackLink from "@library/routing/links/BackLink";
@@ -28,7 +27,6 @@ import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -37,8 +35,10 @@ import { SignInIcon } from "@library/icons/common";
 import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
+import { styleFactory } from "@library/styles/styleUtils";
+import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
 
-interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
+interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
@@ -89,29 +89,13 @@ export class TitleBar extends React.Component<IProps, IState> {
     };
     public render() {
         const { isFixed, hamburger } = this.props;
-        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
+        const isCompact = this.props.device === TitleBarDevices.COMPACT;
         const classes = titleBarClasses();
-        const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
-        const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
+        const showMobileDropDown = isCompact && !this.state.openSearch && this.props.title;
+        const showHamburger = isCompact && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
 
-        const fixedClass = style({
-            ...sticky(),
-            $debugName: "isFixed",
-            top: 0,
-            zIndex: 2,
-        });
-
-        const outerCssClasses = classNames(
-            "titleBar",
-            classes.root,
-            this.props.className,
-            { [fixedClass]: isFixed },
-            this.context.offsetClass,
-        );
-
         const containerElement = this.props.container || document.getElementById("titleBar")!;
-        containerElement.classList.value = outerCssClasses;
 
         return ReactDOM.createPortal(
             <HashOffsetReporter>
@@ -119,7 +103,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("titleBar-bar", classes.bar)}>
                             {!this.state.openSearch &&
-                                isMobile &&
+                                isCompact &&
                                 (this.props.useMobileBackButton ? (
                                     <BackLink
                                         className={classNames(
@@ -132,14 +116,14 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 ) : (
                                     !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                                 ))}
-                            {!isMobile && (
+                            {!isCompact && (
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                     logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
                             )}
-                            {!this.state.openSearch && !isMobile && (
+                            {!this.state.openSearch && !isCompact && (
                                 <TitleBarNav
                                     {...dummyNavigationData()}
                                     className={classNames("titleBar-nav", classes.nav)}
@@ -197,7 +181,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                     )}
                                     cancelContentClassName="meBox-buttonContent"
                                     buttonClass={classNames(classes.button, {
-                                        [classes.buttonOffset]: !isMobile && this.isGuest,
+                                        [classes.buttonOffset]: !isCompact && this.isGuest,
                                     })}
                                     showingSuggestions={this.state.showingSuggestions}
                                     onOpenSuggestions={this.setOpenSuggestions}
@@ -208,7 +192,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                     )}
                                     clearButtonClass={classes.clearButtonClass}
                                 />
-                                {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
+                                {isCompact ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
                             </ConditionalWrap>
                         </div>
                     </PanelWidgetHorizontalPadding>
@@ -221,6 +205,18 @@ export class TitleBar extends React.Component<IProps, IState> {
     public componentDidMount() {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
+        const { isFixed } = this.props;
+        const classes = titleBarClasses();
+
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
+        containerElement.className = classNames(
+            "titleBar",
+            classes.root,
+            this.props.className,
+            { [classes.isFixed]: isFixed },
+            this.context.offsetClass,
+            containerElement.className,
+        );
     }
 
     public componentWillUnmount() {
@@ -326,4 +322,4 @@ export class TitleBar extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(mapUsersStoreState);
-export default withRedux(withPages(withDevice(TitleBar)));
+export default withRedux(withPages(withTitleBarDevice(TitleBar)));

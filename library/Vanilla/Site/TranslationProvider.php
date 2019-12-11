@@ -9,6 +9,7 @@ namespace Vanilla\Site;
 
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\TranslationResourceInterface;
 
 /**
  * Class TranslationProvider .
@@ -18,12 +19,22 @@ class TranslationProvider implements TranslationProviderInterface {
     /** @var LocaleInterface $locale */
     private $locale;
 
+    /** @var TranslationResourceInterface[] */
+    private $validResources;
+
     /**
      * TranslationProvider constructor.
      * @param LocaleInterface $locale
      */
     public function __construct(LocaleInterface $locale) {
         $this->locale = $locale;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initializeResource(TranslationResourceInterface $resource) {
+        $this->validResources[] = $resource;
     }
 
     /**

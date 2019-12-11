@@ -20,6 +20,7 @@ import Button from "@library/forms/Button";
 import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
+import Container from "@library/layout/components/Container";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -83,17 +84,23 @@ story.add(
                 <MemoryRouter>
                     <Provider store={getStore()}>
                         <TitleBarDeviceProvider>
-                            <StoryHeading>Hamburger menu</StoryHeading>
-                            <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
-                            <StoryHeading>Big Logo</StoryHeading>
-                            <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
-                            <StoryHeading>Extra Navigation links</StoryHeading>
-                            <TitleBar
-                                useMobileBackButton={false}
-                                hamburger={true}
-                                isFixed={false}
-                                navigationLinks={true}
-                            />
+                            <div
+                                style={{
+                                    margin: "-35px",
+                                }}
+                            >
+                                <StoryHeading>Hamburger menu</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <StoryHeading>Big Logo</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <StoryHeading>Extra Navigation links</StoryHeading>
+                                <TitleBar
+                                    useMobileBackButton={false}
+                                    hamburger={true}
+                                    isFixed={false}
+                                    navigationLinks={true}
+                                />
+                            </div>
                         </TitleBarDeviceProvider>
                     </Provider>
                 </MemoryRouter>

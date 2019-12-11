@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -59,7 +58,7 @@ class CalculateNumberOfPagesTest extends TestCase {
                 0,
                 5,
                 1,
-            ]
+            ],
         ];
 
         return $r;

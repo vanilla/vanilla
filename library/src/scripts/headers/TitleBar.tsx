@@ -40,7 +40,7 @@ import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@libr
 import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
 
 interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
-    container?: Element; // Element containing header. Should be the default most if not all of the time.
+    container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger

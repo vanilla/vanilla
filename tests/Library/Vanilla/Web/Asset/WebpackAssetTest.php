@@ -98,19 +98,19 @@ class WebpackAssetTest extends TestCase {
     public function webPathProvider(): array {
         return [
             [
-                (new Request())->setHost("http://example.com"),
+                (new Request()),
                 "",
-                "/dist/testSec/test.min.js",
+                "http://example.com/dist/testSec/test.min.js",
             ],
             [
-                (new Request())->setHost("http://example.com")->setAssetRoot("/someRoot"),
+                (new Request())->setAssetRoot("/someRoot"),
                 "",
-                "/someRoot/dist/testSec/test.min.js",
+                "http://example.com/someRoot/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setHost("me.com"),
                 "cacheBuster",
-                "/dist/testSec/test.min.js?h=cacheBuster",
+                "http://me.com/dist/testSec/test.min.js?h=cacheBuster",
             ],
             [
                 (new Request())->setHost("me.com")
@@ -118,7 +118,7 @@ class WebpackAssetTest extends TestCase {
                     ->setRoot("/root-should-be-ignored")
                     ->setAssetRoot("/assetRoot"),
                 "cacheBuster",
-                "/assetRoot/dist/testSec/test.min.js?h=cacheBuster",
+                "http://me.com/assetRoot/dist/testSec/test.min.js?h=cacheBuster",
             ],
         ];
     }

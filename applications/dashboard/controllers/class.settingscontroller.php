@@ -565,7 +565,7 @@ class SettingsController extends DashboardController {
                 'Default' => true,
                 'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.<br>
                     <strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ' .
-                    anchor(t('More information'), 'https://success.vanillaforums.com/entry/signin?Target=categories')),
+                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature')),
                 'Options' => [
                     'Multiline' => true,
                     'UseRealBoolean' => true

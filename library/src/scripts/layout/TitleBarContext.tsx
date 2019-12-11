@@ -76,6 +76,6 @@ export function withTitleBarDevice<T extends ITitleBarDeviceProps = ITitleBarDev
             </TitleBarDeviceContext.Consumer>
         );
     };
-    ComponentWithDevice.displayName = `withDevice(${displayName})`;
+    ComponentWithDevice.displayName = `useTitleBarDevice(${displayName})`;
     return ComponentWithDevice;
 }

@@ -19,6 +19,7 @@ import { percent } from "csx";
 import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
+import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -54,7 +55,9 @@ export function AppContext(props: IProps) {
                                 <FontSizeCalculatorProvider>
                                     <SearchFilterContextProvider>
                                         <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                            <DeviceProvider>{props.children}</DeviceProvider>
+                                            <TitleBarDeviceProvider>
+                                                <DeviceProvider>{props.children}</DeviceProvider>
+                                            </TitleBarDeviceProvider>
                                         </ScrollOffsetProvider>
                                     </SearchFilterContextProvider>
                                 </FontSizeCalculatorProvider>

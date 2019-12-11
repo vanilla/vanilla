@@ -63,5 +63,3 @@ class AbsoluteSourceTest extends TestCase {
         return $r;
     }
 }
-
-

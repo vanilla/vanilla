@@ -13,24 +13,23 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
-import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
+import { DownTriangleIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar - GuestUser", module);
+const story = storiesOf("TitleBar - RegisteredUser", module);
 
-const makeMockGuestUser: IMe = {
-    name: "test",
-    userID: 0,
+const makeMockRegisterUser: IMe = {
+    name: "Neena",
+    userID: 1,
     permissions: [],
     isAdmin: true,
     photoUrl: "",
@@ -39,13 +38,13 @@ const makeMockGuestUser: IMe = {
 };
 
 story.add(
-    "TitleBar",
+    "Titlear",
     () => {
         const initialState = testStoreState({
             users: {
                 current: {
                     status: LoadStatus.SUCCESS,
-                    data: makeMockGuestUser,
+                    data: makeMockRegisterUser,
                 },
             },
             theme: {
@@ -53,19 +52,17 @@ story.add(
                     data: {
                         logo: {
                             type: "image",
-                            url: localLogoUrl,
+                            url: localLogoUrl as string,
                         },
                     },
                 },
             },
-            locales: {},
         });
-
         TitleBarStatic.registerBeforeMeBox(() => {
             return (
                 <Button baseClass={ButtonTypes.TITLEBAR_LINK}>
                     <>
-                        <GlobeIcon />
+                        English
                         <DownTriangleIcon />
                     </>
                 </Button>
@@ -89,12 +86,7 @@ story.add(
                             <StoryHeading>Big Logo</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                             <StoryHeading>Extra Navigation links</StoryHeading>
-                            <TitleBar
-                                useMobileBackButton={false}
-                                hamburger={true}
-                                isFixed={false}
-                                navigationLinks={true}
-                            />
+                            <TitleBar useMobileBackButton={false} isFixed={false} navigationLinks={true} />
                         </DeviceProvider>
                     </Provider>
                 </MemoryRouter>

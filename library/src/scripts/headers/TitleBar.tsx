@@ -38,6 +38,7 @@ import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { styleFactory } from "@library/styles/styleUtils";
 import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
+import { componentExists } from "@library/utility/componentRegistry";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -73,6 +74,7 @@ export class TitleBar extends React.Component<IProps, IState> {
      * @param component The component class to be render.
      */
     public static registerBeforeMeBox(component: React.ComponentType) {
+        TitleBar.extraMeBoxComponents.pop();
         TitleBar.extraMeBoxComponents.push(component);
     }
     public static contextType = ScrollOffsetContext;
@@ -89,6 +91,7 @@ export class TitleBar extends React.Component<IProps, IState> {
         openSearch: false,
         showingSuggestions: false,
         isScrolledOff: false,
+        renderComponent: true,
     };
     public render() {
         const { isFixed, hamburger, navigationLinks } = this.props;

@@ -145,7 +145,8 @@ class ConfigurationModule extends Gdn_Module {
                     $value = '';
                 }
 
-                if (strtolower($row['Control']) === strtolower('toggle') && $row['Options']['UseRealBoolean']) {
+                if ((strtolower($row['Control']) === strtolower('toggle'))
+                    && ($row['Options']['UseRealBoolean'] ?? false)) {
                     $value = $value ? true : false;
                 }
 

@@ -10,6 +10,10 @@
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
+        {% for link in linkTags -%}
+            <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
+
         {% if favIcon -%}
             <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
         {% endif %}
@@ -35,10 +39,6 @@
         {% endfor -%}
 
         {{ preloadModel.renderHtml()|raw }}
-
-        {%- if canonicalUrl -%}
-            <link rel="canonical" href="{{ canonicalUrl }}"/>
-        {%- endif -%}
 
         <noscript>
             <style>

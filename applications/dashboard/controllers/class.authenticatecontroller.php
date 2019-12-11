@@ -165,8 +165,9 @@ class AuthenticateController extends Gdn_Controller {
 
         $this->addReduxAction(
             new ReduxAction(
-                'GET_USER_AUTHENTICATORS_SUCCESS',
-                Data::box($this->authenticateApiController->index_authenticators())
+                '@@auth/GET_ALL_AUTHENTICATORS_DONE',
+                Data::box($this->authenticateApiController->index_authenticators()),
+                []
             )
         );
 

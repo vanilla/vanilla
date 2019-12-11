@@ -255,12 +255,56 @@ export function WarningIcon(props: { className?: string; warningMessage?: string
             aria-hidden={hidden ? "true" : "false"}
         >
             <title>{warningMessage}</title>
-            <circle cx="8" cy="8" r="8" style={currentColorFill} />
-            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
             <path
-                d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z"
+                d="M12.709,13.405H11.314l-.291-5.9H13ZM11,15.472a1.048,1.048,0,0,1,.257-.767,1.01,1.01,0,0,1,.749-.26.982.982,0,0,1,.734.266,1.226,1.226,0,0,1,0,1.514.964.964,0,0,1-.731.275.993.993,0,0,1-.743-.269A1.042,1.042,0,0,1,11,15.472Z"
                 transform="translate(-4 -4)"
-                style={{ fill: "#fff" }}
+                style={{ fill: "currentColor" }}
+            />
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
+export function ErrorIcon(props: { className?: string; errorMessage?: string; hidden?: boolean }) {
+    const classes = iconClasses();
+    const { className, errorMessage = t("Error"), hidden = true } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            aria-label={errorMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 17 17"
+            aria-hidden={hidden ? "true" : "false"}
+        >
+            <title>{errorMessage}</title>
+            <path
+                d="M11.753,4.247a.843.843,0,0,1,0,1.19L9.191,8l2.562,2.562a.842.842,0,0,1,.076,1.105l-.076.086a.843.843,0,0,1-1.19,0L8,9.191,5.438,11.753a.842.842,0,0,1-1.191-1.19L6.809,8,4.247,5.438a.842.842,0,0,1-.076-1.1l.076-.086a.843.843,0,0,1,1.19,0L8,6.809l2.562-2.562a.842.842,0,0,1,1.191,0Z"
+                transform="translate(0.5 0.5)"
+                style={{ fill: "currentColor", fillRule: "evenodd" }}
+            />
+            <circle cx="8.5" cy="8.5" r="8" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
+export function InformationIcon(props: { className?: string; informationMessage?: string; hidden?: boolean }) {
+    const classes = iconClasses();
+    const { className, informationMessage = t("Information"), hidden = true } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            aria-label={informationMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            aria-hidden={hidden ? "true" : "false"}
+        >
+            <title>{informationMessage}</title>
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "currentColor" }} />
+            <path
+                d="M9,12H7V7H9ZM7,5.006a1.063,1.063,0,0,1,.236-.757A1.006,1.006,0,0,1,8,4a1.012,1.012,0,0,1,.764.254A1.058,1.058,0,0,1,9,5.006.883.883,0,0,1,8,6,.879.879,0,0,1,7,5.006Z"
+                style={{ fill: "currentColor", fillRule: "evenodd" }}
             />
         </svg>
     );
@@ -323,7 +367,6 @@ export function DownTriangleIcon(props: { className?: string; title?: string; de
 
     const transform = [rotation, translate].filter(item => item !== undefined).join(", ");
 
-    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -542,25 +585,6 @@ export function DiscussionIcon(props: { className?: string; title?: string }) {
             <path
                 fill="currentColor"
                 d="M12 17.431c4.418 0 8-2.783 8-6.216C20 7.782 16.418 5 12 5s-8 2.783-8 6.216c0 1.572.75 3.008 1.99 4.102l-.765 3.11 3.28-1.619a9.9 9.9 0 0 0 3.495.623zm-6.332 1.892c-.762.376-1.616-.31-1.414-1.134l.627-2.55C3.678 14.396 3 12.854 3 11.215 3 7.168 7.077 4 12 4s9 3.168 9 7.215c0 4.048-4.077 7.215-9 7.215-1.192 0-2.352-.185-3.43-.54l-2.902 1.433z"
-            />
-        </svg>
-    );
-}
-
-export function AlertIcon(props: { className?: string; title?: string; compact?: boolean }) {
-    const classes = iconClasses();
-    return (
-        <svg
-            className={classNames(props.compact ? classes.alertIconCompact : classes.alertIcon, props.className)}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <title>{props.title ? props.title : t("Alert")}</title>
-
-            <circle cx="12" cy="12" r="7" style={{ fill: "#d0021b" }} />
-            <path
-                d="M12.709,12.905H11.314L11.023,7H13ZM11,14.972a1.048,1.048,0,0,1,.257-.767,1.01,1.01,0,0,1,.749-.26.982.982,0,0,1,.734.266,1.226,1.226,0,0,1,0,1.514.964.964,0,0,1-.731.275.993.993,0,0,1-.743-.269A1.042,1.042,0,0,1,11,14.972Z"
-                style={{ fill: "#fff" }}
             />
         </svg>
     );

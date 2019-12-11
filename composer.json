@@ -34,7 +34,7 @@
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
         "firebase/php-jwt": "~5.0",
-        "michelf/php-markdown": "~1.7.0",
+        "michelf/php-markdown": "~1.9",
         "pclzip/pclzip": "~2.0",
         "phpmailer/phpmailer": "~5.2",
         "psr/log": "~1.0",
@@ -45,7 +45,7 @@
         "tburry/pquery": "~1.1",
         "vanilla/garden-container": "^3.0.1",
         "vanilla/garden-http": "~2.1",
-        "vanilla/garden-schema": "~1.0",
+        "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
         "vanilla/legacy-oauth": "~1.0",
@@ -53,7 +53,9 @@
         "vanilla/nbbc": "~2.1",
         "vanilla/safecurl": "~0.9",
         "vanilla/vanilla-connect": "~0.0",
-        "twig/twig": "^2.5"
+        "twig/twig": "^2.5",
+        "psr/event-dispatcher": "^1.0",
+        "fig/event-dispatcher-util": "^1.1"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -76,6 +78,7 @@
         ],
         "files": [
             "library/core/functions.error.php",
+            "library/core/functions.framework.php",
             "library/core/functions.general.php",
             "library/core/functions.compatibility.php",
             "library/core/functions.deprecated.php"

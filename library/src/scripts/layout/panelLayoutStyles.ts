@@ -333,6 +333,10 @@ export const panelLayoutClasses = useThemeCache(() => {
         paddingTop: 0,
     });
 
+    const breadcrumbsContainer = style("breadcrumbs", {
+        marginBottom: unit(10),
+    });
+
     return {
         root,
         content,
@@ -347,5 +351,6 @@ export const panelLayoutClasses = useThemeCache(() => {
         panel,
         isSticky,
         breadcrumbs,
+        breadcrumbsContainer,
     };
 });

@@ -90,7 +90,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
             return;
         }
 
-        FoldQuote = ExamineQuote.children('.QuoteText').children('.Quote, .UserQuote');
+        FoldQuote = ExamineQuote.children('.blockquote-content').children('.Quote, .UserQuote');
         if (!FoldQuote.length) {
             return;
         }

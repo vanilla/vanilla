@@ -54,6 +54,8 @@ if (!class_exists('HeadModule', false)) {
         /** @var \Vanilla\Web\Asset\AssetPreloadModel */
         private $assetPreloadModel;
 
+        /** @var Garden\EventManager */
+        protected $eventManager;
         /**
          *
          *
@@ -68,10 +70,12 @@ if (!class_exists('HeadModule', false)) {
             parent::__construct($sender);
             // Workaround beacuse we can't do parameter injection.
             $this->assetPreloadModel = \Gdn::getContainer()->get(\Vanilla\Web\Asset\AssetPreloadModel::class);
+            $this->eventManager = \Gdn::getContainer()->get(Garden\EventManager::class);
         }
 
         /**
          * Adds a "link" tag to the head containing a reference to a stylesheet.
+         * By default a stylesheet is considered as a static-asset
          *
          * @param string $hRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
          * @param string $media Type media for the stylesheet. ie. "screen", "print", etc.
@@ -82,7 +86,9 @@ if (!class_exists('HeadModule', false)) {
             $properties = [
                 'rel' => 'stylesheet',
                 'href' => asset($hRef, false, $addVersion),
-                'media' => $media];
+                'media' => $media,
+                'static' => $options['static'] ?? true,
+            ];
 
             // Use same underscore convention as AddScript
             if (is_array($options)) {
@@ -137,6 +143,7 @@ if (!class_exists('HeadModule', false)) {
 
         /**
          * Adds a "script" tag to the head.
+         * By default a script is considered as a static-asset
          *
          * @param string $src The location of the script relative to the web root. ie. "/js/jquery.js"
          * @param string $type The type of script being added. ie. "text/javascript"
@@ -163,6 +170,7 @@ if (!class_exists('HeadModule', false)) {
             $attributes = [];
             if ($src) {
                 $attributes['src'] = asset($src, false, $addVersion);
+                $attributes['static'] = $options['static'] ?? true;
             }
             if ($type !== 'text/javascript') {
                 // Not needed in HTML5
@@ -514,12 +522,10 @@ if (!class_exists('HeadModule', false)) {
 
             $this->fireEvent('BeforeToString');
 
-            $tags = $this->_Tags;
-
             // Make sure that css loads before js (for jquery)
             usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
-            $tags2 = $this->_Tags;
+            $this->eventManager->fireArray('HeadTagsBeforeRender', [&$this->_Tags]);
 
             // Start with the title.
             $head = '<title>'.Gdn_Format::text($this->title())."</title>\n";

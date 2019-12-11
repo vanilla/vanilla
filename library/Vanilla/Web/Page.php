@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\EventManager;
 use Garden\Web\Exception\HttpException;
 use Gdn_Upload;
 use Garden\CustomExceptionHandler;
@@ -52,6 +53,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var array */
     private $metaTags = [];
+
+    /** @var array */
+    private $linkTags = [];
 
     /** @var AssetInterface[] */
     protected $scripts = [];
@@ -108,6 +112,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var AssetPreloadModel */
     protected $preloadModel;
 
+    /** @var EventManager */
+    protected $eventManager;
+
     /**
      * Dependendency Injection.
      *
@@ -118,6 +125,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param BreadcrumbModel $breadcrumbModel
      * @param ContentSecurityPolicyModel $cspModel
      * @param AssetPreloadModel $preloadModel
+     * @param EventManager $eventManager
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -126,7 +134,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel
+        AssetPreloadModel $preloadModel,
+        EventManager $eventManager
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
@@ -135,6 +144,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
         $this->preloadModel = $preloadModel;
+        $this->eventManager = $eventManager;
 
         if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
             $this->addMetaTag(["name" => "theme-color", "content" => $mobileAddressBarColor]);
@@ -178,6 +188,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'inlineStyles' => $this->inlineStyles,
             'seoContent' => $this->seoContent,
             'metaTags' => $this->metaTags,
+            'linkTags' => $this->linkTags,
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
             'preloadModel' => $this->preloadModel,
@@ -185,6 +196,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'favIcon' => $this->siteMeta->getFavIcon(),
             'jsonLD' => $this->getJsonLDScriptContent(),
         ];
+
+        $this->eventManager->fireArray('BeforeRenderMasterView', [&$viewData]);
+
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);
@@ -238,6 +252,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
         if ($this->canonicalUrl) {
             $this->addOpenGraphTag('og:url', $this->canonicalUrl);
+            $this->addLinkTag(['rel' => 'canonical', 'href' => $this->canonicalUrl]);
         }
 
         // Twitter specific tags
@@ -376,13 +391,26 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     }
 
     /**
+     * Set page link tag attributes.
+     *
+     * @param array $attributes Array of attributes to set for tag.
+     *
+     * @return $this Own instance for chaining.
+     */
+    public function addLinkTag(array $attributes): self {
+        $this->linkTags[] = $attributes;
+
+        return $this;
+    }
+
+    /**
      * Set page meta tag attributes.
      *
      * @param array $attributes Array of attributes to set for tag.
      *
      * @return $this Own instance for chaining.
      */
-    protected function addMetaTag(array $attributes): self {
+    public function addMetaTag(array $attributes): self {
         $this->metaTags[] = $attributes;
 
         return $this;
@@ -395,7 +423,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param string $content
      * @return $this
      */
-    protected function addOpenGraphTag(string $property, string $content): self {
+    public function addOpenGraphTag(string $property, string $content): self {
         return $this->addMetaTag(['property' => $property, 'content' => $content]);
     }
 

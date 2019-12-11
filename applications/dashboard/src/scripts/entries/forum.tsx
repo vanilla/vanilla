@@ -11,21 +11,21 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 // Other sections should not need this yet.
 import "@dashboard/legacy";
 import { convertAllUserContent, initAllUserContent } from "@library/content";
-import authenticateReducer from "@dashboard/pages/authenticate/authenticateReducer";
-import SignInPage from "@dashboard/pages/authenticate/SignInPage";
-import PasswordPage from "@dashboard/pages/authenticate/PasswordPage";
-import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswordPage";
+import SignInPage from "@dashboard/pages/SignInPage";
+import PasswordPage from "@dashboard/pages/PasswordPage";
+import RecoverPasswordPage from "@dashboard/pages/RecoverPasswordPage";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
+import { authReducer } from "@dashboard/auth/authReducer";
 
 initAllUserContent();
 onContent(convertAllUserContent);
 
 // Redux
-registerReducer("authenticate", authenticateReducer);
+registerReducer("auth", authReducer);
 registerReducer("notifications", new NotificationsModel().reducer);
 
 Router.addRoutes([

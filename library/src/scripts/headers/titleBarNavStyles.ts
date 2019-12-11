@@ -57,7 +57,7 @@ const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBarNav");
 
@@ -67,7 +67,7 @@ const titleBarNavClasses = useThemeCache(() => {
             position: "relative",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
@@ -81,7 +81,7 @@ const titleBarNavClasses = useThemeCache(() => {
             height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),

@@ -13,19 +13,19 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { DownTriangleIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
+import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar - RegisteredUser", module);
+const story = storiesOf("TitleBar", module);
 
 const makeMockRegisterUser: IMe = {
     name: "Neena",
@@ -38,7 +38,7 @@ const makeMockRegisterUser: IMe = {
 };
 
 story.add(
-    "Titlear",
+    "RegisteredUser",
     () => {
         const initialState = testStoreState({
             users: {
@@ -80,14 +80,14 @@ story.add(
             >
                 <MemoryRouter>
                     <Provider store={getStore()}>
-                        <DeviceProvider>
+                        <TitleBarDeviceProvider>
                             <StoryHeading>Hamburger menu</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                             <StoryHeading>Big Logo</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                             <StoryHeading>Extra Navigation links</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} navigationLinks={true} />
-                        </DeviceProvider>
+                        </TitleBarDeviceProvider>
                     </Provider>
                 </MemoryRouter>
             </PageContext.Provider>

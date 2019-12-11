@@ -13,19 +13,19 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
+import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar - GuestUser", module);
+const story = storiesOf("TitleBar", module);
 
 const makeMockGuestUser: IMe = {
     name: "test",
@@ -38,7 +38,7 @@ const makeMockGuestUser: IMe = {
 };
 
 story.add(
-    "TitleBar",
+    "Guest User",
     () => {
         const initialState = testStoreState({
             users: {
@@ -82,7 +82,7 @@ story.add(
             >
                 <MemoryRouter>
                     <Provider store={getStore()}>
-                        <DeviceProvider>
+                        <TitleBarDeviceProvider>
                             <StoryHeading>Hamburger menu</StoryHeading>
                             <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                             <StoryHeading>Big Logo</StoryHeading>
@@ -94,7 +94,7 @@ story.add(
                                 isFixed={false}
                                 navigationLinks={true}
                             />
-                        </DeviceProvider>
+                        </TitleBarDeviceProvider>
                     </Provider>
                 </MemoryRouter>
             </PageContext.Provider>

@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +22,6 @@ class ChangeBaseNameTest extends TestCase {
      * @param string $expected Expected result.
      * @dataProvider provideChangeBaseNameArrays
      */
-
     public function testChangeBaseName(string $testPath, string $testNewBaseName, string $expected) {
         $actual = changeBaseName($testPath, $testNewBaseName);
         $this->assertSame($expected, $actual);
@@ -40,7 +38,7 @@ class ChangeBaseNameTest extends TestCase {
                 'https://old-base-name.com/workspaces/rd-forum-5d39bf0a25dac00001318876/issues/vanilla/support/1132',
                 'new-base-name',
                 'https://new-base-name.com/workspaces/rd-forum-5d39bf0a25dac00001318876/issues/vanilla/support/1132',
-            ]
+            ],
         ];
 
         return $r;

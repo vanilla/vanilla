@@ -11,6 +11,8 @@ import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
+import { IThemeState } from "@library/theming/themeReducer";
+import { ILocaleState } from "@library/locales/localeReducer";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -31,7 +33,7 @@ export interface IUsersStoreState {
 
 const suggestionReducer = new UserSuggestionModel().reducer;
 
-const INITIAL_STATE: IUsersState = {
+export const INITIAL_USERS_STATE: IUsersState = {
     current: {
         status: LoadStatus.PENDING,
     },
@@ -42,6 +44,12 @@ const INITIAL_STATE: IUsersState = {
     suggestions: suggestionReducer(undefined, "" as any),
 };
 
+export const INITIAL_THEMES_STATE: IThemeState = {
+    assets: { status: LoadStatus.PENDING },
+};
+export const INITIAL_LOCALE_STATE: ILocaleState = {
+    locales: { status: LoadStatus.PENDING },
+};
 export const GUEST_USER_ID = 0;
 
 /**
@@ -54,7 +62,7 @@ export function isUserGuest(user: IUserFragment | null | undefined) {
  * Reducer for user related data.
  */
 export const usersReducer = produce(
-    reducerWithInitialState(INITIAL_STATE)
+    reducerWithInitialState(INITIAL_USERS_STATE)
         .case(UserActions.getMeACs.started, state => {
             state.current.status = LoadStatus.LOADING;
             return state;

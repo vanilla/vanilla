@@ -61,7 +61,6 @@ class ActivityController extends Gdn_Controller {
         // Add Modules
         $this->addModule('GuestModule');
         $this->addModule('SignedInModule');
-
         parent::initialize();
         Gdn_Theme::section('ActivityList');
         $this->setData('Breadcrumbs', [['Name' => t('Activity'), 'Url' => '/activity']]);
@@ -106,7 +105,8 @@ class ActivityController extends Gdn_Controller {
      *
      * @param int $offset Number of activity items to skip.
      */
-    public function index($filter = false, $page = false) {
+    public function index($filter = 'feed', $page = false) {
+        $canonicalTemplate = '/activity/'.$filter.'/{Page}';
         switch (strtolower($filter)) {
             case 'mods':
                 $this->title(t('Recent Moderator Activity'));
@@ -135,6 +135,8 @@ class ActivityController extends Gdn_Controller {
         if ($offset < 0) {
             $offset = 0;
         }
+        $totalRecords = $this->ActivityModel->getUserTotal($notifyUserID);
+        PagerModule::current()->configure($offset, $limit, $totalRecords, $canonicalTemplate);
 
         // Page meta.
         $this->addJsFile('activity.js');

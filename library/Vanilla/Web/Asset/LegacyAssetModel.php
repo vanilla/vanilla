@@ -111,7 +111,7 @@ class LegacyAssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
-                $this->addCssFile(asset('/applications/dashboard/design/style-compat.css', true), false, ['Sort' => -9.999]);
+                $this->addCssFile(asset('/applications/dashboard/design/style-compat.css', false), false, ['Sort' => -9.999]);
                 $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {

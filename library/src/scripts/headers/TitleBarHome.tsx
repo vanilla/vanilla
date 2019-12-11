@@ -7,18 +7,18 @@
 import React from "react";
 import TitleBar from "@library/headers/TitleBar";
 import TitleBarMobileHome from "@library/headers/pieces/TitleBarMobileHome";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
+import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
 
-interface IProps extends IDeviceProps {}
+interface IProps extends ITitleBarDeviceProps {}
 
 /**
  * Implements Vanilla Header component. Note that this component uses a react portal.
  */
 export class TitleBarHome extends React.Component<IProps> {
     public render() {
-        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
-        return isMobile ? <TitleBarMobileHome /> : <TitleBar useMobileBackButton={false} />;
+        const isCompact = this.props.device === TitleBarDevices.COMPACT;
+        return isCompact ? <TitleBarMobileHome /> : <TitleBar useMobileBackButton={false} />;
     }
 }
 
-export default withDevice(TitleBarHome);
+export default withTitleBarDevice(TitleBarHome);

@@ -31,7 +31,8 @@ echo $Form->errors();
             continue;
         }
 
-        if ((strtolower($Row['Control'])) !== 'imageupload') {
+        $nowrapControls = ['imageupload', 'react', 'imageuploadreact'];
+        if (!in_array(strtolower($Row['Control']), $nowrapControls)) {
             if (val('no-grid', $Row['Options'])) {
                 echo "<li>\n  ";
             } else {
@@ -82,6 +83,16 @@ echo $Form->errors();
             case 'imageupload':
                 $removeUrl = 'asset/deleteconfigimage/'.urlencode($Row['Name']);
                 echo $Form->imageUploadPreview($Row['Name'], $LabelCode, $Description, $removeUrl, $Row['Options']);
+                break;
+            case 'react':
+                echo $Form->react($Row['Name'], $Row['Component']);
+                break;
+            case 'imageuploadreact':
+                echo $Form->imageUploadReact(
+                    $Row['Name'],
+                    $Row['Label'] ?? '',
+                    $Row['Description'] ?? ''
+                );
                 break;
             case 'color':
                 echo '<div class="label-wrap">';

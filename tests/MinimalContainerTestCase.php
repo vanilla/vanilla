@@ -21,6 +21,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
@@ -51,6 +52,7 @@ class MinimalContainerTestCase extends TestCase {
      */
     private function configureContainer() {
         \Gdn::setContainer(new Container());
+
         self::container()
             ->rule(FormatService::class)
             ->setShared(true)
@@ -92,6 +94,12 @@ class MinimalContainerTestCase extends TestCase {
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
+            ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setShared(true)
+            ->setConstructorArgs([
+                'deploymentTime' => null,
+            ])
+
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
             ->setClass(MockHttpClient::class)
@@ -117,6 +125,11 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(UserProviderInterface::class)
             ->setClass(MockUserProvider::class)
             ->setShared(true)
+
+            ->rule(\Gdn_PluginManager::class)
+            ->addAlias(\Gdn::AliasPluginManager)
+
+            ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
         ;
     }
 

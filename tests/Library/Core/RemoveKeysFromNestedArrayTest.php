@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Core;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\Fixtures\Tuple;
 
 /**
  * Tests for removeKeysFromNestedArray().
@@ -38,7 +39,12 @@ class RemoveKeysFromNestedArrayTest extends TestCase {
             'removeStrKeys' => [
                 [2, ['key1' => 0, "key2" => 1, "key3" => 2], 1],
                 ['key1', 'key2', 'key3'],
-                [2, [0, 1, 2], 1],
+                [2, [], 1],
+            ],
+            'removeNumKeys' => [
+                [2, [5 => 1, 6 => 2, 7 => 3], 4],
+                [6, 7],
+                [2, [1], 4],
             ],
         ];
 

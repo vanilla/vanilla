@@ -40,7 +40,27 @@ class CheckUtf8Test extends TestCase {
             'validUtfSting' => [
                 'stress',
                 true,
-            ]
+            ],
+            'higherThan247' => [
+                chr(248),
+                false,
+            ],
+            'higherThan239' => [
+                chr(240),
+                false,
+            ],
+            'higherThan223' => [
+                chr(224),
+                false,
+            ],
+            'higherThan191' => [
+                chr(192),
+                false,
+            ],
+            'outOfRange' => [
+                chr(-1),
+                false,
+            ],
         ];
 
         return $r;

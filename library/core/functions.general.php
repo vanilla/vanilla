@@ -543,7 +543,7 @@ if (!function_exists('safePrint')) {
      * Return/print human-readable and non casted information about a variable.
      *
      * @param mixed $mixed The variable to return/echo.
-     * @param bool $returnData Whether or not return the data instead of echoing it.
+     * @param bool $returnData Whether or not to return the data instead of echoing it.
      * @return string|void Returns {@link $mixed} or nothing if {@link $returnData} is false.
      */
     function safePrint($mixed, $returnData = false) {

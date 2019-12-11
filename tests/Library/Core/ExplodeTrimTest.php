@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,7 +43,7 @@ class ExplodeTrimTest extends TestCase {
                 ' ',
                 'this is a  string  with some  extra        spaces',
                 false,
-                ['this', 'is', 'a', 'string', 'with', 'some', 'extra', 'spaces',],
+                ['this', 'is', 'a', 'string', 'with', 'some', 'extra', 'spaces'],
             ],
             'stringWithExtraSpacesImploded' => [
                 ' ',

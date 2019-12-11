@@ -123,6 +123,7 @@ if (!function_exists('paramPreference')) {
      * Conditionally save and load a query parameter value from a user's preferences.
      *     If the parameter is not sent in the request query, attempt to load from the user's preferences.
      *     If the parameter is set, save to the user's preferences.
+     *
      * @param string $param Query string parameter name
      * @param string $preference User preference name
      * @param string|null $config Config value, used as a conditional for performing this action
@@ -255,7 +256,7 @@ if (!function_exists('_formatStringCallback')) {
      * @return mixed Returns the matching string or nothing when setting the arguments.
      * @access private
      */
-    function _formatStringCallback($match, $setArgs = false) {
+    function _formatstringcallback($match, $setArgs = false) {
         static $args = [], $contextUserID = null;
         if ($setArgs) {
             $args = $match;
@@ -501,7 +502,7 @@ if (!function_exists('getMentions')) {
      *
      * @param string $html The html-formatted string to parse.
      * @param bool $skipAnchors Whether to call the callback function on anchor tag content.
-     * @param bool $skipCode  Whether to call the callback function on code tag content.
+     * @param bool $skipCode Whether to call the callback function on code tag content.
      * @return array An array of usernames that are mentioned.
      */
     function getMentions($html, $skipAnchors = true, $skipCode = true) {
@@ -639,11 +640,12 @@ if (!function_exists('joinRecords')) {
     /**
      * Join external records to an array.
      *
-     * @param array &$data The data to join.
+     * @param array $data The data to join.
      * In order to join records each row must have the a RecordType and RecordID column.
      * @param string $column The name of the column to put the record in.
      * If this is blank then the record will be merged into the row.
      * @param bool $unset Whether or not to unset rows that don't have a record.
+     * @param bool $checkCategoryPermission Only include results from categories the user has access to.
      * @since 2.3
      */
     function joinRecords(&$data, $column = '', $unset = false, $checkCategoryPermission = true) {
@@ -868,7 +870,6 @@ if (!function_exists('proxyHead')) {
             }
             @fclose($pointer);
             $response = trim($response);
-
         } else {
             throw new Exception(t('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
         }

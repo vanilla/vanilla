@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for isUrl().
  */
+
 class IsUrlTest extends TestCase {
 
     /**

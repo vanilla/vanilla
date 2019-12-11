@@ -473,7 +473,7 @@ class SettingsController extends DashboardController {
     public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->setHighlightRoute('dashboard/settings/branding');
-        $this->title(t('Branding'));
+        $this->title(t('Branding & SEO'));
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.HomepageTitle' => [
@@ -565,6 +565,10 @@ class SettingsController extends DashboardController {
                 'Default' => true,
                 'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.' .
                     "**Warning: Enabling this feature may cause Javascript errors on your site.**". anchor(t("More information"), "https://success.vanillaforums.com/entry/signin?Target=categories")),
+                'Options' => [
+                    'Multiline' => true,
+                    'UseRealBoolean' => true
+                ]
             ]
         ]);
         $this->setData('ConfigurationModule', $configurationModule);

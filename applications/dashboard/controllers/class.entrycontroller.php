@@ -1056,15 +1056,13 @@ class EntryController extends Gdn_Controller {
             $this->Form->validateRule('Email', 'ValidateRequired', sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
             $this->Form->validateRule('Password', 'ValidateRequired');
 
-            $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
-            if (!$legacyLogin) {
-                if (!$this->Request->isAuthenticatedPostBack()) {
+            if (!$this->Request->isAuthenticatedPostBack()) {
+                $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
+                if ($legacyLogin && c('Garden.Embed.Allow')) {
+                    Logger::event('legacy_embed_signin', Logger::INFO, 'Signed in using the legacy embed method', [$this->Form->getFormValue('Email')]);
+                } else {
                     $this->Form->addError('Please try again.');
                     Gdn::session()->ensureTransientKey();
-                }
-            } else {
-                if (!$this->Request->isAuthenticatedPostBack()) {
-                    Logger::event('legacy_embed_signin', Logger::INFO, 'Signed in using the legacy embed method', [$this->Form->getFormValue('Email')]);
                 }
             }
 

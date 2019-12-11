@@ -7,22 +7,22 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for chr_utf8().
  */
-class Chr_utf8Test extends TestCase {
+
+class ChrUtf8Test extends TestCase {
 
     /**
      * Test {@link chr_utf8()} against several scenarios.
      *
      * @param mixed $testNum A UTF-8 character code.
      * @param string $expected The expected result.
-     * @dataProvider provideChr_utf8Arrays
+     * @dataProvider provideChrUtf8Arrays
      */
-    public function testChr_utf8($testNum, $expected) {
+    public function testChrUtf8($testNum, $expected) {
         $actual = chr_utf8($testNum);
         $this->assertSame($expected, $actual);
     }
@@ -32,7 +32,7 @@ class Chr_utf8Test extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideChr_utf8Arrays() {
+    public function provideChrUtf8Arrays() {
         $r = [
             'lessThan128' => [
                 37,
@@ -59,6 +59,7 @@ class Chr_utf8Test extends TestCase {
                 '',
             ]
         ];
+
         return $r;
     }
 }

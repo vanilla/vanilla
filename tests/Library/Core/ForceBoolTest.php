@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,7 +24,6 @@ class ForceBoolTest extends TestCase {
      * @param mixed $testFalse The value to return for false.
      * @dataProvider provideForceBoolArrays
      */
-
     public function testForceBool($expected, $testValue, bool $testDefaultValue, $testTrue, $testFalse) {
         $actual = forceBool($testValue, $testDefaultValue, $testTrue, $testFalse);
         $this->assertSame($expected, $actual);
@@ -104,5 +102,4 @@ class ForceBoolTest extends TestCase {
         ];
         return $r;
     }
-
 }

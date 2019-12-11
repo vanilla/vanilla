@@ -13,7 +13,6 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";

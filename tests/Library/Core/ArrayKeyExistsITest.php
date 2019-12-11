@@ -7,9 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
-
 
 /**
  * Tests for arrayKeyExistsITests().

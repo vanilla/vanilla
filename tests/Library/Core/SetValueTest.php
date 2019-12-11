@@ -44,12 +44,12 @@ class SetValueTest extends TestCase {
               'one',
               'one',
           ],
-          'objectSet' => [
-              "a",
-              new Tuple('a', 'b'),
-              'x',
-              'x',
-          ],
+//          'objectSet' => [
+////              "a",
+////              new Tuple('a', 'b'),
+////              'x',
+////              'x',
+//          ],
           'arrayNoNeedle' => [
               'a',
               ['b' => 'b', 'c' => 'c'],

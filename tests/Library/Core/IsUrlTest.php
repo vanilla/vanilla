@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,7 +21,6 @@ class IsUrlTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideIsUrlArrays
      */
-
     public function testIsUrl($testStr, bool $expected) {
         $actual = isUrl($testStr);
         $this->assertSame($expected, $actual);
@@ -33,7 +31,6 @@ class IsUrlTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-
     public function provideIsUrlArrays() {
         $r = [
             'validUrl' => [

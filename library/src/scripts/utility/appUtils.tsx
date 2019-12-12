@@ -163,8 +163,9 @@ export function assetUrl(path: string): string {
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
+    const staticPathFolder = getMeta("context.staticPathFolder", "");
     const urlFormat = getMeta("context.assetPath", "");
-    return urlFormat + path;
+    return staticPathFolder + urlFormat + path;
 }
 
 /**

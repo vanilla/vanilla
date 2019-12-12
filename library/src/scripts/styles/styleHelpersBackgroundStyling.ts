@@ -41,7 +41,7 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
         return themeAsset(workingImage.substr(1, workingImage.length - 1));
     }
 
-    if (workingImage.startsWith('"data:image/')) {
+    if (workingImage.startsWith("data:image/")) {
         return workingImage;
     }
 

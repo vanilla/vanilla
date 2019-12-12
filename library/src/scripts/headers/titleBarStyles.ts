@@ -31,6 +31,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { buttonClasses, buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import classNames from "classnames";
+import { media } from "typestyle";
 
 enum TitleBarBorderType {
     BORDER = "border",
@@ -192,6 +193,35 @@ export const titleBarVariables = useThemeCache(() => {
         tablet: {},
     });
 
+    const breakpoints = makeThemeVars("breakpoints", {
+        compact: 850,
+    });
+
+    const mediaQueries = () => {
+        const full = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return media(
+                {
+                    minWidth: px(breakpoints.compact + 1),
+                },
+                styles,
+            );
+        };
+
+        const compact = (styles: NestedCSSProperties) => {
+            return media(
+                {
+                    maxWidth: px(breakpoints.compact),
+                },
+                styles,
+            );
+        };
+
+        return {
+            full,
+            compact,
+        };
+    };
+
     return {
         border,
         sizing,
@@ -210,6 +240,8 @@ export const titleBarVariables = useThemeCache(() => {
         meBox,
         bottomRow,
         logo,
+        mediaQueries,
+        breakpoints,
     };
 });
 
@@ -218,7 +250,7 @@ export const titleBarClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = vars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBar");
 
@@ -273,7 +305,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        ...mediaQueries.oneColumnDown({
+        ...mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
         }).$nest,
     });
@@ -283,7 +315,7 @@ export const titleBarClasses = useThemeCache(() => {
         {
             height: px(vars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
         }),
     );
@@ -303,7 +335,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
     const logoContainer = style(
@@ -328,7 +360,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
             marginRight: unit(0),
         }),
@@ -350,7 +382,7 @@ export const titleBarClasses = useThemeCache(() => {
             height: px(vars.sizing.height),
             color: "inherit",
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
     const locales = style(
@@ -370,7 +402,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
     const messages = style("messages", {
@@ -399,7 +431,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
     const compactSearchResults = style("compactSearchResults", {
@@ -437,7 +469,7 @@ export const titleBarClasses = useThemeCache(() => {
             margin: `0 ${px(vars.sizing.spacer / 2)}`,
             borderRadius: px(vars.button.borderRadius),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             fontSize: px(vars.button.mobile.fontSize),
         }),
     );
@@ -447,7 +479,7 @@ export const titleBarClasses = useThemeCache(() => {
         {
             height: px(vars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
         }),
     );
@@ -522,7 +554,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
             width: px(vars.sizing.mobile.width),
             minWidth: px(vars.sizing.mobile.width),
@@ -611,7 +643,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignItems: "center",
             flexBasis: vars.endElements.flexBasis,
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
             height: px(vars.sizing.mobile.height),
@@ -624,7 +656,7 @@ export const titleBarClasses = useThemeCache(() => {
             ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
         }),

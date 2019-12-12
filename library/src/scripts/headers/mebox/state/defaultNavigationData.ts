@@ -6,7 +6,7 @@
 
 import { t } from "@library/utility/appUtils";
 
-export const dummyNavigationData = () => {
+export const defaultNavigationData = () => {
     return {
         data: [
             {

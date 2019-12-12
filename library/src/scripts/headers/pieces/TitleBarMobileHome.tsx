@@ -14,7 +14,7 @@ import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
+import { defaultNavigationData } from "@library/headers/mebox/state/defaultNavigationData";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
@@ -68,7 +68,7 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                 <div className={classes.bottom}>
                     <div className={titleBarVars.scroll}>
                         <TitleBarNav
-                            {...dummyNavigationData()}
+                            {...defaultNavigationData()}
                             className={classNames("titleBar-nav", titleBarVars.nav)}
                             linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
                             linkContentClassName="titleBar-navLinkContent"

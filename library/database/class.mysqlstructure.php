@@ -21,6 +21,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      */
     private $rowCountEstimates;
 
+    /** Default options when creating MySQL table indexes. */
+    private const INDEX_OPTIONS = "algorithm=inplace, lock=none";
+
     /**
      *
      *
@@ -633,11 +636,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     } else {
                         $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";
                     }
-                    $indexSql[$name][] = $alterSqlPrefix."add $sql;\n";
+                    $indexSql[$name][] = $alterSqlPrefix."add {$sql}, " . self::INDEX_OPTIONS . ";\n";
                 }
                 unset($indexesDb[$name]);
             } else {
-                $indexSql[$name][] = $alterSqlPrefix."add $sql;\n";
+                $indexSql[$name][] = $alterSqlPrefix."add {$sql}, " . self::INDEX_OPTIONS . ";\n";
             }
         }
         // Go through the indexes to drop.
@@ -654,8 +657,16 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Modify all of the indexes.
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
-                if (!$this->executeQuery($sql, true)) {
-                    throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                try {
+                    if (!$this->executeQuery($sql)) {
+                        throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                    }
+                } catch (Exception $e) {
+                    // If index creation fails, remove our default options and enforce the threshold check.
+                    $sqlWithoutOptions = preg_replace("/, " . preg_quote(self::INDEX_OPTIONS, "/") . "(?=;\n$)/", "", $sql, 1);
+                    if (!$this->executeQuery($sqlWithoutOptions, true)) {
+                        throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                    }
                 }
             }
         }

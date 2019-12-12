@@ -340,6 +340,17 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Given an SQL representing a single basic alter-table query to add indexes, append the default index options.
+     *
+     * @param string $sql
+     * @return string
+     */
+    private function indexSqlWithOptions(string $sql): string {
+        $result = preg_replace('/;?(?=\n*$)/', ", " . self::INDEX_OPTIONS . ";", $sql, 1);
+        return $result;
+    }
+
+    /**
      *
      *
      * @param $columns
@@ -636,11 +647,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     } else {
                         $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";
                     }
-                    $indexSql[$name][] = $alterSqlPrefix."add {$sql}, " . self::INDEX_OPTIONS . ";\n";
+                    $indexSql[$name][] = $alterSqlPrefix."add $sql;\n";
                 }
                 unset($indexesDb[$name]);
             } else {
-                $indexSql[$name][] = $alterSqlPrefix."add {$sql}, " . self::INDEX_OPTIONS . ";\n";
+                $indexSql[$name][] = $alterSqlPrefix."add $sql;\n";
             }
         }
         // Go through the indexes to drop.
@@ -658,13 +669,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
                 try {
-                    if (!$this->executeQuery($sql)) {
+                    $sqlWithOptions = $this->indexSqlWithOptions($sql);
+                    if (!$this->executeQuery($sqlWithOptions)) {
                         throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
                     }
                 } catch (Exception $e) {
-                    // If index creation fails, remove our default options and enforce the threshold check.
-                    $sqlWithoutOptions = preg_replace("/, " . preg_quote(self::INDEX_OPTIONS, "/") . "(?=;\n$)/", "", $sql, 1);
-                    if (!$this->executeQuery($sqlWithoutOptions, true)) {
+                    // If index creation fails, try without the default options and enforce the threshold check.
+                    if (!$this->executeQuery($sql, true)) {
                         throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
                     }
                 }

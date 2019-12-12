@@ -567,7 +567,6 @@ class SettingsController extends DashboardController {
                     <strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ' .
                     anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature')),
                 'Options' => [
-                    'Multiline' => true,
                     'UseRealBoolean' => true
                 ]
             ]

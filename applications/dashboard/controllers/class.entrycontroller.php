@@ -1059,7 +1059,12 @@ class EntryController extends Gdn_Controller {
             if (!$this->Request->isAuthenticatedPostBack()) {
                 $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
                 if ($legacyLogin && c('Garden.Embed.Allow')) {
-                    Logger::event('legacy_embed_signin', Logger::INFO, 'Signed in using the legacy embed method', [$this->Form->getFormValue('Email')]);
+                    Logger::event(
+                        'legacy_embed_signin',
+                        Logger::INFO,
+                        'Signed in using the legacy embed method',
+                        ['login' => $this->Form->getFormValue('Email')]
+                    );
                 } else {
                     $this->Form->addError('Please try again.');
                     Gdn::session()->ensureTransientKey();

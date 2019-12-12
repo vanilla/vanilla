@@ -654,7 +654,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Modify all of the indexes.
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
-                if (!$this->executeQuery($sql)) {
+                if (!$this->executeQuery($sql, true)) {
                     throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
                 }
             }
@@ -663,7 +663,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Run any additional Sql.
         foreach ($additionalSql as $description => $sql) {
             // These queries are just for enum alters. If that changes then pass true as the second argument.
-            if (!$this->executeQuery($sql)) {
+            if (!$this->executeQuery($sql, true)) {
                 throw new Exception("Error modifying table: {$description}.");
             }
         }

@@ -58,10 +58,6 @@
         "variables_cerulean": {
             "type": "json",
             "file": "variables_cerulean.json"
-        },
-        "navigationData": {
-            "type": "json",
-            "file": "navigationData.json"
         }
     }
 }

@@ -351,9 +351,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Generate part of an alter table statement for modifying indexes.
      *
-     *
-     * @param $columns
+     * @param array $columns
      * @param bool $keyType
      * @return array
      */

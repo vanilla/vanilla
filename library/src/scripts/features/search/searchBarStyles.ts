@@ -148,6 +148,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__input input": {
                     width: important(`100%`),
+                    lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
         },

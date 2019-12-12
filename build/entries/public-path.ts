@@ -21,4 +21,4 @@ import { assetUrl, getMeta } from "@library/utility/appUtils";
  * @see https://github.com/webpack/webpack/issues/2776#issuecomment-233208623
  */
 // @ts-ignore: Cannot find variable warning. See comment aboe.
-__webpack_public_path__ = assetUrl(getMeta("context.staticPathFolder") + "/dist/" + __BUILD__SECTION__ + "/");
+__webpack_public_path__ = assetUrl("/dist/" + __BUILD__SECTION__ + "/");

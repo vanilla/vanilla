@@ -45,7 +45,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      */
     protected function makeAssetPath(string ...$pieces): string {
         $path = self::joinWebPath(
-            '/',
+            $this->request->urlDomain(),
             $this->request->getAssetRoot(),
             ...$pieces
         );

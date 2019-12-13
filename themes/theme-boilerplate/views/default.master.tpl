@@ -34,12 +34,11 @@
             </div>
         {/if}
     {/if}
-    {categories_link format=$linkFormat}
-    {discussions_link format=$linkFormat}
-    {if $DataDrivenTitleBar}
-        {knowledge_link format=$linkFormat}
-    {/if}
+    
     {if !$DataDrivenTitleBar}
+        {categories_link format=$linkFormat}
+        {discussions_link format=$linkFormat}
+        {knowledge_link format=$linkFormat}
         {activity_link format=$linkFormat}
         {custom_menu format=$linkFormat}
     {/if}

@@ -33,8 +33,6 @@
             </div>
         {/if}
     {/if}
-   
-    
     
     {if !$DataDrivenTitleBar}
         {categories_link format=$linkFormat}

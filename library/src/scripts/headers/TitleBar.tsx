@@ -20,7 +20,6 @@ import FlexSpacer from "@library/layout/FlexSpacer";
 import { ScrollOffsetContext, HashOffsetReporter } from "@library/layout/ScrollOffsetContext";
 import BackLink from "@library/routing/links/BackLink";
 import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
-import { sticky } from "@library/styles/styleHelpers";
 import { LogoType } from "@library/theming/ThemeLogo";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -32,14 +31,12 @@ import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SignInIcon } from "@library/icons/common";
-import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
-import { styleFactory } from "@library/styles/styleUtils";
 import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
 import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
-import getStore from "@library/redux/getStore";
-import { getThemeVariables } from "@library/theming/getThemeVariables";
+import { navigationVariables } from "./navigationVariables";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -101,14 +98,13 @@ export class TitleBar extends React.Component<IProps, IState> {
         const showMobileDropDown = isCompact && !this.state.openSearch && this.props.title;
         const showHamburger = isCompact && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
-        const state = getStore().getState();
-        /* const navLinks = navigationLinks
-            ? defaultNavigationData().data.concat(dummyStorybookNavigationData().data)
+        const navigationData = Object.keys(navigationVariables()[`${getCurrentLocale()}`]).includes("data")
+            ? navigationVariables()[`${getCurrentLocale()}`].data
             : defaultNavigationData().data;
-        */
+
         const navLinks = navigationLinks
             ? defaultNavigationData().data.concat(dummyStorybookNavigationData().data)
-            : this.navigationData;
+            : navigationData;
 
         const headerContent = (
             <HashOffsetReporter>
@@ -217,17 +213,6 @@ export class TitleBar extends React.Component<IProps, IState> {
             return ReactDOM.createPortal(headerContent, this.containerElement);
         } else {
             return <header className={this.containerClasses}>{headerContent}</header>;
-        }
-    }
-
-    public get navigationData() {
-        const state = getStore().getState();
-        if (state !== null) {
-            const assets = state.theme.assets.data || {};
-            const variables = assets.variables ? assets.variables.data : {};
-            return variables;
-        } else {
-            return defaultNavigationData().data;
         }
     }
 

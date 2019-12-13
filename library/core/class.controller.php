@@ -14,6 +14,7 @@
 
 use Garden\Web\Data;
 use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
@@ -2040,7 +2041,21 @@ class Gdn_Controller extends Gdn_Pluggable {
             $ControllerName = substr($ControllerName, 4);
         }
 
-        $this->setData('CssClass', ucfirst($this->Application).' '.$ControllerName.' is'.ucfirst($ThemeType).' '.$this->RequestMethod.' '.$this->CssClass, true);
+        $themeSections = Gdn_Theme::section(null, 'get');
+        $sectionClasses = array_map(function ($section) {
+            return 'Section-' . $section;
+        }, $themeSections);
+
+        $cssClass = HtmlUtils::classNames(
+            ucfirst($this->Application),
+            $ControllerName,
+            'is'.ucfirst($ThemeType),
+            $this->RequestMethod,
+            $this->CssClass,
+            ...$sectionClasses
+        );
+        $this->setData('CssClass', $cssClass, true);
+
 
         // Check to see if there is a handler for this particular extension.
         $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($MasterViewPath, '.')));

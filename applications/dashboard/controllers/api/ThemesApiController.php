@@ -68,6 +68,21 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a theme assets.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function index(array $query = []): array {
+        $this->permission();
+        $out = $this->schema([":a" => $this->themeResultSchema('out')]);
+
+        $themeWithAssets = $this->themeModel->getThemes();
+        $result = $out->validate($themeWithAssets);
+        return $result;
+    }
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.

@@ -78,6 +78,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         return $theme;
     }
 
+
     /**
      * Get theme by name
      *
@@ -269,6 +270,14 @@ class FsThemeProvider implements ThemeProviderInterface {
         $theme = $this->getThemeByName($themeID);
         $assets  = $theme->getInfoValue(ThemeModel::ASSET_KEY, $this->getDefaultAssets());
         return $assets;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllThemes(): array{
+        $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        return $themes;
     }
 
     /**

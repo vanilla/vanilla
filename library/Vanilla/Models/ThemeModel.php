@@ -108,6 +108,17 @@ class ThemeModel {
     }
 
     /**
+     * @return array
+     */
+    public function getThemes(): array {
+        $allThemes = [];
+        foreach ($this->themeProviders as $themeProvider) {
+           $allThemes[] = $themeProvider->getAllThemes();
+        }
+        return $allThemes;
+    }
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.

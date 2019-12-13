@@ -45,11 +45,23 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         bottomSpace: 1,
     });
 
+    const navLinks = makeThemeVars("navLinks", {
+        fontSize: 14,
+        fontWeight: 400,
+        padding: {
+            top: 0,
+            bottom: 0,
+            left: 8,
+            right: 8,
+        },
+    });
+
     return {
         border,
         item,
         linkActive,
         padding,
+        navLinks,
     };
 });
 
@@ -146,6 +158,17 @@ const titleBarNavClasses = useThemeCache(() => {
         zIndex: 2,
     });
 
+    const navLinks = style("navLink", {
+        $nest: {
+            "&&": {
+                fontSize: unit(vars.navLinks.fontSize),
+                fontWeight: globalVars.fonts.weights.normal,
+                paddingLeft: unit(vars.navLinks.padding.left),
+                paddingRight: unit(vars.navLinks.padding.right),
+            },
+        },
+    });
+
     return {
         root,
         navigation,
@@ -155,6 +178,7 @@ const titleBarNavClasses = useThemeCache(() => {
         linkContent,
         lastItem,
         firstItem,
+        navLinks,
     };
 });
 

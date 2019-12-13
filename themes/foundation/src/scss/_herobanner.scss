@@ -1,0 +1,132 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Herobanner {
+    background-color: $herobanner_bg;
+    position: relative;
+    width: 100%;
+    height: $herobanner_height;
+    display: flex;
+    align-items: center;
+    color: $herobanner_fg;
+
+    @include maxWidth {
+        display: none;
+    }
+
+    .HomepageTitle {
+        font-size: $herobanner_fontSize;
+    }
+
+    .followButton {
+        color: $herobanner_fg;
+        padding: 10px 5px;
+        min-height: $herobanner_fontSize;
+        display: inline-flex;
+        align-items: flex-end;
+
+        &:active,
+        &:focus,
+        &:hover {
+            color: $herobanner_fg;
+        }
+    }
+
+    .HomepageTitle,
+    .PageDescription {
+        text-shadow: $herobanner_dropShadow;
+    }
+
+    > .Container {
+        width: 100%;
+        z-index: 1;
+    }
+
+    //unset .ThemeOptions-panelToLeft margin
+    .SearchBox.SearchBox {
+        margin-left: auto;
+    }
+
+    .SearchBox {
+        max-width: $SearchboxFeatured_width;
+
+        @include minWidth {
+            margin: 0 auto;
+            font-size: $global-large_fontSize;
+
+            form > div {
+                display: flex;
+
+                &::after {
+                    display: none;
+                }
+            }
+        }
+
+        .Handle {
+            display: none;
+        }
+
+        .InputAndButton {
+            display: flex;
+            width: 100%;
+        }
+
+        .AdvancedSearch .BigInput,
+        #Form_Search {
+            border: $SearchboxFeatured_border;
+            padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+            height: $SearchboxFeatured_height;
+            line-height: $SearchboxFeatured_height;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right-width: 0;
+
+            &:focus,
+            &:active {
+                border: $SearchboxFeatured_border;
+            }
+        }
+
+        .bwrap > .Button,
+        #Form_Go {
+            border: $SearchboxFeatured_border;
+            background-color: $SearchboxFeaturedBtn_bg;
+            color: $SearchboxFeaturedBtn_fg;
+            height: $SearchboxFeatured_height;
+            line-height: $SearchboxFeatured_height;
+            padding: 0 $utility-baseUnitDouble;
+            min-width: 110px;
+            width: auto;
+            position: static;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            &::before {
+                content: attr(title);
+            }
+        }
+    }
+}
+
+.Herobanner-bgImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: brightness($herobanner_bgFilter);
+
+    @include maxWidth {
+        display: none;
+    }
+}

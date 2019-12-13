@@ -166,6 +166,46 @@ class TwigEnhancer {
     }
 
     /**
+     * Render a module with some parameters.
+     *
+     * @param string $moduleName The name of the module.
+     * @param array $moduleParams The parameters to pass to the module.
+     *
+     * @return \Twig\Markup
+     */
+    public function renderModule(string $moduleName, array $moduleParams = []): \Twig\Markup {
+        return new \Twig\Markup(\Gdn_Theme::module($moduleName, $moduleParams), 'utf-8');
+    }
+
+    /**
+     * Render a module with some parameters.
+     *
+     * @param string $assetName The name of the asset.
+     *
+     * @return \Twig\Markup
+     */
+    public function renderControllerAsset(string $assetName): \Twig\Markup {
+        $controller = Gdn::controller();
+        $asset = $controller->getAsset($assetName);
+        if (is_object($asset)) {
+            $asset->AssetName = $assetName;
+
+            if (($asset->Visible ?? true)) {
+                $asset = $asset->toString();
+            } else {
+                $asset = '';
+            }
+        }
+
+        $eventArgs = ['AssetName' => $assetName];
+        $result =
+            $this->firePluggableEchoEvent($controller, 'BeforeRenderAsset', $eventArgs)
+            . $asset
+            . $this->firePluggableEchoEvent($controller, 'AfterRenderAsset', $eventArgs);
+        return new \Twig\Markup($result, 'utf-8');
+    }
+
+    /**
      * Get a config key. The result will then be cached for the instance of the twig enhancer.
      *
      * @param string $key Config key.
@@ -226,6 +266,8 @@ class TwigEnhancer {
             'classNames' => [HtmlUtils::class, 'classNames'],
 
             // Application interaction.
+            'renderControllerAsset' => [$this, 'renderControllerAsset'],
+            'renderModule' => [$this, 'renderModule'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',

@@ -29,15 +29,15 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
         const navigationData = Object.keys(navigationVariables()[`${getCurrentLocale()}`]).includes("data")
             ? navigationVariables()[`${getCurrentLocale()}`].data
             : defaultNavigationData().data;
-
+        const dataLength = navigationData.length - 1;
         const content = navigationData.map((item, key) => {
             return (
-                <>
+                <div key={key}>
                     <DropDownItemLink className={classes.navLinks} key={key} to={item.to}>
                         {item.children}
                     </DropDownItemLink>
-                    <DropDownItemSeparator />
-                </>
+                    {dataLength > key && <DropDownItemSeparator />}
+                </div>
             );
         });
 

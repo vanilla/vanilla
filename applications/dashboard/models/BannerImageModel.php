@@ -10,7 +10,7 @@ namespace Vanilla\Dashboard\Models;
 use Vanilla\AliasLoader;
 
 /**
- * Hero Image Model.
+ * Banner Image Model.
  *
  * Previously this class was provided by the "Hero Image" plugin, but is now built in.
  */
@@ -30,12 +30,12 @@ class BannerImageModel {
      */
     public static function getBannerImageSlug($categoryID) {
         $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
-        if (!$categoryID || $categoryID < 1) {
+        if (!$categoryID || $categoryID < 1 || !class_exists(\CategoryModel::class)) {
             return c(self::DEFAULT_CONFIG_KEY);
         }
 
         $category = \CategoryModel::instance()->getID($categoryID, DATASET_TYPE_ARRAY);
-        $slug = $categoryID['BannerImage'];
+        $slug = $category['BannerImage'];
 
         if (!$slug) {
             $parentID = $category['ParentCategoryID'];
@@ -50,9 +50,14 @@ class BannerImageModel {
      * @return string The URL to the category image. Will be empty if no slug could be found.
      */
     public static function getCurrentBannerImageLink(): string {
-        $categoryID = \Gdn::controller()->data('Category.CategoryID');
+        $controller = \Gdn::controller();
+        if (!$controller) {
+            $imageSlug = self::getBannerImageSlug(null);
+        } else {
+            $categoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
+            $imageSlug = self::getBannerImageSlug($categoryID);
+        }
 
-        $imageSlug = self::getBannerImageSlug($categoryID);
         return $imageSlug ? \Gdn_Upload::url($imageSlug) : '';
     }
 

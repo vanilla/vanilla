@@ -47,7 +47,6 @@ export const titleBarNavigationVariables = useThemeCache(() => {
 
     const navLinks = makeThemeVars("navLinks", {
         fontSize: 14,
-        fontWeight: 400,
         padding: {
             top: 0,
             bottom: 0,

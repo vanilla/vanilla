@@ -159,14 +159,10 @@ const titleBarNavClasses = useThemeCache(() => {
     });
 
     const navLinks = style("navLink", {
-        $nest: {
-            "&&": {
-                fontSize: unit(vars.navLinks.fontSize),
-                fontWeight: globalVars.fonts.weights.normal,
-                paddingLeft: unit(vars.navLinks.padding.left),
-                paddingRight: unit(vars.navLinks.padding.right),
-            },
-        },
+        fontSize: unit(vars.navLinks.fontSize),
+        fontWeight: globalVars.fonts.weights.normal,
+        paddingLeft: unit(vars.navLinks.padding.left),
+        paddingRight: unit(vars.navLinks.padding.right),
     });
 
     return {

@@ -5,10 +5,11 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests;
+namespace VanillaTests\Models;
 
 use PagerModule;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `PagerModule`.

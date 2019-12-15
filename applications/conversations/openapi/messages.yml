@@ -130,8 +130,7 @@ components:
           description: The ID of the conversation.
           type: integer
         format:
-          description: The input format of the record.
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
       required:
       - conversationID
       - body

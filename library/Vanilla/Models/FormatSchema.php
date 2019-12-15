@@ -26,10 +26,14 @@ class FormatSchema extends Schema {
         }
 
         parent::__construct([
+            'type' => 'string',
             'enum' => $formats,
         ]);
         $this->addFilter('', function ($value, ValidationField $field) {
-            return strtolower($value);
+            if (is_string($value)) {
+                return strtolower($value);
+            }
+            return $value;
         });
     }
 }

@@ -13,7 +13,7 @@ export interface ITheme {
 }
 
 export interface IThemeAssets {
-    fonts?: IThemeFont[];
+    fonts?: { data: IThemeFont[] };
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;

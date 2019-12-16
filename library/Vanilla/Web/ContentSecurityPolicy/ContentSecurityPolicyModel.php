@@ -108,7 +108,7 @@ class ContentSecurityPolicyModel {
             }
         }
 
-        if (count($ancestorArguments) <= 1 && $ancestorArguments[0] === Policy::FRAME_ANCESTORS_SELF) {
+        if (count($ancestorArguments) <= 1) {
             return Policy::X_FRAME_SAMEORIGIN;
         }
 

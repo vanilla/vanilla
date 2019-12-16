@@ -36,11 +36,12 @@
     {/if}
     
     {if !$DataDrivenTitleBar}
+        {activity_link format=$linkFormat}
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {knowledge_link format=$linkFormat}
         {custom_menu format=$linkFormat}
-        {activity_link format=$linkFormat}
+        
         
     {/if}
 {/capture}

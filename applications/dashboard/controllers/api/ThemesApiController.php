@@ -78,7 +78,11 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->themeResultSchema('out')]);
 
         $themeWithAssets = $this->themeModel->getThemes();
-        $result = $out->validate($themeWithAssets);
+        $result = [];
+          foreach ($themeWithAssets as $themeWithAsset) {
+          $result[] = $out->validate($themeWithAsset);
+        }
+
         return $result;
     }
 

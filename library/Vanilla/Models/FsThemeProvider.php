@@ -275,9 +275,18 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritDoc
      */
-    public function getAllThemes(): array{
-        $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
-        return $themes;
+    public function getAllThemes(): array {
+        $allThemes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        $allAvailableThemes = [];
+
+        foreach ($allThemes as $theme) {
+            $themeInfo = $theme->getInfo();
+            $filteredTheme = $this->filterTheme($themeInfo);
+            if ($filteredTheme) {
+                $allAvailableThemes[] = $this->getThemeWithAssets($filteredTheme["key"]);
+            }
+        }
+        return $allAvailableThemes;
     }
 
     /**
@@ -294,5 +303,40 @@ class FsThemeProvider implements ThemeProviderInterface {
                 "placeholder" => '{}',
             ]
         ];
+    }
+
+    /**
+     * Filter theme based on it's info.
+     *
+     * @param $themeInfo
+     * @return array
+     */
+    protected function filterTheme($themeInfo): array {
+        $clientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
+        $alwaysVisibleThemes = explode(',', strtolower(c('Garden.Themes.Visible', '')));
+
+        // Check if theme visibility is explicitly set
+        $hidden = $themeInfo['hidden'] ?? null;
+        if (is_null($hidden)) {
+            $hidden = true;
+            $sites = $themeInfo['sites'] ?? [];
+            $site = $themeInfo['site'] ?? '';
+
+            if ($site) {
+                array_push($sites, $site);
+            }
+            foreach ($sites as $s) {
+                if ($s === $clientName || fnmatch($s, $clientName)) {
+                    $hidden = false;
+                    break;
+                }
+            }
+        }
+
+        if ($hidden && !in_array(strtolower($themeInfo['key']), $alwaysVisibleThemes)) {
+            return[];
+        }
+
+        return $themeInfo;
     }
 }

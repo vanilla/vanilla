@@ -1342,7 +1342,7 @@ if (!function_exists('offsetLimit')) {
      *  - <x>-<y>: This is a range viewing records x through y.
      *  - <x>lim<n>: This is a limit/offset pair.
      *  - <x>: This is a limit where offset is given in the next parameter.
-     * @param int $limitOrPageSize The page size or limit.
+     * @param string $limitOrPageSize The page size or limit.
      * @param bool $throw Whether or not to throw an error if the {@link $offsetOrPage} is too high.
      * @return array Returns an array in the form: `[$offset, $limit]`.
      * @throws Exception Throws a 404 exception if the {@link $offsetOrPage} is too high and {@link $throw} is true.

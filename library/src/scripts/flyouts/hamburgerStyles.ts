@@ -30,9 +30,6 @@ export const hamburgerClasses = useThemeCache(() => {
     const root = style({});
     const formElVars = formElementsVariables();
     const content = style({
-        ...paddings({
-            vertical: 9,
-        }),
         $nest: {
             "& .Navigation-row": {
                 display: "flex",

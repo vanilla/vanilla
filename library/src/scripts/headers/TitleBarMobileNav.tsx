@@ -7,6 +7,8 @@ import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import Permission from "@library/features/users/Permission";
+
 export interface ITitleBarMobileNavProps {
     data: any[];
 }
@@ -22,7 +24,7 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
 
         const dataLength = data.length - 1;
         const content = data.map((item, key) => {
-            return (
+            const component = (
                 <div key={key}>
                     <DropDownItemLink className={classes.navLinks} key={key} to={item.to}>
                         {item.children}
@@ -30,6 +32,15 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
                     {dataLength > key && <DropDownItemSeparator />}
                 </div>
             );
+            if (item.permission) {
+                return (
+                    <Permission key={key} permission={item.permission}>
+                        {component}
+                    </Permission>
+                );
+            } else {
+                return component;
+            }
         });
 
         return (

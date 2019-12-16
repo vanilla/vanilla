@@ -98,7 +98,11 @@ export class TitleBar extends React.Component<IProps, IState> {
         const showMobileDropDown = isCompact && !this.state.openSearch && this.props.title;
         const showHamburger = isCompact && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
-        const navigationData = Object.keys(navigationVariables()[`${getCurrentLocale()}`]).includes("data")
+
+        const localNavLinks = navigationVariables()[`${getCurrentLocale()}`]
+            ? "data" in navigationVariables()[`${getCurrentLocale()}`]
+            : null;
+        const navigationData = localNavLinks
             ? navigationVariables()[`${getCurrentLocale()}`].data
             : defaultNavigationData().data;
 
@@ -151,7 +155,11 @@ export class TitleBar extends React.Component<IProps, IState> {
 
                             {showHamburger && (
                                 <>
-                                    <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
+                                    <Hamburger
+                                        buttonClassName={classes.hamburger}
+                                        contents={hamburger}
+                                        data={navLinks}
+                                    />
                                     <FlexSpacer
                                         className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
                                     />

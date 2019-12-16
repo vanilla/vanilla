@@ -5,18 +5,10 @@
 
 import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
-import classNames from "classnames";
-import { getCurrentLocale } from "@vanilla/i18n";
-import { navigationVariables } from "./navigationVariables";
-import { defaultNavigationData } from "./mebox/state/defaultNavigationData";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 export interface ITitleBarMobileNavProps {
-    className?: string;
-    linkClassName?: string;
-    linkContentClassName?: string;
-    listClassName?: string;
-    data?: [];
+    data: any[];
 }
 
 /**
@@ -26,11 +18,10 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
     public render() {
         const classes = titleBarNavClasses();
 
-        const navigationData = Object.keys(navigationVariables()[`${getCurrentLocale()}`]).includes("data")
-            ? navigationVariables()[`${getCurrentLocale()}`].data
-            : defaultNavigationData().data;
-        const dataLength = navigationData.length - 1;
-        const content = navigationData.map((item, key) => {
+        const { data } = this.props;
+
+        const dataLength = data.length - 1;
+        const content = data.map((item, key) => {
             return (
                 <div key={key}>
                     <DropDownItemLink className={classes.navLinks} key={key} to={item.to}>

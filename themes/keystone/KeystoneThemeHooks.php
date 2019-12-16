@@ -8,6 +8,7 @@
 
 namespace Vanilla\Themes\Keystone;
 
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Web\TwigFormWrapper;
 use Vanilla\Web\TwigRenderTrait;
 
@@ -43,6 +44,10 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
 
         //set "hasAdvancedSearch" to smarty
         $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
+
+        // For backwards compatibility in CustomizeTheme
+        $imageUrl = BannerImageModel::getCurrentBannerImageLink();
+        $sender->setData('heroImageUrl', $imageUrl);
 
         //set ThemeOptions to smarty
         $themeOptions = c("Garden.ThemeOptions");

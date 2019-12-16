@@ -32,6 +32,16 @@ class SetValueTest extends TestCase {
     }
 
     /**
+     * Test {@link setValue()} on an object.
+     */
+    public function testSetValueOnObject() {
+        $expected = new Tuple('x', 'b');
+        $haystack = new Tuple('a', 'b');
+        setValue('a', $haystack, 'x');
+        $this->assertEquals($expected, $haystack);
+    }
+
+    /**
      * Provide test data for {@link setValue()}.
      *
      * @return array Returns an array of test data.

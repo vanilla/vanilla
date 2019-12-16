@@ -66,10 +66,6 @@ class DebugTest extends TestCase {
                 false,
                 false,
             ],
-            'badInput' => [
-                'badInput',
-                'badInput',
-            ],
         ];
 
         return $r;

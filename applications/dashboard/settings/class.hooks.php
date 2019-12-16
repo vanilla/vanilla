@@ -340,7 +340,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addGroup(t('Appearance'), 'appearance', '', -1)
             ->addLinkIf(
                 $session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false),
-                t('Branding'),
+                t('Branding & SEO'),
                 '/dashboard/settings/branding',
                 'appearance.banner',
                 '',

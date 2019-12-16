@@ -896,36 +896,6 @@ if (!function_exists('ForeignIDHash')) {
     }
 }
 
-if (!function_exists('formatString')) {
-    /**
-     * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
-     *
-     * @param string $string The string to format with fields from its args enclosed in curly braces.
-     * The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
-     *  - date: Formats the value as a date. Valid arguments are short, medium, long.
-     *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
-     *  - time: Formats the value as a time. This format has no additional arguments.
-     *  - url: Calls url() function around the value to show a valid url with the site.
-     * You can pass a domain to include the domain.
-     *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
-     *  - html: Calls htmlspecialchars.
-     * @param array $args The array of arguments.
-     * If you want to nest arrays then the keys to the nested values can be separated by dots.
-     * @return string The formatted string.
-     * <code>
-     * echo formatString("Hello {Name}, It's {Now,time}.", array('Name' => 'Frank', 'Now' => '1999-12-31 23:59'));
-     * // This would output the following string:
-     * // Hello Frank, It's 12:59PM.
-     * </code>
-     */
-    function formatString($string, $args = []) {
-        _formatStringCallback($args, true);
-        $result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
-
-        return $result;
-    }
-}
-
 if (!function_exists('forceBool')) {
     /**
      * Force a mixed value to a boolean.
@@ -2197,21 +2167,6 @@ if (!function_exists('slugify')) {
         }
 
         return $text;
-    }
-}
-
-if (!function_exists('sprintft')) {
-    /**
-     * A version of {@link sprintf()} That translates the string format.
-     *
-     * @param string $formatCode The format translation code.
-     * @param mixed $arg1 The arguments to pass to {@link sprintf()}.
-     * @return string The translated string.
-     */
-    function sprintft($formatCode, $arg1 = null) {
-        $args = func_get_args();
-        $args[0] = t($formatCode, $formatCode);
-        return call_user_func_array('sprintf', $args);
     }
 }
 

@@ -787,7 +787,7 @@ if (!function_exists('domGetImages')) {
      * @param pQuery $dom The DOM to search.
      * @param string $url The URL of the document to add to relative URLs.
      * @param int $maxImages The maximum number of images to return.
-     * @return array Returns an array in the form: `[['Src' => '', 'Width' => '', 'Height' => ''], ...]`.
+     * @return array Returns an array in the form: `[['http://imageUrl.com'], ...]`.
      */
     function domGetImages($dom, $url, $maxImages = 4) {
         $images = [];

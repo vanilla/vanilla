@@ -39,8 +39,9 @@
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {knowledge_link format=$linkFormat}
-        {activity_link format=$linkFormat}
         {custom_menu format=$linkFormat}
+        {activity_link format=$linkFormat}
+        
     {/if}
 {/capture}
 

@@ -12,8 +12,28 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for debug().
  */
-
 class DebugTest extends TestCase {
+    /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->debug = debug();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        debug($this->debug);
+    }
+
 
     /**
      * Test {@link debug()} against several scenarios.

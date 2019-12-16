@@ -681,23 +681,6 @@ if (!function_exists('dateCompare')) {
     }
 }
 
-if (!function_exists('debug')) {
-    /**
-     * Get or set the current debug state of the application.
-     *
-     * @param bool|null $value The new debug value or null to just return the current value.
-     * @return bool Returns the current debug level.
-     */
-    function debug($value = null) {
-        static $debug = false;
-        if ($value === null) {
-            return $debug;
-        }
-        $debug = $value;
-        return $debug;
-    }
-}
-
 if (!function_exists('debugMethod')) {
     /**
      * Format a function or method call for debug output.

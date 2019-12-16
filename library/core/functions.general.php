@@ -208,7 +208,7 @@ if (!function_exists('arraySearchI')) {
     /**
      * Case-insensitive version of array_search.
      *
-     * @param array $value The value to find in array.
+     * @param string $value The value to find in array.
      * @param array $search The array to search in for $value.
      * @return mixed Key of $value in the $search array.
      */
@@ -418,7 +418,7 @@ if (!function_exists('combinePaths')) {
      *
      * @param array $paths The array of paths to concatenate.
      * @param string $delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
-     * @returns string Returns the concatenated path.
+     * @return string Returns the concatenated path.
      */
     function combinePaths($paths, $delimiter = DS) {
         if (is_array($paths)) {
@@ -543,7 +543,7 @@ if (!function_exists('safePrint')) {
      * Return/print human-readable and non casted information about a variable.
      *
      * @param mixed $mixed The variable to return/echo.
-     * @param bool $returnData Whether or not return the data instead of echoing it.
+     * @param bool $returnData Whether or not to return the data instead of echoing it.
      * @return string|void Returns {@link $mixed} or nothing if {@link $returnData} is false.
      */
     function safePrint($mixed, $returnData = false) {
@@ -681,23 +681,6 @@ if (!function_exists('dateCompare')) {
     }
 }
 
-if (!function_exists('debug')) {
-    /**
-     * Get or set the current debug state of the application.
-     *
-     * @param bool|null $value The new debug value or null to just return the current value.
-     * @return bool Returns the current debug level.
-     */
-    function debug($value = null) {
-        static $debug = false;
-        if ($value === null) {
-            return $debug;
-        }
-        $debug = $value;
-        return $debug;
-    }
-}
-
 if (!function_exists('debugMethod')) {
     /**
      * Format a function or method call for debug output.
@@ -787,7 +770,7 @@ if (!function_exists('domGetImages')) {
      * @param pQuery $dom The DOM to search.
      * @param string $url The URL of the document to add to relative URLs.
      * @param int $maxImages The maximum number of images to return.
-     * @return array Returns an array in the form: `[['Src' => '', 'Width' => '', 'Height' => ''], ...]`.
+     * @return array Returns an array in the form: `[['http://imageUrl.com'], ...]`.
      */
     function domGetImages($dom, $url, $maxImages = 4) {
         $images = [];
@@ -896,36 +879,6 @@ if (!function_exists('ForeignIDHash')) {
     }
 }
 
-if (!function_exists('formatString')) {
-    /**
-     * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
-     *
-     * @param string $string The string to format with fields from its args enclosed in curly braces.
-     * The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
-     *  - date: Formats the value as a date. Valid arguments are short, medium, long.
-     *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
-     *  - time: Formats the value as a time. This format has no additional arguments.
-     *  - url: Calls url() function around the value to show a valid url with the site.
-     * You can pass a domain to include the domain.
-     *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
-     *  - html: Calls htmlspecialchars.
-     * @param array $args The array of arguments.
-     * If you want to nest arrays then the keys to the nested values can be separated by dots.
-     * @return string The formatted string.
-     * <code>
-     * echo formatString("Hello {Name}, It's {Now,time}.", array('Name' => 'Frank', 'Now' => '1999-12-31 23:59'));
-     * // This would output the following string:
-     * // Hello Frank, It's 12:59PM.
-     * </code>
-     */
-    function formatString($string, $args = []) {
-        _formatStringCallback($args, true);
-        $result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
-
-        return $result;
-    }
-}
-
 if (!function_exists('forceBool')) {
     /**
      * Force a mixed value to a boolean.
@@ -946,20 +899,6 @@ if (!function_exists('forceBool')) {
         } else {
             return $defaultValue;
         }
-    }
-}
-
-if (!function_exists('getAppCookie')) {
-    /**
-     * Get a cookie with the application prefix.
-     *
-     * @param string $name The name of the cookie to get.
-     * @param mixed $default The default to return if the cookie is not found.
-     * @return string Returns the cookie value or {@link $default}.
-     */
-    function getAppCookie($name, $default = null) {
-        $px = c('Garden.Cookie.Name');
-        return getValue("$px-$name", $_COOKIE, $default);
     }
 }
 
@@ -1173,19 +1112,6 @@ if (!function_exists('inArrayI')) {
     }
 }
 
-if (!function_exists('inMaintenanceMode')) {
-    /**
-     * Determine if the site is in maintenance mode.
-     *
-     * @return bool
-     */
-    function inMaintenanceMode() {
-        $updateMode = c('Garden.UpdateMode');
-
-        return (bool)$updateMode;
-    }
-}
-
 if (!function_exists('inSubArray')) {
     /**
      * Loop through {@link $haystack} looking for subarrays that contain {@link $needle}.
@@ -1240,76 +1166,6 @@ if (!function_exists('ipEncode')) {
         }
 
         return $result;
-    }
-}
-
-if (!function_exists('isMobile')) {
-    /**
-     * Determine whether or not the site is in mobile mode.
-     *
-     * @param mixed $value Sets a new value for mobile. Pass one of the following:
-     * - true: Force mobile.
-     * - false: Force desktop.
-     * - null: Reset and use the system determined mobile setting.
-     * - not specified: Use the current setting or use the system determined mobile setting.
-     * @return bool
-     */
-    function isMobile($value = '') {
-        if ($value === true || $value === false) {
-            $type = $value ? 'mobile' : 'desktop';
-            userAgentType($type);
-        } elseif ($value === null) {
-            userAgentType(false);
-        }
-
-        $type = userAgentType();
-        // Check the config for an override. (ex. Consider tablets mobile)
-        $type = c('Garden.Devices.'.ucfirst($type), $type);
-
-        switch ($type) {
-            case 'app':
-            case 'mobile':
-                $isMobile = true;
-                break;
-            default:
-                $isMobile = false;
-                break;
-        }
-
-        return $isMobile;
-    }
-}
-
-if (!function_exists('isSearchEngine')) {
-    /**
-     * Determines whether or not the current request is being made by a search engine.
-     *
-     * @return bool Returns true if the current request is a search engine or false otherwise.
-     */
-    function isSearchEngine() {
-        $engines = [
-            'googlebot',
-            'slurp',
-            'search.msn.com',
-            'nutch',
-            'simpy',
-            'bot',
-            'aspseek',
-            'crawler',
-            'msnbot',
-            'libwww-perl',
-            'fast',
-            'baidu',
-        ];
-        $httpUserAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER, ''));
-        if ($httpUserAgent != '') {
-            foreach ($engines as $engine) {
-                if (strpos($httpUserAgent, $engine) !== false) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
 
@@ -1439,7 +1295,7 @@ if (!function_exists('offsetLimit')) {
      *  - <x>-<y>: This is a range viewing records x through y.
      *  - <x>lim<n>: This is a limit/offset pair.
      *  - <x>: This is a limit where offset is given in the next parameter.
-     * @param int $limitOrPageSize The page size or limit.
+     * @param string $limitOrPageSize The page size or limit.
      * @param bool $throw Whether or not to throw an error if the {@link $offsetOrPage} is too high.
      * @return array Returns an array in the form: `[$offset, $limit]`.
      * @throws Exception Throws a 404 exception if the {@link $offsetOrPage} is too high and {@link $throw} is true.
@@ -1514,31 +1370,6 @@ if (!function_exists('pageNumber')) {
     }
 }
 
-if (!function_exists('recordType')) {
-    /**
-     * Return the record type and id of a row.
-     *
-     * @param array|object $row The record we are looking at.
-     * @return array An array with the following items
-     *  - 0: record type
-     *  - 1: record ID
-     * @since 2.1
-     */
-    function recordType($row) {
-        if ($recordType = val('RecordType', $row)) {
-            return [$recordType, val('RecordID', $row)];
-        } elseif ($commentID = val('CommentID', $row)) {
-            return ['Comment', $commentID];
-        } elseif ($discussionID = val('DiscussionID', $row)) {
-            return ['Discussion', $discussionID];
-        } elseif ($activityID = val('ActivityID', $row)) {
-            return ['Activity', $activityID];
-        } else {
-            return [null, null];
-        }
-    }
-}
-
 if (!function_exists('write_ini_string')) {
     /**
      * Formats an array in INI format.
@@ -1560,17 +1391,6 @@ if (!function_exists('write_ini_string')) {
             }
         }
         return implode("\n", $flat);
-    }
-}
-
-if (!function_exists('signInPopup')) {
-    /**
-     * Returns a boolean value indicating if sign in windows should be "popped" into modal in-page popups.
-     *
-     * @return bool Returns true if signin popups are used.
-     */
-    function signInPopup() {
-        return c('Garden.SignIn.Popup');
     }
 }
 
@@ -1907,7 +1727,7 @@ if (!function_exists('sliceParagraph')) {
      * If it can't slice the string at a paragraph it will attempt to slice on a sentence.
      *
      * Note that you should not expect this function to return a string that is always shorter than max-length.
-     * The purpose of this function is to provide a string that is reaonably easy to consume by a human.
+     * The purpose of this function is to provide a string that is reasonably easy to consume by a human.
      *
      * @param string $string The string to slice.
      * @param int|array $limits Either int $maxLength or array($maxLength, $minLength); whereas $maxLength The maximum length of the string; $minLength The intended minimum length of the string (slice on sentence if paragraph is too short).
@@ -2061,7 +1881,7 @@ if (!function_exists('setValue')) {
      * Set the value on an object/array.
      *
      * @param string $needle The key or property name of the value.
-     * @param mixed &$haystack The array or object to set.
+     * @param mixed $haystack The array or object to set.
      * @param mixed $value The value to set.
      */
     function setValue($needle, &$haystack, $value) {
@@ -2070,32 +1890,6 @@ if (!function_exists('setValue')) {
         } elseif (is_object($haystack)) {
             $haystack->$needle = $value;
         }
-    }
-}
-
-if (!function_exists('safeURL')) {
-    /**
-     * Transform a destination to make sure that the resulting URL is "Safe".
-     *
-     * "Safe" means that the domain of the URL is trusted.
-     *
-     * @param string $destination Destination URL or path.
-     * @return string The destination if safe, /home/leaving?Target=$destination if not.
-     */
-    function safeURL($destination) {
-        $url = url($destination, true);
-
-        $trustedDomains = trustedDomains();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination)));
     }
 }
 
@@ -2164,86 +1958,6 @@ if (!function_exists('unicodeRegexSupport')) {
      */
     function unicodeRegexSupport() {
         return (preg_replace('`[\pP]`u', '', 'P') != '');
-    }
-}
-
-if (!function_exists('passwordStrength')) {
-    /**
-     * Check a password's strength.
-     *
-     * @param string $password The password to test.
-     * @param string $username The username that relates to the password.
-     * @return array Returns an analysis of the supplied password, comprised of an array with the following keys:
-     *
-     *    - Pass: Whether or not the password passes the minimum strength requirements.
-     *    - Symbols: The number of characters in the alphabet used by the password.
-     *    - Length: The length of the password.
-     *    - Entropy: The amount of entropy in the password.
-     *    - Score: The password's complexity score.
-     */
-    function passwordStrength($password, $username) {
-        $translations = explode(',', t('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
-
-        // calculate $Entropy
-        $alphabet = 0;
-        if (preg_match('/[0-9]/', $password)) {
-            $alphabet += 10;
-        }
-        if (preg_match('/[a-z]/', $password)) {
-            $alphabet += 26;
-        }
-        if (preg_match('/[A-Z]/', $password)) {
-            $alphabet += 26;
-        }
-        if (preg_match('/[^a-zA-Z0-9]/', $password)) {
-            $alphabet += 31;
-        }
-
-        $length = strlen($password);
-        $entropy = log(pow($alphabet, $length), 2);
-
-        $requiredLength = c('Garden.Password.MinLength', 6);
-        $requiredScore = c('Garden.Password.MinScore', 2);
-        $response = [
-            'Pass' => false,
-            'Symbols' => $alphabet,
-            'Length' => $length,
-            'Entropy' => $entropy,
-            'Required' => $requiredLength,
-            'Score' => 0
-        ];
-
-        if ($length < $requiredLength) {
-            $response['Reason'] = $translations[0];
-            return $response;
-        }
-
-        // password1 == username
-        if (strpos(strtolower($username), strtolower($password)) !== false) {
-            $response['Reason'] = $translations[1];
-            return $response;
-        }
-
-        if ($entropy < 30) {
-            $response['Score'] = 1;
-            $response['Reason'] = $translations[2];
-        } elseif ($entropy < 40) {
-            $response['Score'] = 2;
-            $response['Reason'] = $translations[3];
-        } elseif ($entropy < 55) {
-            $response['Score'] = 3;
-            $response['Reason'] = $translations[4];
-        } elseif ($entropy < 70) {
-            $response['Score'] = 4;
-            $response['Reason'] = $translations[5];
-        } else {
-            $response['Score'] = 5;
-            $response['Reason'] = $translations[6];
-        }
-
-        $response['Pass'] = $response['Score'] >= $requiredScore;
-
-        return $response;
     }
 }
 
@@ -2436,21 +2150,6 @@ if (!function_exists('slugify')) {
         }
 
         return $text;
-    }
-}
-
-if (!function_exists('sprintft')) {
-    /**
-     * A version of {@link sprintf()} That translates the string format.
-     *
-     * @param string $formatCode The format translation code.
-     * @param mixed $arg1 The arguments to pass to {@link sprintf()}.
-     * @return string The translated string.
-     */
-    function sprintft($formatCode, $arg1 = null) {
-        $args = func_get_args();
-        $args[0] = t($formatCode, $formatCode);
-        return call_user_func_array('sprintf', $args);
     }
 }
 

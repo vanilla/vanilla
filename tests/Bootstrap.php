@@ -23,11 +23,13 @@ use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\UASniffer;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -195,6 +197,9 @@ class Bootstrap {
             ->addAlias('Request')
             ->addAlias(RequestInterface::class)
 
+            ->rule(UASnifferInterface::class)
+            ->setClass(UASniffer::class)
+
             // Database.
             ->rule('Gdn_Database')
             ->setShared(true)
@@ -273,7 +278,7 @@ class Bootstrap {
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
-            
+
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])

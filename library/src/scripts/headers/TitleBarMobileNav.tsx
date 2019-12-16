@@ -8,9 +8,10 @@ import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Permission from "@library/features/users/Permission";
+import { navigationVariables } from "@library/headers/navigationVariables";
 
 export interface ITitleBarMobileNavProps {
-    data: any[];
+    data?: any[];
 }
 
 /**
@@ -20,8 +21,7 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
     public render() {
         const classes = titleBarNavClasses();
 
-        const { data } = this.props;
-
+        const data = navigationVariables().getNavItemsForLocale();
         const dataLength = data.length - 1;
         const content = data.map((item, key) => {
             const component = (

@@ -7,10 +7,8 @@
 import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
 import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
-import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
 import { navigationVariables } from "@library/headers/navigationVariables";
 
 export interface ITitleBarNavProps {

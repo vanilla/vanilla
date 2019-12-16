@@ -132,7 +132,6 @@ export function variableFactory(componentName: string) {
  * - Strings starting with `#` get wrapped in `color()`;
  */
 function normalizeVariables(variables: any) {
-    console.log("before vars", variables);
     if (Array.isArray(variables)) {
         variables = variables.map(normalizeVariables);
     } else if (typeof variables === "object") {
@@ -149,7 +148,6 @@ function normalizeVariables(variables: any) {
             return color(variables);
         }
     }
-    console.log("after vars", variables);
 
     return variables;
 }

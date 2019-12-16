@@ -42,34 +42,40 @@ class OffsetLimitTest extends TestCase {
     public function provideTestOffsetLimitArrays() {
         $r = [
             'getPageFormat' => [
-                'p<2>',
+                'p2',
                 '25',
                 false,
-                [0, 25],
+                [25, 25],
             ],
             'rangeQueryFormat' => [
-                '<2>-<20>',
+                '2-20',
                 '25',
                 false,
-                [0, 25],
+                [1, 19],
             ],
             'limitOffsetPairFormat' => [
-                '<5>lim<2>',
+                '5lim2',
                 '2',
                 false,
-                [0, 2],
+                [5,2],
             ],
             'justLimitFormat' => [
-                '<5>',
+                '5',
                 '2',
                 false,
-                [0, 2],
+                [5, 2],
             ],
             'negativeValues' => [
-                '<-5>',
+                '-5',
                 '-5',
                 false,
                 [0, 50],
+            ],
+            'linPattern' => [
+                '5lin2',
+                '2',
+                false,
+                [4, 2],
             ],
         ];
 

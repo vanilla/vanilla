@@ -30,6 +30,16 @@ class RemoveKeysFromNestedArrayTest extends TestCase {
     }
 
     /**
+     * Test {@link removeKeysFromNestedArray()} on an object.
+     */
+    public function testRemoveKeysFromNestedArrayFromObject() {
+        $expected = [2, new Tuple('a', 'b'), 5];
+        unset($expected[1]->b);
+        $actual = removeKeysFromNestedArray([2, new Tuple('a', 'b'), 5], ['b']);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * Provide test data for {@link removeKeysFromNestedArray()}.
      *
      * @return array Returns an array of test data.

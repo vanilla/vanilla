@@ -181,8 +181,8 @@
         "check-types": "tsc -p tsconfig.json --noemit && yarn lint",
         "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
         "lint": "eslint \"**/*.{ts,tsx}\"",
-        "storybook": "start-storybook -p 9001 -c build/.storybook",
-        "build-storybook": "build-storybook -c build/.storybook -o build/.out",
+        "storybook": "node --max-old-space-size=2048 ./node_modules/.bin/start-storybook -p 9001 -c build/.storybook",
+        "build-storybook": "node --max-old-space-size=2048 ./node_modules/.bin/build-storybook -c build/.storybook -o build/.out",
         "bootstrap": "YARN_IGNORE_ENGINES=true lerna bootstrap",
         "chromatic": "chromatic test"
     }

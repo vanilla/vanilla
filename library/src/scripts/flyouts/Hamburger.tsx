@@ -34,7 +34,7 @@ export default function Hamburger(props) {
                             className={classNames(classes.content)}
                             dangerouslySetInnerHTML={{ __html: props.contents }}
                         />
-                        <TitleBarMobileNav data={props.data} />
+                        <TitleBarMobileNav />
                     </FrameBody>
                 }
             />

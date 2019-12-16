@@ -19,6 +19,7 @@ import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
  */
 export default function Hamburger(props) {
     const classes = hamburgerClasses();
+
     return (
         <DropDown
             name={t("Messages")}
@@ -33,7 +34,7 @@ export default function Hamburger(props) {
                             className={classNames(classes.content)}
                             dangerouslySetInnerHTML={{ __html: props.contents }}
                         />
-                        <TitleBarMobileNav />
+                        <TitleBarMobileNav data={props.data} />
                     </FrameBody>
                 }
             />

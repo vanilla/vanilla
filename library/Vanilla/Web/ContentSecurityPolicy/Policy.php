@@ -46,6 +46,11 @@ class Policy {
         self::PLUGIN_TYPES
     ];
 
+    const FRAME_ANCESTORS_SELF = "'self'";
+    const X_FRAME_SAMEORIGIN = "SAMEORIGIN";
+    const X_FRAME_ALLOW_FROM = "ALLOW-FROM";
+    const X_FRAME_DENY = "DENY";
+
     /** @var string */
     private $policyDirective;
 

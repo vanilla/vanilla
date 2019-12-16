@@ -284,9 +284,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $hsts = Gdn::getContainer()->get('HstsModel');
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
-        $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
+        $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
         $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
-
+        $xFrameString = $cspModel->getXFrameString();
+        if ($xFrameString !== null) {
+            $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
+        }
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];
@@ -1886,7 +1889,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     }
 
-                    list($Path, $UrlPath) = $Search;
+                    [$Path, $UrlPath] = $Search;
 
                     if (isUrl($Path)) {
                         $this->Head->addCss($Path, 'all', val('AddVersion', $Options, true), $Options);
@@ -1944,7 +1947,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     }
 
-                    list($Path, $UrlPath) = $Search;
+                    [$Path, $UrlPath] = $Search;
 
                     if ($Path !== false) {
                         $AddVersion = true;

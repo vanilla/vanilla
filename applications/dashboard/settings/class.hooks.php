@@ -254,7 +254,8 @@ class DashboardHooks extends Gdn_Plugin {
                 $sender->addJsFile('embed_local.js');
             }
         } else {
-            $sender->setHeader('X-Frame-Options', 'SAMEORIGIN');
+            $sender->setHeader('
+            X-Frame-Options', 'SAMEORIGIN');
         }
 
 

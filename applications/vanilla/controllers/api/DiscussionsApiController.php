@@ -160,7 +160,7 @@ class DiscussionsApiController extends AbstractApiController {
                 Schema::parse([
                     'name',
                     'body',
-                    'format:s' => new \Vanilla\Models\FormatSchema(),
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'categoryID',
                     'closed?',
                     'sink?',
@@ -402,7 +402,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
-            'format:s' => 'The original format of the discussion',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ]);
     }
 
@@ -422,7 +422,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'discussionID',
                 'name',
                 'body',
-                'format:s' => 'The input format of the discussion.',
+                'format' => new \Vanilla\Models\FormatSchema(true),
                 'categoryID',
                 'sink',
                 'closed',

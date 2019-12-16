@@ -949,20 +949,6 @@ if (!function_exists('forceBool')) {
     }
 }
 
-if (!function_exists('getAppCookie')) {
-    /**
-     * Get a cookie with the application prefix.
-     *
-     * @param string $name The name of the cookie to get.
-     * @param mixed $default The default to return if the cookie is not found.
-     * @return string Returns the cookie value or {@link $default}.
-     */
-    function getAppCookie($name, $default = null) {
-        $px = c('Garden.Cookie.Name');
-        return getValue("$px-$name", $_COOKIE, $default);
-    }
-}
-
 if (!function_exists('getConnectionString')) {
     /**
      * Construct a PDO connection string.
@@ -1173,19 +1159,6 @@ if (!function_exists('inArrayI')) {
     }
 }
 
-if (!function_exists('inMaintenanceMode')) {
-    /**
-     * Determine if the site is in maintenance mode.
-     *
-     * @return bool
-     */
-    function inMaintenanceMode() {
-        $updateMode = c('Garden.UpdateMode');
-
-        return (bool)$updateMode;
-    }
-}
-
 if (!function_exists('inSubArray')) {
     /**
      * Loop through {@link $haystack} looking for subarrays that contain {@link $needle}.
@@ -1240,76 +1213,6 @@ if (!function_exists('ipEncode')) {
         }
 
         return $result;
-    }
-}
-
-if (!function_exists('isMobile')) {
-    /**
-     * Determine whether or not the site is in mobile mode.
-     *
-     * @param mixed $value Sets a new value for mobile. Pass one of the following:
-     * - true: Force mobile.
-     * - false: Force desktop.
-     * - null: Reset and use the system determined mobile setting.
-     * - not specified: Use the current setting or use the system determined mobile setting.
-     * @return bool
-     */
-    function isMobile($value = '') {
-        if ($value === true || $value === false) {
-            $type = $value ? 'mobile' : 'desktop';
-            userAgentType($type);
-        } elseif ($value === null) {
-            userAgentType(false);
-        }
-
-        $type = userAgentType();
-        // Check the config for an override. (ex. Consider tablets mobile)
-        $type = c('Garden.Devices.'.ucfirst($type), $type);
-
-        switch ($type) {
-            case 'app':
-            case 'mobile':
-                $isMobile = true;
-                break;
-            default:
-                $isMobile = false;
-                break;
-        }
-
-        return $isMobile;
-    }
-}
-
-if (!function_exists('isSearchEngine')) {
-    /**
-     * Determines whether or not the current request is being made by a search engine.
-     *
-     * @return bool Returns true if the current request is a search engine or false otherwise.
-     */
-    function isSearchEngine() {
-        $engines = [
-            'googlebot',
-            'slurp',
-            'search.msn.com',
-            'nutch',
-            'simpy',
-            'bot',
-            'aspseek',
-            'crawler',
-            'msnbot',
-            'libwww-perl',
-            'fast',
-            'baidu',
-        ];
-        $httpUserAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER, ''));
-        if ($httpUserAgent != '') {
-            foreach ($engines as $engine) {
-                if (strpos($httpUserAgent, $engine) !== false) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
 
@@ -1514,31 +1417,6 @@ if (!function_exists('pageNumber')) {
     }
 }
 
-if (!function_exists('recordType')) {
-    /**
-     * Return the record type and id of a row.
-     *
-     * @param array|object $row The record we are looking at.
-     * @return array An array with the following items
-     *  - 0: record type
-     *  - 1: record ID
-     * @since 2.1
-     */
-    function recordType($row) {
-        if ($recordType = val('RecordType', $row)) {
-            return [$recordType, val('RecordID', $row)];
-        } elseif ($commentID = val('CommentID', $row)) {
-            return ['Comment', $commentID];
-        } elseif ($discussionID = val('DiscussionID', $row)) {
-            return ['Discussion', $discussionID];
-        } elseif ($activityID = val('ActivityID', $row)) {
-            return ['Activity', $activityID];
-        } else {
-            return [null, null];
-        }
-    }
-}
-
 if (!function_exists('write_ini_string')) {
     /**
      * Formats an array in INI format.
@@ -1560,17 +1438,6 @@ if (!function_exists('write_ini_string')) {
             }
         }
         return implode("\n", $flat);
-    }
-}
-
-if (!function_exists('signInPopup')) {
-    /**
-     * Returns a boolean value indicating if sign in windows should be "popped" into modal in-page popups.
-     *
-     * @return bool Returns true if signin popups are used.
-     */
-    function signInPopup() {
-        return c('Garden.SignIn.Popup');
     }
 }
 
@@ -2073,32 +1940,6 @@ if (!function_exists('setValue')) {
     }
 }
 
-if (!function_exists('safeURL')) {
-    /**
-     * Transform a destination to make sure that the resulting URL is "Safe".
-     *
-     * "Safe" means that the domain of the URL is trusted.
-     *
-     * @param string $destination Destination URL or path.
-     * @return string The destination if safe, /home/leaving?Target=$destination if not.
-     */
-    function safeURL($destination) {
-        $url = url($destination, true);
-
-        $trustedDomains = trustedDomains();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination)));
-    }
-}
-
 if (!function_exists('touchValue')) {
     /**
      * Set the value on an object/array if it doesn't already exist.
@@ -2164,86 +2005,6 @@ if (!function_exists('unicodeRegexSupport')) {
      */
     function unicodeRegexSupport() {
         return (preg_replace('`[\pP]`u', '', 'P') != '');
-    }
-}
-
-if (!function_exists('passwordStrength')) {
-    /**
-     * Check a password's strength.
-     *
-     * @param string $password The password to test.
-     * @param string $username The username that relates to the password.
-     * @return array Returns an analysis of the supplied password, comprised of an array with the following keys:
-     *
-     *    - Pass: Whether or not the password passes the minimum strength requirements.
-     *    - Symbols: The number of characters in the alphabet used by the password.
-     *    - Length: The length of the password.
-     *    - Entropy: The amount of entropy in the password.
-     *    - Score: The password's complexity score.
-     */
-    function passwordStrength($password, $username) {
-        $translations = explode(',', t('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
-
-        // calculate $Entropy
-        $alphabet = 0;
-        if (preg_match('/[0-9]/', $password)) {
-            $alphabet += 10;
-        }
-        if (preg_match('/[a-z]/', $password)) {
-            $alphabet += 26;
-        }
-        if (preg_match('/[A-Z]/', $password)) {
-            $alphabet += 26;
-        }
-        if (preg_match('/[^a-zA-Z0-9]/', $password)) {
-            $alphabet += 31;
-        }
-
-        $length = strlen($password);
-        $entropy = log(pow($alphabet, $length), 2);
-
-        $requiredLength = c('Garden.Password.MinLength', 6);
-        $requiredScore = c('Garden.Password.MinScore', 2);
-        $response = [
-            'Pass' => false,
-            'Symbols' => $alphabet,
-            'Length' => $length,
-            'Entropy' => $entropy,
-            'Required' => $requiredLength,
-            'Score' => 0
-        ];
-
-        if ($length < $requiredLength) {
-            $response['Reason'] = $translations[0];
-            return $response;
-        }
-
-        // password1 == username
-        if (strpos(strtolower($username), strtolower($password)) !== false) {
-            $response['Reason'] = $translations[1];
-            return $response;
-        }
-
-        if ($entropy < 30) {
-            $response['Score'] = 1;
-            $response['Reason'] = $translations[2];
-        } elseif ($entropy < 40) {
-            $response['Score'] = 2;
-            $response['Reason'] = $translations[3];
-        } elseif ($entropy < 55) {
-            $response['Score'] = 3;
-            $response['Reason'] = $translations[4];
-        } elseif ($entropy < 70) {
-            $response['Score'] = 4;
-            $response['Reason'] = $translations[5];
-        } else {
-            $response['Score'] = 5;
-            $response['Reason'] = $translations[6];
-        }
-
-        $response['Pass'] = $response['Score'] >= $requiredScore;
-
-        return $response;
     }
 }
 

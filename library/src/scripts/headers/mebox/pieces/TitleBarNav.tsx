@@ -11,13 +11,13 @@ import { titleBarClasses } from "@library/headers/titleBarStyles";
 import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
+import { navigationVariables } from "@library/headers/navigationVariables";
 
 export interface ITitleBarNavProps {
     className?: string;
     linkClassName?: string;
     linkContentClassName?: string;
     listClassName?: string;
-    data?: ITitleBarNav[];
     children?: React.ReactNode;
     wrapper?: JSX.Element;
     excludeExtraNavItems?: boolean;
@@ -42,10 +42,12 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
     private static extraNavItems: React.ComponentType[] = [];
 
     public render() {
+        const data = navigationVariables().getNavItemsForLocale();
+
         const classes = titleBarNavClasses();
-        const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
-        const content = this.props.data
-            ? this.props.data.map((item, key) => {
+        const dataLength = data ? Object.keys(data!).length - 1 : 0;
+        const content = data
+            ? data.map((item, key) => {
                   const component = (
                       <TitleBarNavItem
                           {...item}

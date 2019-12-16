@@ -11,7 +11,6 @@ import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
-import { defaultNavigationData } from "@library/headers/mebox/state/defaultNavigationData";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import Container from "@library/layout/components/Container";
@@ -34,9 +33,6 @@ import { SignInIcon } from "@library/icons/common";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
-import { dummyStorybookNavigationData } from "./dummyStorybookNavigationData";
-import { navigationVariables } from "./navigationVariables";
-import { getCurrentLocale } from "@vanilla/i18n";
 
 interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -47,7 +43,6 @@ interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesP
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
     logoUrl?: string;
-    navigationLinks?: boolean;
 }
 
 interface IState {
@@ -92,23 +87,12 @@ export class TitleBar extends React.Component<IProps, IState> {
         renderComponent: true,
     };
     public render() {
-        const { isFixed, hamburger, navigationLinks } = this.props;
+        const { hamburger } = this.props;
         const isCompact = this.props.device === TitleBarDevices.COMPACT;
         const classes = titleBarClasses();
         const showMobileDropDown = isCompact && !this.state.openSearch && this.props.title;
         const showHamburger = isCompact && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
-
-        const localNavLinks = navigationVariables()[`${getCurrentLocale()}`]
-            ? "data" in navigationVariables()[`${getCurrentLocale()}`]
-            : null;
-        const navigationData = localNavLinks
-            ? navigationVariables()[`${getCurrentLocale()}`].data
-            : defaultNavigationData().data;
-
-        const navLinks = navigationLinks
-            ? defaultNavigationData().data.concat(dummyStorybookNavigationData().data)
-            : navigationData;
 
         const headerContent = (
             <HashOffsetReporter>
@@ -138,7 +122,6 @@ export class TitleBar extends React.Component<IProps, IState> {
                             )}
                             {!this.state.openSearch && !isCompact && (
                                 <TitleBarNav
-                                    data={navLinks}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"
@@ -155,11 +138,7 @@ export class TitleBar extends React.Component<IProps, IState> {
 
                             {showHamburger && (
                                 <>
-                                    <Hamburger
-                                        buttonClassName={classes.hamburger}
-                                        contents={hamburger}
-                                        data={navLinks}
-                                    />
+                                    <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
                                     <FlexSpacer
                                         className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
                                     />

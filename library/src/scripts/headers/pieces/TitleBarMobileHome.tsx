@@ -14,16 +14,12 @@ import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { defaultNavigationData } from "@library/headers/mebox/state/defaultNavigationData";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
 import Container from "@library/layout/components/Container";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import { SignInIcon } from "@library/icons/common";
-import { navigationVariables } from "../navigationVariables";
-import { getCurrentLocale } from "@vanilla/i18n";
-import { dummyStorybookNavigationData } from "../dummyStorybookNavigationData";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -42,13 +38,6 @@ export class TitleBarMobileHome extends React.Component<IProps> {
         const isGuest = isUserGuest(currentUser);
         const titleBarVars = titleBarClasses();
         const classes = titleBarHomeClasses();
-        const navigationData = Object.keys(navigationVariables()[`${getCurrentLocale()}`]).includes("data")
-            ? navigationVariables()[`${getCurrentLocale()}`].data
-            : defaultNavigationData().data;
-
-        const navLinks = this.props.navigationLinks
-            ? defaultNavigationData().data.concat(dummyStorybookNavigationData().data)
-            : navigationData;
 
         return ReactDOM.createPortal(
             <header className={classNames(titleBarVars.root, classes.root, this.props.className)}>
@@ -79,7 +68,6 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                 <div className={classes.bottom}>
                     <div className={titleBarVars.scroll}>
                         <TitleBarNav
-                            data={navLinks}
                             className={classNames("titleBar-nav", titleBarVars.nav)}
                             linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
                             linkContentClassName="titleBar-navLinkContent"

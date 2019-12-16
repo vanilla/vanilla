@@ -3,25 +3,44 @@
  * @license GPL-2.0-only
  */
 import { t } from "@library/utility/appUtils";
+import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
+import { getCurrentLocale } from "@vanilla/i18n";
+import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
 
-export const navigationVariables = () => {
-    return {
-        en: {
-            data: [
-                {
-                    to: "/kb",
-                    children: t("Help Menu", "Learning Center"),
-                    permission: "kb.view",
-                },
-                {
-                    to: "/discussions",
-                    children: t("Discussions"),
-                },
-                {
-                    to: "/categories",
-                    children: t("Innovation Hub"),
-                },
-            ],
-        },
+export const navigationVariables = useThemeCache(() => {
+    const makeVars = variableFactory("navigation");
+
+    const navItems: {
+        [language: string]: ITitleBarNav[];
+    } = makeVars("navItems", {
+        default: [
+            {
+                to: "/categories",
+                children: t("Categories"),
+            },
+            {
+                to: "/discussions",
+                children: t("Discussions"),
+            },
+            {
+                to: "/kb",
+                children: t("Help Menu", "Help"),
+                permission: "kb.view",
+            },
+        ],
+    });
+
+    console.log(navItems);
+
+    const currentLocale = getCurrentLocale();
+    console.log(currentLocale);
+    const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
+        if (locale in navItems) {
+            return navItems[locale];
+        } else {
+            return navItems.default;
+        }
     };
-};
+
+    return { navItems, getNavItemsForLocale };
+});

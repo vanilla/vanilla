@@ -33,13 +33,14 @@
             </div>
         {/if}
     {/if}
-    
+   
     {if !$DataDrivenTitleBar}
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {knowledge_link format=$linkFormat}
-        {activity_link format=$linkFormat}
         {custom_menu format=$linkFormat}
+        {activity_link format=$linkFormat}
+       
     {/if}
 {/capture}
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -148,8 +149,9 @@
                                 {/if}
                                 {categories_link format=$linkFormat}
                                 {discussions_link format=$linkFormat}
-                                {activity_link format=$linkFormat}
                                 {custom_menu format=$linkFormat}
+                                {activity_link format=$linkFormat}
+                               
                                 <div class='Navigation-linkContainer'>
                                     {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
                                 </div>

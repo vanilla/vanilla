@@ -50,8 +50,8 @@ class SafeGlobTest extends TestCase {
     /**
      * Test with empty glob string.
      */
-    public function testWithEmptyGlobString() {
-        $actual = safeGlob("");
+    public function testWithBadGlobString() {
+        $actual = safeGlob('/tests/fixtures/globe/*');
         $expected = [];
         $this->assertSame($expected, $actual);
     }

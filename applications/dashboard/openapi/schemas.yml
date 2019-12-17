@@ -13,7 +13,6 @@ components:
         - textex
         - wysiwyg
         - bbcode
-        - display
       example: markdown
     RoleFragment:
       type: object

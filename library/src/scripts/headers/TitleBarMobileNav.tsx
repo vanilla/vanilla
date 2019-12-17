@@ -44,7 +44,7 @@ export default class TitleBarMobileNav extends React.Component<ITitleBarMobileNa
         });
 
         return (
-            <nav>
+            <nav className={classes.navContiner}>
                 <ul>{content}</ul>
             </nav>
         );

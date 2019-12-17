@@ -40,6 +40,16 @@ class AttributeTest extends TestCase {
               '500',
               ' width="500"',
             ],
+            'emptyValue' => [
+                "width",
+                false,
+                '',
+            ],
+            'valueIsArray' => [
+                ['data-something' => ['x' => '1', 'y' => '2']],
+                [],
+                ' data-something="{&quot;x&quot;:&quot;1&quot;,&quot;y&quot;:&quot;2&quot;}"'
+            ]
         ];
 
         return $r;

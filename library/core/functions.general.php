@@ -1927,29 +1927,6 @@ if (!function_exists('touchFolder')) {
     }
 }
 
-if (!function_exists('trace')) {
-    /**
-     * Trace some information for debugging.
-     *
-     * @param mixed $value One of the following:
-     *
-     * - null: The entire trace will be returned.
-     * - string: A trace message.
-     * - other: A variable to output.
-     * @param string $type One of the `TRACE_*` constants or a string label for the trace.
-     * @return array Returns the array of traces.
-     */
-    function trace($value = null, $type = TRACE_INFO) {
-        static $traces = [];
-
-        if ($value === null) {
-            return $traces;
-        }
-
-        $traces[] = [$value, $type];
-    }
-}
-
 if (!function_exists('unicodeRegexSupport')) {
     /**
      * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.

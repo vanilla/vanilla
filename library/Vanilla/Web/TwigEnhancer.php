@@ -188,23 +188,7 @@ class TwigEnhancer {
      */
     public function renderControllerAsset(string $assetName): \Twig\Markup {
         $controller = Gdn::controller();
-        $asset = $controller->getAsset($assetName);
-        if (is_object($asset)) {
-            $asset->AssetName = $assetName;
-
-            if (($asset->Visible ?? true)) {
-                $asset = $asset->toString();
-            } else {
-                $asset = '';
-            }
-        }
-
-        $eventArgs = ['AssetName' => $assetName];
-        $result =
-            $this->firePluggableEchoEvent($controller, 'BeforeRenderAsset', $eventArgs)
-            . $asset
-            . $this->firePluggableEchoEvent($controller, 'AfterRenderAsset', $eventArgs);
-        return new \Twig\Markup($result, 'utf-8');
+        return $controller->renderAssetForTwig($assetName);
     }
 
     /**

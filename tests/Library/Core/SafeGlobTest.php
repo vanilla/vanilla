@@ -37,4 +37,22 @@ class SafeGlobTest extends TestCase {
         );
         $this->assertSame($expected, $actual);
     }
+
+    /**
+     * Test with nonexistent extensions.
+     */
+    public function testWithNonexistentExtensions() {
+        $actual = safeGlob(PATH_ROOT.'/tests/fixtures/glob/*', ['html', 'doc']);
+        $expected = [];
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test with empty glob string.
+     */
+    public function testWithEmptyGlobString() {
+        $actual = safeGlob("");
+        $expected = [];
+        $this->assertSame($expected, $actual);
+    }
 }

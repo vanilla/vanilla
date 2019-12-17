@@ -24,7 +24,7 @@ class SafeGlobTest extends TestCase {
             PATH_ROOT.'/tests/fixtures/glob/b.md',
             PATH_ROOT.'/tests/fixtures/glob/a.txt',
         );
-        $this->assertSame($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
@@ -35,7 +35,7 @@ class SafeGlobTest extends TestCase {
         $expected = array (
             PATH_ROOT.'/tests/fixtures/glob/b.md',
         );
-        $this->assertSame($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
@@ -44,7 +44,7 @@ class SafeGlobTest extends TestCase {
     public function testWithNonexistentExtensions() {
         $actual = safeGlob(PATH_ROOT.'/tests/fixtures/glob/*', ['html', 'doc']);
         $expected = [];
-        $this->assertSame($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
@@ -53,6 +53,6 @@ class SafeGlobTest extends TestCase {
     public function testWithBadGlobString() {
         $actual = safeGlob('/tests/fixtures/globe/*');
         $expected = [];
-        $this->assertSame($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 }

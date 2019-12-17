@@ -1688,11 +1688,11 @@ if (!function_exists('safeImage')) {
     function safeImage($imageUrl, $minHeight = 0, $minWidth = 0) {
         try {
             list($width, $height, $_, $_) = getimagesize($imageUrl);
-            if ($minHeight > 0 && $minHeight < $height) {
+            if ($minHeight > 0 && $minHeight > $height) {
                 return false;
             }
 
-            if ($minWidth > 0 && $minWidth < $width) {
+            if ($minWidth > 0 && $minWidth > $width) {
                 return false;
             }
         } catch (Exception $ex) {

@@ -45,20 +45,28 @@ class SafeImageTest extends TestCase {
                 false,
                 PATH_ROOT.'/tests/fixtures/safe-image/empty-folder',
             ],
-            'underMinHeight' => [
-                false,
+            'meetsMinHeight' => [
+                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 1,
             ],
-            'underMinWidth' => [
-                false,
+            'meetsMinWidth' => [
+                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 0,
                 1,
             ],
             'meetsMinHeight' => [
-                PATH_ROOT.'/tests/'
-            ]
+                false,
+                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
+                900,
+            ],
+            'meetsMinWidth' => [
+                false,
+                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
+                0,
+                900,
+            ],
         ];
 
         return $r;

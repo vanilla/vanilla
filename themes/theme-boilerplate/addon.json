@@ -3,7 +3,7 @@
     "name": "Theme Boilerplate",
     "description": "A SCSS boilerplate for vanilla responsive themes.",
     "hidden": true,
-    "version": "1.3.2",
+    "version": "1.4.1",
     "authors": [
         {
             "name": "Adam (charrondev) Charron",

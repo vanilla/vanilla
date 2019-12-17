@@ -59,25 +59,8 @@ class ThemeModel {
         ],
     ];
 
-//    const PREVIEW_VARIABLES = [
-//        "global"mainColors.primary",
-//        "global.mainColors.bg",
-//        "global.mainColors.fg",
-//        "titleBar.colors.bg",
-//        "titleBar.colors.fg",
-//        "splash.outerBackground.image",
-//    ];
-
-
-      const SCOPE = ["global" => true, "titleBar" => true, "splash" => true];
-      const SECTION = ["mainColors" => true, "colors" => true, "outerBackground" => true];
-      const PROPERTIES = ["primary" => true, "bg" => true, "fg" => true, "image" => true];
-
-
     const ASSET_KEY = "assets";
-
-
-
+    
     /** @var ThemeProviderInterface[] */
     private $themeProviders = [];
 

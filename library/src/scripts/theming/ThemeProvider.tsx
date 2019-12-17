@@ -60,10 +60,6 @@ class BaseThemeProvider extends React.Component<IProps> {
         }
         void this.props.requestData();
 
-        if (this.props.variablesOnly) {
-            return;
-        }
-
         const themeHeader = document.getElementById("themeHeader");
         const themeFooter = document.getElementById("themeFooter");
 
@@ -73,6 +69,10 @@ class BaseThemeProvider extends React.Component<IProps> {
 
         if (themeFooter) {
             prepareShadowRoot(themeFooter, true);
+        }
+
+        if (this.props.variablesOnly) {
+            return;
         }
 
         loadThemeFonts();

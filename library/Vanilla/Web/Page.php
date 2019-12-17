@@ -62,6 +62,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /** @var PageHead */
     private $pageHead;
 
+    /** @var MasterViewRenderer */
+    private $masterViewRenderer;
+
     /**
      * Dependendency Injection.
      *
@@ -69,17 +72,20 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * @param \Gdn_Request $request
      * @param \Gdn_Session $session
      * @param PageHead $pageHead
+     * @param MasterViewRenderer $masterViewRenderer
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        PageHead $pageHead
+        PageHead $pageHead,
+        MasterViewRenderer $masterViewRenderer
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
         $this->pageHead = $pageHead;
+        $this->masterViewRenderer = $masterViewRenderer;
         $this->pageHead->setAssetSection($this->getAssetSection());
         $this->setPageHeadProxy($this->pageHead);
     }
@@ -94,6 +100,20 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     }
 
     /**
+     * @return PageHead
+     */
+    public function getHead(): PageHead {
+        return $this->pageHead;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeoContent(): string {
+        return $this->seoContent;
+    }
+
+    /**
      * Render the page content and wrap it in a data object for the dispatcher.
      *
      * This method is kept private so that it can be called internally for error pages without being overridden.
@@ -103,18 +123,15 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     private function renderMasterView(): Data {
         $this->validateSeo();
         $this->addInlineScript($this->getReduxActionsAsJsVariable());
+
         $viewData = [
-            'locale' => $this->siteMeta->getLocaleKey(),
-            'debug' => $this->siteMeta->getDebugModeEnabled(),
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
             'cssClasses' => ['isLoading'],
-            'favIcon' => $this->siteMeta->getFavIcon(),
-            'pageHead' => $this->pageHead,
             'seoContent' => $this->seoContent,
         ];
 
-        $viewContent = $this->renderTwig('resources/views/master.twig', $viewData);
+        $viewContent = $this->masterViewRenderer->renderPage($this, $viewData);
 
         return new Data($viewContent, $this->statusCode);
     }

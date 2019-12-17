@@ -1,25 +1,8 @@
-<!DOCTYPE html>
-<html lang="{{ CurrentLocale.Key|default('en') }}">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    {{ renderControllerAsset('Head') }}
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700,700i" rel="stylesheet">
-</head>
-
-<body class="{{ CssClass|default("") }}">
-
-<!--[if lt IE 9]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-<![endif]-->
-
 <div class="Frame" id="page">
-    <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true"></header>
     <div class="Frame-top">
         <div class="Frame-body">
 
-{#            <!---------- Hero Banner ---------->#}
+{#            <!-- Hero Banner -->#}
 {#            {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}#}
 {#            <div class="Herobanner">#}
 {#                {if $heroImageUrl}#}
@@ -50,7 +33,7 @@
 {#                </div>#}
 {#            </div>#}
 {#            {/if}#}
-{#            <!---------- Hero Banner END ---------->#}
+{#            <!-- Hero Banner END -->#}
 
             <div class="Frame-content">
                 <div class="Container">
@@ -78,9 +61,9 @@
 {#                            {/if}#}
                             <div class="Frame-row">
 
-{#                                <!---------- Main Content ---------->#}
+{#                                <!-- Main Content -->#}
                                 <main class="Content MainContent">
-{#                                    <!---------- Profile Page Header ---------->#}
+{#                                    <!-- Profile Page Header -->#}
 {#                                    {if inSection("Profile")}#}
 {#                                    <div class="Profile-header">#}
 {#                                        <div class="Profile-photo">#}
@@ -104,13 +87,13 @@
 {#                                        </div>#}
 {#                                    </div>#}
 {#                                    {/if}#}
-{#                                    <!---------- Profile Page Header END ---------->#}
+{#                                    <!-- Profile Page Header END -->#}
 
                                     {{ renderControllerAsset("Content") }}
                                 </main>
-{#                                <!---------- Main Content END ---------->#}
+{#                                <!-- Main Content END -->#}
 
-                                <!---------- Main Panel ---------->
+                                <!-- Main Panel -->
                                 <aside class="Panel Panel-main">
 {#                                    {if !$SectionGroups && !$DataDrivenTitleBar}#}
 {#                                    <div class="SearchBox js-sphinxAutoComplete" role="search">#}
@@ -119,7 +102,7 @@
 {#                                    {/if}#}
                                     {{ renderControllerAsset("Panel") }}
                                 </aside>
-                                <!---------- Main Panel END ---------->
+                                <!-- Main Panel END -->
 
                             </div>
                         </div>
@@ -132,8 +115,3 @@
 
     </div>
 </div>
-<div id="modals"></div>
-{event name="AfterBody"}
-</body>
-
-</html>

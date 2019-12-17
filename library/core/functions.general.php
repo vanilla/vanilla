@@ -2088,34 +2088,6 @@ if (!function_exists('userAgentType')) {
     }
 }
 
-if (!function_exists('increaseMaxExecutionTime')) {
-    /**
-     * Used to increase php max_execution_time value.
-     *
-     * @param int $maxExecutionTime PHP max execution time in seconds.
-     * @return bool Returns true if max_execution_time was increased (or stayed the same) or false otherwise.
-     */
-    function increaseMaxExecutionTime($maxExecutionTime) {
-
-        $iniMaxExecutionTime = ini_get('max_execution_time');
-
-        // max_execution_time == 0 means no limit.
-        if ($iniMaxExecutionTime === '0') {
-            return true;
-        }
-
-        if (((string)$maxExecutionTime) === '0') {
-            return set_time_limit(0);
-        }
-
-        if (!ctype_digit($iniMaxExecutionTime) || $iniMaxExecutionTime < $maxExecutionTime) {
-            return set_time_limit($maxExecutionTime);
-        }
-
-        return true;
-    }
-}
-
 if (!function_exists('slugify')) {
     /**
      * Converts a string to a slug-type string.

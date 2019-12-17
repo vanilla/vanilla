@@ -55,7 +55,9 @@
         "vanilla/vanilla-connect": "~0.0",
         "twig/twig": "^2.5",
         "psr/event-dispatcher": "^1.0",
-        "fig/event-dispatcher-util": "^1.1"
+        "fig/event-dispatcher-util": "^1.1",
+        "symfony/polyfill-php73": "^1.13",
+        "symfony/polyfill-php74": "^1.13"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -78,6 +80,7 @@
         ],
         "files": [
             "library/core/functions.error.php",
+            "library/core/functions.framework.php",
             "library/core/functions.general.php",
             "library/core/functions.compatibility.php",
             "library/core/functions.deprecated.php"

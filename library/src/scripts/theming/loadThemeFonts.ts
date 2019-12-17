@@ -17,11 +17,11 @@ export function loadThemeFonts() {
     const assets = state.theme.assets.data || {};
     const { fonts } = assets;
 
-    if (fonts && fonts.length > 0) {
+    if (fonts && fonts.data.length > 0) {
         const webFontConfig: WebFont.Config = {
             custom: {
-                families: fonts.map(font => font.name),
-                urls: fonts.map(font => font.url),
+                families: fonts.data.map(font => font.name),
+                urls: fonts.data.map(font => font.url),
             },
         };
 

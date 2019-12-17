@@ -3,6 +3,17 @@ info:
 paths:
 components:
   schemas:
+    Format:
+      description: The format of the body used to convert it to HTML.
+      type: string
+      enum:
+        - rich
+        - markdown
+        - text
+        - textex
+        - wysiwyg
+        - bbcode
+      example: markdown
     RoleFragment:
       type: object
       properties:

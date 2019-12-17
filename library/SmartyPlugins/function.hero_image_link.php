@@ -13,7 +13,8 @@
  * @param Gdn_Smarty $smarty The smarty instance
  *
  * @return string
+ * @deprecated 4.0
  */
 function smarty_function_hero_image_link($params, &$smarty) {
-    return HeroImagePlugin::getCurrentHeroImageLink();
+    return smarty_function_banner_image_url($params, $smarty);
 }

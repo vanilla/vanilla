@@ -14,9 +14,7 @@ paths:
                   minLength: 1
                   type: string
                 format:
-                  description: The format to be used for rendering the text.
-                  minLength: 1
-                  type: string
+                  $ref: 'schemas.yml#/components/schemas/Format'
               required:
               - body
               - format

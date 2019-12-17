@@ -51,6 +51,7 @@ $Configuration['Garden']['StripWebRoot'] = false;
 $Configuration['Garden']['AllowSSL'] = true;
 $Configuration['Garden']['PrivateCommunity'] = false;
 $Configuration['Garden']['Forms']['HoneypotName'] = 'hpt';
+$Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 
 // Developer stuff.
 $Configuration['Garden']['Debug'] = false;

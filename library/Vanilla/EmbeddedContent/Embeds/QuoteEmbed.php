@@ -11,6 +11,7 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Models\FormatSchema;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\InstanceValidatorSchema;
 
@@ -136,7 +137,7 @@ class QuoteEmbed extends AbstractEmbed {
             'body:s', // The body is need currnetly during edit mode,
             // to prevent needing extra server roundtrips to render them.
             'bodyRaw:s|a', // Raw body is the source of truth for the embed.
-            'format:s',
+            'format' => new FormatSchema(true),
             'dateInserted:dt',
             'insertUser' => new UserFragmentSchema(),
             'displayOptions' => new InstanceValidatorSchema(QuoteEmbedDisplayOptions::class),

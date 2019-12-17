@@ -52,6 +52,7 @@ class MinimalContainerTestCase extends TestCase {
      */
     private function configureContainer() {
         \Gdn::setContainer(new Container());
+
         self::container()
             ->rule(FormatService::class)
             ->setShared(true)
@@ -124,6 +125,11 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(UserProviderInterface::class)
             ->setClass(MockUserProvider::class)
             ->setShared(true)
+
+            ->rule(\Gdn_PluginManager::class)
+            ->addAlias(\Gdn::AliasPluginManager)
+
+            ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
         ;
     }
 

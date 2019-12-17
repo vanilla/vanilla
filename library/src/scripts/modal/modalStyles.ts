@@ -71,6 +71,10 @@ export const modalVariables = useThemeCache(() => {
         boxShadow: `0 -1px 2px 0 ${colorOut(globalVars.overlay.bg)}`,
     });
 
+    const fullScreenTitleSpacing = makeThemeVars("fullScreenModalTitle", {
+        gap: 52,
+    });
+
     return {
         colors,
         sizing,
@@ -79,6 +83,7 @@ export const modalVariables = useThemeCache(() => {
         dropDown,
         header,
         footer,
+        fullScreenTitleSpacing,
     };
 });
 

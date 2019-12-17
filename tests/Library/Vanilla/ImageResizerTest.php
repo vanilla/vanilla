@@ -207,6 +207,22 @@ class ImageResizerTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Verify ability to save an animated GIF without rewriting, causing ths loss of animation.
+     *
+     * @return void
+     */
+    public function testNoGifRewrite() {
+        $resizer = new ImageResizer();
+        $resizer->setAlwaysRewriteGif(false);
+
+        $source = PATH_ROOT."/tests/fixtures/yoda.gif";
+        $destination = PATH_ROOT."/tests/cache/image-resizer/yoda-copy.gif";
+
+        $r = $resizer->resize($source, $destination, ["width" => 256, "height" => 256]);
+        $this->assertFileEquals($source, $destination);
+    }
+
+    /**
      * Provide tests for **testResize()**.
      *
      * @return array Returns a data provider array.

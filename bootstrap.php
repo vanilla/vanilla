@@ -66,6 +66,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
+    ->rule(\Vanilla\ImageResizer::class)
+    ->addCall('setAlwaysRewriteGif', [false])
+
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
     ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])

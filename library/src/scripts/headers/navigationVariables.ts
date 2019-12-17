@@ -7,6 +7,14 @@ import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
 
+type INavItemGenerator = () => ITitleBarNav;
+
+const navItemGenerators: INavItemGenerator[] = [];
+
+export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
+    navItemGenerators.push(navItemGetter);
+}
+
 export const navigationVariables = useThemeCache(() => {
     const makeVars = variableFactory("navigation");
 
@@ -22,18 +30,12 @@ export const navigationVariables = useThemeCache(() => {
                 to: "/discussions",
                 children: t("Discussions"),
             },
-            {
-                to: "/kb",
-                children: t("Help Menu", "Help"),
-                permission: "kb.view",
-            },
+            ...navItemGenerators.map(generator => generator()),
         ],
     });
 
-    console.log(navItems);
-
     const currentLocale = getCurrentLocale();
-    console.log(currentLocale);
+
     const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
         if (locale in navItems) {
             return navItems[locale];

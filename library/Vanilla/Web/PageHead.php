@@ -231,6 +231,17 @@ final class PageHead implements PageHeadInterface {
      */
     public function addInlineScript(string $script) {
         $this->inlineScripts[] = $script;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addScript(AssetInterface $script) {
+        $this->scripts[] = $script;
+
+        return $this;
     }
 
     /**

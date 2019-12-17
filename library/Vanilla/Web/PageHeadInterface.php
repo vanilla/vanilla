@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Navigation\Breadcrumb;
 
 /**
@@ -100,8 +101,17 @@ interface PageHeadInterface {
      * Add an inline script to the page head.
      *
      * @param string $script
+     * @return $this
      */
     public function addInlineScript(string $script);
+
+    /**
+     * Add a script to the page head.
+     *
+     * @param AssetInterface $script
+     * @return $this
+     */
+    public function addScript(AssetInterface $script);
 
     /**
      * @return string

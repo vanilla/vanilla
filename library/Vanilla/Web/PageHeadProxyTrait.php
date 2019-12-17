@@ -28,42 +28,48 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      * @inheritdoc
      */
     public function setAssetSection(string $section) {
-        return $this->proxy->setAssetSection($section);
+        $this->proxy->setAssetSection($section);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function addJsonLDItem(AbstractJsonLDItem $item) {
-        return $this->proxy->addJsonLDItem($item);
+        $this->proxy->addJsonLDItem($item);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function setSeoTitle(string $title, bool $withSiteTitle = true) {
-        return $this->proxy->setSeoTitle($title, $withSiteTitle);
+        $this->proxy->setSeoTitle($title, $withSiteTitle);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function setSeoDescription(string $description) {
-        return $this->proxy->setSeoDescription($description);
+        $this->proxy->setSeoDescription($description);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function setCanonicalUrl(string $path) {
-        return $this->proxy->setCanonicalUrl($path);
+        $this->proxy->setCanonicalUrl($path);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function setSeoBreadcrumbs(array $crumbs) {
-        return $this->proxy->setSeoBreadcrumbs($crumbs);
+        $this->proxy->setSeoBreadcrumbs($crumbs);
+        return $this;
     }
 
     /**
@@ -71,27 +77,31 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      */
     public function addInlineScript(string $script) {
         $this->proxy->addInlineScript($script);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function addLinkTag(array $attributes) {
-        return $this->proxy->addLinkTag($attributes);
+        $this->proxy->addLinkTag($attributes);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function addMetaTag(array $attributes) {
-        return $this->proxy->addMetaTag($attributes);
+        $this->proxy->addMetaTag($attributes);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
     public function addOpenGraphTag(string $property, string $content) {
-        return $this->proxy->addOpenGraphTag($property, $content);
+        $this->proxy->addOpenGraphTag($property, $content);
+        return $this;
     }
 
     /**

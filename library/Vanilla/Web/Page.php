@@ -7,67 +7,21 @@
 
 namespace Vanilla\Web;
 
-use Garden\EventManager;
 use Garden\Web\Exception\HttpException;
-use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Navigation\Breadcrumb;
-use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\JsInterpop\PhpAsJsVariable;
-use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
  * Class representing a single page in the application.
  */
-abstract class Page implements InjectableInterface, CustomExceptionHandler {
+abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface {
 
-    use TwigRenderTrait, ReduxActionPreloadTrait;
-
-    /** @var string */
-    private $canonicalUrl;
-
-    /** @var string */
-    private $favIcon;
-
-    /** @var string */
-    private $seoTitle;
-
-    /** @var string */
-    private $seoDescription;
-
-    /** @var Breadcrumb[]|null */
-    private $seoBreadcrumbs;
-
-    /** @var string|null */
-    private $seoContent;
-
-    /** @var array */
-    private $metaTags = [];
-
-    /** @var array */
-    private $linkTags = [];
-
-    /** @var AssetInterface[] */
-    protected $scripts = [];
-
-    /** @var AssetInterface[] */
-    protected $styles = [];
-
-    /** @var string[] */
-    protected $inlineScripts = [];
-
-    /** @var string[] */
-    protected $inlineStyles = [];
+    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait;
 
     /** @var bool */
     private $requiresSeo = true;
@@ -75,15 +29,17 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var int The page status code. */
     private $statusCode = 200;
 
-    /** @var AbstractJsonLDItem */
-    private $jsonLDItems = [];
-
     /**
      * Prepare the page contents.
      *
      * @return void
      */
     abstract public function initialize();
+
+    /**
+     * Get the section of the site we are serving assets for.
+     */
+    abstract public function getAssetSection(): string;
 
     /** @var SiteMeta */
     protected $siteMeta;
@@ -94,26 +50,17 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var \Gdn_Session */
     protected $session;
 
-    /** @var WebpackAssetProvider */
-    protected $assetProvider;
-
-    /** @var BreadcrumbModel */
-    protected $breadcrumbModel;
-
     /** @var string */
     protected $headerHtml = '';
 
     /** @var string */
     protected $footerHtml = '';
 
-    /** @var ContentSecurityPolicyModel */
-    protected $cspModel;
+    /** @var string|null */
+    protected $seoContent;
 
-    /** @var AssetPreloadModel */
-    protected $preloadModel;
-
-    /** @var EventManager */
-    protected $eventManager;
+    /** @var PageHead */
+    private $pageHead;
 
     /**
      * Dependendency Injection.
@@ -121,34 +68,20 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param SiteMeta $siteMeta
      * @param \Gdn_Request $request
      * @param \Gdn_Session $session
-     * @param WebpackAssetProvider $assetProvider
-     * @param BreadcrumbModel $breadcrumbModel
-     * @param ContentSecurityPolicyModel $cspModel
-     * @param AssetPreloadModel $preloadModel
-     * @param EventManager $eventManager
+     * @param PageHead $pageHead
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel,
-        EventManager $eventManager
+        PageHead $pageHead
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
-        $this->assetProvider = $assetProvider;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->cspModel = $cspModel;
-        $this->preloadModel = $preloadModel;
-        $this->eventManager = $eventManager;
-
-        if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
-            $this->addMetaTag(["name" => "theme-color", "content" => $mobileAddressBarColor]);
-        }
+        $this->pageHead = $pageHead;
+        $this->pageHead->setAssetSection($this->getAssetSection());
+        $this->setPageHeadProxy($this->pageHead);
     }
 
     /**
@@ -169,99 +102,21 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     private function renderMasterView(): Data {
         $this->validateSeo();
-        $this->applyMetaTags();
-
-        $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
-            'meta' => $this->siteMeta,
-        ]);
-        $this->inlineScripts[] = $this->getReduxActionsAsJsVariable();
+        $this->addInlineScript($this->getReduxActionsAsJsVariable());
         $viewData = [
-            'nonce' => $this->cspModel->getNonce(),
-            'title' => $this->seoTitle,
-            'description' => $this->seoDescription,
-            'canonicalUrl' => $this->canonicalUrl,
             'locale' => $this->siteMeta->getLocaleKey(),
             'debug' => $this->siteMeta->getDebugModeEnabled(),
-            'scripts' => $this->scripts,
-            'inlineScripts' => $this->inlineScripts,
-            'styles' => $this->styles,
-            'inlineStyles' => $this->inlineStyles,
-            'seoContent' => $this->seoContent,
-            'metaTags' => $this->metaTags,
-            'linkTags' => $this->linkTags,
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
-            'preloadModel' => $this->preloadModel,
             'cssClasses' => ['isLoading'],
             'favIcon' => $this->siteMeta->getFavIcon(),
-            'jsonLD' => $this->getJsonLDScriptContent(),
+            'pageHead' => $this->pageHead,
+            'seoContent' => $this->seoContent,
         ];
 
-        $this->eventManager->fireArray('BeforeRenderMasterView', [&$viewData]);
-
-        $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
+        $viewContent = $this->renderTwig('resources/views/master.twig', $viewData);
 
         return new Data($viewContent, $this->statusCode);
-    }
-
-    /**
-     * Add a JSON-LD item to be represented.
-     *
-     * @param AbstractJsonLDItem $item
-     *
-     * @return $this For chaining.
-     */
-    public function addJsonLDItem(AbstractJsonLDItem $item): self {
-        $this->jsonLDItems[] = $item;
-        return $this;
-    }
-
-    /**
-     * Get the content of the page's JSON-LD script.
-     * @return string
-     */
-    private function getJsonLDScriptContent(): string {
-        $data = [
-            '@context' => "https://schema.org",
-            "@graph" => $this->jsonLDItems,
-        ];
-
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
-     * Use existing site data to create open graph meta tags.
-     */
-    private function applyMetaTags() {
-
-        // Standard meta tags
-        if ($this->seoDescription) {
-            $this->addMetaTag(['name' => 'description', 'content' => $this->seoDescription]);
-        }
-
-        // Site name
-        $this->addOpenGraphTag('og:site_name', $this->siteMeta->getSiteTitle());
-
-        if ($this->seoTitle) {
-            $this->addOpenGraphTag('og:title', $this->seoTitle);
-        }
-
-        if ($this->seoDescription) {
-            $this->addOpenGraphTag('og:description', $this->seoDescription);
-        }
-
-        if ($this->canonicalUrl) {
-            $this->addOpenGraphTag('og:url', $this->canonicalUrl);
-            $this->addLinkTag(['rel' => 'canonical', 'href' => $this->canonicalUrl]);
-        }
-
-        // Twitter specific tags
-        $this->addMetaTag(['name' => 'twitter:card', 'content' => 'summary']);
-        // There is no need to duplicate twitter & OG tags.
-        //
-        // When the Twitter card processor looks for tags on a page, it first checks for the Twitter-specific property,
-        // and if not present, falls back to the supported Open Graph property.
-        // From https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started#twitter-cards-and-open-graph
     }
 
     /**
@@ -274,11 +129,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             $this->siteMeta->getDebugModeEnabled() &&
             $this->requiresSeo &&
             (
-                $this->seoTitle === null ||
-                $this->seoBreadcrumbs === null ||
+                $this->getSeoTitle() === null ||
+                $this->getSeoBreadcrumbs() === null ||
                 $this->seoContent === null ||
-                $this->seoDescription === null ||
-                $this->canonicalUrl === null
+                $this->getSeoDescription() === null ||
+                $this->getCanonicalUrl() === null
             );
         if ($hasInvalidSeo) {
             throw new ServerException('Page SEO data is not fully implemented');
@@ -311,66 +166,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     }
 
     /**
-     * Set the page title (in the browser tab).
-     *
-     * @param string $title The title to set.
-     * @param bool $withSiteTitle Whether or not to append the global site title.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoTitle(string $title, bool $withSiteTitle = true): self {
-        if ($withSiteTitle) {
-            if ($title === "") {
-                $title = $this->siteMeta->getSiteTitle();
-            } else {
-                $title .= " - " . $this->siteMeta->getSiteTitle();
-            }
-        }
-        $this->seoTitle = $title;
-
-        return $this;
-    }
-
-    /**
-     * Set an the site meta description.
-     *
-     * @param string $description
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoDescription(string $description): self {
-        $this->seoDescription = $description;
-
-        return $this;
-    }
-
-    /**
-     * Set an the canonical URL for the page.
-     *
-     * @param string $path Either a partial path or a full URL.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setCanonicalUrl(string $path): self {
-        $this->canonicalUrl = $this->request->url($path, true);
-
-        return $this;
-    }
-
-    /**
-     * Set an array of breadcrumbs.
-     *
-     * @param Breadcrumb[] $crumbs
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoBreadcrumbs(array $crumbs): self {
-        $this->seoBreadcrumbs = $crumbs;
-        $this->addJsonLDItem(new BreadcrumbJsonLD($crumbs));
-        return $this;
-    }
-
-    /**
      * Render and set the SEO page content.
      *
      * @param string $viewPathOrView The path to the view to render or the rendered view.
@@ -388,43 +183,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->seoContent = $this->renderTwig($viewPathOrView, $viewData);
 
         return $this;
-    }
-
-    /**
-     * Set page link tag attributes.
-     *
-     * @param array $attributes Array of attributes to set for tag.
-     *
-     * @return $this Own instance for chaining.
-     */
-    public function addLinkTag(array $attributes): self {
-        $this->linkTags[] = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * Set page meta tag attributes.
-     *
-     * @param array $attributes Array of attributes to set for tag.
-     *
-     * @return $this Own instance for chaining.
-     */
-    public function addMetaTag(array $attributes): self {
-        $this->metaTags[] = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * Apply an open graph tag.
-     *
-     * @param string $property
-     * @param string $content
-     * @return $this
-     */
-    public function addOpenGraphTag(string $property, string $content): self {
-        return $this->addMetaTag(['property' => $property, 'content' => $content]);
     }
 
     /**

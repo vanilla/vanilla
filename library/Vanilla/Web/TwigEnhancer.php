@@ -119,6 +119,8 @@ class TwigEnhancer {
      */
     public function enhanceFileSystem(FilesystemLoader $loader) {
         $addons = $this->addonProvider->getEnabled();
+        $loader->addPath(PATH_ROOT . '/resources/views', 'resources');
+
         foreach ($addons as $addon) {
             $viewDirectory = PATH_ROOT . $addon->getSubdir() . '/views';
             if (file_exists($viewDirectory)) {

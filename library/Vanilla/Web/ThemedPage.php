@@ -29,14 +29,10 @@ abstract class ThemedPage extends Page {
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel,
-        EventManager $eventManager,
+        PageHead $pageHead,
         ThemePreloadProvider $themeProvider = null // Default required to conform to interface
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $eventManager);
+        parent::setDependencies($siteMeta, $request, $session, $pageHead);
         $this->themeProvider = $themeProvider;
         $this->initAssets();
     }

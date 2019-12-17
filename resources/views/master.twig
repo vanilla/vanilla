@@ -1,53 +1,22 @@
 <!DOCTYPE html>
-<html lang="{{ locale }}">
+<html lang="{{ locale|default(CurrentLocale.Key|default('en')) }}">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ title }}</title>
 
-        {% for meta in metaTags -%}
-            <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
-        {% endfor %}
-
-        {% for link in linkTags -%}
-            <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
-        {% endfor %}
-
-        {% if favIcon -%}
-            <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
+        {% if isLegacyController|default(false) %}
+            {{ renderControllerAsset('Head') }}
+        {% else %}
+            {{ pageHead.renderHtml() }}
         {% endif %}
-
-        {% for script in inlineScripts -%}
-            <script nonce="{{ nonce }}">
-                {{- script|raw -}}
-            </script>
-        {% endfor %}
-
-        {% for script in scripts -%}
-            <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
-        {% endfor %}
-
-        {%- if jsonLD -%}
-            <script type="application/ld+json">
-                {{- jsonLD|raw -}}
-            </script>
-        {%- endif -%}
-
-        {% for stylesheet in styles -%}
-            <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
-        {% endfor -%}
-
-        {{ preloadModel.renderHtml()|raw }}
-
         <noscript>
             <style>
                 .fullPageLoader { display: none }
             </style>
         </noscript>
-
     </head>
-    <body class="{{ cssClasses|join(' ') }}">
+    <body class="{{ cssClasses }}">
         <div id="page" class="page">
             {%- if header -%}
                 <noscript id="themeHeader">

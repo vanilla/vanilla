@@ -2245,6 +2245,15 @@ class DiscussionModel extends Gdn_Model {
         $name = $discussion["Name"] ?? null;
         $type = $discussion["Type"] ?? null;
 
+        $fullPost = c('Vanilla.Activity.FullPost');
+        if ($fullPost) {
+            $story = $discussion["Body"] ?? null;
+            $storyFormat = $discussion["Format"] ?? null;
+        } else {
+            $story = Gdn::formatService()->renderExcerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "");
+            $storyFormat = \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY;
+        }
+
         $discussionCategory = CategoryModel::categories($categoryID);
         if ($discussionCategory === null) {
             return;
@@ -2263,7 +2272,7 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
-            "Format" => $format ?? null,
+            "Format" => $storyFormat,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2271,7 +2280,7 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
-            "Story" => $body ?? null,
+            "Story" => $story,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,

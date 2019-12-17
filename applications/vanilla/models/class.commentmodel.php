@@ -564,11 +564,20 @@ class CommentModel extends Gdn_Model {
         $discussionUserID = $discussion["InsertUserID"] ?? null;
         $format = $comment["Format"] ?? null;
 
+        $fullPost = c('Vanilla.Activity.FullPost');
+        if ($fullPost) {
+            $story = $comment["Body"] ?? null;
+            $storyFormat = $comment["Format"] ?? null;
+        } else {
+            $story = Gdn::formatService()->renderExcerpt($comment["Body"] ?? "", $comment["Format"] ?? "");
+            $storyFormat = \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY;
+        }
+
         // Prepare the notification queue.
         $data = [
             "ActivityType" => "Comment",
             "ActivityUserID" => $comment["InsertUserID"] ?? null,
-            "Format" => $comment["Format"] ?? null,
+            "Format" => $storyFormat,
             "HeadlineFormat" => t(
                 "HeadlineFormat.Comment",
                 '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>'
@@ -576,7 +585,7 @@ class CommentModel extends Gdn_Model {
             "RecordType" => "Comment",
             "RecordID" => $commentID,
             "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
-            "Story" => $comment["Body"] ?? null,
+            "Story" => $story,
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,

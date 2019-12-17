@@ -70,19 +70,15 @@ class ThemesApiController extends AbstractApiController {
     /**
      * Get a theme assets.
      *
-     * @param array $query
      * @return array
      */
-    public function index(array $query = []): array {
+    public function index(): array {
         $this->permission();
         $out = $this->schema([":a" => $this->themeResultSchema('out')]);
 
-        $themeWithAssets = $this->themeModel->getThemes();
-        $result = [];
-          foreach ($themeWithAssets as $themeWithAsset) {
-          $result[] = $out->validate($themeWithAsset);
-        }
+        $themes = $this->themeModel->getThemes();
 
+        $result = $out->validate($themes);
         return $result;
     }
 
@@ -278,4 +274,6 @@ class ThemesApiController extends AbstractApiController {
                 'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
         }
     }
+
+
 }

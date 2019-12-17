@@ -59,7 +59,24 @@ class ThemeModel {
         ],
     ];
 
+//    const PREVIEW_VARIABLES = [
+//        "global"mainColors.primary",
+//        "global.mainColors.bg",
+//        "global.mainColors.fg",
+//        "titleBar.colors.bg",
+//        "titleBar.colors.fg",
+//        "splash.outerBackground.image",
+//    ];
+
+
+      const SCOPE = ["global" => true, "titleBar" => true, "splash" => true];
+      const SECTION = ["mainColors" => true, "colors" => true, "outerBackground" => true];
+      const PROPERTIES = ["primary" => true, "bg" => true, "fg" => true, "image" => true];
+
+
     const ASSET_KEY = "assets";
+
+
 
     /** @var ThemeProviderInterface[] */
     private $themeProviders = [];
@@ -108,12 +125,18 @@ class ThemeModel {
     }
 
     /**
+     * Get all available themes.
+     *
      * @return array
      */
     public function getThemes(): array {
         $allThemes = [];
         foreach ($this->themeProviders as $themeProvider) {
-           $allThemes[] = $themeProvider->getAllThemes();
+            $themes = $themeProvider->getAllThemes();
+            foreach ($themes as &$theme) {
+                $theme['preview'] = $this->generateThemePreview($theme) ?? null;
+                $allThemes[] = $theme;
+            }
         }
         return $allThemes;
     }
@@ -243,5 +266,23 @@ class ThemeModel {
     public function deleteAsset(string $themeKey, string $assetKey) {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * @param $theme
+     * @return array
+     */
+    public function generateThemePreview($theme) {
+        $variables = $theme["assets"]["variables"]->getData('array');
+        $preview = [];
+        if ($variables) {
+            $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
+            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
+            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
+            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
+            $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
+            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+        }
+        return $preview;
     }
 }

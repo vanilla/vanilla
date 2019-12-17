@@ -19,3 +19,13 @@
 /* ------------------ Sections ------------------ */
 
 @import "themeoptions";
+
+
+// Adam kludges
+
+.Arrow.SpFlyoutHandle {
+    background: none;
+    &:before {
+        display: none;
+    }
+}

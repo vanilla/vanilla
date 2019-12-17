@@ -1,7 +1,7 @@
 {
     "navigation": {
         "navItems": {
-            "fr": [
+            "default": [
                 {
                     "to": "/kb",
                     "children": "Learning Center",

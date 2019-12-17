@@ -28,11 +28,24 @@ $Construct->table('Category');
 $CategoryExists = $Construct->tableExists();
 $CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
+$HeroImageExists = $Construct->columnExists('HeroImage');
 
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 
 $CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
 $CountAllCommentsExists = $Construct->columnExists('CountAllComments');
+
+// Rename the remnants of the Hero Image plugin.
+if ($HeroImageExists) {
+    Gdn::config()->remove('EnabledPlugins.heroimage');
+    $Construct->table('Category');
+    $Construct->renameColumn('HeroImage', 'BannerImage');
+}
+
+if ($configBannerImage = Gdn::config('Garden.HeroImage')) {
+    Gdn::config()->set('Garden.BannerImage', $configBannerImage);
+    Gdn::config()->remove('Garden.HeroImage');
+}
 
 $Construct->primaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true, 'key')
@@ -55,6 +68,7 @@ $Construct->primaryKey('CategoryID')
     ->column('Sort', 'int', true)
     ->column('CssClass', 'varchar(50)', true)
     ->column('Photo', 'varchar(255)', true)
+    ->column('BannerImage', 'varchar(255)', true)
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')

@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Theme\TwigAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -47,8 +48,8 @@ trait ThemesApiSchemes {
      */
     private function assetsSchema(): Schema {
         $schema = Schema::parse([
-            "header?" => new InstanceValidatorSchema(HtmlAsset::class),
-            "footer?" => new InstanceValidatorSchema(HtmlAsset::class),
+            "header?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
+            "footer?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
             "variables?" => new InstanceValidatorSchema(JsonAsset::class),
             "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
             "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),

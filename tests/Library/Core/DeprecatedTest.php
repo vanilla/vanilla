@@ -22,9 +22,9 @@ class DeprecatedTest extends TestCase {
      * @param string $testNewName The name of the new function that should be used instead.
      * @dataProvider provideDeprecatedArrays
      */
-    public function testDeprecated($testOldName, $testNewName) {
+    public function testDeprecated(string $testOldName, string $testNewName = '') {
         $this->expectDeprecation();
-        $this->expectDeprecationMessage("$testOldName is deprecated. Use $testNewName instead");
+        $this->expectDeprecationMessage("$testOldName is deprecated.");
         deprecated($testOldName, $testNewName);
     }
 
@@ -38,11 +38,9 @@ class DeprecatedTest extends TestCase {
             'normalCase' => [
                 'deprecatedFunction',
                 'newFunction',
-                trigger_error('deprecatedFunction is deprecated. Use newFunction instead.', E_USER_DEPRECATED),
             ],
             'noNewName' => [
                 'deprecatedFunction',
-                trigger_error('deprecatedFunction is deprecated.')
             ]
         ];
 

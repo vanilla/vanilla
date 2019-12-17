@@ -26,7 +26,17 @@
     },
     "Features": {
         "ProfileHeader": true,
-        "TwigMasterView": true,
+        "SharedMasterView": true,
         "NewFlyouts": true
+    },
+    "assets": {
+        "footer": {
+            "type": "twig",
+            "file": "footer.twig"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        }
     }
 }

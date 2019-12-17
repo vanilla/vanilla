@@ -23,7 +23,7 @@ class ThemeFeatures {
 
     const FEATURE_DEFAULTS = [
         'NewFlyouts' => false,
-        'TwigMasterView' => true,
+        'SharedMasterView' => true,
         'ProfileHeader' => false,
     ];
 
@@ -59,8 +59,8 @@ class ThemeFeatures {
     /**
      * @return bool
      */
-    public function useTwigMasterView(): bool {
-        return (bool) $this->allFeatures()['TwigMasterView'];
+    public function useSharedMasterView(): bool {
+        return (bool) $this->allFeatures()['SharedMasterView'];
     }
 
     /**

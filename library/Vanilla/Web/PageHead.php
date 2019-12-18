@@ -51,19 +51,22 @@ final class PageHead implements PageHeadInterface {
      * @param EventManager $eventManager
      * @param SiteMeta $siteMeta
      * @param WebpackAssetProvider $assetProvider
+     * @param RequestInterface $request
      */
     public function __construct(
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
         EventManager $eventManager,
         SiteMeta $siteMeta,
-        WebpackAssetProvider $assetProvider
+        WebpackAssetProvider $assetProvider,
+        RequestInterface $request
     ) {
         $this->cspModel = $cspModel;
         $this->preloadModel = $preloadModel;
         $this->eventManager = $eventManager;
         $this->siteMeta = $siteMeta;
         $this->assetProvider = $assetProvider;
+        $this->request = $request;
     }
 
     /** @var string */

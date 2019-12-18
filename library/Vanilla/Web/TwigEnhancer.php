@@ -244,7 +244,7 @@ class TwigEnhancer {
      */
     public function renderBreadcrumbs(array $options = []): \Twig\Markup {
         $breadcrumbs = Gdn::controller()->data('Breadcrumbs', []);
-        $html = \Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $params, true), $options);
+        $html = \Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $options, true), $options);
         return new \Twig\Markup($html, 'utf-8');
     }
 

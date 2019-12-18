@@ -23,7 +23,7 @@ class ThemeFeatures {
 
     const FEATURE_DEFAULTS = [
         'NewFlyouts' => false,
-        'SharedMasterView' => true,
+        'SharedMasterView' => false,
         'ProfileHeader' => false,
     ];
 

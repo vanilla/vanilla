@@ -68,6 +68,42 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a theme styles.css asset.
+     * (/api/v2/themes/{id}/styles.css )
+     *
+     * @param int $themeID The unique theme ID.
+     * @return Data
+     */
+    public function get_styles_css(int $themeID): Data {
+        $this->permission();
+        $themeStyles = $this->themeModel->getAssetData($themeID, ThemeModel::STYLES);
+
+        $response = (new Data())
+            ->setData($themeStyles)
+            ->setHeader('Content-Type', 'text/css; charset=utf-8');
+
+        return $response;
+    }
+
+    /**
+     * Get a theme javascript.js asset.
+     * (/api/v2/themes/{id}/javascript.js )
+     *
+     * @param int $themeID The unique theme ID.
+     * @return Data
+     */
+    public function get_javascript_js(int $themeID): Data {
+        $this->permission();
+        $themeJS = $this->themeModel->getAssetData($themeID, ThemeModel::JAVASCRIPT);
+
+        $response = (new Data())
+            ->setData($themeJS)
+            ->setHeader('Content-Type', 'application/javascript; charset=utf-8');
+
+        return $response;
+    }
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.
@@ -100,7 +136,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function patch(int $themeID, array $body): array {
         $this->permission("Garden.Settings.Manage");
-        $in = $this->themePostSchema('in');
+        $in = $this->themePatchSchema('in');
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 

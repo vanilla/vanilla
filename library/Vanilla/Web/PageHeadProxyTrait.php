@@ -117,14 +117,14 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function getSeoTitle(): string {
+    public function getSeoTitle(): ?string {
         return $this->proxy->getSeoTitle();
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoDescription(): string {
+    public function getSeoDescription(): ?string {
         return $this->proxy->getSeoDescription();
     }
 
@@ -138,7 +138,7 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function getCanonicalUrl(): string {
+    public function getCanonicalUrl(): ?string {
         return $this->proxy->getCanonicalUrl();
     }
 }

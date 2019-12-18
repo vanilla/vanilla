@@ -120,7 +120,7 @@ export function variableFactory(componentName: string) {
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
         const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
-        return merge(declaredVars, normalizeVariables(subcomponentVars, componentVars));
+        return merge(declaredVars, normalizeVariables(subcomponentVars, declaredVars));
     };
 }
 

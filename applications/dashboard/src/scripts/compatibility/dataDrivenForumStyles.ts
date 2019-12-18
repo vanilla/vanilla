@@ -17,5 +17,6 @@ export const compatibilityStyles = useThemeCache(() => {
     const mainColors = vars.mainColors;
     cssRule("body", {
         backgroundColor: colorOut(mainColors.bg),
+        color: colorOut(mainColors.fg),
     });
 });

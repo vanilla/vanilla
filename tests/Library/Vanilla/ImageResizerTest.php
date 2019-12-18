@@ -215,8 +215,8 @@ class ImageResizerTest extends SharedBootstrapTestCase {
         $resizer = new ImageResizer();
         $resizer->setAlwaysRewriteGif(false);
 
-        $source = PATH_ROOT."/tests/fixtures/yoda.gif";
-        $destination = PATH_ROOT."/tests/cache/image-resizer/yoda-copy.gif";
+        $source = PATH_ROOT."/tests/fixtures/animated.gif";
+        $destination = PATH_ROOT."/tests/cache/image-resizer/animated-copy.gif";
 
         $r = $resizer->resize($source, $destination, ["width" => 256, "height" => 256]);
         $this->assertFileEquals($source, $destination);

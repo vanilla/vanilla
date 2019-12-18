@@ -78,7 +78,6 @@ class FsThemeProvider implements ThemeProviderInterface {
         return $theme;
     }
 
-
     /**
      * Get theme by name
      *

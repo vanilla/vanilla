@@ -277,7 +277,6 @@ class Bootstrap {
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
-
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
@@ -527,6 +526,4 @@ class Bootstrap {
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
     }
-
-
 }

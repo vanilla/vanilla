@@ -56,9 +56,7 @@ trait ThemesApiSchemes {
         );
         return $schema;
     }
-
-
-
+    
     /**
      * Get 'assets' schema
      *

@@ -43,7 +43,7 @@ class ThemesTest extends AbstractAPIv2Test {
             PATH_ROOT.'/tests/cache/am/test-manager'
         );
 
-        $request = new Gdn_Request();
+        $request = self::container()->get(Gdn_Request::class);
         $config = self::container()->get(Gdn_Configuration::class);
 
         static::container()
@@ -58,10 +58,10 @@ class ThemesTest extends AbstractAPIv2Test {
 
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
+
         static::container()
             ->get(AddonManager::class)
-            ->add($theme)
-        ;
+            ->add($theme);
 
         static::container()
             ->rule(\Vanilla\Models\ThemeModel::class)

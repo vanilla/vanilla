@@ -9,17 +9,21 @@
 \* -------------------------------------------------------------- */
 
 .Footer {
-    background: $footer_bg;
-    color: $footer_color;
+    @if ($colorFromDynamicTheme) {
+        background: $footer_bg;
+        color: $footer_color;
+    }
     font-size: $footer-base_fontSize;
     line-height: $footer-base_lineHeight;
     padding: $utility-baseUnitTriple 0;
 
-    a {
-        color: $footer-link_color;
+    @if ($colorFromDynamicTheme) {
+        a {
+            color: $footer-link_color;
 
-        &:hover {
-            color: $footer-link-hover_color;
+            &:hover {
+                color: $footer-link-hover_color;
+            }
         }
     }
 

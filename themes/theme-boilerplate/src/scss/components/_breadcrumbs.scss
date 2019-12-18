@@ -30,18 +30,24 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
     display: block;
     line-height: $global-base_lineHeight;
     text-transform: $breadcrumbs_textTransform;
-    color: $breadcrumbs_fg;
+    @if ($colorFromDynamicTheme) {
+        color: $breadcrumbs_fg;
+    }
     font-size: $global-small_fontSize;
     font-weight: $breadcrumbs_fontWeight;
     padding: $utility-baseUnitDouble 0;
 
     a {
         font-size: inherit;
-        color: $breadcrumbs-link_fg;
+        @if ($colorFromDynamicTheme) {
+            color: $breadcrumbs-link_fg;
+        }
 
         &:focus,
         &:hover {
-            color: $breadcrumbs-link-hover_fg;
+            @if ($colorFromDynamicTheme) {
+                color: $breadcrumbs-link-hover_fg;
+            }
             text-decoration: $breadcrumbs-hover_textDecoration;
         }
     }
@@ -51,11 +57,15 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
     }
 
     .Last a {
-        color: $breadcrumbs-last_fg;
+        @if ($colorFromDynamicTheme) {
+            color: $breadcrumbs-last_fg;
+        }
 
         &:focus,
         &:hover {
-            color: $breadcrumbs-link-hover_fg;
+            @if ($colorFromDynamicTheme) {
+                color: $breadcrumbs-link-hover_fg;
+            }
             text-decoration: $breadcrumbs-hover_textDecoration;
         }
     }

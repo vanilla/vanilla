@@ -9,8 +9,10 @@
 \* -------------------------------------------------------------- */
 
 .Header {
-    background-color: $header_bg;
-    color: $header_fg;
+    @if ($colorFromDynamicTheme) {
+        background-color: $header_bg;
+        color: $header_fg;
+    }
     border-bottom: $header_border;
     box-shadow: $header_boxShadow;
 
@@ -30,30 +32,37 @@
     }
 
     // Mebox component
-    .MeButton {
-        color: $headerMebutton_fg;
-        background-color: $headerMebutton_bg;
+    @if ($colorFromDynamicTheme) {
+        .MeButton {
+            color: $headerMebutton_fg;
+            background-color: $headerMebutton_bg;
 
-        &:focus,
-        &:hover,
-        &:active {
-            color: $headerMebutton-hover_fg;
-            background-color: $headerMebutton-hover_bg;
-        }
+            &:focus,
+            &:hover,
+            &:active {
+                color: $headerMebutton-hover_fg;
+                background-color: $headerMebutton-hover_bg;
 
-        .Alert {
-            color: $headerMeBoxAlert_fg;
-            background-color: $headerMeBoxAlert_bg;
-            border-color: $headerMeBoxAlert_borderColor;
+
+                .Alert {
+                    color: $headerMeBoxAlert_fg;
+                    background-color: $headerMeBoxAlert_bg;
+                    border-color: $headerMeBoxAlert_borderColor;
+                }
+            }
         }
     }
 
-    .ToggleFlyout.Open .MeButton {
-        background-color: $headerMebutton-active_bg;
+    @if ($colorFromDynamicTheme) {
+        .ToggleFlyout.Open .MeButton {
+            background-color: $headerMebutton-active_bg;
+        }
     }
 
-    .WhoIs > .Username {
-        color: $headerMebutton_fg;
+    @if ($colorFromDynamicTheme) {
+        .WhoIs > .Username {
+            color: $headerMebutton_fg;
+        }
     }
 
     .SignInLinks {
@@ -98,7 +107,6 @@
     }
 
     .Navigation-linkContainer a {
-        color: $header-link_color;
         border-radius: 3px;
         margin: 0 6px;
         padding: 0 6px;
@@ -108,11 +116,14 @@
         align-items: center;
         justify-content: center;
 
-        &:hover,
-        &:focus,
-        &:active {
+        @if ($colorFromDynamicTheme) {
             color: $header-link_color;
-            background: $global-color_primaryAlt;
+            &:hover,
+            &:focus,
+            &:active {
+                color: $header-link_color;
+                background: $global-color_primaryAlt;
+            }
         }
     }
 

@@ -175,9 +175,11 @@
     content: $icon-facebook-alt;
 }
 
-.ReactFacebook:hover {
-    &::before {
-        color: #3A5795;
+@if ($colorFromDynamicTheme) {
+    .ReactFacebook:hover {
+        &::before {
+            color: #3A5795;
+        }
     }
 }
 
@@ -185,9 +187,11 @@
     content: $icon-twitter;
 }
 
-.ReactTwitter:hover {
-    &::before {
-        color: #55ACEE;
+@if ($colorFromDynamicTheme) {
+    .ReactTwitter:hover {
+        &::before {
+            color: #55ACEE;
+        }
     }
 }
 
@@ -195,22 +199,28 @@
     content: $icon-google-plus-alt;
 }
 
-.ReactGooglePlus:hover {
-    &::before {
-        color: #DD4B39;
+@if ($colorFromDynamicTheme) {
+    .ReactGooglePlus:hover {
+        &::before {
+            color: #DD4B39;
+        }
     }
 }
 
-.RSS {
-    a {
-        color: #f26522;
+@if ($colorFromDynamicTheme) {
+    .RSS {
+        a {
+            color: #f26522;
+        }
     }
 }
 
-.ReactButton.PopupWindow {
-    &:hover {
-        .Sprite::before {
-            color: $global-color_primary;
+@if ($colorFromDynamicTheme) {
+    .ReactButton.PopupWindow {
+        &:hover {
+            .Sprite::before {
+                color: $global-color_primary;
+            }
         }
     }
 }
@@ -275,7 +285,9 @@
     .SocialIcon:not(.SocialIcon-OpenID) .Icon::before {
         @include icon;
         font-size: $global-medium_fontSize;
-        color: $global-color_white;
+        @if ($colorFromDynamicTheme) {
+            color: $global-color_white;
+        }
     }
 
     .SocialIcon-Facebook .Icon::before {
@@ -316,19 +328,25 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        color: $global-color_primary;
+        @if ($colorFromDynamicTheme) {
+            color: $global-color_primary;
+        }
         content: $icon-star-empty;
     }
 
     &:hover::before {
-        color: $global-color_primaryAlt;
+        @if ($colorFromDynamicTheme) {
+            color: $global-color_primaryAlt;
+        }
     }
 }
 
 a.Bookmarked {
     &::before,
     &:hover::before {
-        color: #E5B951 !important;
+        @if ($colorFromDynamicTheme) {
+            color: #E5B951 !important;
+        }
         content: $icon-star;
     }
 }

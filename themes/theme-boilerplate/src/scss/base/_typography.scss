@@ -6,7 +6,9 @@
 
 body {
     @include font-style-base;
-    color: $global-color_fg;
+    @if ($colorFromDynamicTheme) {
+        color: $global-color_fg;
+    }
 }
 
 * {

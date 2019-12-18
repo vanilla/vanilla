@@ -3,7 +3,7 @@
     "name": "@vanilla/theme-foundation",
     "description": "A responsive, asset-compatible Vanilla Forums theme. Meant to be extended.",
     "dependencies": {
-        "@vanillaforums/theme-boilerplate": "^1.4.1"
+        "@vanillaforums/theme-boilerplate": "^1.4.2"
     },
     "scripts": {
         "build": "sass assets/styles.scss assets/styles.css"

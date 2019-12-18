@@ -1688,11 +1688,11 @@ if (!function_exists('safeImage')) {
     function safeImage($imageUrl, $minHeight = 0, $minWidth = 0) {
         try {
             list($width, $height, $_, $_) = getimagesize($imageUrl);
-            if ($minHeight > 0 && $minHeight < $height) {
+            if ($minHeight > 0 && $minHeight > $height) {
                 return false;
             }
 
-            if ($minWidth > 0 && $minWidth < $width) {
+            if ($minWidth > 0 && $minWidth > $width) {
                 return false;
             }
         } catch (Exception $ex) {
@@ -1927,29 +1927,6 @@ if (!function_exists('touchFolder')) {
     }
 }
 
-if (!function_exists('trace')) {
-    /**
-     * Trace some information for debugging.
-     *
-     * @param mixed $value One of the following:
-     *
-     * - null: The entire trace will be returned.
-     * - string: A trace message.
-     * - other: A variable to output.
-     * @param string $type One of the `TRACE_*` constants or a string label for the trace.
-     * @return array Returns the array of traces.
-     */
-    function trace($value = null, $type = TRACE_INFO) {
-        static $traces = [];
-
-        if ($value === null) {
-            return $traces;
-        }
-
-        $traces[] = [$value, $type];
-    }
-}
-
 if (!function_exists('unicodeRegexSupport')) {
     /**
      * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.
@@ -1958,161 +1935,6 @@ if (!function_exists('unicodeRegexSupport')) {
      */
     function unicodeRegexSupport() {
         return (preg_replace('`[\pP]`u', '', 'P') != '');
-    }
-}
-
-if (!function_exists('userAgentType')) {
-    /**
-     * Get or set the type of user agent.
-     *
-     * This method checks the user agent to try and determine the type of device making the current request.
-     * It also checks for a special X-UA-Device header that a server module can set to more quickly determine the device.
-     *
-     * @param string|null|false $value The new value to set or **false** to clear. This should be one of desktop, mobile, tablet, or app.
-     * @return string Returns one of desktop, mobile, tablet, or app.
-     */
-    function userAgentType($value = null) {
-        static $type = null;
-
-        if ($value === false) {
-            $type = null;
-            return '';
-        } elseif ($value !== null) {
-            $type = $value;
-        }
-
-        if ($type !== null) {
-            return $type;
-        }
-
-        // A function to make sure the type is one of our supported types.
-        $validateType = function (string $type): string {
-            $validTypes = ['desktop', 'tablet', 'app', 'mobile'];
-
-            if (in_array($type, $validTypes)) {
-                return $type;
-            } else {
-                // There is no exact match so look for a partial match.
-                foreach ($validTypes as $validType) {
-                    if (strpos($type, $validType) !== false) {
-                        return $validType;
-                    }
-                }
-            }
-            return 'desktop';
-        };
-
-        // Try and get the user agent type from the header if it was set from the server, varnish, etc.
-        $type = strtolower(val('HTTP_X_UA_DEVICE', $_SERVER, ''));
-        if ($type) {
-            return $validateType($type);
-        }
-
-        // See if there is an override in the cookie.
-        if ($type = val('X-UA-Device-Force', $_COOKIE)) {
-            return $validateType($type);
-        }
-
-        // Now we will have to figure out the type based on the user agent and other things.
-        $allHttp = strtolower(val('ALL_HTTP', $_SERVER));
-        $httpAccept = strtolower(val('HTTP_ACCEPT', $_SERVER));
-        $userAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER));
-
-        // Check for a mobile app.
-        if (strpos($userAgent, 'vanillamobileapp') !== false) {
-            return $type = 'app';
-        }
-
-        // Match wap Accepts: header
-        if ((strpos($httpAccept, 'application/vnd.wap.xhtml+xml') > 0)
-            || ((isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])))
-        ) {
-            return $type = 'mobile';
-        }
-
-        // Match mobile androids
-        if (strpos($userAgent, 'android') !== false && strpos($userAgent, 'mobile') !== false) {
-            return $type = 'mobile';
-        }
-
-        // Match operamini in 'ALL_HTTP'
-        if (strpos($allHttp, 'operamini') > 0) {
-            return $type = 'mobile';
-        }
-
-        // Match discrete chunks of known mobile agents
-        $directAgents = [
-            'up.browser',
-            'up.link',
-            'mmp',
-            'symbian',
-            'smartphone',
-            'midp',
-            'wap',
-            'phone',
-            'opera m',
-            'kindle',
-            'webos',
-            'playbook',
-            'bb10',
-            'playstation vita',
-            'windows phone',
-            'iphone',
-            'ipod',
-            'nintendo 3ds'
-        ];
-        $directAgentsMatch = implode('|', $directAgents);
-        if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {
-            return $type = 'mobile';
-        }
-
-        // Match starting chunks of known
-        $mobileUserAgent = substr($userAgent, 0, 4);
-        $mobileUserAgents = [
-            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
-            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
-            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
-            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
-            'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox', 'qwap',
-            'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar', 'sie-',
-            'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-', 'tosh',
-            'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp', 'wapr',
-            'webc', 'winw', 'winw', 'xda', 'xda-'];
-
-        if (in_array($mobileUserAgent, $mobileUserAgents)) {
-            return $type = 'mobile';
-        }
-
-        // None of the mobile matches work so we must be a desktop browser.
-        return $type = 'desktop';
-    }
-}
-
-if (!function_exists('increaseMaxExecutionTime')) {
-    /**
-     * Used to increase php max_execution_time value.
-     *
-     * @param int $maxExecutionTime PHP max execution time in seconds.
-     * @return bool Returns true if max_execution_time was increased (or stayed the same) or false otherwise.
-     */
-    function increaseMaxExecutionTime($maxExecutionTime) {
-
-        $iniMaxExecutionTime = ini_get('max_execution_time');
-
-        // max_execution_time == 0 means no limit.
-        if ($iniMaxExecutionTime === '0') {
-            return true;
-        }
-
-        if (((string)$maxExecutionTime) === '0') {
-            return set_time_limit(0);
-        }
-
-        if (!ctype_digit($iniMaxExecutionTime) || $iniMaxExecutionTime < $maxExecutionTime) {
-            return set_time_limit($maxExecutionTime);
-        }
-
-        return true;
     }
 }
 

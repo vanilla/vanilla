@@ -53,7 +53,13 @@ class HtmlEntityDecodeTest extends TestCase {
                 ENT_NOQUOTES,
                 'utf-8',
                 "A 'quote' is <b>bold</b>",
-            ]
+            ],
+            'testWithHexCode' => [
+                '&#x20AC;',
+                ENT_QUOTES,
+                'utf-8',
+                '€',
+            ],
         ];
 
         return $r;

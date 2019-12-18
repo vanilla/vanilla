@@ -10,6 +10,10 @@ namespace VanillaTests\Library\Garden\Web;
 use Garden\Web\Data;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Tests for the Data class's methods.
+ */
+
 class DataTest extends TestCase {
 
     private $data;

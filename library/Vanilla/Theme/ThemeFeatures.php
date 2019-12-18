@@ -41,7 +41,7 @@ class ThemeFeatures {
     /**
      * Get all of the current theme features.
      */
-    public function allFeatures() {
+    public function allFeatures(): array {
         $configValues = [
             'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
         ];

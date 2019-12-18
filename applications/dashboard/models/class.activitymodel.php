@@ -1520,7 +1520,7 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Save an activity.
      *
      * @param array $data
      * @param bool $preference

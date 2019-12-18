@@ -33,7 +33,7 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'current:b?',
-                'assets' => $this->assetsSchema(),
+                'assets?' => $this->assetsSchema(),
             ]),
             $type
         );
@@ -47,12 +47,13 @@ trait ThemesApiSchemes {
      * @return Schema
      */
     private function themesResultSchema(string $type = 'out'): Schema {
-        $schema = $this->themeResultSchema()
-            ->merge(Schema::parse(
+        $schema = $this->themeResultSchema()->merge(
+            Schema::parse(
                 [
                     'preview?' => [":a" => $this->assetsPreviewSchema()]
-                ])
-            );
+                ]
+            )
+        );
         return $schema;
     }
 

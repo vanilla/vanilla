@@ -308,7 +308,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * Filter theme based on it's info.
      *
-     * @param $themeInfo
+     * @param array $themeInfo
      * @return array
      */
     protected function filterTheme($themeInfo): array {

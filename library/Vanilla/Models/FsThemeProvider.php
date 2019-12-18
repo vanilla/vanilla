@@ -21,6 +21,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Request;
 use Gdn_Upload;
+use Vanilla\Theme\TwigAsset;
 
 /**
  * Handle custom themes.
@@ -186,6 +187,8 @@ class FsThemeProvider implements ThemeProviderInterface {
                 return $this->dataAsset($key, $data);
             case "html":
                 return new HtmlAsset($data);
+            case "twig":
+                return new TwigAsset($data);
             case "json":
                 return new JsonAsset($data);
             default:

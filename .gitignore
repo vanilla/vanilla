@@ -63,6 +63,7 @@
 !/themes/default/
 !/themes/mobile/
 !/themes/theme-boilerplate/
+!/themes/foundation/
 !/themes/keystone/
 !/themes/theme-api-test/
 /uploads/*

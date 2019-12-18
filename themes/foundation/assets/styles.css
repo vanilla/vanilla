@@ -1,0 +1,90 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.Footer {
+    background: #f5f5f6;
+    color: #555A62;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 18px 0;
+}
+
+.Container {
+    padding-left: 18px;
+    padding-right: 18px;
+    max-width: 1236px;
+    margin: 0 auto;
+}
+
+.Footer a {
+    color: #0291DB;
+}
+
+.Footer a:hover {
+    color: #0276b3;
+}
+
+.Footer .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: -3px;
+}
+
+.Footer .col {
+    padding: 0 3px;
+}
+
+.Footer .col-copyRight {
+    justify-content: flex-start;
+}
+
+.Footer .col-logo {
+    justify-content: flex-end;
+}
+
+.Footer .col-copyRight,
+.Footer .col-logo {
+    flex: 1;
+    display: flex;
+}
+
+.Vanilla-logo {
+    width: 120px;
+    height: 28px;
+    opacity: .6;
+}
+
+@media screen and (max-width: 768px) {
+
+    .Footer .row {
+        display: block;
+    }
+
+    .Footer .col {
+        width: 100%;
+        text-align: center;
+        margin: 6px 0;
+    }
+
+    .Footer .col:first-child {
+        margin-top: 0;
+    }
+
+    .Footer .col:last-child {
+        margin-bottom: 0;
+    }
+
+    .Footer .col-copyRight,
+    .Footer .col-logo {
+        justify-content: center;
+    }
+
+    .Vanilla-logo {
+        margin: 0 auto;
+    }
+}

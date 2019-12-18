@@ -99,7 +99,14 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        BuildMode.PRODUCTION === options.mode ? MiniCssExtractPlugin.loader : "style-loader",
+                        BuildMode.PRODUCTION === options.mode
+                            ? MiniCssExtractPlugin.loader
+                            : {
+                                  loader: "style-loader",
+                                  options: {
+                                      injectType: "singletonStyleTag",
+                                  },
+                              },
                         {
                             loader: "css-loader",
                             options: {

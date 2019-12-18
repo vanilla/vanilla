@@ -1542,8 +1542,10 @@ EOT;
             return;
         }
 
-        // Make sure to add the "Edit Profile" buttons.
-        $this->addModule('ProfileOptionsModule');
+        if (!\Gdn::themeFeatures()->useProfileHeader()) {
+            // Make sure to add the "Edit Profile" buttons if it's not provided through the new profile header.
+            $this->addModule('ProfileOptionsModule');
+        }
 
         // Show edit menu if in edit mode
         // Show profile pic & filter menu otherwise

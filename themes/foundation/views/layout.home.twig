@@ -1,0 +1,46 @@
+<div class="Frame" id="page">
+    <div class="Frame-top">
+        <div class="Frame-body">
+            <div class="Herobanner">
+                {% if siteMeta.ui.bannerImage %}
+                    <div class="Herobanner-bgImage" style="background-image:url('{{ siteMeta.ui.bannerImage }}')"></div>
+                {% endif %}
+                <div class="Container">
+                    <h2 class="H HomepageTitle">Hello Homepage!!!!</h2>
+                    <p class="P PageDescription">{{ splashDescription }}</p>
+                </div>
+            </div>
+
+            <div class="Frame-content">
+                <div class="Container">
+                    <div class="Frame-contentWrap">
+                        <div class="Frame-details">
+                            {% if not isHomepage %}
+                            <div class="Frame-row">
+                                <nav class="BreadcrumbsBox">
+                                    {{ renderBreadcrumbs() }}
+                                </nav>
+                            </div>
+                            {% endif %}
+                            <div class="Frame-row">
+
+                                <!-- Main Content -->
+                                <main class="Content MainContent">
+                                    {{ renderControllerAsset("Content") }}
+                                </main>
+                                <!-- Main Content END -->
+
+                                <!-- Main Panel -->
+                                <aside class="Panel Panel-main">
+                                    {{ renderControllerAsset("Panel") }}
+                                </aside>
+                                <!-- Main Panel END -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

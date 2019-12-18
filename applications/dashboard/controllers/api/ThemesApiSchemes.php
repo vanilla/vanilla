@@ -94,7 +94,6 @@ trait ThemesApiSchemes {
                     ->addValidator('fonts', [ThemeModel::class, 'validator'])
                     ->addValidator('scripts', [ThemeModel::class, 'validator'])
             ]),
-
             $type
         );
         return $schema;
@@ -133,7 +132,6 @@ trait ThemesApiSchemes {
                     ->addValidator('fonts', [ThemeModel::class, 'validator'])
                     ->addValidator('scripts', [ThemeModel::class, 'validator'])
             ]),
-
             $type
         );
         return $schema;

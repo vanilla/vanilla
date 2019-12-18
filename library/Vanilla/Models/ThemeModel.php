@@ -263,11 +263,11 @@ class ThemeModel {
             case 'json':
                 $valid = true;
                 if ($asset['default'] === '[]') {
-                    $valid = substr($data,0,1) === '[';
-                    $valid = $valid && substr($data,-1) === ']';
+                    $valid = substr($data,0, 1) === '[';
+                    $valid = $valid && substr($data, -1) === ']';
                 } elseif ($asset['default'] === '{}') {
-                    $valid = substr($data,0,1) === '{';
-                    $valid = $valid && substr($data,-1) === '}';
+                    $valid = substr($data,0, 1) === '{';
+                    $valid = $valid && substr($data, -1) === '}';
                 }
                 $json = json_decode($data, true);
                 $valid = $valid && $json !== null;

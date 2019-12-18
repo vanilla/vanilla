@@ -7,13 +7,16 @@
 
 namespace VanillaTests\Library\Vanilla\Web;
 
+use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\PageFixture;
-use VanillaTests\MinimalContainerTestCase;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests of Vanilla's base page class.
  */
-class PageTest extends MinimalContainerTestCase {
+class PageTest extends TestCase {
+
+    use SiteTestTrait;
 
     /**
      * Test that links get added properly.

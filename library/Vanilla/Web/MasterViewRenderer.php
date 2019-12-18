@@ -58,7 +58,7 @@ class MasterViewRenderer {
     public function renderPage(Page $page, array $viewData): string {
         $extraData = [
             'seoContent' => new \Twig\Markup($page->getSeoContent(), 'utf-8'),
-            'cssClasses' => ['isLoading'],
+            'cssClasses' => 'isLoading',
             'pageHead' => $page->getHead()->renderHtml(),
         ];
         $data = array_merge($viewData, $extraData, $this->getSharedData());

@@ -148,7 +148,7 @@ class SiteMeta implements \JsonSerializable {
             $this->shareImage = \Gdn_Upload::url($shareImage);
         }
 
-        $this->bannerImage = class_exists(BannerImageModel::class) ? BannerImageModel::getCurrentBannerImageLink() ?: null : null;
+        $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }

@@ -124,6 +124,8 @@ export function variableFactory(componentName: string) {
     };
 }
 
+const allowedColorPrefixes = ["#", "rgb(", "rgba(", "hsl("];
+
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
  *
@@ -133,22 +135,42 @@ export function variableFactory(componentName: string) {
  */
 function normalizeVariables(customVariable: any, defaultVariable: any) {
     if (defaultVariable instanceof ColorHelper) {
-        // custom value should be a color;
-        if (customVariable !== "transparent") {
-            customVariable = color(customVariable);
+        if (typeof customVariable !== "string") {
+            logWarning("Encountered an improper value for a color variable. It will not be applied", customVariable);
+            return defaultVariable;
         }
-    } else {
-        if (typeof customVariable === "object") {
-            const newObj: any = {};
-            for (const [key, value] of Object.entries(customVariable)) {
-                const defaultNested = defaultVariable[key];
-                if (!defaultNested) {
-                    continue;
-                }
-                newObj[key] = normalizeVariables(value, defaultNested);
+
+        if (customVariable === "transparent") {
+            return defaultVariable;
+        }
+
+        const isValidColor = !!allowedColorPrefixes.find(prefix => customVariable.startsWith(prefix));
+        if (!isValidColor) {
+            logWarning(
+                `Invalid custom color "${customVariable}" supplied. Allowed color prefixes are ${allowedColorPrefixes.join(
+                    ", ",
+                )}.`,
+            );
+            return defaultVariable;
+        }
+        const result = color(customVariable);
+        return result;
+    }
+
+    if (Array.isArray(customVariable)) {
+        return customVariable.map(normalizeVariables);
+    }
+
+    if (typeof customVariable === "object") {
+        const newObj: any = {};
+        for (const [key, value] of Object.entries(customVariable)) {
+            const defaultNested = defaultVariable[key];
+            if (!defaultNested) {
+                continue;
             }
-            return newObj;
+            newObj[key] = normalizeVariables(value, defaultNested);
         }
+        return newObj;
     }
 
     return customVariable;

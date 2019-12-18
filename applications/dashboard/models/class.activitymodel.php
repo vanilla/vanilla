@@ -10,7 +10,6 @@
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
-use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 
 /**

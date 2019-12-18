@@ -564,20 +564,10 @@ class CommentModel extends Gdn_Model {
         $discussionUserID = $discussion["InsertUserID"] ?? null;
         $format = $comment["Format"] ?? null;
 
-        $fullPost = c('Vanilla.Activity.FullPost');
-        if ($fullPost) {
-            $story = $comment["Body"] ?? null;
-            $storyFormat = $comment["Format"] ?? null;
-        } else {
-            $story = Gdn::formatService()->renderExcerpt($comment["Body"] ?? "", $comment["Format"] ?? "");
-            $storyFormat = \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY;
-        }
-
         // Prepare the notification queue.
         $data = [
             "ActivityType" => "Comment",
             "ActivityUserID" => $comment["InsertUserID"] ?? null,
-            "Format" => $storyFormat,
             "HeadlineFormat" => t(
                 "HeadlineFormat.Comment",
                 '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>'
@@ -585,11 +575,16 @@ class CommentModel extends Gdn_Model {
             "RecordType" => "Comment",
             "RecordID" => $commentID,
             "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
-            "Story" => $story,
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
-            ]
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $format,
+                    "Story" => $body,
+                ],
+            ],
         ];
 
         // Pass generic activity to events.
@@ -600,6 +595,10 @@ class CommentModel extends Gdn_Model {
         /** @var DiscussionModel $discussionModel */
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
 
+        if (!Gdn::config("Vanilla.Email.FullPost")) {
+            $data["Ext"]["Email"] = $activityModel->setStoryExcerpt($data["Ext"]["Email"]);
+        }
+
         $notificationGroups = [
             "bookmark" => [
                 "notifyUserIDs" => array_column(
@@ -608,14 +607,6 @@ class CommentModel extends Gdn_Model {
                 ),
                 "options" => ['CheckRecord' => true],
                 "preference" => "BookmarkComment",
-            ],
-            "mention" => [
-                "headlineFormat" => t(
-                    "HeadlineFormat.Mention",
-                    '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>'
-                ),
-                "notifyUserIDs" => [],
-                "preference" => "Mention",
             ],
             "mine" => [
                 "notifyUserIDs" => [$discussionUserID],
@@ -628,6 +619,14 @@ class CommentModel extends Gdn_Model {
                 ),
                 "options" => ['CheckRecord' => true],
                 "preference" => "ParticipateComment",
+            ],
+            "mention" => [
+                "headlineFormat" => t(
+                    "HeadlineFormat.Mention",
+                    '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>'
+                ),
+                "notifyUserIDs" => [],
+                "preference" => "Mention",
             ],
         ];
 

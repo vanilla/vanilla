@@ -2245,15 +2245,6 @@ class DiscussionModel extends Gdn_Model {
         $name = $discussion["Name"] ?? null;
         $type = $discussion["Type"] ?? null;
 
-        $fullPost = c('Vanilla.Activity.FullPost');
-        if ($fullPost) {
-            $story = $discussion["Body"] ?? null;
-            $storyFormat = $discussion["Format"] ?? null;
-        } else {
-            $story = Gdn::formatService()->renderExcerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "");
-            $storyFormat = \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY;
-        }
-
         $discussionCategory = CategoryModel::categories($categoryID);
         if ($discussionCategory === null) {
             return;
@@ -2272,7 +2263,6 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
-            "Format" => $storyFormat,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2280,12 +2270,21 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
-            "Story" => $story,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
-            ]
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $format,
+                    "Story" => $body,
+                ],
+            ],
         ];
+
+        if (!Gdn::config("Vanilla.Email.FullPost")) {
+            $data["Ext"]["Email"] = $activityModel->setStoryExcerpt($data["Ext"]["Email"]);
+        }
 
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];

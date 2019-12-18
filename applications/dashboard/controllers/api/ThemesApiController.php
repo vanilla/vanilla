@@ -74,7 +74,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function index(): array {
         $this->permission();
-        $out = $this->schema([":a" => $this->themeResultSchema('out')]);
+        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
 
         $themes = $this->themeModel->getThemes();
 

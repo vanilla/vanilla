@@ -1,6 +1,20 @@
 openapi: 3.0.2
 info:
 paths:
+  /themes:
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Themes'
+                type: array
+          description: Success
+      tags:
+        - Themes
+      summary: Get all themes available.
   /themes/{key}:
     get:
       parameters:
@@ -219,6 +233,27 @@ components:
         - themeID
         - version
       type: object
+    Themes:
+      properties:
+        assets:
+          $ref: "#/components/schemas/ThemeAssets"
+        preview:
+          $ref: "#/components/schemas/PreviewAssets"
+        type:
+          type: string
+          enum:
+            - themeFile
+        themeID:
+          type:
+            integer
+        version:
+          type: string
+      required:
+        - assets
+        - type
+        - themeID
+        - version
+      type: object
     ThemeAssets:
       description: Assets to include in a page as part of the theme.
       properties:
@@ -377,4 +412,20 @@ components:
       required:
         - url
         - type
+      type: object
+    PreviewAssets:
+      description: A collections of variables to generate a preview.
+      properties:
+        global.mainColors.primary:
+          type: string
+        global.mainColors.bg:
+          type: string
+        global.mainColors.fg:
+          type: string
+        titleBar.colors.bg:
+          type: string
+        titleBar.colors.fg:
+          type: string
+        splash.outerBar.image:
+          type: string
       type: object

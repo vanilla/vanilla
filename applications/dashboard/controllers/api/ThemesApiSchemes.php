@@ -33,13 +33,30 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'current:b?',
-                'assets?' => $this->assetsSchema(),
-                'preview?' => [":a" => $this->assetsPreviewSchema()],
+                'assets' => $this->assetsSchema(),
             ]),
             $type
         );
         return $schema;
     }
+
+    /**
+     * Result theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themesResultSchema(string $type = 'out'): Schema {
+        $schema = $this->themeResultSchema()
+            ->merge(Schema::parse(
+                [
+                    'preview?' => [":a" => $this->assetsPreviewSchema()]
+                ])
+            );
+        return $schema;
+    }
+
+
 
     /**
      * Get 'assets' schema

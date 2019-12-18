@@ -10,7 +10,7 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color } from "csx";
+import { color, ColorHelper } from "csx";
 import { logDebug, logWarning } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
@@ -120,7 +120,7 @@ export function variableFactory(componentName: string) {
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
         const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
-        return merge(declaredVars, normalizeVariables(subcomponentVars));
+        return merge(declaredVars, normalizeVariables(subcomponentVars, componentVars));
     };
 }
 
@@ -131,25 +131,27 @@ export function variableFactory(componentName: string) {
  *
  * - Strings starting with `#` get wrapped in `color()`;
  */
-function normalizeVariables(variables: any) {
-    if (Array.isArray(variables)) {
-        variables = variables.map(normalizeVariables);
-    } else if (typeof variables === "object") {
+function normalizeVariables(customVariable: any, defaultVariable: any) {
+    if (typeof customVariable === "object") {
         const newObj: any = {};
-        for (const [key, value] of Object.entries(variables)) {
-            newObj[key] = normalizeVariables(value);
+        for (const [key, value] of Object.entries(customVariable)) {
+            const defaultNested = defaultVariable[key];
+            if (!defaultNested) {
+                continue;
+            }
+            newObj[key] = normalizeVariables(value, defaultNested);
         }
         return newObj;
     }
 
-    if (typeof variables === "string") {
-        if (variables.startsWith("#")) {
-            // It's a colour.
-            return color(variables);
+    if (defaultVariable instanceof ColorHelper) {
+        // custom value should be a color;
+        if (customVariable !== "transparent") {
+            customVariable = color(customVariable);
         }
     }
 
-    return variables;
+    return customVariable;
 }
 
 /**

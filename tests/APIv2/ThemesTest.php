@@ -32,12 +32,16 @@ class ThemesTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
 
         $root = '/tests/fixtures';
-        $addonManager = new AddonManager([
-            Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-            Addon::TYPE_THEME => "$root/themes",
-            Addon::TYPE_LOCALE => "$root/locales"
-        ],
-            PATH_ROOT.'/tests/cache/am/test-manager');
+        $addonManager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => [
+                    "$root/addons", "$root/applications", "$root/plugins"
+                ],
+                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_LOCALE => "$root/locales"
+            ],
+            PATH_ROOT.'/tests/cache/am/test-manager'
+        );
 
         $request = new Gdn_Request();
         $config = self::container()->get(Gdn_Configuration::class);

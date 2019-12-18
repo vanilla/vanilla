@@ -1500,11 +1500,11 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     * Extract the excerpt for a story.
+     * Set the story for an activity to an excerpt of the original.
      *
      * @param array $activity
      * @param int $length
-     * @return void
+     * @return array
      */
     public function setStoryExcerpt(array $activity, int $length = self::DEFAULT_EXCERPT_LENGTH): array {
         if (!isset($activity["Story"]) || !isset($activity["Format"])) {

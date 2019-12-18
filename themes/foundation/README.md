@@ -1,30 +1,38 @@
-# Keystone
+# Foundation
 
-## Description
+Foundation is Vanilla's first asset-compatible theme. It defines the following assets:
 
-A responsive Vanilla theme with customization options.
+- `variables.json` - Defines color variables for the forum and knowledge base.
+- `footer.twig` - Footer of the theme.
+- `styles.(s)css` - Independantly scoped styles that apply to the footer (and header if it exists). See [Build instructions](#building-the-theme)
 
-## Customizations
+## Building the theme 
 
--   Javascript to animate the open and close of the mobile navigation menu.
--   Sets its own flyout open/close listeners.
--   Dependency on the [theme-boilerplate](https://www.npmjs.com/package/@vanillaforums/theme-boilerplate).
--   Overwrites the `themeOptions_create` to support `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` customized options.
--   Custom options `hasHeroBanner`, `hasFeatureSearchbox` are dependent on the Hero Image Plugin.
--   If Advanced Search Plugin is enabled, the theme will render advanced search module, otherwise, it will render the search module.
+Building this theme requires the following pre-requisites:
 
-## Building Styles / Javascript / Images
+- The theme is present in the `themes` directory of a Vanilla installation.
+- A Vanilla version of `4.0-2020.001` or later.
+- Node & yarn are setup in your development environment. See [prerequsite docs](https://docs.vanillaforums.com/developer/tools/building-frontend/#prerequisites) for installation instructions.
+- Vanilla's `node_modules` are installed. Run `yarn install` in the root of the Vanilla installation.
 
-This theme is built with the [Vanilla Cli](https://docs.vanillaforums.com/developer/vanilla-cli/) and does not come with its own build toolchain. With that installed you can simply run:
+### The `src` directory
 
-```bash
-vanilla build
-```
+Files in the `src` directory use Vanilla's built-in build process. See [the Building Frontend Documentation](https://docs.vanillaforums.com/developer/tools/building-frontend/).
 
-or
+TL;DR:
 
-```bash
-vanilla build --watch
-```
+- To run a fast development build, that will watch for changes:
+  - Add `$Configuration['HotReload']['Enabled'] = true;` to your config.
+  - Run `yarn build:dev`.
+- To run a production build:
+  - Run `composer install` _or_ `yarn build`.
 
-to build your styles/js/images. Documentation for the CLI can be found [here](https://docs.vanillaforums.com/developer/vanilla-cli/#build-tools).
+### The `styles.scss` asset
+
+This asset is _not_ integrated into prodcution builds of the core process.
+
+As such while working on the isolated header/footer stylesheet, it can be rebuild as follows
+
+- Navigate to the theme's root directory in your terminal. 
+- To build it once: `yarn build`
+- To build it and watch for changes: `yarn build --watch`

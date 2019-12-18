@@ -46,7 +46,7 @@ class ThemeFeatures {
             'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
         ];
         $themeValues = $this->theme->getInfoValue('Features', []);
-        return $themeValues + $configValues + self::FEATURE_DEFAULTS;
+        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues);
     }
 
     /**

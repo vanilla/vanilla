@@ -132,22 +132,22 @@ export function variableFactory(componentName: string) {
  * - Strings starting with `#` get wrapped in `color()`;
  */
 function normalizeVariables(customVariable: any, defaultVariable: any) {
-    if (typeof customVariable === "object") {
-        const newObj: any = {};
-        for (const [key, value] of Object.entries(customVariable)) {
-            const defaultNested = defaultVariable[key];
-            if (!defaultNested) {
-                continue;
-            }
-            newObj[key] = normalizeVariables(value, defaultNested);
-        }
-        return newObj;
-    }
-
     if (defaultVariable instanceof ColorHelper) {
         // custom value should be a color;
         if (customVariable !== "transparent") {
             customVariable = color(customVariable);
+        }
+    } else {
+        if (typeof customVariable === "object") {
+            const newObj: any = {};
+            for (const [key, value] of Object.entries(customVariable)) {
+                const defaultNested = defaultVariable[key];
+                if (!defaultNested) {
+                    continue;
+                }
+                newObj[key] = normalizeVariables(value, defaultNested);
+            }
+            return newObj;
         }
     }
 

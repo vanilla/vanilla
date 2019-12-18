@@ -60,7 +60,7 @@ class ThemeModel {
     ];
 
     const ASSET_KEY = "assets";
-    
+
     /** @var ThemeProviderInterface[] */
     private $themeProviders = [];
 
@@ -252,6 +252,8 @@ class ThemeModel {
     }
 
     /**
+     * Generate a theme preview from the variables.
+     *
      * @param $theme
      * @return array
      */

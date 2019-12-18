@@ -28,12 +28,14 @@ class ThemesTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
+
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
-
         static::container()
             ->get(AddonManager::class)
-            ->add($theme);
+            ->add($theme)
+        ;
+
         static::container()
             ->rule(\Vanilla\Models\ThemeModel::class)
             ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
@@ -120,5 +122,19 @@ class ThemesTest extends AbstractAPIv2Test {
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
         $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo));
+    }
+
+    /**
+     * Test /themes endpoint returns all available themes.
+     *
+     * Note: If "hidden" variable isn't explicitly declared false
+     * and "sites" or "Garden.Themes.Visible" are set then a theme
+     * will not be available.
+     *
+     */
+    public function testIndex() {
+        $response = $this->api()->get("themes");
+        $body = $response->getBody();
+        $this->assertEquals(2, count($body));
     }
 }

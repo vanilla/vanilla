@@ -274,6 +274,4 @@ class ThemesApiController extends AbstractApiController {
                 'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
         }
     }
-
-
 }

@@ -51,6 +51,10 @@ class Bootstrap {
      */
     public function __construct($baseUrl) {
         $this->baseUrl = str_replace('\\', '/', $baseUrl);
+        if (!defined('CLIENT_NAME')) {
+            define('CLIENT_NAME', 'vanilla');
+        }
+
     }
 
 
@@ -148,10 +152,10 @@ class Bootstrap {
             ->setConstructorArgs([
                 [
                     Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                    Addon::TYPE_THEME => '/themes',
+                    Addon::TYPE_THEME => '/tests/fixtures/themes',
                     Addon::TYPE_LOCALE => '/locales'
                 ],
-                PATH_ROOT.'/tests/cache/bootstrap'
+                PATH_ROOT.'/tests/cache/am/test-manager'
             ])
             ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
@@ -273,7 +277,7 @@ class Bootstrap {
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
-            
+
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
@@ -523,4 +527,6 @@ class Bootstrap {
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
     }
+
+
 }

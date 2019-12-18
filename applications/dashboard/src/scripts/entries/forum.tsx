@@ -20,6 +20,8 @@ import { AppContext } from "@library/AppContext";
 import { addComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
+import { compatibilityStyles } from "@dashboard/compatibility/dataDrivenForumStyles";
+import gdn from "@library/gdn";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -42,3 +44,7 @@ addComponent("App", () => (
 ));
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
+
+if (gdn.getMeta("DataDrivenForumColors", false)) {
+    compatibilityStyles();
+}

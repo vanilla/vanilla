@@ -109,7 +109,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /**
      * @return string
      */
-    public function getSeoContent(): string {
+    public function getSeoContent(): ?string {
         return $this->seoContent;
     }
 

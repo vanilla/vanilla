@@ -7,6 +7,8 @@
 
 namespace Vanilla\Web;
 
+use Vanilla\Contracts\Web\AssetInterface;
+
 /**
  * Class for proxying one page head interface to another.
  */
@@ -77,6 +79,14 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      */
     public function addInlineScript(string $script) {
         $this->proxy->addInlineScript($script);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addScript(AssetInterface $script) {
+        $this->proxy->addScript($script);
         return $this;
     }
 

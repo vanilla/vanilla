@@ -10,6 +10,8 @@
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\TextFormat;
 
 /**
  * Activity data management.
@@ -17,6 +19,9 @@ use Vanilla\Dashboard\Models\ActivityEmail;
 class ActivityModel extends Gdn_Model {
 
     use \Vanilla\FloodControlTrait;
+
+    /** Maximum length of activity story excerpts. */
+    private const DEFAULT_EXCERPT_LENGTH = 160;
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
@@ -1496,6 +1501,26 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Extract the excerpt for a story.
+     *
+     * @param array $activity
+     * @param int $length
+     * @return void
+     */
+    public function setStoryExcerpt(array $activity, int $length = self::DEFAULT_EXCERPT_LENGTH): array {
+        if (!isset($activity["Story"]) || !isset($activity["Format"])) {
+            return $activity;
+        }
+
+        $excerpt = Gdn::formatService()->renderExcerpt($activity["Story"], $activity["Format"]);
+        $excerpt = sliceString(rtrim($excerpt, "…"), $length, "…");
+
+        $activity["Story"] = $excerpt;
+        $activity["Format"] = TextFormat::FORMAT_KEY;
+        return $activity;
+    }
+
+    /**
      *
      *
      * @param array $data
@@ -1509,6 +1534,11 @@ class ActivityModel extends Gdn_Model {
         $activity = $data;
         $this->_touch($activity);
         $queueEmail = $options["QueueEmail"] ?? false;
+
+        $extraFields = $data["Ext"] ?? [];
+        unset($data["Ext"]);
+        $emailFields = $extraFields["Email"] ?? [];
+
 
         if ($activity['ActivityUserID'] == $activity['NotifyUserID'] && !val('Force', $options)) {
             trace('Skipping activity because it would notify the user of something they did.');
@@ -1601,7 +1631,7 @@ class ActivityModel extends Gdn_Model {
 
         $delete = false;
         if ($activity['Emailed'] == self::SENT_PENDING && !$queueEmail) {
-            $this->email($activity, $options);
+            $this->email($emailFields + $activity, $options);
             $delete = val('_Delete', $activity);
         }
 
@@ -1662,7 +1692,7 @@ class ActivityModel extends Gdn_Model {
                 $activity['ActivityID'] = $activityID;
 
                 if ($activity['Emailed'] == self::SENT_PENDING) {
-                    $this->queueEmail($activity, $options);
+                    $this->queueEmail($emailFields + $activity, $options);
                 }
 
                 $this->prune();

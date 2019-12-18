@@ -681,7 +681,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
         $this->_Definitions += $siteMeta->value();
 
-        $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
+        $this->_Definitions['useNewFlyouts'] = Gdn::themeFeatures()->useNewFlyouts();
 
         $this->_Definitions['ui'] += [
             'siteName' => c('Garden.Title'),

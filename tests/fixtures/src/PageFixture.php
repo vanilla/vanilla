@@ -17,6 +17,13 @@ class PageFixture extends Page {
     /**
      * @inheritdoc
      */
+    public function getAssetSection(): string {
+        return 'tests';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function initialize() {
         return;
     }

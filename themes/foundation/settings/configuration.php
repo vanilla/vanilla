@@ -5,7 +5,6 @@
  * @license GPL-2.0-only
  */
 
-$Configuration['Garden']['MobileTheme'] = 'keystone';
 $Configuration['Badges']['BadgesModule']['Target'] = 'AfterUserInfo';
 $Configuration['Garden']['ThemeOptions']['Options']['hasHeroBanner'] = false;
 $Configuration['Garden']['ThemeOptions']['Options']['hasFeatureSearchbox'] = false;

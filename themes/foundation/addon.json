@@ -21,9 +21,6 @@
     "sites": [],
     "priority": 1000,
     "type": "theme",
-    "build": {
-        "process": "v1"
-    },
     "Features": {
         "ProfileHeader": true,
         "SharedMasterView": true,

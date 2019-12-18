@@ -116,12 +116,12 @@ interface PageHeadInterface {
     /**
      * @return string
      */
-    public function getSeoTitle(): string;
+    public function getSeoTitle(): ?string;
 
     /**
      * @return string
      */
-    public function getSeoDescription(): string;
+    public function getSeoDescription(): ?string;
 
     /**
      * @return Breadcrumb[]|null
@@ -131,5 +131,5 @@ interface PageHeadInterface {
     /**
      * @return string
      */
-    public function getCanonicalUrl(): string;
+    public function getCanonicalUrl(): ?string;
 }

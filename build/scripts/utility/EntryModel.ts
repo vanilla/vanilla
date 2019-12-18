@@ -15,6 +15,7 @@ import {
     LIBRARY_SRC_DIRECTORY,
     PACKAGES_DIRECTORY,
     VANILLA_ROOT,
+    VANILLA_THEMES,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
@@ -73,7 +74,12 @@ export default class EntryModel {
      * This is where ALL files lookups should be started from.
      */
     public async init() {
-        await Promise.all([this.initAddons(VANILLA_APPS), this.initAddons(VANILLA_PLUGINS), this.initPackages()]);
+        await Promise.all([
+            this.initAddons(VANILLA_APPS),
+            this.initAddons(VANILLA_PLUGINS),
+            this.initAddons(VANILLA_THEMES),
+            this.initPackages(),
+        ]);
         await this.initEntries();
     }
 

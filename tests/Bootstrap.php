@@ -28,6 +28,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -161,6 +162,9 @@ class Bootstrap {
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
+            ->rule(ThemeFeatures::class)
+            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
+
             // ApplicationManager
             ->rule(\Gdn_ApplicationManager::class)
             ->setShared(true)
@@ -277,6 +281,7 @@ class Bootstrap {
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
+
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])

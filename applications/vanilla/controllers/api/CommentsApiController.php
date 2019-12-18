@@ -79,7 +79,7 @@ class CommentsApiController extends AbstractApiController {
             $this->commentPostSchema = $this->schema(
                 Schema::parse([
                     'body',
-                    'format:s' => 'The input format of the comment.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'discussionID'
                 ])->add($this->fullSchema()),
                 'CommentPost'
@@ -236,7 +236,7 @@ class CommentsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the comment.',
-            'format:s' => 'The original format of the comment',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ]);
     }
 
@@ -254,7 +254,7 @@ class CommentsApiController extends AbstractApiController {
             'commentID',
             'discussionID',
             'body',
-            'format:s' => 'The input format of the comment.',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ])
             ->add($this->fullSchema()), 'out')
             ->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);

@@ -1,0 +1,39 @@
+{
+    "key": "foundation",
+    "name": "Foundation",
+    "description": "A responsive Vanilla theme with customization options.",
+    "version": "1.0.1",
+    "hidden": false,
+    "authors": [
+        {
+            "name": "Isis Graziatto",
+            "email": "isis.g@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        },
+        {
+            "name": "Adam (charrondev) Charron",
+            "email": "adam.c@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "isResponsive": true,
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "priority": 1000,
+    "type": "theme",
+    "Features": {
+        "ProfileHeader": true,
+        "SharedMasterView": true,
+        "NewFlyouts": true
+    },
+    "assets": {
+        "footer": {
+            "type": "twig",
+            "file": "footer.twig"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        }
+    }
+}

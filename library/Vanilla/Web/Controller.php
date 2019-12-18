@@ -243,7 +243,7 @@ abstract class Controller implements InjectableInterface {
         $result = $this->upload->saveAs(
             $upload->getFile(),
             $target,
-            [],
+            ["OriginalFilename" => $upload->getClientFilename()],
             $copy
         );
         return $result;

@@ -1,90 +1,90 @@
 * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-.Footer {
-    background: #f5f5f6;
-    color: #555A62;
-    font-size: 14px;
-    line-height: 1.5;
-    padding: 18px 0;
+.footer {
+  background: #f5f5f6;
+  color: #555A62;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 18px 0;
 }
 
-.Container {
-    padding-left: 18px;
-    padding-right: 18px;
-    max-width: 1236px;
-    margin: 0 auto;
+.footer-wrap {
+  padding-left: 18px;
+  padding-right: 18px;
+  max-width: 1236px;
+  margin: 0 auto;
 }
 
-.Footer a {
-    color: #0291DB;
+.footer a {
+  color: #0291DB;
+}
+.footer a:hover {
+  color: #0276b3;
 }
 
-.Footer a:hover {
-    color: #0276b3;
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin: -3px;
 }
 
-.Footer .row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    margin: -3px;
+.footer-col {
+  padding: 0 3px;
 }
 
-.Footer .col {
-    padding: 0 3px;
+.footer-col-copyRight {
+  justify-content: flex-start;
 }
 
-.Footer .col-copyRight {
-    justify-content: flex-start;
+.footer-col-logo {
+  justify-content: flex-end;
 }
 
-.Footer .col-logo {
-    justify-content: flex-end;
+.footer-col-copyRight,
+.footer-col-logo {
+  flex: 1;
+  display: flex;
 }
 
-.Footer .col-copyRight,
-.Footer .col-logo {
-    flex: 1;
-    display: flex;
-}
-
-.Vanilla-logo {
-    width: 120px;
-    height: 28px;
-    opacity: .6;
+.logo {
+  width: 120px;
+  height: 28px;
+  opacity: 0.6;
 }
 
 @media screen and (max-width: 768px) {
+  .footer-row {
+    display: block;
+  }
 
-    .Footer .row {
-        display: block;
-    }
+  .footer-col {
+    width: 100%;
+    text-align: center;
+    margin: 6px 0;
+  }
 
-    .Footer .col {
-        width: 100%;
-        text-align: center;
-        margin: 6px 0;
-    }
+  .footer-col:first-child {
+    margin-top: 0;
+  }
 
-    .Footer .col:first-child {
-        margin-top: 0;
-    }
+  .footer-col:last-child {
+    margin-bottom: 0;
+  }
 
-    .Footer .col:last-child {
-        margin-bottom: 0;
-    }
+  .footer-col-copyRight,
+.footer-col-logo {
+    justify-content: center;
+  }
 
-    .Footer .col-copyRight,
-    .Footer .col-logo {
-        justify-content: center;
-    }
-
-    .Vanilla-logo {
-        margin: 0 auto;
-    }
+  .logo {
+    margin: 0 auto;
+  }
 }
+
+/*# sourceMappingURL=styles.css.map */

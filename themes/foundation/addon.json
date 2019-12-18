@@ -6,8 +6,8 @@
     "hidden": false,
     "authors": [
         {
-            "name": "Isis Graziatto",
-            "email": "isis.g@vanillaforums.com",
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
             "homepage": "https://vanillaforums.com"
         },
         {
@@ -34,6 +34,10 @@
         "styles": {
             "type": "css",
             "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
         }
     }
 }

@@ -1,0 +1,15 @@
+{
+    "global": {
+        "mainColors": {
+            "primary": "yellow",
+            "fg": "pink",
+            "bg": "red"
+        }
+    },
+    "titleBar": {
+        "colors": {
+            "fg": "white",
+            "bg": "black"
+        }
+    }
+}

@@ -19,15 +19,6 @@ class FoundationThemeHooks extends \Gdn_Plugin {
     use TwigRenderTrait;
 
     /**
-     * Run once on enable.
-     *
-     * @return void
-     */
-    public function setup() {
-        saveToConfig([ 'Garden.MobileTheme' => 'foundation' ]);
-    }
-
-    /**
      * Runs every page load
      *
      * @param \Gdn_Controller $sender This could be any controller
@@ -35,20 +26,11 @@ class FoundationThemeHooks extends \Gdn_Plugin {
      * @return void
      */
     public function base_render_before($sender) {
-        if (inSection('Dashboard')) {
-            return;
-        }
-
-        $hasAdvancedSearch = class_exists('AdvancedSearchPlugin');
-
-        //set "hasAdvancedSearch" to smarty
-        $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
-
-        //set ThemeOptions to smarty
-        $themeOptions = c("Garden.ThemeOptions");
+        $themeOptions = c("Garden.ThemeOptions.Options", []);
+        $sender->setData('hasAdvancedSearch', class_exists(\AdvancedSearchPlugin::class));
 
         foreach ($themeOptions as $key => &$value) {
-            $sender->setData("ThemeOptions.".$key, $value);
+            $sender->setData("themeOptions", $themeOptions);
         }
     }
 

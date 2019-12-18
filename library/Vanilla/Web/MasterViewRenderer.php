@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Garden\Web\Data;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\ThemePreloadProvider;
 
@@ -30,15 +31,20 @@ class MasterViewRenderer {
     /** @var SiteMeta */
     private $siteMeta;
 
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
      * DI.
      *
      * @param ThemePreloadProvider $themePreloader
      * @param SiteMeta $siteMeta
+     * @param ConfigurationInterface $config
      */
-    public function __construct(ThemePreloadProvider $themePreloader, SiteMeta $siteMeta) {
+    public function __construct(ThemePreloadProvider $themePreloader, SiteMeta $siteMeta, ConfigurationInterface $config) {
         $this->themePreloader = $themePreloader;
         $this->siteMeta = $siteMeta;
+        $this->config = $config;
     }
 
     /**
@@ -67,7 +73,20 @@ class MasterViewRenderer {
      * @return string
      */
     public function renderGdnController(\Gdn_Controller $controller): string {
-        $data = array_merge($controller->Data, $this->getSharedData());
+        $data = array_merge(
+            $controller->Data,
+            $this->getSharedData(),
+            [
+                'splashTitle' => $controller->data(
+                    'Category.Name',
+                    $this->siteMeta->getSiteTitle()
+                ),
+                'splashDescription' => $controller->data(
+                    'Category.Description',
+                    $controller->description()
+                ),
+            ]
+        );
 
         $extraData = [
             'bodyContent' =>
@@ -118,11 +137,13 @@ class MasterViewRenderer {
      */
     private function getSharedData(): array {
         return [
+            'siteMeta' => $this->siteMeta->value(),
             'locale' => $this->siteMeta->getLocaleKey(),
             'debug' => $this->siteMeta->getDebugModeEnabled(),
             'favIcon' => $this->siteMeta->getFavIcon(),
             'themeHeader' => new \Twig\Markup($this->themePreloader->getThemeHeaderHtml(), 'utf-8'),
             'themeFooter' => new \Twig\Markup($this->themePreloader->getThemeFooterHtml(), 'utf-8'),
+            'homePageTitle' => $this->config->get('Garden.HomepageTitle', ''),
         ];
     }
 }

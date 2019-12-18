@@ -236,6 +236,19 @@ class TwigEnhancer {
     }
 
     /**
+     * Render out breadcrumbs from the controller.
+     *
+     * @param array $options
+     *
+     * @return \Twig\Markup
+     */
+    public function renderBreadcrumbs(array $options = []): \Twig\Markup {
+        $breadcrumbs = Gdn::controller()->data('Breadcrumbs', []);
+        $html = \Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $params, true), $options);
+        return new \Twig\Markup($html, 'utf-8');
+    }
+
+    /**
      * Return a mapping of twig function name -> callable.
      */
     private function getFunctionMappings(): array {
@@ -254,6 +267,7 @@ class TwigEnhancer {
             // Application interaction.
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
+            'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',

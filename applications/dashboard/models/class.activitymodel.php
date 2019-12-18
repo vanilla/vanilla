@@ -1629,8 +1629,10 @@ class ActivityModel extends Gdn_Model {
 
         $delete = false;
         if ($activity['Emailed'] == self::SENT_PENDING && !$queueEmail) {
-            $this->email($emailFields + $activity, $options);
-            $delete = val('_Delete', $activity);
+            $emailActivity = $emailFields + $activity;
+            $this->email($emailActivity, $options);
+            $delete = val('_Delete', $emailActivity);
+            $activity["Emailed"] = $emailActivity["Emailed"];
         }
 
         $activityData = $activity['Data'];

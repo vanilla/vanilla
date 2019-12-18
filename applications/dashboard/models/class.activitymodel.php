@@ -1538,7 +1538,6 @@ class ActivityModel extends Gdn_Model {
         unset($data["Ext"]);
         $emailFields = $extraFields["Email"] ?? [];
 
-
         if ($activity['ActivityUserID'] == $activity['NotifyUserID'] && !val('Force', $options)) {
             trace('Skipping activity because it would notify the user of something they did.');
 

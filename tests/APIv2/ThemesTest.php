@@ -7,10 +7,12 @@
 namespace VanillaTests\APIv2;
 
 use Gdn_Configuration;
+use Gdn_Request;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Garden\Container\Reference;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
 
 /**
@@ -28,6 +30,27 @@ class ThemesTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
+
+        $root = '/tests/fixtures';
+        $addonManager = new AddonManager([
+            Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
+            Addon::TYPE_THEME => "$root/themes",
+            Addon::TYPE_LOCALE => "$root/locales"
+        ],
+            PATH_ROOT.'/tests/cache/am/test-manager');
+
+        $request = new Gdn_Request();
+        $config = self::container()->get(Gdn_Configuration::class);
+
+        static::container()
+            ->rule(FsThemeProvider::class)
+            ->setConstructorArgs(
+                [
+                    $addonManager,
+                    $request,
+                    $config
+                ]
+            );
 
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");

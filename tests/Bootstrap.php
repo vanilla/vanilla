@@ -152,10 +152,10 @@ class Bootstrap {
             ->setConstructorArgs([
                 [
                     Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                    Addon::TYPE_THEME => '/tests/fixtures/themes',
+                    Addon::TYPE_THEME => '/themes',
                     Addon::TYPE_LOCALE => '/locales'
                 ],
-                PATH_ROOT.'/tests/cache/am/test-manager'
+                PATH_ROOT.'/tests/cache/bootstrap'
             ])
             ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')

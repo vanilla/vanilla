@@ -118,7 +118,9 @@ class MasterViewRenderer {
             $defaultLayout = PATH_ROOT . $theme->getSubdir() . '/views/' . self::DEFAULT_LAYOUT_NAME;
             $homeLayout = PATH_ROOT . $theme->getSubdir() . '/views/' . self::HOME_LAYOUT_NAME;
 
-            if (file_exists($defaultLayout)) {
+            if ($data['isHomepage'] ?? false && file_exists($homeLayout)) {
+                $template = $homeLayout;
+            } elseif (file_exists($defaultLayout)) {
                 $template = $defaultLayout;
             }
         }

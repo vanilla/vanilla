@@ -40,11 +40,11 @@ class JsonAsset extends Asset {
 
     /**
      * Get the JSON content.
-     * @param string $type
      *
+     * @param string $type
      * @return mixed
      */
-    public function getData(string $type ='string') {
+    public function getData(string $type = 'string') {
         if ($type === 'array') {
             return json_decode(json_encode($this->data), true);
         }
@@ -54,9 +54,5 @@ class JsonAsset extends Asset {
         }
 
         return json_encode($this->data);
-    }
-
-    public function filterData() {
-
     }
 }

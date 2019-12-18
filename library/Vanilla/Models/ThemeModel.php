@@ -254,10 +254,10 @@ class ThemeModel {
     /**
      * Generate a theme preview from the variables.
      *
-     * @param $theme
+     * @param array $theme
      * @return array
      */
-    public function generateThemePreview($theme) {
+    public function generateThemePreview(array $theme): array {
         $variables = $theme["assets"]["variables"]->getData('array');
         $preview = [];
         if ($variables) {

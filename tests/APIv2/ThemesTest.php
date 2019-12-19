@@ -96,9 +96,17 @@ class ThemesTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test getting a theme by its name. Should fail since there is no dynamic theme provider.
+     * Test POSTing a theme new name. Should fail since there is no dynamic theme provider.
      */
     public function testPostTheme() {
+        $this->expectException(ClientException::class);
+        $response = $this->api()->post("themes", ['name'=>'custom theme']);
+    }
+
+    /**
+     * Test PATCHing a theme. Should fail since there is no dynamic theme provider.
+     */
+    public function testPatchTheme() {
         $this->expectException(ClientException::class);
         $response = $this->api()->post("themes", ['name'=>'custom theme']);
     }

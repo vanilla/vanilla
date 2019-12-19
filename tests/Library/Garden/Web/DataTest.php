@@ -27,9 +27,12 @@ class DataTest extends TestCase {
             [
                 'userID' => 123,
                 'email' => 'rich@example.com',
+                'time' => date_create_immutable('1980-06-17 20:00', new \DateTimeZone('UTC')),
+                'IPAddress' => ipEncode('127.0.0.1'),
                 'items' => [
                     ['v' => 'a'],
                     ['v' => 'b'],
+                    ['v' => ['c' => 'd']],
                 ]
             ],
             [
@@ -296,7 +299,7 @@ class DataTest extends TestCase {
     }
 
     /**
-     * Test for offsetUnset().
+     * Test for {@link offsetUnset()}.
      */
     public function testOffsetUnset() {
         $this->assertArrayHasKey('userID', $this->data);
@@ -305,12 +308,52 @@ class DataTest extends TestCase {
     }
 
     /**
-     * Test for count().
+     * Test for {@link count()}.
      */
     public function testCount() {
-        $this->assertCount(3, $this->data);
+        $this->assertCount(5, $this->data);
         $this->data->offsetUnset('userID');
-        $this->assertCount(2, $this->data);
+        $this->assertCount(4, $this->data);
+    }
+
+    /**
+     * Test for {@link getIterator()}
+     */
+    public function testGetIterator() {
+        $iteratorObject = $this->data->getIterator();
+        $actual = $iteratorObject['userID'];
+        $expected = $this->data['userID'];
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test for {@link box()}.
+     */
+
+    /**
+     * Test with data object.
+     */
+    public function testBoxWithDataObject() {
+        $actual = $this->data->box($this->data);
+        $expected = $this->data;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test with array.
+     */
+    public function testBoxWithArray() {
+        $actual = $this->data->box(['foo' => 'bar']);
+        $expected = new Data(['foo' => 'bar']);
+        $this->assertEquals($actual, $expected);
+    }
+
+    /**
+     * Test with string.
+     */
+    public function testBoxWithString() {
+        $this->expectExceptionMessage("Data:box() expects an instance of Data or an array.");
+        $this->data->box('This should throw an exception');
     }
 
     /**
@@ -318,7 +361,7 @@ class DataTest extends TestCase {
      */
 
     /**
-     * Tests for addMeta().
+     * Tests for {@link addMeta()}.
      */
 
     /**

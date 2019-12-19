@@ -41,22 +41,19 @@ class JsonAsset extends Asset {
     /**
      * Get the JSON content.
      *
-     * @param string $type
-     * @return mixed
+     * @return string
      */
-    public function getData(string $type = 'string') {
-        if ($type === 'array') {
-            if (is_array($this->data)) {
-                return $this->data;
-            } else {
-                return json_decode(json_encode($this->data, JSON_UNESCAPED_UNICODE), true);
-            }
-        }
-
-        if ($type === 'class') {
-            return (object)$this->data;
-        }
+    public function getData(): string {
 
         return json_encode($this->data, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Get the get data as an Array.
+     *
+     * @return array
+     */
+    public function getDataArray(): array {
+        return json_decode(json_encode($this->data, JSON_UNESCAPED_UNICODE), true);
     }
 }

@@ -6,6 +6,7 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -258,8 +259,13 @@ class ThemeModel {
      * @return array
      */
     public function generateThemePreview(array $theme): array {
-        $variables = $theme["assets"]["variables"]->getData('array');
         $preview = [];
+
+        if (!($theme["assets"]["variables"] instanceof JsonAsset)){
+            return $preview;
+        }
+
+        $variables = $theme["assets"]["variables"]->getDataArray();
         if ($variables) {
             $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
             $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;

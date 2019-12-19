@@ -332,9 +332,9 @@ class Bootstrap {
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
 
-            ->rule(Vanilla\Scheduler\SchedulerInterface::class)
-            ->setClass(VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
-            ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+            ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
+            ->setClass(\VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
+            ->addCall('addDriver', [\Vanilla\Scheduler\Driver\LocalDriver::class])
             ->addCall('setDispatchEventName', ['SchedulerDispatch'])
             ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
             ->setShared(true)

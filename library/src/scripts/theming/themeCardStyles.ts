@@ -24,8 +24,7 @@ export const themeCardVariables = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.bg,
-        bg: globalVars.mainColors.primary,
+        fg: globalVars.messageColors.warning.fg,
     });
 
     const container = makeThemeVars("subCommunityTile", {
@@ -133,13 +132,11 @@ export const themeCardClasses = useThemeCache(() => {
         position: "relative",
         $nest: {
             "&:hover": {
+                backgroundColor: colorOut(vars.colors.fg),
+                opacity: 0.6,
                 position: "absolute",
                 [`& .${actionButtons}`]: {
                     opacity: 1,
-                },
-                [`& .${wrapper}`]: {
-                    backgroundColor: colorOut(vars.colors.fg),
-                    opacity: 0.3,
                 },
             },
         },

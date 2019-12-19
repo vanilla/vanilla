@@ -18,7 +18,13 @@ story.add("Preview Card", () => {
             <StoryContent>
                 <StoryHeading depth={1}>Preview Card</StoryHeading>
 
-                <ThemePreviewCard />
+                <ThemePreviewCard
+                    globalBg={"#111423"}
+                    globalPrimary={"#985E6D"}
+                    globalFg={"#555a62"}
+                    titleBarBg={"#0291db"}
+                    titleBarFg={"#fff"}
+                />
             </StoryContent>
         </>
     );

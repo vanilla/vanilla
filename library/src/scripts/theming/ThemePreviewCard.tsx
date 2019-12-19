@@ -8,79 +8,59 @@ import React from "react";
 import { themeCardClasses } from "./themeCardStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     globalBg: string;
     globalFg: string;
-    globalColor: string;
+    globalPrimary: string;
     titleBarBg: string;
     titleBarFg: string;
-    headerImg: string;
-    onApply: () => void;
-    onPreview: () => void;
-    onCopy: () => void;
+    headerImg?: string;
+    onApply?: () => void;
+    onPreview?: () => void;
+    onCopy?: () => void;
 }
-interface IState {
-    overlay: boolean;
-}
+interface IState {}
 
 export default class ThemePreviewCard extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
     }
-    public state: IState = {
-        overlay: false,
-    };
+
     public render() {
         const tiles = [1, 2, 3, 4];
-        //dummy data
-        const variables = {
-            data: {
-                global: {
-                    mainColors: {
-                        primary: "#985E6D",
-                        bg: "#111423",
-                        fg: "#555a62",
-                    },
-                },
-                titleBar: {
-                    colors: {
-                        bg: "#0291db",
-                        fg: "#fff",
-                    },
-                },
-            },
-        };
+        const { globalBg, globalPrimary, globalFg, titleBarBg, titleBarFg } = this.props;
         const classes = themeCardClasses();
         const titlebarStyle = {
-            backgroundColor: `${variables.data.titleBar.colors.bg}`,
+            backgroundColor: titleBarBg,
         };
 
         const titleBarLinks = {
-            backgroundColor: `${variables.data.titleBar.colors.fg}`,
+            backgroundColor: titleBarFg,
         };
 
         const containerStyle = {
-            border: `1px solid ${variables.data.global.mainColors.bg}`,
+            border: `1px solid ${globalBg}`,
         };
 
         const headerStyle = {
-            backgroundColor: `${variables.data.global.mainColors.primary}`,
+            backgroundColor: globalPrimary,
         };
         const subCommunityTileStyle = {
-            border: `1px solid ${variables.data.global.mainColors.bg}`,
+            border: `1px solid ${globalBg}`,
             boxShadow: `0 1px 3px 0 rgba(85,90,98,0.3)`,
-            color: `${variables.data.global.mainColors.bg}`,
+            color: `${globalBg}`,
         };
         const tileImgStyle = {
-            border: `1px solid ${variables.data.global.mainColors.bg}`,
+            border: `1px solid ${globalBg}`,
         };
         const tileHeaderStyle = {
-            backgroundColor: `${variables.data.global.mainColors.fg}`,
+            backgroundColor: globalFg,
         };
 
         const tileTextStyle = {
-            backgroundColor: `${variables.data.global.mainColors.fg}`,
+            backgroundColor: globalFg,
         };
 
         return (
@@ -119,21 +99,21 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                                 className={classes.buttons}
                                 onClick={this.props.onApply}
                             >
-                                Apply
+                                {t("Apply")}
                             </Button>
                             <Button
                                 baseClass={ButtonTypes.PRIMARY}
                                 className={classes.buttons}
                                 onClick={this.props.onPreview}
                             >
-                                Preview
+                                {t("Preview")}
                             </Button>
                             <Button
                                 baseClass={ButtonTypes.PRIMARY}
                                 className={classes.buttons}
                                 onClick={this.props.onCopy}
                             >
-                                Copy
+                                {t("Copy")}
                             </Button>
                         </div>
                     </div>

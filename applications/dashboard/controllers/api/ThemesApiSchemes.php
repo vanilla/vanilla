@@ -58,7 +58,7 @@ trait ThemesApiSchemes {
         );
         return $schema;
     }
-    
+
     /**
      * Get 'assets' schema
      *
@@ -97,7 +97,7 @@ trait ThemesApiSchemes {
                 'parentVersion:s' => [
                    'description' => 'Parent theme template version/revision.',
                 ],
-                'assets' => Schema::parse([
+                'assets?' => Schema::parse([
                     "header:s?",
                     "footer:s?",
                     "variables:s?",

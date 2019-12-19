@@ -267,7 +267,7 @@ class DataTest extends TestCase {
      * Test with one header sent.
      */
     public function testRenderOneHeader() {
-        $this->data->setHeader('HTTP_xxx', 'xxx');
+        $this->data->setHeader('xxx', 'xxx');
         $expected = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         $actual = $this->getActualOutput($this->data->render());
         $this->assertSame($expected, $actual);
@@ -311,5 +311,66 @@ class DataTest extends TestCase {
         $this->assertCount(3, $this->data);
         $this->data->offsetUnset('userID');
         $this->assertCount(2, $this->data);
+    }
+
+    /**
+     * Tests for MetaTrait
+     */
+
+    /**
+     * Tests for addMeta().
+     */
+
+    /**
+     * Test with two arguments (name and value).
+     */
+    public function testAddMetaNameValue() {
+        $this->data->addMeta('Location', 'www.example.com/example');
+        $expected = ['Location' => ['www.example.com/example']];
+        $actual = $this->data->getMetaArray();
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test with three arguments (name, key, and value).
+     */
+    public function testAddMetaNameValueAndKey() {
+        $this->data->addMeta('foo', 'bar', 'baz');
+        $expected = ['foo' => ['bar' => 'baz']];
+        $actual = $this->data->getMetaArray();
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test with already existing key.
+     */
+    public function testAddMetaWithAlreadyExistingKey() {
+        $this->data->setMeta('foo', 'bar');
+        $this->assertSame($this->data->getMetaArray(), ['foo' => 'bar']);
+        $this->data->addMeta('foo', 'baz');
+        $expected = ['foo' => ['bar', 'baz']];
+        $actual = $this->data->getMetaArray();
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test {@link setMetaArray()}.
+     */
+    public function testSetMetaArray() {
+        $this->data->setMetaArray(['foo' => 'bar']);
+        $actual = $this->data->getMetaArray();
+        $expected = ['foo' => 'bar'];
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test {@link mergeMetaArray()}
+     */
+    public function testMergeMetaArray() {
+        $this->data->setMetaArray(['foo' => 'bar']);
+        $this->data->mergeMetaArray(['bar' => 'baz']);
+        $expected = ['foo' => 'bar', 'bar' => 'baz'];
+        $actual = $this->data->getMetaArray();
+        $this->assertSame($expected, $actual);
     }
 }

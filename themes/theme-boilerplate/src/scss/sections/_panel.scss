@@ -38,7 +38,7 @@
             align-items: center;
             font-size: $global-subTitle_fontSize;
             font-weight: $global-heading_fontWeight;
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 color: $global-color_fg;
             }
         }
@@ -157,15 +157,17 @@
             border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
-            @if ($colorFromDynamicTheme) {
+
+            @if ($dynamicVariables) {
                 color: $panel_fg;
                 background-color: $panel-item_bg;
             }
+
             display: block;
             border: $panel-item_border;
             transition: transition(color), transition(background-color);
 
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 &:hover,
                 &:focus,
                 &:active {
@@ -195,14 +197,14 @@
             border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 color: $panel_fg;
                 background-color: $panel-item_bg;
                 border: $panel-item_border;
             }
             transition: transition(color), transition(background-color);
 
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 &:hover,
                 &:focus,
                 &:active {
@@ -227,7 +229,7 @@
             margin-left: 10px;
             line-height: $theme-photo-small_size;
 
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 &:focus,
                 &:hover,
                 &:active {
@@ -301,11 +303,9 @@ body.Section-EditProfile .Box,
         display: flex;
         align-items: center;
         padding: $panel-item_padding;
-        @if ($colorFromDynamicTheme) {
-            border: $panel-item_border;
-        }
+        border: $panel-item_border;
         border-radius: $panel_item-borderRadius;
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $panel_fg;
         }
         font-weight: $global-semibold_fontWeight;
@@ -323,14 +323,14 @@ body.Section-EditProfile .Box,
         border: $panel-item_border;
         border-radius: $panel_item-borderRadius;
         width: 100%;
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $panel_fg;
             background-color: $panel-item_bg;
-            border: $panel-item_border;
             transition: transition(color), transition(background-color);
         }
+        border: $panel-item_border;
 
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             &:hover,
             &:focus,
             &:active {

@@ -9,7 +9,7 @@
 \* -------------------------------------------------------------- */
 
 .Footer {
-    @if ($colorFromDynamicTheme) {
+    @if ($dynamicVariables) {
         background: $footer_bg;
         color: $footer_color;
     }
@@ -17,13 +17,11 @@
     line-height: $footer-base_lineHeight;
     padding: $utility-baseUnitTriple 0;
 
-    @if ($colorFromDynamicTheme) {
-        a {
-            color: $footer-link_color;
+    a {
+        color: $footer-link_color;
 
-            &:hover {
-                color: $footer-link-hover_color;
-            }
+        &:hover {
+            color: $footer-link-hover_color;
         }
     }
 

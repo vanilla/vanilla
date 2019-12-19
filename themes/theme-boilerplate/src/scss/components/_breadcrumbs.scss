@@ -30,7 +30,7 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
     display: block;
     line-height: $global-base_lineHeight;
     text-transform: $breadcrumbs_textTransform;
-    @if ($colorFromDynamicTheme) {
+    @if ($dynamicVariables) {
         color: $breadcrumbs_fg;
     }
     font-size: $global-small_fontSize;
@@ -39,13 +39,13 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
 
     a {
         font-size: inherit;
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $breadcrumbs-link_fg;
         }
 
         &:focus,
         &:hover {
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 color: $breadcrumbs-link-hover_fg;
             }
             text-decoration: $breadcrumbs-hover_textDecoration;
@@ -57,13 +57,13 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
     }
 
     .Last a {
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $breadcrumbs-last_fg;
         }
 
         &:focus,
         &:hover {
-            @if ($colorFromDynamicTheme) {
+            @if ($dynamicVariables) {
                 color: $breadcrumbs-link-hover_fg;
             }
             text-decoration: $breadcrumbs-hover_textDecoration;

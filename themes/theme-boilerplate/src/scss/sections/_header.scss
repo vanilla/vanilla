@@ -9,10 +9,8 @@
 \* -------------------------------------------------------------- */
 
 .Header {
-    @if ($colorFromDynamicTheme) {
-        background-color: $header_bg;
-        color: $header_fg;
-    }
+    background-color: $header_bg;
+    color: $header_fg;
     border-bottom: $header_border;
     box-shadow: $header_boxShadow;
 
@@ -32,37 +30,31 @@
     }
 
     // Mebox component
-    @if ($colorFromDynamicTheme) {
-        .MeButton {
-            color: $headerMebutton_fg;
-            background-color: $headerMebutton_bg;
+    .MeButton {
+        color: $headerMebutton_fg;
+        background-color: $headerMebutton_bg;
 
-            &:focus,
-            &:hover,
-            &:active {
-                color: $headerMebutton-hover_fg;
-                background-color: $headerMebutton-hover_bg;
+        &:focus,
+        &:hover,
+        &:active {
+            color: $headerMebutton-hover_fg;
+            background-color: $headerMebutton-hover_bg;
 
 
-                .Alert {
-                    color: $headerMeBoxAlert_fg;
-                    background-color: $headerMeBoxAlert_bg;
-                    border-color: $headerMeBoxAlert_borderColor;
-                }
+            .Alert {
+                color: $headerMeBoxAlert_fg;
+                background-color: $headerMeBoxAlert_bg;
+                border-color: $headerMeBoxAlert_borderColor;
             }
         }
     }
 
-    @if ($colorFromDynamicTheme) {
-        .ToggleFlyout.Open .MeButton {
-            background-color: $headerMebutton-active_bg;
-        }
+    .ToggleFlyout.Open .MeButton {
+        background-color: $headerMebutton-active_bg;
     }
 
-    @if ($colorFromDynamicTheme) {
-        .WhoIs > .Username {
-            color: $headerMebutton_fg;
-        }
+    .WhoIs > .Username {
+        color: $headerMebutton_fg;
     }
 
     .SignInLinks {
@@ -116,7 +108,7 @@
         align-items: center;
         justify-content: center;
 
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $header-link_color;
             &:hover,
             &:focus,

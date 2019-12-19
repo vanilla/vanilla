@@ -6,7 +6,7 @@
 
 body {
     @include font-style-base;
-    @if ($colorFromDynamicTheme) {
+    @if ($dynamicVariables) {
         color: $global-color_fg;
     }
 }

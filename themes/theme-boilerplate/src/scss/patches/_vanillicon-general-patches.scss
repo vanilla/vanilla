@@ -175,11 +175,9 @@
     content: $icon-facebook-alt;
 }
 
-@if ($colorFromDynamicTheme) {
-    .ReactFacebook:hover {
-        &::before {
-            color: #3A5795;
-        }
+.ReactFacebook:hover {
+    &::before {
+        color: #3A5795;
     }
 }
 
@@ -187,11 +185,9 @@
     content: $icon-twitter;
 }
 
-@if ($colorFromDynamicTheme) {
-    .ReactTwitter:hover {
-        &::before {
-            color: #55ACEE;
-        }
+@if ($dynamicVariables) {
+    &::before {
+        color: #55ACEE;
     }
 }
 
@@ -199,23 +195,20 @@
     content: $icon-google-plus-alt;
 }
 
-@if ($colorFromDynamicTheme) {
-    .ReactGooglePlus:hover {
-        &::before {
-            color: #DD4B39;
-        }
+
+.ReactGooglePlus:hover {
+    &::before {
+        color: #DD4B39;
     }
 }
 
-@if ($colorFromDynamicTheme) {
-    .RSS {
-        a {
-            color: #f26522;
-        }
+.RSS {
+    a {
+        color: #f26522;
     }
 }
 
-@if ($colorFromDynamicTheme) {
+@if ($dynamicVariables) {
     .ReactButton.PopupWindow {
         &:hover {
             .Sprite::before {
@@ -285,9 +278,7 @@
     .SocialIcon:not(.SocialIcon-OpenID) .Icon::before {
         @include icon;
         font-size: $global-medium_fontSize;
-        @if ($colorFromDynamicTheme) {
-            color: $global-color_white;
-        }
+        color: $global-color_white;
     }
 
     .SocialIcon-Facebook .Icon::before {
@@ -328,14 +319,14 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $global-color_primary;
         }
         content: $icon-star-empty;
     }
 
     &:hover::before {
-        @if ($colorFromDynamicTheme) {
+        @if ($dynamicVariables) {
             color: $global-color_primaryAlt;
         }
     }
@@ -344,9 +335,7 @@ a.Bookmark {
 a.Bookmarked {
     &::before,
     &:hover::before {
-        @if ($colorFromDynamicTheme) {
-            color: #E5B951 !important;
-        }
+        color: #E5B951 !important;
         content: $icon-star;
     }
 }

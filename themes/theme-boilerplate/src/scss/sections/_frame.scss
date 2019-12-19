@@ -21,7 +21,7 @@
             overflow: visible;
         }
     }
-    @if ($colorFromDynamicTheme) {
+    @if ($dynamicVariables) {
         background-color: $body_bg;
     }
     background-image: $body_backgroundImage;
@@ -37,9 +37,7 @@
 }
 
 .Frame-contentWrap {
-    @if ($colorFromDynamicTheme) {
-        background-color: $frame_bg;
-    }
+    background-color: $frame_bg;
     border: $frame_border;
     box-shadow: $frame_boxShadow;
     padding-top: $frame_padding;
@@ -77,9 +75,7 @@
 }
 
 .MainContent.Content {
-    @if ($colorFromDynamicTheme) {
-        background-color: $content_bg;
-    }
+    background-color: $content_bg;
     border: $frame_border;
     padding: $content_padding;
     border-radius: $content_borderRadius;

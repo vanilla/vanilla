@@ -167,6 +167,11 @@ class Addon implements Contracts\AddonInterface {
                 }
             }
 
+            // ensure that the theme key is always lowercase.
+            if ($info['type'] === 'theme') {
+                $info['type'] = strtolower($info['key']);
+            }
+
             return $info;
         }
 

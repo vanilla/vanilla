@@ -335,7 +335,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             }
         }
 
-        if ($hidden && !in_array(strtolower($themeInfo['key']), $alwaysVisibleThemes)) {
+        if ($hidden && !in_array($themeInfo['key'], $alwaysVisibleThemes)) {
             return[];
         }
 

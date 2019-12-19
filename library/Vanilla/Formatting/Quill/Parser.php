@@ -312,4 +312,40 @@ class Parser {
             $lastOp["insert"] = preg_replace('/\s+$/', "\n", $lastOp["insert"]);
         }
     }
+
+    /**
+     * Get all registered blot classes.
+     *
+     * @return array
+     */
+    public function getBlotClasses(): array {
+        return $this->blotClasses;
+    }
+
+    /**
+     * Replace all registered blot classes.
+     *
+     * @param array
+     */
+    public function setBlotClasses(array $blotClasses) {
+        $this->blotClasses = $blotClasses;
+    }
+
+    /**
+     * Get all registered format classes.
+     *
+     * @return array
+     */
+    public function getFormatClasses(): array {
+        return $this->formatClasses;
+    }
+
+    /**
+     * Replace all registered format classes.
+     *
+     * @param array
+     */
+    public function setFormatClasses(array $formatClasses) {
+        $this->formatClasses = $formatClasses;
+    }
 }

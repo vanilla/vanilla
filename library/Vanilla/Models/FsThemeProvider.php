@@ -315,7 +315,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     protected function filterTheme($themeInfo): array {
         $clientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
-        $alwaysVisibleThemes = explode(',', strtolower(c('Garden.Themes.Visible', '')));
+        $alwaysVisibleThemes = explode(',', c('Garden.Themes.Visible', ''));
 
         // Check if theme visibility is explicitly set
         $hidden = $themeInfo['hidden'] ?? null;

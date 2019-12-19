@@ -1,0 +1,23 @@
+<div class="Profile-header">
+    <div class="Profile-photo">
+        <div class="PhotoLarge">
+            {{ renderModule("UserPhotoModule") }}
+        </div>
+    </div>
+    <div class="Profile-name">
+        <div class="Profile-row">
+            <h1 class="Profile-username">
+                {{ Profile.Name }}
+            </h1>
+        </div>
+        <div class="Profile-row">
+            {% if Rank|default(false) %}
+            <span class="Profile-rank">
+                {# The rank label is trusted HTML #}
+                {{ Rank.Label|raw }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{{ renderModule("ProfileOptionsModule") }}

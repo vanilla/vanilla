@@ -25,6 +25,7 @@ class AliasLoader {
     protected static function provideAliases(): array {
         return [
             \Vanilla\Web\Asset\LegacyAssetModel::class => ['AssetModel'],
+            \Vanilla\Dashboard\Models\BannerImageModel::class => ['HeroImagePlugin'],
         ];
     }
 }

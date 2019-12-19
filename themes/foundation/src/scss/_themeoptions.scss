@@ -1,0 +1,67 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.ThemeOptions-panelToLeft {
+
+    .Panel-main {
+        margin-left: 0;
+    }
+
+    .BreadcrumbsBox,
+    .MainContent {
+        order: 2;
+        margin-left: auto;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            order: 0;
+        }
+    }
+
+    .BreadcrumbsBox {
+        order: 2;
+        margin-left: auto;
+        width: calc(100% - #{$panel_width + 50px});
+
+         @include maxWidth($theme-breakpoint_tablet) {
+             order: initial;
+             margin-left: 0;
+             width: auto;
+         }
+    }
+
+    .SearchBox {
+        margin-left: 0;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            margin-left: auto;
+        }
+    }
+}
+
+.hideHomepageTitle {
+
+    .MainContent {
+
+        .HomepageTitle,
+        .PageDescription {
+            display: none;
+        }
+    }
+}
+
+.ThemeOptions-hasHeroBanner {
+    .BreadcrumbsBox {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+.ThemeOptions-hasHeroBanner.ThemeOptions-hasFeatureSearchbox .Panel {
+
+    .SearchBox {
+        display: none;
+    }
+}

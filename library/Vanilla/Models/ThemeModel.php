@@ -6,6 +6,7 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -114,6 +115,23 @@ class ThemeModel {
         $provider = $this->getThemeProvider($themeKey);
         $theme = $provider->getThemeWithAssets($themeKey);
         return $theme;
+    }
+
+    /**
+     * Get all available themes.
+     *
+     * @return array
+     */
+    public function getThemes(): array {
+        $allThemes = [];
+        foreach ($this->themeProviders as $themeProvider) {
+            $themes = $themeProvider->getAllThemes();
+            foreach ($themes as &$theme) {
+                $theme['preview'] = $this->generateThemePreview($theme) ?? null;
+                $allThemes[] = $theme;
+            }
+        }
+        return $allThemes;
     }
 
     /**
@@ -279,5 +297,30 @@ class ThemeModel {
                 break;
         }
         return $valid;
+    }
+
+    /**
+     * Generate a theme preview from the variables.
+     *
+     * @param array $theme
+     * @return array
+     */
+    public function generateThemePreview(array $theme): array {
+        $preview = [];
+
+        if (!($theme["assets"]["variables"] instanceof JsonAsset)) {
+            return $preview;
+        }
+
+        $variables = $theme["assets"]["variables"]->getDataArray();
+        if ($variables) {
+            $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
+            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
+            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
+            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
+            $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
+            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+        }
+        return $preview;
     }
 }

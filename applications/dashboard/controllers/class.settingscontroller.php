@@ -516,6 +516,11 @@ class SettingsController extends DashboardController {
                     'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'
                 ),
             ],
+            'Garden.BannerImage' => [
+                'Label' => t('Banner Image'),
+                'Control' => 'imageUploadReact',
+                'Description' => t('The default banner image across the site. This can be overriden on a per category basis.'),
+            ],
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
                 'Control' => 'imageupload',

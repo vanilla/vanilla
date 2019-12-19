@@ -118,6 +118,134 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('debug')) {
+    /**
+     * Get or set the current debug state of the application.
+     *
+     * @param bool|null $value The new debug value or null to just return the current value.
+     * @return bool Returns the current debug level.
+     */
+    function debug($value = null) {
+        static $debug = false;
+        if ($value === null) {
+            return $debug;
+        }
+        $debug = $value;
+        return $debug;
+    }
+}
+
+if (!function_exists('increaseMaxExecutionTime')) {
+    /**
+     * Used to increase php max_execution_time value.
+     *
+     * @param int $maxExecutionTime PHP max execution time in seconds.
+     * @return bool Returns true if max_execution_time was increased (or stayed the same) or false otherwise.
+     */
+    function increaseMaxExecutionTime($maxExecutionTime) {
+
+        $iniMaxExecutionTime = ini_get('max_execution_time');
+
+        // max_execution_time == 0 means no limit.
+        if ($iniMaxExecutionTime === '0') {
+            return true;
+        }
+
+        if (((string)$maxExecutionTime) === '0') {
+            return set_time_limit(0);
+        }
+
+        if (!ctype_digit($iniMaxExecutionTime) || $iniMaxExecutionTime < $maxExecutionTime) {
+            return set_time_limit($maxExecutionTime);
+        }
+
+        return true;
+    }
+}
+
+if (!function_exists('inMaintenanceMode')) {
+    /**
+     * Determine if the site is in maintenance mode.
+     *
+     * @return bool
+     */
+    function inMaintenanceMode() {
+        $updateMode = c('Garden.UpdateMode');
+
+        return (bool)$updateMode;
+    }
+}
+
+if (!function_exists('isMobile')) {
+    /**
+     * Determine whether or not the site is in mobile mode.
+     *
+     * @param mixed $value Sets a new value for mobile. Pass one of the following:
+     * - true: Force mobile.
+     * - false: Force desktop.
+     * - null: Reset and use the system determined mobile setting.
+     * - not specified: Use the current setting or use the system determined mobile setting.
+     * @return bool
+     */
+    function isMobile($value = '') {
+        if ($value === true || $value === false) {
+            $type = $value ? 'mobile' : 'desktop';
+            userAgentType($type);
+        } elseif ($value === null) {
+            userAgentType(false);
+        }
+
+        $type = userAgentType();
+        // Check the config for an override. (ex. Consider tablets mobile)
+        $type = c('Garden.Devices.'.ucfirst($type), $type);
+
+        switch ($type) {
+            case 'app':
+            case 'mobile':
+                $isMobile = true;
+                break;
+            default:
+                $isMobile = false;
+                break;
+        }
+
+        return $isMobile;
+    }
+}
+
+if (!function_exists('isSearchEngine')) {
+    /**
+     * Determines whether or not the current request is being made by a search engine.
+     *
+     * @return bool Returns true if the current request is a search engine or false otherwise.
+     */
+    function isSearchEngine() {
+        $engines = [
+            'googlebot',
+            'slurp',
+            'search.msn.com',
+            'nutch',
+            'simpy',
+            'bot',
+            'aspseek',
+            'crawler',
+            'msnbot',
+            'libwww-perl',
+            'fast',
+            'baidu',
+        ];
+        $httpUserAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER, ''));
+        if ($httpUserAgent != '') {
+            foreach ($engines as $engine) {
+                if (strpos($httpUserAgent, $engine) !== false) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
 if (!function_exists('paramPreference')) {
     /**
      * Conditionally save and load a query parameter value from a user's preferences.
@@ -418,6 +546,36 @@ if (!function_exists('fetchPageInfo')) {
     }
 }
 
+if (!function_exists('formatString')) {
+    /**
+     * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
+     *
+     * @param string $string The string to format with fields from its args enclosed in curly braces.
+     * The format of fields is in the form {Field,Format,Arg1,Arg2}. The following formats are the following:
+     *  - date: Formats the value as a date. Valid arguments are short, medium, long.
+     *  - number: Formats the value as a number. Valid arguments are currency, integer, percent.
+     *  - time: Formats the value as a time. This format has no additional arguments.
+     *  - url: Calls url() function around the value to show a valid url with the site.
+     * You can pass a domain to include the domain.
+     *  - urlencode, rawurlencode: Calls urlencode/rawurlencode respectively.
+     *  - html: Calls htmlspecialchars.
+     * @param array $args The array of arguments.
+     * If you want to nest arrays then the keys to the nested values can be separated by dots.
+     * @return string The formatted string.
+     * <code>
+     * echo formatString("Hello {Name}, It's {Now,time}.", array('Name' => 'Frank', 'Now' => '1999-12-31 23:59'));
+     * // This would output the following string:
+     * // Hello Frank, It's 12:59PM.
+     * </code>
+     */
+    function formatString($string, $args = []) {
+        _formatStringCallback($args, true);
+        $result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
+
+        return $result;
+    }
+}
+
 if (!function_exists('_formatStringCallback')) {
     /**
      * The callback helper for {@link formatString()}.
@@ -662,6 +820,20 @@ if (!function_exists('_formatStringCallback')) {
             }
         }
         return $result;
+    }
+}
+
+if (!function_exists('getAppCookie')) {
+    /**
+     * Get a cookie with the application prefix.
+     *
+     * @param string $name The name of the cookie to get.
+     * @param mixed $default The default to return if the cookie is not found.
+     * @return string Returns the cookie value or {@link $default}.
+     */
+    function getAppCookie($name, $default = null) {
+        $px = c('Garden.Cookie.Name');
+        return getValue("$px-$name", $_COOKIE, $default);
     }
 }
 
@@ -1011,6 +1183,86 @@ if (!function_exists('jsonEncodeChecked')) {
     }
 }
 
+if (!function_exists('passwordStrength')) {
+    /**
+     * Check a password's strength.
+     *
+     * @param string $password The password to test.
+     * @param string $username The username that relates to the password.
+     * @return array Returns an analysis of the supplied password, comprised of an array with the following keys:
+     *
+     *    - Pass: Whether or not the password passes the minimum strength requirements.
+     *    - Symbols: The number of characters in the alphabet used by the password.
+     *    - Length: The length of the password.
+     *    - Entropy: The amount of entropy in the password.
+     *    - Score: The password's complexity score.
+     */
+    function passwordStrength($password, $username) {
+        $translations = explode(',', t('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+
+        // calculate $Entropy
+        $alphabet = 0;
+        if (preg_match('/[0-9]/', $password)) {
+            $alphabet += 10;
+        }
+        if (preg_match('/[a-z]/', $password)) {
+            $alphabet += 26;
+        }
+        if (preg_match('/[A-Z]/', $password)) {
+            $alphabet += 26;
+        }
+        if (preg_match('/[^a-zA-Z0-9]/', $password)) {
+            $alphabet += 31;
+        }
+
+        $length = strlen($password);
+        $entropy = log(pow($alphabet, $length), 2);
+
+        $requiredLength = c('Garden.Password.MinLength', 6);
+        $requiredScore = c('Garden.Password.MinScore', 2);
+        $response = [
+            'Pass' => false,
+            'Symbols' => $alphabet,
+            'Length' => $length,
+            'Entropy' => $entropy,
+            'Required' => $requiredLength,
+            'Score' => 0
+        ];
+
+        if ($length < $requiredLength) {
+            $response['Reason'] = $translations[0];
+            return $response;
+        }
+
+        // password1 == username
+        if (strpos(strtolower($username), strtolower($password)) !== false) {
+            $response['Reason'] = $translations[1];
+            return $response;
+        }
+
+        if ($entropy < 30) {
+            $response['Score'] = 1;
+            $response['Reason'] = $translations[2];
+        } elseif ($entropy < 40) {
+            $response['Score'] = 2;
+            $response['Reason'] = $translations[3];
+        } elseif ($entropy < 55) {
+            $response['Score'] = 3;
+            $response['Reason'] = $translations[4];
+        } elseif ($entropy < 70) {
+            $response['Score'] = 4;
+            $response['Reason'] = $translations[5];
+        } else {
+            $response['Score'] = 5;
+            $response['Reason'] = $translations[6];
+        }
+
+        $response['Pass'] = $response['Score'] >= $requiredScore;
+
+        return $response;
+    }
+}
+
 if (!function_exists('proxyHead')) {
     /**
      * Make a cURL HEAD request to a URL.
@@ -1348,6 +1600,31 @@ if (!function_exists('proxyRequest')) {
     }
 }
 
+if (!function_exists('recordType')) {
+    /**
+     * Return the record type and id of a row.
+     *
+     * @param array|object $row The record we are looking at.
+     * @return array An array with the following items
+     *  - 0: record type
+     *  - 1: record ID
+     * @since 2.1
+     */
+    function recordType($row) {
+        if ($recordType = val('RecordType', $row)) {
+            return [$recordType, val('RecordID', $row)];
+        } elseif ($commentID = val('CommentID', $row)) {
+            return ['Comment', $commentID];
+        } elseif ($discussionID = val('DiscussionID', $row)) {
+            return ['Discussion', $discussionID];
+        } elseif ($activityID = val('ActivityID', $row)) {
+            return ['Activity', $activityID];
+        } else {
+            return [null, null];
+        }
+    }
+}
+
 if (!function_exists('redirectTo')) {
     /**
      * Redirect to the supplied destination.
@@ -1428,6 +1705,32 @@ if (!function_exists('removeFromConfig')) {
     }
 }
 
+if (!function_exists('safeURL')) {
+    /**
+     * Transform a destination to make sure that the resulting URL is "Safe".
+     *
+     * "Safe" means that the domain of the URL is trusted.
+     *
+     * @param string $destination Destination URL or path.
+     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     */
+    function safeURL($destination) {
+        $url = url($destination, true);
+
+        $trustedDomains = trustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $url)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination)));
+    }
+}
+
 if (!function_exists('saveToConfig')) {
     /**
      * Save values to the application's configuration file.
@@ -1480,6 +1783,17 @@ if (!function_exists('setAppCookie')) {
     }
 }
 
+if (!function_exists('signInPopup')) {
+    /**
+     * Returns a boolean value indicating if sign in windows should be "popped" into modal in-page popups.
+     *
+     * @return bool Returns true if signin popups are used.
+     */
+    function signInPopup() {
+        return c('Garden.SignIn.Popup');
+    }
+}
+
 if (!function_exists('smartAsset')) {
     /**
      * Takes the path to an asset (image, js file, css file, etc) and prepends the web root.
@@ -1502,6 +1816,21 @@ if (!function_exists('smartAsset')) {
             $result .= (strpos($result, '?') === false ? '?' : '&').'v='.urlencode($version);
         }
         return $result;
+    }
+}
+
+if (!function_exists('sprintft')) {
+    /**
+     * A version of {@link sprintf()} That translates the string format.
+     *
+     * @param string $formatCode The format translation code.
+     * @param mixed $arg1 The arguments to pass to {@link sprintf()}.
+     * @return string The translated string.
+     */
+    function sprintft($formatCode, $arg1 = null) {
+        $args = func_get_args();
+        $args[0] = t($formatCode, $formatCode);
+        return call_user_func_array('sprintf', $args);
     }
 }
 
@@ -1597,6 +1926,29 @@ if (!function_exists('theme')) {
     }
 }
 
+if (!function_exists('trace')) {
+    /**
+     * Trace some information for debugging.
+     *
+     * @param mixed $value One of the following:
+     *
+     * - null: The entire trace will be returned.
+     * - string: A trace message.
+     * - other: A variable to output.
+     * @param string $type One of the `TRACE_*` constants or a string label for the trace.
+     * @return array Returns the array of traces.
+     */
+    function trace($value = null, $type = TRACE_INFO) {
+        static $traces = [];
+
+        if ($value === null) {
+            return $traces;
+        }
+
+        $traces[] = [$value, $type];
+    }
+}
+
 if (!function_exists('trustedDomains')) {
     /**
      * Get an array of all of the trusted domains in the application.
@@ -1668,6 +2020,133 @@ if (!function_exists('url')) {
     function url($path = '', $withDomain = false) {
         $result = Gdn::request()->url(strval($path), $withDomain);
         return $result;
+    }
+}
+
+if (!function_exists('userAgentType')) {
+    /**
+     * Get or set the type of user agent.
+     *
+     * This method checks the user agent to try and determine the type of device making the current request.
+     * It also checks for a special X-UA-Device header that a server module can set to more quickly determine the device.
+     *
+     * @param string|null|false $value The new value to set or **false** to clear. This should be one of desktop, mobile, tablet, or app.
+     * @return string Returns one of desktop, mobile, tablet, or app.
+     */
+    function userAgentType($value = null) {
+        static $type = null;
+
+        if ($value === false) {
+            $type = null;
+            return '';
+        } elseif ($value !== null) {
+            $type = $value;
+        }
+
+        if ($type !== null) {
+            return $type;
+        }
+
+        // A function to make sure the type is one of our supported types.
+        $validateType = function (string $type): string {
+            $validTypes = ['desktop', 'tablet', 'app', 'mobile'];
+
+            if (in_array($type, $validTypes)) {
+                return $type;
+            } else {
+                // There is no exact match so look for a partial match.
+                foreach ($validTypes as $validType) {
+                    if (strpos($type, $validType) !== false) {
+                        return $validType;
+                    }
+                }
+            }
+            return 'desktop';
+        };
+
+        // Try and get the user agent type from the header if it was set from the server, varnish, etc.
+        $type = strtolower(val('HTTP_X_UA_DEVICE', $_SERVER, ''));
+        if ($type) {
+            return $validateType($type);
+        }
+
+        // See if there is an override in the cookie.
+        if ($type = val('X-UA-Device-Force', $_COOKIE)) {
+            return $validateType($type);
+        }
+
+        // Now we will have to figure out the type based on the user agent and other things.
+        $allHttp = strtolower(val('ALL_HTTP', $_SERVER));
+        $httpAccept = strtolower(val('HTTP_ACCEPT', $_SERVER));
+        $userAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER));
+
+        // Check for a mobile app.
+        if (strpos($userAgent, 'vanillamobileapp') !== false) {
+            return $type = 'app';
+        }
+
+        // Match wap Accepts: header
+        if ((strpos($httpAccept, 'application/vnd.wap.xhtml+xml') > 0)
+            || ((isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])))
+        ) {
+            return $type = 'mobile';
+        }
+
+        // Match mobile androids
+        if (strpos($userAgent, 'android') !== false && strpos($userAgent, 'mobile') !== false) {
+            return $type = 'mobile';
+        }
+
+        // Match operamini in 'ALL_HTTP'
+        if (strpos($allHttp, 'operamini') > 0) {
+            return $type = 'mobile';
+        }
+
+        // Match discrete chunks of known mobile agents
+        $directAgents = [
+            'up.browser',
+            'up.link',
+            'mmp',
+            'symbian',
+            'smartphone',
+            'midp',
+            'wap',
+            'phone',
+            'opera m',
+            'kindle',
+            'webos',
+            'playbook',
+            'bb10',
+            'playstation vita',
+            'windows phone',
+            'iphone',
+            'ipod',
+            'nintendo 3ds'
+        ];
+        $directAgentsMatch = implode('|', $directAgents);
+        if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {
+            return $type = 'mobile';
+        }
+
+        // Match starting chunks of known
+        $mobileUserAgent = substr($userAgent, 0, 4);
+        $mobileUserAgents = [
+            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
+            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
+            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
+            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
+            'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox', 'qwap',
+            'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar', 'sie-',
+            'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-', 'tosh',
+            'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp', 'wapr',
+            'webc', 'winw', 'winw', 'xda', 'xda-'];
+
+        if (in_array($mobileUserAgent, $mobileUserAgents)) {
+            return $type = 'mobile';
+        }
+
+        // None of the mobile matches work so we must be a desktop browser.
+        return $type = 'desktop';
     }
 }
 

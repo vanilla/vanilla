@@ -117,6 +117,7 @@ jQuery(document).ready(function($) {
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 $('div.Popup').remove();
                 $.popup({}, XMLHttpRequest.responseText);
+                gdn.enable(btn);
             },
             success: function(json) {
                 // Remove any old popups if not saving as a draft
@@ -136,6 +137,7 @@ jQuery(document).ready(function($) {
                 if (json.FormSaved == false) {
                     $(frm).prepend(json.ErrorMessages);
                     json.ErrorMessages = null;
+                    gdn.enable(btn);
                 } else if (preview) {
                     // Reveal the "Edit" button and hide this one
                     $(btn).hide();
@@ -143,6 +145,7 @@ jQuery(document).ready(function($) {
 
                     $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(json.Data);
                     $(frm).trigger('PreviewLoaded', [frm]);
+                    gdn.enable(btn);
                 } else if (!draft) {
                     if (json.RedirectTo) {
                         $(frm).triggerHandler('complete');
@@ -159,12 +162,11 @@ jQuery(document).ready(function($) {
                             contentContainer.html(json.Data);
                             $(frm).replaceWith(contentContainer);
                         }
+
+                        gdn.enable(btn);
                     }
                 }
                 gdn.inform(json);
-            },
-            complete: function(XMLHttpRequest, textStatus) {
-                gdn.enable(btn);
             }
         });
         $(frm).triggerHandler('submit');

@@ -88,12 +88,7 @@ story.add(
                                 <StoryHeading>Big Logo</StoryHeading>
                                 <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                                 <StoryHeading>Extra Navigation links</StoryHeading>
-                                <TitleBar
-                                    useMobileBackButton={false}
-                                    isFixed={false}
-                                    navigationLinks={true}
-                                    hamburger={true}
-                                />
+                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                             </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </Provider>

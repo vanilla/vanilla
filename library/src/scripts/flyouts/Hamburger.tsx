@@ -12,12 +12,14 @@ import classNames from "classnames";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { HamburgerIcon } from "@library/icons/common";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
+import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
 
 /**
  * Creates a drop down menu
  */
 export default function Hamburger(props) {
     const classes = hamburgerClasses();
+
     return (
         <DropDown
             name={t("Messages")}
@@ -32,6 +34,7 @@ export default function Hamburger(props) {
                             className={classNames(classes.content)}
                             dangerouslySetInnerHTML={{ __html: props.contents }}
                         />
+                        <TitleBarMobileNav />
                     </FrameBody>
                 }
             />

@@ -261,7 +261,7 @@ class ThemeModel {
     public function generateThemePreview(array $theme): array {
         $preview = [];
 
-        if (!($theme["assets"]["variables"] instanceof JsonAsset)){
+        if (!($theme["assets"]["variables"] instanceof JsonAsset)) {
             return $preview;
         }
 

@@ -78,8 +78,8 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
 
                         <div className={classes.subCommunityContent}>
                             <ul className={classes.subCommunityList}>
-                                {tiles.map(() => (
-                                    <li className={classes.subCommunityListItem}>
+                                {tiles.map((val, key) => (
+                                    <li key={key} className={classes.subCommunityListItem}>
                                         <div style={subCommunityTileStyle} className={classes.subCommunityTile}>
                                             <div style={tileImgStyle} className={classes.tileImg}></div>
                                             <div style={tileHeaderStyle} className={classes.tileHeader}></div>

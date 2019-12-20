@@ -317,7 +317,6 @@ export const panelLayoutClasses = useThemeCache(() => {
         "isSticky",
         {
             ...sticky(),
-            top: titleBarVars.sizing.height * 2,
             height: percent(100),
         },
         mediaQueries.oneColumnDown({
@@ -334,7 +333,7 @@ export const panelLayoutClasses = useThemeCache(() => {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        marginBottom: unit(10),
+        paddingBottom: unit(10),
     });
 
     return {

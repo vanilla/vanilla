@@ -13,7 +13,11 @@ import { browserEscapesNoScript, unescapeHTML } from "./sanitization";
  *      Particularly useful for when the initial content is inside of a <noscript /> tag.
  * @param newElementTag
  */
-export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = false, newElementTag = "div") {
+export function prepareShadowRoot(
+    element: HTMLElement,
+    cloneElement: boolean = false,
+    newElementTag = "div",
+): HTMLElement {
     let html = element.innerHTML;
     // This is likely a noscript tag.
     if (browserEscapesNoScript()) {
@@ -39,4 +43,5 @@ export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = 
 
     const shadowHeader = element.attachShadow({ mode: "open" });
     shadowHeader.innerHTML = html;
+    return element;
 }

@@ -8,7 +8,6 @@
 namespace VanillaTests\Library\Core;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\Fixtures\Tuple;
 
 /**
  * Tests for validateRequired().

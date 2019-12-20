@@ -447,7 +447,7 @@ class CommentsApiController extends AbstractApiController {
      * @param array $body The request body.
      * @return array
      * @throws Exception If the user cannot view the discussion.
-     * @throws ServerException if the comment could not be created.
+     * @throws ServerException If the comment could not be created.
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');

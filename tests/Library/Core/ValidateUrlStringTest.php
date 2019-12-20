@@ -28,7 +28,7 @@ class ValidateUrlStringTest extends TestCase {
      * Test with invalid string.
      */
     public function testWithInvalidString() {
-         $actual = validateUrlString('i-think-thiß-iß-not-a-valid-ßtring');
+         $actual = validateUrlString('i-think-thi]-i]-not-a-valid-[tring');
          $expected = false;
          $this->assertSame($expected, $actual);
     }

@@ -3,21 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px, calc, quote } from "csx";
-import {
-    absolutePosition,
-    colorOut,
-    flexHelper,
-    margins,
-    negative,
-    paddings,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { percent } from "csx";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const themeCardVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themePreviewCard");
@@ -27,21 +16,21 @@ export const themeCardVariables = useThemeCache(() => {
         fg: globalVars.messageColors.warning.fg,
     });
 
-    const container = makeThemeVars("subCommunityTile", {
+    const container = makeThemeVars("container", {
         width: 316,
         height: 231,
     });
-    const header = makeThemeVars("subCommunityTile", {
+    const header = makeThemeVars("header", {
         height: 45,
     });
-    const titlebar = makeThemeVars("subCommunityTile", {
+    const titlebar = makeThemeVars("titlebar", {
         height: 16,
         padding: {
             vertical: 0,
             horizontal: 10,
         },
     });
-    const titleBarNav = makeThemeVars("subCommunityTile", {
+    const titleBarNav = makeThemeVars("titleBarNav", {
         width: percent(100),
         padding: {
             vertical: 25,
@@ -49,7 +38,7 @@ export const themeCardVariables = useThemeCache(() => {
         },
     });
 
-    const titleBarLinks = makeThemeVars("subCommunityTile", {
+    const titleBarLinks = makeThemeVars("titleBarLinks", {
         width: 20,
         height: 2,
         margin: {
@@ -57,16 +46,16 @@ export const themeCardVariables = useThemeCache(() => {
         },
     });
 
-    const subCommunityContent = makeThemeVars("subCommunityTile", {
+    const content = makeThemeVars("content", {
         maxWidth: 217,
         padding: 16,
         width: percent(100),
     });
-    const subCommunityListItem = makeThemeVars("subCommunityTile", {
+    const contentList = makeThemeVars("contentList", {
         width: 86,
         height: 67,
     });
-    const subCommunityTile = makeThemeVars("subCommunityTile", {
+    const contentTile = makeThemeVars("contentTile", {
         padding: 4,
         margin: {
             bottom: 10,
@@ -74,7 +63,7 @@ export const themeCardVariables = useThemeCache(() => {
         borderRadius: 2,
     });
 
-    const tileImg = makeThemeVars("subCommunityTile", {
+    const tileImg = makeThemeVars("tileImg", {
         borderRadius: unit(13),
         width: unit(20),
         height: unit(20),
@@ -83,12 +72,12 @@ export const themeCardVariables = useThemeCache(() => {
         },
     });
 
-    const tileHeader = makeThemeVars("subCommunityTile", {
+    const tileHeader = makeThemeVars("tileHeader", {
         height: 5,
         width: 12,
     });
 
-    const tileText = makeThemeVars("subCommunityTile", {
+    const tileText = makeThemeVars("tileText", {
         width: 85,
         height: 5,
     });
@@ -100,9 +89,9 @@ export const themeCardVariables = useThemeCache(() => {
         titlebar,
         titleBarNav,
         titleBarLinks,
-        subCommunityContent,
-        subCommunityListItem,
-        subCommunityTile,
+        content,
+        contentList,
+        contentTile,
         tileImg,
         tileHeader,
         tileText,
@@ -164,33 +153,33 @@ export const themeCardClasses = useThemeCache(() => {
         marginRight: unit(vars.titleBarLinks.margin.right),
     });
 
-    const subCommunityContent = style("subCommunityContent", {
+    const content = style("content", {
         margin: "auto",
-        maxWidth: unit(vars.subCommunityContent.maxWidth),
-        padding: unit(vars.subCommunityContent.padding),
-        width: vars.subCommunityContent.width,
+        maxWidth: unit(vars.content.maxWidth),
+        padding: unit(vars.content.padding),
+        width: vars.content.width,
     });
-    const subCommunityTile = style("subCommunityTile", {
+    const contentTile = style("contentTile", {
         alignItems: "center",
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        padding: unit(vars.subCommunityTile.padding),
+        padding: unit(vars.contentTile.padding),
         userSelect: "none",
         width: percent(100),
-        marginBottom: unit(vars.subCommunityTile.margin.bottom),
-        borderRadius: unit(vars.subCommunityTile.borderRadius),
+        marginBottom: unit(vars.contentTile.margin.bottom),
+        borderRadius: unit(vars.contentTile.borderRadius),
     });
 
-    const subCommunityListItem = style("subCommunityListItem", {
-        width: unit(vars.subCommunityListItem.width),
-        height: unit(vars.subCommunityListItem.height),
+    const contentListItem = style("contentListItem", {
+        width: unit(vars.contentList.width),
+        height: unit(vars.contentList.height),
         alignItems: "center",
         display: "flex",
         flexDirection: "column",
         justifyContent: "stretch",
     });
-    const subCommunityList = style("subCommunityList", {
+    const contentList = style("contentList", {
         alignItems: "stretch",
         display: "flex",
         flexWrap: "wrap",
@@ -228,7 +217,7 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const buttons = style("buttons", {
-        marginBottom: unit(vars.subCommunityTile.margin.bottom),
+        marginBottom: unit(vars.contentTile.margin.bottom),
     });
 
     return {
@@ -237,10 +226,10 @@ export const themeCardClasses = useThemeCache(() => {
         header,
         titleBarNav,
         titleBarLinks,
-        subCommunityContent,
-        subCommunityList,
-        subCommunityListItem,
-        subCommunityTile,
+        content,
+        contentList,
+        contentListItem,
+        contentTile,
         tileImg,
         tileHeader,
         tileContent,

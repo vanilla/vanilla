@@ -69,18 +69,18 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                     <div className={classes.wrapper}>
                         <div style={titlebarStyle} className={classes.titlebar}>
                             <ul className={classes.titleBarNav}>
-                                <li style={titleBarLinks} className={classes.titleBarLinks}></li>
-                                <li style={titleBarLinks} className={classes.titleBarLinks}></li>
-                                <li style={titleBarLinks} className={classes.titleBarLinks}></li>
+                                {[0, 1, 2].map(key => (
+                                    <li key={key} style={titleBarLinks} className={classes.titleBarLinks}></li>
+                                ))}
                             </ul>
                         </div>
                         <div style={headerStyle} className={classes.header}></div>
 
-                        <div className={classes.subCommunityContent}>
-                            <ul className={classes.subCommunityList}>
+                        <div className={classes.content}>
+                            <ul className={classes.contentList}>
                                 {tiles.map((val, key) => (
-                                    <li key={key} className={classes.subCommunityListItem}>
-                                        <div style={subCommunityTileStyle} className={classes.subCommunityTile}>
+                                    <li key={key} className={classes.contentListItem}>
+                                        <div style={subCommunityTileStyle} className={classes.contentTile}>
                                             <div style={tileImgStyle} className={classes.tileImg}></div>
                                             <div style={tileHeaderStyle} className={classes.tileHeader}></div>
                                             <div className={classes.tileContent}>

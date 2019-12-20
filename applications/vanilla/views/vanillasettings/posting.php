@@ -184,4 +184,14 @@ specify the same one as above. If users report issues with mobile editing, this 
         <?php echo $form->textBox('Vanilla.Comment.MinLength', ['class' => 'InputBox SmallInput']); ?>
         </div>
     </div>
+    <div class="form-group">
+        <?php
+        echo $form->toggle(
+            "Vanilla.Email.FullPost",
+            "Include full post in email notifications",
+            [],
+            "If enabled, the full content of posts will be sent in email notifications to users."
+        );
+        ?>
+    </div>
 <?php echo $form->close('Save'); ?>

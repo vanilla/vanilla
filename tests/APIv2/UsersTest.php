@@ -114,6 +114,10 @@ class UsersTest extends AbstractResourceTest {
                 case 'emailConfirmed':
                 case 'bypassSpam':
                     $value = !$value;
+                    break;
+                case 'password':
+                    $value = md5(microtime());
+                    break;
             }
             $row[$key] = $value;
         }

@@ -60,6 +60,7 @@ class MasterViewRenderer {
             'seoContent' => new \Twig\Markup($page->getSeoContent(), 'utf-8'),
             'cssClasses' => 'isLoading',
             'pageHead' => $page->getHead()->renderHtml(),
+            'title' => $page->getSeoTitle(),
         ];
         $data = array_merge($viewData, $extraData, $this->getSharedData());
 

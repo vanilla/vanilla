@@ -118,26 +118,10 @@ export default function PanelLayout(props: IProps) {
                             })}
                             tag="aside"
                         >
-                            {childComponents.leftTop && (
-                                <PanelArea>
-                                    <PanelOverflow
-                                        offset={overflowOffset}
-                                        overflowSizing={props.leftBottom ? "half" : "full"}
-                                    >
-                                        {childComponents.leftTop}
-                                    </PanelOverflow>
-                                </PanelArea>
-                            )}
-                            {childComponents.leftBottom && (
-                                <PanelArea>
-                                    <PanelOverflow
-                                        offset={overflowOffset}
-                                        overflowSizing={props.leftTop ? "half" : "full"}
-                                    >
-                                        {childComponents.leftBottom}
-                                    </PanelOverflow>
-                                </PanelArea>
-                            )}
+                            <PanelOverflow offset={overflowOffset}>
+                                {childComponents.leftTop && <PanelArea>{childComponents.leftTop}</PanelArea>}
+                                {childComponents.leftBottom && <PanelArea>{childComponents.leftBottom}</PanelArea>}
+                            </PanelOverflow>
                         </Panel>
                     )}
 
@@ -174,26 +158,14 @@ export default function PanelLayout(props: IProps) {
                                 [classes.isSticky]: isFixed,
                             })}
                         >
-                            {childComponents.rightTop && (
-                                <PanelArea tag="aside">
-                                    <PanelOverflow
-                                        offset={overflowOffset}
-                                        overflowSizing={props.rightBottom ? "half" : "full"}
-                                    >
-                                        {childComponents.rightTop}
-                                    </PanelOverflow>
-                                </PanelArea>
-                            )}
-                            {childComponents.rightBottom && (
-                                <PanelArea tag="aside">
-                                    <PanelOverflow
-                                        offset={overflowOffset}
-                                        overflowSizing={props.rightTop ? "half" : "full"}
-                                    >
-                                        {childComponents.rightBottom}
-                                    </PanelOverflow>
-                                </PanelArea>
-                            )}
+                            <PanelOverflow offset={overflowOffset}>
+                                {childComponents.rightTop && (
+                                    <PanelArea tag="aside">{childComponents.rightTop}</PanelArea>
+                                )}
+                                {childComponents.rightBottom && (
+                                    <PanelArea tag="aside">{childComponents.rightBottom}</PanelArea>
+                                )}
+                            </PanelOverflow>
                         </Panel>
                     )}
                 </div>
@@ -228,18 +200,12 @@ export function Panel(props: IContainerProps) {
     );
 }
 
-export function PanelOverflow(props: IContainerProps & { overflowSizing: "half" | "full"; offset: number }) {
+export function PanelOverflow(props: IContainerProps & { offset: number }) {
     const classes = panelAreaClasses();
     return (
         <div className={classes.areaOverlay}>
             <div className={classes.areaOverlayBefore}></div>
-            <div
-                ref={props.innerRef}
-                className={classNames(props.className, {
-                    [classes.overflowHalf(props.offset)]: props.overflowSizing === "half",
-                    [classes.overflowFull(props.offset)]: props.overflowSizing === "full",
-                })}
-            >
+            <div ref={props.innerRef} className={classNames(props.className, classes.overflowFull(props.offset))}>
                 {props.children}
             </div>
             <div className={classes.areaOverlayAfter}></div>

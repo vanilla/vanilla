@@ -52,12 +52,6 @@ export const panelAreaClasses = useThemeCache(() => {
         }),
     );
 
-    const overflowHalf = (offset: number) =>
-        style("overflowHalf", {
-            maxHeight: calc(`50vh - ${unit(offset / 2)}`),
-            overflow: "auto",
-            minHeight: 100,
-        });
     const overflowFull = (offset: number) =>
         style("overflowFull", {
             maxHeight: calc(`100vh - ${unit(offset)}`),
@@ -99,5 +93,5 @@ export const panelAreaClasses = useThemeCache(() => {
         ),
     });
 
-    return { root, overflowHalf, overflowFull, areaOverlayBefore, areaOverlayAfter, areaOverlay };
+    return { root, overflowFull, areaOverlayBefore, areaOverlayAfter, areaOverlay };
 });

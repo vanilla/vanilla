@@ -445,8 +445,9 @@ class CommentsApiController extends AbstractApiController {
      * Add a comment.
      *
      * @param array $body The request body.
-     * @throws ServerException if the comment could not be created.
      * @return array
+     * @throws Exception If the user cannot view the discussion.
+     * @throws ServerException if the comment could not be created.
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -458,6 +459,13 @@ class CommentsApiController extends AbstractApiController {
         $commentData = ApiUtils::convertInputKeys($body);
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
+        $session = $this->getSession();
+        $sessionUser = $session->UserID;
+        $isAdmin = $session->checkRankedPermission('Garden.Moderation.Manage');
+        $canView = $this->discussionModel->canView($discussion, $sessionUser);
+        if (!$canView && !$isAdmin) {
+            throw permissionException('Vanilla.Discussions.View');
+        }
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
         if (!$id) {

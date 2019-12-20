@@ -52,16 +52,14 @@ export const panelAreaClasses = useThemeCache(() => {
         }),
     );
 
-    const { margin } = layoutVars.panelLayoutSpacing;
-    const totalMargin = margin.top + margin.bottom;
     const overflowHalf = (offset: number) =>
         style("overflowHalf", {
-            maxHeight: calc(`50vh - ${unit(globalVars.gutter.size + totalMargin)}`),
+            maxHeight: calc(`50vh - ${unit(globalVars.gutter.size)}`),
             overflow: "auto",
         });
     const overflowFull = (offset: number) =>
         style("overflowFull", {
-            maxHeight: calc(`100vh - ${unit(totalMargin + offset)}`),
+            maxHeight: calc(`100vh - ${unit(offset)}`),
             overflow: "auto",
             position: "relative",
             paddingBottom: 50,

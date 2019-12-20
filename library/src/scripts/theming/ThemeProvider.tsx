@@ -25,7 +25,7 @@ interface IProps {
     disabled?: boolean;
 }
 
-export function ThemeProvider(props: IProps) {
+export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     const { themeKey, disabled, variablesOnly } = props;
     const { getAssets } = useReduxActions(ThemeActions);
     const { assets } = useSelector((state: ICoreStoreState) => state.theme);
@@ -47,9 +47,8 @@ export function ThemeProvider(props: IProps) {
 
             if (themeHeader) {
                 themeHeader = prepareShadowRoot(themeHeader, true);
-                console.log("Measure theme header", themeHeader, themeHeader.getBoundingClientRect());
-                // For some reason the measurements are not applied immediately to the header
-                // Waiting 1 tick works though.
+
+                // Apply the theme's header height to offset our panel layouts.
                 setTopOffset(themeHeader.getBoundingClientRect().height);
             }
 
@@ -65,24 +64,20 @@ export function ThemeProvider(props: IProps) {
         }
     }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey]);
 
-    if (props.disabled) {
-        return props.children;
+    if (props.disabled || props.variablesOnly) {
+        return <>props.children</>;
     }
-    if (props)
-        switch (assets.status) {
-            case LoadStatus.PENDING:
-            case LoadStatus.LOADING:
-                return <Loader />;
-            case LoadStatus.ERROR:
-                return props.errorComponent;
-        }
+
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(assets.status)) {
+        return <Loader />;
+    }
+
+    if (assets.status === LoadStatus.ERROR) {
+        return <>props.errorComponent</>;
+    }
 
     if (!assets.data) {
         return null;
-    }
-
-    if (props.variablesOnly) {
-        return props.children;
     }
 
     // Apply kludged input text styling everywhere.
@@ -94,11 +89,4 @@ export function ThemeProvider(props: IProps) {
             {props.children}
         </>
     );
-}
-
-function mapDispatchToProps(dispatch: any, ownProps: IProps) {
-    const themeActions = new ThemeActions(dispatch, apiv2);
-    return {
-        requestData: () => themeActions.getAssets(ownProps.themeKey),
-    };
-}
+};

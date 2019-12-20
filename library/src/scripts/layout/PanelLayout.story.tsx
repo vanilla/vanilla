@@ -6,8 +6,8 @@
 import React from "react";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import Container from "@library/layout/components/Container";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {
     title: "PanelLayout",
@@ -29,92 +29,103 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
     );
 };
 
-export const LargeContent = () => {
+export const SimplePanels = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <DeviceProvider>
-            <Container>
-                <PanelLayout
-                    leftTop={<DummyPanel>Left Top</DummyPanel>}
-                    leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
-                    middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                    rightTop={<DummyPanel>Right Top</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-                ></PanelLayout>
-            </Container>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+            ></PanelLayout>
         </DeviceProvider>
     );
-};
+});
 
-export const LargeLeftPanel = () => {
+export const LargeContent = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <DeviceProvider>
-            <Container>
-                <PanelLayout
-                    leftTop={<DummyPanel>Left Top {largeIpsum}</DummyPanel>}
-                    leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
-                    middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
-                    rightTop={<DummyPanel>Right Top</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-                ></PanelLayout>
-            </Container>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom</DummyPanel>}
+            ></PanelLayout>
         </DeviceProvider>
     );
-};
+});
 
-export const LargeRightTopPanel = () => {
-    return (
-        <DeviceProvider>
-            <Container>
-                <PanelLayout
-                    leftTop={<DummyPanel>Left Top</DummyPanel>}
-                    leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
-                    middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
-                    rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-                ></PanelLayout>
-            </Container>
-        </DeviceProvider>
-    );
-};
+export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    useStoryConfig(NO_WRAPPER_CONFIG);
 
-export const LargeRightBottomPanel = () => {
     return (
         <DeviceProvider>
-            <Container>
-                <PanelLayout
-                    leftTop={<DummyPanel>Left Top</DummyPanel>}
-                    leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
-                    middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                    middleBottom={
-                        <DummyPanel>
-                            Middle Bottom{smallIpsum}
-                            {smallIpsum}
-                        </DummyPanel>
-                    }
-                    rightTop={<DummyPanel>Right Top</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-                ></PanelLayout>
-            </Container>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top {largeIpsum}</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
+                rightTop={<DummyPanel>Right Top</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom</DummyPanel>}
+            ></PanelLayout>
         </DeviceProvider>
     );
-};
+});
 
-export const LargeEverything = () => {
+export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    useStoryConfig(NO_WRAPPER_CONFIG);
+
     return (
         <DeviceProvider>
-            <Container>
-                <PanelLayout
-                    leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
-                    leftBottom={<DummyPanel>Left Bottom{largeIpsum}</DummyPanel>}
-                    middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                    rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-                ></PanelLayout>
-            </Container>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
+                rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom</DummyPanel>}
+            ></PanelLayout>
         </DeviceProvider>
     );
-};
+});
+
+export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    useStoryConfig(NO_WRAPPER_CONFIG);
+
+    return (
+        <DeviceProvider>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                middleBottom={
+                    <DummyPanel>
+                        Middle Bottom{smallIpsum}
+                        {smallIpsum}
+                    </DummyPanel>
+                }
+                rightTop={<DummyPanel>Right Top</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+            ></PanelLayout>
+        </DeviceProvider>
+    );
+});
+
+export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    useStoryConfig(NO_WRAPPER_CONFIG);
+
+    return (
+        <DeviceProvider>
+            <PanelLayout
+                leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom{largeIpsum}</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+            ></PanelLayout>
+        </DeviceProvider>
+    );
+});

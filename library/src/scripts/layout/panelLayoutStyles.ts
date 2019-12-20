@@ -16,7 +16,12 @@ import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const layoutVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("globalVariables");
+
+    const colors = makeThemeVars("colors", {
+        leftColumnBg: globalVars.mainColors.bg,
+    });
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
@@ -167,6 +172,7 @@ export const layoutVariables = useThemeCache(() => {
     };
 
     return {
+        colors,
         foundationalWidths,
         gutter,
         panel,

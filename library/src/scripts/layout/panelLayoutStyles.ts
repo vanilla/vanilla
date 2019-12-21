@@ -191,7 +191,6 @@ export const panelLayoutClasses = useThemeCache(() => {
     const style = styleFactory("panelLayout");
     const classesPanelArea = panelAreaClasses();
     const classesPanelList = panelListClasses();
-    const titleBarVars = titleBarVariables();
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -324,6 +323,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         {
             ...sticky(),
             height: percent(100),
+            $unique: true,
         },
         mediaQueries.oneColumnDown({
             position: "relative",

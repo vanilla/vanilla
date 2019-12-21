@@ -9,10 +9,10 @@ import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import classNames from "classnames";
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
-import { style } from "typestyle";
 import { useMeasure } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useMemo, useRef } from "react";
+import { style } from "typestyle";
 
 interface IProps {
     className?: string;
@@ -65,11 +65,12 @@ export default function PanelLayout(props: IProps) {
 
     const { offsetClass, topOffset } = useScrollOffset();
     const device = useDevice();
-    const sidePanelRef = useRef<HTMLDivElement | null>(null);
-    const sidePanelMeasure = useMeasure(sidePanelRef);
+    const panelRef = useRef<HTMLDivElement | null>(null);
+    const sidePanelMeasure = useMeasure(panelRef);
     const overflowOffset = sidePanelMeasure.top - topOffset;
 
-    const panelOffsetClass = style({ top: overflowOffset });
+    console.log("render panel", overflowOffset, sidePanelMeasure);
+    const panelOffsetClass = useMemo(() => style({ top: overflowOffset }), [overflowOffset]);
 
     // Calculate some rendering variables.
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
@@ -109,10 +110,12 @@ export default function PanelLayout(props: IProps) {
             )}
 
             <main className={classNames(classes.main, props.growMiddleBottom ? inheritHeightClass() : "")}>
-                <div className={classNames(classes.container, props.growMiddleBottom ? inheritHeightClass() : "")}>
+                <div
+                    ref={panelRef}
+                    className={classNames(classes.container, props.growMiddleBottom ? inheritHeightClass() : "")}
+                >
                     {!isMobile && shouldRenderLeftPanel && (
                         <Panel
-                            innerRef={sidePanelRef}
                             className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
                                 [classes.isSticky]: isFixed,
                             })}

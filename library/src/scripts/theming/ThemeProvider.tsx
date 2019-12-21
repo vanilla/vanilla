@@ -13,7 +13,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { useReduxActions } from "@library/redux/ReduxActions";
 import ThemeActions from "@library/theming/ThemeActions";
 import { prepareShadowRoot } from "@vanilla/dom-utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 
@@ -31,12 +31,19 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     const { assets } = useSelector((state: ICoreStoreState) => state.theme);
     const { setTopOffset } = useScrollOffset();
 
+    const [ownThemeKey, setThemeKey] = useState({});
+    // Trigger a state re-render when the theme key changes
+    useEffect(() => {
+        setThemeKey(themeKey);
+    }, [themeKey, setThemeKey]);
+
     useEffect(() => {
         if (disabled) {
             return;
         }
 
         if (assets.status === LoadStatus.PENDING) {
+            console.log("fetch assets");
             void getAssets(themeKey);
             return;
         }
@@ -65,7 +72,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey]);
 
     if (props.disabled || props.variablesOnly) {
-        return <>props.children</>;
+        return <>{props.children}</>;
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(assets.status)) {
@@ -73,7 +80,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     }
 
     if (assets.status === LoadStatus.ERROR) {
-        return <>props.errorComponent</>;
+        return <>{props.errorComponent}</>;
     }
 
     if (!assets.data) {

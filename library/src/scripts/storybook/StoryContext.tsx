@@ -4,7 +4,7 @@
  */
 
 import Backgrounds from "@library/layout/Backgrounds";
-import getStore from "@library/redux/getStore";
+import getStore, { resetStore } from "@library/redux/getStore";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
@@ -14,6 +14,13 @@ import { Provider } from "react-redux";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 import isEqual from "lodash/isEqual";
+import { setMeta } from "@library/utility/appUtils";
+import { randomBytes } from "crypto";
+import { clearThemeCache } from "@library/styles/styleUtils";
+import { LoadStatus } from "@library/@types/api/core";
+import { forceRenderStyles } from "typestyle";
+import { resetStoreState } from "@library/__tests__/testStoreState";
+import merge from "lodash/merge";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -23,7 +30,9 @@ function ErrorComponent() {
 
 interface IContext {
     storeState?: DeepPartial<ICoreStoreState>;
+    themeVars?: any;
     useWrappers?: boolean;
+    refreshKey?: string;
 }
 
 const StoryContext = React.createContext<IContext & { updateContext: (value: Partial<IContext>) => void }>({
@@ -39,12 +48,13 @@ export function useStoryConfig(value: Partial<IContext>) {
     useLayoutEffect(() => {
         context.updateContext(value);
     }, [context, value]);
+    return context.refreshKey;
 }
 
 export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType) {
     const HookWrapper = () => {
-        useStoryConfig(config);
-        return <Component />;
+        const refreshKey = useStoryConfig(config);
+        return <Component key={refreshKey} />;
     };
 
     const StoryCaller = () => {
@@ -57,15 +67,37 @@ export function storyWithConfig(config: Partial<IContext>, Component: React.Comp
 export function StoryContextProvider(props: { children?: React.ReactNode }) {
     const [contextState, setContextState] = useState<IContext>({
         useWrappers: true,
+        storeState: {},
     });
+    const [themeKey, setThemeKey] = useState("");
+
     const updateContext = useCallback(
         (value: Partial<IContext>) => {
-            const newState = { ...contextState, ...value };
+            const themeState: DeepPartial<ICoreStoreState> = {
+                theme: {
+                    assets: {
+                        data: {
+                            variables: {
+                                data: value.themeVars ?? {},
+                            },
+                        },
+                        status: LoadStatus.SUCCESS,
+                    },
+                },
+            };
+            const newState = {
+                ...contextState,
+                ...value,
+                storeState: merge(value.storeState ?? {}, themeState),
+            };
             if (!isEqual(newState, contextState)) {
-                setContextState({ ...contextState, ...value });
+                console.log("uipdate to new state", newState);
+                setContextState(newState);
+                resetStoreState(newState.storeState);
+                setThemeKey(clearThemeCache().toString());
             }
         },
-        [setContextState, contextState],
+        [contextState],
     );
     const content = (
         <>
@@ -76,10 +108,11 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
 
     const classes = storyBookClasses();
     blotCSS();
+
     return (
-        <StoryContext.Provider value={{ ...contextState, updateContext }}>
-            <Provider store={getStore()}>
-                <ThemeProvider errorComponent={<ErrorComponent />} themeKey="theme-variables-dark">
+        <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>
+            <Provider store={getStore(contextState.storeState)}>
+                <ThemeProvider variablesOnly errorComponent={<ErrorComponent />} themeKey={themeKey}>
                     {contextState.useWrappers ? (
                         <div className={classes.containerOuter}>
                             <div className={classes.containerInner}>{content}</div>

@@ -58,8 +58,6 @@ export const LargeContent = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 });
 
 export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
-    useStoryConfig(NO_WRAPPER_CONFIG);
-
     return (
         <DeviceProvider>
             <PanelLayout
@@ -75,8 +73,6 @@ export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 });
 
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
-    useStoryConfig(NO_WRAPPER_CONFIG);
-
     return (
         <DeviceProvider>
             <PanelLayout
@@ -92,8 +88,6 @@ export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 });
 
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
-    useStoryConfig(NO_WRAPPER_CONFIG);
-
     return (
         <DeviceProvider>
             <PanelLayout
@@ -114,8 +108,6 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 });
 
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
-    useStoryConfig(NO_WRAPPER_CONFIG);
-
     return (
         <DeviceProvider>
             <PanelLayout
@@ -129,3 +121,31 @@ export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
         </DeviceProvider>
     );
 });
+
+export const DarkMode = storyWithConfig(
+    {
+        ...NO_WRAPPER_CONFIG,
+        themeVars: {
+            global: {
+                mainColors: {
+                    bg: "#333",
+                    fg: "#fff",
+                },
+            },
+        },
+    },
+    () => {
+        return (
+            <DeviceProvider>
+                <PanelLayout
+                    leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
+                    leftBottom={<DummyPanel>Left Bottom{largeIpsum}</DummyPanel>}
+                    middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                    rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                    rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+                ></PanelLayout>
+            </DeviceProvider>
+        );
+    },
+);

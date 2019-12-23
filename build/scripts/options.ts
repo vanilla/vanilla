@@ -68,6 +68,13 @@ function parseEnabledAddons(config: any) {
         }
     }
 
+    const theme = config?.Garden?.Theme;
+    const mobileTheme = config?.Garden.MobileTheme;
+    addonKeys.push(theme);
+    if (theme !== mobileTheme) {
+        addonKeys.push(mobileTheme);
+    }
+
     return addonKeys;
 }
 

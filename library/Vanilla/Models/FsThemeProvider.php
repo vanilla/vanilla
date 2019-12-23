@@ -21,6 +21,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Request;
 use Gdn_Upload;
+use Vanilla\Theme\TwigAsset;
 
 /**
  * Handle custom themes.
@@ -186,6 +187,8 @@ class FsThemeProvider implements ThemeProviderInterface {
                 return $this->dataAsset($key, $data);
             case "html":
                 return new HtmlAsset($data);
+            case "twig":
+                return new TwigAsset($data);
             case "json":
                 return new JsonAsset($data);
             default:
@@ -272,6 +275,23 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getAllThemes(): array {
+        $allThemes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        $allAvailableThemes = [];
+
+        foreach ($allThemes as $theme) {
+            $themeInfo = $theme->getInfo();
+            $filteredTheme = $this->filterTheme($themeInfo);
+            if ($filteredTheme) {
+                $allAvailableThemes[] = $this->getThemeWithAssets($filteredTheme["key"]);
+            }
+        }
+        return $allAvailableThemes;
+    }
+
+    /**
      * In case theme does not have any asset defined yet
      * we still need some of them to exist (ex: variables.json)
      *
@@ -285,5 +305,46 @@ class FsThemeProvider implements ThemeProviderInterface {
                 "placeholder" => '{}',
             ]
         ];
+    }
+
+    /**
+     * Filter theme based on it's info.
+     *
+     * @param array $themeInfo
+     * @return array
+     */
+    protected function filterTheme($themeInfo): array {
+        $clientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
+        $alwaysVisibleThemes = c('Garden.Themes.Visible', '');
+
+        if ($alwaysVisibleThemes === 'all') {
+            return $themeInfo;
+        }
+
+        $alwaysVisibleThemes = explode(',', $alwaysVisibleThemes);
+
+        // Check if theme visibility is explicitly set
+        $hidden = $themeInfo['hidden'] ?? null;
+        if (is_null($hidden)) {
+            $hidden = true;
+            $sites = $themeInfo['sites'] ?? [];
+            $site = $themeInfo['site'] ?? '';
+
+            if ($site) {
+                array_push($sites, $site);
+            }
+            foreach ($sites as $s) {
+                if ($s === $clientName || fnmatch($s, $clientName)) {
+                    $hidden = false;
+                    break;
+                }
+            }
+        }
+
+        if ($hidden && !in_array($themeInfo['key'], $alwaysVisibleThemes)) {
+            return [];
+        }
+
+        return $themeInfo;
     }
 }

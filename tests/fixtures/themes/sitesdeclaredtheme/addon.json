@@ -1,0 +1,11 @@
+{
+    "key": "sitesdeclaredtheme",
+    "name": "Test Theme",
+    "type": "theme",
+    "hidden": false,
+    "sites": [
+        "vanilla.vanillacommunities.com",
+        "vanilla.vanillastaging.com",
+        "vanilla"
+    ]
+}

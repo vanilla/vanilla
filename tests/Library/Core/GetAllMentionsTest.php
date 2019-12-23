@@ -42,13 +42,17 @@ class GetAllMentionsTest extends TestCase {
                 'this string has one mention: @blutarch',
                 ['blutarch'],
             ],
-            'multiple mentions' => [
+            'multipleMentions' => [
                 'this string mentions @blutarch and @herodotus and @gorgias and @pl@to',
                 ['blutarch', 'herodotus', 'gorgias', 'pl@to'],
             ],
-            'quoted mention' => [
-                'this string has one @unquoted mention and one quoted "@mention in it"',
-                ['unquoted', 'mention'],
+            'quotedMention' => [
+                '@"quoted mention" is quoted and @unquoted mention is not',
+                ['quoted mention', 'unquoted'],
+            ],
+            'quotedMentionPartFalse' => [
+                '@"@',
+                [],
             ],
         ];
 

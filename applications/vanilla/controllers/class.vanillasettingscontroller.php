@@ -72,8 +72,8 @@ class VanillaSettingsController extends Gdn_Controller {
             'Plugins.editor.ForceWysiwyg',
             'ImageUpload.Limits.Enabled',
             'ImageUpload.Limits.Width',
-            'ImageUpload.Limits.Height'
-
+            'ImageUpload.Limits.Height',
+            'Vanilla.Email.FullPost',
         ]);
 
         // Fire an filter event gather extra form HTML for specific format items.

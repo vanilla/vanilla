@@ -9,6 +9,7 @@ import { themeCardClasses } from "./themeCardStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
 
 interface IProps {
     globalBg: string;
@@ -20,6 +21,7 @@ interface IProps {
     onApply?: () => void;
     onPreview?: () => void;
     onCopy?: () => void;
+    isActiveTheme: boolean;
 }
 interface IState {}
 
@@ -41,7 +43,7 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
         };
 
         const containerStyle = {
-            border: `1px solid ${globalBg}`,
+            backgroundColor: `${globalBg}`,
         };
 
         const headerStyle = {
@@ -52,20 +54,23 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
             boxShadow: `0 1px 3px 0 rgba(85,90,98,0.3)`,
             color: `${globalBg}`,
         };
-        const tileImgStyle = {
+        /* const tileImgStyle = {
             border: `1px solid ${globalBg}`,
         };
-        const tileHeaderStyle = {
+         const tileHeaderStyle = {
             backgroundColor: globalFg,
         };
 
-        const tileTextStyle = {
+         const tileTextStyle = {
             backgroundColor: globalFg,
-        };
+        };*/
 
         return (
             <React.Fragment>
-                <div style={containerStyle} className={classes.container}>
+                <div
+                    style={containerStyle}
+                    className={this.props.isActiveTheme ? classes.noActions : classes.container}
+                >
                     <div className={classes.wrapper}>
                         <div style={titlebarStyle} className={classes.titlebar}>
                             <ul className={classes.titleBarNav}>
@@ -74,19 +79,27 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                                 ))}
                             </ul>
                         </div>
-                        <div style={headerStyle} className={classes.header}></div>
+                        <div style={headerStyle} className={classes.header}>
+                            <div className={classes.title}></div>
+                            <div className={classes.search}>
+                                <span className={classes.bar}></span>
+                                <span className={classes.search_btn}>
+                                    <span className={classes.searchText}></span>
+                                </span>
+                            </div>
+                        </div>
 
                         <div className={classes.content}>
                             <ul className={classes.contentList}>
                                 {tiles.map((val, key) => (
                                     <li key={key} className={classes.contentListItem}>
                                         <div style={subCommunityTileStyle} className={classes.contentTile}>
-                                            <div style={tileImgStyle} className={classes.tileImg}></div>
-                                            <div style={tileHeaderStyle} className={classes.tileHeader}></div>
+                                            <div className={classes.tileImg}></div>
+                                            <div className={classes.tileHeader}></div>
                                             <div className={classes.tileContent}>
-                                                <p style={tileTextStyle} className={classes.text1}></p>
-                                                <p style={tileTextStyle} className={classes.text2}></p>
-                                                <p style={tileTextStyle} className={classes.text3}></p>
+                                                <p className={classes.text1}></p>
+                                                <p className={classes.text2}></p>
+                                                <p className={classes.text3}></p>
                                             </div>
                                         </div>
                                     </li>

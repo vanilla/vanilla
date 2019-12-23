@@ -3,30 +3,50 @@
  * @license GPL-2.0-only
  */
 
-import { percent } from "csx";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { percent, color, rgba } from "csx";
+import { colorOut, unit, paddings } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { unitOfTime } from "moment";
 
 export const themeCardVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themePreviewCard");
     const globalVars = globalVariables();
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.messageColors.warning.fg,
+        fg: color("#adb2bb"),
+        imgColor: color("#0291db"),
+        bg: {
+            white: color("#fff"),
+            overlay: rgba(103, 105, 109, 0.8),
+        },
     });
 
     const container = makeThemeVars("container", {
-        width: 316,
-        height: 231,
+        width: 310,
+        height: 225,
     });
     const header = makeThemeVars("header", {
-        height: 45,
-    });
-    const titlebar = makeThemeVars("titlebar", {
-        height: 16,
+        height: 61,
         padding: {
-            vertical: 0,
+            top: 25,
+            right: 38,
+            bottom: 11,
+            left: 38,
+        },
+    });
+
+    const title = makeThemeVars("title", {
+        width: 110,
+        margin: {
+            bottom: 10,
+        },
+    });
+
+    const titlebar = makeThemeVars("titlebar", {
+        height: 10,
+        padding: {
+            top: 0,
             horizontal: 10,
         },
     });
@@ -34,21 +54,32 @@ export const themeCardVariables = useThemeCache(() => {
         width: percent(100),
         padding: {
             vertical: 25,
-            horizontal: 8,
+            horizontal: 4,
         },
     });
 
     const titleBarLinks = makeThemeVars("titleBarLinks", {
-        width: 20,
+        width: 12,
         height: 2,
         margin: {
             right: 12,
         },
     });
 
+    const bar = makeThemeVars("bar", {
+        width: 120,
+        height: 9,
+    });
+
+    const search_btn = makeThemeVars("search_btn", {
+        width: 24,
+        height: 9,
+    });
     const content = makeThemeVars("content", {
         maxWidth: 217,
-        padding: 16,
+        padding: {
+            top: 15,
+        },
         width: percent(100),
     });
     const contentList = makeThemeVars("contentList", {
@@ -64,31 +95,38 @@ export const themeCardVariables = useThemeCache(() => {
     });
 
     const tileImg = makeThemeVars("tileImg", {
-        borderRadius: unit(13),
-        width: unit(20),
-        height: unit(20),
+        borderRadius: 13,
+        width: 20,
+        height: 20,
         margin: {
-            bottom: 2,
+            bottom: 5,
         },
     });
 
     const tileHeader = makeThemeVars("tileHeader", {
-        height: 5,
-        width: 12,
+        height: 4,
+        width: 27,
     });
 
     const tileText = makeThemeVars("tileText", {
         width: 85,
-        height: 5,
+        height: 2,
+        backgroundColor: "#adb2bb",
+        margin: {
+            bottom: 2,
+        },
     });
 
     return {
         colors,
         container,
         header,
+        title,
         titlebar,
         titleBarNav,
         titleBarLinks,
+        bar,
+        search_btn,
         content,
         contentList,
         contentTile,
@@ -119,20 +157,48 @@ export const themeCardClasses = useThemeCache(() => {
         width: unit(vars.container.width),
         height: unit(vars.container.height),
         position: "relative",
+        borderRadius: unit(2),
+        boxShadow: "0 1px 3px 0 rgba(85, 90, 98, 0.31)",
+
         $nest: {
             "&:hover": {
-                backgroundColor: colorOut(vars.colors.fg),
+                // backgroundColor: "red",
                 opacity: 0.6,
-                position: "absolute",
                 [`& .${actionButtons}`]: {
                     opacity: 1,
                 },
             },
         },
     });
+
+    const noActions = style("noActions", {
+        width: unit(vars.container.width),
+        height: unit(vars.container.height),
+        position: "relative",
+        borderRadius: unit(2),
+        boxShadow: "0 1px 3px 0 rgba(85, 90, 98, 0.31)",
+        backgroundColor: vars.colors.bg.white.toString(),
+    });
     const header = style("header", {
         height: unit(vars.header.height),
+        ...paddings({
+            top: vars.header.padding.top,
+            right: vars.header.padding.right,
+            bottom: vars.header.padding.bottom,
+            left: vars.header.padding.left,
+        }),
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
     });
+
+    const title = style("title", {
+        width: unit(vars.title.width),
+        height: unit(vars.tileHeader.height),
+        backgroundColor: vars.colors.bg.white.toString(),
+        marginBottom: unit(vars.title.margin.bottom),
+    });
+
     const titlebar = style("titlebar", {
         height: unit(vars.titlebar.height),
     });
@@ -156,7 +222,7 @@ export const themeCardClasses = useThemeCache(() => {
     const content = style("content", {
         margin: "auto",
         maxWidth: unit(vars.content.maxWidth),
-        padding: unit(vars.content.padding),
+        paddingTop: unit(vars.content.padding.top),
         width: vars.content.width,
     });
     const contentTile = style("contentTile", {
@@ -185,35 +251,70 @@ export const themeCardClasses = useThemeCache(() => {
         flexWrap: "wrap",
         justifyContent: "space-between",
         position: "relative",
+        background: vars.colors.bg.white.toString(),
+        borderRadius: unit(2),
+        width: percent(86),
+        margin: "0 auto",
     });
     const tileImg = style("tileImg", {
         borderRadius: unit(vars.tileImg.borderRadius),
         width: unit(vars.tileImg.width),
         height: unit(vars.tileImg.height),
         marginBottom: unit(vars.tileImg.margin.bottom),
+        border: `1px solid ${vars.colors.imgColor.toString()}`,
     });
     const tileHeader = style("tileHeader", {
-        width: unit(vars.titleBarLinks.width),
+        width: unit(vars.tileHeader.width),
         height: unit(vars.tileHeader.height),
         marginBottom: unit(vars.tileImg.margin.bottom),
+        background: vars.colors.fg.toString(),
     });
     const tileContent = style("tileContent", {
         width: percent(100),
         marginBottom: unit(vars.tileImg.margin.bottom),
+        display: "contents",
+    });
+
+    const search = style("search", {
+        display: "flex",
+    });
+    const bar = style("bar", {
+        background: vars.colors.bg.white.toString(),
+        width: vars.bar.width,
+        height: vars.bar.height,
+    });
+    const search_btn = style("search_btn", {
+        width: unit(vars.search_btn.width),
+        height: unit(vars.search_btn.height),
+        borderRadius: unit(1.3),
+        border: "solid 0.3px #ffffff",
+        backgroundColor: "rgba(0, 0, 0, 0.1)",
+    });
+
+    const searchText = style("searchText", {
+        background: vars.colors.bg.white.toString(),
+        width: unit(vars.titleBarLinks.width),
+        height: unit(vars.titleBarLinks.height),
+        alignItems: "center",
+        display: "flex",
+        margin: unit(vars.tileText.margin.bottom + 1),
     });
     const text1 = style("text1", {
         width: percent(vars.tileText.width),
-        marginBottom: unit(vars.tileImg.margin.bottom),
+        marginBottom: unit(vars.tileText.margin.bottom),
         height: unit(vars.tileText.height),
+        background: vars.colors.fg.toString(),
     });
     const text2 = style("text2", {
         width: percent(vars.tileText.width - 5),
-        marginBottom: unit(vars.tileImg.margin.bottom),
+        marginBottom: unit(vars.tileText.margin.bottom),
         height: unit(vars.tileText.height),
+        background: vars.colors.fg.toString(),
     });
     const text3 = style("text3", {
-        width: percent(vars.tileText.width - 5),
+        width: percent(vars.tileText.width - 15),
         height: unit(vars.tileText.height),
+        background: vars.colors.fg.toString(),
     });
 
     const buttons = style("buttons", {
@@ -233,12 +334,18 @@ export const themeCardClasses = useThemeCache(() => {
         tileImg,
         tileHeader,
         tileContent,
+        search,
+        bar,
+        search_btn,
         text1,
         text2,
         text3,
         actionButtons,
         buttons,
         wrapper,
+        noActions,
+        title,
+        searchText,
     };
 });
 

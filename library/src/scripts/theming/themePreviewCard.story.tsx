@@ -19,11 +19,21 @@ story.add("Preview Card", () => {
                 <StoryHeading depth={1}>Preview Card</StoryHeading>
 
                 <ThemePreviewCard
-                    globalBg={"#111423"}
+                    globalBg={"#fff"}
                     globalPrimary={"#985E6D"}
                     globalFg={"#555a62"}
                     titleBarBg={"#0291db"}
                     titleBarFg={"#fff"}
+                    isActiveTheme={false}
+                />
+                <StoryHeading depth={1}>Current theme - preview card</StoryHeading>
+                <ThemePreviewCard
+                    globalBg={"#fff"}
+                    globalPrimary={"#985E6D"}
+                    globalFg={"#555a62"}
+                    titleBarBg={"#0291db"}
+                    titleBarFg={"#fff"}
+                    isActiveTheme={true}
                 />
             </StoryContent>
         </>

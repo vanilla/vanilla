@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "@library/styles/styleHelpers";
+import { unit, paddings } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themeCardStyles";
@@ -38,10 +38,22 @@ export const currentThemeVariables = useThemeCache(() => {
         },
     });
 
+    const addTheme = makeThemeVars("addTheme", {
+        width: 310,
+        height: 225,
+
+        padding: {
+            top: 70,
+            bottom: 70,
+            right: 117,
+            left: 117,
+        },
+    });
     return {
         flag,
         name,
         authorName,
+        addTheme,
     };
 });
 
@@ -110,6 +122,18 @@ export const currentThemeClasses = useThemeCache(() => {
         },
     });
 
+    const addTheme = style("addTheme", {
+        width: unit(vars.addTheme.width),
+        height: unit(vars.addTheme.height),
+        border: "1px dashed #979797",
+        ...paddings({
+            top: unit(vars.addTheme.padding.top),
+            bottom: unit(vars.addTheme.padding.bottom),
+            left: unit(vars.addTheme.padding.left),
+            right: unit(vars.addTheme.padding.right),
+        }),
+    });
+
     return {
         themeContainer,
         flag,
@@ -117,6 +141,7 @@ export const currentThemeClasses = useThemeCache(() => {
         authorName,
         description,
         themeActionButtons,
+        addTheme,
     };
 });
 

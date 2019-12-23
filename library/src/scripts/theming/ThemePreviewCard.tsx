@@ -9,7 +9,6 @@ import { themeCardClasses } from "./themeCardStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
-import classNames from "classnames";
 
 interface IProps {
     globalBg: string;
@@ -49,21 +48,6 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
         const headerStyle = {
             backgroundColor: globalPrimary,
         };
-        const subCommunityTileStyle = {
-            border: `1px solid ${globalBg}`,
-            boxShadow: `0 1px 3px 0 rgba(85,90,98,0.3)`,
-            color: `${globalBg}`,
-        };
-        /* const tileImgStyle = {
-            border: `1px solid ${globalBg}`,
-        };
-         const tileHeaderStyle = {
-            backgroundColor: globalFg,
-        };
-
-         const tileTextStyle = {
-            backgroundColor: globalFg,
-        };*/
 
         return (
             <React.Fragment>
@@ -71,6 +55,11 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                     style={containerStyle}
                     className={this.props.isActiveTheme ? classes.noActions : classes.container}
                 >
+                    <div className={classes.menuBar}>
+                        {[0, 1, 2].map(key => (
+                            <span key={key} className={classes.dots}></span>
+                        ))}
+                    </div>
                     <div className={classes.wrapper}>
                         <div style={titlebarStyle} className={classes.titlebar}>
                             <ul className={classes.titleBarNav}>
@@ -93,7 +82,7 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                             <ul className={classes.contentList}>
                                 {tiles.map((val, key) => (
                                     <li key={key} className={classes.contentListItem}>
-                                        <div style={subCommunityTileStyle} className={classes.contentTile}>
+                                        <div className={classes.contentTile}>
                                             <div className={classes.tileImg}></div>
                                             <div className={classes.tileHeader}></div>
                                             <div className={classes.tileContent}>

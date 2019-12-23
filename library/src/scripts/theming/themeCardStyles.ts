@@ -4,10 +4,9 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { colorOut, unit, paddings } from "@library/styles/styleHelpers";
+import { unit, paddings } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unitOfTime } from "moment";
 
 export const themeCardVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themePreviewCard");
@@ -59,10 +58,10 @@ export const themeCardVariables = useThemeCache(() => {
     });
 
     const titleBarLinks = makeThemeVars("titleBarLinks", {
-        width: 12,
+        width: 16,
         height: 2,
         margin: {
-            right: 12,
+            right: 7,
         },
     });
 
@@ -78,7 +77,7 @@ export const themeCardVariables = useThemeCache(() => {
     const content = makeThemeVars("content", {
         maxWidth: 217,
         padding: {
-            top: 15,
+            top: 10,
         },
         width: percent(100),
     });
@@ -117,6 +116,11 @@ export const themeCardVariables = useThemeCache(() => {
         },
     });
 
+    const dots = makeThemeVars("dots", {
+        width: 4,
+        height: 4,
+    });
+
     return {
         colors,
         container,
@@ -133,6 +137,7 @@ export const themeCardVariables = useThemeCache(() => {
         tileImg,
         tileHeader,
         tileText,
+        dots,
     };
 });
 
@@ -140,6 +145,20 @@ export const themeCardClasses = useThemeCache(() => {
     const vars = themeCardVariables();
     const style = styleFactory("themePreviewCard");
 
+    const menuBar = style("menuBar", {
+        height: unit(vars.titlebar.height),
+        display: "flex",
+        paddingTop: unit(vars.titlebar.padding.top + 2),
+        paddingLeft: unit(vars.titlebar.padding.horizontal - 3),
+    });
+
+    const dots = style("dots", {
+        height: unit(vars.dots.height),
+        width: unit(vars.dots.width),
+        backgroundColor: "#bbb",
+        borderRadius: percent(50),
+        marginRight: unit(3),
+    });
     const actionButtons = style("actionButtons", {
         opacity: 0,
         position: "absolute",
@@ -162,7 +181,6 @@ export const themeCardClasses = useThemeCache(() => {
 
         $nest: {
             "&:hover": {
-                // backgroundColor: "red",
                 opacity: 0.6,
                 [`& .${actionButtons}`]: {
                     opacity: 1,
@@ -235,6 +253,8 @@ export const themeCardClasses = useThemeCache(() => {
         width: percent(100),
         marginBottom: unit(vars.contentTile.margin.bottom),
         borderRadius: unit(vars.contentTile.borderRadius),
+        boxShadow: "0 1px 3px 0 rgba(85, 90, 98, 0.31)",
+        backgroundColor: vars.colors.bg.white.toString(),
     });
 
     const contentListItem = style("contentListItem", {
@@ -293,7 +313,7 @@ export const themeCardClasses = useThemeCache(() => {
 
     const searchText = style("searchText", {
         background: vars.colors.bg.white.toString(),
-        width: unit(vars.titleBarLinks.width),
+        width: unit(vars.titleBarLinks.width - 2),
         height: unit(vars.titleBarLinks.height),
         alignItems: "center",
         display: "flex",
@@ -346,6 +366,8 @@ export const themeCardClasses = useThemeCache(() => {
         noActions,
         title,
         searchText,
+        dots,
+        menuBar,
     };
 });
 

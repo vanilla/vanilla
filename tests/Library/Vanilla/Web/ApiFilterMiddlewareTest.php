@@ -97,7 +97,7 @@ class ApiFilterMiddlewareTest extends TestCase {
     }
 
     /**
-     * Test getBlacklistFields method.
+     * Test getBlacklistFields().
      */
     public function testGetBlacklist() {
         $apiMiddleware = new ApiFilterMiddleware();

@@ -59,7 +59,7 @@ class CacheControlMiddleware {
     }
 
     /**
-     * Invoke the smart ID middleware on a request.
+     * Invoke the cache control middleware on a request.
      *
      * @param RequestInterface $request The incoming request.
      * @param callable $next The next middleware.

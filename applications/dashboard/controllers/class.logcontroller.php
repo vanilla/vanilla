@@ -258,21 +258,17 @@ class LogController extends DashboardController {
             'RecordType' => 'Discussion',
             'RecordID' => $recordID
         ];
-
         $orWhere = [
             'RecordType' => 'Comment',
             'ParentRecordID' => $recordID
         ];
-        $count = $this->LogModel->getCountWhere($where, $orWhere);
+        $recordCount = $this->LogModel->getCountWhere($where, $orWhere);
+        $this->setData('RecordCount', $recordCount);
 
-        if ($offset >= $count) {
-            $offset = $count - $limit;
+        if ($offset >= $recordCount) {
+            $offset = $recordCount - $limit;
         }
 
-        $this->setData('RecordCount', $count);
-        if ($offset >= $count) {
-            $offset = $count - $limit;
-        }
         $log = $this->LogModel->getWhere($where, 'LogID', 'Desc', $offset, $limit, $orWhere);
         $this->setData('Log', $log);
 

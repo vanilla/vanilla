@@ -9,6 +9,7 @@ import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } fro
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { percent } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -64,14 +65,22 @@ export const tabClasses = useThemeCache(() => {
         width: "100%",
     });
 
+    const tabList = style("tabList", {
+        display: "flex",
+        width: percent(100),
+        justifyContent: "space-between",
+        border: "solid 1px #bfcbd8",
+        backgroundColor: "#f5f6f7",
+    });
     const tab = style(
         "tab",
         {
             ...userSelect(),
-            position: "relative",
-            flexWrap: "nowrap",
-            alignItems: "center",
-            justifyContent: "center",
+
+            width: percent(25),
+            textAlign: "center",
+            borderRight: "1px solid #bfcbd8",
+            padding: "4px 0",
             $nest: {
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
@@ -101,6 +110,7 @@ export const tabClasses = useThemeCache(() => {
     return {
         root,
         tabsHandles,
+        tabList,
         tab,
         isActive,
     };

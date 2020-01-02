@@ -178,7 +178,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         // Set the canonical Url.
-        $this->canonicalUrl(userUrl($this->User));
+        $this->canonicalUrl(url(userUrl($this->User), true));
 
         $this->render();
     }
@@ -241,7 +241,7 @@ class ProfileController extends Gdn_Controller {
             touchValue('Connected', $Row, !is_null(val('UniqueID', $Provider, null)));
         }
 
-        $this->canonicalUrl(userUrl($this->User, '', 'connections'));
+        $this->canonicalUrl(url(userUrl($this->User, '', 'connections'), true));
         $this->title(t('Social'));
         require_once $this->fetchViewLocation('connection_functions');
         $this->render();

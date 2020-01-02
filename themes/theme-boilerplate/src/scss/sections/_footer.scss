@@ -9,7 +9,7 @@
 \* -------------------------------------------------------------- */
 
 .Footer {
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         background: $footer_bg;
         color: $footer_color;
     }

@@ -108,7 +108,7 @@
         align-items: center;
         justify-content: center;
 
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             color: $header-link_color;
             &:hover,
             &:focus,

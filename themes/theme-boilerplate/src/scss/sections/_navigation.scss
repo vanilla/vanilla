@@ -70,7 +70,7 @@
 
     .ButtonGroup.Multi {
 
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             &:focus,
             &:hover,
             &:active {
@@ -204,7 +204,7 @@
     padding: 0 $utility-baseUnitTriple;
     display: flex;
     align-items: center;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         color: $navigation_fg;
         &:focus,
         &:hover {
@@ -272,7 +272,7 @@
     height: 32px;
     width: 32px;
     border-radius: $mebox-button_borderRadius;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         color: $MobileMeBox_fg;
     }
     margin-left: auto;
@@ -305,7 +305,7 @@
 }
 
 .mobileMebox {
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         background-color: $MobileMeBox_bg;
     }
     .Container {
@@ -344,7 +344,7 @@
 
     .MeButton {
 
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             &:focus,
             &:hover,
             &:active {
@@ -353,7 +353,7 @@
         }
 
         .Alert {
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 color: $MobileMeBox_fg;
                 background-color: $MobileMeBoxAlert_bg;
                 border-color: $MobileMeBoxAlert_borderColor;

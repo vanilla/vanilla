@@ -14,6 +14,7 @@ import { fonts } from "@library/styles/styleHelpersTypography";
 import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 // To use compatibility styles, set '$colorFromDynamicTheme : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -63,6 +64,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinButton(".group-members-filter-box .Button.search", ButtonTypes.PRIMARY);
     mixinButton("#Form_Ban", ButtonTypes.PRIMARY);
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
+    mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);
@@ -101,11 +103,12 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".Panel .PanelInThisDiscussion a");
     mixinFontLink(".Panel .Leaderboard a");
     mixinFontLink(".Panel .InThisConversation a");
+    mixinFontLink(".FilterMenu a");
+    mixinFontLink("div.Popup .Body a");
 
-    cssRule("", {});
-    cssRule("", {});
-    cssRule("", {});
-    cssRule("", {});
+    cssRule(".ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle", {
+        borderColor: primary,
+    });
 });
 
 // Mixins replacement

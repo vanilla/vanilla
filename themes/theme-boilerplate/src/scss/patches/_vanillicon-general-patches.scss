@@ -185,7 +185,7 @@
     content: $icon-twitter;
 }
 
-@if ($dynamicVariables) {
+.ReactTwitter:hover {
     &::before {
         color: #55ACEE;
     }
@@ -208,7 +208,7 @@
     }
 }
 
-@if ($dynamicVariables) {
+@if ($staticVariables) {
     .ReactButton.PopupWindow {
         &:hover {
             .Sprite::before {
@@ -319,14 +319,14 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             color: $global-color_primary;
         }
         content: $icon-star-empty;
     }
 
     &:hover::before {
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             color: $global-color_primaryAlt;
         }
     }

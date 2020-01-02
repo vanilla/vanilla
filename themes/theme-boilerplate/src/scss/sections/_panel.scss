@@ -38,7 +38,7 @@
             align-items: center;
             font-size: $global-subTitle_fontSize;
             font-weight: $global-heading_fontWeight;
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 color: $global-color_fg;
             }
         }
@@ -158,7 +158,7 @@
             border-radius: $panel_item-borderRadius;
             width: 100%;
 
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 color: $panel_fg;
                 background-color: $panel-item_bg;
             }
@@ -167,7 +167,7 @@
             border: $panel-item_border;
             transition: transition(color), transition(background-color);
 
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 &:hover,
                 &:focus,
                 &:active {
@@ -197,14 +197,14 @@
             border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 color: $panel_fg;
                 background-color: $panel-item_bg;
                 border: $panel-item_border;
             }
             transition: transition(color), transition(background-color);
 
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 &:hover,
                 &:focus,
                 &:active {
@@ -229,7 +229,7 @@
             margin-left: 10px;
             line-height: $theme-photo-small_size;
 
-            @if ($dynamicVariables) {
+            @if ($staticVariables) {
                 &:focus,
                 &:hover,
                 &:active {
@@ -305,7 +305,7 @@ body.Section-EditProfile .Box,
         padding: $panel-item_padding;
         border: $panel-item_border;
         border-radius: $panel_item-borderRadius;
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             color: $panel_fg;
         }
         font-weight: $global-semibold_fontWeight;
@@ -323,14 +323,14 @@ body.Section-EditProfile .Box,
         border: $panel-item_border;
         border-radius: $panel_item-borderRadius;
         width: 100%;
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             color: $panel_fg;
             background-color: $panel-item_bg;
             transition: transition(color), transition(background-color);
         }
         border: $panel-item_border;
 
-        @if ($dynamicVariables) {
+        @if ($staticVariables) {
             &:hover,
             &:focus,
             &:active {

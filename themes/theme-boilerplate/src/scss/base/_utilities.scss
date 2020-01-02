@@ -14,7 +14,7 @@
     font-weight: $global-normal_fontWeight;
     font-size: $global-medium_fontSize;
     line-height: $global-base_lineHeight;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         font-family: $global-body_fontFamily;
         color: $global-color_fg;
     }
@@ -25,12 +25,12 @@
     font-family: $link-body_fontFamily;
     font-weight: $link-body_fontWeight;
     font-size: $link-body_fontSize;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         color: $link_default-color;
     }
     line-height: inherit;
 
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         &:focus,
         &:hover {
             color: $link_default_hover-color;
@@ -725,16 +725,17 @@
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     transition: background 0.1s ease, border 0.1s ease;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         background: $bg;
         color: $fg;
     }
     border: $formButton_border;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         border-color: $border;
     }
     line-height: $formButton_height;
     min-height: $formButton_height;
+    width: $formButton_height;
     padding: 0 $formButton_padding;
     text-decoration: none;
     border-radius: $formButton_borderRadius;
@@ -745,7 +746,7 @@
         max-width: 100%;
     }
 
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         &:hover,
         &:active,
         &:focus {
@@ -763,13 +764,13 @@
     justify-content: center;
     font-size: $icon-default_size;
     font-family: Arial, sans-serif;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         background: transparent;
         color: rgba($color, .7);
     }
     visibility: visible;
 
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         &:hover {
             background: transparent;
             color: $color;

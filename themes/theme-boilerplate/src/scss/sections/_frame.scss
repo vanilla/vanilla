@@ -21,7 +21,7 @@
             overflow: visible;
         }
     }
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         background-color: $body_bg;
     }
     background-image: $body_backgroundImage;

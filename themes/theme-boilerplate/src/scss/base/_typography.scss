@@ -6,7 +6,7 @@
 
 body {
     @include font-style-base;
-    @if ($dynamicVariables) {
+    @if ($staticVariables) {
         color: $global-color_fg;
     }
 }

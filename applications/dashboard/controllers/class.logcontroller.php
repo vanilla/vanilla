@@ -206,11 +206,11 @@ class LogController extends DashboardController {
     }
 
     /**
-     * Access the log history of a specific record
-     *
-     * @param string $recordType
-     * @param int $recordID
-     */
+ * Access the log history of a specific record
+ *
+ * @param string $recordType
+ * @param int $recordID
+ */
     public function record($recordType, $recordID, $page = '') {
         $this->permission('Garden.Moderation.Manage');
         list($offset, $limit) = offsetLimit($page, 10);
@@ -239,6 +239,50 @@ class LogController extends DashboardController {
         Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/log/edits');
         $this->render();
+    }
+
+    /**
+     * Access the log history of a specific discussion thread
+     *
+     * @param string $recordID
+     * @param string $page
+     */
+    public function discussion(string $recordID, string $page = '') {
+        $this->permission('Garden.Moderation.Manage');
+        //list($offset, $limit) = offsetLimit($page, 10);
+        list($offset, $limit) = offsetLimit($page, 3);
+        $this->setData('Title', t('Change Log'));
+
+        $where = [
+            'Operation' => ['Edit', 'Delete', 'Ban'],
+            'RecordType' => 'Discussion',
+            'RecordID' => $recordID
+        ];
+
+        $orWhere = [
+            'RecordType' => 'Comment',
+            'ParentRecordID' => $recordID
+        ];
+        $count = $this->LogModel->getCountWhere($where, $orWhere);
+
+        if ($offset >= $count) {
+            $offset = $count - $limit;
+        }
+
+        $this->setData('RecordCount', $count);
+        if ($offset >= $count) {
+            $offset = $count - $limit;
+        }
+        $log = $this->LogModel->getWhere($where, 'LogID', 'Desc', $offset, $limit, $orWhere);
+        $this->setData('Log', $log);
+
+        if ($this->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $this->View = 'Table';
+        }
+
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/edits');
+        $this->render('record', 'log', 'dashboard');
     }
 
 

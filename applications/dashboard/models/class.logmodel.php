@@ -394,7 +394,7 @@ class LogModel extends Gdn_Pluggable {
      * @param bool $limit The database limit.
      * @return array Returns a data set.
      */
-    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $offset = false, $limit = false) {
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $offset = false, $limit = false, $orWhere = false) {
         if ($offset < 0) {
             $offset = 0;
         }
@@ -404,16 +404,21 @@ class LogModel extends Gdn_Pluggable {
             unset($where['Operation']);
         }
 
-        $result = Gdn::sql()
-            ->select('l.*')
+        $sql = Gdn::sql();
+        $sql->select('l.*')
             ->select('ru.Name as RecordName, iu.Name as InsertName')
             ->from('Log l')
             ->join('User ru', 'l.RecordUserID = ru.UserID', 'left')
             ->join('User iu', 'l.InsertUserID = iu.UserID', 'left')
-            ->where($where)
-            ->limit($limit, $offset)
-            ->orderBy($orderFields, $orderDirection)
-            ->get()->resultArray();
+            ->where($where);
+
+        if ($orWhere) {
+            $sql->orWhere($orWhere);
+        }
+        $sql->limit($limit, $offset)
+            ->orderBy($orderFields, $orderDirection);
+
+        $result = $sql->get()->resultArray();
 
         // Deserialize the data.
         foreach ($result as &$row) {
@@ -430,19 +435,25 @@ class LogModel extends Gdn_Pluggable {
      * Get the count of log entries matching a query.
      *
      * @param array $where The filter.
+     * @param bool|array $orWhere
      * @return int Returns the count.
      */
-    public function getCountWhere($where) {
+    public function getCountWhere($where, $orWhere = false) {
         if (isset($where['Operation'])) {
             Gdn::sql()->whereIn('Operation', (array)$where['Operation']);
             unset($where['Operation']);
         }
 
-        $result = Gdn::sql()
-            ->select('l.LogID', 'count', 'CountLogID')
+        $sql = Gdn::sql();
+        $sql->select('l.LogID', 'count', 'CountLogID')
             ->from('Log l')
-            ->where($where)
-            ->get()->value('CountLogID', 0);
+            ->where($where);
+
+        if ($orWhere) {
+            $sql->orWhere($orWhere);
+        }
+
+        $result = $sql->get()->value('CountLogID', 0);
 
         return $result;
     }

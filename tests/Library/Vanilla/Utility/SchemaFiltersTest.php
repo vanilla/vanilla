@@ -48,4 +48,28 @@ class SchemaFiltersTest extends TestCase {
         $decoded = SchemaFilters::decodeValue($encoded, $testField);
         $this->assertSame($testValue, $decoded);
     }
+
+    /**
+     * Test decodeValue() with "null" string.
+     */
+    public function testDecodeWithNullString() {
+        $testValidation = new Validation();
+        $testSchema = new Schema('foo');
+        $testField = new ValidationField($testValidation, $testSchema, $testSchema);
+        $testValue = "null";
+        $decoded = SchemaFilters::decodeValue($testValue, $testField);
+        $this->assertSame($decoded, false);
+    }
+
+    /**
+     * Test decodeValue() with un-unserializable string.
+     */
+    public function testDecodeWithUnUnserializableString() {
+        $testValidation = new Validation();
+        $testSchema = new Schema('foo');
+        $testField = new ValidationField($testValidation, $testSchema, $testSchema);
+        $testValue = "apos'trophe";
+        $decoded = SchemaFilters::decodeValue($testValue, $testField);
+        $this->assertSame($decoded, false);
+    }
 }

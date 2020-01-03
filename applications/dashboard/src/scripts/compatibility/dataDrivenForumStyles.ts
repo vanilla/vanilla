@@ -121,6 +121,9 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".OptionsLink-Clipboard");
     mixinFontLink("a.OptionsLink");
     mixinFontLink(".ItemContent a");
+    mixinFontLink(".DataList .Item h3 a");
+    mixinFontLink(".DataList .Item a.Title", true);
+    mixinFontLink(".MorePager a");
 
     mixinInputBorderColor(`input[type= "text"]`);
     mixinInputBorderColor("textarea");
@@ -131,20 +134,6 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinInputBorderColor("select");
     mixinInputBorderColor(".InputBox.BigInput");
     mixinInputBorderColor("ul.token-input-list", "& .token-list-focused");
-
-    cssRule(`.DataList .Item h3 a, DataList .Item a.Title`, {
-        $nest: {
-            "&:hover": {
-                color: colorOut(vars.links.colors.hover),
-            },
-            "&.focus-visible": {
-                color: colorOut(vars.links.colors.focus),
-            },
-            "&:focus": {
-                color: colorOut(vars.links.colors.focus),
-            },
-        },
-    });
 
     cssRule(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
         borderColor: primary,
@@ -158,14 +147,14 @@ export const compatibilityStyles = useThemeCache(() => {
 });
 
 // Mixins replacement
-export const mixinFontLink = (selector: string) => {
+export const mixinFontLink = (selector: string, skipDefaultColor = false) => {
     const linkColors = setAllLinkColors();
 
-    console.log("link Colors: ", linkColors);
-
-    cssRule(selector, {
-        color: linkColors.color,
-    });
+    if (!skipDefaultColor) {
+        cssRule(selector, {
+            color: linkColors.color,
+        });
+    }
 
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssRule above.

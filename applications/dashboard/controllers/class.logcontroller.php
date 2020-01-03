@@ -213,7 +213,9 @@ class LogController extends DashboardController {
  */
     public function record($recordType, $recordID, $page = '') {
         $this->permission('Garden.Moderation.Manage');
-        list($offset, $limit) = offsetLimit($page, 10);
+        $limit = 10;
+        $this->setData('Limit', $limit);
+        list($offset, $limit) = offsetLimit($page, $limit);
         $this->setData('Title', t('Change Log'));
 
         $recordType = ucfirst($recordType);
@@ -249,8 +251,9 @@ class LogController extends DashboardController {
      */
     public function discussion(string $recordID, string $page = '') {
         $this->permission('Garden.Moderation.Manage');
-        //list($offset, $limit) = offsetLimit($page, 10);
-        list($offset, $limit) = offsetLimit($page, 3);
+        $limit = 10;
+        $this->setData('Limit', $limit);
+        list($offset, $limit) = offsetLimit($page, $limit);
         $this->setData('Title', t('Change Log'));
 
         $where = [

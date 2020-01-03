@@ -72,7 +72,7 @@ export const currentThemeVariables = useThemeCache(() => {
 export const currentThemeClasses = useThemeCache(() => {
     const vars = currentThemeVariables();
     const globalVars = globalVariables();
-    const themePreviewCardVars = themeCardVariables();
+
     const style = styleFactory("currentThemeInfo");
 
     const themeContainer = style("themeContainer", {
@@ -100,13 +100,12 @@ export const currentThemeClasses = useThemeCache(() => {
         borderRightColor: "transparent",
         borderWidth: unit(9),
         textTransform: "uppercase",
-        marginBottom: unit(vars.flag.margin.bottom),
+        marginBottom: unit(vars.flag.margin.bottom - 15),
     });
 
     const name = style("name", {
         fontSize: unit(globalVars.fonts.size.large),
         color: globalVars.mainColors.fg.toString(),
-        paddingBottom: unit(vars.name.padding.bottom),
         $nest: {
             ["& h5"]: {
                 fontWeight: globalVars.fonts.weights.semiBold,
@@ -136,6 +135,7 @@ export const currentThemeClasses = useThemeCache(() => {
     const themeActionButtons = style("actionButtons", {
         flexDirection: "column",
         flex: 1,
+        marginTop: unit(vars.themeContainer.margin.top + 10),
         $nest: {
             ["& button"]: {
                 marginBottom: unit(vars.flag.margin.bottom),
@@ -146,6 +146,7 @@ export const currentThemeClasses = useThemeCache(() => {
 
     const themeInfo = style("themeInfo", {
         width: percent(100),
+        marginRight: unit(vars.themeContainer.margin.right + 20),
     });
 
     const addTheme = style("addTheme", {

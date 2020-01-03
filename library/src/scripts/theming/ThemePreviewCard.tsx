@@ -6,7 +6,6 @@
 
 import React from "react";
 import { themeCardClasses } from "./themeCardStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 
@@ -95,16 +94,18 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                                 ))}
                             </ul>
                         </div>
-                        <div className={classes.actionButtons}>
-                            <Button className={classes.buttons} onClick={this.props.onApply}>
-                                {t("Apply")}
-                            </Button>
-                            <Button className={classes.buttons} onClick={this.props.onPreview}>
-                                {t("Preview")}
-                            </Button>
-                            <Button className={classes.buttons} onClick={this.props.onCopy}>
-                                {t("Copy")}
-                            </Button>
+                        <div className={this.props.isActiveTheme ? classes.noOverlay : classes.overlay}>
+                            <div className={classes.actionButtons}>
+                                <Button className={classes.buttons} onClick={this.props.onApply}>
+                                    {t("Apply")}
+                                </Button>
+                                <Button className={classes.buttons} onClick={this.props.onPreview}>
+                                    {t("Preview")}
+                                </Button>
+                                <Button className={classes.buttons} onClick={this.props.onCopy}>
+                                    {t("Copy")}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -160,13 +160,14 @@ export const themeCardClasses = useThemeCache(() => {
         marginRight: unit(3),
     });
     const actionButtons = style("actionButtons", {
-        opacity: 0,
-        position: "absolute",
-        top: percent(25),
-        left: percent(19),
         textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
+        margin: "44px 0",
+    });
+    const overlay = style("overlay", {
+        position: "absolute",
+        top: 0,
+        backgroundColor: "rgba(103, 105, 109, 0.8)",
+        opacity: 0,
     });
     const wrapper = style("wrapper", {
         opacity: 1,
@@ -181,8 +182,7 @@ export const themeCardClasses = useThemeCache(() => {
 
         $nest: {
             "&:hover": {
-                opacity: 0.6,
-                [`& .${actionButtons}`]: {
+                [`& .${overlay}`]: {
                     opacity: 1,
                 },
             },
@@ -342,6 +342,9 @@ export const themeCardClasses = useThemeCache(() => {
         marginBottom: unit(vars.contentTile.margin.bottom),
         width: unit(180),
     });
+    const noOverlay = style("noOverlay", {
+        display: "none",
+    });
 
     return {
         container,
@@ -370,6 +373,8 @@ export const themeCardClasses = useThemeCache(() => {
         searchText,
         dots,
         menuBar,
+        overlay,
+        noOverlay,
     };
 });
 

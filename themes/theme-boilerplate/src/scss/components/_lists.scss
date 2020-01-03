@@ -72,20 +72,25 @@
         display: block;
         margin-bottom: $utility-baseUnit;
 
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+        @if ($staticVariables){
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
+
 
         a {
             font-size: inherit;
             font-weight: inherit;
             display: inline;
-            color: inherit;
-
-            &:focus,
-            &:hover {
+            @if ($staticVariables){
                 color: inherit;
+
+                &:focus,
+                &:hover {
+                    color: inherit;
+                }
             }
         }
     }

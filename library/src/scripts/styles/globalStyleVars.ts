@@ -29,7 +29,7 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const constants = makeThemeVars("constants", {
-        linkStateColorEmphasis: 0.2,
+        linkStateColorEmphasis: 0.15,
     });
 
     const elementaryColors = {

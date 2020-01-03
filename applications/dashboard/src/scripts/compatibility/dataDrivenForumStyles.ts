@@ -14,7 +14,6 @@ import { fonts } from "@library/styles/styleHelpersTypography";
 import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { margins, unit } from "@library/styles/styleHelpers";
 import { ColorHelper } from "csx";
 
@@ -120,10 +119,12 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".Back a");
     mixinFontLink(".OptionsLink-Clipboard");
     mixinFontLink("a.OptionsLink");
-    mixinFontLink(".ItemContent a");
+    mixinFontLink(".MorePager a");
+    // Links that have FG color by default but regular state colors.
+    mixinFontLink(".ItemContent a", true);
     mixinFontLink(".DataList .Item h3 a", true);
     mixinFontLink(".DataList .Item a.Title", true);
-    mixinFontLink(".MorePager a");
+    mixinFontLink(".DataList .Item .Title a", true);
 
     mixinInputBorderColor(`input[type= "text"]`);
     mixinInputBorderColor("textarea");
@@ -153,6 +154,10 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssRule(".Meta-Discussion > .Tag", {
         marginLeft: unit(6),
+    });
+
+    cssRule("a.Title, .Title a", {
+        color: fg,
     });
 });
 

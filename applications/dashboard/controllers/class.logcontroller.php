@@ -206,11 +206,12 @@ class LogController extends DashboardController {
     }
 
     /**
- * Access the log history of a specific record
- *
- * @param string $recordType
- * @param int $recordID
- */
+    * Access the log history of a specific record
+    *
+    * @param string $recordType
+    * @param int $recordID
+    * @param string $page
+    */
     public function record($recordType, $recordID, $page = '') {
         $this->permission('Garden.Moderation.Manage');
         $limit = 10;

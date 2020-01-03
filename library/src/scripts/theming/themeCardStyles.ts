@@ -163,7 +163,7 @@ export const themeCardClasses = useThemeCache(() => {
         opacity: 0,
         position: "absolute",
         top: percent(25),
-        left: percent(30),
+        left: percent(19),
         textAlign: "center",
         display: "flex",
         flexDirection: "column",
@@ -340,6 +340,7 @@ export const themeCardClasses = useThemeCache(() => {
 
     const buttons = style("buttons", {
         marginBottom: unit(vars.contentTile.margin.bottom),
+        width: unit(180),
     });
 
     return {

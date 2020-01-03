@@ -96,25 +96,13 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
                             </ul>
                         </div>
                         <div className={classes.actionButtons}>
-                            <Button
-                                baseClass={ButtonTypes.PRIMARY}
-                                className={classes.buttons}
-                                onClick={this.props.onApply}
-                            >
+                            <Button className={classes.buttons} onClick={this.props.onApply}>
                                 {t("Apply")}
                             </Button>
-                            <Button
-                                baseClass={ButtonTypes.PRIMARY}
-                                className={classes.buttons}
-                                onClick={this.props.onPreview}
-                            >
+                            <Button className={classes.buttons} onClick={this.props.onPreview}>
                                 {t("Preview")}
                             </Button>
-                            <Button
-                                baseClass={ButtonTypes.PRIMARY}
-                                className={classes.buttons}
-                                onClick={this.props.onCopy}
-                            >
+                            <Button className={classes.buttons} onClick={this.props.onCopy}>
                                 {t("Copy")}
                             </Button>
                         </div>

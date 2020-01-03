@@ -31,7 +31,7 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <section className={classes.themeContainer}>
-                    <div>
+                    <div className={classes.themeInfo}>
                         <div className={classes.flag}>Current Theme</div>
                         <div className={classes.name}>
                             <h5>{name}</h5>

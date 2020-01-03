@@ -229,6 +229,7 @@ export const themeCardClasses = useThemeCache(() => {
         width: vars.titleBarNav.width,
         paddingTop: unit(vars.titleBarNav.padding.horizontal),
         paddingLeft: unit(vars.titleBarNav.padding.vertical),
+        listStyle: "none",
     });
 
     const titleBarLinks = style("titleBarLinks", {
@@ -269,12 +270,12 @@ export const themeCardClasses = useThemeCache(() => {
         alignItems: "stretch",
         display: "flex",
         flexWrap: "wrap",
-        justifyContent: "space-between",
+        justifyContent: "space-around",
         position: "relative",
         background: vars.colors.bg.white.toString(),
         borderRadius: unit(2),
-        width: percent(86),
         margin: "0 auto",
+        padding: 0,
     });
     const tileImg = style("tileImg", {
         borderRadius: unit(vars.tileImg.borderRadius),

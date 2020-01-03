@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings } from "@library/styles/styleHelpers";
+import { unit, paddings, margins } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themeCardStyles";
+import { percent } from "csx";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -49,11 +50,22 @@ export const currentThemeVariables = useThemeCache(() => {
             left: 117,
         },
     });
+
+    const themeContainer = makeThemeVars("themeContainer", {
+        margin: {
+            top: 32,
+            right: 28,
+            bottom: 0,
+            left: 26,
+        },
+        width: 596,
+    });
     return {
         flag,
         name,
         authorName,
         addTheme,
+        themeContainer,
     };
 });
 
@@ -65,6 +77,15 @@ export const currentThemeClasses = useThemeCache(() => {
 
     const themeContainer = style("themeContainer", {
         display: "flex",
+        ...margins({
+            top: unit(vars.themeContainer.margin.top),
+            bottom: unit(vars.themeContainer.margin.bottom),
+            left: unit(vars.themeContainer.margin.left),
+            right: unit(vars.themeContainer.margin.right),
+        }),
+        maxWidth: percent(100),
+        position: "relative",
+        width: unit(vars.themeContainer.width),
     });
 
     const flag = style("flag", {
@@ -118,8 +139,13 @@ export const currentThemeClasses = useThemeCache(() => {
         $nest: {
             ["& button"]: {
                 marginBottom: unit(vars.flag.margin.bottom),
+                width: unit(144),
             },
         },
+    });
+
+    const themeInfo = style("themeInfo", {
+        width: percent(100),
     });
 
     const addTheme = style("addTheme", {
@@ -142,6 +168,7 @@ export const currentThemeClasses = useThemeCache(() => {
         description,
         themeActionButtons,
         addTheme,
+        themeInfo,
     };
 });
 

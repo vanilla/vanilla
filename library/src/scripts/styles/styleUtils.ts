@@ -10,8 +10,8 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color, ColorHelper } from "csx";
-import { logDebug, logWarning } from "@vanilla/utils";
+import { color } from "csx";
+import { logDebug, logWarning, hashString } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
@@ -67,6 +67,13 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
+let themeUniqueness = hashString(Math.random().toString());
+
+export function clearThemeCache() {
+    themeUniqueness = hashString(Math.random().toString());
+    return themeUniqueness;
+}
+
 /**
  * Wrap a callback so that it will only run once with a particular set of global theme variables.
  *
@@ -77,8 +84,9 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status;
-        return cacheKey + JSON.stringify(args);
+        const cacheKey = themeKey + status + themeUniqueness;
+        const result = cacheKey + JSON.stringify(args);
+        return result;
     };
     return memoize(callback as any, makeCacheKey);
 }
@@ -120,11 +128,9 @@ export function variableFactory(componentName: string) {
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
         const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
-        return merge(declaredVars, normalizeVariables(subcomponentVars, declaredVars));
+        return merge(declaredVars, normalizeVariables(subcomponentVars));
     };
 }
-
-const allowedColorPrefixes = ["#", "rgb(", "rgba(", "hsl("];
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -133,47 +139,25 @@ const allowedColorPrefixes = ["#", "rgb(", "rgba(", "hsl("];
  *
  * - Strings starting with `#` get wrapped in `color()`;
  */
-function normalizeVariables(customVariable: any, defaultVariable: any) {
-    if (defaultVariable instanceof ColorHelper) {
-        if (typeof customVariable !== "string") {
-            logWarning("Encountered an improper value for a color variable. It will not be applied", customVariable);
-            return defaultVariable;
-        }
-
-        if (customVariable === "transparent") {
-            return defaultVariable;
-        }
-
-        const isValidColor = !!allowedColorPrefixes.find(prefix => customVariable.startsWith(prefix));
-        if (!isValidColor) {
-            logWarning(
-                `Invalid custom color "${customVariable}" supplied. Allowed color prefixes are ${allowedColorPrefixes.join(
-                    ", ",
-                )}.`,
-            );
-            return defaultVariable;
-        }
-        const result = color(customVariable);
-        return result;
-    }
-
-    if (Array.isArray(customVariable)) {
-        return customVariable.map(normalizeVariables);
-    }
-
-    if (typeof customVariable === "object") {
+function normalizeVariables(variables: any) {
+    if (Array.isArray(variables)) {
+        variables = variables.map(normalizeVariables);
+    } else if (typeof variables === "object") {
         const newObj: any = {};
-        for (const [key, value] of Object.entries(customVariable)) {
-            const defaultNested = defaultVariable[key];
-            if (!defaultNested) {
-                continue;
-            }
-            newObj[key] = normalizeVariables(value, defaultNested);
+        for (const [key, value] of Object.entries(variables)) {
+            newObj[key] = normalizeVariables(value);
         }
         return newObj;
     }
 
-    return customVariable;
+    if (typeof variables === "string") {
+        if (variables.startsWith("#")) {
+            // It's a colour.
+            return color(variables);
+        }
+    }
+
+    return variables;
 }
 
 /**

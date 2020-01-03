@@ -735,7 +735,9 @@
     }
     line-height: $formButton_height;
     min-height: $formButton_height;
-    width: $formButton_height;
+    @if ($staticVariables) {
+        width: $formButton_height;
+    }
     padding: 0 $formButton_padding;
     text-decoration: none;
     border-radius: $formButton_borderRadius;

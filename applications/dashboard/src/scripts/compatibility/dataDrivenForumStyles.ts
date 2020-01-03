@@ -143,10 +143,6 @@ export const compatibilityStyles = useThemeCache(() => {
         borderWidth: unit(vars.border.width),
     });
 
-    cssRule(".Button.change-picture-new", {
-        width: "auto",
-    });
-
     cssRule(".Meta-Discussion .Tag", {
         ...margins({
             horizontal: 3,
@@ -162,12 +158,28 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssRule(
-        ".DataList .Tag-Announcement, .DataList .NewCommentCount, .DataList .HasNew.HasNew, .MessageList .Tag-Announcement, .MessageList .NewCommentCount, .MessageList .HasNew.HasNew, .DataTableWrap .Tag-Announcement, .DataTableWrap .NewCommentCount, .DataTableWrap .HasNew.HasNew",
-        {
-            color: primary,
-            borderColor: primary,
-        },
+        ".DataList .Tag-Announcement, " +
+            ".DataList .NewCommentCount, " +
+            ".DataList .HasNew.HasNew, " +
+            ".MessageList .Tag-Announcement, " +
+            ".MessageList .NewCommentCount, " +
+            ".MessageList .HasNew.HasNew, " +
+            ".DataTableWrap .Tag-Announcement, " +
+            ".DataTableWrap .NewCommentCount, " +
+            ".DataTableWrap .HasNew.HasNew, " +
+            {
+                color: primary,
+                borderColor: primary,
+            },
     );
+
+    cssRule(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
+        color: primary,
+    });
+
+    cssRule("ul.token-input-list.token-input-focused, .AdvancedSearch .InputBox:focus", {
+        borderColor: primary,
+    });
 });
 
 // Mixins replacement

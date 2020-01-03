@@ -125,6 +125,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".DataList .Item h3 a", true);
     mixinFontLink(".DataList .Item a.Title", true);
     mixinFontLink(".DataList .Item .Title a", true);
+    mixinFontLink("a.Tag", true);
 
     mixinInputBorderColor(`input[type= "text"]`);
     mixinInputBorderColor("textarea");
@@ -159,6 +160,14 @@ export const compatibilityStyles = useThemeCache(() => {
     cssRule("a.Title, .Title a", {
         color: fg,
     });
+
+    cssRule(
+        ".DataList .Tag-Announcement, .DataList .NewCommentCount, .DataList .HasNew.HasNew, .MessageList .Tag-Announcement, .MessageList .NewCommentCount, .MessageList .HasNew.HasNew, .DataTableWrap .Tag-Announcement, .DataTableWrap .NewCommentCount, .DataTableWrap .HasNew.HasNew",
+        {
+            color: primary,
+            borderColor: primary,
+        },
+    );
 });
 
 // Mixins replacement

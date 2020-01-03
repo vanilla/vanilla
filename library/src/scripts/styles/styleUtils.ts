@@ -11,7 +11,7 @@ import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
-import { logDebug, logWarning } from "@vanilla/utils";
+import { logDebug, logWarning, hashString } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
@@ -67,6 +67,13 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
+let themeUniqueness = hashString(Math.random().toString());
+
+export function clearThemeCache() {
+    themeUniqueness = hashString(Math.random().toString());
+    return themeUniqueness;
+}
+
 /**
  * Wrap a callback so that it will only run once with a particular set of global theme variables.
  *
@@ -77,8 +84,9 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status;
-        return cacheKey + JSON.stringify(args);
+        const cacheKey = themeKey + status + themeUniqueness;
+        const result = cacheKey + JSON.stringify(args);
+        return result;
     };
     return memoize(callback as any, makeCacheKey);
 }

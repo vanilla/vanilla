@@ -15,7 +15,7 @@ import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { unit } from "@library/styles/styleHelpers";
+import { margins, unit } from "@library/styles/styleHelpers";
 import { ColorHelper } from "csx";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
@@ -121,7 +121,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".OptionsLink-Clipboard");
     mixinFontLink("a.OptionsLink");
     mixinFontLink(".ItemContent a");
-    mixinFontLink(".DataList .Item h3 a");
+    mixinFontLink(".DataList .Item h3 a", true);
     mixinFontLink(".DataList .Item a.Title", true);
     mixinFontLink(".MorePager a");
 
@@ -143,6 +143,16 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssRule(".Button.change-picture-new", {
         width: "auto",
+    });
+
+    cssRule(".Meta-Discussion .Tag", {
+        ...margins({
+            horizontal: 3,
+        }),
+    });
+
+    cssRule(".Meta-Discussion > .Tag", {
+        marginLeft: unit(6),
     });
 });
 

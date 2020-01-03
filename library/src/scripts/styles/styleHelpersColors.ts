@@ -60,6 +60,7 @@ export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, 
 export const emphasizeLightness = (
     colorValue: ColorHelper | "transparent",
     weight: number,
+    darken: boolean = false,
     flipIfMax: boolean = true,
 ) => {
     if (colorValue === "transparent") {
@@ -76,7 +77,7 @@ export const emphasizeLightness = (
     const colorDarker = colorValue.darken(weightCurved) as ColorHelper;
     const colorLighter = colorValue.lighten(weightCurved) as ColorHelper;
 
-    if (isLightColor(colorValue)) {
+    if (isLightColor(colorValue) && !darken) {
         if (colorLightness + weightCurved > 1 && flipIfMax) {
             return colorDarker;
         } else {

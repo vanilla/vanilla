@@ -17,7 +17,12 @@ input.InputBox,
 select {
     line-height: $formElement_height;
     height: $formElement_height;
-    border: $formElement_border;
+    @if ($staticVariables) {
+        border: $formElement_border;
+    } else {
+        border-style: solid;
+        border-width: $formElement_borderWidth;
+    }
     border-radius: $formElement_borderRadius;
     color: $formElement_color;
     font-family: $global-body_fontFamily;

@@ -6,7 +6,7 @@
  */
 
 import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { cssRule } from "typestyle";
+import { cssRaw, cssRule } from "typestyle";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
@@ -15,16 +15,21 @@ import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { unit } from "@library/styles/styleHelpers";
+import { ColorHelper } from "csx";
 
-// To use compatibility styles, set '$colorFromDynamicTheme : true;' in custom.scss
+// To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export const compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
     const mainColors = vars.mainColors;
+
+    // Temporary workaround:
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
     const secondary = colorOut(mainColors.secondary);
+
     fullBackgroundCompat();
     cssRule("body", {
         backgroundColor: bg,
@@ -78,6 +83,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinButton("body.Section-Profile .ProfileOptions .Button-EditProfile", ButtonTypes.STANDARD);
     mixinButton("body.Section-Profile .ProfileOptions .MemberButtons", ButtonTypes.STANDARD);
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
+    mixinButton(".Button.Close", ButtonTypes.STANDARD);
 
     cssRule(".Breadcrumbs", {
         color: colorOut(vars.meta.colors.fg),
@@ -105,23 +111,115 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".Panel .InThisConversation a");
     mixinFontLink(".FilterMenu a");
     mixinFontLink("div.Popup .Body a");
+    mixinFontLink(".selectBox-toggle");
+    mixinFontLink(".followButton");
+    mixinFontLink(".Breadcrumbs a");
+    mixinFontLink(".Panel a");
+    mixinFontLink(".QuickSearchButton");
+    mixinFontLink(".SelectWrapper::after");
+    mixinFontLink(".Back a");
+    mixinFontLink(".OptionsLink-Clipboard");
+    mixinFontLink("a.OptionsLink");
+    mixinFontLink(".ItemContent a");
 
-    cssRule(".ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle", {
+    mixinInputBorderColor(`input[type= "text"]`);
+    mixinInputBorderColor("textarea");
+    mixinInputBorderColor("ul.token-input-list");
+    mixinInputBorderColor("input.InputBox");
+    mixinInputBorderColor(".InputBox");
+    mixinInputBorderColor(".AdvancedSearch select");
+    mixinInputBorderColor("select");
+    mixinInputBorderColor(".InputBox.BigInput");
+    mixinInputBorderColor("ul.token-input-list", "& .token-list-focused");
+
+    cssRule(`.DataList .Item h3 a, DataList .Item a.Title`, {
+        $nest: {
+            "&:hover": {
+                color: colorOut(vars.links.colors.hover),
+            },
+            "&.focus-visible": {
+                color: colorOut(vars.links.colors.focus),
+            },
+            "&:focus": {
+                color: colorOut(vars.links.colors.focus),
+            },
+        },
+    });
+
+    cssRule(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
         borderColor: primary,
+        borderStyle: vars.border.style,
+        borderWidth: unit(vars.border.width),
+    });
+
+    cssRule(".Button.change-picture-new", {
+        width: "auto",
     });
 });
 
 // Mixins replacement
 export const mixinFontLink = (selector: string) => {
     const linkColors = setAllLinkColors();
+
+    console.log("link Colors: ", linkColors);
+
     cssRule(selector, {
         color: linkColors.color,
-        $nest: linkColors.nested,
+    });
+
+    // $nest doesn't work in this scenario. Working around it by doing it manually.
+    // Hopefully a future update will allow us to just pass the nested styles in the cssRule above.
+    let rawStyles = `\n`;
+    Object.keys(linkColors.nested).forEach(key => {
+        const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
+        const targetStyles = linkColors.nested[key];
+        const keys = Object.keys(targetStyles);
+        if (keys.length > 0) {
+            rawStyles += `${finalSelector} { `;
+            keys.forEach(property => {
+                const style = targetStyles[property];
+                if (style) {
+                    rawStyles += `\n    ${property}: ${style instanceof ColorHelper ? colorOut(style) : style};`;
+                }
+            });
+            rawStyles += `\n}\n\n`;
+        }
+    });
+
+    cssRaw(rawStyles);
+};
+
+export const mixinInputBorderColor = (selector: string, focusSelector?: string) => {
+    const vars = globalVariables();
+    const primary = colorOut(vars.mainColors.primary);
+    let extraFocus = {};
+    if (focusSelector) {
+        extraFocus = {
+            [focusSelector]: {
+                borderColor: primary,
+            },
+        };
+    }
+
+    cssRule(selector, {
+        borderColor: colorOut(vars.border.color),
+        borderStyle: vars.border.style,
+        borderWidth: unit(vars.border.width),
+        $nest: {
+            "&:focus": {
+                borderColor: primary,
+            },
+            "& .focus-visible": {
+                borderColor: primary,
+            },
+            ...extraFocus,
+        },
     });
 };
 
 export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTypes.STANDARD) => {
     const vars = buttonVariables();
+
     if (buttonType === ButtonTypes.PRIMARY) {
         cssRule(selector, generateButtonStyleProperties(vars.primary));
     } else if (buttonType === ButtonTypes.STANDARD) {
@@ -129,4 +227,23 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
     } else {
         new Error(`No support yet for button type: ${buttonType}`);
     }
+};
+
+export const mixinCloseButton = (selector: string) => {
+    const vars = globalVariables();
+    cssRule(selector, {
+        color: colorOut(vars.mainColors.fg),
+        background: "none",
+        $nest: {
+            "&:hover": {
+                color: colorOut(vars.mainColors.primary),
+            },
+            "&:focus": {
+                color: colorOut(vars.mainColors.primary),
+            },
+            "&.focus-visible": {
+                color: colorOut(vars.mainColors.primary),
+            },
+        },
+    });
 };

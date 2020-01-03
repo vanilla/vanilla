@@ -28,6 +28,10 @@ export const globalVariables = useThemeCache(() => {
         "svg.encoding": "data:image/svg+xml,",
     };
 
+    const constants = makeThemeVars("constants", {
+        linkStateColorEmphasis: 0.2,
+    });
+
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
@@ -82,7 +86,8 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(colorPrimary, 0.09);
+    const linkColorState = emphasizeLightness(colorPrimary, constants.linkStateColorEmphasis, true);
+
     const links = makeThemeVars("links", {
         colors: {
             default: linkColorDefault,

@@ -14,20 +14,22 @@ import { fonts } from "@library/styles/styleHelpersTypography";
 import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { margins, unit } from "@library/styles/styleHelpers";
+import { borders, margins, unit } from "@library/styles/styleHelpers";
 import { ColorHelper } from "csx";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export const compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
+    const formVars = formElementsVariables();
     const mainColors = vars.mainColors;
 
     // Temporary workaround:
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const secondary = colorOut(mainColors.secondary);
+    const metaFg = colorOut(vars.meta.colors.fg);
 
     fullBackgroundCompat();
     cssRule("body", {
@@ -84,10 +86,6 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
 
-    cssRule(".Breadcrumbs", {
-        color: colorOut(vars.meta.colors.fg),
-    });
-
     cssRule(".ReactButton.PopupWindow&:hover .Sprite::before", {
         color: primary,
     });
@@ -100,11 +98,9 @@ export const compatibilityStyles = useThemeCache(() => {
             },
         },
     });
-
-    mixinFontLink(".Navigation-linkContainer a");
-
     cssRule(".Box h4", { color: fg });
 
+    mixinFontLink(".Navigation-linkContainer a");
     mixinFontLink(".Panel .PanelInThisDiscussion a");
     mixinFontLink(".Panel .Leaderboard a");
     mixinFontLink(".Panel .InThisConversation a");
@@ -126,6 +122,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink(".DataList .Item a.Title", true);
     mixinFontLink(".DataList .Item .Title a", true);
     mixinFontLink("a.Tag", true);
+    mixinFontLink(".MenuItems a", true);
 
     mixinInputBorderColor(`input[type= "text"]`);
     mixinInputBorderColor("textarea");
@@ -153,24 +150,39 @@ export const compatibilityStyles = useThemeCache(() => {
         marginLeft: unit(6),
     });
 
-    cssRule("a.Title, .Title a", {
-        color: fg,
-    });
+    cssRule(
+        `
+        a.Title,
+        .Title a,
+        .DataList .Item .Title,
+        .DataList .Item.Read .Title,
+        .DataList .Item h3,
+        .MessageList .Item .Title,
+        .MessageList .Item.Read .Title,
+        .MessageList .Item h3
+        `,
+        {
+            color: fg,
+        },
+    );
 
     cssRule(
-        ".DataList .Tag-Announcement, " +
-            ".DataList .NewCommentCount, " +
-            ".DataList .HasNew.HasNew, " +
-            ".MessageList .Tag-Announcement, " +
-            ".MessageList .NewCommentCount, " +
-            ".MessageList .HasNew.HasNew, " +
-            ".DataTableWrap .Tag-Announcement, " +
-            ".DataTableWrap .NewCommentCount, " +
-            ".DataTableWrap .HasNew.HasNew, " +
-            {
-                color: primary,
-                borderColor: primary,
-            },
+        `
+        .DataList .Meta .Tag-Announcement,
+        .DataList .NewCommentCount,
+        .DataList .HasNew.HasNew,
+        .MessageList .Tag-Announcement,
+        .MessageList .NewCommentCount,
+        .MessageList .HasNew.HasNew,
+        .DataTableWrap .Tag-Announcement,
+        .DataTableWrap .NewCommentCount,
+        .DataTableWrap .HasNew.HasNew
+        `,
+        {
+            color: primary,
+            borderColor: primary,
+            textDecoration: "none",
+        },
     );
 
     cssRule(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
@@ -179,6 +191,126 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssRule("ul.token-input-list.token-input-focused, .AdvancedSearch .InputBox:focus", {
         borderColor: primary,
+    });
+
+    cssRule(
+        `
+        input[type= "text"],
+        textarea,
+        ul.token-input-list,
+        input.InputBox,
+        .AdvancedSearch .InputBox,
+        .AdvancedSearch select,
+        select,
+        ul.token-input-list.token-input-focused,
+    `,
+        {
+            borderRadius: unit(formVars.border.radius),
+            color: fg,
+            background: bg,
+            borderColor: fg,
+        },
+    );
+
+    cssRule(
+        `
+        #token-input-Form_tags,
+        input[type= "text"],
+        textarea,
+        ul.token-input-list,
+        input.InputBox,
+        .InputBox,
+        .AdvancedSearch select,
+        select,
+        .InputBox.BigInput,
+        input.SmallInput:focus,
+        input.InputBox:focus,
+        textarea:focus
+        `,
+        {
+            background: "transparent",
+            color: fg,
+        },
+    );
+
+    cssRule(`div.token-input-dropdown`, borders());
+
+    // Meta colors
+    cssRule(
+        `
+        .DataList .Meta,
+        .MessageList .Meta,
+        .DataList .AuthorInfo,
+        .MessageList .AuthorInfo,
+        .DataList-Search .MItem-Author a,
+        .DataList .Excerpt,
+        .DataList .CategoryDescription,
+        .MessageList .Excerpt,
+        .MessageList .CategoryDescription,
+        .Breadcrumbs,
+        .DataList .Tag,
+        .DataList .Tag-Poll,
+        .DataList .RoleTracker,
+        .DataList .IdeationTag,
+        .MessageList .Tag,
+        .MessageList .Tag-Poll,
+        .MessageList .RoleTracker,
+        .MessageList .IdeationTag,
+        .DataTableWrap .Tag,
+        .DataTableWrap .Tag-Poll,
+        .DataTableWrap .RoleTracker,
+        .DataTableWrap .IdeationTag,
+        .DataList-Search .MItem-Author
+        `,
+        {
+            color: metaFg,
+            $nest: {
+                a: {
+                    color: metaFg,
+                    fontSize: "inherit",
+                    textDecoration: "underline",
+                    $nest: {
+                        "&:hover": {
+                            textDecoration: "underline",
+                        },
+                        "&:focus": {
+                            textDecoration: "underline",
+                        },
+                        "&.focus-visible": {
+                            textDecoration: "underline",
+                        },
+                    },
+                },
+            },
+        },
+    );
+
+    cssRule(
+        `
+        .Herobanner .SearchBox .AdvancedSearch .BigInput,
+        .Herobanner .SearchBox #Form_Search
+    `,
+        {
+            borderRight: 0,
+            backgroundColor: bg,
+            color: fg,
+        },
+    );
+
+    cssRule(
+        `
+        .MenuItems,
+        .Flyout.Flyout,
+        .richEditorFlyout,
+        `,
+        {
+            backgroundColor: bg,
+            color: fg,
+        },
+    );
+
+    cssRule(".MenuItems a", {
+        color: fg,
     });
 });
 

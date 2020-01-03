@@ -17,27 +17,27 @@ input.InputBox,
 select {
     line-height: $formElement_height;
     height: $formElement_height;
+    font-family: $global-body_fontFamily;
     @if ($staticVariables) {
         border: $formElement_border;
-    } else {
-        border-style: solid;
-        border-width: $formElement_borderWidth;
+        border-radius: $formElement_borderRadius;
+        color: $formElement_color;
+        background: $global-color_white;
     }
-    border-radius: $formElement_borderRadius;
-    color: $formElement_color;
-    font-family: $global-body_fontFamily;
-    background: $global-color_white;
+
     padding: $formElement_paddingVertical $formElement_paddingHorizontal;
     margin: 0;
     width: 100%;
 
     &:focus,
     &:active {
-        background: $global-color_white;
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+            color: $formElement_color;
+        }
         box-shadow: none;
         outline: none;
-        border-color: $global-color_primary;
-        color: $formElement_color;
     }
 }
 
@@ -201,10 +201,12 @@ ul.token-input-list {
     }
 
     &.token-input-focused {
-        background: $global-color_white;
         box-shadow: none;
         outline: none;
-        border-color: $global-color_primary;
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+        }
     }
 }
 
@@ -217,9 +219,11 @@ div.token-input-dropdown {
     border-top: $component_border;
     visibility: visible !important;
     opacity: 1 !important;
-    border: $component_border;
-    border-radius: $formElement_borderRadius;
-    box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+    @if ($staticVariables) {
+        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        border-radius: $formElement_borderRadius;
+        border: $component_border;
+    }
 
     ul li[class^= "token-input-dropdown-item"],
     p {

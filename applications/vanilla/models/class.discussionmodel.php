@@ -294,7 +294,7 @@ class DiscussionModel extends Gdn_Model {
             return false;
         }
 
-        if (Gdn::session()->UserID === $insertUserID) {
+        if (Gdn::session()->UserID === $insertUserID && Gdn::session()->checkPermission('Vanilla.Discussions.CloseOwn')) {
             return true;
         }
 

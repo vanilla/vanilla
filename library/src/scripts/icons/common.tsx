@@ -653,3 +653,14 @@ export function ToggleIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
+
+export function PlusIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="81" viewBox="0 0 80 81">
+            <g fill="#EFEFF0" fillRule="evenodd">
+                <path d="M32 0h16v80.762H32zM80 32.381v16H48v-16zM32 32.381v16H0v-16z" />
+            </g>
+        </svg>
+    );
+}

@@ -4,6 +4,7 @@ import { ToggleIcon } from "@library/icons/common";
 import { classes } from "typestyle";
 import { relative } from "path";
 import { StringifyOptions } from "querystring";
+import textEditorClasses from "./textEditorStyles";
 
 interface IOptions {
     lineNumbers: string;
@@ -18,6 +19,7 @@ export default function TextEditor(props: ITextEditorProps) {
     const { theme, language, options, height } = props;
     const [intialTheme, setTheme] = useState(theme);
     const [isEditorReady, setIsEditorReady] = useState(false);
+    const classes = textEditorClasses();
 
     function handleEditorDidMount() {
         setIsEditorReady(true);
@@ -29,7 +31,12 @@ export default function TextEditor(props: ITextEditorProps) {
 
     return (
         <div style={{ position: "relative" }}>
-            <button onClick={toggleTheme} disabled={!isEditorReady} style={{ position: "absolute" }}>
+            <button
+                onClick={toggleTheme}
+                className={classes.themeToggleIcon}
+                disabled={!isEditorReady}
+                style={{ position: "absolute" }}
+            >
                 <ToggleIcon />
             </button>
             <Editor

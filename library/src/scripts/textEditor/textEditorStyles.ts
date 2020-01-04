@@ -22,8 +22,8 @@ export const textEditorClasses = useThemeCache(() => {
     const themeToggleIcon = style("themeToggleIcon", {
         position: "absolute",
         zIndex: 12,
-        top: 12,
-        right: 12,
+        top: vars.themeToggleIcon.top,
+        right: vars.themeToggleIcon.right,
     });
 
     return {

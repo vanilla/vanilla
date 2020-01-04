@@ -28,12 +28,7 @@ export default function TextEditor(props: ITextEditorProps) {
 
     return (
         <div style={{ position: "relative" }}>
-            <button
-                onClick={toggleTheme}
-                className={classes.themeToggleIcon}
-                disabled={!isEditorReady}
-                style={{ position: "absolute" }}
-            >
+            <button onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 <ToggleIcon />
             </button>
             <Editor

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabClasses } from "@library/sectioning/TabStyles";
-import { TextEditor } from "@library/textEditor/TextEditor";
 
 interface IDAta {
     label: string;
@@ -9,7 +8,7 @@ interface IDAta {
 }
 interface IProps {
     data: IDAta[];
-    editor: "";
+    children: React.ReactNode;
 }
 
 export function DataTabs(props: IProps) {
@@ -22,24 +21,23 @@ export function DataTabs(props: IProps) {
                 setActiveTab(index);
             }}
         >
-            <TabList>
+            <TabList className={classes.tabList}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     const style = {
-                        color: isActive ? "grey" : "black",
+                        background: isActive ? "#fff" : "#f5f6f7",
                     };
                     return (
-                        <Tab className={classes.tab} key={index}>
-                            <div style={style}>{tab.label}</div>
+                        <Tab key={index} style={style} className={classes.tab}>
+                            {" "}
+                            <div>{tab.label}</div>
                         </Tab>
                     );
                 })}
             </TabList>
             <TabPanels>
                 {data.map((tab, index) => (
-                    <TabPanel className={classes.tab} key={index}>
-                        <TextEditor />
-                    </TabPanel>
+                    <TabPanel key={index}>{props.children}</TabPanel>
                 ))}
             </TabPanels>
         </Tabs>

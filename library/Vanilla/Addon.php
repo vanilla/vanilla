@@ -166,7 +166,7 @@ class Addon implements Contracts\AddonInterface {
                     }
                 }
             }
-
+            
             return $info;
         }
 

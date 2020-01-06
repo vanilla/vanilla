@@ -69,7 +69,6 @@ export default function PanelLayout(props: IProps) {
     const sidePanelMeasure = useMeasure(panelRef);
     const overflowOffset = sidePanelMeasure.top - topOffset;
 
-    console.log("render panel", overflowOffset, sidePanelMeasure);
     const panelOffsetClass = useMemo(() => style({ top: overflowOffset }), [overflowOffset]);
 
     // Calculate some rendering variables.

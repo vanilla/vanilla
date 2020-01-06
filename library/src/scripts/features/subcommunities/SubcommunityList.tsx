@@ -5,7 +5,10 @@
  */
 
 import React from "react";
-import { subcommunityListClasses } from "@library/features/subcommunities/subcommunityListStyles";
+import {
+    subcommunityListClasses,
+    subcommunityListVariables,
+} from "@library/features/subcommunities/subcommunityListStyles";
 import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 import SubcommunityTile from "@library/features/subcommunities/SubcommunityTile";
 import Paragraph from "@library/layout/Paragraph";
@@ -26,6 +29,13 @@ interface IProps {
     hiddenTitle?: boolean;
     emptyMessage: string;
     fallbackIcon?: React.ReactNode;
+    alignment?: SubcommunityListAlignment;
+    columns?: number;
+}
+
+export enum SubcommunityListAlignment {
+    LEFT = "left",
+    CENTER = "center",
 }
 
 /**
@@ -33,7 +43,8 @@ interface IProps {
  */
 export default class SubcommunityList extends React.Component<IProps> {
     public render() {
-        const { className, items } = this.props;
+        const vars = subcommunityListVariables();
+        const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
         const classes = subcommunityListClasses();
 
         if (items.length === 0) {
@@ -44,16 +55,17 @@ export default class SubcommunityList extends React.Component<IProps> {
             );
         } else {
             return (
-                <div className={classNames("subcommunityList", className, classes.root)}>
-                    <ul className={classNames("subcommunityList-items", classes.items)}>
+                <div className={classNames("subcommunityList", className, classes.root(columns))}>
+                    <ul className={classNames("subcommunityList-items", classes.items(alignment))}>
                         {items.map((subcommunity, i) => (
-                            <li key={i} className={classNames("subcommunityList-item", classes.item)}>
+                            <li key={i} className={classNames("subcommunityList-item", classes.item(columns))}>
                                 <SubcommunityTile
                                     icon={subcommunity.icon}
                                     fallbackIcon={this.props.fallbackIcon}
                                     title={subcommunity.name}
                                     description={subcommunity.description}
                                     url={subcommunity.url}
+                                    columns={columns}
                                 />
                             </li>
                         ))}

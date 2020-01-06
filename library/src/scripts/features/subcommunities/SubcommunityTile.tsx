@@ -19,6 +19,7 @@ interface IProps {
     className?: string;
     headingLevel?: 2 | 3 | 4 | 5 | 6;
     fallbackIcon?: React.ReactNode;
+    columns?: number;
 }
 
 /**

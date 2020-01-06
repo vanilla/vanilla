@@ -14,6 +14,7 @@ use Vanilla\AddonManager;
 use Garden\Container\Reference;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -121,6 +122,22 @@ class ThemesTest extends AbstractAPIv2Test {
         foreach ($expectedAssets as $asset) {
             $this->assertArrayHasKey($asset, $body["assets"], "Theme does not have expected asset: {$asset}");
         }
+    }
+
+    /**
+     * Test POSTing a theme new name. Should fail since there is no dynamic theme provider.
+     */
+    public function testPostTheme() {
+        $this->expectException(ClientException::class);
+        $response = $this->api()->post("themes", ['name'=>'custom theme']);
+    }
+
+    /**
+     * Test PATCHing a theme. Should fail since there is no dynamic theme provider.
+     */
+    public function testPatchTheme() {
+        $this->expectException(ClientException::class);
+        $response = $this->api()->post("themes", ['name'=>'custom theme']);
     }
 
     /**

@@ -14,6 +14,7 @@ use Vanilla\Theme\StyleAsset;
 //use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
+use Vanilla\Models\ThemeModel;
 
 /**
  * ThemesApiController schemes.
@@ -57,7 +58,7 @@ trait ThemesApiSchemes {
         );
         return $schema;
     }
-    
+
     /**
      * Get 'assets' schema
      *
@@ -90,6 +91,64 @@ trait ThemesApiSchemes {
                 'name:s' => [
                     'description' => 'Custom theme name.',
                 ],
+                'parentTheme:s' => [
+                    'description' => 'Parent theme template name.',
+                ],
+                'parentVersion:s' => [
+                   'description' => 'Parent theme template version/revision.',
+                ],
+                'assets?' => Schema::parse([
+                    "header:s?",
+                    "footer:s?",
+                    "variables:s?",
+                    "fonts:s?",
+                    "scripts:s?",
+                    "styles:s?",
+                    "javascript:s?"
+                ])
+                    ->addValidator('header', [ThemeModel::class, 'validator'])
+                    ->addValidator('footer', [ThemeModel::class, 'validator'])
+                    ->addValidator('variables', [ThemeModel::class, 'validator'])
+                    ->addValidator('fonts', [ThemeModel::class, 'validator'])
+                    ->addValidator('scripts', [ThemeModel::class, 'validator'])
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    /**
+     * PATCH theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themePatchSchema(string $type = 'in'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'name:s?' => [
+                    'description' => 'Custom theme name.',
+                ],
+                'parentTheme:s?' => [
+                    'description' => 'Parent theme template name.',
+                ],
+                'parentVersion:s?' => [
+                    'description' => 'Parent theme template version/revision.',
+                ],
+                'assets?' => Schema::parse([
+                    "header:s?",
+                    "footer:s?",
+                    "variables:s?",
+                    "fonts:s?",
+                    "scripts:s?",
+                    "styles:s?",
+                    "javascript:s?"
+                ])
+                    ->addValidator('header', [ThemeModel::class, 'validator'])
+                    ->addValidator('footer', [ThemeModel::class, 'validator'])
+                    ->addValidator('variables', [ThemeModel::class, 'validator'])
+                    ->addValidator('fonts', [ThemeModel::class, 'validator'])
+                    ->addValidator('scripts', [ThemeModel::class, 'validator'])
             ]),
             $type
         );

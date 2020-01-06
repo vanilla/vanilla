@@ -44,6 +44,16 @@ class JsonAsset extends Asset {
      * @return string
      */
     public function getData(): string {
-        return $this->data;
+
+        return json_encode($this->data, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Get the get data as an Array.
+     *
+     * @return array
+     */
+    public function getDataArray(): array {
+        return json_decode(json_encode($this->data, JSON_UNESCAPED_UNICODE), true);
     }
 }

@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+
+if (Gdn::themeFeatures()->useProfileHeader()) {
+    echo $this->fetchView("user-header");
+}
 ?>
 <div class="User" itemscope itemtype="http://schema.org/Person">
     <h1 class="H"><?php

@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
 use Vanilla\Addon;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 
@@ -59,6 +60,9 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var string|null */
     private $shareImage;
+
+    /** @var string|null */
+    private $bannerImage;
 
     /** @var array */
     private $featureFlags;
@@ -144,6 +148,8 @@ class SiteMeta implements \JsonSerializable {
             $this->shareImage = \Gdn_Upload::url($shareImage);
         }
 
+        $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
+
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
 
@@ -177,6 +183,7 @@ class SiteMeta implements \JsonSerializable {
                 'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'shareImage' => $this->shareImage,
+                'bannerImage' => $this->bannerImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [

@@ -26,7 +26,7 @@ const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar", module);
+const story = storiesOf("Headers", module);
 
 const makeMockRegisterUser: IMe = {
     name: "Neena",
@@ -39,7 +39,7 @@ const makeMockRegisterUser: IMe = {
 };
 
 story.add(
-    "RegisteredUser",
+    "TitleBar Registered User",
     () => {
         const initialState = testStoreState({
             users: {

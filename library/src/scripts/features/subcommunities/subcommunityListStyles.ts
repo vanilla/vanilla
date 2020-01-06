@@ -44,7 +44,7 @@ export const subcommunityListClasses = useThemeCache(() => {
     const style = styleFactory("subcommunityList");
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = (columns: number) => {
+    const root = (columns?: number) => {
         let columnCount = columns ?? vars.options.columns;
         let maxWidth = vars.sizing.containerWidthTwoColumns;
         let itemPadding = vars.spacing.paddingTwoColumns;
@@ -90,14 +90,14 @@ export const subcommunityListClasses = useThemeCache(() => {
         );
     };
 
-    const item = (columns: number) => {
+    const item = (columns?: number) => {
         const isTwoColumns = (columns ?? vars.options.columns) === 2;
         const globalVars = globalVariables();
 
         let columnCount = columns ?? vars.options.columns;
         let width: CSSPercentage = "50%";
         let additionnalMediaQueries = [] as NestedCSSProperties[];
-        let padding = vars.options.
+        let padding = vars.spacing.paddingTwoColumns;
         switch (columnCount) {
             case 3:
                 width = globalVars.utility["percentage.third"];
@@ -106,6 +106,7 @@ export const subcommunityListClasses = useThemeCache(() => {
                         width: percent(50),
                     }),
                 );
+                padding = vars.spacing.paddingThreeColumns;
                 break;
             case 4:
                 width = "25%";
@@ -114,6 +115,7 @@ export const subcommunityListClasses = useThemeCache(() => {
                         width: percent(50),
                     }),
                 );
+                padding = vars.spacing.paddingFourColumns;
                 break;
         }
 

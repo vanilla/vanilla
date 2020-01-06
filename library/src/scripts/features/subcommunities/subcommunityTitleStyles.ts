@@ -17,10 +17,9 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { TLength } from "typestyle/lib/types";
-import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent } from "csx";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
-import { style } from "typestyle";
 
 export const subcommunityTileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -29,6 +28,7 @@ export const subcommunityTileVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         twoColumns: 24,
         threeColumns: 18,
+        fourColumns: 18,
         color: globalVars.mainColors.primary as ColorHelper,
     });
 
@@ -84,8 +84,19 @@ export const subcommunityTileClasses = useThemeCache(() => {
     const style = styleFactory("subcommunityTile");
     const shadow = shadowHelper();
 
-    const root = (columns: number) => {
-        style({
+    const root = (columns?: number) => {
+        let padding = vars.spacing.twoColumns;
+
+        switch (columns) {
+            case 3:
+                padding = vars.spacing.threeColumns;
+                break;
+            case 4:
+                padding = vars.spacing.fourColumns;
+                break;
+        }
+
+        return style({
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",

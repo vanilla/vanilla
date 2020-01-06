@@ -30,12 +30,12 @@ export default class SubcommunityTile extends React.Component<IProps> {
         headingLevel: 3,
     };
     public render() {
-        const { icon, title, description, url, className, iconAltText, headingLevel } = this.props;
+        const { icon, title, description, url, className, iconAltText, headingLevel, columns } = this.props;
         const H = `h${headingLevel}` as "h1";
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
         const classes = subcommunityTileClasses();
         return (
-            <div className={classNames("subcommunityTile", className, classes.root)}>
+            <div className={classNames(className, classes.root(columns))}>
                 <SmartLink className={classNames("subcommunityTile-link", classes.link)} to={url}>
                     <div className={classNames("subcommunityTile-iconFrame", classes.frame)}>
                         {icon && (

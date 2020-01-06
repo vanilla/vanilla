@@ -21,12 +21,11 @@ export default function TextEditor(props: ITextEditorProps) {
     }
 
     return (
-        <div style={{ position: "relative" }}>
+        <div className={classes.root(intialTheme)}>
             <button onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 <ToggleIcon />
             </button>
             <Editor
-                height={"90vh"} // By default, it fully fits with its parent
                 theme={intialTheme}
                 language={language}
                 editorDidMount={handleEditorDidMount}

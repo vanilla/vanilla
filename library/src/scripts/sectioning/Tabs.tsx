@@ -18,6 +18,7 @@ export function DataTabs(props: IProps) {
 
     return (
         <Tabs
+            className={classes.root}
             onChange={index => {
                 setActiveTab(index);
             }}
@@ -35,9 +36,13 @@ export function DataTabs(props: IProps) {
                     );
                 })}
             </TabList>
-            <TabPanels>
+            <TabPanels className={classes.tabPanels}>
                 {data.map((tab, index) => {
-                    return <TabPanel key={index}>{data[index].contents}</TabPanel>;
+                    return (
+                        <TabPanel className={classes.panel} key={index}>
+                            {data[index].contents}
+                        </TabPanel>
+                    );
                 })}
             </TabPanels>
         </Tabs>

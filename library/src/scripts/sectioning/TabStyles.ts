@@ -9,7 +9,7 @@ import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } fro
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent } from "csx";
+import { percent, viewHeight } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -53,7 +53,10 @@ export const tabClasses = useThemeCache(() => {
     const formElementVariables = formElementsVariables();
 
     const root = style({
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "stretch",
+        height: viewHeight(90),
     });
 
     const tabsHandles = style("tabsHandles", {
@@ -101,7 +104,17 @@ export const tabClasses = useThemeCache(() => {
         }),
     );
 
-    const panels = style;
+    const tabPanels = style("tab", {
+        flexGrow: 1,
+        height: percent(100),
+        flexDirection: "column",
+    });
+
+    const panel = style("panel", {
+        flexGrow: 1,
+        height: percent(100),
+        flexDirection: "column",
+    });
 
     const isActive = style("isActive", {
         backgroundColor: colorOut(vars.colors.selected.bg),
@@ -112,6 +125,8 @@ export const tabClasses = useThemeCache(() => {
         tabsHandles,
         tabList,
         tab,
+        tabPanels,
+        panel,
         isActive,
     };
 });

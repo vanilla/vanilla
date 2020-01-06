@@ -516,9 +516,7 @@ paths:
                     description: The ID of the discussion.
                     type: integer
                   format:
-                    description: The original format of the discussion
-                    minLength: 1
-                    type: string
+                    $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
                   insertUser:
                     $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
                   name:
@@ -990,9 +988,7 @@ components:
           description: The ID of the discussion.
           type: integer
         format:
-          description: The input format of the discussion.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         groupID:
           x-addon: groups
           description: The group the discussion is in.
@@ -1042,9 +1038,7 @@ components:
           description: Whether the discussion is closed or open.
           type: boolean
         format:
-          description: The input format of the discussion.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         groupID:
           x-addon: groups
           description: The group the discussion is in.

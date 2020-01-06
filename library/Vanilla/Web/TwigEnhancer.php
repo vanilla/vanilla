@@ -119,6 +119,8 @@ class TwigEnhancer {
      */
     public function enhanceFileSystem(FilesystemLoader $loader) {
         $addons = $this->addonProvider->getEnabled();
+        $loader->addPath(PATH_ROOT . '/resources/views', 'resources');
+
         foreach ($addons as $addon) {
             $viewDirectory = PATH_ROOT . $addon->getSubdir() . '/views';
             if (file_exists($viewDirectory)) {
@@ -166,6 +168,30 @@ class TwigEnhancer {
     }
 
     /**
+     * Render a module with some parameters.
+     *
+     * @param string $moduleName The name of the module.
+     * @param array $moduleParams The parameters to pass to the module.
+     *
+     * @return \Twig\Markup
+     */
+    public function renderModule(string $moduleName, array $moduleParams = []): \Twig\Markup {
+        return new \Twig\Markup(\Gdn_Theme::module($moduleName, $moduleParams), 'utf-8');
+    }
+
+    /**
+     * Render a module with some parameters.
+     *
+     * @param string $assetName The name of the asset.
+     *
+     * @return \Twig\Markup
+     */
+    public function renderControllerAsset(string $assetName): \Twig\Markup {
+        $controller = Gdn::controller();
+        return $controller->renderAssetForTwig($assetName);
+    }
+
+    /**
      * Get a config key. The result will then be cached for the instance of the twig enhancer.
      *
      * @param string $key Config key.
@@ -210,6 +236,19 @@ class TwigEnhancer {
     }
 
     /**
+     * Render out breadcrumbs from the controller.
+     *
+     * @param array $options
+     *
+     * @return \Twig\Markup
+     */
+    public function renderBreadcrumbs(array $options = []): \Twig\Markup {
+        $breadcrumbs = Gdn::controller()->data('Breadcrumbs', []);
+        $html = \Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $options, true), $options);
+        return new \Twig\Markup($html, 'utf-8');
+    }
+
+    /**
      * Return a mapping of twig function name -> callable.
      */
     private function getFunctionMappings(): array {
@@ -226,6 +265,9 @@ class TwigEnhancer {
             'classNames' => [HtmlUtils::class, 'classNames'],
 
             // Application interaction.
+            'renderControllerAsset' => [$this, 'renderControllerAsset'],
+            'renderModule' => [$this, 'renderModule'],
+            'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',

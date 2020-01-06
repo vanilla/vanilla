@@ -1154,7 +1154,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             'name' => 'unknown',
             'email' => 'unknown@example.com',
             'photoUrl' => self::getDefaultAvatarUrl(),
-            'dateLastActive' => time(0),
+            'dateLastActive' => time(),
         ];
         switch ($key) {
             case self::GENERATED_FRAGMENT_KEY_GUEST:

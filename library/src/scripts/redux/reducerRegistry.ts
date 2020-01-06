@@ -15,11 +15,17 @@ import getStore from "@library/redux/getStore";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import ConversationsModel from "@library/features/conversations/ConversationsModel";
 
-const dynamicReducers = {};
+let dynamicReducers = {};
 
 export function registerReducer(name: string, reducer: Reducer) {
     dynamicReducers[name] = reducer;
-    getStore().replaceReducer(combineReducers(getReducers()));
+    const store = getStore();
+    store.replaceReducer(combineReducers(getReducers()));
+
+    const initialActions = window.__ACTIONS__ || [];
+
+    // Re-apply initial actions.
+    initialActions.forEach(store.dispatch);
 }
 
 export interface ICoreStoreState extends IUsersStoreState {
@@ -37,6 +43,10 @@ export function getReducers(): ReducersMapObject<any, any> {
         conversations: new ConversationsModel().reducer,
         ...dynamicReducers,
     };
+}
+
+export function resetReducers() {
+    dynamicReducers = {};
 }
 
 /**

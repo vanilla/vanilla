@@ -59,6 +59,20 @@ class WebpackAssetTest extends TestCase {
     }
 
     /**
+     * Test our static property.
+     */
+    public function testStatic() {
+        $asset = new WebpackAsset(
+            new Request(),
+            ".min.js",
+            "test",
+            "asset"
+        );
+
+        $this->assertTrue($asset->isStatic());
+    }
+
+    /**
      * Test that web patches are properly generated.
      *
      * @param Request $req

@@ -968,7 +968,9 @@ class Gdn_Format {
         foreach ($parts as $i => $str) {
             // Text before the mention.
             if ($i == 0) {
-                $str[$i] = htmlspecialchars($str);
+                if (!empty($str)) {
+                    $str[0] = htmlspecialchars($str);
+                }
                 continue;
             }
 

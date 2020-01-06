@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Theme\TwigAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -33,7 +34,7 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'current:b?',
-                'assets?' => $this->assetsSchema()
+                'assets?' => $this->assetsSchema(),
             ]),
             $type
         );
@@ -41,14 +42,31 @@ trait ThemesApiSchemes {
     }
 
     /**
+     * Result theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themesResultSchema(string $type = 'out'): Schema {
+        $schema = $this->themeResultSchema()->merge(
+            Schema::parse(
+                [
+                    'preview?' => [":a" => $this->assetsPreviewSchema()]
+                ]
+            )
+        );
+        return $schema;
+    }
+    
+    /**
      * Get 'assets' schema
      *
      * @return Schema
      */
     private function assetsSchema(): Schema {
         $schema = Schema::parse([
-            "header?" => new InstanceValidatorSchema(HtmlAsset::class),
-            "footer?" => new InstanceValidatorSchema(HtmlAsset::class),
+            "header?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
+            "footer?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
             "variables?" => new InstanceValidatorSchema(JsonAsset::class),
             "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
             "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
@@ -105,6 +123,23 @@ trait ThemesApiSchemes {
         $schema = Schema::parse([
             "data:s",
         ])->setID('themeAssetsPutSchema');
+        return $schema;
+    }
+
+    /**
+     * PUT 'assets' schema
+     *
+     * @return Schema
+     */
+    private function assetsPreviewSchema(): Schema {
+        $schema = Schema::parse([
+            "global.mainColors.primary:s?",
+            "global.mainColors.bg:s?",
+            "global.mainColors.fg:s?",
+            "titleBar.colors.bg:s?",
+            "titleBar.colors.fg:s?",
+            "splash.outerBackground.image:s?",
+        ])->setID('themeAssetsPreviewSchema');
         return $schema;
     }
 }

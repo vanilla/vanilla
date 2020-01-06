@@ -9,6 +9,9 @@ namespace Vanilla\Models;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
+use Vanilla\Theme\Asset;
+use Vanilla\Theme\HtmlAsset;
+use Vanilla\Theme\TwigAsset;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\Asset\ThemeScriptAsset;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -165,7 +168,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['header'] ?? '');
+
+        return $this->renderAsset($themeData['assets']['footer'] ?? null);
     }
 
     /**
@@ -178,6 +182,25 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['footer'] ?? '');
+        return $this->renderAsset($themeData['assets']['header'] ?? null);
+    }
+
+
+    /**
+     * Render a theme asset for the header or footer.
+     *
+     * @param Asset|null $themeAsset
+     *
+     * @return string
+     */
+    private function renderAsset(?Asset $themeAsset): string {
+        $styles = $this->getThemeInlineCss();
+        if ($themeAsset instanceof HtmlAsset) {
+            return $styles . $themeAsset->getData();
+        } elseif ($themeAsset instanceof TwigAsset) {
+            return $styles . $themeAsset->renderHtml([]);
+        } else {
+            return '';
+        }
     }
 }

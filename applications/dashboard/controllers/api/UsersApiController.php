@@ -193,7 +193,7 @@ class UsersApiController extends AbstractApiController {
      * @param int $id The ID of the user.
      * @param array $query The request query.
      * @throws NotFoundException if the user could not be found.
-     * @return array
+     * @return Data
      */
     public function get($id, array $query) {
         $this->permission([
@@ -214,6 +214,7 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -222,7 +223,7 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @throws NotFoundException if the user could not be found.
-     * @return array
+     * @return Data
      */
     public function get_edit($id) {
         $this->permission('Garden.Users.Edit');
@@ -233,6 +234,7 @@ class UsersApiController extends AbstractApiController {
         $row = $this->userByID($id);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -499,7 +501,7 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
 
     }
 
@@ -544,7 +546,7 @@ class UsersApiController extends AbstractApiController {
      * @param int $id The ID of the user.
      * @param array $body The request body.
      * @throws NotFoundException if unable to find the user.
-     * @return array
+     * @return Data
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Edit');
@@ -568,6 +570,7 @@ class UsersApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -603,7 +606,8 @@ class UsersApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        $result = new Data($result, ['api-allow' => ['email']]);
+        return $result;
     }
 
     /**
@@ -715,7 +719,7 @@ class UsersApiController extends AbstractApiController {
             $result = $out->validate($row);
             $result = new Data($result, 201);
         }
-
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -772,7 +776,7 @@ class UsersApiController extends AbstractApiController {
      * @throws ClientException if email has been confirmed.
      * @throws Exception if confirmationCode doesn't match.
      * @throws NotFoundException if unable to find the user.
-     * @return array the response body.
+     * @return Data
      */
     public function post_confirmEmail($id, array $body) {
         $this->permission(\Vanilla\Permissions::BAN_CSRF);
@@ -793,6 +797,7 @@ class UsersApiController extends AbstractApiController {
         $this->validateModel($this->userModel);
 
         $result = $out->validate($this->userByID($id));
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -891,7 +896,7 @@ class UsersApiController extends AbstractApiController {
 
         if ($schema === null) {
             $schema = $this->schema(Schema::parse([
-                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?', 'password?',
                 'roleID?' => [
                     'type' => 'array',
                     'items' => ['type' => 'integer'],

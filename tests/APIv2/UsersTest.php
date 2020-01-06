@@ -114,6 +114,10 @@ class UsersTest extends AbstractResourceTest {
                 case 'emailConfirmed':
                 case 'bypassSpam':
                     $value = !$value;
+                    break;
+                case 'password':
+                    $value = md5(microtime());
+                    break;
             }
             $row[$key] = $value;
         }
@@ -546,7 +550,7 @@ class UsersTest extends AbstractResourceTest {
      */
     private function verifyRegistration(array $fields) {
         $registration = $this->api()->post('/users/register', $fields)->getBody();
-
+        $registration = $registration->getData();
         $user = $this->runWithAdminUser(function () use ($registration) {
             return $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
         });

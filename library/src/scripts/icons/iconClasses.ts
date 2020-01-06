@@ -44,7 +44,6 @@ export const iconVariables = useThemeCache(() => {
     const warning = themeVars("warning", {
         width: 16,
         height: 16,
-        color: "#f5af15",
     });
 
     const settings = themeVars("settings", {
@@ -205,7 +204,6 @@ export const iconClasses = useThemeCache(() => {
     const warning = style("warning", {
         width: unit(vars.warning.width),
         height: unit(vars.warning.height),
-        color: colorOut(vars.warning.color),
     });
 
     const search = style("search", {
@@ -304,20 +302,9 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
-    const alertIcon = style("alertIcon", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
-    });
-
     const globeIcon = style("globeIcon", {
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
-    });
-
-    const alertIconCompact = style("alertIconCompact", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
-        margin: unit(-globalVars.buttonIcon.offset),
     });
 
     const hamburger = style("alertIconCompact", {
@@ -325,10 +312,15 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
+    const errorFgColor = style("errorFgColor", {
+        color: colorOut(globalVars.messageColors.error.fg),
+    });
+
     return {
         standard,
         newFolder,
         warning,
+        errorFgColor,
         fileType,
         attachmentError,
         vanillaLogo,
@@ -351,8 +343,6 @@ export const iconClasses = useThemeCache(() => {
         deleteIcon,
         editIcon,
         discussionIcon,
-        alertIcon,
-        alertIconCompact,
         globeIcon,
         isSmall,
         hamburger,

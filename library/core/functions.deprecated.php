@@ -917,6 +917,23 @@ if (!function_exists('viewLocation')) {
     }
 }
 
+if (!function_exists('TagFullName')) {
+    /**
+     * Return the full name of a tag row.
+     *
+     * @param array|object $row
+     * @return mixed
+     * @deprecated
+     */
+    function tagFullName($row) {
+        $result = val('FullName', $row);
+        if (!$result) {
+            $result = val('Name', $row);
+        }
+        return $result;
+    }
+}
+
 if (!function_exists('\Gdn::config()->touch')) {
     /**
      * Make sure the config has a setting.

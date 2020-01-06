@@ -166,11 +166,12 @@ export const themeCardClasses = useThemeCache(() => {
     const overlay = style("overlay", {
         position: "absolute",
         top: 0,
+        left: 0,
         backgroundColor: "rgba(103, 105, 109, 0.8)",
         opacity: 0,
     });
     const wrapper = style("wrapper", {
-        ...defaultTransition("transform"),
+        ...defaultTransition("opacity"),
     });
 
     const container = style("container", {

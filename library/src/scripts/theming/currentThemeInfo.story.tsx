@@ -25,7 +25,7 @@ story.add("Current Theme", () => {
                     globalFg={"#555a62"}
                     titleBarBg={"#0291db"}
                     titleBarFg={"#fff"}
-                    isActiveTheme={false}
+                    isActiveTheme={true}
                 />
                 <CurrentThemeInfo
                     name={"Keystone"}

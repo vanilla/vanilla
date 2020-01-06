@@ -27,7 +27,7 @@ export default function TextEditor(props: ITextEditorProps) {
             </button>
             <Editor
                 height={"90vh"} // By default, it fully fits with its parent
-                theme={"dark"} // By default, it fully fits with its parent
+                theme={intialTheme}
                 language={language}
                 editorDidMount={handleEditorDidMount}
                 options={{ lineNumbers: "on" }}

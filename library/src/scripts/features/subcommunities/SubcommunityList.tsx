@@ -9,6 +9,7 @@ import {
     subcommunityListClasses,
     subcommunityListVariables,
 } from "@library/features/subcommunities/subcommunityListStyles";
+
 import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 import SubcommunityTile from "@library/features/subcommunities/SubcommunityTile";
 import Paragraph from "@library/layout/Paragraph";
@@ -49,16 +50,16 @@ export default class SubcommunityList extends React.Component<IProps> {
 
         if (items.length === 0) {
             return (
-                <div className={classNames("subcommunityList", className, "isEmpty", classes.root)}>
+                <div className={classNames("subcommunityList", className, "isEmpty", classes.root(columns))}>
                     <Paragraph className="subcommunityList-emptyMessage">{this.props.emptyMessage}</Paragraph>
                 </div>
             );
         } else {
             return (
-                <div className={classNames("subcommunityList", className, classes.root(columns))}>
-                    <ul className={classNames("subcommunityList-items", classes.items(alignment))}>
+                <div className={classNames(className, classes.root(columns))}>
+                    <ul className={classNames(classes.items(alignment))}>
                         {items.map((subcommunity, i) => (
-                            <li key={i} className={classNames("subcommunityList-item", classes.item(columns))}>
+                            <li key={i} className={classNames(classes.item(columns))}>
                                 <SubcommunityTile
                                     icon={subcommunity.icon}
                                     fallbackIcon={this.props.fallbackIcon}

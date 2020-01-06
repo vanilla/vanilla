@@ -3,19 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
-import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
-import { DashboardCheckGroup, DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
-import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import SubcommunityList, { SubcommunityListAlignment } from "@library/features/subcommunities/SubcommunityList";
 
-const formsStory = storiesOf("Home Page", module).addDecorator(dashboardCssDecorator);
+const formsStory = storiesOf("Home Page", module);
 
 formsStory.add("Subcommunity List", () =>
     (() => {

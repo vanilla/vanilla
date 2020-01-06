@@ -11,7 +11,7 @@ import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts 
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
-    console.log("body css", globalVars);
+
     cssRule("html", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
     });

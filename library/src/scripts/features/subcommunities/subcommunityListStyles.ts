@@ -10,16 +10,21 @@ import { percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { SubcommunityListAlignment } from "@library/features/subcommunities/SubcommunityList";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { CSSPercentage } from "csx/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");
     const spacing = themeVars("spacing", {
-        padding: 24,
+        paddingTwoColumns: 24,
+        paddingThreeColumns: 17,
+        paddingFourColumns: 17,
     });
 
     const sizing = themeVars("sizing", {
-        containerWidthTwoColumns: 912,
-        containerWidthThreeColumns: 912,
+        containerWidthTwoColumns: spacing.paddingTwoColumns * 6 + 384 * 2,
+        containerWidthThreeColumns: spacing.paddingThreeColumns * 8 + 260 * 3,
+        containerWidthFourColumns: spacing.paddingThreeColumns * 10 + 260 * 4,
     });
 
     const options = themeVars("options", {
@@ -40,13 +45,24 @@ export const subcommunityListClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
 
     const root = (columns: number) => {
-        const isTwoColumns = columns ?? vars.options.columns === 2;
+        let columnCount = columns ?? vars.options.columns;
+        let maxWidth = vars.sizing.containerWidthTwoColumns;
+        let itemPadding = vars.spacing.paddingTwoColumns;
+        switch (columnCount) {
+            case 3:
+                maxWidth = vars.sizing.containerWidthThreeColumns;
+                itemPadding = vars.spacing.paddingThreeColumns;
+                break;
+            case 4:
+                maxWidth = vars.sizing.containerWidthFourColumns;
+                itemPadding = vars.spacing.paddingFourColumns;
+                break;
+        }
+
         return style(
             {
-                maxWidth: unit(
-                    isTwoColumns ? vars.sizing.containerWidthTwoColumns : vars.sizing.containerWidthThreeColumns,
-                ),
-                padding: unit(vars.spacing.padding),
+                maxWidth: unit(maxWidth),
+                padding: unit(itemPadding),
                 margin: "auto",
                 width: percent(100),
             },
@@ -58,7 +74,7 @@ export const subcommunityListClasses = useThemeCache(() => {
 
     const items = (alignment: SubcommunityListAlignment) => {
         const vars = subcommunityListVariables();
-        const isCentered = alignment ?? vars.options.alignment === SubcommunityListAlignment.CENTER;
+        const isCentered = (alignment ?? vars.options.alignment) === SubcommunityListAlignment.CENTER;
         return style(
             "items",
             {
@@ -75,8 +91,32 @@ export const subcommunityListClasses = useThemeCache(() => {
     };
 
     const item = (columns: number) => {
-        const isTwoColumns = columns ?? vars.options.columns === 2;
+        const isTwoColumns = (columns ?? vars.options.columns) === 2;
         const globalVars = globalVariables();
+
+        let columnCount = columns ?? vars.options.columns;
+        let width: CSSPercentage = "50%";
+        let additionnalMediaQueries = [] as NestedCSSProperties[];
+        let padding = vars.options.
+        switch (columnCount) {
+            case 3:
+                width = globalVars.utility["percentage.third"];
+                additionnalMediaQueries.push(
+                    mediaQueries.twoColumns({
+                        width: percent(50),
+                    }),
+                );
+                break;
+            case 4:
+                width = "25%";
+                additionnalMediaQueries.push(
+                    mediaQueries.twoColumns({
+                        width: percent(50),
+                    }),
+                );
+                break;
+        }
+
         return style(
             "item",
             {
@@ -85,8 +125,9 @@ export const subcommunityListClasses = useThemeCache(() => {
                 alignItems: "center",
                 justifyContent: "stretch",
                 width: isTwoColumns ? unit("50%") : globalVars.utility["percentage.third"],
+                padding: unit(padding),
             },
-
+            ...additionnalMediaQueries,
             mediaQueries.oneColumnDown({
                 display: "block",
                 width: percent(100),

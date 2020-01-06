@@ -17,45 +17,42 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { TLength } from "typestyle/lib/types";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent } from "csx";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
 import { style } from "typestyle";
 
 export const subcommunityTileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = componentThemeVariables("subcommunityTile");
+    const themeVars = variableFactory("subcommunityTile");
 
-    const spacing = {
-        default: 24 as PaddingProperty<TLength>,
+    const spacing = themeVars("spacing", {
+        twoColumns: 24,
+        threeColumns: 18,
         color: globalVars.mainColors.primary as ColorHelper,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const frame = {
+    const frame = themeVars("frame", {
         height: 90 as PaddingProperty<TLength>,
         width: 90 as PaddingProperty<TLength>,
         bottomMargin: 16 as MarginProperty<TLength>,
-        ...themeVars.subComponentStyles("frame"),
-    };
+    });
 
-    const title = {
+    const title = themeVars("title", {
         fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
         lineHeight: globalVars.lineHeights.condensed,
         marginBottom: 6,
-        ...themeVars.subComponentStyles("title"),
-    };
+    });
 
-    const description = {
+    const description = themeVars("description", {
         fontSize: globalVars.fonts.size.medium as FontSizeProperty<TLength>,
         marginTop: 6,
         lineHeight: globalVars.lineHeights.excerpt,
-        ...themeVars.subComponentStyles("description"),
-    };
+    });
 
-    const link = {
+    const link = themeVars("link", {
         padding: {
-            top: 38,
+            top: 36,
             bottom: 24,
             left: 24,
             right: 24,
@@ -63,44 +60,50 @@ export const subcommunityTileVariables = useThemeCache(() => {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         minHeight: 280,
-        ...themeVars.subComponentStyles("link"),
-    };
+    });
 
-    const fallBackIcon = {
+    const fallBackIcon = themeVars("fallBackIcon", {
         width: 90 as WidthProperty<TLength>,
         height: 90 as HeightProperty<TLength>,
         fg: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("fallBackIcon"),
-    };
+    });
 
-    return { spacing, frame, title, description, link, fallBackIcon };
+    return {
+        spacing,
+        frame,
+        title,
+        description,
+        link,
+        fallBackIcon,
+    };
 });
 
 export const subcommunityTileClasses = useThemeCache(() => {
     const vars = subcommunityTileVariables();
     const globalVars = globalVariables();
-    const debug = debugHelper("subcommunityTile");
+    const style = styleFactory("subcommunityTile");
     const shadow = shadowHelper();
 
-    const root = style({
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        width: percent(100),
-        padding: unit(vars.spacing.default),
-        ...userSelect(),
-        flexGrow: 1,
-        ...debug.name(),
-    });
+    const root = (columns: number) => {
+        style({
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+            width: percent(100),
+            padding: unit(columns === 2 ? vars.spacing.twoColumns : vars.spacing.threeColumns),
+            flexGrow: 1,
+            ...userSelect(),
+        });
+    };
 
-    const link = style({
+    const link = style("link", {
         ...defaultTransition("box-shadow", "border"),
         ...paddings(vars.link.padding),
         display: "block",
         position: "relative",
         cursor: "pointer",
         flexGrow: 1,
-        color: vars.link.fg.toString(),
+        color: colorOut(globalVars.mainColors.fg),
         backgroundColor: colorOut(vars.link.bg),
         borderRadius: unit(2),
         minHeight: unit(vars.link.minHeight),
@@ -111,8 +114,10 @@ export const subcommunityTileClasses = useThemeCache(() => {
             }),
             shadow.embed(),
         ),
+        textDecoration: "none",
         $nest: {
             "&:hover": {
+                textDecoration: "none",
                 ...shadowOrBorderBasedOnLightness(
                     globalVars.body.backgroundImage.color,
                     borders({
@@ -122,15 +127,13 @@ export const subcommunityTileClasses = useThemeCache(() => {
                 ),
             },
         },
-        ...debug.name("link"),
     });
 
-    const main = style({
+    const main = style("main", {
         position: "relative",
-        ...debug.name("main"),
     });
 
-    const frame = style({
+    const frame = style("iconFrame", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -141,10 +144,9 @@ export const subcommunityTileClasses = useThemeCache(() => {
         marginRight: "auto",
         marginLeft: "auto",
         marginBottom: unit(vars.frame.bottomMargin),
-        ...debug.name("iconFrame"),
     });
 
-    const icon = style({
+    const icon = style("icon", {
         display: "block",
         position: "absolute",
         top: 0,
@@ -155,33 +157,38 @@ export const subcommunityTileClasses = useThemeCache(() => {
         height: "auto",
         maxWidth: percent(100),
         maxHeight: percent(100),
-        ...debug.name("icon"),
     });
 
-    const title = style({
+    const title = style("title", {
         fontSize: unit(vars.title.fontSize),
         lineHeight: vars.title.lineHeight,
         textAlign: "center",
         marginBottom: unit(vars.title.marginBottom),
-        ...debug.name("title"),
     });
 
-    const description = style({
+    const description = style("description", {
         position: "relative",
         marginTop: unit(vars.description.marginTop),
         fontSize: unit(vars.description.fontSize),
         lineHeight: vars.description.lineHeight,
         textAlign: "center",
-        ...debug.name("description"),
     });
 
-    const fallBackIcon = style({
+    const fallBackIcon = style("fallbackIcon", {
         ...absolutePosition.middleOfParent(),
         width: unit(vars.fallBackIcon.width),
         height: unit(vars.fallBackIcon.height),
         color: vars.fallBackIcon.fg.toString(),
-        ...debug.name("fallbackicon"),
     });
 
-    return { root, link, frame, icon, main, title, description, fallBackIcon };
+    return {
+        root,
+        link,
+        frame,
+        icon,
+        main,
+        title,
+        description,
+        fallBackIcon,
+    };
 });

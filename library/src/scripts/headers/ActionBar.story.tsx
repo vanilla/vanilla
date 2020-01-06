@@ -22,7 +22,7 @@ story.add("ActionBar", () => {
             <StoryContent>
                 <StoryHeading> Default </StoryHeading>
                 <ActionBar />
-                <StoryHeading> Full </StoryHeading>
+                <StoryHeading>Full</StoryHeading>
                 <ActionBar
                     callToActionTitle={"Do Action"}
                     optionsMenu={

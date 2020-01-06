@@ -17,7 +17,9 @@ story.add("Tabs", () => {
     return (
         <StoryContent>
             <StoryHeading>Simple Tab List </StoryHeading>
-            <DataTabs data={tabData} />
+            <DataTabs data={tabData}>
+                <div></div>
+            </DataTabs>
         </StoryContent>
     );
 });

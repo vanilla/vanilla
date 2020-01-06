@@ -52,6 +52,10 @@ class Bootstrap {
      */
     public function __construct($baseUrl) {
         $this->baseUrl = str_replace('\\', '/', $baseUrl);
+        if (!defined('CLIENT_NAME')) {
+            define('CLIENT_NAME', 'vanilla');
+        }
+
     }
 
 

@@ -100,12 +100,13 @@ export const currentThemeClasses = useThemeCache(() => {
         borderRightColor: "transparent",
         borderWidth: unit(9),
         textTransform: "uppercase",
-        marginBottom: unit(vars.flag.margin.bottom - 15),
+        marginBottom: unit(vars.flag.margin.bottom - 2),
     });
 
     const name = style("name", {
         fontSize: unit(globalVars.fonts.size.large),
         color: globalVars.mainColors.fg.toString(),
+        marginBottom: unit(vars.flag.margin.bottom - 6),
         $nest: {
             ["& h5"]: {
                 fontWeight: globalVars.fonts.weights.semiBold,

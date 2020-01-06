@@ -3,18 +3,12 @@ import Editor from "@monaco-editor/react";
 import { ToggleIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
 
-interface IOptions {
-    lineNumbers: string;
-}
 export interface ITextEditorProps {
-    theme: string;
     language: string;
-    options: IOptions;
-    height: string;
 }
 export default function TextEditor(props: ITextEditorProps) {
-    const { theme, language, options, height } = props;
-    const [intialTheme, setTheme] = useState(theme);
+    const { language } = props;
+    const [intialTheme, setTheme] = useState("dark");
     const [isEditorReady, setIsEditorReady] = useState(false);
     const classes = textEditorClasses();
 
@@ -32,11 +26,11 @@ export default function TextEditor(props: ITextEditorProps) {
                 <ToggleIcon />
             </button>
             <Editor
-                height={height} // By default, it fully fits with its parent
-                theme={intialTheme}
+                height={"90vh"} // By default, it fully fits with its parent
+                theme={"dark"} // By default, it fully fits with its parent
                 language={language}
                 editorDidMount={handleEditorDidMount}
-                options={options}
+                options={{ lineNumbers: "on" }}
             />
         </div>
     );

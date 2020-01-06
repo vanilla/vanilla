@@ -21,13 +21,11 @@ export default class AddTheme extends React.Component<IProps> {
     public render() {
         const classes = currentThemeClasses();
         return (
-            <React.Fragment>
-                <SmartLink to={this.props.to}>
-                    <div className={classes.addTheme}>
-                        <PlusIcon />
-                    </div>
-                </SmartLink>
-            </React.Fragment>
+            <SmartLink to={this.props.to}>
+                <div className={classes.addTheme}>
+                    <PlusIcon />
+                </div>
+            </SmartLink>
         );
     }
 }

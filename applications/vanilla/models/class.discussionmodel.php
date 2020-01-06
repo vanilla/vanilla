@@ -26,7 +26,7 @@ class DiscussionModel extends Gdn_Model {
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
     /** @var string Closed by moderator attribute. */
-    const CLOSED_BY_AUTHOR = 'ClosedByAuthor';
+    const CLOSED_BY_AUTHOR = 'CloseUserID';
 
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';

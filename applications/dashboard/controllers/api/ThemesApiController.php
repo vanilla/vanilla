@@ -115,7 +115,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function patch(int $themeID, array $body): array {
         $this->permission("Garden.Settings.Manage");
-        $in = $this->themePostSchema('in');
+        $in = $this->themePatchSchema('in');
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 

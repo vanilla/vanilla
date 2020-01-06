@@ -46,22 +46,22 @@ export function AppContext(props: IProps) {
                 <SearchContextProvider>
                     <ContentTranslationProvider>
                         <LiveAnnouncer>
-                            <ThemeProvider
-                                disabled={props.noTheme}
-                                errorComponent={props.errorComponent || null}
-                                themeKey={getMeta("ui.themeKey", "keystone")}
-                                variablesOnly={props.variablesOnly}
-                            >
-                                <FontSizeCalculatorProvider>
-                                    <SearchFilterContextProvider>
-                                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                                <ThemeProvider
+                                    disabled={props.noTheme}
+                                    errorComponent={props.errorComponent || null}
+                                    themeKey={getMeta("ui.themeKey", "keystone")}
+                                    variablesOnly={props.variablesOnly}
+                                >
+                                    <FontSizeCalculatorProvider>
+                                        <SearchFilterContextProvider>
                                             <TitleBarDeviceProvider>
                                                 <DeviceProvider>{props.children}</DeviceProvider>
                                             </TitleBarDeviceProvider>
-                                        </ScrollOffsetProvider>
-                                    </SearchFilterContextProvider>
-                                </FontSizeCalculatorProvider>
-                            </ThemeProvider>
+                                        </SearchFilterContextProvider>
+                                    </FontSizeCalculatorProvider>
+                                </ThemeProvider>
+                            </ScrollOffsetProvider>
                         </LiveAnnouncer>
                     </ContentTranslationProvider>
                 </SearchContextProvider>

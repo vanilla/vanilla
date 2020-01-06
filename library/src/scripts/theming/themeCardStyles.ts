@@ -4,7 +4,7 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { unit, paddings } from "@library/styles/styleHelpers";
+import { unit, paddings, defaultTransition } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -170,7 +170,7 @@ export const themeCardClasses = useThemeCache(() => {
         opacity: 0,
     });
     const wrapper = style("wrapper", {
-        opacity: 1,
+        ...defaultTransition("transform"),
     });
 
     const container = style("container", {

@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabClasses } from "@library/sectioning/TabStyles";
 
-interface IDAta {
+interface IData {
     label: string;
     panelData: string;
+    contents: React.ReactNode;
 }
 interface IProps {
-    data: IDAta[];
-    children: React.ReactNode;
+    data: IData[];
 }
 
 export function DataTabs(props: IProps) {
     const { data } = props;
     const classes = tabClasses();
     const [activeTab, setActiveTab] = useState(0);
+
     return (
         <Tabs
             onChange={index => {
@@ -29,16 +30,15 @@ export function DataTabs(props: IProps) {
                     };
                     return (
                         <Tab key={index} style={style} className={classes.tab}>
-                            {" "}
                             <div>{tab.label}</div>
                         </Tab>
                     );
                 })}
             </TabList>
             <TabPanels>
-                {data.map((tab, index) => (
-                    <TabPanel key={index}>{props.children}</TabPanel>
-                ))}
+                {data.map((tab, index) => {
+                    return <TabPanel key={index}>{data[index].contents}</TabPanel>;
+                })}
             </TabPanels>
         </Tabs>
     );

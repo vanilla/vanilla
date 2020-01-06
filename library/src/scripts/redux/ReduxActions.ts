@@ -11,9 +11,6 @@ import { ThunkDispatch, ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AsyncActionCreators } from "typescript-fsa";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { useDispatch } from "react-redux";
-import { useMemo, useDebugValue } from "react";
-import apiv2 from "@library/apiv2";
 
 /**
  * Base class for creating redux actions.
@@ -206,20 +203,6 @@ export default class ReduxActions<S extends ICoreStoreState = ICoreStoreState> {
             return getState();
         });
     }
-}
-
-type ReduxActionConstructor<T extends ICoreStoreState, R extends ReduxActions<T>> = {
-    new (dispatch: any, api: AxiosInstance): R;
-};
-export function useReduxActions<T extends ICoreStoreState, R extends ReduxActions<T>>(
-    actionClass: ReduxActionConstructor<T, R>,
-): R {
-    const dispatch = useDispatch();
-    const actions = useMemo(() => {
-        return new actionClass(dispatch, apiv2);
-    }, [dispatch, actionClass]);
-    useDebugValue(actions);
-    return actions;
 }
 
 // Redux FSA

@@ -68,7 +68,7 @@ export function CollapsableContent(props: IProps) {
                 ref.current?.appendChild(node);
             });
         }
-    }, [domNodesToAttach]); // eslint-ignore-line
+    }, []); // eslint-ignore-line
 
     useLayoutEffect(() => {
         nextTick(() => {

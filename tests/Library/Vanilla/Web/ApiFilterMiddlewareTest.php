@@ -10,7 +10,6 @@ namespace VanillaTests\Library\Vanilla\Web;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use PHPUnit\Framework\TestCase;
-use ReflectionException;
 use Vanilla\Web\ApiFilterMiddleware;
 use VanillaTests\Fixtures\Request;
 
@@ -94,52 +93,5 @@ class ApiFilterMiddlewareTest extends TestCase {
             return new Data($testSuccessArray, ['request' => $request, 'api-allow' => ['InsertIPAddress']]);
         });
         $this->assertEquals($testSuccessArray, $response->getData());
-    }
-
-    /**
-     * Test getBlacklistFields().
-     */
-    public function testGetBlacklist() {
-        $apiMiddleware = new ApiFilterMiddleware();
-        $actual = $apiMiddleware->getBlacklistFields();
-        $expected = ['password', 'email', 'insertipaddress', 'updateipaddress'];
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * Set up function to call protected methods.
-     *
-     * @param object $testApiMiddleware Middleware object to test with.
-     * @param string $protectedMethod Protected method to test.
-     * @param array $testParameters Parameters to pass to $protectedMethod.
-     * @return mixed Returns the return value of the called function.
-     * @throws ReflectionException Throws exception.
-     */
-    public function invokeProtectedMethod(object &$testApiMiddleware, string $protectedMethod, array $testParameters) {
-        $reflectedApiMiddleware = new \ReflectionClass(get_class($testApiMiddleware));
-        $method = $reflectedApiMiddleware->getMethod($protectedMethod);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($testApiMiddleware, $testParameters);
-    }
-
-    /**
-     * Test addBlacklistField().
-     */
-    public function testAddBlacklistField() {
-        $apiMiddleware = new ApiFilterMiddleware();
-        $this->invokeProtectedMethod($apiMiddleware, 'addBlacklistField', ['topsecretinfo']);
-        $blacklistFields = $apiMiddleware->getBlacklistFields();
-        $this->assertContains('topsecretinfo', $blacklistFields);
-    }
-
-    /**
-     * Test removeBlacklistField().
-     */
-    public function testRemoveBlacklistField() {
-        $apiMiddleware = new ApiFilterMiddleware();
-        $this->invokeProtectedMethod($apiMiddleware, 'removeBlacklistField', ['email']);
-        $blacklistFields = $apiMiddleware->getBlacklistFields();
-        $this->assertNotContains('email', $blacklistFields);
     }
 }

@@ -195,9 +195,7 @@ if (!function_exists('arrayReplaceConfig')) {
         $result = array_replace($default, $override);
 
         foreach ($result as $key => &$value) {
-            if (is_array($value) && isset($default[$key]) && isset($override[$key]) &&
-                is_array($default[$key]) && !isset($value[0]) && !isset($default[$key][0])
-            ) {
+            if (is_array($value) && isset($default[$key]) && isset($override[$key]) && is_array($default[$key]) && !isset($value[0]) && !isset($default[$key][0])) {
                 $value = arrayReplaceConfig($default[$key], $override[$key]);
             }
         }
@@ -312,6 +310,7 @@ if (!function_exists('attribute')) {
 
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);
+
             }
 
             if ($val != '' && $attribute != 'Standard') {
@@ -1016,9 +1015,7 @@ if (!function_exists('htmlEntityDecode')) {
         $string = html_entity_decode($string, $quote_style, $charset);
         $string = str_ireplace('&apos;', "'", $string);
         $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
-        $string = preg_replace_callback('/&#([0-9]+);/', function ($matches) {
-            return chr_utf8($matches[1]);
-        }, $string);
+        $string = preg_replace_callback('/&#([0-9]+);/', function($matches) { return chr_utf8($matches[1]); }, $string);
         return $string;
     }
 
@@ -1511,16 +1508,12 @@ if (!function_exists('betterRandomString')) {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $randomChars = unpack('C*', openssl_random_pseudo_bytes($length, $cryptoStrong));
         } elseif (function_exists('mcrypt_create_iv')) {
-            // @codeCoverageIgnoreStart
             $randomChars = unpack('C*', mcrypt_create_iv($length));
             $cryptoStrong = true;
-            // @codeCoverageIgnoreEnd
         } else {
-            // @codeCoverageIgnoreStart
             for ($i = 0; $i < $length; $i++) {
                 $randomChars[] = mt_rand();
             }
-            // @codeCoverageIgnoreEnd
         }
 
         $string = '';
@@ -1530,9 +1523,7 @@ if (!function_exists('betterRandomString')) {
         }
 
         if (!$cryptoStrong) {
-            // @codeCoverageIgnoreStart
             Logger::log(Logger::WARNING, 'Random number generation is not cryptographically strong.');
-            // @codeCoverageIgnoreEnd
         }
 
         return $string;
@@ -1658,9 +1649,10 @@ if (!function_exists('safeGlob')) {
     /**
      * A version of {@link glob()} that always returns an array.
      *
-     * @param string $pattern The glob pattern.
-     * @param string[] $extensions An array of file extensions to whitelist.
-     * @return string[] Returns an array of paths that match the glob.
+     * @param string        $pattern    The glob pattern.
+     * @param array[string] $extensions An array of file extensions to whitelist.
+     *
+     * @return array[string] Returns an array of paths that match the glob.
      */
     function safeGlob($pattern, $extensions = []) {
         $result = glob($pattern, GLOB_NOSORT);
@@ -1738,13 +1730,12 @@ if (!function_exists('sliceParagraph')) {
      * The purpose of this function is to provide a string that is reasonably easy to consume by a human.
      *
      * @param string $string The string to slice.
-     * @param int|array $limits Either int $maxLength or array($maxLength, $minLength); whereas $maxLength The maximum length of the string;
-     * $minLength The intended minimum length of the string (slice on sentence if paragraph is too short).
+     * @param int|array $limits Either int $maxLength or array($maxLength, $minLength); whereas $maxLength The maximum length of the string; $minLength The intended minimum length of the string (slice on sentence if paragraph is too short).
      * @param string $suffix The suffix if the string must be sliced mid-sentence.
      * @return string
      */
     function sliceParagraph($string, $limits = 500, $suffix = '…') {
-        if (is_int($limits)) {
+        if(is_int($limits)) {
             $limits = [$limits, 32];
         }
         list($maxLength, $minLength) = $limits;
@@ -1810,10 +1801,8 @@ if (!function_exists('sliceString')) {
         if (function_exists('mb_strimwidth')) {
             return mb_strimwidth($string, 0, $length, $suffix, 'utf-8');
         } else {
-            // @codeCoverageIgnoreStart
             $trim = substr($string, 0, $length);
             return $trim.((strlen($trim) != strlen($string)) ? $suffix : '');
-            // @codeCoverageIgnoreEnd
         }
     }
 }
@@ -1909,9 +1898,8 @@ if (!function_exists('touchValue')) {
      * Set the value on an object/array if it doesn't already exist.
      *
      * @param string $key The key or property name of the value.
-     * @param mixed $collection The array or object to set.
+     * @param mixed &$collection The array or object to set.
      * @param mixed $default The value to set.
-     * @return mixed Returns the existing or new value in the collection.
      */
     function touchValue($key, &$collection, $default) {
         if (is_array($collection) && !array_key_exists($key, $collection)) {
@@ -2056,7 +2044,7 @@ if (!function_exists('walkAllRecursive')) {
         $currentDepth = 0;
         $maxDepth = 128;
 
-        $walker = function (&$input, $callback, $parent = null) use (&$walker, &$currentDepth, $maxDepth) {
+        $walker = function(&$input, $callback, $parent = null) use (&$walker, &$currentDepth, $maxDepth) {
             $currentDepth++;
 
             if ($currentDepth > $maxDepth) {
@@ -2085,7 +2073,7 @@ if (!function_exists('ipEncodeRecursive')) {
      * @return array|object
      */
     function ipEncodeRecursive($input) {
-        walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
             if (is_string($val)) {
                 if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true) || $key === 'IP') {
                     $val = ipEncode($val);
@@ -2104,7 +2092,7 @@ if (!function_exists('ipDecodeRecursive')) {
      * @return array|object
      */
     function ipDecodeRecursive($input) {
-        walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
             if (is_string($val)) {
                 if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true) || $key === 'IP') {
                     $val = ipDecode($val);
@@ -2112,5 +2100,21 @@ if (!function_exists('ipDecodeRecursive')) {
             }
         });
         return $input;
+    }
+}
+
+if (!function_exists('TagFullName')) {
+    /**
+     *
+     *
+     * @param $row
+     * @return mixed
+     */
+    function tagFullName($row) {
+        $result = val('FullName', $row);
+        if (!$result) {
+            $result = val('Name', $row);
+        }
+        return $result;
     }
 }

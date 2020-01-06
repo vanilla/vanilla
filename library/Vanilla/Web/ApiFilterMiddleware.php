@@ -77,13 +77,4 @@ class ApiFilterMiddleware {
             unset($this->blacklist[$key]);
         }
     }
-
-    /**
-     * Gets the array of blacklisted fields.
-     *
-     * @return array Returns an array of the blacklisted fields.
-     */
-    public function getBlacklistFields() {
-        return $this->blacklist;
-    }
 }

@@ -15,7 +15,23 @@ import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
 import 'storybook-chromatic';
 
+/**
+ * Utility for importing everything from a wepback require.context
+ * https://webpack.js.org/guides/dependency-management/#context-module-api
+ */
+function importAll(r) {
+    r.keys().forEach(r);
+}
+
 require('../../library/src/scripts/storybookConfig');
+
+function loadStories() {
+    const storyFiles = require.context(
+        '../..',
+        true,
+        /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
+    importAll(storyFiles);
+}
 
 addParameters({
     chromatic: {
@@ -80,9 +96,5 @@ addParameters({
 });
 
 // Load Stories
-const storyFiles = require.context(
-    '../..',
-    true,
-    /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
-configure(storyFiles, module);
+configure(loadStories, module);
 

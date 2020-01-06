@@ -115,6 +115,7 @@ class Addon implements Contracts\AddonInterface {
 
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
+
     }
 
     /**
@@ -165,7 +166,7 @@ class Addon implements Contracts\AddonInterface {
                     }
                 }
             }
-
+            
             return $info;
         }
 
@@ -475,6 +476,7 @@ class Addon implements Contracts\AddonInterface {
                     if (strcasecmp(substr($className, -6), 'plugin') === 0
                         || strcasecmp(substr($className, -5), 'hooks') === 0
                     ) {
+
                         if (empty($this->special['plugin'])) {
                             $this->special['plugin'] = $namespace.$className;
                         } else {
@@ -754,6 +756,7 @@ class Addon implements Contracts\AddonInterface {
         if ($rawKey !== $subdir
             && in_array($this->getType(), [static::TYPE_LOCALE, static::TYPE_THEME])
         ) {
+
             $issues['key-subdir-mismatch'] = "The addon key must match its subdirectory name ($rawKey vs. $subdir).";
         }
 
@@ -919,7 +922,6 @@ class Addon implements Contracts\AddonInterface {
      *
      * @param string $version The version to check.
      * @param string $requirement The version requirement.
-     * @return bool Returns **true** if the version checks out or **false** otherwise.
      */
     public static function checkVersion($version, $requirement) {
         // Split the version up on operator boundaries.
@@ -1257,7 +1259,7 @@ class Addon implements Contracts\AddonInterface {
         $classInfo = self::parseFullyQualifiedClass($fullClassName);
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
-            foreach ($this->classes[$key] as $classData) {
+            foreach($this->classes[$key] as $classData) {
                 if (strtolower($classInfo['namespace']) === strtolower($classData['namespace'])) {
                     $path = $this->path($classData['path'], $relative);
                     return $path;

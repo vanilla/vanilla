@@ -16,12 +16,7 @@ import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const layoutVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("globalVariables");
-
-    const colors = makeThemeVars("colors", {
-        leftColumnBg: globalVars.mainColors.bg,
-    });
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
@@ -172,7 +167,6 @@ export const layoutVariables = useThemeCache(() => {
     };
 
     return {
-        colors,
         foundationalWidths,
         gutter,
         panel,
@@ -191,6 +185,7 @@ export const panelLayoutClasses = useThemeCache(() => {
     const style = styleFactory("panelLayout");
     const classesPanelArea = panelAreaClasses();
     const classesPanelList = panelListClasses();
+    const titleBarVars = titleBarVariables();
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -322,8 +317,8 @@ export const panelLayoutClasses = useThemeCache(() => {
         "isSticky",
         {
             ...sticky(),
+            top: titleBarVars.sizing.height * 2,
             height: percent(100),
-            $unique: true,
         },
         mediaQueries.oneColumnDown({
             position: "relative",
@@ -339,7 +334,7 @@ export const panelLayoutClasses = useThemeCache(() => {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        paddingBottom: unit(10),
+        marginBottom: unit(10),
     });
 
     return {

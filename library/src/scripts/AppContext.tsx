@@ -46,22 +46,22 @@ export function AppContext(props: IProps) {
                 <SearchContextProvider>
                     <ContentTranslationProvider>
                         <LiveAnnouncer>
-                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                <ThemeProvider
-                                    disabled={props.noTheme}
-                                    errorComponent={props.errorComponent || null}
-                                    themeKey={getMeta("ui.themeKey", "keystone")}
-                                    variablesOnly={props.variablesOnly}
-                                >
-                                    <FontSizeCalculatorProvider>
-                                        <SearchFilterContextProvider>
+                            <ThemeProvider
+                                disabled={props.noTheme}
+                                errorComponent={props.errorComponent || null}
+                                themeKey={getMeta("ui.themeKey", "keystone")}
+                                variablesOnly={props.variablesOnly}
+                            >
+                                <FontSizeCalculatorProvider>
+                                    <SearchFilterContextProvider>
+                                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
                                             <TitleBarDeviceProvider>
                                                 <DeviceProvider>{props.children}</DeviceProvider>
                                             </TitleBarDeviceProvider>
-                                        </SearchFilterContextProvider>
-                                    </FontSizeCalculatorProvider>
-                                </ThemeProvider>
-                            </ScrollOffsetProvider>
+                                        </ScrollOffsetProvider>
+                                    </SearchFilterContextProvider>
+                                </FontSizeCalculatorProvider>
+                            </ThemeProvider>
                         </LiveAnnouncer>
                     </ContentTranslationProvider>
                 </SearchContextProvider>

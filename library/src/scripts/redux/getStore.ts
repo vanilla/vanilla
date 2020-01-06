@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { createStore, compose, applyMiddleware, combineReducers, Store, AnyAction, DeepPartial, Action } from "redux";
+import { createStore, compose, applyMiddleware, combineReducers, Store, AnyAction, DeepPartial } from "redux";
 import { getReducers, ICoreStoreState } from "@library/redux/reducerRegistry";
 import thunk from "redux-thunk";
 
@@ -33,29 +33,10 @@ export function resetStore() {
     store = undefined;
 }
 
-export const resetActionAC = (newState: ICoreStoreState) => {
-    return {
-        type: "@@store/RESET",
-        payload: newState,
-    };
-};
-
-function createRootReducer() {
-    const appReducer = combineReducers(getReducers());
-
-    return (state, action) => {
-        if (action.type === "@@store/RESET") {
-            return action.payload;
-        } else {
-            return appReducer(state, action);
-        }
-    };
-}
-
 export default function getStore<S = ICoreStoreState>(initialState?: DeepPartial<S>, force?: boolean): Store<S, any> {
     if (store === undefined || force) {
         // Get our reducers.
-        const reducer = createRootReducer();
+        const reducer = combineReducers(getReducers());
         store = createStore(reducer, initialState || {}, enhancer);
 
         // Dispatch initial actions returned from the server.

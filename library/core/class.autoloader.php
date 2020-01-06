@@ -14,8 +14,6 @@
  * classes into scope as needed.
  *
  * This is a static class that hooks into the SPL autoloader.
- * @deprecated
- * @codeCoverageIgnore
  */
 class Gdn_Autoloader {
     const CONTEXT_APPLICATION = 'application';

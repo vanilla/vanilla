@@ -6,12 +6,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { cssRule, forceRenderStyles } from "typestyle";
+import { cssRule } from "typestyle";
 import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
-    console.log("body css", globalVars);
     cssRule("html", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
     });
@@ -26,7 +25,6 @@ export const bodyCSS = useThemeCache(() => {
         wordBreak: "break-word",
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
         height: percent(100),
-        $unique: true, // This doesn't refresh without this for some reason.
     });
 
     cssRule("*", {

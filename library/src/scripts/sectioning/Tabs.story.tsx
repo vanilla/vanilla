@@ -1,7 +1,7 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { DataTabs } from "@library/sectioning/Tabs";
+import { Tabs } from "@library/sectioning/Tabs";
 import React from "react";
 import TextEditor from "@library/textEditor/TextEditor";
 
@@ -20,7 +20,7 @@ story.add("Tabs", () => {
             <StoryContent>
                 <StoryHeading>Simple Tab List </StoryHeading>
             </StoryContent>
-            <DataTabs data={tabData} />
+            <Tabs data={tabData} />
         </>
     );
 });

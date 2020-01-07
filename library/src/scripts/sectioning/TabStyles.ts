@@ -51,6 +51,7 @@ export const tabClasses = useThemeCache(() => {
     const style = styleFactory("tabs");
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         display: "flex",
@@ -71,9 +72,9 @@ export const tabClasses = useThemeCache(() => {
     const tabList = style("tabList", {
         display: "flex",
         width: percent(100),
-        justifyContent: "space-between",
+        justifyContent: "stretch",
+        alignItems: "stretch",
         border: "solid 1px #bfcbd8",
-        backgroundColor: "#f5f6f7",
     });
     const tab = style(
         "tab",
@@ -81,18 +82,24 @@ export const tabClasses = useThemeCache(() => {
             ...userSelect(),
 
             width: percent(25),
+            fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             borderRight: "1px solid #bfcbd8",
             padding: "4px 0",
+            color: colorOut("#48576a"),
+            backgroundColor: colorOut("#f5f6f7"),
+            minHeight: unit(18),
+            fontSize: unit(13),
             $nest: {
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
                 },
                 "&:hover, &:focus, &:active": {
-                    color: colorOut(vars.colors.state.fg),
+                    color: colorOut("#48576a"),
                 },
             },
         },
+
         mediaQueries.oneColumnDown({
             flexGrow: 0,
             $nest: {
@@ -117,7 +124,7 @@ export const tabClasses = useThemeCache(() => {
     });
 
     const isActive = style("isActive", {
-        backgroundColor: colorOut(vars.colors.selected.bg),
+        backgroundColor: colorOut(globalVars.elementaryColors.white),
     });
 
     return {

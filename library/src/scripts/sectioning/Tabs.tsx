@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from "react";
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
+import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabClasses } from "@library/sectioning/TabStyles";
+import classNames from "classnames";
 
 interface IData {
     label: string;
@@ -11,13 +12,13 @@ interface IProps {
     data: IData[];
 }
 
-export function DataTabs(props: IProps) {
+export function Tabs(props: IProps) {
     const { data } = props;
     const classes = tabClasses();
     const [activeTab, setActiveTab] = useState(0);
 
     return (
-        <Tabs
+        <ReachTabs
             className={classes.root}
             onChange={index => {
                 setActiveTab(index);
@@ -26,11 +27,8 @@ export function DataTabs(props: IProps) {
             <TabList className={classes.tabList}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
-                    const style = {
-                        background: isActive ? "#fff" : "#f5f6f7",
-                    };
                     return (
-                        <Tab key={index} style={style} className={classes.tab}>
+                        <Tab key={index} className={classNames(classes.tab, { [classes.isActive]: isActive })}>
                             <div>{tab.label}</div>
                         </Tab>
                     );
@@ -45,6 +43,6 @@ export function DataTabs(props: IProps) {
                     );
                 })}
             </TabPanels>
-        </Tabs>
+        </ReachTabs>
     );
 }

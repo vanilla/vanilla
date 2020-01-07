@@ -72,7 +72,7 @@ export const tabClasses = useThemeCache(() => {
     const tabList = style("tabList", {
         display: "flex",
         width: percent(100),
-        justifyContent: "stretch",
+        justifyContent: "space-between",
         alignItems: "stretch",
         border: "solid 1px #bfcbd8",
     });

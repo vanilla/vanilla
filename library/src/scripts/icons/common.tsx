@@ -637,3 +637,30 @@ export function HamburgerIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
+export function ToggleIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+            <g fill="none" fillRule="evenodd">
+                <circle cx="10" cy="10" r="10" fill="#42464C" stroke="#DDDEE0" transform="rotate(-180 10 10)" />
+                <path fill="#DDDEE0" d="M10 19.986V.014C15.573.288 20 4.654 20 10c0 5.346-4.428 9.712-10 9.986z" />
+                <circle cx="4.444" cy="4.444" r="3.951" stroke="#DDDEE0" transform="rotate(-90 10 4.444)" />
+                <path
+                    fill="#D8D8D8"
+                    d="M6.097 5.564l-.305-1.392-1.348-.279 1.348-.318.305-1.353.239 1.353 1.462.314-1.462.283zM3.875 8.898L3.57 7.506l-1.348-.28 1.348-.318.305-1.352.238 1.352 1.462.314-1.462.284z"
+                />
+            </g>
+        </svg>
+    );
+}
+
+export function PlusIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="81" viewBox="0 0 80 81">
+            <g fill="#EFEFF0" fillRule="evenodd">
+                <path d="M32 0h16v80.762H32zM80 32.381v16H48v-16zM32 32.381v16H0v-16z" />
+            </g>
+        </svg>
+    );
+}

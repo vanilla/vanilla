@@ -681,11 +681,11 @@ class DiscussionController extends VanillaController {
         $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
 
         $attributes = $Discussion->Attributes;
-        unset($Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_AUTHOR]);
+        unset($Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_USER_ID]);
 
         // Check if the discussion is getting closed and check if the author is closing it.
-        if ($Close && $Discussion->InsertUserID === Gdn::session()->User->UserID) {
-            $Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_AUTHOR] = $Discussion->InsertUserID;
+        if ($Close) {
+            $Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
         }
 
         // Update the attributes if they changed.

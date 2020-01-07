@@ -25,8 +25,8 @@ class DiscussionModel extends Gdn_Model {
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
-    /** @var string Closed by moderator attribute. */
-    const CLOSED_BY_AUTHOR = 'CloseUserID';
+    /** @var string Thus userID of whomever closed the discussion. */
+    const CLOSED_BY_USER_ID = 'ClosedByUserID';
 
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
@@ -290,7 +290,7 @@ class DiscussionModel extends Gdn_Model {
             return true;
         }
 
-        if ($isClosed && empty($attributes[self::CLOSED_BY_AUTHOR])) {
+        if ($isClosed && $attributes[self::CLOSED_BY_USER_ID] !== Gdn::session()->UserID) {
             return false;
         }
 

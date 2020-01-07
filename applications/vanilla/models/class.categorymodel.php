@@ -2534,10 +2534,13 @@ class CategoryModel extends Gdn_Model {
         if (!is_array($category) && !is_object($category)) {
             $category = self::categories($category);
         }
-
         $category = self::categories(val('PermissionCategoryID', $category));
+
         // Ensure all of our values are processed properly.
-        self::calculate($category);
+        if (isset($category)) {
+            self::calculate($category);
+        }
+
         return $category;
     }
 

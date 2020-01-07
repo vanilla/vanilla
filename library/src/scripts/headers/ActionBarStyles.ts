@@ -27,10 +27,7 @@ export const actionBarClasses = useThemeCache(() => {
             alignItems: "center",
             width: percent(100),
             height: unit(titleBarVars.sizing.height),
-<<<<<<< HEAD
             listStyle: "none",
-=======
->>>>>>> master
         },
         mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),

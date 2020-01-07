@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
     core: vanilla/core@2
-    chromatic: wave/chromatic@1.0.1
+    chromatic: wave/chromatic@1.2.0
     codecov: codecov/codecov@1.0.5
 aliases:
     - &run_yarn

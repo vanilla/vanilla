@@ -67,7 +67,7 @@ export const panelAreaClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const areaOverlayBefore = (color?: ColorHelper) => {
+    const areaOverlayBefore = (color?: ColorHelper, side?: "left" | "right") => {
         let gradientColor = color ?? globalVars.mainColors.bg;
 
         return style("areaOverlayBefore", {

@@ -29,6 +29,7 @@ interface IProps {
     rightTop?: React.ReactNode;
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
+    renderLeftPanelBackground?: boolean;
 }
 
 /**
@@ -121,7 +122,11 @@ export default function PanelLayout(props: IProps) {
                             })}
                             tag="aside"
                         >
-                            <PanelOverflow offset={overflowOffset} isLeft={true}>
+                            <PanelOverflow
+                                offset={overflowOffset}
+                                isLeft={true}
+                                renderLeftPanelBackground={props.renderLeftPanelBackground}
+                            >
                                 {childComponents.leftTop && <PanelArea>{childComponents.leftTop}</PanelArea>}
                                 {childComponents.leftBottom && <PanelArea>{childComponents.leftBottom}</PanelArea>}
                             </PanelOverflow>
@@ -203,10 +208,15 @@ export function Panel(props: IContainerProps) {
     );
 }
 
-export function PanelOverflow(props: IContainerProps & { offset: number; isLeft?: boolean }) {
+export function PanelOverflow(
+    props: IContainerProps & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
+) {
     const classes = panelAreaClasses();
     const panelVars = panelBackgroundVariables();
-    const color = panelVars.config.render && !!props.isLeft ? panelVars.colors.backgroundColor : undefined;
+    const color =
+        panelVars.config.render && !!props.isLeft && props.renderLeftPanelBackground
+            ? panelVars.colors.backgroundColor
+            : undefined;
     return (
         <div className={classes.areaOverlay}>
             <div className={classes.areaOverlayBefore(color, "left")}></div>

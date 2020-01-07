@@ -273,7 +273,7 @@ class DiscussionModel extends Gdn_Model {
      * @param object|array $discussion
      * @return bool Returns true if the user can close or false otherwise.
      */
-    public static function canClose($discussion) {
+    public static function canClose($discussion): bool {
         if (is_object($discussion)) {
             $categoryID = $discussion->CategoryID ?? null;
             $insertUserID = $discussion->InsertUserID ?? 0;

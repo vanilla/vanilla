@@ -13,6 +13,7 @@ import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
+import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
 
 interface IProps {
     className?: string;
@@ -120,7 +121,7 @@ export default function PanelLayout(props: IProps) {
                             })}
                             tag="aside"
                         >
-                            <PanelOverflow offset={overflowOffset}>
+                            <PanelOverflow offset={overflowOffset} isLeft={true}>
                                 {childComponents.leftTop && <PanelArea>{childComponents.leftTop}</PanelArea>}
                                 {childComponents.leftBottom && <PanelArea>{childComponents.leftBottom}</PanelArea>}
                             </PanelOverflow>
@@ -202,15 +203,17 @@ export function Panel(props: IContainerProps) {
     );
 }
 
-export function PanelOverflow(props: IContainerProps & { offset: number }) {
+export function PanelOverflow(props: IContainerProps & { offset: number; isLeft?: boolean }) {
     const classes = panelAreaClasses();
+    const panelVars = panelBackgroundVariables();
+    const color = panelVars.config.render && !!props.isLeft ? panelVars.colors.backgroundColor : undefined;
     return (
         <div className={classes.areaOverlay}>
-            <div className={classes.areaOverlayBefore}></div>
+            <div className={classes.areaOverlayBefore(color)}></div>
             <div ref={props.innerRef} className={classNames(props.className, classes.overflowFull(props.offset))}>
                 {props.children}
             </div>
-            <div className={classes.areaOverlayAfter}></div>
+            <div className={classes.areaOverlayAfter(color)}></div>
         </div>
     );
 }

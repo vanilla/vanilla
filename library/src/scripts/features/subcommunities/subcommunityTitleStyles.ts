@@ -27,9 +27,15 @@ export const subcommunityTileVariables = useThemeCache(() => {
 
     const spacing = themeVars("spacing", {
         twoColumns: 24,
-        threeColumns: 18,
-        fourColumns: 18,
+        threeColumns: 17,
+        fourColumns: 17,
         color: globalVars.mainColors.primary as ColorHelper,
+    });
+
+    const minWidths = themeVars("minWidths", {
+        big: 384,
+        small: 260,
+        fourColumns: 1,
     });
 
     const frame = themeVars("frame", {

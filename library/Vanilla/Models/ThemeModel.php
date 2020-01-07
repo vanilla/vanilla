@@ -10,49 +10,58 @@ use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
+use Garden\Schema\ValidationField;
 
 /**
  * Handle custom themes.
  */
 class ThemeModel {
+    const HEADER = 'header';
+    const FOOTER = 'footer';
+    const VARIABLES = 'variables';
+    const FONTS = 'fonts';
+    const SCRIPTS = 'scripts';
+    const STYLES = 'styles';
+    const JAVASCRIPT = 'javascript';
+
     const ASSET_LIST = [
-        "header" => [
+        self::HEADER => [
             "type" => "html",
             "file" => "header.html",
             "default" => "",
             "mime-type" => "text/html"
         ],
-        "footer" => [
+        self::FOOTER => [
             "type" => "html",
             "file" => "footer.html",
             "default" => "",
             "mime-type" => "text/html"
         ],
-        "variables" => [
+        self::VARIABLES => [
             "type" => "json",
             "file" => "variables.json",
             "default" => "{}",
             "mime-type" => "application/json"
         ],
-        "fonts" => [
+        self::FONTS => [
             "type" => "json",
             "file" => "fonts.json",
             "default" => "[]",
             "mime-type" => "application/json"
         ],
-        "scripts" => [
+        self::SCRIPTS => [
             "type" => "json",
             "file" => "scripts.json",
             "default" => "[]",
             "mime-type" => "application/json"
         ],
-        "styles" => [
+        self::STYLES => [
             "type" => "css",
             "file" => "styles.css",
             "default" => "",
             "mime-type" => "text/css"
         ],
-        "javascript" => [
+        self::JAVASCRIPT => [
             "type" => "js",
             "file" => "javascript.js",
             "default" => "",
@@ -250,6 +259,44 @@ class ThemeModel {
     public function deleteAsset(string $themeKey, string $assetKey) {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * Basic input string validation function for html and json assets
+     *
+     * @param string $data
+     * @param ValidationField $field
+     * @return bool
+     */
+    public static function validator(string $data, ValidationField $field) {
+        $asset = self::ASSET_LIST[$field->getName()];
+        switch ($asset['type']) {
+            case 'html':
+                libxml_use_internal_errors(true);
+                $doc = new \DOMDocument();
+                $doc->loadHTML($data);
+                $valid = count(libxml_get_errors()) === 0;
+                libxml_clear_errors();
+                break;
+            case 'json':
+                $valid = true;
+                if ($asset['default'] === '[]') {
+                    $valid = substr($data, 0, 1) === '[';
+                    $valid = $valid && substr($data, -1) === ']';
+                } elseif ($asset['default'] === '{}') {
+                    $valid = substr($data, 0, 1) === '{';
+                    $valid = $valid && substr($data, -1) === '}';
+                }
+                $json = json_decode($data, true);
+                $valid = $valid && $json !== null;
+                break;
+            case 'css':
+            case 'js':
+            default:
+                $valid = true;
+                break;
+        }
+        return $valid;
     }
 
     /**

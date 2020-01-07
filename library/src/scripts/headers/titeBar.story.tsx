@@ -27,7 +27,7 @@ const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar", module);
+const story = storiesOf("Headers", module);
 
 const makeMockGuestUser: IMe = {
     name: "test",
@@ -40,7 +40,7 @@ const makeMockGuestUser: IMe = {
 };
 
 story.add(
-    "Guest User",
+    "TitleBar Guest User",
     () => {
         const initialState = testStoreState({
             users: {

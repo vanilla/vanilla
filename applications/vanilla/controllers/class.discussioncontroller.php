@@ -673,7 +673,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        if (!$this->DiscussionModel::canClose($Discussion)) {
+        if (!DiscussionModel::canClose($Discussion)) {
             $this->permission('Vanilla.Discussions.Close', true, 'Category', $Discussion->CategoryID);
         }
 
@@ -681,11 +681,11 @@ class DiscussionController extends VanillaController {
         $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
 
         $attributes = $Discussion->Attributes;
-        unset($Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_USER_ID]);
+        unset($Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID]);
 
         // Check if the discussion is getting closed and check if the author is closing it.
         if ($Close) {
-            $Discussion->Attributes[$this->DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
+            $Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
         }
 
         // Update the attributes if they changed.

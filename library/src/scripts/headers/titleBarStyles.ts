@@ -28,9 +28,8 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonClasses, buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
-import classNames from "classnames";
 import { media } from "typestyle";
 
 enum TitleBarBorderType {

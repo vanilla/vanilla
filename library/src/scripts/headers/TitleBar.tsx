@@ -33,6 +33,7 @@ import { SignInIcon } from "@library/icons/common";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
+import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
 
 interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -43,6 +44,7 @@ interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesP
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
     logoUrl?: string;
+    backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
 }
 
 interface IState {
@@ -131,6 +133,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 <MobileDropDown
                                     title={this.props.title!}
                                     buttonClass={classNames("titleBar-mobileDropDown")}
+                                    hasBackgroundColor={this.props.backgroundColorForMobileDropdown}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>

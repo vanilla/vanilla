@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, calc, linearGradient, ColorHelper } from "csx";
+import { color, percent, calc, linearGradient, ColorHelper, translateY } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
+import { panelWidgetClasses, panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { paddings, unit, colorOut, ColorValues } from "@library/styles/styleHelpers";
 import { NestedCSSSelectors } from "typestyle/lib/types";
 
@@ -63,22 +63,23 @@ export const panelAreaClasses = useThemeCache(() => {
             marginTop: -50,
         });
 
-    const areaOverlay = style("areaOverlay", {});
+    const areaOverlay = style("areaOverlay", {
+        position: "relative",
+    });
 
     const areaOverlayBefore = (color?: ColorHelper) => {
         let gradientColor = color ?? globalVars.mainColors.bg;
+
         return style("areaOverlayBefore", {
             zIndex: 3,
             top: 0,
             left: 0,
             right: 0,
             position: "absolute",
-            height: 50,
-            marginTop: -50,
-            background: linearGradient("to top", colorOut(gradientColor!.fade(0))!, colorOut(gradientColor)!),
+            width: percent(100),
         });
     };
-    const areaOverlayAfter = (color?: ColorHelper) => {
+    const areaOverlayAfter = (color?: ColorHelper, side?: "left" | "right") => {
         let gradientColor = color ?? globalVars.mainColors.bg;
 
         return style("areaOverlayAfter", {
@@ -89,6 +90,7 @@ export const panelAreaClasses = useThemeCache(() => {
             position: "absolute",
             height: 50,
             background: linearGradient("to bottom", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
+            width: percent(100),
         });
     };
 

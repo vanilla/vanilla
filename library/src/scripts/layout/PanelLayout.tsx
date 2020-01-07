@@ -209,11 +209,11 @@ export function PanelOverflow(props: IContainerProps & { offset: number; isLeft?
     const color = panelVars.config.render && !!props.isLeft ? panelVars.colors.backgroundColor : undefined;
     return (
         <div className={classes.areaOverlay}>
-            <div className={classes.areaOverlayBefore(color)}></div>
+            <div className={classes.areaOverlayBefore(color, "left")}></div>
             <div ref={props.innerRef} className={classNames(props.className, classes.overflowFull(props.offset))}>
                 {props.children}
             </div>
-            <div className={classes.areaOverlayAfter(color)}></div>
+            <div className={classes.areaOverlayAfter(color, "right")}></div>
         </div>
     );
 }

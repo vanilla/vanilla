@@ -7,13 +7,11 @@
 
 namespace VanillaTests\Models;
 
-use DiscussionController;
+
 use DiscussionModel;
 use Gdn;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\ExpectErrorTrait;
-use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -127,8 +125,14 @@ class DiscussionModelTest extends TestCase {
         $userSession->UserID = 123;
         $userSession->getPermissions()->set('Vanilla.Discussions.CloseOwn', $userSession->UserID);
         $userSession->getPermissions()->setAdmin(false);
-        $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
-        $actual = DiscussionModel::canClose($discussion);
+        $discussion = [
+            'DiscussionID' => 0,
+            'CategoryID' => 1,
+            'Name' => 'test',
+            'Body' => 'discuss',
+            'InsertUserID' => 123
+        ];
+        $actual = $this->model->canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -142,8 +146,14 @@ class DiscussionModelTest extends TestCase {
         $userSession->UserID = 123;
         $userSession->getPermissions()->set('Vanilla.Discussions.CloseOwn', $userSession->UserID);
         $userSession->getPermissions()->setAdmin(false);
-        $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 321];
-        $actual = DiscussionModel::canClose($discussion);
+        $discussion = [
+            'DiscussionID' => 0,
+            'CategoryID' => 1,
+            'Name' => 'test',
+            'Body' => 'discuss',
+            'InsertUserID' => 321
+        ];
+        $actual = $this->model->canClose($discussion);
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -164,8 +174,9 @@ class DiscussionModelTest extends TestCase {
             'Body' => 'discuss',
             'InsertUserID' => 321,
             'Closed' => true,
-            'Attributes' => ['ClosedByUserID' => 321]];
-        $actual = DiscussionModel::canClose($discussion);
+            'Attributes' => ['ClosedByUserID' => 321]
+        ];
+        $actual = $this->model->canClose($discussion);
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -178,7 +189,7 @@ class DiscussionModelTest extends TestCase {
         $userSession->User = ["UserID" => 123];
         $userSession->UserID = 123;
         $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
-        $actual = DiscussionModel::canClose($discussion);
+        $actual = $this->model->canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -196,7 +207,7 @@ class DiscussionModelTest extends TestCase {
         $discussion->Name = 'test';
         $discussion->Body = 'discuss';
         $discussion->InsertUserID = 123;
-        $actual = DiscussionModel::canClose($discussion);
+        $actual = $this->model->canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }

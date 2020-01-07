@@ -269,8 +269,6 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
-    console.log("vars: ", vars);
-
     const root = style({
         maxWidth: percent(100),
         backgroundColor: vars.colors.bg.toString(),

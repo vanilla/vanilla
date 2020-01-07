@@ -15,6 +15,7 @@ import {
     unit,
     userSelect,
     negative,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -228,52 +229,53 @@ export const dropDownClasses = useThemeCache(() => {
 
     // Contents (button or link)
     // Replaces: .dropDownItem-button, .dropDownItem-link
+    const actionMixin: NestedCSSProperties = {
+        ...buttonResetMixin(),
+        cursor: "pointer",
+        appearance: "none",
+        display: "flex",
+        alignItems: "center",
+        width: percent(100),
+        textAlign: "left",
+        minHeight: unit(vars.item.minHeight),
+        lineHeight: unit(globalVars.lineHeights.condensed),
+        ...paddings({
+            vertical: 4,
+            horizontal: vars.item.padding.horizontal,
+        }),
+        ...borders({
+            color: "transparent",
+            radius: 0,
+        }),
+        color: colorOut(vars.item.colors.fg, true),
+        ...userSelect("none"),
+        ...buttonStates({
+            allStates: {
+                textShadow: "none",
+                outline: 0,
+            },
+            hover: {
+                backgroundColor: colorOut(globalVars.states.hover.color, true),
+            },
+            focus: {
+                backgroundColor: colorOut(globalVars.states.focus.color, true),
+            },
+            active: {
+                backgroundColor: colorOut(globalVars.states.active.color, true),
+            },
+            accessibleFocus: {
+                borderColor: colorOut(globalVars.mainColors.primary, true),
+            },
+        }),
+        ...mediaQueries.oneColumnDown({
+            fontSize: unit(vars.item.mobile.fontSize),
+            fontWeight: globalVars.fonts.weights.semiBold,
+            minHeight: unit(vars.item.mobile.minHeight),
+        }),
+    };
     const action = style("action", {
         $nest: {
-            "&&": {
-                ...buttonResetMixin(),
-                cursor: "pointer",
-                appearance: "none",
-                display: "flex",
-                alignItems: "center",
-                width: percent(100),
-                textAlign: "left",
-                minHeight: unit(vars.item.minHeight),
-                lineHeight: unit(globalVars.lineHeights.condensed),
-                ...paddings({
-                    vertical: 4,
-                    horizontal: vars.item.padding.horizontal,
-                }),
-                ...borders({
-                    color: "transparent",
-                    radius: 0,
-                }),
-                color: colorOut(vars.item.colors.fg),
-                ...userSelect("none"),
-                ...buttonStates({
-                    allStates: {
-                        textShadow: "none",
-                        outline: 0,
-                    },
-                    hover: {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
-                    },
-                    focus: {
-                        backgroundColor: colorOut(globalVars.states.focus.color),
-                    },
-                    active: {
-                        backgroundColor: colorOut(globalVars.states.active.color),
-                    },
-                    accessibleFocus: {
-                        borderColor: colorOut(globalVars.mainColors.primary),
-                    },
-                }),
-                ...mediaQueries.oneColumnDown({
-                    fontSize: unit(vars.item.mobile.fontSize),
-                    fontWeight: globalVars.fonts.weights.semiBold,
-                    minHeight: unit(vars.item.mobile.minHeight),
-                }),
-            },
+            "&&": actionMixin,
         },
     });
 
@@ -372,6 +374,7 @@ export const dropDownClasses = useThemeCache(() => {
         section,
         toggleButtonIcon,
         action,
+        actionMixin,
         text,
         separator,
         sectionHeading,

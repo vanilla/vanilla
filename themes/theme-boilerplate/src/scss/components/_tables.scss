@@ -84,13 +84,15 @@
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
-        color: $component-title_color;
         display: block;
         margin-bottom: $utility-baseUnit;
 
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+        @if $staticVariables {
+            color: $component-title_color;
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
 
         a {

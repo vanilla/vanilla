@@ -20,3 +20,7 @@ $staticVariables: false;
 /* ------------------ Sections ------------------ */
 
 @import "themeoptions";
+
+.Arrow.SpFlyoutHandle:before {
+    display: none;
+}

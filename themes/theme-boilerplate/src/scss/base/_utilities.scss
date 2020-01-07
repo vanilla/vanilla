@@ -350,14 +350,15 @@
     }
 
 
-    .CategoryName h2 {
-        color: $component-title_color;
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+    @if $staticVariables {
+        .CategoryName h2 {
+            color: $component-title_color;
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
     }
-
 
     &.Read {
         opacity: 1;

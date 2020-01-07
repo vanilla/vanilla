@@ -12,11 +12,14 @@ import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
-import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
+import { ButtonTypes, buttonVariables, buttonUtilityClasses, buttonGlobalVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { borders, margins, unit } from "@library/styles/styleHelpers";
 import { ColorHelper } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { inputVariables, inputClasses } from "@vanilla/library/src/scripts/forms/inputStyles";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import { siteNavClasses, siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -56,9 +59,20 @@ export const compatibilityStyles = useThemeCache(() => {
         color: fg,
     });
 
+    cssRule(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
+    cssRule(".token-input-list", inputClasses().inputMixin);
+
+    cssRule(".DataTable .Item td", {
+        background: bg,
+        color: fg,
+    });
+
     // @mixin Button
+    mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
     mixinButton(".js-poll-result-btn");
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
+    mixinButton(".FormTitleWrapper .Buttons .Button");
+    mixinButton(".FormWrapper .Buttons .Button");
     mixinButton(".FormTitleWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Button-Controls .Button.Primary", ButtonTypes.PRIMARY);
@@ -100,16 +114,21 @@ export const compatibilityStyles = useThemeCache(() => {
     });
     cssRule(".Box h4", { color: fg });
 
+    // Panel
+    cssRule(".Panel a", {
+        ...siteNavNodeClasses().linkMixin,
+    });
+
+    // Various links
     mixinFontLink(".Navigation-linkContainer a");
     mixinFontLink(".Panel .PanelInThisDiscussion a");
     mixinFontLink(".Panel .Leaderboard a");
     mixinFontLink(".Panel .InThisConversation a");
-    mixinFontLink(".FilterMenu a");
+    mixinFontLink(".FilterMenu a", true);
+    mixinFontLink(".Breadcrumbs a", true);
     mixinFontLink("div.Popup .Body a");
     mixinFontLink(".selectBox-toggle");
     mixinFontLink(".followButton");
-    mixinFontLink(".Breadcrumbs a");
-    mixinFontLink(".Panel a");
     mixinFontLink(".QuickSearchButton");
     mixinFontLink(".SelectWrapper::after");
     mixinFontLink(".Back a");
@@ -124,6 +143,10 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFontLink("a.Tag", true);
     mixinFontLink(".MenuItems a", true);
 
+    mixinFontLink(".DataTable h2 a", true);
+    mixinFontLink(".DataTable h3 a", true);
+    mixinFontLink(".DataTable .Title.Title a", true);
+
     mixinInputBorderColor(`input[type= "text"]`);
     mixinInputBorderColor("textarea");
     mixinInputBorderColor("ul.token-input-list");
@@ -134,6 +157,18 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinInputBorderColor(".InputBox.BigInput");
     mixinInputBorderColor("ul.token-input-list", "& .token-list-focused");
 
+    // Dropdown hover/focus colors:
+
+    cssRule(".MenuItems, .Flyout.Flyout", {
+        background: bg,
+        color: fg,
+    });
+    mixinFlyoutItem(".MenuItems .Item a");
+    mixinFlyoutItem(".MenuItems.MenuItems li a");
+    mixinFlyoutItem(".Flyout.Flyout li a");
+    mixinFlyoutItem(".editor-action.editor-action.editor-action a");
+
+    // Buttons
     cssRule(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
         borderColor: primary,
         borderStyle: vars.border.style,
@@ -236,54 +271,28 @@ export const compatibilityStyles = useThemeCache(() => {
     cssRule(`div.token-input-dropdown`, borders());
 
     // Meta colors
-    cssRule(
-        `
-        .DataList .Meta,
-        .MessageList .Meta,
-        .DataList .AuthorInfo,
-        .MessageList .AuthorInfo,
-        .DataList-Search .MItem-Author a,
-        .DataList .Excerpt,
-        .DataList .CategoryDescription,
-        .MessageList .Excerpt,
-        .MessageList .CategoryDescription,
-        .Breadcrumbs,
-        .DataList .Tag,
-        .DataList .Tag-Poll,
-        .DataList .RoleTracker,
-        .DataList .IdeationTag,
-        .MessageList .Tag,
-        .MessageList .Tag-Poll,
-        .MessageList .RoleTracker,
-        .MessageList .IdeationTag,
-        .DataTableWrap .Tag,
-        .DataTableWrap .Tag-Poll,
-        .DataTableWrap .RoleTracker,
-        .DataTableWrap .IdeationTag,
-        .DataList-Search .MItem-Author
-        `,
-        {
-            color: metaFg,
-            $nest: {
-                a: {
-                    color: metaFg,
-                    fontSize: "inherit",
-                    textDecoration: "underline",
-                    $nest: {
-                        "&:hover": {
-                            textDecoration: "underline",
-                        },
-                        "&:focus": {
-                            textDecoration: "underline",
-                        },
-                        "&.focus-visible": {
-                            textDecoration: "underline",
-                        },
-                    },
-                },
-            },
-        },
-    );
+    mixinMetaLinkContainer(".DataList .Meta");
+    mixinMetaLinkContainer(".MessageList .Meta");
+    mixinMetaLinkContainer(".DataList .AuthorInfo");
+    mixinMetaLinkContainer(".MessageList .AuthorInfo");
+    mixinMetaLinkContainer(".DataList-Search .MItem-Author");
+    mixinMetaLinkContainer(".DataList .Excerpt");
+    mixinMetaLinkContainer(".DataList .CategoryDescription");
+    mixinMetaLinkContainer(".MessageList .Excerpt");
+    mixinMetaLinkContainer(".MessageList .CategoryDescription");
+    mixinMetaLinkContainer(".Breadcrumbs");
+    mixinMetaLinkContainer(".DataList .Tag");
+    mixinMetaLinkContainer(".DataList .Tag-Poll");
+    mixinMetaLinkContainer(".DataList .RoleTracker");
+    mixinMetaLinkContainer(".DataList .IdeationTag");
+    mixinMetaLinkContainer(".MessageList .Tag");
+    mixinMetaLinkContainer(".MessageList .Tag-Poll");
+    mixinMetaLinkContainer(".MessageList .RoleTracker");
+    mixinMetaLinkContainer(".MessageList .IdeationTag");
+    mixinMetaLinkContainer(".DataTableWrap .Tag");
+    mixinMetaLinkContainer(".DataTableWrap .Tag-Poll");
+    mixinMetaLinkContainer(".DataTableWrap .RoleTracker");
+    mixinMetaLinkContainer(".DataTableWrap .IdeationTag");
 
     cssRule(
         `
@@ -294,6 +303,9 @@ export const compatibilityStyles = useThemeCache(() => {
             borderRight: 0,
             backgroundColor: bg,
             color: fg,
+            ...borders(inputVariables().border),
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
         },
     );
 
@@ -313,6 +325,35 @@ export const compatibilityStyles = useThemeCache(() => {
         color: fg,
     });
 });
+
+function mixinFlyoutItem(selector: string) {
+    cssRule(selector, dropDownClasses().actionMixin);
+}
+
+function mixinMetaLinkContainer(selector: string) {
+    const vars = globalVariables();
+    const metaFg = colorOut(vars.meta.text.color);
+
+    cssRule(selector, {
+        color: metaFg,
+        $nest: {
+            "& a": {
+                color: metaFg,
+                fontSize: "inherit",
+                textDecoration: "underline",
+            },
+            "& a:hover": {
+                textDecoration: "underline",
+            },
+            "& a:focus": {
+                textDecoration: "underline",
+            },
+            "& a.focus-visible": {
+                textDecoration: "underline",
+            },
+        },
+    });
+}
 
 // Mixins replacement
 export const mixinFontLink = (selector: string, skipDefaultColor = false) => {
@@ -381,6 +422,8 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
         cssRule(selector, generateButtonStyleProperties(vars.primary));
     } else if (buttonType === ButtonTypes.STANDARD) {
         cssRule(selector, generateButtonStyleProperties(vars.standard));
+    } else if (buttonType === ButtonTypes.ICON_COMPACT) {
+        cssRule(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
     } else {
         new Error(`No support yet for button type: ${buttonType}`);
     }

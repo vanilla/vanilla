@@ -81,10 +81,10 @@ interface ThemeProviderInterface {
     /**
      * Set current theme.
      *
-     * @param int $themeID Theme ID to set current.
+     * @param int|string $themeID Theme ID to set current.
      * @return array
      */
-    public function setCurrent(int $themeID): array;
+    public function setCurrent($themeID): array;
 
     /**
      * Get "current" theme.

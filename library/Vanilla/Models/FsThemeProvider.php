@@ -6,7 +6,9 @@
 
 namespace Vanilla\Models;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Addon;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -105,9 +107,12 @@ class FsThemeProvider implements ThemeProviderInterface {
     private function normalizeTheme(Addon $theme, array $assets): array {
         $res = [
             "assets" => $assets,
+            'name' => $theme->getInfoValue('name'),
             'themeID' => $theme->getInfoValue('key'),
+            'name' => $theme->getInfoValue('name'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
+            'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme')),
         ];
 
         $res["assets"] = [];
@@ -151,6 +156,9 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
             }
         }
+
+        $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
+        $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
 
         return $res;
     }
@@ -346,5 +354,16 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         return $themeInfo;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCurrent($themeKey): array {
+        $this->config->set('Garden.Theme', $themeKey);
+        $this->config->set('Garden.MobileTheme', $themeKey);
+        $this->config->set('Garden.CurrentTheme', $themeKey);
+        $theme = $this->getThemeWithAssets($themeKey);
+        return $theme;
     }
 }

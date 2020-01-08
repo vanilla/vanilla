@@ -21,9 +21,9 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { ColorHelper, percent } from "csx";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
 
-export const subcommunityTileVariables = useThemeCache(() => {
+export const tileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("subcommunityTile");
+    const themeVars = variableFactory("tiles");
 
     const spacing = themeVars("spacing", {
         twoColumns: 24,
@@ -80,10 +80,10 @@ export const subcommunityTileVariables = useThemeCache(() => {
     };
 });
 
-export const subcommunityTileClasses = useThemeCache(() => {
-    const vars = subcommunityTileVariables();
+export const tileClasses = useThemeCache(() => {
+    const vars = tileVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("subcommunityTile");
+    const style = styleFactory("tile");
     const shadow = shadowHelper();
 
     const root = (columns?: number) => {

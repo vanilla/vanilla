@@ -8,12 +8,13 @@ import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { SubcommunityListAlignment } from "@library/features/subcommunities/SubcommunityList";
+
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { TileAlignment } from "@library/features/tiles/Tiles";
 
-export const subcommunityListVariables = useThemeCache(() => {
+export const tilesVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");
     const spacing = themeVars("spacing", {
         paddingTwoColumns: 25,
@@ -29,7 +30,7 @@ export const subcommunityListVariables = useThemeCache(() => {
 
     const options = themeVars("options", {
         columns: 2,
-        alignment: SubcommunityListAlignment.CENTER,
+        alignment: TileAlignment.CENTER,
     });
 
     return {
@@ -39,8 +40,8 @@ export const subcommunityListVariables = useThemeCache(() => {
     };
 });
 
-export const subcommunityListClasses = useThemeCache(() => {
-    const vars = subcommunityListVariables();
+export const tilesClasses = useThemeCache(() => {
+    const vars = tilesVariables();
     const style = styleFactory("subcommunityList");
     const mediaQueries = layoutVariables().mediaQueries();
 
@@ -72,9 +73,9 @@ export const subcommunityListClasses = useThemeCache(() => {
         );
     };
 
-    const items = (alignment: SubcommunityListAlignment) => {
-        const vars = subcommunityListVariables();
-        const isCentered = (alignment ?? vars.options.alignment) === SubcommunityListAlignment.CENTER;
+    const items = (alignment: TileAlignment) => {
+        const vars = tilesVariables();
+        const isCentered = (alignment ?? vars.options.alignment) === TileAlignment.CENTER;
         return style(
             "items",
             {

@@ -25,7 +25,7 @@ interface IProps {
 /**
  * Render a subcommunity tile
  */
-export default class SubcommunityTile extends React.Component<IProps> {
+export default class Tile extends React.Component<IProps> {
     public static defaultProps = {
         headingLevel: 3,
     };

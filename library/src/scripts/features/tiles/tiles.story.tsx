@@ -7,11 +7,11 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
-import SubcommunityList, { SubcommunityListAlignment } from "@library/features/subcommunities/SubcommunityList";
+import Tiles, { TileAlignment } from "@library/features/subcommunities/Tiles";
 
 const formsStory = storiesOf("Home Page", module);
 
-formsStory.add("Subcommunity List", () =>
+formsStory.add("Tiles", () =>
     (() => {
         return (
             <>
@@ -19,9 +19,9 @@ formsStory.add("Subcommunity List", () =>
                     <StoryHeading depth={1}>Sub community List</StoryHeading>
                     <StoryHeading>As Tiles - 2 columns left aligned</StoryHeading>
                 </StoryContent>
-                <SubcommunityList
+                <Tiles
                     columns={2}
-                    alignment={SubcommunityListAlignment.LEFT}
+                    alignment={TileAlignment.LEFT}
                     items={[
                         {
                             name: "Development",
@@ -60,9 +60,9 @@ formsStory.add("Subcommunity List", () =>
                 <StoryContent>
                     <StoryHeading>As Tiles - 3 columns centered</StoryHeading>
                 </StoryContent>
-                <SubcommunityList
+                <Tiles
                     columns={3}
-                    alignment={SubcommunityListAlignment.CENTER}
+                    alignment={TileAlignment.CENTER}
                     items={[
                         {
                             name: "Development",

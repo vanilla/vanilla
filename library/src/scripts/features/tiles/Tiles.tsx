@@ -5,17 +5,12 @@
  */
 
 import React from "react";
-import {
-    subcommunityListClasses,
-    subcommunityListVariables,
-} from "@library/features/subcommunities/subcommunityListStyles";
-
-import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
-import SubcommunityTile from "@library/features/subcommunities/SubcommunityTile";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
+import { subcommunityListClasses, subcommunityListVariables } from "@library/features/tiles/subcommunityListStyles";
+import Tile from "@library/features/tiles/Tile";
 
-interface ISubcommunity {
+interface ITile {
     icon: string;
     name: string;
     description: string;
@@ -24,25 +19,25 @@ interface ISubcommunity {
 
 interface IProps {
     className?: string;
-    items: ISubcommunity[];
+    items: ITile[];
     title: string;
     titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     hiddenTitle?: boolean;
     emptyMessage: string;
     fallbackIcon?: React.ReactNode;
-    alignment?: SubcommunityListAlignment;
+    alignment?: TileAlignment;
     columns?: number;
 }
 
-export enum SubcommunityListAlignment {
+export enum TileAlignment {
     LEFT = "left",
     CENTER = "center",
 }
 
 /**
- * Renders list of subcommunities
+ * Renders list of tiles
  */
-export default class SubcommunityList extends React.Component<IProps> {
+export default class Tiles extends React.Component<IProps> {
     public render() {
         const vars = subcommunityListVariables();
         const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
@@ -50,22 +45,22 @@ export default class SubcommunityList extends React.Component<IProps> {
 
         if (items.length === 0) {
             return (
-                <div className={classNames("subcommunityList", className, "isEmpty", classes.root(columns))}>
-                    <Paragraph className="subcommunityList-emptyMessage">{this.props.emptyMessage}</Paragraph>
+                <div className={classNames(className, "isEmpty", classes.root(columns))}>
+                    <Paragraph>{this.props.emptyMessage}</Paragraph>
                 </div>
             );
         } else {
             return (
                 <div className={classNames(className, classes.root(columns))}>
                     <ul className={classNames(classes.items(alignment))}>
-                        {items.map((subcommunity, i) => (
+                        {items.map((tile, i) => (
                             <li key={i} className={classNames(classes.item(columns))}>
-                                <SubcommunityTile
-                                    icon={subcommunity.icon}
+                                <Tile
+                                    icon={tile.icon}
                                     fallbackIcon={this.props.fallbackIcon}
-                                    title={subcommunity.name}
-                                    description={subcommunity.description}
-                                    url={subcommunity.url}
+                                    title={tile.name}
+                                    description={tile.description}
+                                    url={tile.url}
                                     columns={columns}
                                 />
                             </li>

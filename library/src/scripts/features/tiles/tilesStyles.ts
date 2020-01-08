@@ -83,7 +83,7 @@ export const tilesClasses = useThemeCache(() => {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "stretch",
-                justifyContent: isCentered ? "center" : "space-between",
+                justifyContent: isCentered ? "center" : "flex-start",
             },
             mediaQueries.oneColumnDown({
                 display: "block",

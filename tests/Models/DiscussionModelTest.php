@@ -137,7 +137,7 @@ class DiscussionModelTest extends TestCase {
             'Body' => 'discuss',
             'InsertUserID' => 123
         ];
-        $actual = $this->model->canClose($discussion);
+        $actual = DiscussionModel::canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -156,7 +156,7 @@ class DiscussionModelTest extends TestCase {
             'Body' => 'discuss',
             'InsertUserID' => 321
         ];
-        $actual = $this->model->canClose($discussion);
+        $actual = DiscussionModel::canClose($discussion);
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -177,7 +177,7 @@ class DiscussionModelTest extends TestCase {
             'Closed' => true,
             'Attributes' => ['ClosedByUserID' => 321]
         ];
-        $actual = $this->model->canClose($discussion);
+        $actual = DiscussionModel::canClose($discussion);
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -188,7 +188,7 @@ class DiscussionModelTest extends TestCase {
     public function testCanCloseAdminTrue() {
         $this->session->UserID = 123;
         $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
-        $actual = $this->model->canClose($discussion);
+        $actual = DiscussionModel::canCLose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -204,7 +204,7 @@ class DiscussionModelTest extends TestCase {
         $discussion->Name = 'test';
         $discussion->Body = 'discuss';
         $discussion->InsertUserID = 123;
-        $actual = $this->model->canClose($discussion);
+        $actual = DiscussionModel::canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }

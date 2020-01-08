@@ -76,6 +76,8 @@ export const panelAreaClasses = useThemeCache(() => {
             left: 0,
             right: 0,
             position: "absolute",
+            height: 50,
+            background: linearGradient("to top", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
             width: percent(100),
         });
     };

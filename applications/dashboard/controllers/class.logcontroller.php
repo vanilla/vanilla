@@ -245,48 +245,6 @@ class LogController extends DashboardController {
     }
 
     /**
-     * Access the log history of a specific discussion thread
-     *
-     * @param string $recordID
-     * @param string $page
-     */
-    public function discussion(string $recordID, string $page = '') {
-        $this->permission('Garden.Moderation.Manage');
-        $limit = 10;
-        $this->setData('Limit', $limit);
-        list($offset, $limit) = offsetLimit($page, $limit);
-        $this->setData('Title', t('Change Log'));
-
-        $where = [
-            'Operation' => ['Edit', 'Delete', 'Ban'],
-            'RecordType' => 'Discussion',
-            'RecordID' => $recordID
-        ];
-        $orWhere = [
-            'RecordType' => 'Comment',
-            'ParentRecordID' => $recordID
-        ];
-        $recordCount = $this->LogModel->getCountWhere($where, $orWhere);
-        $this->setData('RecordCount', $recordCount);
-
-        if ($offset >= $recordCount) {
-            $offset = $recordCount - $limit;
-        }
-
-        $log = $this->LogModel->getWhere($where, 'LogID', 'Desc', $offset, $limit, $orWhere);
-        $this->setData('Log', $log);
-
-        if ($this->deliveryType() == DELIVERY_TYPE_VIEW) {
-            $this->View = 'Table';
-        }
-
-        Gdn_Theme::section('Moderation');
-        $this->setHighlightRoute('dashboard/log/edits');
-        $this->render('record', 'log', 'dashboard');
-    }
-
-
-    /**
      * Searches the logs for edit, delete or ban operations on posts made by the user with the given user ID.
      *
      * @param $recordUserID The user ID to search the logs for.

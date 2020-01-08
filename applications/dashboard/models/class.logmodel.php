@@ -392,9 +392,10 @@ class LogModel extends Gdn_Pluggable {
      * @param string $orderDirection The order direction.
      * @param bool $offset The database offset.
      * @param bool $limit The database limit.
+     * @param array|null $orWhere The orWhere filter
      * @return array Returns a data set.
      */
-    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $offset = false, $limit = false, $orWhere = false) {
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $offset = false, $limit = false, $orWhere = null) {
         if ($offset < 0) {
             $offset = 0;
         }
@@ -412,7 +413,7 @@ class LogModel extends Gdn_Pluggable {
             ->join('User iu', 'l.InsertUserID = iu.UserID', 'left')
             ->where($where);
 
-        if ($orWhere) {
+        if (is_array($orWhere)) {
             $sql->orWhere($orWhere);
         }
         $sql->limit($limit, $offset)
@@ -437,8 +438,9 @@ class LogModel extends Gdn_Pluggable {
      * @param array $where The filter.
      * @param bool|array $orWhere
      * @return int Returns the count.
+     * @param array|null $orWhere The orWhere filter
      */
-    public function getCountWhere($where, $orWhere = false) {
+    public function getCountWhere($where, $orWhere = null) {
         if (isset($where['Operation'])) {
             Gdn::sql()->whereIn('Operation', (array)$where['Operation']);
             unset($where['Operation']);
@@ -449,7 +451,7 @@ class LogModel extends Gdn_Pluggable {
             ->from('Log l')
             ->where($where);
 
-        if ($orWhere) {
+        if (is_array($orWhere)) {
             $sql->orWhere($orWhere);
         }
 

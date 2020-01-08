@@ -16,6 +16,13 @@ use Garden\Container\Reference;
  */
 class VanillaHooks implements Gdn_IPlugin {
 
+    /** @var LogModel */
+    private $logModel;
+
+    public function __construct(\LogModel $logModel) {
+        $this->logModel = $logModel;
+    }
+
     /**
      * Handle the container init event to register things with the container.
      *
@@ -1078,6 +1085,49 @@ class VanillaHooks implements Gdn_IPlugin {
             ->addLinkIf(c('Vanilla.Archive.Date', false) &&  Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Archive Discussions'), '/vanilla/settings/archive', 'forum.archive', 'nav-forum-archive', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Embedding'), 'embed/forum', 'site-settings.embed-site', 'nav-embed nav-embed-site', $sort)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
+    }
+
+    /**
+     * Access the change log of a discussion thread
+     *
+     * @param LogController $sender
+     * @param array $args
+     * @param string $recordID
+     * @param string $page
+     */
+    public function logController_discussion_create(LogController $sender, array $args, string $recordID, string $page = '') {
+        $sender->permission('Garden.Moderation.Manage');
+        $limit = 10;
+        $sender->setData('Limit', $limit);
+        list($offset, $limit) = offsetLimit($page, $limit);
+        $sender->setData('Title', t('Change Log'));
+
+        $where = [
+            'Operation' => ['Edit', 'Delete', 'Ban'],
+            'RecordType' => 'Discussion',
+            'RecordID' => $recordID
+        ];
+        $orWhere = [
+            'RecordType' => 'Comment',
+            'ParentRecordID' => $recordID
+        ];
+        $recordCount = $this->logModel->getCountWhere($where, $orWhere);
+        $sender->setData('RecordCount', $recordCount);
+
+        if ($offset >= $recordCount) {
+            $offset = $recordCount - $limit;
+        }
+
+        $log = $this->logModel->getWhere($where, 'LogID', 'Desc', $offset, $limit, $orWhere);
+        $sender->setData('Log', $log);
+
+        if ($sender->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $sender->View = 'Table';
+        }
+
+        Gdn_Theme::section('Moderation');
+        $sender->setHighlightRoute('dashboard/log/edits');
+        $sender->render('record', 'log', 'dashboard');
     }
 
     /**

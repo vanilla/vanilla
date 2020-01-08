@@ -158,7 +158,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
-        $res['preview']['previewImage'] = $themeInfo['IconUrl'];
+        $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
 
         return $res;
     }

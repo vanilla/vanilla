@@ -6,9 +6,9 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
-import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
+import { tileClasses } from "@library/features/tiles/titleStyles";
 
 interface IProps {
     icon: string;
@@ -33,7 +33,7 @@ export default class Tile extends React.Component<IProps> {
         const { icon, title, description, url, className, iconAltText, headingLevel, columns } = this.props;
         const H = `h${headingLevel}` as "h1";
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
-        const classes = subcommunityTileClasses();
+        const classes = tileClasses();
         return (
             <div className={classNames(className, classes.root(columns))}>
                 <SmartLink className={classNames("subcommunityTile-link", classes.link(columns))} to={url}>

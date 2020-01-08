@@ -23,10 +23,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
-import {
-    panelBackgroundClasses,
-    panelBackgroundVariables,
-} from "@knowledge/modules/article/components/panelBackgroundStyles";
+import { panelBackgroundClasses } from "@library/layout/panelBackgroundStyles";
 
 export interface IProps {
     className?: string;

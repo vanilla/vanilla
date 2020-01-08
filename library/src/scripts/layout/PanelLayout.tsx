@@ -13,7 +13,7 @@ import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
-import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 
 interface IProps {
     className?: string;

@@ -15,7 +15,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 
 export const layoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();

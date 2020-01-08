@@ -33,7 +33,6 @@ import { SignInIcon } from "@library/icons/common";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
-import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
 
 interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.

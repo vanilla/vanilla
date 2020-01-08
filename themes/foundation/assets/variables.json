@@ -1,15 +1,15 @@
 {
     "global": {
         "mainColors": {
-            "primary": "#26a648",
+            "primary": "#0ad03f",
             "fg": "#fff",
-            "bg": "#222"
+            "bg": "#0e0f19"
         }
     },
     "titleBar": {
         "colors": {
-            "fg": "#333",
-            "bg": "#fff"
+            "fg": "#fff",
+            "bg": "#00074e"
         },
         "border": {
             "type": "shadow"

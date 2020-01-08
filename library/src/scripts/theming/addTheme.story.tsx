@@ -11,7 +11,7 @@ import AddTheme from "./AddTheme";
 
 const story = storiesOf("Theme", module);
 
-story.add("Add Thme", () => {
+story.add("Add Theme", () => {
     return (
         <>
             <StoryContent>

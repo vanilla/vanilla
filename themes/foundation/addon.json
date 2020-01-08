@@ -3,7 +3,7 @@
     "name": "Foundation",
     "description": "A responsive Vanilla theme with customization options.",
     "version": "1.0.1",
-    "hidden": false,
+    "hidden": true,
     "authors": [
         {
             "name": "Stéphane LaFlèche",

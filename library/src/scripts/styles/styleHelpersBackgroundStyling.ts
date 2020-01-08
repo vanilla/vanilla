@@ -11,6 +11,7 @@ import {
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
     ObjectFitProperty,
+    OpacityProperty,
     PositionProperty,
 } from "csstype";
 import { percent, px, quote, url, viewHeight, viewWidth } from "csx";
@@ -27,6 +28,7 @@ export interface IBackground {
     size?: BackgroundSizeProperty<TLength>;
     image?: BackgroundImageProperty;
     fallbackImage?: BackgroundImageProperty;
+    opacity?: OpacityProperty;
 }
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
@@ -59,6 +61,7 @@ export const background = (props: IBackground) => {
         backgroundRepeat: props.repeat || "no-repeat",
         backgroundSize: props.size || "cover",
         backgroundImage: image ? url(image) : undefined,
+        opacity: props.opacity ?? undefined,
     };
 };
 

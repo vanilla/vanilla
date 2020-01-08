@@ -111,7 +111,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             'name' => $theme->getInfoValue('name'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
-            'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme')
+            'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'))
         ];
 
         $res["assets"] = [];
@@ -360,6 +360,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     public function setCurrent($themeKey): array {
         $this->config->set('Garden.Theme', $themeKey);
+        $this->config->set('Garden.MobileTheme', $themeKey);
         $this->config->set('Garden.CurrentTheme', $themeKey);
         $theme = $this->getThemeWithAssets($themeKey);
         return $theme;

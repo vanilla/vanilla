@@ -7,7 +7,9 @@
 
 namespace VanillaTests\Models;
 
-use PHPUnit\Framework\Error\Warning;
+
+use DiscussionModel;
+use Gdn;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
@@ -29,6 +31,11 @@ class DiscussionModelTest extends TestCase {
     private $now;
 
     /**
+     * @var \Gdn_Session
+     */
+    private $session;
+
+    /**
      * Get a new model for each test.
      */
     public function setUp(): void {
@@ -36,6 +43,7 @@ class DiscussionModelTest extends TestCase {
 
         $this->model = $this->container()->get(\DiscussionModel::class);
         $this->now = new \DateTimeImmutable();
+        $this->session = Gdn::session();
     }
 
     /**
@@ -112,5 +120,92 @@ class DiscussionModelTest extends TestCase {
         ];
 
         return $r;
+    }
+
+
+    /**
+     * Test canClose() where Admin is false and user has CloseOwn permission.
+     */
+    public function testCanCloseAdminFalseCloseOwnTrue() {
+        $this->session->UserID = 123;
+        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
+        $this->session->getPermissions()->setAdmin(false);
+        $discussion = [
+            'DiscussionID' => 0,
+            'CategoryID' => 1,
+            'Name' => 'test',
+            'Body' => 'discuss',
+            'InsertUserID' => 123
+        ];
+        $actual = DiscussionModel::canClose($discussion);
+        $expected = true;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test canClose() where Admin is false and user has CloseOwn permission but user did not start the discussion.
+     */
+    public function testCanCloseCloseOwnTrueNotOwn() {
+        $this->session->UserID = 123;
+        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
+        $this->session->getPermissions()->setAdmin(false);
+        $discussion = [
+            'DiscussionID' => 0,
+            'CategoryID' => 1,
+            'Name' => 'test',
+            'Body' => 'discuss',
+            'InsertUserID' => 321
+        ];
+        $actual = DiscussionModel::canClose($discussion);
+        $expected = false;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test canClose() with discussion already closed and user didn't start the discussion.
+     */
+    public function testCanCloseCloseIsClosed() {
+        $this->session->UserID = 123;
+        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
+        $this->session->getPermissions()->setAdmin(false);
+        $discussion = [
+            'DiscussionID' => 0,
+            'CategoryID' => 1,
+            'Name' => 'test',
+            'Body' => 'discuss',
+            'InsertUserID' => 321,
+            'Closed' => true,
+            'Attributes' => ['ClosedByUserID' => 321]
+        ];
+        $actual = DiscussionModel::canClose($discussion);
+        $expected = false;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test canClose() where Admin is true.
+     */
+    public function testCanCloseAdminTrue() {
+        $this->session->UserID = 123;
+        $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
+        $actual = DiscussionModel::canCLose($discussion);
+        $expected = true;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test canClose() with discussion object.
+     */
+    public function testCanCloseDiscussionObject() {
+        $this->session->UserID = 123;
+        $discussion = new \stdClass();
+        $discussion->DiscussionID = 0;
+        $discussion->CategoryID = 1;
+        $discussion->Name = 'test';
+        $discussion->Body = 'discuss';
+        $discussion->InsertUserID = 123;
+        $actual = DiscussionModel::canClose($discussion);
+        $expected = true;
+        $this->assertSame($expected, $actual);
     }
 }

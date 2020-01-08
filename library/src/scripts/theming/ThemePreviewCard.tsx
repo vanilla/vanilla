@@ -8,13 +8,18 @@ import React from "react";
 import { themeCardClasses } from "./themeCardStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
+import {globalVariables} from "@library/styles/globalStyleVars";
+import {colorOut} from "@library/styles/styleHelpersColors";
+import {titleBarVariables} from "@library/headers/titleBarStyles";
 
 interface IProps {
-    globalBg: string;
-    globalFg: string;
-    globalPrimary: string;
-    titleBarBg: string;
-    titleBarFg: string;
+    name?: string;
+    previewImage?: string;
+    globalBg?: string;
+    globalFg?: string;
+    globalPrimary?: string;
+    titleBarBg?: string;
+    titleBarFg?: string;
     headerImg?: string;
     onApply?: () => void;
     onPreview?: () => void;
@@ -30,7 +35,15 @@ export default class ThemePreviewCard extends React.Component<IProps, IState> {
 
     public render() {
         const tiles = [1, 2, 3, 4];
-        const { globalBg, globalPrimary, globalFg, titleBarBg, titleBarFg } = this.props;
+        const vars = globalVariables();
+        const titleVars = titleBarVariables();
+        const {
+            globalBg = colorOut(vars.mainColors.bg)
+            , globalPrimary = colorOut(vars.mainColors.primary)
+            , globalFg = colorOut(vars.mainColors.fg)
+            , titleBarBg = colorOut(titleVars.colors.bg)
+            , titleBarFg = colorOut(titleVars.colors.fg)
+        } = this.props;
         const classes = themeCardClasses();
         const titlebarStyle = {
             backgroundColor: titleBarBg,

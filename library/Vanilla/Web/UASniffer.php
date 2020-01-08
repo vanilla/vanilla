@@ -37,7 +37,7 @@ class UASniffer implements UASnifferInterface {
         }
 
         // Implementation based on https://stackoverflow.com/a/24913015
-        $agentString = $_SERVER['HTTP_USER_AGENT'];
+        $agentString = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (strpos($agentString, 'rv:11.0') !== false
             && strpos($agentString, 'Trident/7.0;')!== false
         ) {

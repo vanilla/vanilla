@@ -56,7 +56,7 @@ export const inputClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
 
-    const textStyles = {
+    const inputMixin: NestedCSSProperties = {
         ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
         backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
@@ -74,10 +74,10 @@ export const inputClasses = useThemeCache(() => {
     };
 
     // Use as assignable unique style.
-    const text = style("text", textStyles as NestedCSSProperties);
+    const text = style("text", inputMixin);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText", textStyles as NestedCSSProperties);
+    const applyInputCSSRules = () => cssRule(" .inputText", inputMixin);
 
     const inputText = style("inputText", {
         marginBottom: 0,
@@ -88,5 +88,5 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, applyInputCSSRules };
+    return { text, inputText, inputMixin, applyInputCSSRules };
 });

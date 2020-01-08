@@ -12,6 +12,7 @@ use Vanilla\Contracts;
 use Vanilla\Addon;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
@@ -51,6 +52,9 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var Addon */
     private $activeTheme;
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
 
     /** @var string */
     private $favIcon;
@@ -92,6 +96,7 @@ class SiteMeta implements \JsonSerializable {
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
+     * @param ThemeFeatres $themeFeatures
      * @param Contracts\AddonInterface $activeTheme
      */
     public function __construct(
@@ -99,6 +104,7 @@ class SiteMeta implements \JsonSerializable {
         Contracts\ConfigurationInterface $config,
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
+        ThemeFeatures $themeFeatures,
         ?Contracts\AddonInterface $activeTheme = null
     ) {
         $this->host = $request->getHost();
@@ -111,6 +117,7 @@ class SiteMeta implements \JsonSerializable {
         $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
 
         $this->featureFlags = $config->get('Feature', []);
+        $this->themeFeatures = $themeFeatures;
 
         $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
@@ -192,6 +199,7 @@ class SiteMeta implements \JsonSerializable {
                 'allowedExtensions' => $this->allowedExtensions,
             ],
             'featureFlags' => $this->featureFlags,
+            'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
         ];
     }

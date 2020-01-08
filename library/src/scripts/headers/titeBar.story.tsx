@@ -83,7 +83,7 @@ story.add(
                 }}
             >
                 <MemoryRouter>
-                    <Provider store={getStore()}>
+                    <Provider store={getStore(initialState, true)}>
                         <TitleBarDeviceProvider>
                             <StoryFullPage>
                                 <StoryHeading>Hamburger menu</StoryHeading>

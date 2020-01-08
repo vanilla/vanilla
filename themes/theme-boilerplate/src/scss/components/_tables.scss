@@ -84,13 +84,15 @@
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
-        color: $component-title_color;
         display: block;
         margin-bottom: $utility-baseUnit;
 
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+        @if $staticVariables {
+            color: $component-title_color;
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
 
         a {
@@ -145,12 +147,14 @@
         line-height: $icon-default_size;
     }
 
-    .Meta,
-    .AuthorInfo {
-        font-size: $component-meta_fontSize;
-        font-weight: $component-meta_fontWeight;
-        line-height: $component-meta_lineHeight;
-        color: $component-meta_color;
+    @if ($staticVariables) {
+        .Meta,
+        .AuthorInfo {
+            font-size: $component-meta_fontSize;
+            font-weight: $component-meta_fontWeight;
+            line-height: $component-meta_lineHeight;
+            color: $component-meta_color;
+        }
     }
 
     .MItem.Category {
@@ -173,11 +177,14 @@
             font-size: inherit;
             font-weight: inherit;
             line-height: inherit;
-            color: $component-meta-link_color;
 
-            &:focus,
-            &:hover {
-                color: $component-meta-link-hover_color;
+            @if ($staticVariables) {
+                color: $component-meta-link_color;
+
+                &:focus,
+                &:hover {
+                    color: $component-meta-link-hover_color;
+                }
             }
         }
     }

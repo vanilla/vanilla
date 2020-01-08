@@ -8,6 +8,7 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule, forceRenderStyles } from "typestyle";
 import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { homePageVariables } from "@library/layout/homePageStyles";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -91,10 +92,13 @@ export const bodyCSS = useThemeCache(() => {
     });
 });
 
-export const bodyClasses = useThemeCache(() => {
+export const fullBackgroundClasses = useThemeCache((isHome = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
     const image = globalVars.body.backgroundImage;
+
+    const source = isHome ? homePageVariables() : globalVars.body;
+
     const root = style(
         {
             display: !image ? "none" : "block",
@@ -105,7 +109,7 @@ export const bodyClasses = useThemeCache(() => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        background(image),
+        background(source.backgroundImage),
     );
 
     return { root };

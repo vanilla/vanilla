@@ -92,7 +92,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
     return (
         <>
-            <Backgrounds />
+            <Backgrounds isHomePage={true} />
             {props.children}
         </>
     );

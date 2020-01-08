@@ -9,6 +9,7 @@ import { percent, viewHeight } from "csx";
 import { cssRule, forceRenderStyles } from "typestyle";
 import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
 import { homePageVariables } from "@library/layout/homePageStyles";
+import { isEmpty } from "lodash";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -96,8 +97,8 @@ export const fullBackgroundClasses = useThemeCache((isHome = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
     const image = globalVars.body.backgroundImage;
-
-    const source = isHome ? homePageVariables() : globalVars.body;
+    const homePageVars = homePageVariables();
+    const source = isHome && !isEmpty(homePageVars.backgroundImage) ? homePageVariables() : globalVars.body;
 
     const root = style(
         {

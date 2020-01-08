@@ -7,8 +7,8 @@
 import React from "react";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import { subcommunityListClasses, subcommunityListVariables } from "@library/features/tiles/subcommunityListStyles";
 import Tile from "@library/features/tiles/Tile";
+import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
 
 interface ITile {
     icon: string;
@@ -39,9 +39,9 @@ export enum TileAlignment {
  */
 export default class Tiles extends React.Component<IProps> {
     public render() {
-        const vars = subcommunityListVariables();
+        const vars = tilesVariables();
         const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
-        const classes = subcommunityListClasses();
+        const classes = tilesClasses();
 
         if (items.length === 0) {
             return (

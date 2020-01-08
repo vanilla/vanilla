@@ -15,7 +15,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { TileAlignment } from "@library/features/tiles/Tiles";
 
 export const tilesVariables = useThemeCache(() => {
-    const themeVars = variableFactory("subcommunityList");
+    const themeVars = variableFactory("tiles");
     const spacing = themeVars("spacing", {
         paddingTwoColumns: 25,
         paddingThreeColumns: 17,
@@ -42,7 +42,7 @@ export const tilesVariables = useThemeCache(() => {
 
 export const tilesClasses = useThemeCache(() => {
     const vars = tilesVariables();
-    const style = styleFactory("subcommunityList");
+    const style = styleFactory("tiles");
     const mediaQueries = layoutVariables().mediaQueries();
 
     const root = (columns?: number) => {

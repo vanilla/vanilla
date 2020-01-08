@@ -93,12 +93,12 @@ export const bodyCSS = useThemeCache(() => {
     });
 });
 
-export const fullBackgroundClasses = useThemeCache((isHome = false) => {
+export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
     const image = globalVars.body.backgroundImage;
     const homePageVars = homePageVariables();
-    const source = isHome && !isEmpty(homePageVars.backgroundImage) ? homePageVariables() : globalVars.body;
+    const source = isRootPage && !isEmpty(homePageVars.backgroundImage) ? homePageVariables() : globalVars.body;
 
     const root = style(
         {

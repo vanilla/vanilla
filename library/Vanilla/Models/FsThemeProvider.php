@@ -107,11 +107,12 @@ class FsThemeProvider implements ThemeProviderInterface {
     private function normalizeTheme(Addon $theme, array $assets): array {
         $res = [
             "assets" => $assets,
+            'name' => $theme->getInfoValue('name'),
             'themeID' => $theme->getInfoValue('key'),
             'name' => $theme->getInfoValue('name'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
-            'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme')
+            'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme')),
         ];
 
         $res["assets"] = [];

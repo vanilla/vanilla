@@ -16,15 +16,15 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");
     const spacing = themeVars("spacing", {
-        paddingTwoColumns: 24,
+        paddingTwoColumns: 25,
         paddingThreeColumns: 17,
         paddingFourColumns: 17,
     });
 
     const sizing = themeVars("sizing", {
-        containerWidthTwoColumns: spacing.paddingTwoColumns * 6 + 384 * 2,
-        containerWidthThreeColumns: spacing.paddingThreeColumns * 8 + 260 * 3,
-        containerWidthFourColumns: spacing.paddingThreeColumns * 10 + 260 * 4,
+        containerWidthTwoColumns: spacing.paddingTwoColumns * 10 + 384 * 2,
+        containerWidthThreeColumns: spacing.paddingThreeColumns * 14 + 260 * 3,
+        containerWidthFourColumns: spacing.paddingThreeColumns * 18 + 260 * 4,
     });
 
     const options = themeVars("options", {
@@ -91,9 +91,7 @@ export const subcommunityListClasses = useThemeCache(() => {
     };
 
     const item = (columns?: number) => {
-        const isTwoColumns = (columns ?? vars.options.columns) === 2;
         const globalVars = globalVariables();
-
         let columnCount = columns ?? vars.options.columns;
         let width: CSSPercentage = "50%";
         let additionnalMediaQueries = [] as NestedCSSProperties[];
@@ -126,13 +124,14 @@ export const subcommunityListClasses = useThemeCache(() => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "stretch",
-                width: isTwoColumns ? unit("50%") : globalVars.utility["percentage.third"],
+                width,
                 padding: unit(padding),
             },
             ...additionnalMediaQueries,
             mediaQueries.oneColumnDown({
                 display: "block",
                 width: percent(100),
+                padding: 0,
             }),
         );
     };

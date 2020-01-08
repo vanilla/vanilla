@@ -20,7 +20,7 @@ import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { styleFactory } from "@library/styles/styleUtils";
 
 export interface IBackground {
-    color: ColorValues;
+    color?: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;

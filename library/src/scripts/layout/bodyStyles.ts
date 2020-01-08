@@ -6,11 +6,14 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { cssRule, forceRenderStyles } from "typestyle";
-import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { cssRule } from "typestyle";
+import { colorOut, background, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { homePageVariables } from "@library/layout/homePageStyles";
+import isEmpty from "lodash/isEmpty";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
+
     cssRule("html", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
     });
@@ -84,12 +87,19 @@ export const bodyCSS = useThemeCache(() => {
             display: "none",
         },
     );
+
+    cssRule("#app", {
+        overflowX: "hidden",
+    });
 });
 
-export const bodyClasses = useThemeCache(() => {
+export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
     const image = globalVars.body.backgroundImage;
+    const homePageVars = homePageVariables();
+    const source = isRootPage && !isEmpty(homePageVars.backgroundImage) ? homePageVariables() : globalVars.body;
+
     const root = style(
         {
             display: !image ? "none" : "block",
@@ -100,7 +110,7 @@ export const bodyClasses = useThemeCache(() => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        background(image),
+        background(source.backgroundImage),
     );
 
     return { root };

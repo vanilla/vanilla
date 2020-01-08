@@ -94,6 +94,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
             transition: "transform 0.3s ease",
             willChange: "transform",
             transform: isScrolledOff ? `translateY(-${scrollOffset}px)` : "none",
+            $debugName: "offsetClass",
         });
 
         // Render out the context with all values and methods.

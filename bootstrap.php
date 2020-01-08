@@ -13,6 +13,7 @@ use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
@@ -68,6 +69,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
+    ->rule(\Vanilla\ImageResizer::class)
+    ->addCall('setAlwaysRewriteGif', [false])
+
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
     ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])
@@ -101,6 +105,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('AddonManager')
     ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
+
+    ->rule(ThemeFeatures::class)
+    ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // ApplicationManager
     ->rule('Gdn_ApplicationManager')

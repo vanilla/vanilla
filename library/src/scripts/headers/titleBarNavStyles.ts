@@ -45,11 +45,27 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         bottomSpace: 1,
     });
 
+    const navLinks = makeThemeVars("navLinks", {
+        fontSize: 14,
+        padding: {
+            left: 8,
+            right: 8,
+        },
+    });
+
+    const navPadding = makeThemeVars("navPadding", {
+        padding: {
+            bottom: 4,
+        },
+    });
+
     return {
         border,
         item,
         linkActive,
         padding,
+        navLinks,
+        navPadding,
     };
 });
 
@@ -57,7 +73,7 @@ const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBarNav");
 
@@ -67,7 +83,7 @@ const titleBarNavClasses = useThemeCache(() => {
             position: "relative",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
@@ -81,7 +97,7 @@ const titleBarNavClasses = useThemeCache(() => {
             height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),
@@ -145,6 +161,15 @@ const titleBarNavClasses = useThemeCache(() => {
     const lastItem = style("lastItem", {
         zIndex: 2,
     });
+    const navContiner = style("navContiner", {
+        paddingBottom: unit(vars.navPadding.padding.bottom),
+    });
+    const navLinks = style("navLink", {
+        fontSize: unit(vars.navLinks.fontSize),
+        fontWeight: globalVars.fonts.weights.normal,
+        paddingLeft: unit(vars.navLinks.padding.left),
+        paddingRight: unit(vars.navLinks.padding.right),
+    });
 
     return {
         root,
@@ -155,6 +180,8 @@ const titleBarNavClasses = useThemeCache(() => {
         linkContent,
         lastItem,
         firstItem,
+        navLinks,
+        navContiner,
     };
 });
 

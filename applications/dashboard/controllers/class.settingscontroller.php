@@ -473,7 +473,7 @@ class SettingsController extends DashboardController {
     public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->setHighlightRoute('dashboard/settings/branding');
-        $this->title(t('Branding'));
+        $this->title(t('Branding & SEO'));
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.HomepageTitle' => [
@@ -501,20 +501,25 @@ class SettingsController extends DashboardController {
                 'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
             ],
             'Garden.Logo' => [
-                'LabelCode' => t('Banner Logo'),
-                'Control' => 'imageupload',
-                'Description' => t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('banner logo'))
-                ]
+                'Label' => t('Banner Logo'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'LogoDescription',
+                    'The banner logo appears at the top of your site. Some themes may not display this logo.'
+                ),
             ],
             'Garden.MobileLogo' => [
-                'LabelCode' => t('Mobile Banner Logo'),
-                'Control' => 'imageupload',
-                'Description' => t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('mobile banner logo'))
-                ]
+                'Label' => t('Mobile Banner Logo'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'MobileLogoDescription',
+                    'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'
+                ),
+            ],
+            'Garden.BannerImage' => [
+                'Label' => t('Banner Image'),
+                'Control' => 'imageUploadReact',
+                'Description' => t('The default banner image across the site. This can be overriden on a per category basis.'),
             ],
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
@@ -528,8 +533,6 @@ class SettingsController extends DashboardController {
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
                 ]
             ],
-
-
             'Garden.TouchIcon' => [
                 'LabelCode' => t('Touch Icon'),
                 'Control' => 'imageupload',
@@ -542,14 +545,15 @@ class SettingsController extends DashboardController {
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('Touch Icon'))
                 ]
             ],
-
             'Garden.ShareImage' => [
-                'LabelCode' => t('Share Image'),
-                'Control' => 'imageupload',
-                'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('share image'))
-                ]
+                'Label' => t('Share Image'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'ShareImageDescription',
+                    "When someone shares a link from your site we try and grab an image from the page. "
+                    . "If there isn't an image on the page then we'll use this image instead. "
+                    . "The image should be at least 50×50, but we recommend 200×200."
+                ),
             ],
             'Garden.MobileAddressBarColor' => [
                 'LabelCode' => t('Mobile Address Bar Color'),
@@ -557,6 +561,17 @@ class SettingsController extends DashboardController {
                 'Description' => t('AddressBarColorDescription', 'Some browsers support a color for the address bar. Mobile only.'),
                 'Options' => [
                     'AllowEmpty' => true,
+                ]
+            ],
+            'Feature.DeferredLegacyScripts.Enabled' => [
+                'LabelCode' => t('Defer Javascript Loading'),
+                'Control' => 'toggle',
+                'Default' => true,
+                'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.<br>
+                    <strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ' .
+                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature')),
+                'Options' => [
+                    'UseRealBoolean' => true
                 ]
             ]
         ]);

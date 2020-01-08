@@ -39,6 +39,7 @@
         "phpmailer/phpmailer": "~5.2",
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
+        "ramsey/uuid": "^3.0",
         "smarty/smarty": "~3.1",
         "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
@@ -55,7 +56,9 @@
         "vanilla/vanilla-connect": "~0.0",
         "twig/twig": "^2.5",
         "psr/event-dispatcher": "^1.0",
-        "fig/event-dispatcher-util": "^1.1"
+        "fig/event-dispatcher-util": "^1.1",
+        "symfony/polyfill-php73": "^1.13",
+        "symfony/polyfill-php74": "^1.13"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -78,6 +81,7 @@
         ],
         "files": [
             "library/core/functions.error.php",
+            "library/core/functions.framework.php",
             "library/core/functions.general.php",
             "library/core/functions.compatibility.php",
             "library/core/functions.deprecated.php"

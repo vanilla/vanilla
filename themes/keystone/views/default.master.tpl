@@ -33,14 +33,25 @@
             </div>
         {/if}
     {/if}
-    {categories_link format=$linkFormat}
-    {discussions_link format=$linkFormat}
-    {if $DataDrivenTitleBar}
-        {knowledge_link format=$linkFormat}
-    {/if}
+   
     {if !$DataDrivenTitleBar}
         {activity_link format=$linkFormat}
+        {categories_link format=$linkFormat}
+        {discussions_link format=$linkFormat}
+        {knowledge_link format=$linkFormat}
         {custom_menu format=$linkFormat}
+       
+       
+    {/if}
+{/capture}
+
+{capture name="navLinks"}
+    {if !$DataDrivenTitleBar}
+        {activity_link format=$linkFormat}
+        {categories_link format=$linkFormat}
+        {discussions_link format=$linkFormat}
+        {custom_menu format=$linkFormat}
+       
     {/if}
 {/capture}
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -110,9 +121,7 @@
                                     {mobile_logo}
                                 </a>
                                 <nav class="Header-desktopNav">
-                                    {categories_link format=$linkFormat}
-                                    {discussions_link format=$linkFormat}
-                                    {custom_menu format=$linkFormat}
+                                     {$smarty.capture.navLinks}
                                 </nav>
                                 <div class="Header-flexSpacer"></div>
                                 <div class="Header-right">
@@ -147,10 +156,8 @@
                                         </div>
                                     </div>
                                 {/if}
-                                {categories_link format=$linkFormat}
-                                {discussions_link format=$linkFormat}
-                                {activity_link format=$linkFormat}
-                                {custom_menu format=$linkFormat}
+                               {$smarty.capture.navLinks}
+                               
                                 <div class='Navigation-linkContainer'>
                                     {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
                                 </div>
@@ -176,8 +183,8 @@
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
                     <div class="Herobanner">
-                        {if $heroImageUrl}
-                            <div class="Herobanner-bgImage" style="background-image:url('{$heroImageUrl}')"></div>
+                        {if {banner_image_url}}
+                            <div class="Herobanner-bgImage" style="background-image:url('{banner_image_url}')"></div>
                         {/if}
                         <div class="Container">
                             {if $ThemeOptions.Options.hasFeatureSearchbox}

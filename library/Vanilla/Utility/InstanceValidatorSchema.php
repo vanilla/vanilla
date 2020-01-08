@@ -16,14 +16,14 @@ use Garden\Schema\ValidationField;
 class InstanceValidatorSchema extends Schema {
 
     /** @var string */
-    private $className;
+    private $classNames;
 
     /**
-     * @param string $className
+     * @param string|array $className
      */
-    public function __construct(string $className) {
+    public function __construct($className) {
         parent::__construct();
-        $this->className = $className;
+        $this->classNames = is_array($className) ? $className : [$className];
         $this->addValidator("", [$this, 'validator']);
     }
 
@@ -36,8 +36,16 @@ class InstanceValidatorSchema extends Schema {
      * @return bool
      */
     public function validator($value, ValidationField $field) {
-        if (!($value instanceof $this->className)) {
-            $field->addError(get_class($value) . ' is not an instanceof ' . $this->className);
+        $matches = false;
+        foreach ($this->classNames as $className) {
+            if ($value instanceof $className) {
+                $matches = true;
+                break;
+            }
+        }
+
+        if (!$matches) {
+            $field->addError(get_class($value) . ' is not an instanceof oneof ' . implode(", ", $this->classNames));
 
             return false;
         }

@@ -59,11 +59,14 @@ dashboardHeading({
             {{ form.textBox('CssClass', {'MultiLine': false}) }}
         </div>
     </li>
-    {{ form.imageUploadPreview(
+    {{ form.imageUploadReact(
         'Photo',
-        t('Photo'),
-        '',
-        category.CategoryID is defined ? 'vanilla/settings/deletecategoryphoto/' ~ category.CategoryID : ''
+        t('Photo')
+    ) }}
+    {{ form.imageUploadReact(
+        "BannerImage",
+        t('Banner Image'),
+        t('The banner image to use for this category. Recommended dimensions are about 1000px by 400px or a similar ratio.')
     ) }}
 
     {#

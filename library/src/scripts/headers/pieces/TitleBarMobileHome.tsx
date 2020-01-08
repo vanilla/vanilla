@@ -14,7 +14,6 @@ import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
@@ -25,6 +24,7 @@ import { SignInIcon } from "@library/icons/common";
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
+    navigationLinks?: boolean;
 }
 
 /**
@@ -68,7 +68,6 @@ export class TitleBarMobileHome extends React.Component<IProps> {
                 <div className={classes.bottom}>
                     <div className={titleBarVars.scroll}>
                         <TitleBarNav
-                            {...dummyNavigationData()}
                             className={classNames("titleBar-nav", titleBarVars.nav)}
                             linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
                             linkContentClassName="titleBar-navLinkContent"

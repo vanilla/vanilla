@@ -359,7 +359,7 @@ class MessagesApiController extends AbstractApiController {
                 Schema::parse([
                     'conversationID',
                     'body',
-                    'format:s?' => 'The input format of the record.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                 ])->add($this->fullSchema()),
                 'MessagePost'
             );

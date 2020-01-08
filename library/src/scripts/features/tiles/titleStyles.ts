@@ -203,7 +203,6 @@ export const tileClasses = useThemeCache(() => {
         fontSize: unit(vars.description.fontSize),
         lineHeight: vars.description.lineHeight,
         textAlign: "center",
-        display: "none",
     });
 
     const fallBackIcon = style("fallbackIcon", {

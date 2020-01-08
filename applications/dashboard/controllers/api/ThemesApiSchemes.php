@@ -35,6 +35,7 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'current:b?',
+                'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
             ]),
             $type
@@ -164,8 +165,8 @@ trait ThemesApiSchemes {
     private function themePutCurrentSchema(string $type = 'in'): Schema {
         $schema = $this->schema(
             Schema::parse([
-                'themeID:i' => [
-                    'description' => 'Theme ID.',
+                'themeID:s' => [
+                    'description' => 'Theme ID or Theme Key',
                 ],
             ]),
             $type
@@ -198,6 +199,7 @@ trait ThemesApiSchemes {
             "titleBar.colors.bg:s?",
             "titleBar.colors.fg:s?",
             "splash.outerBackground.image:s?",
+            "theme.preview.image:s?",
         ])->setID('themeAssetsPreviewSchema');
         return $schema;
     }

@@ -3,24 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import Backgrounds from "@library/layout/Backgrounds";
 import getStore, { resetStore } from "@library/redux/getStore";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
-import React, { useContext, useState, useEffect, useLayoutEffect, useMemo, useCallback } from "react";
+import React, { useContext, useState, useLayoutEffect, useMemo, useCallback } from "react";
 import { Provider } from "react-redux";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 import isEqual from "lodash/isEqual";
-import { setMeta } from "@library/utility/appUtils";
-import { randomBytes } from "crypto";
 import { clearThemeCache } from "@library/styles/styleUtils";
 import { LoadStatus } from "@library/@types/api/core";
-import { forceRenderStyles } from "typestyle";
 import { resetStoreState } from "@library/__tests__/testStoreState";
 import merge from "lodash/merge";
+import { Backgrounds } from "@library/layout/Backgrounds";
 
 const errorMessage = "There was an error fetching the theme.";
 

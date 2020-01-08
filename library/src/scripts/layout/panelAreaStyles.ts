@@ -54,7 +54,7 @@ export const panelAreaClasses = useThemeCache(() => {
 
     const overflowFull = (offset: number) =>
         style("overflowFull", {
-            maxHeight: calc(`100vh - ${unit(offset)}`),
+            height: calc(`100vh - ${unit(offset)}`),
             overflow: "auto",
             position: "relative",
             minHeight: 100,

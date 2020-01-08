@@ -63,7 +63,6 @@ export class TitleBarNavItem extends React.Component<IProps> {
      */
     public currentPage = (): boolean => {
         if (this.props.location && this.props.location.pathname) {
-            console.log(siteUrl(window.location.pathname), formatUrl(this.props.to, true));
             return siteUrl(window.location.pathname) === formatUrl(this.props.to, true);
         } else {
             return false;

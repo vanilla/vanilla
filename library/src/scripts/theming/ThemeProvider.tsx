@@ -14,7 +14,8 @@ import { prepareShadowRoot } from "@vanilla/dom-utils";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
-import { Backgrounds } from "@library/layout/Backgrounds";
+import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
+import { BrowserRouter } from "react-router-dom";
 
 interface IProps {
     children: React.ReactNode;
@@ -91,8 +92,12 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
     return (
         <>
-            <Backgrounds />
-            {props.children}
+            <BrowserRouter>
+                <BackgroundsProvider>
+                    <Backgrounds />
+                    {props.children}
+                </BackgroundsProvider>
+            </BrowserRouter>
         </>
     );
 };

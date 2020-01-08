@@ -39,11 +39,9 @@ export function Router(props: IProps) {
 
     if (!props.disableDynamicRouting) {
         routes = (
-            <BackgroundsProvider>
-                <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>
-                    <BackRoutingProvider>{routes}</BackRoutingProvider>
-                </LinkContextProvider>
-            </BackgroundsProvider>
+            <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>
+                <BackRoutingProvider>{routes}</BackRoutingProvider>
+            </LinkContextProvider>
         );
     }
 

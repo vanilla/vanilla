@@ -32,12 +32,6 @@ export const subcommunityTileVariables = useThemeCache(() => {
         color: globalVars.mainColors.primary as ColorHelper,
     });
 
-    const minWidths = themeVars("minWidths", {
-        big: 384,
-        small: 260,
-        fourColumns: 1,
-    });
-
     const frame = themeVars("frame", {
         height: 90 as PaddingProperty<TLength>,
         width: 90 as PaddingProperty<TLength>,
@@ -65,7 +59,9 @@ export const subcommunityTileVariables = useThemeCache(() => {
         },
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
-        minHeight: 280,
+        twoColumnsMinHeight: 0,
+        threeColumnsMinHeight: 0,
+        fourColumnsMinHeight: 0,
     });
 
     const fallBackIcon = themeVars("fallBackIcon", {
@@ -113,38 +109,56 @@ export const subcommunityTileClasses = useThemeCache(() => {
         });
     };
 
-    const link = style("link", {
-        ...defaultTransition("box-shadow", "border"),
-        ...paddings(vars.link.padding),
-        display: "block",
-        position: "relative",
-        cursor: "pointer",
-        flexGrow: 1,
-        color: colorOut(globalVars.mainColors.fg),
-        backgroundColor: colorOut(vars.link.bg),
-        borderRadius: unit(2),
-        minHeight: unit(vars.link.minHeight),
-        ...shadowOrBorderBasedOnLightness(
-            globalVars.body.backgroundImage.color,
-            borders({
-                color: vars.link.fg.fade(0.3),
-            }),
-            shadow.embed(),
-        ),
-        textDecoration: "none",
-        $nest: {
-            "&:hover": {
-                textDecoration: "none",
-                ...shadowOrBorderBasedOnLightness(
-                    globalVars.body.backgroundImage.color,
-                    borders({
-                        color: vars.link.fg.fade(0.5),
-                    }),
-                    shadow.embedHover(),
-                ),
+    const link = (columns?: number) => {
+        let minHeight;
+
+        switch (columns) {
+            case 2:
+                minHeight = vars.link.twoColumnsMinHeight;
+                break;
+            case 3:
+                minHeight = vars.link.threeColumnsMinHeight;
+                break;
+            case 4:
+                minHeight = vars.link.fourColumnsMinHeight;
+                break;
+            default:
+                minHeight = 0;
+        }
+
+        return style("link", {
+            ...defaultTransition("box-shadow", "border"),
+            ...paddings(vars.link.padding),
+            display: "block",
+            position: "relative",
+            cursor: "pointer",
+            flexGrow: 1,
+            color: colorOut(globalVars.mainColors.fg),
+            backgroundColor: colorOut(vars.link.bg),
+            borderRadius: unit(2),
+            minHeight: unit(minHeight ?? 0),
+            ...shadowOrBorderBasedOnLightness(
+                globalVars.body.backgroundImage.color,
+                borders({
+                    color: vars.link.fg.fade(0.3),
+                }),
+                shadow.embed(),
+            ),
+            textDecoration: "none",
+            $nest: {
+                "&:hover": {
+                    textDecoration: "none",
+                    ...shadowOrBorderBasedOnLightness(
+                        globalVars.body.backgroundImage.color,
+                        borders({
+                            color: vars.link.fg.fade(0.5),
+                        }),
+                        shadow.embedHover(),
+                    ),
+                },
             },
-        },
-    });
+        });
+    };
 
     const main = style("main", {
         position: "relative",
@@ -189,6 +203,7 @@ export const subcommunityTileClasses = useThemeCache(() => {
         fontSize: unit(vars.description.fontSize),
         lineHeight: vars.description.lineHeight,
         textAlign: "center",
+        display: "none",
     });
 
     const fallBackIcon = style("fallbackIcon", {

@@ -63,6 +63,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
+        width: "auto",
         maxWidth: percent(100),
         color: colorOut(
             buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,

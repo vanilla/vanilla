@@ -6,7 +6,9 @@
 
 body {
     @include font-style-base;
-    color: $global-color_fg;
+    @if ($staticVariables) {
+        color: $global-color_fg;
+    }
 }
 
 * {
@@ -107,11 +109,13 @@ abbr {
         font-size: inherit;
         font-weight: inherit;
         font-family: inherit;
-        color: inherit;
-
-        &:focus,
-        &:hover {
+        @if ($staticVariables){
             color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
         }
     }
 }

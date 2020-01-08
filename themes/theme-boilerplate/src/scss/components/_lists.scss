@@ -72,20 +72,25 @@
         display: block;
         margin-bottom: $utility-baseUnit;
 
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+        @if ($staticVariables){
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
+
 
         a {
             font-size: inherit;
             font-weight: inherit;
             display: inline;
-            color: inherit;
-
-            &:focus,
-            &:hover {
+            @if ($staticVariables){
                 color: inherit;
+
+                &:focus,
+                &:hover {
+                    color: inherit;
+                }
             }
         }
     }
@@ -131,11 +136,13 @@
         display: inline-block;
     }
 
-    .Meta,
-    .AuthorInfo {
-        font-size: $component-meta_fontSize;
-        font-weight: $component-meta_fontWeight;
-        color: $component-meta_color;
+    @if ($staticVariables) {
+        .Meta,
+        .AuthorInfo {
+            font-size: $component-meta_fontSize;
+            font-weight: $component-meta_fontWeight;
+            color: $component-meta_color;
+        }
     }
 
     .Meta,
@@ -163,12 +170,14 @@
             font-size: inherit;
             font-weight: inherit;
             line-height: inherit;
-            color: $component-meta-link_color;
+            @if ($staticVariables) {
+                color: $component-meta-link_color;
 
-            &:focus,
-            &:hover {
-                text-decoration: $theme-link-hover_textDecoration;
-                color: $component-meta-link-hover_color;
+                &:focus,
+                &:hover {
+                    text-decoration: $theme-link-hover_textDecoration;
+                    color: $component-meta-link-hover_color;
+                }
             }
         }
     }

@@ -92,7 +92,7 @@ if (!function_exists('writeComment')) :
             $discussion = $discussionModel->getID($comment->DiscussionID);
             $sender->setData('Discussion', $discussion);
         }
-        
+
         if ($sender->data('Discussion.InsertUserID') === $comment->InsertUserID) {
             $cssClass .= ' isOriginalPoster';
         }
@@ -339,7 +339,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
         $canAnnounce = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Announce');
         $canSink = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Sink');
-        $canClose = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close');
+        $canClose = DiscussionModel::canClose($discussion);
         $canDelete = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Delete');
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);

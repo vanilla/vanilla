@@ -19,3 +19,16 @@ export default class Backgrounds extends React.Component {
         return <div className={classes.root} />;
     }
 }
+
+export function fullBackgroundCompat() {
+    bodyCSS(); // set styles on body tag
+
+    // Make a backwards compatible body background (absolute positioned).
+    const classes = bodyClasses();
+    const fullBodyBackground = document.createElement("div");
+    fullBodyBackground.classList.add(classes.root);
+    const frameBody = document.querySelector(".Frame-body");
+    if (frameBody) {
+        frameBody.prepend(fullBodyBackground);
+    }
+}

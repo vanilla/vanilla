@@ -5,12 +5,13 @@
  */
 
 /* ------------------ Theme ------------------ */
+$staticVariables: false;
 
 @import "variables";
 
 /* --------------- Boilerplate --------------- */
 
-@import "../../../theme-boilerplate/src/scss/custom";
+@import "../../../theme-boilerplate/src/scss/custom_compat";
 
 /* --------------- Components --------------- */
 
@@ -19,3 +20,7 @@
 /* ------------------ Sections ------------------ */
 
 @import "themeoptions";
+
+.Arrow.SpFlyoutHandle:before {
+    display: none;
+}

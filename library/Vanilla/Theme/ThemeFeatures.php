@@ -25,23 +25,27 @@ class ThemeFeatures {
         'NewFlyouts' => false,
         'SharedMasterView' => false,
         'ProfileHeader' => false,
+        'DataDrivenForumColors' => false,
     ];
 
     /**
      * Constuctor.
      *
-     * @param Addon $theme
      * @param ConfigurationInterface $config
+     * @param Addon|null $theme
      */
-    public function __construct(Addon $theme, ConfigurationInterface $config) {
-        $this->theme = $theme;
+    public function __construct(ConfigurationInterface $config, ?Addon $theme) {
         $this->config = $config;
+        $this->theme = $theme;
     }
 
     /**
      * Get all of the current theme features.
      */
     public function allFeatures(): array {
+        if ($this->theme === null) {
+            return self::FEATURE_DEFAULTS;
+        }
         $configValues = [
             'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
         ];

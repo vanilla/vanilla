@@ -30,3 +30,5 @@ ignore:
   - "**/views/**/*.php"
   - "**/settings/**.*.php"
   - "**/conf/**/*.php"
+  - "**/*.css"
+  - "**/*.scss"

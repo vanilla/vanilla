@@ -3,11 +3,11 @@
     "name": "Foundation",
     "description": "A responsive Vanilla theme with customization options.",
     "version": "1.0.1",
-    "hidden": false,
+    "hidden": true,
     "authors": [
         {
-            "name": "Isis Graziatto",
-            "email": "isis.g@vanillaforums.com",
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
             "homepage": "https://vanillaforums.com"
         },
         {
@@ -24,7 +24,8 @@
     "Features": {
         "ProfileHeader": true,
         "SharedMasterView": true,
-        "NewFlyouts": true
+        "NewFlyouts": true,
+        "DataDrivenForumColors": true
     },
     "assets": {
         "footer": {
@@ -34,6 +35,10 @@
         "styles": {
             "type": "css",
             "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
         }
     }
 }

@@ -195,6 +195,7 @@
     content: $icon-google-plus-alt;
 }
 
+
 .ReactGooglePlus:hover {
     &::before {
         color: #DD4B39;
@@ -207,10 +208,12 @@
     }
 }
 
-.ReactButton.PopupWindow {
-    &:hover {
-        .Sprite::before {
-            color: $global-color_primary;
+@if ($staticVariables) {
+    .ReactButton.PopupWindow {
+        &:hover {
+            .Sprite::before {
+                color: $global-color_primary;
+            }
         }
     }
 }
@@ -316,12 +319,16 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        color: $global-color_primary;
+        @if ($staticVariables) {
+            color: $global-color_primary;
+        }
         content: $icon-star-empty;
     }
 
     &:hover::before {
-        color: $global-color_primaryAlt;
+        @if ($staticVariables) {
+            color: $global-color_primaryAlt;
+        }
     }
 }
 

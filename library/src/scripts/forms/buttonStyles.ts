@@ -404,6 +404,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         buttonAsText,
         buttonAsTextPrimary,
         pushRight,
+        iconMixin,
         buttonIconCompact,
         buttonIcon,
         buttonIconRightMargin,

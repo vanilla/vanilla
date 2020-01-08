@@ -249,7 +249,6 @@ export const titleBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = titleBarVariables();
     const formElementVars = formElementsVariables();
-    const headerColors = vars.colors;
     const mediaQueries = vars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBar");
@@ -272,8 +271,8 @@ export const titleBarClasses = useThemeCache(() => {
 
     const root = style({
         maxWidth: percent(100),
-        backgroundColor: headerColors.bg.toString(),
-        color: headerColors.fg.toString(),
+        backgroundColor: vars.colors.bg.toString(),
+        color: vars.colors.fg.toString(),
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {

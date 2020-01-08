@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@vanillaforums/theme-boilerplate@^1.0.10":
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.2.5.tgz#693bf53e631ce211ebffa91bd16e958601ac3100"
-  integrity sha512-jj5UuUZVU+ZBjJA7J4VYmFlkAvpvDeUxa0XGrhcef7j1Zf5PGsecKjoe6GdIQCo5jcnGtC9TzoYWM+j3G/otwg==
+"@vanillaforums/theme-boilerplate@^1.4.2":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.4.0.tgz#4f006f86d38eb4b403a200fb3a20b6879840b469"
+  integrity sha512-0mo41UgrBFHzHk1mAD0koyPHqWpU3RRwBt1Cv3CQNPrr3NFKyxxWkRZCmsVa79RpDsugiBnFdp+Cawv3V8qHdQ==
   dependencies:
     fs-extra "^7.0.0"
 

@@ -2527,17 +2527,19 @@ class CategoryModel extends Gdn_Model {
      * @since 2.2
      */
     public static function permissionCategory($category) {
-        if (!is_integer($category)) {
-            if (empty($category) || empty(((object)$category->PermissionCategoryID))) {
-                return self::categories(-1);
-            }
+        if (empty($category)) {
+            return self::categories(-1);
         }
 
         if (!is_array($category) && !is_object($category)) {
             $category = self::categories($category);
         }
+        
         $permissionCategory = self::categories(val('PermissionCategoryID', $category));
-
+        if (empty($permissionCategory)) {
+            return self::categories(-1);
+        }
+        
         // Ensure all of our values are processed properly.
         self::calculate($permissionCategory);
         return $permissionCategory;

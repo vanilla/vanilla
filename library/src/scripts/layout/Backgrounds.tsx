@@ -24,11 +24,11 @@ export default class Backgrounds extends React.Component<IProps> {
     }
 }
 
-export function fullBackgroundCompat() {
+export function fullBackgroundCompat(isHomePage = false) {
     bodyCSS(); // set styles on body tag
 
     // Make a backwards compatible body background (absolute positioned).
-    const classes = bodyClasses();
+    const classes = fullBackgroundClasses(!!isHomePage);
     const fullBodyBackground = document.createElement("div");
     fullBodyBackground.classList.add(classes.root);
     const frameBody = document.querySelector(".Frame-body");

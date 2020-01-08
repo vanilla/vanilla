@@ -6,10 +6,10 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { cssRule, forceRenderStyles } from "typestyle";
-import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { cssRule } from "typestyle";
+import { colorOut, background, margins, paddings, fonts } from "@library/styles/styleHelpers";
 import { homePageVariables } from "@library/layout/homePageStyles";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -24,7 +24,8 @@
     "Features": {
         "ProfileHeader": true,
         "SharedMasterView": true,
-        "NewFlyouts": true
+        "NewFlyouts": true,
+        "DataDrivenForumColors": true
     },
     "assets": {
         "footer": {

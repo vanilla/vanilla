@@ -682,7 +682,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Definitions += $siteMeta->value();
 
         $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
-        $this->_Definitions['DataDrivenForumColors'] = \Vanilla\FeatureFlagHelper::featureEnabled('DataDrivenForumColors');
 
         $this->_Definitions['ui'] += [
             'siteName' => c('Garden.Title'),

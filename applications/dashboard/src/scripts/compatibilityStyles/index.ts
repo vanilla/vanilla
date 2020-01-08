@@ -19,7 +19,7 @@ import { ColorHelper } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { inputVariables, inputClasses } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
-import { siteNavClasses, siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
+import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;

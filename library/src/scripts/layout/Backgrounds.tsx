@@ -47,7 +47,9 @@ export const BackgroundsProvider = (props: { children: ReactNode }) => {
                 isHomePage,
                 setIsHomePage,
             }}
-        />
+        >
+            {props.children}
+        </BackgroundContext.Provider>
     );
 };
 

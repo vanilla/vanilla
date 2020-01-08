@@ -4,7 +4,7 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { unit, paddings, defaultTransition } from "@library/styles/styleHelpers";
+import { unit, paddings, defaultTransition, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -162,13 +162,18 @@ export const themeCardClasses = useThemeCache(() => {
     const actionButtons = style("actionButtons", {
         textAlign: "center",
         margin: "44px 0",
+        ...flexHelper().middle(),
+        flexDirection: "column",
     });
     const overlay = style("overlay", {
         position: "absolute",
         top: 0,
         left: 0,
+        bottom: 0,
+        right: 0,
         backgroundColor: "rgba(103, 105, 109, 0.8)",
         opacity: 0,
+        ...flexHelper().middle(),
         ...defaultTransition("opacity"),
     });
     const wrapper = style("wrapper", {});

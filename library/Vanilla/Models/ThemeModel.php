@@ -177,9 +177,24 @@ class ThemeModel {
      * @param int $themeID Theme ID to set current.
      * @return array
      */
-    public function setCurrentTheme(int $themeID): array {
+    public function setCurrentTheme($themeID): array {
         $provider = $this->getThemeProvider($themeID);
-        return $provider->setCurrent($themeID);
+
+        if ($theme = $provider->setCurrent($themeID)) {
+            if ($provider->themeKeyType() === 0) {
+                try {
+                    $dbThemeProvider = $this->getThemeProvider(1);
+                    $dbThemeProvider->resetCurrent();
+                } catch (ClientException $e) {
+                    if ($e->getMessage() !== 'No custom theme provider found!') {
+                        throw $e;
+                    }
+                    //do nothing if db provider does not exist
+                }
+            }
+        }
+
+        return $theme;
     }
 
     /**
@@ -306,7 +321,7 @@ class ThemeModel {
      * @return array
      */
     public function generateThemePreview(array $theme): array {
-        $preview = [];
+        $preview = $theme['preview'] ?? [];
 
         if (!($theme["assets"]["variables"] instanceof JsonAsset)) {
             return $preview;

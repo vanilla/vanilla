@@ -333,6 +333,7 @@ $PermissionModel->SQL = $SQL;
 $PermissionModel->define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
+    'Vanilla.Discussions.CloseOwn' => 0,
 ]);
 $PermissionModel->undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 

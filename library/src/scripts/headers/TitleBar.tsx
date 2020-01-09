@@ -43,6 +43,7 @@ interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesP
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
     logoUrl?: string;
+    backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
 }
 
 interface IState {
@@ -131,6 +132,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 <MobileDropDown
                                     title={this.props.title!}
                                     buttonClass={classNames("titleBar-mobileDropDown")}
+                                    hasBackgroundColor={this.props.backgroundColorForMobileDropdown}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>

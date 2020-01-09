@@ -4,7 +4,7 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { unit, paddings, defaultTransition } from "@library/styles/styleHelpers";
+import { unit, paddings, defaultTransition, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -162,30 +162,45 @@ export const themeCardClasses = useThemeCache(() => {
     const actionButtons = style("actionButtons", {
         textAlign: "center",
         margin: "44px 0",
+        ...flexHelper().middle(),
+        flexDirection: "column",
     });
     const overlay = style("overlay", {
         position: "absolute",
         top: 0,
         left: 0,
+        bottom: 0,
+        right: 0,
         backgroundColor: "rgba(103, 105, 109, 0.8)",
         opacity: 0,
-    });
-    const wrapper = style("wrapper", {
+        ...flexHelper().middle(),
         ...defaultTransition("opacity"),
     });
+    const wrapper = style("wrapper", {});
 
     const container = style("container", {
-        width: unit(vars.container.width),
+        maxWidth: unit(vars.container.width),
+        width: "auto",
         height: unit(vars.container.height),
+        overflow: "hidden",
         position: "relative",
         borderRadius: unit(2),
         boxShadow: "0 1px 3px 0 rgba(85, 90, 98, 0.31)",
 
         $nest: {
-            "&:hover": {
-                [`& .${overlay}`]: {
-                    opacity: 1,
-                },
+            [`&:hover .${overlay}`]: {
+                opacity: 1,
+            },
+            [`&:focus .${overlay}`]: {
+                opacity: 1,
+            },
+        },
+    });
+
+    const isFocused = style("isFocused", {
+        $nest: {
+            [`.${overlay}`]: {
+                opacity: 1,
             },
         },
     });
@@ -347,6 +362,17 @@ export const themeCardClasses = useThemeCache(() => {
         display: "none",
     });
 
+    const previewImage = style("previewImage", {
+        objectFit: "cover",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: percent(100),
+        height: percent(100),
+    });
+
     return {
         container,
         titlebar,
@@ -368,6 +394,7 @@ export const themeCardClasses = useThemeCache(() => {
         text3,
         actionButtons,
         buttons,
+        previewImage,
         wrapper,
         noActions,
         title,
@@ -375,6 +402,7 @@ export const themeCardClasses = useThemeCache(() => {
         dots,
         menuBar,
         overlay,
+        isFocused,
         noOverlay,
     };
 });

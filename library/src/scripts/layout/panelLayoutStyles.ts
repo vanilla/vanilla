@@ -290,7 +290,6 @@ export const panelLayoutClasses = useThemeCache(() => {
         width: unit(vars.panel.paddedWidth),
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
-        transform: translateY(`${unit(vars.panelLayoutSpacing.offset.left)}`),
         paddingRight: unit(offset),
     });
 
@@ -300,7 +299,6 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
         overflow: "initial",
-        transform: translateY(`${unit(vars.panelLayoutSpacing.offset.right)}`),
         paddingLeft: unit(offset),
     });
 

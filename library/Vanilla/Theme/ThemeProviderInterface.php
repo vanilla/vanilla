@@ -21,6 +21,13 @@ interface ThemeProviderInterface {
     public function themeKeyType(): int;
 
     /**
+     * Return all themes available.
+     *
+     * @return array
+     */
+    public function getAllThemes(): array;
+
+    /**
      * Returns type of theme with all assets
      *
      * @param string|int $themeKey Theme key or id
@@ -74,10 +81,10 @@ interface ThemeProviderInterface {
     /**
      * Set current theme.
      *
-     * @param int $themeID Theme ID to set current.
+     * @param int|string $themeID Theme ID to set current.
      * @return array
      */
-    public function setCurrent(int $themeID): array;
+    public function setCurrent($themeID): array;
 
     /**
      * Get "current" theme.

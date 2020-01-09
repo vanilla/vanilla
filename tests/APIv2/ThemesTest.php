@@ -7,11 +7,14 @@
 namespace VanillaTests\APIv2;
 
 use Gdn_Configuration;
+use Gdn_Request;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Garden\Container\Reference;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -28,12 +31,39 @@ class ThemesTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
+
+        $root = '/tests/fixtures';
+        $addonManager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => [
+                    "$root/addons", "$root/applications", "$root/plugins"
+                ],
+                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_LOCALE => "$root/locales"
+            ],
+            PATH_ROOT.'/tests/cache/am/test-manager'
+        );
+
+        $request = self::container()->get(Gdn_Request::class);
+        $config = self::container()->get(Gdn_Configuration::class);
+
+        static::container()
+            ->rule(FsThemeProvider::class)
+            ->setConstructorArgs(
+                [
+                    $addonManager,
+                    $request,
+                    $config
+                ]
+            );
+
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
 
         static::container()
             ->get(AddonManager::class)
             ->add($theme);
+
         static::container()
             ->rule(\Vanilla\Models\ThemeModel::class)
             ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
@@ -95,6 +125,22 @@ class ThemesTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test POSTing a theme new name. Should fail since there is no dynamic theme provider.
+     */
+    public function testPostTheme() {
+        $this->expectException(ClientException::class);
+        $response = $this->api()->post("themes", ['name'=>'custom theme']);
+    }
+
+    /**
+     * Test PATCHing a theme. Should fail since there is no dynamic theme provider.
+     */
+    public function testPatchTheme() {
+        $this->expectException(ClientException::class);
+        $response = $this->api()->post("themes", ['name'=>'custom theme']);
+    }
+
+    /**
      * Test getting a theme's logo.
      *
      * @depends testGetByName
@@ -120,5 +166,19 @@ class ThemesTest extends AbstractAPIv2Test {
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
         $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo));
+    }
+
+    /**
+     * Test /themes endpoint returns all available themes.
+     *
+     * Note: If "hidden" variable isn't explicitly declared false
+     * and "sites" or "Garden.Themes.Visible" are set then a theme
+     * will not be available.
+     *
+     */
+    public function testIndex() {
+        $response = $this->api()->get("themes");
+        $body = $response->getBody();
+        $this->assertEquals(2, count($body));
     }
 }

@@ -7,8 +7,9 @@
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { negative, unit } from "@library/styles/styleHelpers";
+import { negative, unit, colorOut } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -113,7 +114,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         },
     });
 
-    const link = style("link", {
+    const linkMixin: NestedCSSProperties = {
         display: "block",
         flexGrow: 1,
         color: "inherit",
@@ -127,7 +128,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 outline: 0,
             },
             "&:hover": {
-                color: globalVars.links.colors.default.toString(),
+                color: colorOut(globalVars.links.colors.default.toString()),
             },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
@@ -140,7 +141,8 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 },
             },
         },
-    });
+    };
+    const link = style("link", linkMixin);
 
     const label = style(
         "label",
@@ -190,5 +192,5 @@ export const siteNavNodeClasses = useThemeCache(() => {
         transform: `translateY(-50%)`,
     });
 
-    return { root, children, contents, link, label, spacer, toggle, buttonOffset };
+    return { root, children, contents, link, linkMixin, label, spacer, toggle, buttonOffset };
 });

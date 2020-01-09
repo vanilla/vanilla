@@ -9,11 +9,13 @@
 }
 
 @mixin font-style-base() {
-    font-family: $global-body_fontFamily;
     font-weight: $global-normal_fontWeight;
     font-size: $global-medium_fontSize;
     line-height: $global-base_lineHeight;
-    color: $global-color_fg;
+    @if ($staticVariables) {
+        font-family: $global-body_fontFamily;
+        color: $global-color_fg;
+    }
 }
 
 @mixin font-link() {
@@ -21,12 +23,16 @@
     font-family: $link-body_fontFamily;
     font-weight: $link-body_fontWeight;
     font-size: $link-body_fontSize;
-    color: $link_default-color;
+    @if ($staticVariables) {
+        color: $link_default-color;
+    }
     line-height: inherit;
 
-    &:focus,
-    &:hover {
-        color: $link_default_hover-color;
+    @if ($staticVariables) {
+        &:focus,
+        &:hover {
+            color: $link_default_hover-color;
+        }
     }
 }
 
@@ -341,12 +347,14 @@
         }
     }
 
-    .CategoryName h2 {
-        color: $component-title_color;
 
-        &:focus,
-        &:hover {
-            color: $component-title-hover_color;
+    @if $staticVariables {
+        .CategoryName h2 {
+            color: $component-title_color;
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
         }
     }
 
@@ -716,12 +724,19 @@
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     transition: background 0.1s ease, border 0.1s ease;
-    background: $bg;
-    color: $fg;
+    @if ($staticVariables) {
+        background: $bg;
+        color: $fg;
+    }
     border: $formButton_border;
-    border-color: $border;
+    @if ($staticVariables) {
+        border-color: $border;
+    }
     line-height: $formButton_height;
     min-height: $formButton_height;
+    @if ($staticVariables) {
+        width: $formButton_height;
+    }
     padding: 0 $formButton_padding;
     text-decoration: none;
     border-radius: $formButton_borderRadius;
@@ -732,12 +747,14 @@
         max-width: 100%;
     }
 
-    &:hover,
-    &:active,
-    &:focus {
-        background: $bgHover;
-        color: $fgHover;
-        border-color: $borderHover;
+    @if ($staticVariables) {
+        &:hover,
+        &:active,
+        &:focus {
+            background: $bgHover;
+            color: $fgHover;
+            border-color: $borderHover;
+        }
     }
 }
 
@@ -746,15 +763,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
     font-size: $icon-default_size;
     font-family: Arial, sans-serif;
-    color: rgba($color, .7);
+    @if ($staticVariables) {
+        background: transparent;
+        color: rgba($color, .7);
+    }
     visibility: visible;
 
-    &:hover {
-        background: transparent;
-        color: $color;
+    @if ($staticVariables) {
+        &:hover {
+            background: transparent;
+            color: $color;
+        }
     }
 }
 

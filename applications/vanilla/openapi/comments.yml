@@ -261,9 +261,7 @@ paths:
                     description: The ID of the discussion.
                     type: integer
                   format:
-                    description: The input format of the comment.
-                    minLength: 1
-                    type: string
+                    $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
                 required:
                 - commentID
                 - discussionID
@@ -322,9 +320,7 @@ paths:
                     nullable: true
                     type: string
                   format:
-                    description: The original format of the comment
-                    minLength: 1
-                    type: string
+                    $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
                   insertUser:
                     $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
                   url:
@@ -630,9 +626,7 @@ components:
           description: The ID of the discussion.
           type: integer
         format:
-          description: The input format of the comment.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
       required:
       - body
       - format

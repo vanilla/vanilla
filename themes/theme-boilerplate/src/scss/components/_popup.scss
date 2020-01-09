@@ -136,13 +136,14 @@ div.Popup {
     }
 }
 
-#Form_Cancel {
-
-    &:focus,
-    &:hover {
-        background-color: $button-basic-hover_bg;
-        color: $button-basic-hover_fg;
-        border-color: $button-basic-hover_border;
+@if ($staticVariables) {
+    #Form_Cancel {
+        &:focus,
+        &:hover {
+            background-color: $button-basic-hover_bg;
+            color: $button-basic-hover_fg;
+            border-color: $button-basic-hover_border;
+        }
     }
 }
 

@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Theme\TwigAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -13,6 +14,7 @@ use Vanilla\Theme\StyleAsset;
 //use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
+use Vanilla\Models\ThemeModel;
 
 /**
  * ThemesApiController schemes.
@@ -33,9 +35,27 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'current:b?',
-                'assets?' => $this->assetsSchema()
+                'parentTheme:s?',
+                'assets?' => $this->assetsSchema(),
             ]),
             $type
+        );
+        return $schema;
+    }
+
+    /**
+     * Result theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themesResultSchema(string $type = 'out'): Schema {
+        $schema = $this->themeResultSchema()->merge(
+            Schema::parse(
+                [
+                    'preview?' => [":a" => $this->assetsPreviewSchema()]
+                ]
+            )
         );
         return $schema;
     }
@@ -47,8 +67,8 @@ trait ThemesApiSchemes {
      */
     private function assetsSchema(): Schema {
         $schema = Schema::parse([
-            "header?" => new InstanceValidatorSchema(HtmlAsset::class),
-            "footer?" => new InstanceValidatorSchema(HtmlAsset::class),
+            "header?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
+            "footer?" => new InstanceValidatorSchema([HtmlAsset::class, TwigAsset::class]),
             "variables?" => new InstanceValidatorSchema(JsonAsset::class),
             "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
             "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
@@ -72,6 +92,64 @@ trait ThemesApiSchemes {
                 'name:s' => [
                     'description' => 'Custom theme name.',
                 ],
+                'parentTheme:s' => [
+                    'description' => 'Parent theme template name.',
+                ],
+                'parentVersion:s' => [
+                   'description' => 'Parent theme template version/revision.',
+                ],
+                'assets?' => Schema::parse([
+                    "header:s?",
+                    "footer:s?",
+                    "variables:s?",
+                    "fonts:s?",
+                    "scripts:s?",
+                    "styles:s?",
+                    "javascript:s?"
+                ])
+                    ->addValidator('header', [ThemeModel::class, 'validator'])
+                    ->addValidator('footer', [ThemeModel::class, 'validator'])
+                    ->addValidator('variables', [ThemeModel::class, 'validator'])
+                    ->addValidator('fonts', [ThemeModel::class, 'validator'])
+                    ->addValidator('scripts', [ThemeModel::class, 'validator'])
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    /**
+     * PATCH theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themePatchSchema(string $type = 'in'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'name:s?' => [
+                    'description' => 'Custom theme name.',
+                ],
+                'parentTheme:s?' => [
+                    'description' => 'Parent theme template name.',
+                ],
+                'parentVersion:s?' => [
+                    'description' => 'Parent theme template version/revision.',
+                ],
+                'assets?' => Schema::parse([
+                    "header:s?",
+                    "footer:s?",
+                    "variables:s?",
+                    "fonts:s?",
+                    "scripts:s?",
+                    "styles:s?",
+                    "javascript:s?"
+                ])
+                    ->addValidator('header', [ThemeModel::class, 'validator'])
+                    ->addValidator('footer', [ThemeModel::class, 'validator'])
+                    ->addValidator('variables', [ThemeModel::class, 'validator'])
+                    ->addValidator('fonts', [ThemeModel::class, 'validator'])
+                    ->addValidator('scripts', [ThemeModel::class, 'validator'])
             ]),
             $type
         );
@@ -87,8 +165,8 @@ trait ThemesApiSchemes {
     private function themePutCurrentSchema(string $type = 'in'): Schema {
         $schema = $this->schema(
             Schema::parse([
-                'themeID:i' => [
-                    'description' => 'Theme ID.',
+                'themeID:s' => [
+                    'description' => 'Theme ID or Theme Key',
                 ],
             ]),
             $type
@@ -105,6 +183,24 @@ trait ThemesApiSchemes {
         $schema = Schema::parse([
             "data:s",
         ])->setID('themeAssetsPutSchema');
+        return $schema;
+    }
+
+    /**
+     * PUT 'assets' schema
+     *
+     * @return Schema
+     */
+    private function assetsPreviewSchema(): Schema {
+        $schema = Schema::parse([
+            "global.mainColors.primary:s?",
+            "global.mainColors.bg:s?",
+            "global.mainColors.fg:s?",
+            "titleBar.colors.bg:s?",
+            "titleBar.colors.fg:s?",
+            "splash.outerBackground.image:s?",
+            "theme.preview.image:s?",
+        ])->setID('themeAssetsPreviewSchema');
         return $schema;
     }
 }

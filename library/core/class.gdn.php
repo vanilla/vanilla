@@ -12,6 +12,7 @@
  */
 
 use Vanilla\Formatting\FormatService;
+use Vanilla\Theme\ThemeFeatures;
 
 /**
  * Framework superobject.
@@ -502,6 +503,13 @@ class Gdn {
      */
     public static function themeManager() {
         return self::factory(self::AliasThemeManager);
+    }
+
+    /**
+     * Get the theme features instance.
+     */
+    public static function themeFeatures(): ThemeFeatures {
+        return self::getContainer()->get(ThemeFeatures::class);
     }
 
     /**

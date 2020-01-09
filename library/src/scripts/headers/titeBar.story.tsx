@@ -27,7 +27,7 @@ const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-const story = storiesOf("TitleBar", module);
+const story = storiesOf("Headers", module);
 
 const makeMockGuestUser: IMe = {
     name: "test",
@@ -40,7 +40,7 @@ const makeMockGuestUser: IMe = {
 };
 
 story.add(
-    "Guest User",
+    "TitleBar Guest User",
     () => {
         const initialState = testStoreState({
             users: {
@@ -83,7 +83,7 @@ story.add(
                 }}
             >
                 <MemoryRouter>
-                    <Provider store={getStore()}>
+                    <Provider store={getStore(initialState, true)}>
                         <TitleBarDeviceProvider>
                             <StoryFullPage>
                                 <StoryHeading>Hamburger menu</StoryHeading>
@@ -91,12 +91,7 @@ story.add(
                                 <StoryHeading>Big Logo</StoryHeading>
                                 <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
                                 <StoryHeading>Extra Navigation links</StoryHeading>
-                                <TitleBar
-                                    useMobileBackButton={false}
-                                    hamburger={true}
-                                    isFixed={false}
-                                    navigationLinks={true}
-                                />
+                                <TitleBar useMobileBackButton={false} hamburger={true} isFixed={false} />
                             </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </Provider>

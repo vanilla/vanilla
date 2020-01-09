@@ -178,7 +178,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         // Set the canonical Url.
-        $this->canonicalUrl(userUrl($this->User));
+        $this->canonicalUrl(url(userUrl($this->User), true));
 
         $this->render();
     }
@@ -241,7 +241,7 @@ class ProfileController extends Gdn_Controller {
             touchValue('Connected', $Row, !is_null(val('UniqueID', $Provider, null)));
         }
 
-        $this->canonicalUrl(userUrl($this->User, '', 'connections'));
+        $this->canonicalUrl(url(userUrl($this->User, '', 'connections'), true));
         $this->title(t('Social'));
         require_once $this->fetchViewLocation('connection_functions');
         $this->render();
@@ -1542,8 +1542,10 @@ EOT;
             return;
         }
 
-        // Make sure to add the "Edit Profile" buttons.
-        $this->addModule('ProfileOptionsModule');
+        if (!\Gdn::themeFeatures()->useProfileHeader()) {
+            // Make sure to add the "Edit Profile" buttons if it's not provided through the new profile header.
+            $this->addModule('ProfileOptionsModule');
+        }
 
         // Show edit menu if in edit mode
         // Show profile pic & filter menu otherwise

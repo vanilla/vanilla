@@ -70,30 +70,32 @@
 
     .ButtonGroup.Multi {
 
-        &:focus,
-        &:hover,
-        &:active {
-
-            .Button.Handle,
-            &.Open .Button.Handle {
-                border-color: $navigationButton-hover_border;
-                background-color: $navigationButton-hover_bg;
-                color: $navigationButton-hover_fg;
-            }
-        }
-
-        .Button.Handle,
-        &.Open .Button.Handle {
-            border-color: $navigationButton_border;
-            background-color: $navigationButton_bg;
-            color: $navigationButton_fg;
-
+        @if ($staticVariables) {
             &:focus,
             &:hover,
             &:active {
+
+                .Button.Handle,
+                &.Open .Button.Handle {
+                    border-color: $navigationButton-hover_border;
+                    background-color: $navigationButton-hover_bg;
+                    color: $navigationButton-hover_fg;
+                }
+            }
+
+            .Button.Handle,
+            &.Open .Button.Handle {
                 border-color: $navigationButton_border;
-                background: rgba($navigationButton_bg, 0.05);
+                background-color: $navigationButton_bg;
                 color: $navigationButton_fg;
+
+                &:focus,
+                &:hover,
+                &:active {
+                    border-color: $navigationButton_border;
+                    background: rgba($navigationButton_bg, 0.05);
+                    color: $navigationButton_fg;
+                }
             }
         }
     }
@@ -200,13 +202,14 @@
     display: block;
     width: 100%;
     padding: 0 $utility-baseUnitTriple;
-    color: $navigation_fg;
     display: flex;
     align-items: center;
-
-    &:focus,
-    &:hover {
-        color: $navigation-hover_fg;
+    @if ($staticVariables) {
+        color: $navigation_fg;
+        &:focus,
+        &:hover {
+            color: $navigation-hover_fg;
+        }
     }
 }
 
@@ -269,7 +272,9 @@
     height: 32px;
     width: 32px;
     border-radius: $mebox-button_borderRadius;
-    color: $MobileMeBox_fg;
+    @if ($staticVariables) {
+        color: $MobileMeBox_fg;
+    }
     margin-left: auto;
     opacity: 0.6;
 
@@ -300,8 +305,9 @@
 }
 
 .mobileMebox {
-    background-color: $MobileMeBox_bg;
-
+    @if ($staticVariables) {
+        background-color: $MobileMeBox_bg;
+    }
     .Container {
         display: flex;
         align-items: center;
@@ -338,16 +344,20 @@
 
     .MeButton {
 
-        &:focus,
-        &:hover,
-        &:active {
-            background-color: transparent;
+        @if ($staticVariables) {
+            &:focus,
+            &:hover,
+            &:active {
+                background-color: transparent;
+            }
         }
 
         .Alert {
-            color: $MobileMeBox_fg;
-            background-color: $MobileMeBoxAlert_bg;
-            border-color: $MobileMeBoxAlert_borderColor;
+            @if ($staticVariables) {
+                color: $MobileMeBox_fg;
+                background-color: $MobileMeBoxAlert_bg;
+                border-color: $MobileMeBoxAlert_borderColor;
+            }
 
             @include maxWidth {
                 top: -6px;

@@ -28,11 +28,24 @@ $Construct->table('Category');
 $CategoryExists = $Construct->tableExists();
 $CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
+$HeroImageExists = $Construct->columnExists('HeroImage');
 
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 
 $CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
 $CountAllCommentsExists = $Construct->columnExists('CountAllComments');
+
+// Rename the remnants of the Hero Image plugin.
+if ($HeroImageExists) {
+    Gdn::config()->remove('EnabledPlugins.heroimage');
+    $Construct->table('Category');
+    $Construct->renameColumn('HeroImage', 'BannerImage');
+}
+
+if ($configBannerImage = Gdn::config('Garden.HeroImage')) {
+    Gdn::config()->set('Garden.BannerImage', $configBannerImage);
+    Gdn::config()->remove('Garden.HeroImage');
+}
 
 $Construct->primaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true, 'key')
@@ -55,6 +68,7 @@ $Construct->primaryKey('CategoryID')
     ->column('Sort', 'int', true)
     ->column('CssClass', 'varchar(50)', true)
     ->column('Photo', 'varchar(255)', true)
+    ->column('BannerImage', 'varchar(255)', true)
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')
@@ -126,8 +140,8 @@ $Construct
     ->column('UpdateUserID', 'int', true)
     ->column('FirstCommentID', 'int', true)
     ->column('LastCommentID', 'int', true)
-    ->column('Name', 'varchar(100)', false, 'fulltext')
-    ->column('Body', 'text', false, 'fulltext')
+    ->column('Name', 'varchar(100)', false)
+    ->column('Body', 'text', false)
     ->column('Format', 'varchar(20)', true)
     ->column('Tags', 'text', null)
     ->column('CountComments', 'int', '0')
@@ -200,7 +214,7 @@ $Construct
     ->column('InsertUserID', 'int', true, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DeleteUserID', 'int', true)
-    ->column('Body', 'text', false, 'fulltext')
+    ->column('Body', 'text', false)
     ->column('Format', 'varchar(20)', true)
     ->column('DateInserted', 'datetime', null, ['index.1', 'index'])
     ->column('DateDeleted', 'datetime', true)
@@ -319,6 +333,7 @@ $PermissionModel->SQL = $SQL;
 $PermissionModel->define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
+    'Vanilla.Discussions.CloseOwn' => 0,
 ]);
 $PermissionModel->undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 

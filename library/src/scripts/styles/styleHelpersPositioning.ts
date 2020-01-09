@@ -142,5 +142,6 @@ export const inheritHeightClass = () => {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
+        position: "relative",
     });
 };

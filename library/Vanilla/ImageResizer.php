@@ -11,6 +11,11 @@ namespace Vanilla;
  * Offers utility methods for resizing image files.
  */
 class ImageResizer {
+
+    /** @var bool */
+    protected $alwaysRewriteGif = true;
+
+    /** @var array */
     protected static $typeExt = [
         IMAGETYPE_GIF => 'gif',
         IMAGETYPE_JPEG => 'jpg',
@@ -76,6 +81,13 @@ class ImageResizer {
         }
 
         $resize = $this->calculateResize(['height' => $height, 'width' => $width], $options);
+        $requiresResizing = $height > $resize["height"] && $width > $resize["width"];
+
+        // Rewriting animated GIFs will cause the loss of animation. Allow bypassing rewriting, if configured to do so.
+        if ($srcType === IMAGETYPE_GIF && $requiresResizing === false && $this->alwaysRewriteGif === false) {
+            $resize = $this->directSave($source, $destination, $resize);
+            return $resize;
+        }
 
         try {
             $srcImage = $this->createImage($source, $srcType);
@@ -254,6 +266,22 @@ class ImageResizer {
     }
 
     /**
+     * Direct save a source image to a new destination.
+     *
+     * @param string $source Source file path.
+     * @param string $destination Destination file path.
+     * @param array $resize Resizing configuration details.
+     * @return array
+     */
+    private function directSave(string $source, string $destination, array $resize = []): array {
+        if ($source !== $destination && copy($source, $destination) === false) {
+            throw new \Exception("Unable to save image.");
+        }
+        $resize["path"] = $destination;
+        return $resize;
+    }
+
+    /**
      * Return the type-to-extension map.
      *
      * @return array
@@ -403,5 +431,17 @@ class ImageResizer {
         } finally {
             unlink($tmpPath);
         }
+    }
+
+    /**
+     * Should GIFs always be rewritten? GIFs will be rewritten if they exceed limits, regardless of this setting.
+     * Rewriting animated GIFs will result in loss of animation.
+     *
+     * @param boolean $alwaysRewriteGif
+     * @return self
+     */
+    public function setAlwaysRewriteGif(bool $alwaysRewriteGif): self {
+        $this->alwaysRewriteGif = $alwaysRewriteGif;
+        return $this;
     }
 }

@@ -79,7 +79,7 @@ class CommentsApiController extends AbstractApiController {
             $this->commentPostSchema = $this->schema(
                 Schema::parse([
                     'body',
-                    'format:s' => 'The input format of the comment.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'discussionID'
                 ])->add($this->fullSchema()),
                 'CommentPost'
@@ -236,7 +236,7 @@ class CommentsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the comment.',
-            'format:s' => 'The original format of the comment',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ]);
     }
 
@@ -254,7 +254,7 @@ class CommentsApiController extends AbstractApiController {
             'commentID',
             'discussionID',
             'body',
-            'format:s' => 'The input format of the comment.',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ])
             ->add($this->fullSchema()), 'out')
             ->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
@@ -445,8 +445,9 @@ class CommentsApiController extends AbstractApiController {
      * Add a comment.
      *
      * @param array $body The request body.
-     * @throws ServerException if the comment could not be created.
      * @return array
+     * @throws Exception If the user cannot view the discussion.
+     * @throws ServerException If the comment could not be created.
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -458,6 +459,13 @@ class CommentsApiController extends AbstractApiController {
         $commentData = ApiUtils::convertInputKeys($body);
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
+        $session = $this->getSession();
+        $sessionUser = $session->UserID;
+        $isAdmin = $session->checkRankedPermission('Garden.Moderation.Manage');
+        $canView = $this->discussionModel->canView($discussion, $sessionUser);
+        if (!$canView && !$isAdmin) {
+            throw permissionException('Vanilla.Discussions.View');
+        }
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
         if (!$id) {

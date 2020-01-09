@@ -18,6 +18,8 @@
         "yarn": "^1.4.2"
     },
     "dependencies": {
+        "@monaco-editor/react": "^2.5.0",
+        "@reach/tabs": "^0.6.4",
         "@reach/tooltip": "^0.3.0",
         "axios": "0.18.1",
         "classnames": "2.2.6",
@@ -148,7 +150,7 @@
         "sass-loader": "^7.1.0",
         "sinon": "^7.3.2",
         "storybook-chromatic": "^2.1.1",
-        "style-loader": "^0.23.1",
+        "style-loader": "^1.0.1",
         "terser-webpack-plugin": "^1.2.3",
         "ts-lint": "^4.5.1",
         "ts-node": "^8.1.0",
@@ -181,8 +183,8 @@
         "check-types": "tsc -p tsconfig.json --noemit && yarn lint",
         "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
         "lint": "eslint \"**/*.{ts,tsx}\"",
-        "storybook": "start-storybook -p 9001 -c build/.storybook",
-        "build-storybook": "build-storybook -c build/.storybook -o build/.out",
+        "storybook": "node --max-old-space-size=2048 ./node_modules/.bin/start-storybook -p 9001 -c build/.storybook",
+        "build-storybook": "node --max-old-space-size=2048 ./node_modules/.bin/build-storybook -c build/.storybook -o build/.out",
         "bootstrap": "YARN_IGNORE_ENGINES=true lerna bootstrap",
         "chromatic": "chromatic test"
     }

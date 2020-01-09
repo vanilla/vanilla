@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { calc, color, percent, px, viewHeight } from "csx";
+import { calc, color, percent, px, translateY, viewHeight } from "csx";
 import { cssRule, media } from "typestyle";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -14,15 +14,22 @@ import { panelListClasses } from "@library/layout/panelListStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 
 export const layoutVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("globalVariables");
+
+    const colors = makeThemeVars("colors", {
+        leftColumnBg: globalVars.mainColors.bg,
+    });
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         fullGutter: 48,
         panelWidth: 216,
-        middleColumnWidth: 672,
+        middleColumnWidth: 700,
         minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
         breakPoints: {
@@ -85,6 +92,13 @@ export const layoutVariables = useThemeCache(() => {
         },
         largePadding: {
             top: 64,
+        },
+        offset: {
+            left: -44,
+            right: -36,
+        },
+        withPanelBackground: {
+            gutter: 70,
         },
     });
 
@@ -167,6 +181,7 @@ export const layoutVariables = useThemeCache(() => {
     };
 
     return {
+        colors,
         foundationalWidths,
         gutter,
         panel,
@@ -185,7 +200,6 @@ export const panelLayoutClasses = useThemeCache(() => {
     const style = styleFactory("panelLayout");
     const classesPanelArea = panelAreaClasses();
     const classesPanelList = panelListClasses();
-    const titleBarVars = titleBarVariables();
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -267,11 +281,16 @@ export const panelLayoutClasses = useThemeCache(() => {
         padding: 0,
     });
 
+    const offset = panelBackgroundVariables().config.render
+        ? layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
+        : 0;
+
     const leftColumn = style("leftColumn", {
         position: "relative",
         width: unit(vars.panel.paddedWidth),
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
+        paddingRight: unit(offset),
     });
 
     const rightColumn = style("rightColumn", {
@@ -280,6 +299,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
         overflow: "initial",
+        paddingLeft: unit(offset),
     });
 
     const middleColumn = style("middleColumn", {
@@ -317,8 +337,8 @@ export const panelLayoutClasses = useThemeCache(() => {
         "isSticky",
         {
             ...sticky(),
-            top: titleBarVars.sizing.height * 2,
             height: percent(100),
+            $unique: true,
         },
         mediaQueries.oneColumnDown({
             position: "relative",
@@ -334,7 +354,7 @@ export const panelLayoutClasses = useThemeCache(() => {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        marginBottom: unit(10),
+        paddingBottom: unit(10),
     });
 
     return {

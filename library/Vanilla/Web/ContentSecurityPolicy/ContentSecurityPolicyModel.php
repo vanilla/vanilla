@@ -103,7 +103,7 @@ class ContentSecurityPolicyModel {
             if ($policy->getDirective() === Policy::FRAME_ANCESTORS) {
                 $ancestors = explode(' ', $policy->getArgument());
                 foreach ($ancestors as $ancestor) {
-                    $ancestorArguments []= $ancestor;
+                    $ancestorArguments[] = $ancestor;
                 }
             }
         }

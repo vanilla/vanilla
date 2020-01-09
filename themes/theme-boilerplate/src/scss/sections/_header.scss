@@ -153,3 +153,10 @@
     align-self: stretch;
     align-items: center;
 }
+
+// IE 11 specific bug
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+    .Header-logo img {
+        max-height: unset;
+    }
+}

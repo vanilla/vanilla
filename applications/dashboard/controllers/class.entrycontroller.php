@@ -503,6 +503,8 @@ class EntryController extends Gdn_Controller {
         }
 
         $isTrustedProvider = $this->data('Trusted');
+        $saveRoles = false;
+        $saveRolesRegister = false;
 
         // Check if we need to sync roles
         if (($isTrustedProvider || c('Garden.SSO.SyncRoles'))) {
@@ -535,9 +537,6 @@ class EntryController extends Gdn_Controller {
 
                 $this->Form->setFormValue('RoleID', $roleIDs);
             }
-        } else {
-            $saveRoles = false;
-            $saveRolesRegister = false;
         }
 
         $userModel = Gdn::userModel();

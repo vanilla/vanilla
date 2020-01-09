@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important } from "csx";
+import { color, ColorHelper, important } from "csx";
+import { throwError } from "rxjs";
 
 export type ColorValues = ColorHelper | "transparent" | undefined;
 
@@ -56,18 +57,27 @@ export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, 
  * @param weight - The amount you want to mix the two colors (value from 0 to 1)
  * @param flipIfMax - Modify in the opposite direction if we're darker than black or whiter than white.
  */
-export const emphasizeLightness = (color: ColorHelper, weight: number, flipIfMax: boolean = true) => {
-    const colorLightness = color.lightness();
+export const emphasizeLightness = (
+    colorValue: ColorHelper | "transparent",
+    weight: number,
+    darken: boolean = false,
+    flipIfMax: boolean = true,
+) => {
+    if (colorValue === "transparent") {
+        return colorValue;
+    }
+
+    const colorLightness = colorValue.lightness();
     let weightOffset = 1;
     if (colorLightness < 0.4) {
         weightOffset = Math.abs(colorLightness - 0.5) * 20;
     }
 
     const weightCurved = weight * weightOffset;
-    const colorDarker = color.darken(weightCurved) as ColorHelper;
-    const colorLighter = color.lighten(weightCurved) as ColorHelper;
+    const colorDarker = colorValue.darken(weightCurved) as ColorHelper;
+    const colorLighter = colorValue.lighten(weightCurved) as ColorHelper;
 
-    if (isLightColor(color)) {
+    if (isLightColor(colorValue) && !darken) {
         if (colorLightness + weightCurved > 1 && flipIfMax) {
             return colorDarker;
         } else {

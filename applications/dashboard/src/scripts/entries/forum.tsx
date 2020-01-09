@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { onContent } from "@library/utility/appUtils";
+import { onContent, getMeta } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -20,6 +20,7 @@ import { AppContext } from "@library/AppContext";
 import { addComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
+import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -42,3 +43,7 @@ addComponent("App", () => (
 ));
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
+
+if (getMeta("themeFeatures.DataDrivenForumColors", false)) {
+    compatibilityStyles();
+}

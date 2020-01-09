@@ -6,29 +6,33 @@
 
 //kb Icons
 @font-face {
-  font-family: 'kbicons';
-  src:  url('./fonts/kbicons/kbicons.eot?cwtzhl');
-  src:  url('./fonts/kbicons/kbicons.eot?cwtzhl#iefix') format('embedded-opentype'),
-        url('./fonts/kbicons/kbicons.ttf?cwtzhl') format('truetype'),
-        url('./fonts/kbicons/kbicons.woff?cwtzhl') format('woff'),
-        url('./fonts/kbicons/kbicons.svg?cwtzhl#icomoon') format('svg');
-  font-weight: normal;
-  font-style: normal;
+    @if $staticVariables {
+        font-family: 'kbicons';
+        src:  url('./fonts/kbicons/kbicons.eot?cwtzhl');
+        src:  url('./fonts/kbicons/kbicons.eot?cwtzhl#iefix') format('embedded-opentype'),
+              url('./fonts/kbicons/kbicons.ttf?cwtzhl') format('truetype'),
+              url('./fonts/kbicons/kbicons.woff?cwtzhl') format('woff'),
+              url('./fonts/kbicons/kbicons.svg?cwtzhl#icomoon') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
 }
 
 @mixin kbicon() {
-    display: inline-block;
-    min-width: 1em;
-    font-family: kbicons;
-    font-variant: normal;
-    font-weight: normal;
-    font-style: normal;
-    text-align: center;
-    text-decoration: inherit;
-    text-transform: none;
-    line-height: inherit;
-    color: inherit;
-    -webkit-font-smoothing: antialiased;
+    @if $staticVariables {
+        display: inline-block;
+        min-width: 1em;
+        font-family: kbicons;
+        font-variant: normal;
+        font-weight: normal;
+        font-style: normal;
+        text-align: center;
+        text-decoration: inherit;
+        text-transform: none;
+        line-height: inherit;
+        color: inherit;
+        -webkit-font-smoothing: antialiased;
+    }
 }
 
 /* -------------------------------------------------------------- *\

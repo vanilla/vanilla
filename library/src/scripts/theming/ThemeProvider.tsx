@@ -4,9 +4,7 @@
  */
 
 import { LoadStatus } from "@library/@types/api/core";
-import apiv2 from "@library/apiv2";
 import { inputClasses } from "@library/forms/inputStyles";
-import Backgrounds from "@library/layout/Backgrounds";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import Loader from "@library/loaders/Loader";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -16,6 +14,8 @@ import { prepareShadowRoot } from "@vanilla/dom-utils";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
+import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
+import { BrowserRouter } from "react-router-dom";
 
 interface IProps {
     children: React.ReactNode;
@@ -92,8 +92,12 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
     return (
         <>
-            <Backgrounds />
-            {props.children}
+            <BrowserRouter>
+                <BackgroundsProvider>
+                    <Backgrounds />
+                    {props.children}
+                </BackgroundsProvider>
+            </BrowserRouter>
         </>
     );
 };

@@ -9,8 +9,10 @@
 \* -------------------------------------------------------------- */
 
 .Footer {
-    background: $footer_bg;
-    color: $footer_color;
+    @if ($staticVariables) {
+        background: $footer_bg;
+        color: $footer_color;
+    }
     font-size: $footer-base_fontSize;
     line-height: $footer-base_lineHeight;
     padding: $utility-baseUnitTriple 0;

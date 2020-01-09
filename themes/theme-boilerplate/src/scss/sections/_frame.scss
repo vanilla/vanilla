@@ -21,7 +21,9 @@
             overflow: visible;
         }
     }
-    background-color: $body_bg;
+    @if ($staticVariables) {
+        background-color: $body_bg;
+    }
     background-image: $body_backgroundImage;
     background-size: $body_backgroundSize;
     background-position: $body_backgroundPosition;

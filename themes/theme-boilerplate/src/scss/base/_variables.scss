@@ -366,7 +366,7 @@ $formButton_maxWidth:                    360px !default;
 $formButton_padding:                     $utility-baseUnitDouble !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
-$formButton_border:                      1px solid !default;
+$formButton_border:                      1px solid $formElement_borderColor !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

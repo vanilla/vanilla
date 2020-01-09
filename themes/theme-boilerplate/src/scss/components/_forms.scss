@@ -322,14 +322,13 @@ div.token-input-dropdown {
         right: 0;
         top: 0;
         height: 100%;
-        width: $formButton_height;
+        min-width: $formButton_height;
         border-color: $button-primary_border;
 
         @if ($staticVariables) {
             background-color: $button-primary_bg;
             color: $button-primary_fg;
         }
-        min-width: $formButton_height;
 
         .SpDropdownHandle::before {
             height: 100%;
@@ -356,7 +355,7 @@ div.token-input-dropdown {
         .Button.Handle {
             background-color: rgba($button-primary-hover_bg, 0.3);
             color: $button-primary-hover_fg;
-            width: $formButton_height;
+            min-width: $formButton_height;
         }
     }
 }

@@ -724,19 +724,15 @@
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     transition: background 0.1s ease, border 0.1s ease;
-    @if ($staticVariables) {
-        background: $bg;
-        color: $fg;
-    }
     border: $formButton_border;
     @if ($staticVariables) {
         border-color: $border;
+        min-width: $formButton_height;
+        background: $bg;
+        color: $fg;
     }
     line-height: $formButton_height;
     min-height: $formButton_height;
-    @if ($staticVariables) {
-        width: $formButton_height;
-    }
     padding: 0 $formButton_padding;
     text-decoration: none;
     border-radius: $formButton_borderRadius;

@@ -505,25 +505,36 @@ class EntryController extends Gdn_Controller {
         $isTrustedProvider = $this->data('Trusted');
 
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
-            $saveRoles = $saveRolesRegister = true;
-
-            // Translate the role names to IDs.
+        if (($isTrustedProvider || c('Garden.SSO.SyncRoles'))) {
             $roles = $this->Form->getFormValue('Roles', null);
-            $roles = RoleModel::getByName($roles);
-            $roleIDs = array_keys($roles);
 
-            // Ensure user has at least one role.
-            if (empty($roleIDs)) {
-                $roleIDs = $this->UserModel->newUserRoleIDs();
+            // Allow the roles index to be lower case.
+            // This feature was requested and approved here https://github.com/vanillaforums/estimates/issues/886
+            $loweredRoles = $this->Form->getFormValue('roles', null);
+            if ($roles === null && $loweredRoles !== null) {
+                $this->Form->setFormValue('Roles', $loweredRoles);
+                $roles = $loweredRoles;
             }
 
-            // Allow role syncing to only happen on first connect.
-            if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
-                $saveRoles = false;
-            }
+            if ($roles !== null) {
+                $saveRoles = $saveRolesRegister = true;
 
-            $this->Form->setFormValue('RoleID', $roleIDs);
+                // Translate the role names to IDs.
+                $roles = RoleModel::getByName($roles);
+                $roleIDs = array_keys($roles);
+
+                // Ensure user has at least one role.
+                if (empty($roleIDs)) {
+                    $roleIDs = $this->UserModel->newUserRoleIDs();
+                }
+
+                // Allow role syncing to only happen on first connect.
+                if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
+                    $saveRoles = false;
+                }
+
+                $this->Form->setFormValue('RoleID', $roleIDs);
+            }
         } else {
             $saveRoles = false;
             $saveRolesRegister = false;

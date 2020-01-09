@@ -12,11 +12,15 @@ use Garden\Http\HttpClient;
 use Garden\Web\RequestInterface;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Contracts\Web\UASnifferInterface;
+use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
@@ -104,10 +108,21 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(HttpClient::class)
             ->setClass(MockHttpClient::class)
 
+            ->rule(UASnifferInterface::class)
+            ->setClass(MockUASniffer::class)
+
             // Dates
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
+
+            // Logger
+            ->rule(\Vanilla\Logger::class)
+            ->setShared(true)
+            ->addAlias(LoggerInterface::class)
+
+            ->rule(LoggerAwareInterface::class)
+            ->addCall('setLogger')
 
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)

@@ -3,6 +3,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Html\HtmlEnhancer;
@@ -18,6 +19,7 @@ use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
 use Vanilla\Web\Page;
 use Vanilla\Web\TwigEnhancer;
+use Vanilla\Web\UASniffer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -165,6 +167,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('fromEnvironment')
     ->addAlias('Request')
     ->addAlias(\Garden\Web\RequestInterface::class)
+
+    ->rule(UASnifferInterface::class)
+    ->setClass(UASniffer::class)
 
     // Database.
     ->rule('Gdn_Database')

@@ -666,17 +666,18 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         // Modify all of the indexes.
+        $indexErrorTemplate = t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.');
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
                 try {
                     $sqlWithOptions = $this->indexSqlWithOptions($sql);
                     if (!$this->executeQuery($sqlWithOptions)) {
-                        throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                        throw new AlterDatabaseException(sprintf($indexErrorTemplate, $name, $this->_TableName));
                     }
                 } catch (Exception $e) {
                     // If index creation fails, try without the default options and enforce the threshold check.
                     if (!$this->executeQuery($sql, true)) {
-                        throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                        throw new AlterDatabaseException(sprintf($indexErrorTemplate, $name, $this->_TableName));
                     }
                 }
             }

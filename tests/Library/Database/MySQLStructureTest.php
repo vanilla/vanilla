@@ -145,7 +145,7 @@ class MySQLStructureTest extends TestCase {
     }
 
     /**
-     * Test adding an index requring a lock on a table under the modify row threshold.
+     * Test adding an index requring a lock on a table *over* the modify row threshold.
      *
      * @return void
      */

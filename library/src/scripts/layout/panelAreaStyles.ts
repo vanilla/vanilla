@@ -54,7 +54,7 @@ export const panelAreaClasses = useThemeCache(() => {
 
     const overflowFull = (offset: number) =>
         style("overflowFull", {
-            maxHeight: calc(`100vh - ${unit(offset)}`),
+            height: calc(`100vh - ${unit(offset)}`),
             overflow: "auto",
             position: "relative",
             minHeight: 100,
@@ -76,6 +76,8 @@ export const panelAreaClasses = useThemeCache(() => {
             left: 0,
             right: 0,
             position: "absolute",
+            height: 50,
+            background: linearGradient("to top", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
             width: percent(100),
         });
     };

@@ -87,10 +87,6 @@ export const bodyCSS = useThemeCache(() => {
             display: "none",
         },
     );
-
-    cssRule("#app", {
-        overflowX: "hidden",
-    });
 });
 
 export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {

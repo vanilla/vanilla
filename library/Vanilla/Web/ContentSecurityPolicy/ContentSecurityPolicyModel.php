@@ -132,9 +132,16 @@ class ContentSecurityPolicyModel {
 
         // We have IE11 & a CSP that is not possible to express as an X-Frame-Origin.
         // This makes users in that browser susceptible to clickjacking.
+        //
         // We can't actually return a header here without potentially breaking an embed.
         // And the "workaround" described in RFC7034 isn't really feasible.
         // @see https://tools.ietf.org/html/rfc7034#section-2.1
+        //
+        // So why can't we just check the Referrer header?
+        // The referrer will generally not be the outer frame. Take this example:
+        // User opens an outer page, with forum.com/discussions as the frame URL. -> Referrer MAY be the outer frame.
+        // User navigates within the frame to forum.com/discussion/100 -> Referrer WILL BE forum.com/discussions
+        // We would then send back our own domain as the ALLOW_FROM which would be incorrect, and the page load would be blocked.
         //
         // Because of the circumstances we are just going ot log a warning here.
 

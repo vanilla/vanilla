@@ -96,7 +96,7 @@ interface ThemeProviderInterface {
     /**
      * Get theme view folder path
      *
-     * @param $themeKey
+     * @param strig|int $themeKey Theme key or id
      * @return string
      */
     public function getThemeViewPath($themeKey): string;

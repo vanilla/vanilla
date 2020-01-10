@@ -1605,11 +1605,11 @@ class Gdn_Form extends Gdn_Pluggable {
                 $count = count($problems);
                 for ($i = 0; $i < $count; ++$i) {
                     if (substr($problems[$i], 0, 1) == '@') {
-                        $return .= "<li>".substr(htmlspecialchars($problems[$i]), 1)."</li>\n";
+                        $return .= "<li>".substr($problems[$i], 1)."</li>\n";
                     } else {
                         $return .= '<li>'.sprintf(
-                            htmlspecialchars(t($problems[$i])),
-                            htmlspecialchars(t($fieldName))
+                            t($problems[$i]),
+                            t($fieldName)
                         )."</li>\n";
                     }
                 }
@@ -2309,7 +2309,7 @@ PASSWORDMETER;
      */
     public function addError($error, $fieldName = '') {
         if (is_string($error)) {
-            $errorCode = $error;
+            $errorCode = htmlspecialchars($error);
         } elseif (is_a($error, 'Exception')) {
             if (debug()) {
                 // Strip the extra information out of the exception.
@@ -2329,7 +2329,7 @@ PASSWORDMETER;
             } elseif ($error instanceof \Gdn_SanitizedUserException) {
                 $errorCode = '@'.$error->getMessage();
             } else {
-                $errorCode = '@'.htmlspecialchars(strip_tags($error->getMessage()));
+                $errorCode = '@'.htmlspecialchars($error->getMessage());
             }
         }
 
@@ -2969,7 +2969,22 @@ PASSWORDMETER;
             $this->_ValidationResults = [];
         }
 
-        $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $validationResults);
+        // Ensure that our validation results get sanitized properly by adding them through addError.
+        /**
+         * @var string $fieldName
+         * @var string[] $fieldErrors
+         */
+        foreach ($validationResults as $fieldName => $fieldErrors) {
+            if (is_array($fieldErrors)) {
+                foreach ($fieldErrors as $fieldError) {
+                    $this->addError($fieldError, $fieldName);
+                }
+            } elseif (is_string($fieldErrors)) {
+                $this->addError($fieldErrors, $fieldName);
+            }
+        }
+
+//        $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $validationResults);
     }
 
     /**
@@ -3134,7 +3149,7 @@ PASSWORDMETER;
     public function validateModel() {
         $this->_Model->defineSchema();
         if ($this->_Model->Validation->validate($this->formValues()) === false) {
-            $this->_ValidationResults = $this->_Model->validationResults();
+            $this->setValidationResults($this->_Model->validationResults());
         }
         return $this->errorCount();
     }

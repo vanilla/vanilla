@@ -203,6 +203,7 @@ class ThemeModel {
      * @return array|void If no currnt theme set returns null
      */
     public function getCurrentTheme(): ?array {
+        $current = null;
         try {
             $provider = $this->getThemeProvider(1);
             $current = $provider->getCurrent();

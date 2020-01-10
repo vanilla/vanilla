@@ -50,8 +50,15 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $localeKey;
 
-    /** @var Addon */
-    private $activeTheme;
+
+    /** @var ThemeModel */
+    private $themeModel;
+
+    /** @var string */
+    private $activeThemeKey;
+
+    /** @var string */
+    private $activeThemeViewPath;
 
     /** @var ThemeFeatures */
     private $themeFeatures;
@@ -105,7 +112,7 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ?Contracts\AddonInterface $activeTheme = null
+        ?ThemeModel $themeModel
     ) {
         $this->host = $request->getHost();
 
@@ -141,7 +148,10 @@ class SiteMeta implements \JsonSerializable {
         $this->cacheBuster = $deploymentCacheBuster->value();
 
         // Theming
-        $this->activeTheme = $activeTheme;
+        $this->themeModel = $themeModel;
+        $currentTheme = $themeModel->getCurrentTheme();
+        $this->activeThemeKey = $currentTheme['themeID'];
+        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($currentTheme['themeID']);
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
@@ -186,7 +196,7 @@ class SiteMeta implements \JsonSerializable {
                 'siteName' => $this->siteTitle,
                 'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
-                'themeKey' => $this->activeTheme ? $this->activeTheme->getKey() : null,
+                'themeKey' => $this->activeThemeKey,
                 'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'shareImage' => $this->shareImage,
@@ -268,10 +278,17 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
-     * @return Addon
+     * @return string
      */
-    public function getActiveTheme(): ?Contracts\AddonInterface {
-        return $this->activeTheme;
+    public function getActiveThemeKey(): string {
+        return $this->activeThemeKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveThemeViewPath(): string {
+        return $this->activeThemeViewPath;
     }
 
     /**

@@ -98,6 +98,18 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getThemeViewPath($themeKey): string {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
+        return $path;
+    }
+
+    /**
      * Get all theme assets
      *
      * @param Addon $theme
@@ -365,5 +377,13 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->config->set('Garden.CurrentTheme', $themeKey);
         $theme = $this->getThemeWithAssets($themeKey);
         return $theme;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrent(): ?array {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        return $this->getThemeWithAssets($themeKey);
     }
 }

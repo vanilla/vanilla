@@ -43,7 +43,6 @@ describe("NewLineClickInsertionModule", () => {
         type: MarkdownMacroType.INLINE,
         trailingCharacter: "", // The space is actually inserted by quill automatically. No need for an extra
     });
-    });
 
     testInlineFormat({
         name: "italic *",

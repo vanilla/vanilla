@@ -63,11 +63,6 @@ class ThemesTest extends AbstractAPIv2Test {
         static::container()
             ->get(AddonManager::class)
             ->add($theme);
-
-        static::container()
-            ->rule(\Vanilla\Models\ThemeModel::class)
-            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
-        ;
     }
 
     /**
@@ -179,6 +174,7 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testIndex() {
         $response = $this->api()->get("themes");
         $body = $response->getBody();
+        var_dump($body);
         $this->assertEquals(2, count($body));
     }
 }

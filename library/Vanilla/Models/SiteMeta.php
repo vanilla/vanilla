@@ -148,10 +148,9 @@ class SiteMeta implements \JsonSerializable {
         $this->cacheBuster = $deploymentCacheBuster->value();
 
         // Theming
-        $this->themeModel = $themeModel;
-        $currentTheme = $themeModel->getCurrentTheme();
-        $this->activeThemeKey = $currentTheme['themeID'];
-        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($currentTheme['themeID']);
+        $themeKey = $config->get('Garden.CurrentTheme', $config->get('Garden.Theme'));
+        $this->activeThemeKey = $themeKey;
+        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);

@@ -112,7 +112,7 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ?ThemeModel $themeModel
+        ThemeModel $themeModel
     ) {
         $this->host = $request->getHost();
 

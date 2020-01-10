@@ -13,7 +13,7 @@ import { capitalizeFirstLetter } from "@vanilla/utils";
 
 interface IProps extends IOptionalComponentID {
     className?: string;
-    errors?: IFieldError[];
+    errors?: Array<Error | IFieldError>;
 }
 
 interface IState {

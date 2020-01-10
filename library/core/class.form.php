@@ -1605,11 +1605,11 @@ class Gdn_Form extends Gdn_Pluggable {
                 $count = count($problems);
                 for ($i = 0; $i < $count; ++$i) {
                     if (substr($problems[$i], 0, 1) == '@') {
-                        $return .= "<li>".substr($problems[$i], 1)."</li>\n";
+                        $return .= "<li>".substr(htmlspecialchars($problems[$i]), 1)."</li>\n";
                     } else {
                         $return .= '<li>'.sprintf(
-                            t($problems[$i]),
-                            t($fieldName)
+                            htmlspecialchars(t($problems[$i])),
+                            htmlspecialchars(t($fieldName))
                         )."</li>\n";
                     }
                 }

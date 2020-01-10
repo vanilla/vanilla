@@ -174,7 +174,15 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testIndex() {
         $response = $this->api()->get("themes");
         $body = $response->getBody();
-        var_dump($body);
         $this->assertEquals(2, count($body));
+    }
+
+    /**
+     * Test /themes/current endpoint returns active theme (keystone).
+     */
+    public function testCurrent() {
+        $response = $this->api()->get("themes/current");
+        $body = $response->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
     }
 }

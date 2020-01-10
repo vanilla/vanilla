@@ -223,7 +223,7 @@ class ThemeModel {
     /**
      * Get theme view folder path
      *
-     * @param $themeKey
+     * @param string|int $themeKey Theme key or id
      * @return string
      */
     public function getThemeViewPath($themeKey): string {

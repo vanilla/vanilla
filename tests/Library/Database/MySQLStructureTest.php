@@ -95,6 +95,111 @@ class MySQLStructureTest extends TestCase {
     }
 
     /**
+     * Test adding a simple index.
+     *
+     * @return void
+     */
+    public function testAddInplaceIndex(): void {
+        // Make sure we're starting with a blank slate.
+        $this->st->table(__FUNCTION__)->drop();
+
+        // Setup the table, without the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->primaryKey("id")
+            ->column("value", "int")
+            ->set();
+
+        // Add the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->column("value", "int", false, "index.test")
+            ->set();
+
+        $this->assertColumnHasIndex(__FUNCTION__, "value");
+    }
+
+    /**
+     * Test adding an index requring a lock on a table under the modify row threshold.
+     *
+     * @return void
+     */
+    public function testIndexRequiringLockUnderThreshold(): void {
+        // Make sure we're starting with a blank slate.
+        $this->st->table(__FUNCTION__)->drop();
+
+        // Setup the table, without the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->primaryKey("id")
+            ->column("value", "text")
+            ->set();
+
+        // Add the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->column("value", "text", false, "fulltext.test")
+            ->set();
+
+        $this->assertColumnHasIndex(__FUNCTION__, "value");
+    }
+
+    /**
+     * Test adding an index requring a lock on a table *over* the modify row threshold.
+     *
+     * @return void
+     */
+    public function testIndexRequiringLockOverThreshold(): void {
+        // Make sure we're starting with a blank slate.
+        $this->st->table(__FUNCTION__)->drop();
+
+        // Setup the table, without the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->primaryKey("id")
+            ->column("value", "text")
+            ->set();
+
+        // Exceed the threshold.
+        $sql = $this->st->Database->sql();
+        $threshold = 5;
+        $this->st->setAlterTableThreshold($threshold);
+        for ($i = 1; $i <= ($threshold + 1); $i++) {
+            $sql->insert(__FUNCTION__, ["value" => "Row {$i}"]);
+        }
+
+        // Add the index.
+        $this->st
+            ->table(__FUNCTION__)
+            ->column("value", "text", false, "fulltext.test")
+            ->set();
+
+        // Verify the issue was detected.
+        $issues = $this->st->getIssues();
+        $this->assertEquals(
+            "The table was past its threshold. Run the alter manually.",
+            $issues[0]["message"]
+        );
+
+        // Verify the index wasn't actually created.
+        $columns = $this->tableColumns(__FUNCTION__);
+        $this->assertEmpty($columns["value"]["Key"]);
+    }
+
+    /**
+     * Assert the specified index exists for the column.
+     *
+     * @param string $table
+     * @param string $column
+     * @return boolean
+     */
+    private function assertColumnHasIndex(string $table, string $column) {
+        // Verify the index was set.
+        $columns = $this->tableColumns($table);
+        $this->assertNotEmpty($columns[$column]["Key"]);
+    }
+
+    /**
      * A forced engine should override the default.
      *
      * @param array $config Config changes to run the test with.
@@ -136,5 +241,20 @@ EOT;
             'innodb' => ['innodb'],
             'myisam' => ['myisam'],
         ];
+    }
+
+    /**
+     * Get current structure of the database.
+     *
+     * @param string $table
+     * @return array
+     */
+    private function tableColumns(string $table): array {
+        $sql = $this->st->Database->sql();
+        $columnsRaw = $sql
+            ->query($sql->fetchColumnSql($table))
+            ->resultArray();
+        $columns = array_column($columnsRaw, null, "Field");
+        return $columns;
     }
 }

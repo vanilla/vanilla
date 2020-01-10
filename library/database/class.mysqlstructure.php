@@ -21,6 +21,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      */
     private $rowCountEstimates;
 
+    /** Default options when creating MySQL table indexes. */
+    private const INDEX_OPTIONS = "algorithm=inplace, lock=none";
+
     /**
      *
      *
@@ -337,9 +340,20 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Given an SQL representing a single basic alter-table query to add indexes, append the default index options.
      *
+     * @param string $sql
+     * @return string
+     */
+    private function indexSqlWithOptions(string $sql): string {
+        $result = preg_replace('/;?(?=\n*$)/', ", " . self::INDEX_OPTIONS . ";", $sql, 1);
+        return $result;
+    }
+
+    /**
+     * Generate part of an alter table statement for modifying indexes.
      *
-     * @param $columns
+     * @param array $columns
      * @param bool $keyType
      * @return array
      */
@@ -652,10 +666,19 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         // Modify all of the indexes.
+        $indexErrorTemplate = t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.');
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
-                if (!$this->executeQuery($sql)) {
-                    throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                try {
+                    $sqlWithOptions = $this->indexSqlWithOptions($sql);
+                    if (!$this->executeQuery($sqlWithOptions)) {
+                        throw new AlterDatabaseException(sprintf($indexErrorTemplate, $name, $this->_TableName));
+                    }
+                } catch (Exception $e) {
+                    // If index creation fails, try without the default options and enforce the threshold check.
+                    if (!$this->executeQuery($sql, true)) {
+                        throw new AlterDatabaseException(sprintf($indexErrorTemplate, $name, $this->_TableName));
+                    }
                 }
             }
         }
@@ -663,7 +686,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Run any additional Sql.
         foreach ($additionalSql as $description => $sql) {
             // These queries are just for enum alters. If that changes then pass true as the second argument.
-            if (!$this->executeQuery($sql)) {
+            if (!$this->executeQuery($sql, true)) {
                 throw new Exception("Error modifying table: {$description}.");
             }
         }

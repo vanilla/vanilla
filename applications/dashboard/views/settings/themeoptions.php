@@ -38,7 +38,13 @@ echo $this->Form->errors();
             <div class="image-wrap">
                 <?php
                 // Look for a screenshot for for the style.
-                $Screenshot = safeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']);
+                $Screenshots = safeGlob(
+                    PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
+                );
+                $Screenshots = array_merge($Screenshots, safeGlob(
+                    PATH_ADDONS.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
+                ));
+
                 if (is_array($Screenshot) && count($Screenshot) > 0) {
                     $Screenshot = basename($Screenshot[0]);
                 } else {

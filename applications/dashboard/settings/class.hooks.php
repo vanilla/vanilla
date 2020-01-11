@@ -298,9 +298,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
         $isDefaultMaster = $sender->MasterView == 'default' || $sender->MasterView == '';
         if ($theme != '' && $isDefaultMaster) {
-            $htmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
-            if (file_exists($htmlFile)) {
-                $sender->EventArguments['MasterViewPath'] = $htmlFile;
+            $themeHtmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
+            $themeAddonHtmlFile = paths(PATH_ADDONS, $theme, 'views', 'default.master.tpl');
+            if (file_exists($themeHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeHtmlFile;
+            } elseif (file_exists($themeAddonHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeAddonHtmlFile;
             } else {
                 // for default theme
                 $sender->EventArguments['MasterViewPath'] = $sender->fetchViewLocation('default.master', '', 'dashboard');

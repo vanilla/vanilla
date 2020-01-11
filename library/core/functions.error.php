@@ -222,9 +222,11 @@ function gdn_ExceptionHandler($Exception) {
                     if ($CurrentTheme != '') {
                         // Look for CSS in the theme folder:
                         $CssPaths[] = PATH_THEMES.DS.$CurrentTheme.DS.'design'.DS.$MasterViewCss;
+                        $CssPaths[] = PATH_ADDONS.DS.$CurrentTheme.DS.'design'.DS.$MasterViewCss;
 
                         // Look for Master View in the theme folder:
                         $MasterViewPaths[] = PATH_THEMES.DS.$CurrentTheme.DS.'views'.DS.$MasterViewName;
+                        $MasterViewPaths[] = PATH_ADDONS.DS.$CurrentTheme.DS.'views'.DS.$MasterViewName;
                     }
                 }
 

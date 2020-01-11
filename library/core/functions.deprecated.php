@@ -878,6 +878,7 @@ if (!function_exists('viewLocation')) {
             if (Gdn::controller() && $theme = Gdn::controller()->Theme) {
                 foreach ($extensions as $ext) {
                     $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
+                    $paths[] = PATH_ADDONS."/{$theme}/views{$controller}/$view.$ext";
                 }
             }
 

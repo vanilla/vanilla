@@ -16,6 +16,7 @@ import {
     PACKAGES_DIRECTORY,
     VANILLA_ROOT,
     VANILLA_THEMES,
+    VANILLA_ADDONS,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
@@ -78,6 +79,7 @@ export default class EntryModel {
             this.initAddons(VANILLA_APPS),
             this.initAddons(VANILLA_PLUGINS),
             this.initAddons(VANILLA_THEMES),
+            this.initAddons(VANILLA_ADDONS),
             this.initPackages(),
         ]);
         await this.initEntries();

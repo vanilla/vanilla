@@ -17,6 +17,7 @@ if (!defined('PATH_UPLOADS')) {
 }
 
 // You should not change these paths.
+define('PATH_ADDONS', PATH_ROOT.'/addons');
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
 define('PATH_PLUGINS', PATH_ROOT.'/plugins');
 define('PATH_THEMES', PATH_ROOT.'/themes');

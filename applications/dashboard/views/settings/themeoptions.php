@@ -38,19 +38,19 @@ echo $this->Form->errors();
             <div class="image-wrap">
                 <?php
                 // Look for a screenshot for for the style.
-                $Screenshots = safeGlob(
+                $Screenshot = safeGlob(
                     PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
                 );
-                $Screenshots = array_merge($Screenshots, safeGlob(
+                $Screenshot = array_merge($Screenshot, safeGlob(
                     PATH_ADDONS.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
                 ));
 
                 if (is_array($Screenshot) && count($Screenshot) > 0) {
-                    $Screenshot = basename($Screenshot[0]);
+                    $Screenshot = str_replace(PATH_ROOT, '', $Screenshot[0]);
                 } else {
-                    $Screenshot = 'images'.DS.'theme-placeholder.svg';
+                    $Screenshot = '/applications/dashboard/design/images/theme-placeholder.svg';
                 }
-                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, ['class' => 'label-selector-image', 'alt' => t($Key), 'width' => '160']); ?>
+                echo img($Screenshot, ['class' => 'label-selector-image', 'alt' => t($Key), 'width' => '160']); ?>
                 <div class="overlay">
                     <div class="buttons">
                         <?php echo anchor(t('Select'), '?style='.urlencode($Key), 'js-select-theme btn btn-overlay Hijack', ['Key' => $Key]) ?>

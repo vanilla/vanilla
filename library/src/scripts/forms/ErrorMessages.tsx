@@ -12,6 +12,7 @@ import { capitalizeFirstLetter } from "@vanilla/utils";
 
 interface IError {
     message: string;
+    [key: string]: any;
 }
 
 interface IProps extends IOptionalComponentID {

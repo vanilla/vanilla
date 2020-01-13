@@ -1032,6 +1032,7 @@ class EntryController extends Gdn_Controller {
      * @return string Rendered XHTML template.
      */
     public function signIn($method = false, $arg1 = false) {
+        $this->canonicalUrl(url('/entry/signin', true));
         if (!$this->Request->isPostBack()) {
             $this->checkOverride('SignIn', $this->target());
         }
@@ -1781,6 +1782,7 @@ class EntryController extends Gdn_Controller {
      * @since 2.0.0
      */
     public function passwordRequest() {
+        $this->canonicalUrl(url('/entry/passwordrequest', true));
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
             Gdn::locale()->setTranslation('Email', t('Username'));
         }

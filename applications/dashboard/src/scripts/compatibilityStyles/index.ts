@@ -6,7 +6,7 @@
  */
 
 import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { cssRaw, cssRule } from "typestyle";
+import { cssRaw, cssRule, media } from "typestyle";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
@@ -20,6 +20,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { inputVariables, inputClasses } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
+import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -85,6 +86,7 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinButton("#Form_Ban", ButtonTypes.PRIMARY);
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
+    mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);
@@ -159,10 +161,9 @@ export const compatibilityStyles = useThemeCache(() => {
 
     // Dropdown hover/focus colors:
 
-    cssRule(".MenuItems, .Flyout.Flyout", {
-        background: bg,
-        color: fg,
-    });
+    console.log("fg: ", fg);
+    console.log("bg: ", bg);
+
     mixinFlyoutItem(".MenuItems .Item a");
     mixinFlyoutItem(".MenuItems.MenuItems li a");
     mixinFlyoutItem(".Flyout.Flyout li a");
@@ -195,6 +196,7 @@ export const compatibilityStyles = useThemeCache(() => {
         .MessageList .Item .Title,
         .MessageList .Item.Read .Title,
         .MessageList .Item h3
+        .MenuItems a
         `,
         {
             color: fg,
@@ -237,7 +239,7 @@ export const compatibilityStyles = useThemeCache(() => {
         .AdvancedSearch .InputBox,
         .AdvancedSearch select,
         select,
-        ul.token-input-list.token-input-focused,
+        ul.token-input-list.token-input-focused
     `,
         {
             borderRadius: unit(formVars.border.radius),
@@ -309,21 +311,31 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
+    cssRule(`div.Popup .Body`, {
+        // borderRadius: unit(vars.border.radius),
+        ...borders(),
+        backgroundColor: bg,
+        color: fg,
+    });
+
     cssRule(
         `
-        .MenuItems,
         .Flyout.Flyout,
         .richEditorFlyout,
+        .MenuItems
         `,
         {
-            backgroundColor: bg,
             color: fg,
+            background: bg,
         },
     );
 
-    cssRule(".MenuItems a", {
-        color: fg,
+    cssRule(`div.Popup p`, {
+        paddingLeft: 0,
+        paddingRight: 0,
     });
+
+    socialConnectCSS();
 });
 
 function mixinFlyoutItem(selector: string) {

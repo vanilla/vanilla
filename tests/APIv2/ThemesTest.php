@@ -15,6 +15,7 @@ use Garden\Container\Reference;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Models\ThemeModel;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -63,11 +64,6 @@ class ThemesTest extends AbstractAPIv2Test {
         static::container()
             ->get(AddonManager::class)
             ->add($theme);
-
-        static::container()
-            ->rule(\Vanilla\Models\ThemeModel::class)
-            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
-        ;
     }
 
     /**
@@ -180,5 +176,24 @@ class ThemesTest extends AbstractAPIv2Test {
         $response = $this->api()->get("themes");
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
+    }
+
+    /**
+     * Test /themes/current endpoint returns active theme (keystone).
+     */
+    public function testCurrent() {
+        $response = $this->api()->get("themes/current");
+        $body = $response->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
+    }
+
+    /**
+     * Test getThemeViewPath method of ThemeModel.
+     */
+    public function testGetThemeViewPath() {
+        /** @var ThemeModel $themeModel */
+        $themeModel = self::container()->get(ThemeModel::class);
+        $viewPath = $themeModel->getThemeViewPath('keystone');
+        $this->assertStringEndsWith('/themes/keystone/views/', $viewPath);
     }
 }

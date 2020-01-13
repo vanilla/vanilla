@@ -10,6 +10,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * API Controller for the `/comments` resource.
@@ -215,7 +216,7 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $comment['Url'] = commentUrl($comment);
-        $isRich = $comment['Format'] === 'Rich';
+        $isRich = strcasecmp($comment['Format'], RichFormat::FORMAT_KEY) === 0;
         $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
 
         $this->userModel->expandUsers($comment, ['InsertUserID']);

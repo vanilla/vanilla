@@ -22,9 +22,9 @@ export default function mountEditor(containerSelector: string | Element) {
         throw new Error("Could not find the BodyBox to mount editor to.");
     }
 
-    const initialFormat = bodybox.getAttribute("format") || "Rich";
+    const initialFormat = bodybox.getAttribute("format");
 
-    if (initialFormat === "Rich") {
+    if (initialFormat === "Rich" || initialFormat === "rich") {
         mountReact(<ForumEditor legacyTextArea={bodybox as HTMLInputElement} />, container, () => {
             container.classList.remove("isDisabled");
         });

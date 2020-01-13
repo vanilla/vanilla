@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@monaco-editor/react";
-import { ToggleIcon } from "@library/icons/common";
+import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
 
 export interface ITextEditorProps {
@@ -10,7 +10,7 @@ export interface ITextEditorProps {
     editorDidMount?: DiffEditorDidMount;
 }
 export default function TextEditor(props: ITextEditorProps) {
-    const { language, value } = props;
+    const { language, value, onChange } = props;
     const [intialTheme, setTheme] = useState("dark");
     const [isEditorReady, setIsEditorReady] = useState(false);
     const classes = textEditorClasses();
@@ -23,10 +23,12 @@ export default function TextEditor(props: ITextEditorProps) {
         setTheme(intialTheme === "light" ? "dark" : "light");
     }
 
+    const themeModeButton = intialTheme === "light" ? <LightThemeIcon /> : <DarkThemeIcon />;
+
     return (
         <div className={classes.root(intialTheme)}>
             <button onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
-                <ToggleIcon />
+                {themeModeButton}
             </button>
             <ControlledEditor
                 theme={intialTheme}
@@ -34,6 +36,7 @@ export default function TextEditor(props: ITextEditorProps) {
                 editorDidMount={handleEditorDidMount}
                 options={{ lineNumbers: "on" }}
                 value={value}
+                onChange={onChange}
             />
         </div>
     );

@@ -87,6 +87,18 @@ export const actionBarClasses = useThemeCache(() => {
         visibility: "hidden",
     });
 
+    const fullWidth = style("fullWidth", {
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        marginLeft: "auto",
+        marginRight: "auto",
+        paddingLeft: "85px",
+        paddingRight: "70px",
+        position: "relative",
+        width: "100%",
+    });
+
     return {
         items,
         centreColumn,
@@ -96,5 +108,6 @@ export const actionBarClasses = useThemeCache(() => {
         itemMarginLeft,
         backSpacer,
         callToAction,
+        fullWidth,
     };
 });

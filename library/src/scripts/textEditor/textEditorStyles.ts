@@ -7,15 +7,23 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { viewHeight } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
 
 export const textEditorVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("themePreviewCard");
-    const themeToggleIcon = makeThemeVars("themeToggleIcon", {
+    const makeTextEditorVars = variableFactory("textEditor");
+    const themeToggleIcon = makeTextEditorVars("themeToggleIcon", {
         top: 12,
         right: 26,
     });
+    const editorPadding = makeTextEditorVars("editorPadding", {
+        padding: {
+            top: 15,
+            left: 25,
+        },
+    });
     return {
         themeToggleIcon,
+        editorPadding,
     };
 });
 
@@ -26,6 +34,8 @@ export const textEditorClasses = useThemeCache(() => {
 
     const root = theme => {
         return style({
+            paddingTop: unit(vars.editorPadding.padding.top),
+            paddingLeft: unit(vars.editorPadding.padding.left),
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",

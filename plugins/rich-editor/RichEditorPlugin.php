@@ -1,13 +1,15 @@
 <?php
-
-use Vanilla\Formatting\Formats\RichFormat;
-
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+use Vanilla\Formatting\Formats\RichFormat;
+
+/**
+ * Plugin class for the Rich Editor.
+ */
 class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = RichFormat::FORMAT_KEY;

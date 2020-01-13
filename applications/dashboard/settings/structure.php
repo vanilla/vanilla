@@ -825,7 +825,6 @@ $Construct
     ->column('ThumbPath', 'varchar(255)', null)
     ->set(false, false);
 
-// Previously
 // Merge backup.
 $Construct
     ->table('UserMerge')

@@ -382,6 +382,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $isRich = $discussion['Format'] === 'Rich';
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
+        $discussion = $this->discussionModel->fixRow($discussion);
 
         $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);

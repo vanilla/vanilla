@@ -30,6 +30,53 @@ class FormTest extends MinimalContainerTestCase {
     }
 
     /**
+     * Test that errors are properly escape in the output.
+     */
+    public function testErrorEscaping() {
+        $frm = new Gdn_Form('', 'bootstrap');
+        $stringError = '<script>alert(document.cookie)</script>';
+        $exception = new \Exception($stringError);
+        $frm->addError($stringError, 'item1');
+        $frm->addError($exception, 'item1');
+        $frm->addError(new \Gdn_SanitizedUserException('<strong>Hello World</strong>'), 'item3');
+
+        $frm->setValidationResults([
+            'item1' => [$stringError],
+            'item2' => [$exception],
+        ]);
+
+        // 3 fields have errors
+        $this->assertEquals(3, $frm->errorCount());
+
+        // Make sure we are escaped properly.
+        $expectedHtml = <<<HTML
+<div class="Messages Errors">
+<ul>
+<li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
+<li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
+<li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
+<li><strong>Hello World</strong></li>
+<li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
+</ul>
+</div>
+HTML;
+
+        $expectedString = '&lt;script&gt;alert(document.cookie)&lt;/script&gt;. &lt;script&gt;alert(document.cookie)&lt;/script&gt;.'
+                        .' &lt;script&gt;alert(document.cookie)&lt;/script&gt;. <strong>Hello World</strong>.'
+                        . ' &lt;script&gt;alert(document.cookie)&lt;/script&gt;.';
+
+        $expectedInline = <<<HTML
+<p class=Error>&lt;script&gt;alert(document.cookie)&lt;/script&gt; @&lt;script&gt;alert(document.cookie)&lt;/script&gt;
+&lt;script&gt;alert(document.cookie)&lt;/script&gt;
+</p>
+HTML;
+
+        $this->assertHtmlStringEqualsHtmlString($expectedHtml, $frm->errors());
+        $this->assertEquals($expectedString, $frm->errorString());
+        $this->assertHtmlStringEqualsHtmlString($expectedInline, $frm->inlineError('item1'));
+    }
+
+    /**
      * Test a basic text box.
      */
     public function testTextBox() {

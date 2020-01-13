@@ -1,10 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<div class="BoxButtons BoxNewDiscussion">';
 
-$Css = 'Button Primary Action NewDiscussion';
-$Css .= strpos($this->CssClass, 'Big') !== FALSE ? ' BigButton' : '';
+$Css = 'Button Primary Action NewDiscussion BigButton';
+$default = c('Vanilla.DefaultNewButton');
 
-echo buttonGroup($this->Buttons, $Css, $this->DefaultButton, $this->reorder);
+foreach ($this->getButtonGroups() as $buttonGroup) {
+//    $Css .= (count($buttonGroup) == 1) ? ' BigButton' : '';
+    echo buttonGroup($buttonGroup, $Css, $default, $this->reorder);
+}
+
 Gdn::controller()->fireEvent('AfterNewDiscussionButton');
 
 echo '</div>';

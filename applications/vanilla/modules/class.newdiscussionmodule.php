@@ -61,11 +61,12 @@ class NewDiscussionModule extends Gdn_Module {
     /**
      * Add a button to the collection.
      *
-     * @param $text
-     * @param $url
+     * @param string $text
+     * @param string $url
+     * @param bool $asButton Whether to display as a separate button or not.
      */
-    public function addButton($text, $url) {
-        $this->Buttons[] = ['Text' => $text, 'Url' => $url];
+    public function addButton($text, $url, $asButton) {
+        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asButton' => $asButton];
     }
 
     /**
@@ -102,6 +103,7 @@ class NewDiscussionModule extends Gdn_Module {
 
         // Grab the allowed discussion types.
         $discussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, isset($category) ? $category : []);
+        $buttonsConfig = c('NewDiscussionModule.Types', []);
 
         foreach ($discussionTypes as $key => $type) {
             if (isset($type['AddPermission']) && !Gdn::session()->checkPermission($type['AddPermission'])) {
@@ -123,7 +125,13 @@ class NewDiscussionModule extends Gdn_Module {
                 $url = $this->GuestUrl.'?Target='.$url;
             }
 
-            $this->addButton(t(val('AddText', $type)), $url);
+            // Check whether to display in dropdown or as a separate button.
+            $asOwnButton = false;
+            if ($buttonsConfig[$type['Singular']]['Button']) {
+                $asOwnButton = true;
+            }
+
+            $this->addButton(t(val('AddText', $type)), $url, $asOwnButton);
         }
 
         // Add QueryString to URL if one is defined.
@@ -134,5 +142,27 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         return parent::toString();
+    }
+
+    /**
+     * Groups buttons according to whether they are standalone or part of a dropdown.
+     *
+     * @return array Returns buttons grouped by whether they are standalone or part of a dropdown.
+     */
+    public function getButtonGroups() {
+        $this->reorder = true;
+        $allButtons = [];
+        $groupedButtons = [];
+        foreach ($this->Buttons as $key => $button) {
+            if ($button['asButton']) {
+                array_push($allButtons, [$button]);
+            } else {
+                array_push($groupedButtons, $button);
+            }
+        }
+        if (!empty($groupedButtons)) {
+            array_unshift($allButtons, $groupedButtons);
+        }
+        return $allButtons;
     }
 }

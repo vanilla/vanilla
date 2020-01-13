@@ -826,7 +826,6 @@ $Construct
     ->set(false, false);
 
 // Previously
-
 // Merge backup.
 $Construct
     ->table('UserMerge')

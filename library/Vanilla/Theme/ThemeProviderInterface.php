@@ -94,6 +94,14 @@ interface ThemeProviderInterface {
     public function getCurrent(): ?array;
 
     /**
+     * Get theme view folder path
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getThemeViewPath($themeKey): string;
+
+    /**
      * Set theme asset (replace existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.

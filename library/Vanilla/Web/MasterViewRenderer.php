@@ -114,10 +114,10 @@ class MasterViewRenderer {
     private function renderThemeContentView(array $data): ?\Twig\Markup {
         $template = null;
 
-        $theme = $this->siteMeta->getActiveTheme();
-        if ($theme) {
-            $defaultLayout = PATH_ROOT . $theme->getSubdir() . '/views/' . self::DEFAULT_LAYOUT_NAME;
-            $homeLayout = PATH_ROOT . $theme->getSubdir() . '/views/' . self::HOME_LAYOUT_NAME;
+        $themeViewPath = $this->siteMeta->getActiveThemeViewPath();
+        if ($themeViewPath) {
+            $defaultLayout =  $themeViewPath . self::DEFAULT_LAYOUT_NAME;
+            $homeLayout = $themeViewPath . self::HOME_LAYOUT_NAME;
 
             if (($data['isHomepage'] ?? false) && file_exists($homeLayout)) {
                 $template = $homeLayout;

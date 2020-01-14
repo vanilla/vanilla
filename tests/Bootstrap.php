@@ -269,6 +269,10 @@ class Bootstrap {
             ->rule(SearchModel::class)
             ->setShared(true)
 
+            // File base theme api provider
+            ->rule(\Vanilla\Models\ThemeModel::class)
+            ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
             ->rule(SSOModel::class)
             ->setShared(true)
 

@@ -52,7 +52,7 @@ export const panelAreaClasses = useThemeCache(() => {
         }),
     );
 
-    const overflowFull = (offset: number) =>
+    const overflowFull = useThemeCache((offset: number) =>
         style("overflowFull", {
             height: calc(`100vh - ${unit(offset)}`),
             overflow: "auto",
@@ -61,13 +61,14 @@ export const panelAreaClasses = useThemeCache(() => {
             paddingBottom: 50,
             paddingTop: 50,
             marginTop: -50,
-        });
+        }),
+    );
 
     const areaOverlay = style("areaOverlay", {
         position: "relative",
     });
 
-    const areaOverlayBefore = (color?: ColorHelper, side?: "left" | "right") => {
+    const areaOverlayBefore = useThemeCache((color?: ColorHelper, side?: "left" | "right") => {
         let gradientColor = color ?? globalVars.mainColors.bg;
 
         return style("areaOverlayBefore", {
@@ -80,8 +81,9 @@ export const panelAreaClasses = useThemeCache(() => {
             background: linearGradient("to top", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
             width: percent(100),
         });
-    };
-    const areaOverlayAfter = (color?: ColorHelper, side?: "left" | "right") => {
+    });
+
+    const areaOverlayAfter = useThemeCache((color?: ColorHelper, side?: "left" | "right") => {
         let gradientColor = color ?? globalVars.mainColors.bg;
 
         return style("areaOverlayAfter", {
@@ -94,7 +96,7 @@ export const panelAreaClasses = useThemeCache(() => {
             background: linearGradient("to bottom", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
             width: percent(100),
         });
-    };
+    });
 
     return { root, overflowFull, areaOverlayBefore, areaOverlayAfter, areaOverlay };
 });

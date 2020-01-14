@@ -364,9 +364,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
 
-    ->rule(Vanilla\Models\SiteMeta::class)
-    ->setConstructorArgs(['activeTheme' => ContainerUtils::currentTheme()])
-
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])

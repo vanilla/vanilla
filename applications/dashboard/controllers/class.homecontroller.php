@@ -169,6 +169,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function termsOfService() {
+        $this->canonicalUrl(url('/home/termsofservices', true));
         $this->render();
     }
 

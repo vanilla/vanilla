@@ -49,6 +49,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
         flexDirection: "row",
         justifyContent: "flex-start",
         flexWrap: "wrap",
+        minHeight: px(16),
     });
 
     const separator = style("separator", {

@@ -15,7 +15,7 @@ import { makeProdConfig } from "./configs/makeProdConfig";
 import { DIST_DIRECTORY } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./options";
 import EntryModel from "./utility/EntryModel";
-import { installLerna } from "./utility/moduleUtils";
+import { copyMonacoEditorModule, installLerna } from "./utility/moduleUtils";
 import { fail, print } from "./utility/utils";
 
 /**
@@ -53,6 +53,7 @@ export default class Builder {
     public async build() {
         await this.entryModel.init();
         await installLerna();
+
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -69,6 +70,7 @@ export default class Builder {
     private async runProd() {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
+        copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
         const configs = await Promise.all([
             ...sections.map(section => makeProdConfig(this.entryModel, section)),
@@ -116,6 +118,7 @@ export default class Builder {
      * Requires the HotReload config option to be enabled.
      */
     private async runDev() {
+        copyMonacoEditorModule();
         const buildOptions = await getOptions();
         const hotReloadConfigSet = buildOptions.phpConfig.HotReload && buildOptions.phpConfig.HotReload.Enabled;
         if (buildOptions.mode === BuildMode.DEVELOPMENT && !hotReloadConfigSet) {

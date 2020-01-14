@@ -15,6 +15,9 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
  * Dispatcher middleware for handling content-security headers.
  */
 class ContentSecurityPolicyMiddleware {
+
+    const SCRIPT_BYPASS = "CSP_SCRIPT_BYPASS";
+
     /**
      * @var ContentSecurityPolicyModel
      */
@@ -38,9 +41,14 @@ class ContentSecurityPolicyMiddleware {
     public function __invoke(RequestInterface $request, callable $next) {
         $response = Data::box($next($request));
 
+        $filter = 'all';
+        if ($response->getMeta(self::SCRIPT_BYPASS)) {
+            $filter = Policy::FRAME_ANCESTORS;
+        }
+
         $response->setHeader(
             ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY,
-            $this->contentSecurityPolicyModel->getHeaderString()
+            $this->contentSecurityPolicyModel->getHeaderString($filter)
         );
 
         return $response;

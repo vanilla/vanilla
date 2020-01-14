@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@monaco-editor/react";
+import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@vanilla/monaco-editor";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
 import MonacoDiffEditor, {DiffChangeHandler} from 'react-monaco-editor';
+import {assetUrl} from "@library/utility/appUtils";
 
 export interface ITextEditorProps {
     language: string;
@@ -10,11 +11,15 @@ export interface ITextEditorProps {
     onChange?: DiffChangeHandler;
     editorDidMount?: DiffEditorDidMount;
 }
+
 export default function TextEditor(props: ITextEditorProps) {
     const { language, value, onChange } = props;
     const [intialTheme, setTheme] = useState("dark");
     const [isEditorReady, setIsEditorReady] = useState(false);
     const classes = textEditorClasses();
+
+    // Make sure we have the proper asset root set.
+    window.MONACO_EDITOR_WEB_ROOT = assetUrl('/dist');
 
     function handleEditorDidMount() {
         setIsEditorReady(true);
@@ -31,15 +36,13 @@ export default function TextEditor(props: ITextEditorProps) {
             <button onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 {themeModeButton}
             </button>
-            <MonacoDiffEditor
+            <ControlledEditor
                 theme={intialTheme}
                 language={language}
                 editorDidMount={handleEditorDidMount}
                 options={{ lineNumbers: "on" }}
                 value={value}
                 onChange={onChange}
-                width={"1000"}
-                height={"1000"}
             />
         </div>
     );

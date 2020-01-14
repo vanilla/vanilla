@@ -6,7 +6,7 @@
 
 import * as path from "path";
 import webpack from "webpack";
-import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
+import { DIST_DIRECTORY, PRETTIER_FILE, VANILLA_ROOT } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
 import { BuildMode, getOptions } from "../options";
 import chalk from "chalk";

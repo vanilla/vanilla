@@ -21,6 +21,8 @@ import { inputVariables, inputClasses } from "@vanilla/library/src/scripts/forms
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
+import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
+import * as types from "typestyle/lib/types";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -36,34 +38,34 @@ export const compatibilityStyles = useThemeCache(() => {
     const metaFg = colorOut(vars.meta.colors.fg);
 
     fullBackgroundCompat();
-    cssRule("body", {
+    cssOut("body", {
         backgroundColor: bg,
         color: fg,
     });
-    cssRule(".Frame", {
+    cssOut(".Frame", {
         background: "none",
     });
 
-    cssRule(".DataList .Item, .MessageList .Item", {
+    cssOut(".DataList .Item, .MessageList .Item", {
         background: "none",
     });
 
     // @mixin font-style-base()
-    cssRule("html, body, .DismissMessage", {
+    cssOut("html, body, .DismissMessage", {
         ...fonts({
             family: vars.fonts.families.body,
             color: mainColors.fg,
         }),
     });
 
-    cssRule(".DismissMessage", {
+    cssOut(".DismissMessage", {
         color: fg,
     });
 
-    cssRule(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
-    cssRule(".token-input-list", inputClasses().inputMixin);
+    cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
+    cssOut(".token-input-list", inputClasses().inputMixin);
 
-    cssRule(".DataTable .Item td", {
+    cssOut(".DataTable .Item td", {
         background: bg,
         color: fg,
     });
@@ -102,11 +104,11 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
 
-    cssRule(".ReactButton.PopupWindow&:hover .Sprite::before", {
+    cssOut(".ReactButton.PopupWindow&:hover .Sprite::before", {
         color: primary,
     });
 
-    cssRule("a.Bookmark &::before", {
+    cssOut("a.Bookmark &::before", {
         color: primary,
         $nest: {
             "&:hover::before": {
@@ -114,10 +116,10 @@ export const compatibilityStyles = useThemeCache(() => {
             },
         },
     });
-    cssRule(".Box h4", { color: fg });
+    cssOut(".Box h4", { color: fg });
 
     // Panel
-    cssRule(".Panel a", {
+    cssOut(".Panel a", {
         ...siteNavNodeClasses().linkMixin,
     });
 
@@ -158,6 +160,15 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinInputBorderColor("select");
     mixinInputBorderColor(".InputBox.BigInput");
     mixinInputBorderColor("ul.token-input-list", "& .token-list-focused");
+    mixinInputBorderColor(`
+        .Container input[type= "text"],
+        .Container textarea, ul.token-input-list,
+        .Container input.InputBox,
+        .Container .AdvancedSearch .InputBox,
+        .Container .AdvancedSearch select,
+        .Container select
+        `);
+    mixinInputBorderColor(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
 
     // Dropdown hover/focus colors:
 
@@ -170,23 +181,23 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinFlyoutItem(".editor-action.editor-action.editor-action a");
 
     // Buttons
-    cssRule(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
+    cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
         borderColor: primary,
         borderStyle: vars.border.style,
         borderWidth: unit(vars.border.width),
     });
 
-    cssRule(".Meta-Discussion .Tag", {
+    cssOut(".Meta-Discussion .Tag", {
         ...margins({
             horizontal: 3,
         }),
     });
 
-    cssRule(".Meta-Discussion > .Tag", {
+    cssOut(".Meta-Discussion > .Tag", {
         marginLeft: unit(6),
     });
 
-    cssRule(
+    cssOut(
         `
         a.Title,
         .Title a,
@@ -203,7 +214,7 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(
+    cssOut(
         `
         .DataList .Meta .Tag-Announcement,
         .DataList .NewCommentCount,
@@ -213,7 +224,9 @@ export const compatibilityStyles = useThemeCache(() => {
         .MessageList .HasNew.HasNew,
         .DataTableWrap .Tag-Announcement,
         .DataTableWrap .NewCommentCount,
-        .DataTableWrap .HasNew.HasNew
+        .DataTableWrap .HasNew.HasNew,
+        .MessageList .ItemComment .Username,
+        .MessageList .ItemDiscussion .Username
         `,
         {
             color: primary,
@@ -222,15 +235,15 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
+    cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
         color: primary,
     });
 
-    cssRule("ul.token-input-list.token-input-focused, .AdvancedSearch .InputBox:focus", {
+    cssOut("ul.token-input-list.token-input-focused, .AdvancedSearch .InputBox:focus", {
         borderColor: primary,
     });
 
-    cssRule(
+    cssOut(
         `
         input[type= "text"],
         textarea,
@@ -249,7 +262,7 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(
+    cssOut(
         `
         #token-input-Form_tags,
         input[type= "text"],
@@ -270,7 +283,7 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(`div.token-input-dropdown`, borders());
+    cssOut(`div.token-input-dropdown`, borders());
 
     // Meta colors
     mixinMetaLinkContainer(".DataList .Meta");
@@ -295,8 +308,10 @@ export const compatibilityStyles = useThemeCache(() => {
     mixinMetaLinkContainer(".DataTableWrap .Tag-Poll");
     mixinMetaLinkContainer(".DataTableWrap .RoleTracker");
     mixinMetaLinkContainer(".DataTableWrap .IdeationTag");
+    mixinMetaLinkContainer(".MessageList .ItemComment .Username");
+    mixinMetaLinkContainer(".MessageList .ItemDiscussion .Username");
 
-    cssRule(
+    cssOut(
         `
         .Herobanner .SearchBox .AdvancedSearch .BigInput,
         .Herobanner .SearchBox #Form_Search
@@ -311,14 +326,14 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(`div.Popup .Body`, {
+    cssOut(`div.Popup .Body`, {
         // borderRadius: unit(vars.border.radius),
         ...borders(),
         backgroundColor: bg,
         color: fg,
     });
 
-    cssRule(
+    cssOut(
         `
         .Flyout.Flyout,
         .richEditorFlyout,
@@ -330,23 +345,40 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssRule(`div.Popup p`, {
+    cssOut(`div.Popup p`, {
         paddingLeft: 0,
         paddingRight: 0,
     });
 
+    cssOut(".Panel-main .ApplyButton", {
+        width: "auto",
+    });
+
+    cssOut(
+        `
+        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a
+        `,
+        {
+            textDecoration: "none",
+        },
+    );
+
     socialConnectCSS();
+    reactionsCSS();
 });
 
 function mixinFlyoutItem(selector: string) {
-    cssRule(selector, dropDownClasses().actionMixin);
+    selector = trimTrailingCommas(selector);
+    cssOut(selector, dropDownClasses().actionMixin);
 }
 
 function mixinMetaLinkContainer(selector: string) {
+    selector = trimTrailingCommas(selector);
     const vars = globalVariables();
     const metaFg = colorOut(vars.meta.text.color);
 
-    cssRule(selector, {
+    cssOut(selector, {
         color: metaFg,
         $nest: {
             "& a": {
@@ -370,15 +402,16 @@ function mixinMetaLinkContainer(selector: string) {
 // Mixins replacement
 export const mixinFontLink = (selector: string, skipDefaultColor = false) => {
     const linkColors = setAllLinkColors();
+    selector = trimTrailingCommas(selector);
 
     if (!skipDefaultColor) {
-        cssRule(selector, {
+        cssOut(selector, {
             color: linkColors.color,
         });
     }
 
     // $nest doesn't work in this scenario. Working around it by doing it manually.
-    // Hopefully a future update will allow us to just pass the nested styles in the cssRule above.
+    // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
     let rawStyles = `\n`;
     Object.keys(linkColors.nested).forEach(key => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
@@ -401,6 +434,7 @@ export const mixinFontLink = (selector: string, skipDefaultColor = false) => {
 
 export const mixinInputBorderColor = (selector: string, focusSelector?: string) => {
     const vars = globalVariables();
+    selector = trimTrailingCommas(selector);
     const primary = colorOut(vars.mainColors.primary);
     let extraFocus = {};
     if (focusSelector) {
@@ -411,15 +445,16 @@ export const mixinInputBorderColor = (selector: string, focusSelector?: string) 
         };
     }
 
-    cssRule(selector, {
-        borderColor: colorOut(vars.border.color),
+    cssOut(selector, {
+        // borderColor: colorOut(vars.border.color),
+        borderColor: "orange",
         borderStyle: vars.border.style,
         borderWidth: unit(vars.border.width),
         $nest: {
             "&:focus": {
                 borderColor: primary,
             },
-            "& .focus-visible": {
+            "&.focus-visible": {
                 borderColor: primary,
             },
             ...extraFocus,
@@ -429,13 +464,14 @@ export const mixinInputBorderColor = (selector: string, focusSelector?: string) 
 
 export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTypes.STANDARD) => {
     const vars = buttonVariables();
+    selector = trimTrailingCommas(selector);
 
     if (buttonType === ButtonTypes.PRIMARY) {
-        cssRule(selector, generateButtonStyleProperties(vars.primary));
+        cssOut(selector, generateButtonStyleProperties(vars.primary));
     } else if (buttonType === ButtonTypes.STANDARD) {
-        cssRule(selector, generateButtonStyleProperties(vars.standard));
+        cssOut(selector, generateButtonStyleProperties(vars.standard));
     } else if (buttonType === ButtonTypes.ICON_COMPACT) {
-        cssRule(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
+        cssOut(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
     } else {
         new Error(`No support yet for button type: ${buttonType}`);
     }
@@ -443,7 +479,7 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
 
 export const mixinCloseButton = (selector: string) => {
     const vars = globalVariables();
-    cssRule(selector, {
+    cssOut(selector, {
         color: colorOut(vars.mainColors.fg),
         background: "none",
         $nest: {
@@ -458,4 +494,12 @@ export const mixinCloseButton = (selector: string) => {
             },
         },
     });
+};
+
+export const trimTrailingCommas = selector => {
+    return selector.replace(new RegExp("[,]+$"), "");
+};
+
+export const cssOut = (selector: string, ...objects: types.NestedCSSProperties[]) => {
+    cssRule(trimTrailingCommas(selector), ...objects);
 };

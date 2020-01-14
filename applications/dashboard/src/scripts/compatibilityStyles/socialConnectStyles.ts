@@ -5,28 +5,29 @@
  * @license GPL-2.0-only
  */
 
-import { cssRule, media } from "typestyle";
+import { media } from "typestyle";
 import { unit } from "@library/styles/styleHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles/index";
 
 export const socialConnectCSS = () => {
-    cssRule(`.DataList-Connections .Connection-Header`, {
+    cssOut(`.DataList-Connections .Connection-Header`, {
         alignItems: "flex-end",
     });
 
-    cssRule(`.Gloss`, {
+    cssOut(`.Gloss`, {
         minHeight: "42px",
         marginTop: unit(5),
         minWidth: unit(200),
     });
 
-    cssRule(`.ActivateSlider`, {
+    cssOut(`.ActivateSlider`, {
         minWidth: unit(200),
         marginLeft: unit(16),
     });
 
     const breakPointConnections = 768;
 
-    cssRule(
+    cssOut(
         `.DataList-Connections .Connection-Header`,
         media(
             { maxWidth: breakPointConnections },
@@ -36,7 +37,7 @@ export const socialConnectCSS = () => {
             },
         ),
     );
-    cssRule(
+    cssOut(
         `.Connection-Name`,
         { minHeight: unit(42) },
         media(
@@ -46,7 +47,7 @@ export const socialConnectCSS = () => {
             },
         ),
     );
-    cssRule(
+    cssOut(
         `.DataList-Connections .IconWrap`,
         media(
             { maxWidth: breakPointConnections },
@@ -55,7 +56,7 @@ export const socialConnectCSS = () => {
             },
         ),
     );
-    cssRule(
+    cssOut(
         `.ActivateSlider`,
         media(
             { maxWidth: breakPointConnections },

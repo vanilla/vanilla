@@ -25,7 +25,7 @@ class ThemeFeatures {
         'NewFlyouts' => false,
         'SharedMasterView' => false,
         'ProfileHeader' => false,
-        'DataDrivenForumColors' => false,
+        'DataDrivenTheme' => false,
     ];
 
     /**

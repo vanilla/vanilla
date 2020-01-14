@@ -145,7 +145,13 @@ export default class EntryModel {
     public async getSections(): Promise<string[]> {
         let names: string[] = [];
         for (const dir of this.entryDirs) {
-            const entryNameList = await readDir(path.resolve(dir));
+            const resolvedPath = path.resolve(dir);
+            const dirExists = await fileExists(resolvedPath);
+            if (!dirExists) {
+                continue;
+            }
+
+            const entryNameList = await readDir(resolvedPath);
             names.push(...entryNameList);
         }
 

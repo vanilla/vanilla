@@ -8,6 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import Tiles, { TileAlignment } from "./Tiles";
+import {layoutVariables} from "@library/layout/panelLayoutStyles";
 
 const formsStory = storiesOf("Home Page", module);
 
@@ -148,4 +149,9 @@ formsStory.add("Tiles", () =>
             </>
         );
     })(),
+    {
+        chromatic: {
+            viewports: [1200],
+        },
+    },
 );

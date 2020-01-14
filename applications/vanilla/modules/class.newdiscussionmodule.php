@@ -63,7 +63,7 @@ class NewDiscussionModule extends Gdn_Module {
      *
      * @param string $text
      * @param string $url
-     * @param bool $asButton Whether to display as a separate button or not.
+     * @param bool $asOwnButton Whether to display as a separate button or not.
      */
     public function addButton($text, $url, $asOwnButton) {
         $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asOwnButton' => $asOwnButton];

@@ -65,8 +65,8 @@ class NewDiscussionModule extends Gdn_Module {
      * @param string $url
      * @param bool $asButton Whether to display as a separate button or not.
      */
-    public function addButton($text, $url, $asButton) {
-        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asButton' => $asButton];
+    public function addButton($text, $url, $asOwnButton) {
+        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asOwnButton' => $asOwnButton];
     }
 
     /**
@@ -126,10 +126,7 @@ class NewDiscussionModule extends Gdn_Module {
             }
 
             // Check whether to display in dropdown or as a separate button.
-            $asOwnButton = false;
-            if ($buttonsConfig[$type['Singular']]['Button']) {
-                $asOwnButton = true;
-            }
+            $asOwnButton = $buttonsConfig[$type['Singular']]['AsOwnButton'] ?? false;
 
             $this->addButton(t(val('AddText', $type)), $url, $asOwnButton);
         }
@@ -154,10 +151,10 @@ class NewDiscussionModule extends Gdn_Module {
         $allButtons = [];
         $groupedButtons = [];
         foreach ($this->Buttons as $key => $button) {
-            if ($button['asButton']) {
-                array_push($allButtons, [$button]);
+            if ($button['asOwnButton']) {
+                $allButtons[] = [$button];
             } else {
-                array_push($groupedButtons, $button);
+                $groupedButtons[] = $button;
             }
         }
         if (!empty($groupedButtons)) {

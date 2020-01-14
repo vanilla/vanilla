@@ -18,8 +18,8 @@ export const tilesVariables = useThemeCache(() => {
     const themeVars = variableFactory("tiles");
     const spacing = themeVars("spacing", {
         paddingTwoColumns: 24,
-        paddingThreeColumns: 9,
-        paddingFourColumns: 17,
+        paddingThreeColumns: 14,
+        paddingFourColumns: 14,
     });
 
     const sizing = themeVars("sizing", {

@@ -120,6 +120,11 @@ class ImageResizer {
             }
 
             $destImage = imagecreatetruecolor($resize['width'], $resize['height']);
+            if ($srcType === IMAGETYPE_PNG || $srcType === IMAGETYPE_ICO) {
+                // Set image transparency on target if necessary
+                imagealphablending($destImage, false);
+                imagesavealpha($destImage, true);
+            }
 
             imagecopyresampled(
                 $destImage,
@@ -343,7 +348,6 @@ class ImageResizer {
                 break;
             case IMAGETYPE_PNG:
                 $r = imagecreatefrompng($path);
-                imagealphablending($r, true);
                 break;
             default:
                 $ext = $this->extFromImageType($type);

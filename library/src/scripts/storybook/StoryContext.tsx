@@ -79,7 +79,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
                     assets: {
                         data: {
                             variables: {
-                                data: value.themeVars ?? {},
+                                data: (value.themeVars as any) ?? {},
                             },
                         },
                         status: LoadStatus.SUCCESS,
@@ -92,7 +92,6 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
                 storeState: merge(value.storeState ?? {}, themeState),
             };
             if (!isEqual(newState, contextState)) {
-                console.log("uipdate to new state", newState);
                 setContextState(newState);
                 resetStoreState(newState.storeState);
                 setThemeKey(clearThemeCache().toString());

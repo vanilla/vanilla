@@ -361,7 +361,7 @@ if (!function_exists('buttonGroup')) {
                 $buttonClass .= ' Primary';
             }
             // Strip "Button" or "NavButton" off the group class.
-            echo '<div class="ButtonGroup Multi '.str_replace(['\bNavButton\b', '\bButton\b'], ['', ''], $cssClass).'">';
+            echo '<div class="ButtonGroup Multi '.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
 
             echo anchor($text, $url, $buttonClass);
             if ($reorder) {

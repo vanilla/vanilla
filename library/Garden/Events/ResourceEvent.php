@@ -12,13 +12,13 @@ namespace Garden\Events;
 abstract class ResourceEvent {
 
     /** A resource has been removed. */
-    const ACTION_DELETE = "delete";
+    public const ACTION_DELETE = "delete";
 
     /** A resource has been created. */
-    const ACTION_INSERT = "insert";
+    public const ACTION_INSERT = "insert";
 
     /** An existing resource has been updated. */
-    const ACTION_UPDATE = "update";
+    public const ACTION_UPDATE = "update";
 
     /** @var string */
     protected $action;
@@ -44,9 +44,9 @@ abstract class ResourceEvent {
     /**
      * Get the event action.
      *
-     * @return string|null
+     * @return string
      */
-    public function getAction(): ?string {
+    public function getAction(): string {
         return $this->action;
     }
 
@@ -62,9 +62,9 @@ abstract class ResourceEvent {
     /**
      * Get the event type.
      *
-     * @return string|null
+     * @return string
      */
-    public function getType(): ?string {
+    public function getType(): string {
         return $this->type;
     }
 

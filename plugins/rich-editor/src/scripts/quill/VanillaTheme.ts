@@ -33,6 +33,7 @@ export default class VanillaTheme extends ThemeBase {
 
         super(quill, themeOptions);
         this.applyLastSelectionHack();
+        this.applyFocusFixHack();
 
         this.quill.root.classList.add(classesRichEditor.text);
         this.quill.root.classList.add("richEditor-text");
@@ -53,6 +54,22 @@ export default class VanillaTheme extends ThemeBase {
 
         // Create the newline insertion module.
         void new NewLineClickInsertionModule(this.quill);
+    }
+
+    /**
+     * Quill has a bad habit of scrolling the document on focus.
+     * We are monkey patching over it to pass some extra arguments to the build in focus method.
+     */
+    private applyFocusFixHack() {
+        const { root } = this.quill.selection;
+        const initialFocus: typeof HTMLElement.prototype.focus = root.focus;
+
+        root.focus = function(options = {}) {
+            initialFocus.call(root, {
+                ...options,
+                preventScroll: true,
+            });
+        };
     }
 
     /**

@@ -24,7 +24,10 @@ export function Router(props: IProps) {
 
     useEffect(() => {
         if (onRouteChange) {
-            const unregister = history.listen(() => onRouteChange(history));
+            const unregister = history.listen(() => {
+                window.scrollTo(0, 0);
+                onRouteChange(history);
+            });
             // Return the cleanup function.
             return unregister;
         }

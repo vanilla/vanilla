@@ -5,9 +5,14 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Formatting\Formats\RichFormat;
+
+/**
+ * Plugin class for the Rich Editor.
+ */
 class RichEditorPlugin extends Gdn_Plugin {
 
-    const FORMAT_NAME = "Rich";
+    const FORMAT_NAME = RichFormat::FORMAT_KEY;
     const QUOTE_CONFIG_ENABLE = "RichEditor.Quote.Enable";
 
     /** @var integer */
@@ -25,8 +30,8 @@ class RichEditorPlugin extends Gdn_Plugin {
      * {@inheritDoc}
      */
     public function setup() {
-        saveToConfig('Garden.InputFormatter', self::FORMAT_NAME);
-        saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
+        saveToConfig('Garden.InputFormatter', RichFormat::FORMAT_KEY);
+        saveToConfig('Garden.MobileInputFormatter', RichFormat::FORMAT_KEY);
         saveToConfig(self::QUOTE_CONFIG_ENABLE, true);
         saveToConfig('EnabledPlugins.Quotes', false);
     }
@@ -52,13 +57,13 @@ class RichEditorPlugin extends Gdn_Plugin {
      */
     public function isFormRich(Gdn_Form $form): bool {
         $data = $form->formData();
-        $format = $data['Format'] ?? 'Rich';
+        $format = $data['Format'] ?? null;
 
-        return $format === self::FORMAT_NAME;
+        return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
     }
 
     public function isInputFormatterRich(): bool {
-        return Gdn_Format::defaultFormat() === "Rich";
+        return strcasecmp(Gdn_Format::defaultFormat(), RichFormat::FORMAT_KEY) === 0;
     }
 
     /**
@@ -69,7 +74,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @return string[] Additional post formats.
      */
     public function getPostFormats_handler(array $postFormats): array {
-        $postFormats[] = self::FORMAT_NAME;
+        $postFormats[] = RichFormat::FORMAT_KEY;
         return $postFormats;
     }
 

@@ -209,7 +209,7 @@ export class TitleBar extends React.Component<IProps, IState> {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
         if (this.containerElement) {
-            this.containerElement.classList.value = this.containerClasses;
+            this.containerElement.setAttribute("class", this.containerClasses);
         }
     }
 

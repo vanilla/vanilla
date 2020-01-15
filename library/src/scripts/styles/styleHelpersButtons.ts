@@ -18,6 +18,16 @@ export interface IActionStates {
     active?: object;
 }
 
+export interface IStateSelectors {
+    noState?: string;
+    allStates?: string; // Applies to all
+    hover?: string;
+    focus?: string;
+    focusNotKeyboard?: string; // Focused, not through keyboard?: object;
+    accessibleFocus?: string; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: string;
+}
+
 export interface IButtonStates {
     allStates?: object; // Applies to all
     noState?: object; // Applies to stateless link
@@ -66,7 +76,7 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, debugMod
  * Helper to write CSS state styles. Note this one is for buttons or links
  * *** You must use this inside of a "$nest" ***
  */
-export const buttonStates = (styles: IActionStates, nest?: object, classBasedStates?: IActionStates) => {
+export const buttonStates = (styles: IActionStates, nest?: object, classBasedStates?: IStateSelectors) => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const hover = styles.hover !== undefined ? styles.hover : {};
     const focus = styles.focus !== undefined ? styles.focus : {};

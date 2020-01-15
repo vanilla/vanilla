@@ -229,7 +229,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     // Contents (button or link)
     // Replaces: .dropDownItem-button, .dropDownItem-link
-    const actionMixin: NestedCSSProperties = (classBasedStates?: IActionStates) => {
+    const actionMixin: NestedCSSProperties = (classBasedStates?: IStateSelectors) => {
         return {
                 ...buttonResetMixin(),
                 cursor: "pointer",

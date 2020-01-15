@@ -2306,6 +2306,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Notify users of new discussions.
      *
      * @param int|array|stdClass $discussion
      * @param ActivityModel $activityModel
@@ -3602,7 +3603,9 @@ class DiscussionModel extends Gdn_Model {
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
-                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
+                'description' => 'The location for the discussion, if pinned. '
+                    . '"category" are pinned to their own category. '
+                    . '"recent" are pinned to the recent discussions list, as well as their own category.',
             ],
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',

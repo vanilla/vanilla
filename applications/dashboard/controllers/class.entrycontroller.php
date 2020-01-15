@@ -503,40 +503,30 @@ class EntryController extends Gdn_Controller {
         }
 
         $isTrustedProvider = $this->data('Trusted');
-        $saveRoles = false;
-        $saveRolesRegister = false;
+        $roles = $this->Form->getFormValue('Roles', $this->Form->getFormValue('roles', null));
 
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles'))) {
-            $roles = $this->Form->getFormValue('Roles', null);
+        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $roles !== null) {
+            $saveRoles = $saveRolesRegister = true;
 
-            // Allow the roles index to be lower case.
-            // This feature was requested and approved here https://github.com/vanillaforums/estimates/issues/886
-            $loweredRoles = $this->Form->getFormValue('roles', null);
-            if ($roles === null && $loweredRoles !== null) {
-                $this->Form->setFormValue('Roles', $loweredRoles);
-                $roles = $loweredRoles;
+            // Translate the role names to IDs.
+            $roles = RoleModel::getByName($roles);
+            $roleIDs = array_keys($roles);
+
+            // Ensure user has at least one role.
+            if (empty($roleIDs)) {
+                $roleIDs = $this->UserModel->newUserRoleIDs();
             }
 
-            if ($roles !== null) {
-                $saveRoles = $saveRolesRegister = true;
-
-                // Translate the role names to IDs.
-                $roles = RoleModel::getByName($roles);
-                $roleIDs = array_keys($roles);
-
-                // Ensure user has at least one role.
-                if (empty($roleIDs)) {
-                    $roleIDs = $this->UserModel->newUserRoleIDs();
-                }
-
-                // Allow role syncing to only happen on first connect.
-                if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
-                    $saveRoles = false;
-                }
-
-                $this->Form->setFormValue('RoleID', $roleIDs);
+            // Allow role syncing to only happen on first connect.
+            if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
+                $saveRoles = false;
             }
+
+            $this->Form->setFormValue('RoleID', $roleIDs);
+        } else {
+            $saveRoles = false;
+            $saveRolesRegister = false;
         }
 
         $userModel = Gdn::userModel();

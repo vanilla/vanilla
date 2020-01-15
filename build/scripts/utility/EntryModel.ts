@@ -17,6 +17,7 @@ import {
     VANILLA_ROOT,
     VANILLA_THEMES,
     VANILLA_ADDONS,
+    VANILLA_THEMES_LEGACY,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
@@ -78,8 +79,9 @@ export default class EntryModel {
         await Promise.all([
             this.initAddons(VANILLA_APPS),
             this.initAddons(VANILLA_PLUGINS),
-            this.initAddons(VANILLA_THEMES),
             this.initAddons(VANILLA_ADDONS),
+            this.initAddons(VANILLA_THEMES),
+            this.initAddons(VANILLA_THEMES_LEGACY),
             this.initPackages(),
         ]);
         await this.initEntries();

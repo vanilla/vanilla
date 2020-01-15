@@ -2972,7 +2972,9 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
-        $discussionEvent = $this->eventFromRow($data, DiscussionEvent::ACTION_DELETE);
+        $dataObject = (object)$data;
+        $this->calculate($dataObject);
+        $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
         Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
 
         return true;
@@ -3501,7 +3503,7 @@ class DiscussionModel extends Gdn_Model {
         $this->formatField($row, "Body", $row["Format"]);
         $row['Attributes'] = new Attributes($row['Attributes']);
 
-        if (isset($row["Bookmarked"])) {
+        if (array_key_exists("Bookmarked", $row)) {
             $row["Bookmarked"] = (bool)$row["Bookmarked"];
         }
 

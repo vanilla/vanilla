@@ -65,7 +65,7 @@ class NewDiscussionModule extends Gdn_Module {
      * @param string $url
      * @param bool $asOwnButton Whether to display as a separate button or not.
      */
-    public function addButton($text, $url, $asOwnButton) {
+    public function addButton($text, $url, $asOwnButton = false) {
         $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asOwnButton' => $asOwnButton];
     }
 
@@ -128,7 +128,7 @@ class NewDiscussionModule extends Gdn_Module {
             // Check whether to display in dropdown or as a separate button.
             $asOwnButton = $buttonsConfig[$type['Singular']]['AsOwnButton'] ?? false;
 
-            $this->addButton(t(val('AddText', $type)), $url, $asOwnButton);
+            $this->addButton(($type['AddText'] ?? ''), $url, $asOwnButton);
         }
 
         // Add QueryString to URL if one is defined.
@@ -146,7 +146,7 @@ class NewDiscussionModule extends Gdn_Module {
      *
      * @return array Returns buttons grouped by whether they are standalone or part of a dropdown.
      */
-    public function getButtonGroups() {
+    public function getButtonGroups(): array {
         $this->reorder = true;
         $allButtons = [];
         $groupedButtons = [];

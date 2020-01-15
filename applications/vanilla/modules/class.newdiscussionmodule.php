@@ -34,7 +34,7 @@ class NewDiscussionModule extends Gdn_Module {
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
     public $GuestUrl = '/entry/signin';
 
-    /** @var boolean Reorder HTML for easier syling */
+    /** @var boolean Reorder HTML for easier styling */
     public $reorder = false;
 
     /**
@@ -147,7 +147,6 @@ class NewDiscussionModule extends Gdn_Module {
      * @return array Returns buttons grouped by whether they are standalone or part of a dropdown.
      */
     public function getButtonGroups(): array {
-        $this->reorder = true;
         $allButtons = [];
         $groupedButtons = [];
         foreach ($this->Buttons as $key => $button) {

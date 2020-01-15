@@ -25,7 +25,7 @@ story.add("Preview Card", () => {
                         titleBarBg={"#0291db"}
                         titleBarFg={"#fff"}
                         isActiveTheme={false}
-                        isThemeDb={false}
+                        canCopy={true}
                     />
                 </div>
                 <StoryHeading depth={1}>Preview Card with dropdown</StoryHeading>
@@ -37,7 +37,8 @@ story.add("Preview Card", () => {
                         titleBarBg={"#0291db"}
                         titleBarFg={"#fff"}
                         isActiveTheme={false}
-                        isThemeDb={true}
+                        canEdit={true}
+                        canDelete={true}
                     />
                 </div>
                 <StoryHeading depth={1}>Preview card (with no hover)</StoryHeading>

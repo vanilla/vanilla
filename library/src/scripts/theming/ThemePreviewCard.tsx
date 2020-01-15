@@ -36,7 +36,9 @@ interface IProps {
     onDelete?: () => void;
     isActiveTheme: boolean;
     noActions?: boolean;
-    isThemeDb?: boolean;
+    canCopy?: boolean;
+    canDelete?: boolean;
+    canEdit?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -128,13 +130,12 @@ export default function ThemePreviewCard(props: IProps) {
             )}
             {!props.noActions && (
                 <div className={props.noActions ? classes.noOverlay : classes.overlay}>
-                    {props.isThemeDb && (
+                    {(props.canEdit || props.canDelete) && (
                         <div className={classes.actionDropdown}>
                             <DropDown flyoutType={FlyoutType.LIST} renderLeft={true}>
-                                <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />
-                                <DropDownItemButton name={t("Copy")} onClick={props.onCopy} />
+                                {props.canEdit && <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />}
                                 <DropDownItemSeparator />
-                                <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />
+                                {props.canDelete && <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />}
                             </DropDown>
                         </div>
                     )}
@@ -151,7 +152,7 @@ export default function ThemePreviewCard(props: IProps) {
                         <Button className={classes.buttons} onClick={props.onPreview}>
                             {t("Preview")}
                         </Button>
-                        {!props.isThemeDb && (
+                        {props.canCopy && (
                             <Button className={classes.buttons} onClick={props.onCopy}>
                                 {t("Copy")}
                             </Button>

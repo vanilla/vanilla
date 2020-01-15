@@ -13,7 +13,7 @@ export interface ICommonHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
-    title: string;
+    title: React.ReactNode;
 }
 
 export interface IHeadingProps extends ICommonHeadingProps {

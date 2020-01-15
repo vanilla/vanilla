@@ -36,7 +36,7 @@ interface IProps {
     onDelete?: () => void;
     isActiveTheme: boolean;
     noActions?: boolean;
-    themeType?: string;
+    isThemeDb?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -128,15 +128,16 @@ export default function ThemePreviewCard(props: IProps) {
             )}
             {!props.noActions && (
                 <div className={props.noActions ? classes.noOverlay : classes.overlay}>
-                    {props.themeType === "themeDB"}
-                    <div className={classes.actionDropdown}>
-                        <DropDown flyoutType={FlyoutType.LIST}>
-                            <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />
-                            <DropDownItemButton name={t("Copy")} onClick={props.onCopy} />
-                            <DropDownItemSeparator />
-                            <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />
-                        </DropDown>
-                    </div>
+                    {props.isThemeDb && (
+                        <div className={classes.actionDropdown}>
+                            <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.AUTO}>
+                                <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />
+                                <DropDownItemButton name={t("Copy")} onClick={props.onCopy} />
+                                <DropDownItemSeparator />
+                                <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />
+                            </DropDown>
+                        </div>
+                    )}
                     <div className={classes.actionButtons}>
                         <Button
                             className={classes.buttons}
@@ -150,7 +151,7 @@ export default function ThemePreviewCard(props: IProps) {
                         <Button className={classes.buttons} onClick={props.onPreview}>
                             {t("Preview")}
                         </Button>
-                        {props.themeType === "themeFile" && (
+                        {!props.isThemeDb && (
                             <Button className={classes.buttons} onClick={props.onCopy}>
                                 {t("Copy")}
                             </Button>

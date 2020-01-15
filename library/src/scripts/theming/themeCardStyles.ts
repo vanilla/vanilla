@@ -356,7 +356,12 @@ export const themeCardClasses = useThemeCache(() => {
 
     const buttons = style("buttons", {
         marginBottom: unit(vars.contentTile.margin.bottom),
-        width: unit(180),
+
+        $nest: {
+            "&&": {
+                width: unit(180),
+            },
+        },
     });
     const noOverlay = style("noOverlay", {
         display: "none",
@@ -379,11 +384,12 @@ export const themeCardClasses = useThemeCache(() => {
         right: unit(7),
 
         $nest: {
-            "&& button": {
-                color: vars.colors.bg.white.toString(),
-            },
-            [`&:hover button,  &:visited button`]: {
-                color: vars.colors.bg.white.toString(),
+            "& button": {
+                $nest: {
+                    "&, &:hover, &:focus, &:active": {
+                        color: vars.colors.bg.white.toString(),
+                    },
+                },
             },
         },
     });

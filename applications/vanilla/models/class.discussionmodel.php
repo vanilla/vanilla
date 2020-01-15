@@ -12,7 +12,6 @@ use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
-use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Exception\PermissionException;
 use Vanilla\ExtensibleSchemasTrait;
@@ -2268,10 +2267,9 @@ class DiscussionModel extends Gdn_Model {
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
 
-                $normalizedRow = $this->normalizeRow((array)$discussion, true);
-                $discussionEvent = new DiscussionEvent(
-                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
-                    ["discussion" => $normalizedRow]
+                $discussionEvent = $this->eventFromRow(
+                    (array)$discussion,
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
                 );
                 Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
 
@@ -2284,6 +2282,27 @@ class DiscussionModel extends Gdn_Model {
         }
 
         return $discussionID;
+    }
+
+    /**
+     * Generate a discussion event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return DiscussionEvent
+     */
+    private function eventFromRow(array $row, string $action): DiscussionEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+
+        $userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
+        $discussion = $this->normalizeRow($row, true);
+        $discussion = $this->schema()->validate($discussion);
+        $result = new DiscussionEvent(
+            $action,
+            ["discussion" => $discussion]
+        );
+        return $result;
     }
 
     /**
@@ -2952,11 +2971,7 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
-        $normalizedRow = $this->normalizeRow($data, true);
-        $discussionEvent = new DiscussionEvent(
-            DiscussionEvent::ACTION_DELETE,
-            ["discussion" => $normalizedRow]
-        );
+        $discussionEvent = $this->eventFromRow($data, DiscussionEvent::ACTION_DELETE);
         Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
 
         return true;
@@ -3570,7 +3585,7 @@ class DiscussionModel extends Gdn_Model {
      * @return Schema
      */
     public function schema(): Schema {
-        return Schema::parse([
+        $result = Schema::parse([
             'discussionID:i' => 'The ID of the discussion.',
             'type:s|n' => [
                 'description' => 'The type of this discussion if any.',
@@ -3578,7 +3593,6 @@ class DiscussionModel extends Gdn_Model {
             'name:s' => 'The title of the discussion.',
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
-            'category?' => $this->extensibleSchema(new CategoryFragmentSchema(), 'CategoryFragment'),
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
@@ -3598,9 +3612,21 @@ class DiscussionModel extends Gdn_Model {
             'url:s?' => 'The full URL to the discussion.',
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
             'lastPost?' => $this->extensibleSchema(new PostFragmentSchema(), "PostFragment"),
+        ]);
+        return $result;
+    }
+
+    /**
+     * Get a schema representing ser-specific discussion fields.
+     *
+     * @return Schema
+     */
+    public function userDiscussionSchema(): Schema {
+        $result = Schema::parse([
             'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
             'unread:b' => 'Whether or not the discussion should have an unread indicator.',
             'countUnread:i?' => 'The number of unread comments.',
         ]);
+        return $result;
     }
 }

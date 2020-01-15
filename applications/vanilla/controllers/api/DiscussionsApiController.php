@@ -11,6 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Formatting\Formats\RichFormat;
 
 /**
@@ -211,7 +212,13 @@ class DiscussionsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return $this->discussionModel->schema();
+        $result = $this->discussionModel
+            ->schema()
+            ->merge($this->discussionModel->userDiscussionSchema())
+            ->merge(Schema::parse([
+                'category?' => $this->extensibleSchema(new CategoryFragmentSchema(), 'CategoryFragment'),
+            ]));
+        return $result;
     }
 
     /**

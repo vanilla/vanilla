@@ -10,7 +10,7 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color } from "csx";
+import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, hashString } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
@@ -124,13 +124,24 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  */
 export function variableFactory(componentName: string) {
     const themeVars = getThemeVariables();
-    const componentVars = (themeVars && themeVars[componentName]) || {};
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
-        const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
-        return merge(declaredVars, normalizeVariables(subcomponentVars));
+        const customVars = themeVars?.[componentName]?.[subElementName] ?? null;
+        if (customVars === null) {
+            return declaredVars;
+        }
+
+        const normalized = normalizeVariables(customVars, declaredVars);
+        const result = merge(declaredVars, normalized);
+        if (Object.entries(customVars).length > 0) {
+            console.log({ declaredVars, customVars, normalized, result });
+        }
+        return result;
     };
 }
+
+const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)\s?,?(.+)?\)/;
+const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)\s?,?(.+)?\)/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -139,25 +150,73 @@ export function variableFactory(componentName: string) {
  *
  * - Strings starting with `#` get wrapped in `color()`;
  */
-function normalizeVariables(variables: any) {
-    if (Array.isArray(variables)) {
-        variables = variables.map(normalizeVariables);
-    } else if (typeof variables === "object") {
+function normalizeVariables(customVariable: any, defaultVariable: any) {
+    if (Array.isArray(customVariable)) {
+        customVariable = customVariable.map(normalizeVariables);
+    } else if (typeof customVariable === "object") {
         const newObj: any = {};
-        for (const [key, value] of Object.entries(variables)) {
-            newObj[key] = normalizeVariables(value);
+        for (const [key, value] of Object.entries(customVariable)) {
+            if (!(key in defaultVariable)) {
+                console.log("could not find key", key, "in", defaultVariable);
+                // If we don't have a default version of this variable, remove it.
+                continue;
+            }
+            const defaultNested = defaultVariable[key];
+            newObj[key] = normalizeVariables(value, defaultNested);
         }
         return newObj;
     }
 
-    if (typeof variables === "string") {
-        if (variables.startsWith("#")) {
-            // It's a colour.
-            return color(variables);
+    if (defaultVariable instanceof ColorHelper && typeof customVariable === "string") {
+        try {
+            const color = colorStringToInstance(customVariable);
+            return color;
+        } catch (e) {
+            logWarning(e);
+            return defaultVariable;
         }
     }
 
-    return variables;
+    return customVariable;
+}
+
+/**
+ * Convert a color string into an instance.
+ * @param colorString
+ */
+export function colorStringToInstance(colorString: string): ColorHelper {
+    if (colorString.startsWith("#")) {
+        // It's a colour.
+        return color(colorString);
+    } else if (colorString.match(rgbRegex)) {
+        const result = rgbRegex.exec(colorString)!;
+
+        const r = parseInt(result[1], 10);
+        const g = parseInt(result[2], 10);
+        const b = parseInt(result[3], 10);
+        const a = parseFloat(result[4]);
+
+        if (a !== null) {
+            return rgba(r, g, b, a);
+        } else {
+            return rgb(r, g, b);
+        }
+    } else if (colorString.match(hslRegex)) {
+        const result = hslRegex.exec(colorString)!;
+
+        const h = parseInt(result[1], 10);
+        const s = parseInt(result[2], 10);
+        const l = parseInt(result[3], 10);
+        const a = parseFloat(result[4]);
+
+        if (a !== null) {
+            return hsla(h, s, l, a);
+        } else {
+            return hsl(h, s, l);
+        }
+    } else {
+        throw new Error("Invalid color detected");
+    }
 }
 
 /**

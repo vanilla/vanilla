@@ -22,6 +22,7 @@ import {
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { Col } from "@jest/types/build/Global";
 
 const fontFallbacks = [
     "-apple-system",
@@ -140,6 +141,15 @@ export const placeholderStyles = (styles: NestedCSSProperties) => {
     };
 };
 
+export const autoFillReset = (fg: ColorValues, bg: ColorValues) => {
+    return {
+        "&:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus": {
+        ["-webkit-text-fill-color"]: colorOut(fg),
+        ["-webkit-box-shadow"]: `0 0 0px 1000px ${colorOut(bg)} inset`,
+        ["transition"]: `background-color 5000s ease-in-out 0s`
+    }
+};
+
 export const singleLineEllipsis = () => {
     return {
         whiteSpace: "nowrap" as WhiteSpaceProperty,
@@ -148,6 +158,7 @@ export const singleLineEllipsis = () => {
         maxWidth: percent(100) as MaxWidthProperty<TLength>,
     };
 };
+
 export const longWordEllipsis = () => {
     return {
         textOverflow: "ellipsis" as TextOverflowProperty,

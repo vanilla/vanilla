@@ -6,6 +6,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
+    autoFillReset,
     borders,
     colorOut,
     IBordersWithRadius,
@@ -13,7 +14,6 @@ import {
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
-import { px } from "csx";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -64,6 +64,7 @@ export const inputClasses = useThemeCache(() => {
         outline: 0,
         fontWeight: globalVars.fonts.weights.normal,
         $nest: {
+            ...autoFillReset(vars.colors.bg, vars.colors.fg),
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),

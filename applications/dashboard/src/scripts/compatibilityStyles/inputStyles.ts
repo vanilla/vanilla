@@ -152,8 +152,21 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
         ...extraFocus,
     });
 
-    cssOut("form .SelectWrapper::after, .AdvancedSearch .Handle.Handle ", {
+    cssOut("form .SelectWrapper::after", {
+        color: "inherit",
+    });
+
+    cssOut("form .SelectWrapper, .AdvancedSearch .Handle.Handle ", {
         color: colorOut(globalVars.border.color),
+    });
+
+    cssOut("form .SelectWrapper", {
+        cursor: "pointer",
+        $nest: {
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 
     cssOut(".Handle.Handle", {

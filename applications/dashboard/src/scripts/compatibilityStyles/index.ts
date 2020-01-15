@@ -199,12 +199,3 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
 
     cssRaw(rawStyles);
 };
-
-// Just for development
-
-cssRule(
-    ".ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content.ui-corner-all.MenuItems.MenuItems-Input.ui-autocomplete-disabled.ui-state-disabled",
-    {
-        display: important("block"),
-    },
-);

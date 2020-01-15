@@ -221,7 +221,7 @@ class LegacyAssetModel extends Gdn_Model {
         if ($theme) {
             $path = "/$theme/design/$filename";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
-            $paths[] = [PATH_ADDONS_THEMES.$path, "/addons{$path}"];
+            $paths[] = [PATH_ADDONS_THEMES.$path, "/addons/themes{$path}"];
         }
 
         // 4. Static, Plugin, or App relative file
@@ -235,11 +235,11 @@ class LegacyAssetModel extends Gdn_Model {
                 $folder = substr($folder, strlen('plugins/'));
                 $path = "/{$folder}/design/{$filename}";
                 $paths[] = [PATH_PLUGINS.$path, "/plugins$path"];
-                $paths[] = [PATH_ADDONS_ADDONS.$path, "/plugins$path"];
+                $paths[] = [PATH_ADDONS_ADDONS.$path, "/addons/addons$path"];
 
                 // Allow direct-to-file links for plugins
                 $paths[] = [PATH_PLUGINS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
-                $paths[] = [PATH_ADDONS_ADDONS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
+                $paths[] = [PATH_ADDONS_ADDONS."/$folder/$filename", "/addons/addons/{$folder}/{$filename}", true]; // deprecated
 
             // An app-relative path was given
             } else {

@@ -3,23 +3,16 @@
         <div class="Frame-body">
 
             <!-- Hero Banner -->
-            {%- if themeOptions.hasHeroBanner and inSection(['CategoryList', 'DiscussionList']) -%}
             <div class="Herobanner">
                 {% if siteMeta.ui.bannerImage %}
                     <div class="Herobanner-bgImage" style="background-image:url('{{ siteMeta.ui.bannerImage }}')"></div>
                 {% endif %}
                 <div class="Container">
-                    {% if themeOptions.hasFeatureSearchbox|default(false) and hasAdvancedSearch %}
-                        <div class="SearchBox js-sphinxAutoComplete" role="search">
-                            {{ renderModule("AdvancedSearchModule") }}
-                        </div>
-                    {% else %}
-                        <h2 class="H HomepageTitle">{{ splashTitle }}</h2>
-                        <p class="P PageDescription">{{ splashDescription }}</p>
-                    {% endif %}
+                    <div class="SearchBox js-sphinxAutoComplete" role="search">
+                        {{ renderModule("AdvancedSearchModule") }}
+                    </div>
                 </div>
             </div>
-            {%- endif -%}
             <!-- Hero Banner END -->
 
             <div class="Frame-content">

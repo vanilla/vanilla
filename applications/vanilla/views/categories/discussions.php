@@ -36,7 +36,38 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
 
                 </div>
 
-            <?php endif; ?>
+            <?php else:
+
+                if ($Category->CountCategories > 0) { ?>
+
+                    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
+                        <?php echo getOptions($Category); ?>
+                        <h2 class="H">
+                            <?php
+                                echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category));
+                                Gdn::controller()->EventArguments['Category'] = $Category;
+                                Gdn::controller()->fireEvent('AfterCategoryTitle');
+                            ?>
+                        </h2>
+                    </div>
+
+                <?php } else { ?>
+
+                    <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
+                        <?php echo getOptions($Category); ?>
+                        <h2 class="H">
+                            <?php
+                                echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category));
+                                Gdn::controller()->EventArguments['Category'] = $Category;
+                                Gdn::controller()->fireEvent('AfterCategoryTitle');
+                            ?>
+                        </h2>
+                        <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+                    </div>
+
+                <?php }
+
+            endif; ?>
 
         <?php endforeach; ?>
     <?php else: ?>

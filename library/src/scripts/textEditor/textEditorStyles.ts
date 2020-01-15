@@ -7,7 +7,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { viewHeight } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { unit, defaultTransition } from "@library/styles/styleHelpers";
 
 export const textEditorVariables = useThemeCache(() => {
     const makeTextEditorVars = variableFactory("textEditor");
@@ -49,6 +49,7 @@ export const textEditorClasses = useThemeCache(() => {
         zIndex: 12,
         top: vars.themeToggleIcon.top,
         right: vars.themeToggleIcon.right,
+        ...defaultTransition("transform"),
     });
 
     return {

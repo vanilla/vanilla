@@ -28,6 +28,7 @@ export const actionBarClasses = useThemeCache(() => {
             width: percent(100),
             height: unit(titleBarVars.sizing.height),
             listStyle: "none",
+            margin: 0,
         },
         mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
@@ -52,12 +53,23 @@ export const actionBarClasses = useThemeCache(() => {
                     right: 0,
                 }),
                 justifyContent: "flex-end",
+
+                $nest: {
+                    "& button": {
+                        fontSize: globalVars.fonts.size.medium,
+                    },
+                },
             },
         },
     });
 
     const itemMarginLeft = style("itemMarginLeft", {
         marginLeft: unit(globalVars.gutter.half),
+        $nest: {
+            "& li.dropDown-item": {
+                fontSize: globalVars.fonts.size.medium,
+            },
+        },
     });
 
     const centreColumn = style("centreColumn", {
@@ -93,8 +105,8 @@ export const actionBarClasses = useThemeCache(() => {
         flexDirection: "column",
         marginLeft: "auto",
         marginRight: "auto",
-        paddingLeft: "85px",
-        paddingRight: "70px",
+        paddingLeft: "65px",
+        paddingRight: "100px",
         position: "relative",
         width: "100%",
     });

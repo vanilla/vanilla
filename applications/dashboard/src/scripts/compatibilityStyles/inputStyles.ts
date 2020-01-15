@@ -75,27 +75,27 @@ export const inputCSS = () => {
     cssOut(`div.token-input-dropdown`, borders());
 
     // The padding here needs to be removed so the autocomplete calculates the width properly.
-    cssOut(".token-input-list", {
-        paddingLeft: important(0),
-        paddingRight: important(0),
-    });
+    // cssOut(".token-input-list", {
+    //     padding: important(0),
+    // });
 
     cssOut(".token-input-input-token input", {
         ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.fullWidth),
+        border: important(0),
+        paddingTop: important(0),
+        paddingBottom: important(0),
     });
 
     mixinInputStyles(`input[type= "text"]`);
     mixinInputStyles("textarea");
-    mixinInputStyles("ul.token-input-list");
     mixinInputStyles("input.InputBox");
     mixinInputStyles(".InputBox");
     mixinInputStyles(".AdvancedSearch select");
     mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
-    mixinInputStyles("ul.token-input-list", "& .token-list-focused");
     mixinInputStyles(`
         .Container input[type= "text"],
-        .Container textarea, ul.token-input-list,
+        .Container textarea,
         .Container input.InputBox,
         .Container .AdvancedSearch .InputBox,
         .Container .AdvancedSearch select,
@@ -104,18 +104,27 @@ export const inputCSS = () => {
     mixinInputStyles(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
     mixinInputStyles(".token-input-list, .token-input-focused");
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
+    mixinInputStyles(".AdvancedSearch .InputBox", false, true);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
     cssOut(".token-input-list", inputClasses().inputMixin);
 
-    cssOut(".token-input-input-token input", {
-        border: important(0),
+    cssOut("ul.token-input-list li input", {
+        // paddingLeft: unit(inputVars.sizing.height * 2),
+        // paddingRight: unit(inputVars.sizing.height * 2),
+        // paddingLeft: important(0),
+        // paddingRight: important(0),
+        padding: important(0),
+        minHeight: important("initial"),
+        lineHeight: important(1),
     });
 };
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
-    const vars = globalVariables();
+    const globalVars = globalVariables();
+    const vars = inputVariables();
     selector = trimTrailingCommas(selector);
-    const primary = colorOut(vars.mainColors.primary);
+    const formElementVars = formElementsVariables();
+    const primary = colorOut(globalVars.mainColors.primary);
     let extraFocus = {};
     if (focusSelector) {
         extraFocus = {
@@ -126,11 +135,16 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     }
 
     cssOut(selector, {
-        borderColor: colorOut(vars.border.color),
-        borderStyle: isImportant ? important(vars.border.style) : vars.border.style,
-        borderWidth: isImportant ? important(unit(vars.border.width) as string) : unit(vars.border.width),
-        backgroundColor: isImportant ? important(colorOut(vars.mainColors.bg) as string) : colorOut(vars.mainColors.bg),
-        color: isImportant ? important(colorOut(vars.mainColors.fg) as string) : colorOut(vars.mainColors.fg),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
+        borderColor: colorOut(globalVars.border.color),
+        borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
+        borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),
+        backgroundColor: isImportant
+            ? important(colorOut(globalVars.mainColors.bg) as string)
+            : colorOut(globalVars.mainColors.bg),
+        color: isImportant
+            ? important(colorOut(globalVars.mainColors.fg) as string)
+            : colorOut(globalVars.mainColors.fg),
     });
 
     nestedWorkaround(selector, {

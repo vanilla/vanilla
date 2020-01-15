@@ -21,6 +21,7 @@ import {
 } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 const fontFallbacks = [
     "-apple-system",
@@ -64,10 +65,12 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
 
 export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
     const paddingTop = (height - fullBorderWidth - fontSize * 1.5) / 2;
+
     return {
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
+        minHeight: unit(formElementsVariables().sizing.height),
         ...paddings({
             top: unit(paddingTop),
             bottom: unit(paddingTop),

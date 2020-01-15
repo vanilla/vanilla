@@ -4995,7 +4995,7 @@ body.embed .InformMessages {
   width: 16px;
   height: 16px;
   margin-right: 0.3em;
-  line-height: inherit;
+  line-height: 18px;
   vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
   background-position: 16px 16px;

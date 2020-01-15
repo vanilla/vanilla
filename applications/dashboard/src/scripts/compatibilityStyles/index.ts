@@ -12,7 +12,7 @@ import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { borders } from "@library/styles/styleHelpers";
-import { ColorHelper } from "csx";
+import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
@@ -199,3 +199,13 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
 
     cssRaw(rawStyles);
 };
+
+// Just for development
+
+cssRule(
+    ".ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content.ui-corner-all.MenuItems.MenuItems-Input.ui-autocomplete-disabled.ui-state-disabled",
+    {
+        display: important("block"),
+    },
+);
+document.querySelector(".AdvancedSearch  .Handle").click();

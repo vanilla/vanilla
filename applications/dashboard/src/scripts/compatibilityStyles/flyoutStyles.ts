@@ -9,6 +9,7 @@ import { cssRaw } from "typestyle";
 import {
     borders,
     colorOut,
+    IActionStates,
     negative,
     pointerEvents,
     setAllLinkColors,
@@ -37,7 +38,8 @@ export const flyoutCSS = () => {
     mixinFlyoutItem(".MenuItems.MenuItems li a");
     mixinFlyoutItem(".Flyout.Flyout li a");
     mixinFlyoutItem(".editor-action.editor-action.editor-action a");
-    // mixinFlyoutItem("div.token-input-dropdown ul li.token-input-selected-dropdown-item");
+    mixinFlyoutItem("div.token-input-dropdown ul li", { hover: "token-input-selected-dropdown-item" });
+
     mixinFlyoutItem("div.token-input-dropdown ul li.token-input-dropdown-item");
     mixinFlyoutItem("div.token-input-dropdown ul li.token-input-dropdown-item2");
 
@@ -54,7 +56,7 @@ export const flyoutCSS = () => {
     );
 };
 
-function mixinFlyoutItem(selector: string) {
+function mixinFlyoutItem(selector: string, classBasedStates?: IActionStates) {
     selector = trimTrailingCommas(selector);
-    cssOut(selector, dropDownClasses().actionMixin);
+    cssOut(selector, dropDownClasses().actionMixin(classBasedStates));
 }

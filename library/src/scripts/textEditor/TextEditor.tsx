@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@vanilla/monaco-editor";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
-import MonacoDiffEditor, {DiffChangeHandler} from 'react-monaco-editor';
 import {assetUrl} from "@library/utility/appUtils";
+
 
 export interface ITextEditorProps {
     language: string;
     value?: string;
-    onChange?: DiffChangeHandler;
+    onChange?: ControlledEditorOnChange;
     editorDidMount?: DiffEditorDidMount;
 }
 

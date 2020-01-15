@@ -6,7 +6,6 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
-    autoFillReset,
     borders,
     colorOut,
     IBordersWithRadius,
@@ -64,7 +63,6 @@ export const inputClasses = useThemeCache(() => {
         outline: 0,
         fontWeight: globalVars.fonts.weights.normal,
         $nest: {
-            ...autoFillReset(vars.colors.bg, vars.colors.fg),
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { ColorValues, paddings, unit } from "@library/styles/styleHelpers";
 import {
     FontFamilyProperty,
@@ -24,7 +24,7 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { Col } from "@jest/types/build/Global";
 
-const fontFallbacks = [
+export const fontFallbacks = [
     "-apple-system",
     "BlinkMacSystemFont",
     "HelveticaNeue-Light",
@@ -143,11 +143,15 @@ export const placeholderStyles = (styles: NestedCSSProperties) => {
 
 export const autoFillReset = (fg: ColorValues, bg: ColorValues) => {
     return {
-        "&:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus": {
-        ["-webkit-text-fill-color"]: colorOut(fg),
-        ["-webkit-box-shadow"]: `0 0 0px 1000px ${colorOut(bg)} inset`,
-        ["transition"]: `background-color 5000s ease-in-out 0s`
-    }
+        "&&&:-webkit-autofill, &&&&:-webkit-autofill:hover, &&&&:-webkit-autofill:focus": {
+            ["-webkit-text-fill-color"]: important(colorOut(fg) as string),
+            ["-webkit-box-shadow"]: important(`0 0 0px 1000px ${colorOut(bg)} inset`),
+            ["transition"]: important(`background-color 5000s ease-in-out 0s`),
+        },
+        "&&&:-webkit-autofill": {
+            fontSize: important("inherit"),
+        },
+    };
 };
 
 export const singleLineEllipsis = () => {

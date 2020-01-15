@@ -22,7 +22,7 @@ import {
     sticky,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -55,6 +55,7 @@ export const titleBarVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
+        bgImage: null as string | null,
     });
 
     const guest = makeThemeVars("guest", {
@@ -84,7 +85,7 @@ export const titleBarVariables = useThemeCache(() => {
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
-            bg: colors.bg,
+            bg: "transparent",
         },
         fonts: {
             color: colors.fg,
@@ -222,6 +223,7 @@ export const titleBarVariables = useThemeCache(() => {
     };
 
     return {
+        options,
         border,
         sizing,
         colors,
@@ -268,10 +270,19 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
+    const bgImageStyles: NestedCSSProperties = vars.colors.bgImage
+        ? {
+              backgroundImage: url(vars.colors.bgImage),
+              backgroundPosition: "50% 50%",
+              backgroundSize: "cover",
+          }
+        : {};
+
     const root = style({
         maxWidth: percent(100),
-        backgroundColor: vars.colors.bg.toString(),
-        color: vars.colors.fg.toString(),
+        backgroundColor: colorOut(vars.colors.bg),
+        color: colorOut(vars.colors.fg),
+        ...bgImageStyles,
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {

@@ -17,6 +17,7 @@ import { ColorValues } from "@library/styles/styleHelpersColors";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
+import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 
 export interface ISplashStyleOverwrite {
     colors?: {
@@ -47,11 +48,18 @@ export default function Splash(props: IProps) {
     const { action, className, title } = props;
     const styleOverwrite = props.styleOverwrite || {};
 
+    const varsTitleBar = titleBarVariables();
+    const classesTitleBar = titleBarClasses();
     const classes = splashClasses(styleOverwrite);
     const vars = splashVariables(styleOverwrite);
 
     return (
-        <div ref={ref} className={classNames(className, classes.root)}>
+        <div
+            ref={ref}
+            className={classNames(className, classes.root, {
+                [classesTitleBar.negativeSpacer]: varsTitleBar.options.integrateWithSplash,
+            })}
+        >
             <div
                 className={classNames(
                     classes.outerBackground(

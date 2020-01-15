@@ -193,7 +193,7 @@ export const titleBarVariables = useThemeCache(() => {
 
     const logo = makeThemeVars("logo", {
         maxWidth: 200,
-        heightOffset: 18,
+        heightOffset: sizing.height / 3,
         tablet: {},
     });
 
@@ -274,19 +274,9 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
-    const bgImageStyles: NestedCSSProperties = vars.colors.bgImage
-        ? {
-              backgroundImage: url(vars.colors.bgImage),
-              backgroundPosition: "50% 50%",
-              backgroundSize: "cover",
-          }
-        : {};
-
     const root = style({
         maxWidth: percent(100),
-        backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
-        ...bgImageStyles,
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {
@@ -322,6 +312,40 @@ export const titleBarClasses = useThemeCache(() => {
             height: px(vars.sizing.mobile.height),
         }).$nest,
     });
+
+    const bg = style("bg", {
+        willChange: "opacity",
+        ...absolutePosition.fullSizeOfParent(),
+        backgroundColor: colorOut(vars.colors.bg),
+    });
+
+    const bgImage = style(
+        "bgImage",
+        vars.colors.bgImage
+            ? {
+                  willChange: "opacity",
+                  ...absolutePosition.fullSizeOfParent(),
+                  background:
+                      vars.colors.bgImage instanceof ColorHelper
+                          ? colorOut(vars.colors.bgImage)
+                          : url(vars.colors.bgImage),
+                  backgroundPosition: "50% 50%",
+                  backgroundSize: "cover",
+              }
+            : {
+                  ...absolutePosition.fullSizeOfParent(),
+              },
+    );
+
+    const negativeSpacer = style(
+        "negativeSpacer",
+        {
+            marginTop: px(-vars.sizing.height),
+        },
+        mediaQueries.compact({
+            marginTop: px(-vars.sizing.mobile.height),
+        }),
+    );
 
     const spacer = style(
         "spacer",
@@ -505,11 +529,11 @@ export const titleBarClasses = useThemeCache(() => {
         "button",
         {
             ...buttonResetMixin(),
-            color: colorOut(vars.colors.fg),
             height: px(vars.button.size),
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
+            color: colorOut(vars.colors.fg),
             $nest: {
                 "&&": {
                     ...allButtonStates(
@@ -760,7 +784,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const isFixed = style("isFixed", {
+    const isSticky = style("isSticky", {
         ...sticky(),
         top: 0,
         zIndex: 10,
@@ -768,6 +792,9 @@ export const titleBarClasses = useThemeCache(() => {
 
     return {
         root,
+        bg,
+        bgImage,
+        negativeSpacer,
         spacer,
         bar,
         logoContainer,
@@ -801,7 +828,7 @@ export const titleBarClasses = useThemeCache(() => {
         desktopNavWrap,
         logoCenterer,
         hamburger,
-        isFixed,
+        isSticky,
     };
 });
 

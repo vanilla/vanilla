@@ -16,7 +16,6 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
-    const globalVars = globalVariables();
 
     const baseColor = titleBarVars.colors.bg.darken(0.05);
     const colors = makeVars("colors", {
@@ -101,6 +100,7 @@ export const compactSearchClasses = useThemeCache(() => {
     });
 
     const searchAndResults = style("searchAndResults", {
+        flex: 1,
         position: "relative",
         width: percent(100),
         height: unit(formElementsVars.sizing.height),

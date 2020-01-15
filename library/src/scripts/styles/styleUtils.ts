@@ -167,9 +167,9 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
         return newObj;
     }
 
-    if (defaultVariable instanceof ColorHelper && typeof customVariable === "string") {
+    if (typeof customVariable === "string") {
         try {
-            const color = colorStringToInstance(customVariable);
+            const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
             return color;
         } catch (e) {
             logWarning(e);
@@ -184,7 +184,7 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
  * Convert a color string into an instance.
  * @param colorString
  */
-export function colorStringToInstance(colorString: string): ColorHelper {
+export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
     if (colorString.startsWith("#")) {
         // It's a colour.
         return color(colorString);
@@ -215,7 +215,11 @@ export function colorStringToInstance(colorString: string): ColorHelper {
             return hsl(h, s, l);
         }
     } else {
-        throw new Error("Invalid color detected");
+        if (throwOnFailure) {
+            throw new Error("Invalid color detected");
+        }
+
+        return colorString;
     }
 }
 

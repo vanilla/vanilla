@@ -55,7 +55,7 @@ export function SplashContextProvider(props: { children: React.ReactNode }) {
             setSplashExists(false);
             setSplashRect(null);
         });
-    });
+    }, [history]);
 
     return (
         <context.Provider

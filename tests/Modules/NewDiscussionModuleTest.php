@@ -9,14 +9,25 @@ namespace VanillaTests\Modules;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\MockNewDiscussionModule;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for getButtonsGroup() from NewDiscussionModule.
  */
-
-class GetButtonGroupsTest extends TestCase {
+class NewDiscussionModuleTest extends TestCase {
+    use SiteTestTrait;
 
     private $testDiscussionModule;
+
+    /**
+     * Get the names of addons to install.
+     *
+     * @return string[] Returns an array of addon names.
+     */
+    protected static function getAddons(): array {
+        return ['vanilla'];
+    }
+
     /**
      * Set up a mock discussion module to test on.
      */

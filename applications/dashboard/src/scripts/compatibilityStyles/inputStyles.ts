@@ -291,4 +291,8 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
             },
         },
     });
+
+    cssOut("#Form_date", {
+        marginRight: unit(globalVars.gutter.half),
+    });
 };

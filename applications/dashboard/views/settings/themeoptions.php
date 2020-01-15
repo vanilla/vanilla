@@ -42,7 +42,7 @@ echo $this->Form->errors();
                     PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
                 );
                 $Screenshot = array_merge($Screenshot, safeGlob(
-                    PATH_ADDONS.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
+                    PATH_ADDONS_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']
                 ));
 
                 if (is_array($Screenshot) && count($Screenshot) > 0) {

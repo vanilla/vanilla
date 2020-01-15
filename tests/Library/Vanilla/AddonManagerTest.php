@@ -59,8 +59,8 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-                Addon::TYPE_THEME => ["$root/addons", "$root/themes"],
+                Addon::TYPE_ADDON => ["$root/addons/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => ["$root/addons/themes", "$root/themes"],
                 Addon::TYPE_LOCALE => "$root/locales"
             ],
             PATH_ROOT.'/tests/cache/am/test-manager'
@@ -150,12 +150,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
             'theme-in-addons' => [
                 'theme-in-addons',
                 Addon::TYPE_THEME,
-                self::FIXTURE_ROOT.'/addons/theme-in-addons',
+                self::FIXTURE_ROOT.'/addons/themes/theme-in-addons',
             ],
             'plugin-in-addons' => [
                 'plugin-in-addons',
                 ADDON::TYPE_ADDON,
-                self::FIXTURE_ROOT.'/addons/plugin-in-addons',
+                self::FIXTURE_ROOT.'/addons/addons/plugin-in-addons',
             ],
         ];
     }

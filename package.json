@@ -11,7 +11,8 @@
             "applications/dashboard",
             "applications/vanilla",
             "plugins/*",
-            "addons/*"
+            "addons/themes/*",
+            "addons/addons/*"
         ]
     },
     "engines": {

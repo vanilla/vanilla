@@ -96,8 +96,8 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->setConstructorArgs([
         [
-            Addon::TYPE_ADDON => ['/addons', '/applications', '/plugins'],
-            Addon::TYPE_THEME => ['/addons', '/themes'],
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
             Addon::TYPE_LOCALE => '/locales'
         ],
         PATH_CACHE

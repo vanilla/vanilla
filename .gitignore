@@ -1,5 +1,5 @@
 /addons/*
-~/addons/theme-foundation
+!/addons/themes/theme-foundation
 /applications/*
 !/applications/conversations/
 !/applications/dashboard/

@@ -221,7 +221,7 @@ class LegacyAssetModel extends Gdn_Model {
         if ($theme) {
             $path = "/$theme/design/$filename";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
-            $paths[] = [PATH_ADDONS.$path, "/addons{$path}"];
+            $paths[] = [PATH_ADDONS_THEMES.$path, "/addons{$path}"];
         }
 
         // 4. Static, Plugin, or App relative file
@@ -235,11 +235,11 @@ class LegacyAssetModel extends Gdn_Model {
                 $folder = substr($folder, strlen('plugins/'));
                 $path = "/{$folder}/design/{$filename}";
                 $paths[] = [PATH_PLUGINS.$path, "/plugins$path"];
-                $paths[] = [PATH_ADDONS.$path, "/plugins$path"];
+                $paths[] = [PATH_ADDONS_ADDONS.$path, "/plugins$path"];
 
                 // Allow direct-to-file links for plugins
                 $paths[] = [PATH_PLUGINS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
-                $paths[] = [PATH_ADDONS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
+                $paths[] = [PATH_ADDONS_ADDONS."/$folder/$filename", "/plugins/{$folder}/{$filename}", true]; // deprecated
 
             // An app-relative path was given
             } else {
@@ -310,7 +310,7 @@ class LegacyAssetModel extends Gdn_Model {
         if ($theme) {
             $path = "/{$theme}/js/{$filename}";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
-            $paths[] = [PATH_ADDONS.$path, "/themes{$path}"];
+            $paths[] = [PATH_ADDONS_THEMES.$path, "/themes{$path}"];
         }
 
         // 4. Static, Plugin, or App relative file
@@ -324,11 +324,11 @@ class LegacyAssetModel extends Gdn_Model {
                 $folder = substr($folder, strlen('plugins/'));
                 $path = "/{$folder}/js/{$filename}";
                 $paths[] = [PATH_PLUGINS.$path, "/plugins{$path}"];
-                $paths[] = [PATH_ADDONS.$path, "/plugins{$path}"];
+                $paths[] = [PATH_ADDONS_ADDONS.$path, "/plugins{$path}"];
 
                 // Allow direct-to-file links for plugins
                 $paths[] = [PATH_PLUGINS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true]; // deprecated
-                $paths[] = [PATH_ADDONS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true]; // deprecated
+                $paths[] = [PATH_ADDONS_ADDONS."/{$folder}/{$filename}", "/plugins/{$folder}/{$filename}", true]; // deprecated
 
             // An app-relative path was given
             } else {
@@ -337,7 +337,7 @@ class LegacyAssetModel extends Gdn_Model {
                 if ($theme) {
                     $path = "/{$theme}/{$folder}/js/{$filename}";
                     $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
-                    $paths[] = [PATH_ADDONS.$path, "/themes{$path}"];
+                    $paths[] = [PATH_ADDONS_THEMES.$path, "/themes{$path}"];
                 }
 
                 $path = "/{$folder}/js/{$filename}";
@@ -544,7 +544,7 @@ class LegacyAssetModel extends Gdn_Model {
                 if ($theme) {
                     foreach ($extensions as $ext) {
                         $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
-                        $paths[] = PATH_ADDONS."/{$theme}/views{$controller}/$view.$ext";
+                        $paths[] = PATH_ADDONS_THEMES."/{$theme}/views{$controller}/$view.$ext";
                     }
                 }
             }

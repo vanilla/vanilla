@@ -29,7 +29,7 @@ story.add("Preview Card", () => {
                     />
                 </div>
                 <StoryHeading depth={1}>Preview Card with dropdown</StoryHeading>
-                <div style={{ paddingBottom: unit(52), textAlign: "center" }}>
+                <div style={{ paddingBottom: unit(52), textAlign: "center", width: unit(320), minWidth: unit(320) }}>
                     <ThemePreviewCard
                         globalBg={"#fff"}
                         globalPrimary={"#985E6D"}

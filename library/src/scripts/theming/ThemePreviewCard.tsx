@@ -130,7 +130,7 @@ export default function ThemePreviewCard(props: IProps) {
                 <div className={props.noActions ? classes.noOverlay : classes.overlay}>
                     {props.isThemeDb && (
                         <div className={classes.actionDropdown}>
-                            <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.AUTO}>
+                            <DropDown flyoutType={FlyoutType.LIST} renderLeft={true}>
                                 <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />
                                 <DropDownItemButton name={t("Copy")} onClick={props.onCopy} />
                                 <DropDownItemSeparator />

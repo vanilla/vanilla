@@ -17,6 +17,7 @@ use Gdn_Locale as LocaleInterface;
 use Gdn_Session as SessionInterface;
 use Gdn_Upload as Upload;
 use Vanilla\Exception\PermissionException;
+use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\InjectableInterface;
 use Vanilla\UploadedFile;
 use Vanilla\Utility\ModelUtils;
@@ -25,6 +26,9 @@ use Vanilla\Utility\ModelUtils;
  * The controller base class.
  */
 abstract class Controller implements InjectableInterface {
+
+    use ExtensibleSchemasTrait;
+
     /**
      * @var SessionInterface
      */
@@ -112,29 +116,7 @@ abstract class Controller implements InjectableInterface {
      * @return Schema Returns a schema object.
      */
     public function schema($schema, $type = 'in') {
-        $id = '';
-        if (is_array($type)) {
-            $origType = $type;
-            list($id, $type) = $origType;
-        } elseif (!in_array($type, ['in', 'out'], true)) {
-            $id = $type;
-            $type = '';
-        }
-
-        // Figure out the name.
-        if (is_array($schema)) {
-            $schema = Schema::parse($schema);
-        } elseif ($schema instanceof Schema) {
-            $schema = clone $schema;
-        }
-
-        // Fire an event for schema modification.
-        if (!empty($id)) {
-            // The type is a specific type of schema.
-            $schema->setID($id);
-
-            $this->eventManager->fire("{$id}Schema_init", $schema);
-        }
+        $schema = $this->extensibleSchema($schema, $type);
 
         // Fire a generic schema event for documentation.
         if (!empty($type)) {

@@ -8,11 +8,18 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+use Garden\Schema\Schema;
 use Vanilla\Attributes;
+use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Exception\PermissionException;
+use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 
@@ -21,7 +28,10 @@ use Vanilla\Utility\ModelUtils;
  */
 class DiscussionModel extends Gdn_Model {
 
+    use ExtensibleSchemasTrait;
+
     use StaticInitializer;
+
     use \Vanilla\FloodControlTrait;
 
     use FormatfieldTrait;
@@ -2258,6 +2268,13 @@ class DiscussionModel extends Gdn_Model {
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
 
+                $normalizedRow = $this->normalizeRow((array)$discussion, true);
+                $discussionEvent = new DiscussionEvent(
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
+                    ["discussion" => $normalizedRow]
+                );
+                Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
+
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
@@ -2935,6 +2952,13 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
+        $normalizedRow = $this->normalizeRow($data, true);
+        $discussionEvent = new DiscussionEvent(
+            DiscussionEvent::ACTION_DELETE,
+            ["discussion" => $normalizedRow]
+        );
+        Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
+
         return true;
     }
 
@@ -3456,23 +3480,11 @@ class DiscussionModel extends Gdn_Model {
      * @return array
      */
     public function normalizeRow(array $row, $expand = []): array {
-        $session = Gdn::session();
-
         $row['Announce'] = (bool)$row['Announce'];
         $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
         $this->formatField($row, "Body", $row["Format"]);
         $row['Attributes'] = new Attributes($row['Attributes']);
-
-        if ($session->User) {
-            $row['unread'] = $row['CountUnreadComments'] !== 0
-                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $session->User), $row['DateInserted']) <= 0);
-            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
-                $row['countUnread'] = $row['CountUnreadComments'];
-            }
-        } else {
-            $row['unread'] = false;
-        }
 
         if (ModelUtils::isExpandOption('lastPost', $expand)) {
             $lastPost = [
@@ -3502,11 +3514,6 @@ class DiscussionModel extends Gdn_Model {
         // This shouldn't be necessary, but the db allows nulls for dateLastComment.
         if (empty($row['DateLastComment'])) {
             $row['DateLastComment'] = $row['DateInserted'];
-        }
-
-        // The Category key will hold a category fragment in API responses. Ditch the default string.
-        if (array_key_exists('Category', $row) && !is_array($row['Category'])) {
-            unset($row['Category']);
         }
 
         $scheme = new CamelCaseScheme;
@@ -3555,5 +3562,45 @@ class DiscussionModel extends Gdn_Model {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get a schema instance comprised of standard discussion fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        return Schema::parse([
+            'discussionID:i' => 'The ID of the discussion.',
+            'type:s|n' => [
+                'description' => 'The type of this discussion if any.',
+            ],
+            'name:s' => 'The title of the discussion.',
+            'body:s' => 'The body of the discussion.',
+            'categoryID:i' => 'The category the discussion is in.',
+            'category?' => $this->extensibleSchema(new CategoryFragmentSchema(), 'CategoryFragment'),
+            'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'dateLastComment:dt|n' => 'When the last comment was posted.',
+            'insertUserID:i' => 'The user that created the discussion.',
+            'insertUser?' => $this->extensibleSchema(new UserFragmentSchema(), "UserFragment"),
+            'lastUser?' => $this->extensibleSchema(new UserFragmentSchema(), "UserFragment"),
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
+            'pinLocation:s|n' => [
+                'enum' => ['category', 'recent'],
+                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
+            ],
+            'closed:b' => 'Whether the discussion is closed or open.',
+            'sink:b' => 'Whether or not the discussion has been sunk.',
+            'countComments:i' => 'The number of comments on the discussion.',
+            'countViews:i' => 'The number of views on the discussion.',
+            'score:i|n' => 'Total points associated with this post.',
+            'url:s?' => 'The full URL to the discussion.',
+            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
+            'lastPost?' => $this->extensibleSchema(new PostFragmentSchema(), "PostFragment"),
+            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
+        ]);
     }
 }

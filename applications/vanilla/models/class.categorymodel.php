@@ -9,6 +9,8 @@
  */
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
+use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 
@@ -16,6 +18,8 @@ use Vanilla\Navigation\BreadcrumbModel;
  * Manages discussion categories' data.
  */
 class CategoryModel extends Gdn_Model {
+
+    use ExtensibleSchemasTrait;
 
     /** Cache key. */
     const CACHE_KEY = 'Categories';
@@ -3697,5 +3701,19 @@ SQL;
             $targetID = val('CategoryID', $current);
             self::instance()->setField($targetID, ['LastCategoryID' => $categoryID]);
         }
+    }
+
+    /**
+     * Get the schema for categories joined to records.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function fragmentSchema(): Schema {
+        $result = $this->extensibleSchema([
+            'categoryID:i' => 'The ID of the category.',
+            'name:s' => 'The name of the category.',
+            'url:s' => 'Full URL to the category.',
+        ], 'CategoryFragment');
+        return $result;
     }
 }

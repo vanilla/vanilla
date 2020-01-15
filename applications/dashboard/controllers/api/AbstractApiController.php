@@ -6,6 +6,8 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Utility\ModelUtils;
 
@@ -49,11 +51,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      */
     public function getCategoryFragmentSchema() {
         if ($this->categoryFragmentSchema === null) {
-            $this->categoryFragmentSchema = $this->schema([
-                'categoryID:i' => 'The ID of the category.',
-                'name:s' => 'The name of the category.',
-                'url:s' => 'Full URL to the category.',
-            ], 'CategoryFragment');
+            $this->categoryFragmentSchema = $this->schema(new CategoryFragmentSchema(), 'CategoryFragment');
         }
         return $this->categoryFragmentSchema;
     }
@@ -79,16 +77,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      */
     public function getPostFragmentSchema() {
         if ($this->postFragmentSchema === null) {
-            $this->postFragmentSchema = $this->schema([
-                'discussionID:i?' => 'The discussion ID of the post.',
-                'commentID:i?' => 'The comment ID of the post, if any.',
-                'name:s' => 'The title of the post.',
-                'body:s?' => 'The HTML body of the post.',
-                'url:s' => 'The URL of the post.',
-                'dateInserted:dt' => 'The date of the post.',
-                'insertUserID:i' => 'The author of the post.',
-                'insertUser?' => $this->getUserFragmentSchema(),
-            ], 'PostFragment');
+            $this->postFragmentSchema = $this->schema(new PostFragmentSchema(), 'PostFragment');
         }
         return $this->postFragmentSchema;
     }

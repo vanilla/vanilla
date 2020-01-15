@@ -211,39 +211,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return Schema::parse([
-            'discussionID:i' => 'The ID of the discussion.',
-            'type:s|n' => [
-                //'enum' => [] // Let's find a way to fill that properly.
-                'description' => 'The type of this discussion if any.',
-            ],
-            'name:s' => 'The title of the discussion.',
-            'body:s' => 'The body of the discussion.',
-            'categoryID:i' => 'The category the discussion is in.',
-            'category?' => $this->getCategoryFragmentSchema(),
-            'dateInserted:dt' => 'When the discussion was created.',
-            'dateUpdated:dt|n' => 'When the discussion was last updated.',
-            'dateLastComment:dt|n' => 'When the last comment was posted.',
-            'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'lastUser?' => $this->getUserFragmentSchema(),
-            'pinned:b?' => 'Whether or not the discussion has been pinned.',
-            'pinLocation:s|n' => [
-                'enum' => ['category', 'recent'],
-                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
-            ],
-            'closed:b' => 'Whether the discussion is closed or open.',
-            'sink:b' => 'Whether or not the discussion has been sunk.',
-            'countComments:i' => 'The number of comments on the discussion.',
-            'countViews:i' => 'The number of views on the discussion.',
-            'score:i|n' => 'Total points associated with this post.',
-            'url:s?' => 'The full URL to the discussion.',
-            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
-            'lastPost?' => $this->getPostFragmentSchema(),
-            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
-            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
-            'countUnread:i?' => 'The number of unread comments.',
-        ]);
+        return $this->discussionModel->schema();
     }
 
     /**
@@ -294,6 +262,21 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord, $expand = []) {
+        if ($this->getSession()->User) {
+            $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
+                && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
+            if ($dbRecord['CountUnreadComments'] !== true && $dbRecord['CountUnreadComments'] > 0) {
+                $dbRecord['countUnread'] = $dbRecord['CountUnreadComments'];
+            }
+        } else {
+            $dbRecord['unread'] = false;
+        }
+
+        // The Category key will hold a category fragment in API responses. Ditch the default string.
+        if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
+            unset($dbRecord['Category']);
+        }
+
         $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
 
         // Allow addons to hook into the normalization process.

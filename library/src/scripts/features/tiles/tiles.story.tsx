@@ -9,13 +9,14 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import Tiles, { TileAlignment } from "./Tiles";
 import {layoutVariables} from "@library/layout/panelLayoutStyles";
+import Container from "@library/layout/components/Container";
 
 const formsStory = storiesOf("Home Page", module);
 
 formsStory.add("Tiles", () =>
     (() => {
         return (
-            <>
+            <Container>
                 <StoryContent>
                     <StoryHeading depth={1}>Sub community List</StoryHeading>
                     <StoryHeading>As Tiles - 2 columns left aligned</StoryHeading>
@@ -146,7 +147,7 @@ formsStory.add("Tiles", () =>
                     title={"Our Games"}
                     emptyMessage={"No subcommunities found"}
                 />
-            </>
+            </Container>
         );
     })(),
     {

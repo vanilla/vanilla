@@ -1,0 +1,108 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Section-Entry {
+
+    @include noPanel;
+
+    .SearchBox {
+        display: none;
+    }
+
+    .Methods {
+
+        b {
+            margin: 10px 0 3px;
+            display: inline-block;
+        }
+    }
+
+    .ForgotPassword {
+        margin-left: 0;
+    }
+
+    .ForgotPassword,
+    .CreateAccount a {
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
+    }
+
+    label.RadioLabel,
+    label.CheckBoxLabel {
+        font-size: $global-medium_fontSize !important;
+
+        a {
+            font-size: inherit;
+            color: $component-meta-link_color;
+
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
+        }
+    }
+
+    .Legal br {
+        display: none;
+    }
+
+    @include maxWidth {
+
+        .g-recaptcha {
+            transform: scale(.8);
+        }
+
+        .MainForm,
+        .Methods {
+            width: 100%;
+            display: block;
+            padding: 0;
+            margin-bottom: $component-item_spacing;
+        }
+
+        .MainForm {
+            .InputBox {
+                max-width: 100%;
+            }
+        }
+
+        .Methods {
+            margin-left: 0;
+        }
+    }
+}
+
+.SignInPopup .input.Password {
+    width: 100%;
+}
+
+.MultipleEntryMethods {
+
+    .Methods {
+        margin-left: 0;
+        padding: 0;
+        float: left;
+
+        @include maxWidth {
+            float: none;
+
+            b {
+                display: inline-block;
+                margin: $utility-baseUnitTriple 0 0;
+            }
+        }
+    }
+}

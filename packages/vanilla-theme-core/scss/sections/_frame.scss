@@ -1,0 +1,126 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Frame {
+    @if ($theme_stickFooter) {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            /* IE10+ CSS styles go here */
+            min-height: initial;
+            height: 100vh;
+            overflow: visible;
+        }
+    }
+    @if ($staticVariables) {
+        background-color: $body_bg;
+    }
+    background-image: $body_backgroundImage;
+    background-size: $body_backgroundSize;
+    background-position: $body_backgroundPosition;
+    background-repeat: $body_backgroundRepeat;
+}
+
+.Frame-top {
+    @if ($theme_stickFooter) {
+        flex: 1 0 auto;
+    }
+}
+
+.Frame-contentWrap {
+    background-color: $frame_bg;
+    border: $frame_border;
+    box-shadow: $frame_boxShadow;
+    padding-top: $frame_padding;
+    padding-bottom: 48px;
+    @include framePaddingReverse();
+
+    @include maxWidth {
+        padding-top: $frame-mobile_padding;
+        padding-bottom: $frame-mobile_padding;
+    }
+}
+
+.Frame-details {
+    @include clearfix;
+    .SearchBoxMobile {
+        display: none;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            display: block;
+        }
+    }
+}
+
+.Container {
+    @include framePadding;
+    max-width: $global-main_width;
+    margin: 0 auto;
+}
+
+.Frame-row {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.MainContent.Content {
+    background-color: $content_bg;
+    border: $frame_border;
+    padding: $content_padding;
+    border-radius: $content_borderRadius;
+    border: $content_border;
+    width: calc(100% - #{$panel_width + $panel_gap});
+
+    @if ($panel_toLeft) {
+        order: 2;
+        margin-left: auto;
+    }
+
+    @include maxWidth($theme-breakpoint_tablet) {
+        width: 100%;
+        order: 0;
+    }
+}
+
+.Crumbs {
+    margin: $utility-baseUnitHalf 0;
+}
+
+.Frame-content {
+
+    .HomepageTitle,
+    .PageDescription {
+        margin-bottom: $global-block_margin;
+    }
+
+    .HomepageTitle {
+
+        .AdminCheck {
+            padding: 0;
+            line-height: inherit;
+
+            input {
+                margin: 0;
+            }
+        }
+    }
+
+    .PageDescription {
+        line-height: $global-base_lineHeight;
+    }
+
+    .PageDescription:empty {
+        display: none;
+    }
+}

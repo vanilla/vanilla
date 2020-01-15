@@ -1,0 +1,131 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Utility Variables
+\* -------------------------------------------------------------- */
+
+$utility-baseUnit:                      6px;
+$utility-baseUnitHalf:                  $utility-baseUnit / 2; // Derived
+$utility-baseUnitDouble:                $utility-baseUnit * 2; // Derived
+$utility-baseUnitTriple:                $utility-baseUnit * 3; // Derived
+$utility-percentage_third:              (100% / 3);
+$utility-percentage_nineSixteenths:     (9 / 16 * 100%);
+$utility-SVGEncoding:                   "data:image/svg+xml,";
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global_borderRadius:                   4px !default;
+
+$global-color_black:                    #000;
+$global-color_white:                    #fff;
+$global-color_transparent:              transparent;
+
+$global-color_navy:                     #22252C;
+$global-color_butter:                   #E9B000;
+$global-color_coral:                    #E14658;
+
+$global-color_primary:                  $global-color_coral !default;
+$global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
+$global-color_secondary:                $global-color_navy !default;
+
+$global-color_bg:                       $global-color_white !default;
+$global-color_fg:                       darken(desaturate($global-color_primary, 70%), 12%) !default; // text color | should have high contrast between $global-color_bg
+
+$global-body_bg:                        $global-color_bg !default;
+
+/* -------------------------------------------------------------- *\
+    Theme Colors
+\* -------------------------------------------------------------- */
+
+$theme-border_color:                    rgba(mix($global-color_fg, $global-color_secondary, 34%), .2) !default;
+$theme-hover_color:                     rgba(mix($global-color_fg, $global-color_primary, 12%), .2) !default;
+
+$theme-link-hover_textDecoration:       underline !default;
+
+$theme-heading_color:                   $global-color_primary !default;
+$theme-heading-hover_color:             $global-color_primary !default;
+
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+
+$header_minHeight:                       48px !default;
+$header_bg:                              $global-color_navy !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_button-bg:                   $global-color_butter !default;
+
+/* -------------------------------------------------------------- *\
+    Panel
+\* -------------------------------------------------------------- */
+
+$panel-item_height:                      2.5em !default;
+$panel_item-borderRadius:                $panel-item_height !default;
+
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+
+$footer_bg:                              rgba($global-color_secondary, .2) !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_bg:                          lighten($header_bg, 10%) !default;
+$navigation_fg:                          $global-color_white !default;
+
+$navigation-hover_fg:                    $navigation_fg !default;
+
+$headerMeBoxAlert_fg:                    $navigation_fg !default;
+$headerMeBoxAlert_bg:                    $global-color_butter !default;
+$headerMeBoxAlert_borderColor:           $global-color_butter !default;
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-item_spacing:                 0 !default;
+
+$component-title_color:                  $global-color_secondary !default;
+$component-title-hover_color:            darken($global-color_secondary, 8%) !default;
+$component-meta-link-hover_color:        darken($global-color_secondary, 8%) !default;
+
+$component-casual-message_bg:            #f3f3f3;
+$component-casual-message_borderColor:   #c3c3c3;
+$component-casual-message_link-color:    #676767;
+
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
+
+$MobileMeBox_bg:                         $navigation_bg !default;
+
+$MobileMeBoxAlert_bg:                    $global-color_primary !default;
+$MobileMeBoxAlert_borderColor:           $global-color_primary !default;
+
+/* -------------------------------------------------------------- *\
+    Form Elements
+\* -------------------------------------------------------------- */
+
+$formElement_height:                     $utility-baseUnit * 6 !default;
+$formElement_borderRadius:               18px !default; // $formElement_height / 2
+
+/* -------------------------------------------------------------- *\
+    Buttons
+\* -------------------------------------------------------------- */
+
+$formButton_height:                      $formElement_height !default;
+$formButton_borderRadius:                18px !default; // $formButton_height / 2

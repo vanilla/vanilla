@@ -1,0 +1,90 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Section-SearchResults {
+    @include noPanel;
+
+    .SearchBox {
+        display: none;
+    }
+
+    .SearchForm {
+        position: relative;
+        margin-top: 0;
+    }
+
+    .SearchForm .SiteSearch {
+        max-width: 100%;
+
+        .Button {
+            top: 0;
+            right: 0;
+        }
+    }
+
+    .AdvancedSearch {
+        margin: 0 auto;
+
+        @include maxWidth {
+            max-width: 100%;
+        }
+
+        .KeywordsWrap {
+            margin: 0 0 $utility-baseUnitTriple;
+            padding: 0;
+
+            @include maxWidth {
+                padding: 0;
+
+                .bwrap .Button {
+                    right: 0;
+                }
+
+                .Handle.Handle {
+                    right: $formElement_height;
+                }
+            }
+        }
+
+        .Handle.Handle {
+            right: $formElement_height;
+        }
+
+        .Button .Sprite {
+            vertical-align: baseline;
+        }
+
+        .P.Buttons {
+            display: flex;
+
+            .Button {
+                margin-left: auto;
+            }
+        }
+
+        .AdvancedWrap {
+            @include clearfix;
+
+            @include maxWidth {
+                padding: 0;
+                background: transparent;
+            }
+
+            > .P.Inline .SelectWrapper {
+                margin-bottom: $utility-baseUnitDouble;
+            }
+
+            .CheckBoxLabel {
+                display: inline-flex;
+                align-items: center;
+            }
+        }
+    }
+}

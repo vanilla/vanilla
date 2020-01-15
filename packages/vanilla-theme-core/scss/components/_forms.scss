@@ -1,0 +1,417 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+input[type= "text"],
+textarea,
+ul.token-input-list,
+input.InputBox,
+.AdvancedSearch .InputBox,
+.AdvancedSearch select,
+select {
+    line-height: $formElement_height;
+    height: $formElement_height;
+    font-family: $global-body_fontFamily;
+    @if ($staticVariables) {
+        border: $formElement_border;
+        border-radius: $formElement_borderRadius;
+        color: $formElement_color;
+        background: $global-color_white;
+    }
+
+    padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+    margin: 0;
+    width: 100%;
+
+    &:focus,
+    &:active {
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+            color: $formElement_color;
+        }
+        box-shadow: none;
+        outline: none;
+    }
+}
+
+::-ms-clear {
+    display: none;
+}
+
+textarea {
+    overflow: auto;
+
+    @if ($formElement_borderRadius >= 16px) {
+        border-radius: 16px;
+    }
+}
+
+select,
+.AdvancedSearch select {
+    -moz-appearance: none;
+
+    font-family: "system-ui", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+        "Helvetica Neue", sans-serif;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    &:focus {
+        -moz-appearance: none;
+    }
+}
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+select::-ms-expand {
+    display: none;
+}
+
+.FormWrapper {
+    padding: 0;
+    border-radius: $formElement_borderRadius;
+    background: transparent;
+
+    label {
+        color: $global-color_fg;
+    }
+
+    .Buttons .Back {
+        padding-right: $utility-baseUnitDouble;
+    }
+}
+
+.editor-help-text {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+
+    a {
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
+    }
+}
+
+.js-poll-result-btn {
+    @include Button;
+}
+
+.FormTitleWrapper,
+.FormWrapper {
+    .Buttons {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .Buttons .Button,
+    .Buttons .Back {
+        margin-right: 0;
+        padding-right: 0;
+        margin-bottom: $utility-baseUnitHalf;
+        margin-left: $utility-baseUnitHalf;
+    }
+
+    .Buttons .Back {
+        font-size: $global-medium_fontSize;
+        line-height: $formButton_height;
+
+        a:hover,
+        a:focus {
+            text-decoration: $theme-link-hover_textDecoration;
+        }
+
+        @include maxWidth {
+            display: block;
+            margin-left: 0;
+            text-align: left;
+            line-height: $global-base_lineHeight;
+            margin-bottom: $utility-baseUnitDouble;
+        }
+    }
+
+    .Buttons .Button {
+        @include Button;
+    }
+
+    .Buttons .Button.Primary {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
+    }
+
+    .Buttons .Button.Hidden {
+        display: none;
+    }
+}
+
+#Form_OK,
+.Button:not(.GroupOptionsTitle),
+.Buttons .btn-primary {
+    @include Button;
+}
+
+.Buttons .Close,
+.Button.Danger {
+    @include Button;
+}
+
+.ActivityFormWrap {
+    margin-bottom: $utility-baseUnitDouble;
+}
+
+label {
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+ul.token-input-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+    line-height: initial;
+
+    li input {
+        margin: 0 !important;
+        padding: 0;
+        height: $formElement_height - 6px;
+        line-height: initial;
+        font-size: $global-medium_fontSize;
+        font-weight: $global-normal_fontWeight !important;
+    }
+
+    &.token-input-focused {
+        box-shadow: none;
+        outline: none;
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+        }
+    }
+}
+
+li.token-input-token {
+    @include Tag;
+}
+
+div.token-input-dropdown {
+    border: none;
+    border-top: $component_border;
+    visibility: visible !important;
+    opacity: 1 !important;
+    @if ($staticVariables) {
+        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        border-radius: $formElement_borderRadius;
+        border: $component_border;
+    }
+
+    ul li[class^= "token-input-dropdown-item"],
+    p {
+        @include framePadding;
+        display: inline-block;
+        line-height: 40px;
+        width: 100%;
+    }
+}
+
+.editor {
+    a {
+        cursor: pointer;
+    }
+
+    .icon-caret-down:hover {
+        background: none;
+    }
+}
+
+.SelectWrapper {
+    position: relative;
+
+    select {
+        appearance: none;
+        width: 100%;
+    }
+
+    &::after {
+        @include icon;
+        content: $icon-select;
+        position: absolute;
+        top: 50%;
+        right: 6px;
+        transform: translateY(-50%);
+        color: $global-color_primary;
+        pointer-events: none;
+    }
+}
+
+.Button-Controls .Button.Primary,
+.BigButton:not(.Danger),
+.NewConversation.NewConversation {
+
+    @include Button(
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
+    );
+}
+
+.groupToolbar .Button.Primary,
+.BoxButtons .Button.Primary {
+    @include Button(
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
+    );
+}
+
+.BigButton,
+.ButtonGroup.Multi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: $formButton_maxWidth;
+
+
+    @include maxWidth {
+        width: 100%;
+        display: flex;
+        margin: 0 auto;
+    }
+}
+
+.ButtonGroup.Multi {
+
+    > .Button:first-child {
+        width: 100%;
+        text-align: center;
+        border-top-right-radius: $formButton_borderRadius;
+        border-bottom-right-radius: $formButton_borderRadius;
+    }
+
+    .Button.Handle,
+    &.Open .Button.Handle {
+        padding: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        min-width: $formButton_height;
+        border-color: $button-primary_border;
+
+        @if ($staticVariables) {
+            background-color: $button-primary_bg;
+            color: $button-primary_fg;
+        }
+
+        .SpDropdownHandle::before {
+            height: 100%;
+            padding: 0 $utility-baseUnitDouble;
+        }
+
+        @if ($staticVariables) {
+            &:hover,
+            &:focus,
+            &:active {
+                background-color: rgba($button-primary-hover_bg, 0.05);
+                color: $button-primary-hover_fg;
+            }
+        }
+    }
+}
+
+.ButtonGroup.Multi {
+
+    &:focus,
+    &:hover,
+    &:active {
+
+        .Button.Handle {
+            background-color: rgba($button-primary-hover_bg, 0.3);
+            color: $button-primary-hover_fg;
+            min-width: $formButton_height;
+        }
+    }
+}
+
+.change-picture {
+
+    .WarningMessage {
+        margin: $utility-baseUnitDouble 0;
+    }
+
+    @include maxWidth {
+        .Button {
+            width: 100%;
+            text-align: center;
+        }
+
+        .change-picture-new {
+           margin: 0 0 $utility-baseUnitHalf;
+       }
+    }
+}
+
+.CommentForm textarea.TextBox,
+.DiscussionForm textarea.TextBox {
+    min-height: 100px;
+}
+
+.FormTitleWrapper .H {
+    margin-bottom: $utility-baseUnit;
+}
+
+.Form-HeaderWrap .Author {
+    display: none;
+}
+
+.FormTitleWrapper {
+    margin-bottom: $global-block_margin;
+}
+
+.FormWrapper-Condensed,
+.CommentForm.CommentForm {
+
+    .FormWrapper {
+        border-width: 0;
+        padding: 0;
+    }
+
+    @include maxWidth {
+
+        .FormWrapper.FormWrapper .Buttons {
+            padding: 0;
+        }
+    }
+}
+
+.CommentForm .DraftButton {
+    display: none !important;
+}
+

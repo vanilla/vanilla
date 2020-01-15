@@ -1,0 +1,67 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Post .FormWrapper {
+
+    .AvailableTags {
+        a {
+            line-height: $global-base_lineHeight;
+            display: inline-block;
+            margin: 3px 0;
+        }
+    }
+
+    .editor-help-text {
+        font-size: inherit;
+    }
+
+    .SearchBox {
+        display: none;
+    }
+
+    .Buttons {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+
+        .Button {
+            margin-bottom: $utility-baseUnitHalf;
+            margin-left: $utility-baseUnitHalf;
+            margin-right: 0;
+            margin-top: 0;
+        }
+    }
+
+    .SelectWrapper {
+        width: 100%;
+    }
+
+    .ShowTags {
+        display: block;
+        margin-top: $utility-baseUnitHalf;
+    }
+}
+
+body.announcement,
+body.Post,
+.Section-Post,
+body.Section-PostConversation,
+body.Messages.inbox {
+
+    .SearchBox {
+        display: none;
+    }
+}
+
+body.announcement {
+    @include noPanel;
+}

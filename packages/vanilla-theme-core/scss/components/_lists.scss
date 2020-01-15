@@ -1,0 +1,802 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.DataList,
+.MessageList {
+    margin: 0 0 $utility-baseUnitTriple;
+
+    .Item {
+        @include listItem;
+    }
+
+    @if $component-item_spacing == 0 AND $component_lateralBorder == true {
+        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
+            border-top-left-radius: $component_borderRadius;
+            border-top-right-radius: $component_borderRadius;
+        }
+    }
+
+    .CategoryHeading {
+        padding: 0 !important;
+        margin-bottom: $component-base_padding;
+        font-size: $global-title_fontSize;
+
+        .Options {
+            display: none;
+        }
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    .Item ~ .CategoryHeading {
+        margin-top: $component-base_padding;
+
+        @if $component-item_spacing == 0 {
+
+            &::before {
+                content: "";
+                height: $component_borderRadius;
+                border-bottom: $component_border;
+
+                @if $component_lateralBorder == true {
+                    border-left: $component_border;
+                    border-right: $component_border;
+                    border-bottom-left-radius: $component_borderRadius;
+                    border-bottom-right-radius: $component_borderRadius;
+                }
+
+                background: transparent;
+                width: calc(100% - (#{$component_borderWidth} * 2));
+                position: absolute;
+                top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+            }
+        }
+    }
+
+    .Item .Title,
+    .Item.Read .Title,
+    .Item h3 {
+        font-size: $component-title_fontSize;
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
+        color: $component-title_color;
+        display: block;
+        margin-bottom: $utility-baseUnit;
+
+        @if ($staticVariables){
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
+        }
+
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            display: inline;
+            @if ($staticVariables){
+                color: inherit;
+
+                &:focus,
+                &:hover {
+                    color: inherit;
+                }
+            }
+        }
+    }
+
+    .Excerpt,
+    .CategoryDescription {
+        display: block;
+        width: 100%;
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        line-height: $component-base_lineHeight;
+        color: $component-base_color;
+        margin: 0 0 $utility-baseUnit;
+    }
+
+    .Excerpt:empty,
+    .CategoryDescription:empty {
+        display: none;
+    }
+
+    .ItemContent.Discussion .Excerpt {
+        margin-top: $utility-baseUnit;
+    }
+
+    .Options {
+        display: flex;
+    }
+
+    .Bookmark::before,
+    .OptionsMenu .Arrow::before {
+        font-size: $icon-default_size;
+        line-height: $icon-default_size;
+    }
+
+    .OptionsMenu .Arrow::before {
+        font-size: #{$icon-default_size - 2px};
+        margin-top: -1px;
+    }
+
+    .MostRecentBy,
+    .LatestPostTitle {
+        @include ellipsis;
+        display: inline-block;
+    }
+
+    @if ($staticVariables) {
+        .Meta,
+        .AuthorInfo {
+            font-size: $component-meta_fontSize;
+            font-weight: $component-meta_fontWeight;
+            color: $component-meta_color;
+        }
+    }
+
+    .Meta,
+    .AuthorWrap {
+        margin-left: -$utility-baseUnit;
+        margin-right: -$utility-baseUnit;
+
+        @include maxWidth {
+            margin-top: $utility-baseUnitDouble;
+            line-height: $component-meta_lineHeight;
+        }
+    }
+
+    .Author .Username,
+    .MItem,
+    .MItem.Category,
+    .ChildCategories {
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        margin: 0 $utility-baseUnit;
+        display: inline-block;
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            @if ($staticVariables) {
+                color: $component-meta-link_color;
+
+                &:focus,
+                &:hover {
+                    text-decoration: $theme-link-hover_textDecoration;
+                    color: $component-meta-link-hover_color;
+                }
+            }
+        }
+    }
+
+    .MItem.Hidden {
+        display: none;
+    }
+
+    .Tag:not([class*="Status-Tag"]),
+    .HasNew {
+        margin-bottom: $utility-baseUnitHalf;
+    }
+
+    .MItem.DiscussionAuthor {
+        display: none;
+    }
+
+    .MItem.Category {
+        display: inline;
+
+        a {
+            @include ellipsis;
+            display: inherit;
+        }
+    }
+
+    .MostRecent,
+    .MostRecentBy {
+
+        > * {
+            white-space: normal;
+        }
+
+        a {
+            display: inline;
+        }
+    }
+
+    .MostRecentBy {
+        display: inherit;
+    }
+
+    .MItem.RSS,
+    .MItem.LastCommentDate {
+        display: none;
+    }
+
+    .ChildCategories {
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 0;
+        margin-bottom: -$utility-baseUnitHalf;
+
+        b {
+            margin-right: $utility-baseUnitHalf;
+            margin-bottom: $utility-baseUnitHalf;
+        }
+
+        a {
+            color: $component-meta-link_color;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            margin-bottom: $utility-baseUnitHalf;
+
+            &:focus,
+            &:hover,
+            &:active {
+                color: $component-meta-link-hover_color;
+            }
+        }
+
+        .Comma {
+            margin-right: $utility-baseUnitHalf;
+        }
+    }
+
+    a.Delete {
+        @include CloseButton;
+    }
+
+    .PhotoWrap {
+        margin: 0 $utility-baseUnitDouble 0 0;
+        @include photoWrap;
+    }
+
+    .IndexPhoto {
+        margin-right: 0;
+    }
+
+    // overwrite ideation plugin styles
+    .ItemIdea.ItemIdea.ItemIdea {
+        .PhotoWrap.IndexPhoto,
+        .idea-counter-module .idea-counter-box {
+            margin: 0 $utility-baseUnitHalf 0 0;
+            width: $theme-photo_size;
+            height: $theme-photo_size;
+        }
+    }
+
+    //Warnings and Notes
+    .Item-Col .Options {
+        visibility: visible;
+
+        .OptionsLink {
+            @include Button(
+                    $button-basic_bg,
+                    $button-basic_fg,
+                    $button-basic_border,
+                    $button-basic-hover_bg,
+                    $button-basic-hover_fg,
+                    $button-basic-hover_border
+            );
+            margin-left: $utility-baseUnitHalf;
+        }
+
+        .Bullet {
+            display: none;
+        }
+    }
+
+    .NoteType {
+        @include font-heading;
+    }
+
+    .CategoryPhoto {
+        height: inherit;
+    }
+
+    .MItem.MItem-Resolved {
+        display: inline-block;
+        width: 13px;
+        height: 14px;
+        padding: 0;
+        margin-bottom: 0;
+        line-height: inherit;
+        font-size: inherit;
+        vertical-align: middle;
+    }
+
+    .resolved2-unresolved,
+    .resolved2-resolved {
+        top: initial;
+        display: block;
+    }
+
+    .Hero {
+        padding: 0;
+    }
+
+    mark {
+        background-color: rgba($global-color_warning, .5);
+    }
+
+    .Reactions {
+        margin: 0 -#{$utility-baseUnitHalf};
+
+        .Bullet {
+            display: none;
+        }
+
+        .ToggleFlyout {
+            display: inline-block;
+        }
+
+        .ReactButton {
+            margin: $utility-baseUnitHalf $utility-baseUnitHalf 0;
+
+            @include maxWidth {
+                line-height: 2.5em;
+            }
+        }
+
+        .ReactButton-Flag {
+            margin-left: 0;
+        }
+    }
+}
+
+.DataList,
+.PageTitle + .ItemDiscussion {
+
+    @if $component_lateralBorder == false {
+        border-top-width: 0;
+    }
+
+    @if $component-item_spacing == 0 {
+        border-radius: $component_borderRadius;
+        box-shadow: $component_boxShadow;
+    }
+}
+
+.DataList.CategoryList {
+
+    .CategoryHeading {
+        border-top-width: 0;
+    }
+
+    .Item[class*="Depth"] {
+
+        @if $component_lateralBorder == true {
+            padding-left: $component-base_padding !important;
+        } @else {
+            padding-left: 0 !important;
+        }
+    }
+}
+
+.DataList.Discussions {
+
+    .Item {
+
+        .Title {
+            display: block;
+        }
+
+        .Options .ToggleFlyout {
+            order: 2;
+        }
+    }
+
+    //overwrite indexphoto plugin styles
+    .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto .Discussion.ItemContent {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+}
+
+.MessageList {
+
+    .PageTitle,
+    .ItemComment {
+
+        .Options {
+
+            .ToggleFlyout {
+                order: 2;
+            }
+        }
+    }
+
+    .PageTitle {
+        margin-bottom: $global-block_margin;
+
+        h1{
+            font-size: $global-title_fontSize;
+            line-height: $global-condensed_lineHeight;
+
+            @include maxWidth {
+                font-size: $global-subTitle_fontSize;
+            }
+        }
+
+        .Options .Bookmark {
+            order: 2;
+        }
+    }
+
+    .ItemComment.ItemComment,
+    .ItemDiscussion.ItemDiscussion {
+        padding: 0;
+    }
+
+    .ItemComment,
+    .ItemDiscussion {
+        position: relative;
+
+        .Item-Header {
+            background: $component-header_bg;
+            margin: 0;
+            width: 100%;
+            min-height: $theme-photo_size + ($utility-baseUnitDouble * 2);
+            padding-top: $utility-baseUnitDouble;
+            padding-bottom: $utility-baseUnitDouble;
+
+            @if $component-item_spacing != 0 {
+                border-top-left-radius: $component_borderRadius;
+                border-top-right-radius: $component_borderRadius;
+            }
+
+            @if $component_lateralBorder == true {
+                padding-left: $utility-baseUnitDouble;
+                padding-right: $utility-baseUnitDouble;
+            }
+
+            .PhotoWrap {
+                margin: 0;
+                position: absolute;
+                top: $utility-baseUnitDouble;
+
+                @if $component_lateralBorder == true {
+                    left: $utility-baseUnitDouble;
+                } @else {
+                    left: 0;
+                }
+
+            }
+        }
+
+        .MItem.RoleTracker {
+                padding: 0 $utility-baseUnitHalf;
+
+                a {
+                    color: inherit;
+                    margin: 0;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        text-decoration: none;
+                    }
+                }
+            }
+
+            .Meta,
+            .AuthorWrap {
+                font-size: $component-meta_fontSize;
+                line-height: $component-meta_lineHeight;
+                display: inline-block;
+                padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+
+                > * {
+                    display: inline;
+                    font-size: inherit;
+                    line-height: inherit;
+                }
+            }
+
+            .InlineTags {
+                padding-left: 0;
+
+                a {
+                    font-size: inherit;
+                    color: $component-meta-link_color;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
+                }
+            }
+
+            .Meta {
+                width: 100%;
+
+                @include maxWidth {
+                    margin-top: 0;
+                }
+            }
+
+        .MItem {
+            margin-bottom: 0;
+
+            @include maxWidth {
+                margin-bottom: $utility-baseUnitHalf;
+            }
+        }
+
+            .AuthorWrap {
+                max-width: calc(100% - 45px);
+            }
+
+            .MItem.Category {
+                display: none;
+            }
+
+            .MItem.RoleTitle,
+            .MItem.Rank {
+                @include Tag;
+                color: inherit;
+            }
+
+            .Username {
+                color: $component-meta-link_color;
+                font-weight: $component-meta_fontWeight;
+
+                &:hover,
+                &:focus {
+                    color: $component-meta-link-hover_color;
+                }
+            }
+
+        .flair {
+            display: inline-flex;
+            margin: 0 -#{$utility-baseUnitHalf};
+            width: calc(100% + (#{$utility-baseUnitHalf} * 2));
+        }
+
+        .flair-item {
+            display: inline-block;
+            margin: 0 $utility-baseUnitHalf;
+
+            img {
+                margin: 0;
+            }
+        }
+
+        .Item-BodyWrap {
+            border-bottom-left-radius: $component_borderRadius;
+            border-bottom-right-radius: $component_borderRadius;
+
+            padding-top: $utility-baseUnitDouble;
+            padding-bottom: $utility-baseUnitDouble;
+
+            @if $component_lateralBorder == true {
+                padding-left: $utility-baseUnitDouble;
+                padding-right: $utility-baseUnitDouble;
+            }
+        }
+
+        .Item-Body > * {
+            margin: 0 0 $utility-baseUnitDouble;
+
+            &:last-child {
+                margin: 0;
+            }
+        }
+    }
+}
+
+.MessageList {
+
+    &.Comments,
+    &.AcceptedAnswers {
+
+        .Item:first-child {
+            @if $component_lateralBorder == false {
+                border-top-width: 0;
+
+                .Item-Header {
+                    padding-top: 0;
+                }
+
+                .Options {
+                    margin-top: 0;
+                }
+            }
+        }
+    }
+}
+
+.Activities,
+.Conversations,
+.MessageList {
+    clear: both;
+
+    .Item.Activity {
+
+        .Title {
+
+            @include maxWidth {
+                padding-right: $utility-baseUnitDouble;
+            }
+        }
+
+        .Author {
+            display: block;
+
+            .PhotoWrap {
+
+                @include maxWidth {
+                    margin-right: 0;
+                }
+            }
+        }
+
+        .Delete {
+            @include maxWidth {
+                position: absolute;
+            }
+        }
+    }
+
+    .ItemComment .Options {
+        margin-top: $component-base_padding;
+
+        @if $component_lateralBorder == true {
+            margin-right: $component-base_padding;
+        }
+
+        @include maxWidth {
+            position: absolute;
+            right: 0;
+        }
+    }
+}
+
+.DataList-Search {
+    margin-top: $utility-baseUnitTriple;
+
+    h3,
+    .Item-Body {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+
+    .PhotoWrap {
+        position: absolute;
+        top: $component-base_padding;
+
+        @if $component_lateralBorder == true {
+            left: $component-base_padding;
+        } @else {
+            left: 0;
+        }
+    }
+
+    .Meta {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .MItem-Author a {
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
+    }
+}
+
+.DataList.Announcements {
+
+    .ItemContent.Discussion {
+        padding-left: 0;
+    }
+
+    .Options {
+        position: absolute;
+        right: $component-base_padding;
+    }
+
+    .Meta {
+
+        @include maxWidth {
+            margin-top: 0;
+        }
+    }
+}
+
+.ApplicantList .DataList {
+
+    .PhotoWrap {
+        margin-right: 0;
+    }
+
+    .ItemContent {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+}
+
+.DataList-Notes  {
+
+    .Item-Col {
+        padding-left: 0;
+    }
+
+    .Meta {
+        margin: 0 0 $utility-baseUnit;
+    }
+
+    .NoteType {
+        font-size: $component-title_fontSize;
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
+        color: $component-title_color;
+        display: block;
+        margin-bottom: $utility-baseUnit;
+    }
+}
+
+// Mixed Layout
+.CategoryBox + .CategoryBox {
+    margin-top: $component-base_padding;
+}
+
+.CategoryBox {
+
+    .H {
+        font-family: $global-heading_fontFamily;
+        font-weight: $global-heading_fontWeight;
+        font-size: $global-title_fontSize;
+        line-height: $global-base_lineHeight;
+        margin-bottom: $component-base_padding;
+        color: inherit;
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    > .OptionsMenu {
+        float: right;
+        margin-right: $component-base_padding;
+    }
+
+    .Bookmark::before,
+    .OptionsMenu .Arrow::before {
+        font-size: $icon-default_size;
+        line-height: $icon-default_size;
+    }
+
+    .OptionsMenu .Arrow::before {
+        font-size: #{$icon-default_size - 2px};
+        margin-top: -1px;
+    }
+}

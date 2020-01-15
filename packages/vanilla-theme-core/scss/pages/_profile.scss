@@ -1,0 +1,493 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Section-Profile {
+
+    .Profile h2,
+    .BadgeGrid h4 {
+        font-size: $global-subTitle_fontSize;
+        font-weight: $global-heading_fontWeight;
+        margin-bottom: $utility-baseUnitTriple;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    .Profile > .User {
+        background-color: $content_bg;
+        border-radius: $content_borderRadius;
+        border: $content_border;
+        position: relative;
+
+        > * + * {
+            margin-top: $utility-baseUnitTriple;
+        }
+    }
+
+    .User .H {
+        display: flex;
+        align-items: center;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            display: none;
+        }
+    }
+
+    .Gloss,
+    .Profile-rank {
+        font-weight: normal;
+        font-size: 10px;
+        color: $global-color_primary;
+        text-transform: uppercase;
+        border: 1px solid $global-color-primary;
+        padding: $utility-baseUnitHalf;
+        display: inline-flex;
+        border-radius: $tag_borderRadius;
+    }
+
+    .H .Gloss {
+        margin-left: 1em;
+        margin-top: 0.5em;
+    }
+
+    .Gloss:empty {
+        display: none;
+    }
+
+    .MainContent {
+
+        > .FormTitleWrapper {
+            padding: 0;
+        }
+
+        .DismissMessage {
+            width: 100%;
+            order: -1;
+        }
+    }
+
+    .Profile-header {
+        display: none;
+        flex-wrap: wrap;
+        align-items: center;
+        width: 100%;
+        margin: 0 0 $utility-baseUnitTriple;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            display: flex;
+        }
+
+        .Profile-username {
+            margin: 0;
+
+            @include maxWidth {
+                font-size: $global-large_fontSize;
+            }
+        }
+    }
+
+    .Profile-name {
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    .Profile-photo {
+        @include maxWidth($theme-breakpoint_tablet) {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+
+            a.ChangePicture {
+                padding-top: 20px;
+            }
+        }
+
+        .WhosOnline {
+            display: none;
+        }
+
+        > .PhotoLarge {
+            @include photoWrap(145px);
+            margin-bottom: 8px;
+        }
+
+        .PhotoWrapLarge {
+            position: absolute;
+            height: 145px;
+            width: 145px;
+            display: block;
+        }
+    }
+
+    .ProfileOptions {
+        float: right;
+        margin: 0;
+        z-index: 1;
+
+        .Dropdown {
+            text-align: left;
+        }
+
+        .MemberButtons {
+            @include Button;
+            margin-right: $utility-baseUnitHalf;
+
+            @include maxWidth {
+                margin-right: 0;
+            }
+        }
+
+        .Button-EditProfile {
+            @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+            );
+        }
+
+        .ButtonGroup.Open .NavButton.Handle {
+            background-color: darken($formButton_bg, 8%);
+            border-color: darken($formButton_bg, 8%);
+            color: $formButton_color;
+        }
+
+        .ProfileButtons-BackToProfile {
+            @include Button;
+        }
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            float: none;
+            margin-left: auto;
+            padding-top: 0;
+            padding-right: 0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        @include maxWidth {
+            margin-left: 0;
+            margin-bottom: $utility-baseUnitTriple;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            .MemberButtons,
+            .Button-EditProfile,
+            .ButtonGroup {
+                width: inherit;
+            }
+
+            .MemberButtons,
+            .Button-EditProfile {
+                text-align: center;
+            }
+
+            .MemberButtons {
+                margin-bottom: $utility-baseUnitTriple;
+            }
+        }
+    }
+
+    .Panel-main {
+
+        .PhotoWrapLarge {
+            margin-bottom: $utility-baseUnitTriple;
+        }
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            & > .PhotoWrap {
+                display: none;
+            }
+        }
+    }
+
+    .SearchBox,
+    .Content .BoxProfileFilter,
+    .User > #Status {
+        display: none;
+    }
+
+    .User .DismissMessage {
+        margin-top: $utility-baseUnitDouble;
+    }
+
+    .Box li {
+        border: none;
+    }
+
+    .About.P .About,
+    .FormTitleWrapper,
+    .change-picture,
+    &.quotes .Frame-content form {
+        padding: $utility-baseUnitDouble;
+        margin-bottom: $utility-baseUnitTriple;
+
+        @include maxWidth {
+            padding: 0;
+        }
+    }
+
+    .Content .BadgeGrid .PhotoGrid,
+    .DataCounts {
+        @include tilesContainer(5);
+
+        @include maxWidth {
+            @include tilesContainer(4);
+        }
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            @include tilesContainer(3);
+        }
+    }
+
+    .Content .BadgeGrid a,
+    .CountItemWrap {
+        @include tilesColumns(5);
+        margin-top: $utility-baseUnitTriple;
+        margin-bottom: $utility-baseUnitTriple;
+
+        @include maxWidth {
+            @include tilesColumns(4);
+        }
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            @include tilesColumns(3);
+        }
+    }
+
+    .Content .BadgeGrid a,
+    .CountItem {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .CountItemWrap {
+
+        .TextColor {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: inherit;
+        }
+
+        .CountTotal {
+            display: block;
+            width: 100%;
+        }
+    }
+
+    .CountItem {
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .About.P .About {
+        margin-top: 0;
+        display: flex;
+        flex-wrap: wrap;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            padding: 0;
+        }
+    }
+
+    .Content .Box.BadgeGrid {
+        margin: 0;
+    }
+
+    .Profile {
+
+        dl {
+            @include clearfix;
+            width: 100%;
+            padding: $utility-baseUnitHalf 0;
+        }
+
+        dd,
+        dt {
+            display: inline-block;
+            float: left;
+            background: none;
+            padding: 0;
+            font-size: $formButton_fontSize;
+            line-height: inherit;
+            margin-bottom: $utility-baseUnitHalf;
+            color: inherit;
+        }
+
+        dt {
+            width: 25%;
+            font-weight: bold;
+
+            @include maxWidth {
+                width: 100%;
+                display: block;
+                margin-bottom: 0;
+            }
+        }
+
+        dd {
+            width: 75%;
+            display: inline-block;
+            padding-left: $utility-baseUnitHalf;
+
+            @include maxWidth {
+                padding-left: 0;
+                width: 100%;
+                display: block;
+                margin-bottom: $utility-baseUnitDouble;
+            }
+        }
+    }
+
+    @include maxWidth($theme-breakpoint_tablet) {
+
+        .Button-EditProfile {
+            .Hidden {
+                display: inline;
+            }
+        }
+
+        .User h1 {
+            display: none;
+        }
+    }
+}
+
+body.Section-EditProfile {
+
+    // titles have different classes depending on the page
+    &.signature,
+    &.preferences {
+
+        h2 {
+            font-size: $global-large_fontSize;
+            font-weight: $global-heading_fontWeight;
+            margin-top: $component-item_spacing;
+            margin-bottom: $utility-baseUnitHalf;
+            border-bottom: $component_border;
+
+            @include maxWidth {
+                font-size: $global-subTitle_fontSize;
+            }
+        }
+    }
+
+    .Profile-header {
+        display: none;
+    }
+
+    .ProfileButtons-BackToProfile {
+
+        @include maxWidth {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    .FormTitleWrapper form {
+        background: none !important;
+
+        li {
+            @include clearfix;
+            width: 100%;
+
+            input {
+                width: 100%;
+            }
+        }
+
+        .CustomProfileFieldLabel,
+        .CustomProfileFieldValue {
+            max-width: calc(50% - 9px);
+            margin-right: 18px;
+            margin-top: $utility-baseUnitDouble;
+            float: left;
+
+            &:nth-child(2n) {
+                margin-right: 0;
+            }
+        }
+
+        .CheckBoxLabel input {
+            width: auto;
+        }
+
+        li.User-Avatar {
+            order: 100;
+            width: 100%;
+            margin-right: 0;
+        }
+
+        .Button {
+            margin-top: $utility-baseUnitDouble;
+        }
+    }
+
+    .box-cropped-image {
+        margin-bottom: $utility-baseUnitTriple;
+    }
+
+    .Preferences > form > div {
+        overflow-x: auto;
+    }
+
+    table.PreferenceGroup {
+        width: 100%;
+        margin-bottom: $utility-baseUnitTriple;
+
+        @include maxWidth {
+            min-width: 500px;
+        }
+
+        * {
+            line-height: $formElement_height;
+        }
+    }
+
+    .Preferences .Buttons .Button {
+        float: right;
+    }
+
+    @include maxWidth {
+
+        .Buttons {
+            .Button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        &.tokens {
+
+            .Button.Action {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+
+    #CategoryNotificationHeader {
+        white-space: nowrap;
+    }
+}

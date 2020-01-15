@@ -1,0 +1,33 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Drafts {
+    .Content {
+        .BoxDiscussionFilter {
+            display: none;
+        }
+
+        .Item.Draft {
+            position: relative;
+
+            .DraftLink {
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 40px; // leave space for the close button
+                    bottom: 0;
+                }
+            }
+        }
+    }
+}

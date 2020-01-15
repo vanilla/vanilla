@@ -1,0 +1,966 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.CategoryGroup .Empty {
+    padding-top: $component-base_padding;
+    padding-bottom: $component-base_padding;
+    border-top: $component_border;
+    border-bottom: $component_border;
+    box-shadow: $component_boxShadow;
+
+    @if $component_lateralBorder == true {
+        padding-left: $component-base_padding;
+        padding-right: $component-base_padding;
+        border-left: $component_border;
+        border-right: $component_border;
+        border-radius: $component_borderRadius;
+    }
+}
+
+.categoryList-heading {
+    font-size: $global-title_fontSize;
+    margin-bottom: $component-base_padding;
+
+    @include maxWidth {
+        font-size: $global-subTitle_fontSize;
+    }
+}
+
+.Groups .DataTable,
+.DataTable {
+    margin: 0 0 $utility-baseUnitTriple;
+    table-layout: fixed;
+    width: 100%;
+
+    .Item {
+        @include TableItem;
+    }
+
+    thead {
+        table-layout: fixed;
+        width: inherit;
+        display: table;
+
+        @include maxWidth {
+            display: none;
+        }
+
+        tr {
+            border: none;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        td,
+        td:first-child,
+        td:last-child {
+            border: 0;
+        }
+
+        .Wrap {
+            word-break: normal;
+            white-space: nowrap;
+            padding: 0;
+        }
+    }
+
+    .SpFlyoutHandle::before,
+    .Bookmark::before {
+        font-size: $global-medium_fontSize;
+    }
+
+    h2,
+    h3,
+    .Title.Title {
+        font-size: $component-title_fontSize;
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
+        display: block;
+        margin-bottom: $utility-baseUnit;
+
+        @if $staticVariables {
+            color: $component-title_color;
+            &:focus,
+            &:hover {
+                color: $component-title-hover_color;
+            }
+        }
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            display: inline;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
+    }
+
+    .Excerpt,
+    .CategoryDescription {
+        display: block;
+        width: 100%;
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        line-height: $component-base_lineHeight;
+        color: $component-base_color;
+        margin: 0 0 $utility-baseUnit;
+    }
+
+    .Excerpt:empty,
+    .CategoryDescription:empty {
+        display: none;
+    }
+
+    .ItemContent.Discussion .Excerpt {
+        margin-top: $utility-baseUnit;
+    }
+
+    .Options {
+        display: flex;
+        align-items: center;
+
+        @include maxWidth {
+            right: 0;
+        }
+
+        .Bookmark {
+            margin-left: $utility-baseUnitHalf;
+        }
+    }
+
+    .Bookmark::before,
+    .OptionsMenu .Arrow::before {
+        font-size: $icon-default_size;
+        line-height: $icon-default_size;
+    }
+
+    @if ($staticVariables) {
+        .Meta,
+        .AuthorInfo {
+            font-size: $component-meta_fontSize;
+            font-weight: $component-meta_fontWeight;
+            line-height: $component-meta_lineHeight;
+            color: $component-meta_color;
+        }
+    }
+
+    .MItem.Category {
+        @include ellipsis;
+        display: inline;
+
+        @include maxWidth {
+            max-width: calc(100% - 21px);
+        }
+    }
+
+    .Meta > *,
+    .AuthorInfo * {
+        font-size: inherit;
+        font-weight: inherit;
+
+        margin: 0;
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+
+            @if ($staticVariables) {
+                color: $component-meta-link_color;
+
+                &:focus,
+                &:hover {
+                    color: $component-meta-link-hover_color;
+                }
+            }
+        }
+    }
+
+    .Tag:not([class*="Status-Tag"]),
+    .HasNew {
+        margin-bottom: $utility-baseUnitHalf;
+    }
+
+    .NewCommentCount.NewCommentCount,
+    .MItem {
+        font-size: $component-meta_fontSize;
+        line-height: inherit;
+        margin-left: 0;
+    }
+
+    .MItem {
+        color: $component-meta-link_color;
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+        &:focus,
+        &:hover {
+            color: $component-meta-link-hover_color;
+        }
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
+    }
+
+    .LatestPostTitle,
+    .UserLink.BlockTitle,
+    .BigCount .Meta,
+    .Block.Wrap .Meta {
+         margin-left: $utility-baseUnitDouble;
+    }
+
+    .LatestPostTitle,
+    .UserLink {
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            color: $component-meta-link-hover_color;
+        }
+    }
+
+    .Meta,
+    .MItem.Category {
+
+        @include maxWidth {
+            margin-top: $utility-baseUnitDouble;
+        }
+    }
+
+    .MItem.RSS {
+        display: none;
+    }
+
+    .Block.Wrap {
+        line-height: $global-base_lineHeight;
+    }
+
+    td.BigCount {
+        width: 110px;
+    }
+
+    td.LatestPost,
+    td.LastUser,
+    td.FirstUser {
+        width: 170px;
+        max-width: 170px;
+
+        .MItem {
+            margin-bottom: $utility-baseUnitHalf;
+        }
+    }
+
+    tbody .Options {
+        top: 3px;
+        bottom: auto;
+    }
+
+    tbody {
+        table-layout: fixed;
+        width: inherit;
+        display: table;
+        margin: -$component-item_spacing 0;
+        border-spacing: 0 $component-item_spacing;
+
+        @if $component-item_spacing == 0 {
+            box-shadow: $component_boxShadow;
+            border-radius: $component_borderRadius;
+        }
+
+        td.LatestPost,
+        td.LastUser,
+        td.FirstUser {
+            position: relative;
+            margin-top: 0;
+            font-size: $global-small_fontSize;
+
+            a {
+                font-size: inherit;
+            }
+
+            .Wrap {
+                padding-left: $theme-photo_size;
+            }
+
+            .PhotoWrap {
+                position: absolute;
+                width: $theme-photo_size;
+                height: $theme-photo_size;
+                left: 0;
+                margin: 0;
+
+                img {
+                    height: 100%;
+                    width: 100%;
+                }
+            }
+
+            .Bullet {
+                display: none;
+            }
+        }
+    }
+
+    //Section-CategoryList
+    &.CategoryTable {
+        @include categoriesTableItem;
+
+        thead .CategoryName {
+            padding-left: $component-base_padding;
+        }
+
+        tbody {
+
+            .Options {
+                top: auto;
+            }
+
+            td.CategoryName {
+                margin-bottom: 0;
+
+                .Wrap {
+                    padding-left: 0;
+                }
+
+                .PhotoWrap {
+                    margin: 0 $utility-baseUnitDouble 0 0;
+                    @include photoWrap;
+                    position: relative;
+
+                    img {
+                        position: absolute;
+                    }
+                }
+            }
+
+            td.LatestPost {
+                font-weight: inherit;
+
+                .Meta span:last-child {
+                    display: none;
+                }
+
+                a {
+                    display: block;
+                    margin-right: 0;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                }
+
+                .LatestPostTitle {
+                    font-weight: inherit;
+                }
+
+                .UserLink {
+                    @include ellipsis;
+                }
+            }
+        }
+
+        .ChildCategories {
+            display: flex;
+            flex-wrap: wrap;
+            border-top: 0;
+            font-size: $component-meta_fontSize;
+            font-weight: $component-meta_fontWeight;
+            margin-bottom: -$utility-baseUnitHalf;
+
+            b {
+                margin-right: $utility-baseUnitHalf;
+            }
+
+            a {
+                font-size: inherit;
+                font-weight: inherit;
+                line-height: inherit;
+                color: $component-meta-link_color;
+
+                &:focus,
+                &:hover {
+                    color: $component-meta-link-hover_color;
+                }
+            }
+
+            .Comma {
+                margin-right: $utility-baseUnitHalf;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_desktop) {
+            td.LatestPost {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            td.LatestPost {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_base) {
+
+            td.CountComments,
+            td.LatestPost {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            td.CountComments,
+            td.CountDiscussions {
+                display: none;
+            }
+        }
+    }
+
+    //Section-DiscussionList
+    &.DiscussionsTable.DiscussionsTable {
+        //reset ideation styles
+        table-layout: fixed;
+
+        @include discussionsTableItem;
+
+        .MiniPager {
+            margin: 0;
+            display: block;
+            width: 100%;
+            order: 2;
+            text-align: right;
+
+            @include maxWidth {
+                display: none;
+            }
+
+            a {
+                background-color: $button-basic_bg;
+                color: $button-basic_fg;
+                border: none;
+                line-height: $global-base_lineHeight;
+                border-radius: $global_borderRadius;
+                padding: 0 $utility-baseUnitHalf;
+                display: inline;
+                font-weight: $global-semibold_fontWeight;
+                font-size: inherit;
+                white-space: nowrap;
+
+                &:focus,
+                &:hover {
+                    background-color: $button-basic-hover_bg;
+                    color: $button-basic-hover_fg;
+                }
+            }
+        }
+
+        td.CheckBoxColumn {
+            width: 35px;
+
+            .Wrap {
+                padding: $utility-baseUnitHalf 0;
+            }
+        }
+
+        td.DiscussionName {
+            width: 100%;
+            padding-right: $utility-baseUnit;
+
+            @if $component_lateralBorder == true {
+                padding-left: $component-base_padding;
+            } @else {
+                padding-left: 0;
+            }
+
+        }
+
+        //ideation styles
+        .ItemIdea {
+            td.DiscussionName {
+                position: relative;
+
+                .idea-counter-module {
+                    position: absolute;
+                    left: 0;
+                    margin: 0;
+                }
+
+                .Wrap {
+                    padding-left: $theme-photo_size;
+                }
+            }
+        }
+
+        //Hide some columns depending on window width
+        @include maxWidth($theme-breakpoint_desktop) {
+            td.FirstUser {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_desktop) {
+            td.LastUser {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_smallTable) {
+            td.CountViews {
+                display: none;
+            }
+        }
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            td.BigCount {
+                display: none;
+            }
+
+            .MItem.Category a {
+                max-width: 30ex;
+            }
+        }
+    }
+}
+
+.categoryList-heading {
+    color: $global-color_fg;
+}
+
+.CategoryGroup.HideTable {
+    display: none;
+}
+
+body.UserLoggedOut .DiscussionsTable tbody td.DiscussionName .Wrap {
+    padding-right: 0;
+}
+
+.Frame-contentWrap {
+    @include clearfix;
+}
+
+body.Section-DiscussionList.mine,
+body.Categories.Section-DiscussionList,
+body.Section-Group {
+
+    .DataTable.DiscussionsTable {
+        width: 100%;
+    }
+}
+
+//Section-GroupList
+.GroupWrap .DataTable {
+    @include groupsTableItem;
+
+    .Title.Title {
+        display: inline-block;
+        width: auto;
+        padding-right: 0;
+    }
+
+    .EventTitle .Title {
+        display: inline;
+    }
+
+    .Title-Icon {
+        color: $global-color_fg;
+    }
+
+    .Buttons {
+        margin-right: 0;
+        margin-left: $utility-baseUnitHalf;
+    }
+
+    .Title-Wrapper,
+    .Excerpt {
+        margin: 0 0 $utility-baseUnit;
+    }
+
+    .Meta {
+        margin-left: -$utility-baseUnit;
+        margin-right: -$utility-baseUnit;
+
+        @include maxWidth {
+            margin-top: 0;
+        }
+    }
+
+    .Invitation {
+
+        .MItem {
+            color: $component-meta_color;
+
+            &:focus,
+            &:hover {
+                color: $component-meta_color;
+            }
+        }
+
+        .UserName {
+
+            @include maxWidth {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+
+                .Meta {
+                    display: none;
+                }
+            }
+        }
+
+        .BlockColumn-Buttons {
+
+            @include maxWidth {
+                min-width: 105px;
+            }
+        }
+    }
+
+    .Event {
+
+        .EventTitle .Wrap {
+
+            @include maxWidth {
+                display: flex;
+                flex-wrap: wrap;
+
+                .DateTile {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    margin-top: 0;
+                    height: $theme-photo_size;
+                    width: $theme-photo_size;
+                }
+
+                .OptionsMenu {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: auto;
+                }
+
+                .Title,
+                .Description {
+                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+                }
+
+                .Title-Wrapper {
+                    padding-right: 0;
+                }
+
+                .Options,
+                .ButtonGroup,
+                .Button {
+                    width: 100%;
+                }
+
+                .Options {
+                    margin-top: $utility-baseUnitDouble;
+                    order: 2;
+                }
+
+                .Button {
+                    text-align: center;
+                }
+            }
+        }
+
+        .OptionsMenu {
+            margin-right: $utility-baseUnitHalf;
+        }
+    }
+
+    .LastUser,
+    .LatestPost {
+        width: 30ex;
+        max-width: 30ex;
+    }
+
+    .Group-Name {
+
+        .Title-Wrapper,
+        .Wrap {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .PhotoWrap {
+            margin-right: $utility-baseUnitDouble;
+
+            @include maxWidth {
+                display: none;
+            }
+        }
+
+        .Buttons .Button:nth-child(2) {
+            background-color: transparent;
+            border-color: $global-color_primary;
+            color: $global-color_primary;
+
+            &:focus,
+            &:hover {
+                border-color: $global-color_primary;
+                background-color: $global-color_primary;
+                color: $global-color_white;
+            }
+        }
+
+        @include maxWidth {
+
+            .Wrap {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .Options {
+                order: 2;
+                margin-left: auto;
+                margin-right: 0;
+            }
+
+            .GroupDescription,
+            .Options {
+                margin-top: $utility-baseUnitDouble;
+            }
+
+            .OptionsMenu {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+
+            .Title-Wrapper {
+                padding-right: 20px;
+            }
+        }
+    }
+
+    .Options {
+        position: static;
+        align-items: flex-start;
+    }
+
+
+    .EventLocation {
+        .Text {
+            display: block;
+            @include ellipsis;
+        }
+    }
+
+    //Applicants & Invitations table
+    @include maxWidth {
+
+        tr.Invitation {
+            td.UserName {
+                border-right: none;
+            }
+
+            .Title,
+            .Title-Wrapper {
+                padding-right: 0;
+            }
+        }
+    }
+
+    //Hide some columns depending on window width
+    @include maxWidth($theme-breakpoint_desktop) {
+        td.EventLocation,
+        td.LatestPost {
+            display: none;
+        }
+    }
+
+    @include maxWidth($theme-breakpoint_smallTable) {
+        td.CountDiscussions {
+            display: none;
+        }
+    }
+
+    @include maxWidth {
+
+        td.CountMembers,
+        td.EventDate {
+            display: none;
+        }
+
+        td.EventTitle {
+            @include lastCell;
+        }
+    }
+}
+
+.MemberList .DataTable {
+
+    td.UserName {
+        width: 70%;
+
+        @include maxWidth {
+            padding-right: 0;
+            border-right-width: 0;
+            border-top-right-radius: 0;
+            border-top-left-radius: 0;
+        }
+    }
+
+    td.Buttons,
+    td.BlockColumn-Buttons,
+    td.JoinDate {
+        width: 260px;
+    }
+
+    td.BlockColumn-Buttons {
+
+        @include maxWidth {
+            width: 160px;
+
+            .Button {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+
+            .Button + .Button {
+                margin-top: $utility-baseUnitHalf;
+            }
+        }
+    }
+
+    td.JoinDate {
+
+        @include maxWidth {
+            display: none;
+        }
+    }
+
+    .Title-Wrapper {
+        padding-right: 0;
+        height: $theme-photo_size;
+        display: inline-flex;
+        align-items: center;
+        width: calc(100% - (#{$theme-photo_size} + #{$utility-baseUnitDouble}));
+    }
+
+    .PhotoWrap {
+        display: inline-block;
+        margin-bottom: 0;
+    }
+}
+
+//.Section-Groups DiscussionsList
+.Group-Box .DiscussionsTable {
+
+    td.DiscussionName.DiscussionName .Wrap {
+        display: block;
+        padding-left: 0;
+    }
+
+    .Options {
+        position: static;
+        margin: 0;
+        float: right;
+    }
+
+    .DiscussionName {
+
+        .Title.Title {
+            padding-right: 0;
+
+            @include maxWidth {
+                margin-bottom: $utility-baseUnitDouble;
+            }
+        }
+    }
+}
+
+
+// Reactions Log
+.DataTable-ReactionsLog {
+    border-radius: 4px;
+    overflow: hidden;
+
+    tbody {
+        border-spacing: 0 $component-item_spacing;
+        margin-top: 0;
+    }
+
+    .Options.Options {
+        top: 0;
+        bottom: 0;
+    }
+
+    .Options .Hijack {
+        @include CloseButton;
+    }
+
+    .Item {
+        background-color: $component_bg;
+
+        td {
+            border: 0 !important;
+            border-radius: 0 !important;
+            background-color: $theme-hover_color;
+            vert-align: middle;
+        }
+    }
+
+    .ReactionsLog-Date {
+        width: 16ex;
+    }
+
+    .ReactionsLog-User {
+        width: 50%;
+
+        a {
+            @include ellipsis;
+            color: $component-meta-link_color;
+
+            &:focus,
+            &:hover {
+                color: $component-meta-link-hover_color;
+            }
+        }
+    }
+
+    .ReactionsLog-Reaction {
+        width: 12ex;
+        text-align: center;
+    }
+
+    .ReactionsLog-Options {
+        position: relative;
+        width: 2ex;
+    }
+
+    .Options a {
+        @include CloseButton;
+    }
+}
+
+table.PreferenceGroup tbody tr:hover td {
+    background: $theme-hover_color !important;
+}
+
+/*=====  End of Tables  ======*/

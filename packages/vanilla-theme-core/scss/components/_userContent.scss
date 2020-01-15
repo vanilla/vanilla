@@ -1,0 +1,157 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$spoiler_bg:                            mix($component_bg, $global-color_fg, 95%) !default;
+$spolier_fg:                            $global-color_fg !default;
+$spolier_border:                        none !default;
+$spoiler_borderRadius:                  $global_borderRadius !default;
+$spoiler-fontSize:                      16px !default;
+
+$code_fontSize:                         .85em !default;
+$code_borderRadius:                     0 !default;
+$code_bg:                               mix($global-color_fg, $global-color_bg, 5%) !default; // target rgba(127, 127, 127, .15);
+$code_fg:                               darken($global-color_fg, 20%) !default;
+
+$code-inline_borderColor:               mix($global-color_fg, $global-color_bg, 50%) !default; // target #a3a3a3
+$code-inline_borderRadius:              $code_borderRadius !default;
+$code-inline_padding:                   .2em .4em !default;
+
+$code-block_borderRadius:               $code_borderRadius !default;
+$code-block_padding:                    $userContent_fontSize !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.userContent,
+.UserContent {
+
+    h3 {
+
+        &:focus,
+        &:hover {
+            color: $global-color_fg !important;
+        }
+    }
+
+    p img {
+        position: relative;
+        margin: 0 auto;
+        display: block;
+    }
+
+    p,
+    li {
+        a {
+            color: $link-default_color;
+
+            &:focus,
+            &:hover {
+                color: $link-default-hover_color;
+                text-decoration: underline;
+            }
+
+            &:visited {
+                color: $link-default_visited_color;
+            }
+        }
+    }
+
+    div.Spoiler,
+    div.Spoiler.SpoilerConfigured {
+        padding: $utility-baseUnitHalf 0;
+        background-color: $spoiler_bg;
+        border-radius: $spoiler_borderRadius;
+        border: $spolier_border;
+        margin-top: 0;
+        margin-right: 0;
+    }
+
+    div.SpoilerTitle {
+        text-align: center;
+        padding: 0 $icon_default_size;
+        font-size: $spoiler-fontSize;
+        min-height: $icon_default_size * 2;
+        line-height: $icon_default_size * 2;
+        position: relative;
+
+        &::before,
+        &::after {
+            @include icon;
+            font-size: $icon-default_size;
+            position: relative;
+            width: $icon_default_size * 2;
+            height: $icon_default_size * 2;
+            line-height: $icon_default_size * 2;
+        }
+
+        &::before {
+            @include icon;
+            content:$icon-eye-close;
+            margin-right: $utility-baseUnitHalf;
+        }
+    }
+
+    div.Spoiler div.SpoilerTitle input {
+        position: absolute;
+        padding: 0;
+        margin: 0;
+        left: 0;
+        right: 0;
+        width: calc(100% - 10px);
+        color: transparent;
+        background-color: transparent;
+        border-width: 0;
+    }
+
+    div.Spoiler div.SpoilerText {
+        border-left-width: 0;
+        margin: 0;
+        padding: 0 $embeddedText_padding $embeddedText_padding $embeddedText_padding;
+    }
+
+    .codeBlock,
+    code,
+    pre {
+        vertical-align: middle;
+        font-size: $code_fontSize;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        margin: 0;
+        border: 0;
+    }
+
+    pre,
+    pre.codeBlock {
+        max-width: 100%;
+        overflow-x: auto;
+        display: block;
+        position: relative;
+        flex-shrink: 0;
+        color: $code_fg;
+        background-color: $code_bg;
+        padding: $code-block_padding;
+    }
+
+    .codeBlock,
+    code {
+        padding: 0;
+        color: inherit;
+        display: inline;
+        background-color: transparent;
+    }
+
+    p .codeBlock,
+    p code {
+        display: inline;
+        white-space: normal;
+        background-color: $code_bg;
+        padding: $code-inline_padding;
+    }
+}

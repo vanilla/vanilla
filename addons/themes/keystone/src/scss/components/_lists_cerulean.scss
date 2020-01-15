@@ -1,0 +1,83 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.Discussion {
+    .DataList,
+    .MessageList {
+        $arrow-size: 12px;
+        $left-spacing: #{$theme-photo_size + $utility-baseUnit + $arrow-size};
+
+        .Item {
+            margin-left: $left-spacing;
+
+            &::before,
+            &::after {
+                border-top: $arrow-size solid transparent;
+                border-bottom: $arrow-size solid transparent;
+                border-left: $arrow-size solid transparent;
+                border-right: $arrow-size solid $component_borderColor;
+                content: "";
+                left: -#{$arrow-size + $component-base_padding};
+                position: absolute;
+                top: $component-base_padding;
+            }
+
+            &::after {
+              border-right: $arrow-size solid $global-color_white;
+              left: -#{$arrow-size + $component-base_padding - 2px};
+            }
+
+            .Item-Header {
+                background: transparent;
+
+                .PhotoWrap {
+                    left: -$left-spacing;
+                    top: 0;
+                }
+
+                .Meta,
+                .AuthorWrap {
+                    padding-left: 0;
+                }
+            }
+
+            .Username {
+                color: $global-color_primary;
+
+                &:focus,
+                &:hover {
+                    color: $global-color_primaryAlt;
+                }
+            }
+
+            @include maxWidth {
+                margin-left: 0;
+
+                &::before,
+                &::after {
+                    content: none;
+                }
+
+                .Item-Header {
+
+                    .PhotoWrap {
+                        top: $utility-baseUnitDouble;
+                        left: $utility-baseUnitDouble;
+                    }
+
+                    .Meta,
+                    .AuthorWrap {
+                        padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+                    }
+                }
+            }
+        }
+
+        .ItemDiscussion {
+            position: relative;
+        }
+    }
+}

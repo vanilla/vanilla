@@ -1,0 +1,99 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+body.hasRichEditor {
+
+    .FormWrapper.FormWrapper-Condensed {
+        border-width: 0;
+        padding-right: 0 !important;
+        background-color: transparent;
+
+        .richEditor {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+
+    .richEditor-frame {
+        border-radius: $formElement_borderRadius;
+        border: $formElement_border;
+        overflow: initial;
+    }
+
+    .CommentOptions {
+        display: block;
+    }
+
+    .CommentOptions,
+    .bodybox-wrap {
+        margin-bottom: $utility-baseUnitDouble;
+    }
+
+    .Popup {
+
+        .NoteForm {
+            padding: 0;
+        }
+
+        .richEditor {
+            padding-left: 0;
+        }
+    }
+
+    .richEditor {
+        padding-left: 0;
+    }
+
+    .CommentForm.CommentForm {
+        border-width: 0;
+        padding: 0;
+        background-color: transparent;
+
+        .Buttons {
+            padding-right: 0;
+        }
+    }
+
+    .embedDialogue.embedDialogue {
+
+        @include maxWidth {
+            position: static;
+        }
+    }
+
+    #EventAddEditForm,
+    #GroupForm,
+    #MessageForm,
+    #ConversationForm {
+
+        .FormWrapper {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+
+body.hasRichEditor #MessageForm,
+body.hasRichEditor.Profile {
+    .FormWrapper-Condensed.FormWrapper-Condensed {
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            padding-left: $utility-baseUnitTriple;
+        }
+
+        @include maxWidth {
+            padding-left: 0;
+        }
+    }
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm {
+
+    .FormWrapper {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}

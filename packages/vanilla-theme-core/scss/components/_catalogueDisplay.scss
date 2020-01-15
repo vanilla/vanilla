@@ -1,0 +1,77 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$catalogue-photoSize:                         100px !default;
+$catalogue-mobileHeight:                      100px !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+// Prevent indexphoto styles
+.DataList.Discussions .CatalogueRow.ItemDiscussion-withPhoto .Discussion.ItemContent {
+    padding-left: calc(#{$catalogue-photoSize} + #{$utility-baseUnitDouble});
+
+    @include maxWidth($theme-breakpoint_mobile) {
+        padding-left: 0;
+    }
+}
+
+.catalogue-image-wrapper.catalogue-image-wrapper {
+    height: $catalogue-photoSize;
+    width: $catalogue-photoSize;
+    margin-right: $utility-baseUnitDouble;
+    overflow: hidden;
+    border-radius: $global_borderRadius;
+    box-shadow: inset 0 0 1px rgba($global-color_black, 0.2);
+    position: relative;
+
+    @include maxWidth($theme-breakpoint_mobile) {
+        float: none;
+        height: $catalogue-photoSize;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: $utility-baseUnitDouble;
+    }
+
+    a {
+        height: inherit;
+        width: inherit;
+        display: block;
+    }
+
+    img {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 100%;
+        width: auto;
+        max-width: none;
+        max-height: none;
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            width: 100%;
+            height: auto;
+            top: 50%;
+            left: auto;
+            transform: translateX(0) translateY(-50%);
+        }
+    }
+}
+
+.DataTable {
+
+    .CatalogueRow .Options {
+
+        @include maxWidth($theme-breakpoint_mobile) {
+            margin-bottom: $utility-baseUnitDouble;
+        }
+    }
+}

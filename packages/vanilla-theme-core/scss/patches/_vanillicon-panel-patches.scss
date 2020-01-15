@@ -1,0 +1,177 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Box,
+.BoxFilter {
+
+    a {
+        display: flex;
+        align-items:  center;
+
+        &::before {
+
+            @if($panel_item-showIcons == false) {
+                content: none !important;
+            } @else {
+                margin-right: $utility-baseUnitHalf;
+                margin-left: $utility-baseUnitHalf;
+            }
+        }
+
+        .Aside {
+            order: 2;
+            margin-left: auto;
+        }
+    }
+
+    .Sprite {
+        display: none !important;
+    }
+
+    &.BadgeGrid {
+       a {
+           display: inline-block;
+       }
+    }
+
+    li.MyDiscussions a::before {
+        @include icon;
+        content: $icon-comment;
+    }
+
+    li.MyDrafts a::before {
+        @include icon;
+        content: $icon-file-text;
+    }
+
+    li.QnA-UnansweredQuestions a::before {
+        @include icon;
+        content: $icon-question;
+    }
+
+    li.EditAccountLink a::before {
+        @include icon;
+        content: $icon-edit;
+    }
+
+    li.PasswordLink a::before {
+        @include icon;
+        content: "•••";
+    }
+
+    li.PreferencesLink a::before {
+        @include icon;
+        content: $icon-globe;
+    }
+
+    li.PictureLink a::before {
+        @include icon;
+        content: $icon-user;
+    }
+
+    li.QuoteSettingsLink a::before {
+        @include icon;
+        content: $icon-quote;
+    }
+
+    li.Activity a::before {
+        @include icon;
+        content: $icon-time;
+    }
+
+    li.Notifications a::before {
+        @include icon;
+        content: $icon-globe;
+    }
+
+    li.Inbox a::before {
+        @include icon;
+        content: $icon-inbox;
+    }
+
+    li.Comments a::before {
+        @include icon;
+        content: $icon-comment;
+    }
+
+    li.Reactions-BestOf a::before {
+        @include icon;
+        content: $icon-thumbs-up;
+    }
+
+    li.AllCategories a::before {
+        @include icon;
+        content: $icon-folder-close;
+    }
+
+    li.Discussions a::before {
+        @include icon;
+        content: $icon-comments;
+    }
+
+    li.Activities a::before {
+        @include icon;
+        content: $icon-time;
+    }
+
+    li.UserNotes a::before {
+        @include icon;
+        content: $icon-note;
+    }
+
+    li.MyBookmarks a::before {
+        @include icon;
+        content: $icon-star;
+    }
+
+    li.Groups a::before {
+        @include icon;
+        content: $icon-group;
+    }
+
+    li.link-social a::before {
+        @include icon;
+        content: $icon-facebook-alt;
+    }
+
+    li.link-tokens a::before {
+        @include icon;
+        content: $icon-key;
+    }
+
+    li.Popup a[href*="/profile/signature"]::before {
+        @include icon;
+        content: $icon-nib;
+    }
+
+    li.Popup a[href*="/profile/online"]::before {
+        @include icon;
+        content: $icon-question;
+    }
+}
+
+.BoxActivityFilter {
+    li:nth-child(1) a::before {
+        @include icon;
+        content: $icon-globe;
+    }
+
+    li:nth-child(2) a::before {
+        @include icon;
+        content: $icon-mod;
+    }
+
+    li:nth-child(3) a::before {
+        @include icon;
+        content: $icon-crown;
+    }
+}
+
+/*=====  End of Panel Patches  ======*/

@@ -1,0 +1,14 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.Navigation-linkContainer {
+
+    &::after {
+        width: calc(100% - (#{$utility-baseUnitTriple} * 2));
+        margin: 0 auto;
+    }
+}
+

@@ -1,0 +1,59 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$reactions_fg:                        $global-color_white !default;
+$reactions_bg:                        rgba(0,0,0,0.5) !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Reactions .ReactButton {
+    color: $component-meta_color;
+
+    &:hover {
+        color: $component-meta-link-hover_color;
+    }
+}
+
+.RecordReactions {
+    margin-left: -$utility-baseUnitHalf;
+    margin-right: -$utility-baseUnitHalf;
+
+    .PhotoWrap {
+        position: relative;
+        width: 24px;
+        height: 24px;
+    }
+
+    .ReactSprite {
+        color: $reactions_fg;
+        margin-right: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: $reactions_bg;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .UserReactionWrap {
+        width: 24px;
+        margin: 0 $utility-baseUnitHalf $utility-baseUnitHalf;
+    }
+
+    // icon has a weird shape
+    .ReactAwesome::before {
+        font-size: 11px;
+        margin-left: 1.5px;
+        margin-top: 1px;
+    }
+}

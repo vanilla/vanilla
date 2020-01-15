@@ -1,0 +1,134 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$tag_borderRadius:                3px !default;
+$tag_height:                      $formButton_height !default;
+$tag_fontSize:                    $global-small_fontSize !default;
+$tag_bg:                          $button-basic_bg !default;
+$tag_fg:                          $button-basic_fg !default;
+$tag_borderColor:                 $button-basic_border !default;
+$tag-hover_bg:                    $button-basic-hover_bg !default;
+$tag-hover_fg:                    $global-color_primary !default;
+$tag-hover_borderColor:           $global-color_primary !default;
+
+@mixin Tag($color_fg: $tag_fg, $color_bg: $tag_bg, $borderColor: $tag_borderColor) {
+    background-color: $color_bg;
+    color: $color_fg;
+    border: 1px solid $borderColor;
+    line-height: $global-base_lineHeight;
+    height: auto;
+    border-radius: $tag_borderRadius;
+    padding: 0 $utility-baseUnitHalf;
+    display: inline-block;
+    font-weight: inherit;
+    font-size: $tag_fontSize;
+    white-space: nowrap;
+
+    &:focus,
+    &:hover,
+    &:active {
+        text-decoration: none;
+    }
+}
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.TagCloud a {
+    @include Tag;
+    @include ellipsis;
+    max-width: calc(#{$panel_width} - #{$panel_padding} * 2);
+
+    .Count {
+        padding: 0;
+        color: inherit;
+        background-color: transparent;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: $tag-hover_bg;
+        border-color: $tag-hover_borderColor;
+        color: $tag-hover_fg;
+
+        .Count {
+            color: inherit;
+        }
+    }
+}
+
+.DataList,
+.MessageList,
+.DataTableWrap {
+
+    .Tag,
+    .Tag-Poll,
+    .RoleTracker,
+    .IdeationTag {
+       @include Tag;
+    }
+
+    .RoleTracker,
+    .IdeationTag {
+
+        .Tag {
+            background-color: transparent;
+            padding: 0;
+            border-width: 0;
+            color: inherit;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: inherit;
+        }
+    }
+
+    .RoleTracker {
+        background-color: transparent;
+    }
+
+    .Tag-Announcement,
+    .NewCommentCount,
+    .HasNew.HasNew {
+        @include Tag($global-color_primary, transparent, $global-color_primary);
+    }
+
+    //Tags that are links get hover state
+    .IdeationTag,
+    .tag-tracker,
+    .MItem.RoleTracker {
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: $tag-hover_bg;
+            border-color: $tag-hover_borderColor;
+            color: $tag-hover_fg;
+        }
+    }
+
+}
+
+.Form-Tags .AvailableTag {
+    @include Tag;
+
+    &:focus,
+    &:hover {
+        background-color: $global-color_primary;
+        border-color: $global-color_primary;
+        color: $global-color_white;
+        text-decoration: none;
+    }
+}
+

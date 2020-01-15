@@ -1,0 +1,33 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.Frame-content .SearchBox {
+    .InputBox.BigInput,
+    #Form_Search {
+        background-color: $frame_backgroundColor;
+        color: $global-color_white;
+    }
+}
+
+.groupSearch .InputBox.BigInput {
+    background-color: $frame_backgroundColor;
+    color: $global-color_white;
+}
+
+.SearchForm .InputAndButton .Button {
+    color: transparent;
+}
+
+.Herobanner .SearchBox {
+    .InputBox.BigInput,
+    #Form_Search {
+
+        @include maxWidth {
+            background-color: $global-color_bg;
+            color: $global-color_white;
+        }
+    }
+}

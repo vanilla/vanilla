@@ -154,7 +154,7 @@ formsStory.add(
         })(),
     {
         chromatic: {
-            viewports: [1200],
+            viewports: [1400],
         },
     },
 );

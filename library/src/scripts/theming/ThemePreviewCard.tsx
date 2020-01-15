@@ -15,6 +15,9 @@ import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
+import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 
 interface IProps {
     name?: string;
@@ -29,8 +32,11 @@ interface IProps {
     isApplyLoading?: boolean;
     onPreview?: () => void;
     onCopy?: () => void;
+    onEdit?: () => void;
+    onDelete?: () => void;
     isActiveTheme: boolean;
     noActions?: boolean;
+    themeType?: string;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -122,6 +128,15 @@ export default function ThemePreviewCard(props: IProps) {
             )}
             {!props.noActions && (
                 <div className={props.noActions ? classes.noOverlay : classes.overlay}>
+                    {props.themeType === "themeDB"}
+                    <div className={classes.actionDropdown}>
+                        <DropDown flyoutType={FlyoutType.LIST}>
+                            <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />
+                            <DropDownItemButton name={t("Copy")} onClick={props.onCopy} />
+                            <DropDownItemSeparator />
+                            <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />
+                        </DropDown>
+                    </div>
                     <div className={classes.actionButtons}>
                         <Button
                             className={classes.buttons}
@@ -135,9 +150,11 @@ export default function ThemePreviewCard(props: IProps) {
                         <Button className={classes.buttons} onClick={props.onPreview}>
                             {t("Preview")}
                         </Button>
-                        <Button className={classes.buttons} onClick={props.onCopy}>
-                            {t("Copy")}
-                        </Button>
+                        {props.themeType === "themeFile" && (
+                            <Button className={classes.buttons} onClick={props.onCopy}>
+                                {t("Copy")}
+                            </Button>
+                        )}
                     </div>
                 </div>
             )}

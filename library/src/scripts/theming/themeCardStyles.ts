@@ -373,6 +373,21 @@ export const themeCardClasses = useThemeCache(() => {
         height: percent(100),
     });
 
+    const actionDropdown = style("actionDropdown", {
+        position: "absolute",
+        top: unit(5),
+        right: unit(7),
+
+        $nest: {
+            "&& button": {
+                color: vars.colors.bg.white.toString(),
+            },
+            [`&:hover button,  &:visited button`]: {
+                color: vars.colors.bg.white.toString(),
+            },
+        },
+    });
+
     return {
         container,
         titlebar,
@@ -404,6 +419,7 @@ export const themeCardClasses = useThemeCache(() => {
         overlay,
         isFocused,
         noOverlay,
+        actionDropdown,
     };
 });
 

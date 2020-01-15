@@ -20,7 +20,7 @@ export const compactSearchVariables = useThemeCache(() => {
 
     const baseColor = titleBarVars.colors.bg.darken(0.05);
     const colors = makeVars("colors", {
-        bg: baseColor.fade(0.8),
+        bg: baseColor.fadeOut(0.8),
         fg: titleBarVars.colors.fg,
         placeholder: titleBarVars.colors.fg.fade(0.8),
         active: {

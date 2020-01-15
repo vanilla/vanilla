@@ -43,6 +43,10 @@ export const titleBarVariables = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const makeThemeVars = variableFactory("titleBar");
 
+    const options = makeThemeVars("options", {
+        integrateWithSplash: false,
+    });
+
     const sizing = makeThemeVars("sizing", {
         height: 48,
         spacer: 12,

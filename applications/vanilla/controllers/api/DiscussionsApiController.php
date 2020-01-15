@@ -294,63 +294,16 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord, $expand = []) {
-        $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
-        $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
-        $dbRecord['Url'] = discussionUrl($dbRecord);
-        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
-        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
-
-        if ($this->getSession()->User) {
-            $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
-                && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
-            if ($dbRecord['CountUnreadComments'] !== true && $dbRecord['CountUnreadComments'] > 0) {
-                $dbRecord['countUnread'] = $dbRecord['CountUnreadComments'];
-            }
-        } else {
-            $dbRecord['unread'] = false;
-        }
-
-        if ($this->isExpandField('lastPost', $expand)) {
-            $lastPost = [
-                'discussionID' => $dbRecord['DiscussionID'],
-                'dateInserted' => $dbRecord['DateLastComment'],
-                "insertUserID" => $dbRecord["LastUserID"],
-            ];
-            if ($dbRecord['LastCommentID']) {
-                $lastPost['CommentID'] = $dbRecord['LastCommentID'];
-                $lastPost['name'] = sprintft('Re: %s', $dbRecord['Name']);
-                $lastPost['url'] = commentUrl($lastPost, true);
-            } else {
-                $lastPost['name'] = $dbRecord['Name'];
-                $lastPost['url'] = $dbRecord['Url'];
-            }
-
-            if ($this->isExpandField('lastPost.insertUser', $expand) || $this->isExpandField('lastUser', $expand) && array_key_exists('LastUser', $dbRecord)) {
-                $lastPost['insertUser'] = $dbRecord['LastUser'];
-                if (!$this->isExpandField('lastUser', $expand)) {
-                    unset($dbRecord['LastUser']);
-                }
-            }
-
-            $dbRecord['lastPost'] = $lastPost;
-        }
-
-        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
-        if (empty($dbRecord['DateLastComment'])) {
-            $dbRecord['DateLastComment'] = $dbRecord['DateInserted'];
-        }
-
-        // The Category key will hold a category fragment in API responses. Ditch the default string.
-        if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
-            unset($dbRecord['Category']);
-        }
-
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
+        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
 
         // Allow addons to hook into the normalization process.
         $options = ['expand' => $expand];
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
+        $result = $this->getEventManager()->fireFilter(
+            'discussionsApiController_normalizeOutput',
+            $normalizedRow,
+            $this,
+            $options
+        );
 
         return $result;
     }

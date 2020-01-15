@@ -6,11 +6,15 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Formatting\FormatFieldTrait;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Base API controller for APIv2.
  */
 abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface {
+
+    use FormatFieldTrait;
 
     /** @var Schema */
     private $categoryFragmentSchema;
@@ -36,19 +40,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
             return $valid;
         });
         return $result;
-    }
-
-    /**
-     * Format a specific field.
-     *
-     * @param array $row An array representing a database row.
-     * @param string $field The field name.
-     * @param string $format The source format.
-     */
-    public function formatField(array &$row, $field, $format) {
-        if (array_key_exists($field, $row)) {
-            $row[$field] = \Gdn::formatService()->renderHTML($row[$field], $format) ?: '<!-- empty -->';
-        }
     }
 
     /**
@@ -110,13 +101,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @return bool
      */
     public function isExpandField($field, $expand) {
-        $result = false;
-        if ($expand === true) {
-            // A boolean true allows everything.
-            $result = true;
-        } elseif (is_array($expand)) {
-            $result = !empty(array_intersect([\Vanilla\ApiUtils::EXPAND_ALL, 'true', '1', $field], $expand));
-        }
+        $result = ModelUtils::isExpandOption($field, $expand);
         return $result;
     }
 

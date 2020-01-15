@@ -8,9 +8,13 @@
  * @since 2.0
  */
 
+use Vanilla\Attributes;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussions data.
@@ -19,6 +23,8 @@ class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
     use \Vanilla\FloodControlTrait;
+
+    use FormatfieldTrait;
 
     use UpdateMediaTrait;
 
@@ -3440,6 +3446,74 @@ class DiscussionModel extends Gdn_Model {
                 }
             }
         }
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        $session = Gdn::session();
+
+        $row['Announce'] = (bool)$row['Announce'];
+        $row['Bookmarked'] = (bool)$row['Bookmarked'];
+        $row['Url'] = discussionUrl($row);
+        $this->formatField($row, "Body", $row["Format"]);
+        $row['Attributes'] = new Attributes($row['Attributes']);
+
+        if ($session->User) {
+            $row['unread'] = $row['CountUnreadComments'] !== 0
+                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $session->User), $row['DateInserted']) <= 0);
+            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
+                $row['countUnread'] = $row['CountUnreadComments'];
+            }
+        } else {
+            $row['unread'] = false;
+        }
+
+        if (ModelUtils::isExpandOption('lastPost', $expand)) {
+            $lastPost = [
+                'discussionID' => $row['DiscussionID'],
+                'dateInserted' => $row['DateLastComment'],
+                "insertUserID" => $row["LastUserID"],
+            ];
+            if ($row['LastCommentID']) {
+                $lastPost['CommentID'] = $row['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $row['Name']);
+                $lastPost['url'] = commentUrl($lastPost, true);
+            } else {
+                $lastPost['name'] = $row['Name'];
+                $lastPost['url'] = $row['Url'];
+            }
+
+            if (ModelUtils::isExpandOption('lastPost.insertUser', $expand) || ModelUtils::isExpandOption('lastUser', $expand) && array_key_exists('LastUser', $row)) {
+                $lastPost['insertUser'] = $row['LastUser'];
+                if (!ModelUtils::isExpandOption('lastUser', $expand)) {
+                    unset($row['LastUser']);
+                }
+            }
+
+            $row['lastPost'] = $lastPost;
+        }
+
+        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
+        if (empty($row['DateLastComment'])) {
+            $row['DateLastComment'] = $row['DateInserted'];
+        }
+
+        // The Category key will hold a category fragment in API responses. Ditch the default string.
+        if (array_key_exists('Category', $row) && !is_array($row['Category'])) {
+            unset($row['Category']);
+        }
+
+        $scheme = new CamelCaseScheme;
+        $result = $scheme->convertArrayKeys($row);
+        $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
+
+        return $result;
     }
 
     /**

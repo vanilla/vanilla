@@ -11,13 +11,14 @@ import {
     colorOut,
     getHorizontalPaddingForTextInput,
     getVerticalPaddingForTextInput,
+    margins,
     negative,
     pointerEvents,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, translateY } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -32,9 +33,14 @@ export const inputCSS = () => {
     const primary = colorOut(mainColors.primary);
     const metaFg = colorOut(globalVars.meta.colors.fg);
 
-    cssOut("ul.token-input-list.token-input-focused, .AdvancedSearch .InputBox:focus", {
-        borderColor: primary,
-    });
+    cssOut(
+        `
+        .Container ul.token-input-list.token-input-focused,
+        .AdvancedSearch .InputBox:focus`,
+        {
+            borderColor: primary,
+        },
+    );
 
     cssOut(
         `
@@ -47,23 +53,16 @@ export const inputCSS = () => {
         div.token-input-dropdown.token-input-dropdown,
     `,
         {
-            borderRadius: unit(formVars.border.radius),
             color: fg,
             backgroundColor: bg,
-            borderColor: fg,
+            ...borders(),
         },
     );
 
     cssOut(
         `
         #token-input-Form_tags,
-        input[type= "text"],
-        textarea,
-        input.InputBox,
-        .InputBox,
-        .AdvancedSearch select,
-        select,
-        .InputBox.BigInput,
+
         input.SmallInput:focus,
         input.InputBox:focus,
         textarea:focus
@@ -74,12 +73,11 @@ export const inputCSS = () => {
         },
     );
 
-    cssOut(`div.token-input-dropdown`, borders());
-
-    // The padding here needs to be removed so the autocomplete calculates the width properly.
-    // cssOut(".token-input-list", {
-    //     padding: important(0),
-    // });
+    cssOut(`div.token-input-dropdown`, {
+        // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
+        ...borders(),
+        transform: translateY(unit(globalVars.border.width) as string),
+    });
 
     cssOut(".token-input-input-token input", {
         ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.fullWidth),
@@ -92,8 +90,8 @@ export const inputCSS = () => {
     mixinInputStyles("textarea");
     mixinInputStyles("input.InputBox");
     mixinInputStyles(".InputBox");
-    mixinInputStyles(".AdvancedSearch select");
-    mixinInputStyles("select");
+    // mixinInputStyles(".AdvancedSearch select");
+    // mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
     mixinInputStyles(`
         .Container input[type= "text"],
@@ -104,11 +102,17 @@ export const inputCSS = () => {
         .Container select
         `);
     mixinInputStyles(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
-    mixinInputStyles(".token-input-list, .token-input-focused");
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
     mixinInputStyles(".AdvancedSearch .InputBox", false, true);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
-    cssOut(".token-input-list", inputClasses().inputMixin);
+    // cssOut(".token-input-list", inputClasses().inputMixin);
+    cssOut("select", {
+        $nest: {
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                borderColor: important(colorOut(globalVars.mainColors.primary) as string),
+            },
+        },
+    });
 };
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
@@ -131,6 +135,9 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
         borderColor: colorOut(globalVars.border.color),
         borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
         borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),
+        borderRadius: isImportant
+            ? important(unit(globalVars.border.radius) as string)
+            : unit(globalVars.border.radius),
         backgroundColor: isImportant
             ? important(colorOut(globalVars.mainColors.bg) as string)
             : colorOut(globalVars.mainColors.bg),
@@ -140,6 +147,12 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     });
 
     nestedWorkaround(selector, {
+        "&:active": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        "&:hover": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
         "&:focus": {
             borderColor: isImportant ? important(primary as string) : primary,
         },
@@ -161,8 +174,10 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     });
 
     cssOut("form .SelectWrapper", {
-        cursor: "pointer",
         $nest: {
+            "& select": {
+                cursor: "pointer",
+            },
             "&:hover, &:focus, &.focus-visible, &:active": {
                 color: colorOut(globalVars.mainColors.primary),
             },
@@ -246,6 +261,33 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
         $nest: {
             "&:hover, &:focus, &.focus-visible, &:active": {
                 color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    // Inline Checkboxes:
+    cssOut(".Checkboxes.Inline", {
+        display: "flex",
+        flexWrap: "wrap",
+        width: calc(`100% + ${unit(globalVars.meta.spacing.default * 2)}`),
+        marginLeft: unit(negative(globalVars.meta.spacing.default)),
+        marginTop: unit(globalVars.meta.spacing.default),
+        $nest: {
+            "& .CheckBoxLabel": {
+                cursor: "pointer",
+                ...margins({
+                    all: 0,
+                    right: unit(globalVars.meta.spacing.default),
+                    bottom: unit(globalVars.meta.spacing.default),
+                }),
+            },
+        },
+    });
+
+    cssOut("input[type='checkbox']", {
+        $nest: {
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
             },
         },
     });

@@ -66,7 +66,7 @@ export const inputClasses = useThemeCache(() => {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),
-            "&:focus, &.focus-visible": {
+            "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
                     color: vars.colors.state.fg,
                 }),

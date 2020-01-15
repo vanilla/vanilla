@@ -177,9 +177,14 @@ export const cssOut = (selector: string, ...objects: types.NestedCSSProperties[]
     cssRule(trimTrailingCommas(selector), ...objects);
 };
 
+export const camelCaseToDash = (str: string) => {
+    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+};
+
 export const nestedWorkaround = (selector: string, nestedObject: {}) => {
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
+
     let rawStyles = `\n`;
     Object.keys(nestedObject).forEach(key => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
@@ -190,7 +195,9 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
             keys.forEach(property => {
                 const style = targetStyles[property];
                 if (style) {
-                    rawStyles += `\n    ${property}: ${style instanceof ColorHelper ? colorOut(style) : style};`;
+                    rawStyles += `\n    ${camelCaseToDash(property)}: ${
+                        style instanceof ColorHelper ? colorOut(style) : style
+                    };`;
                 }
             });
             rawStyles += `\n}\n\n`;

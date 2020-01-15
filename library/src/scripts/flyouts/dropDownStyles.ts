@@ -15,10 +15,10 @@ import {
     unit,
     userSelect,
     negative,
-    importantUnit, IActionStates,
+    IStateSelectors,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -227,72 +227,9 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    // Contents (button or link)
-    // Replaces: .dropDownItem-button, .dropDownItem-link
-    const actionMixin: NestedCSSProperties = (classBasedStates?: IStateSelectors) => {
-        return {
-                ...buttonResetMixin(),
-                cursor: "pointer",
-                appearance: "none",
-            display
-    :
-        "flex",
-            alignItems
-    :
-        "center",
-            width
-    :
-        percent(100),
-            textAlign
-    :
-        "left",
-            minHeight
-    :
-        unit(vars.item.minHeight),
-            lineHeight
-    :
-        unit(globalVars.lineHeights.condensed),
-    ...
-        paddings({
-            vertical: 4,
-            horizontal: vars.item.padding.horizontal,
-        }),
-    ...
-        borders({
-            color: "transparent",
-            radius: 0,
-        }),
-            color:colorOut(vars.item.colors.fg, true),
-        ...userSelect("none"),
-        ...buttonStates({
-                allStates: {
-                    textShadow: "none",
-                    outline: 0,
-                },
-                hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.color, true),
-                },
-                focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.color, true),
-                },
-                active: {
-                    backgroundColor: colorOut(globalVars.states.active.color, true),
-                },
-                accessibleFocus: {
-                    borderColor: colorOut(globalVars.mainColors.primary, true),
-                },
-            },undefined, classBasedStates),
-    ...mediaQueries.oneColumnDown({
-                fontSize: unit(vars.item.mobile.fontSize),
-                fontWeight: globalVars.fonts.weights.semiBold,
-                minHeight: unit(vars.item.mobile.minHeight),
-            })
-        };
-    };
-
     const action = style("action", {
         $nest: {
-            "&&": actionMixin,
+            "&&": actionMixin(),
         },
     });
 
@@ -391,7 +328,6 @@ export const dropDownClasses = useThemeCache(() => {
         section,
         toggleButtonIcon,
         action,
-        actionMixin,
         text,
         separator,
         sectionHeading,
@@ -406,3 +342,60 @@ export const dropDownClasses = useThemeCache(() => {
         contentOffsetRight,
     };
 });
+
+// Contents (button or link)
+// Replaces: .dropDownItem-button, .dropDownItem-link
+export const actionMixin = (classBasedStates?: IStateSelectors) => {
+    const vars = dropDownVariables();
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+
+    return {
+        ...buttonResetMixin(),
+        cursor: "pointer",
+        appearance: "none",
+        display: "flex",
+        alignItems: "center",
+        width: percent(100),
+        textAlign: "left",
+        minHeight: unit(vars.item.minHeight),
+        lineHeight: unit(globalVars.lineHeights.condensed),
+        ...paddings({
+            vertical: 4,
+            horizontal: vars.item.padding.horizontal,
+        }),
+        ...borders({
+            color: "transparent",
+            radius: 0,
+        }),
+        color: colorOut(vars.item.colors.fg, true),
+        ...userSelect("none"),
+        ...buttonStates(
+            {
+                allStates: {
+                    textShadow: "none",
+                    outline: 0,
+                },
+                hover: {
+                    backgroundColor: colorOut(globalVars.states.hover.color, true),
+                },
+                focus: {
+                    backgroundColor: colorOut(globalVars.states.focus.color, true),
+                },
+                active: {
+                    backgroundColor: colorOut(globalVars.states.active.color, true),
+                },
+                accessibleFocus: {
+                    borderColor: colorOut(globalVars.mainColors.primary, true),
+                },
+            },
+            undefined,
+            classBasedStates,
+        ),
+        ...mediaQueries.oneColumnDown({
+            fontSize: unit(vars.item.mobile.fontSize),
+            fontWeight: globalVars.fonts.weights.semiBold,
+            minHeight: unit(vars.item.mobile.minHeight),
+        }),
+    } as NestedCSSProperties;
+};

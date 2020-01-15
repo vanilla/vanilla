@@ -63,19 +63,25 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
     };
 };
 
-export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
-    const paddingTop = (height - fullBorderWidth - fontSize * 1.5) / 2;
+export const getVerticalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {
+    return (height - fullBorderWidth - fontSize * 1.5) / 2;
+};
 
+export const getHorizontalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {
+    return getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth) * 2;
+};
+
+export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
+    const paddingVertical = getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth);
+    const paddingHorizontal = getHorizontalPaddingForTextInput(height, fontSize, fullBorderWidth);
     return {
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
         minHeight: unit(formElementsVariables().sizing.height),
         ...paddings({
-            top: unit(paddingTop),
-            bottom: unit(paddingTop),
-            left: unit(paddingTop * 2),
-            right: unit(paddingTop * 2),
+            vertical: unit(paddingVertical),
+            horizontal: unit(paddingHorizontal),
         }),
     };
 };

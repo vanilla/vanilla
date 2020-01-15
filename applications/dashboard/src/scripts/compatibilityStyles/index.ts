@@ -208,4 +208,3 @@ cssRule(
         display: important("block"),
     },
 );
-document.querySelector(".AdvancedSearch  .Handle").click();

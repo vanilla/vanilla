@@ -9,13 +9,15 @@ import { cssRaw } from "typestyle";
 import {
     borders,
     colorOut,
+    getHorizontalPaddingForTextInput,
+    getVerticalPaddingForTextInput,
     negative,
     pointerEvents,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important } from "csx";
+import { calc, important, percent } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -107,16 +109,6 @@ export const inputCSS = () => {
     mixinInputStyles(".AdvancedSearch .InputBox", false, true);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
     cssOut(".token-input-list", inputClasses().inputMixin);
-
-    cssOut("ul.token-input-list li input", {
-        // paddingLeft: unit(inputVars.sizing.height * 2),
-        // paddingRight: unit(inputVars.sizing.height * 2),
-        // paddingLeft: important(0),
-        // paddingRight: important(0),
-        padding: important(0),
-        minHeight: important("initial"),
-        lineHeight: important(1),
-    });
 };
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
@@ -158,5 +150,90 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
             borderColor: isImportant ? important(primary as string) : primary,
         },
         ...extraFocus,
+    });
+
+    cssOut("form .SelectWrapper::after, .AdvancedSearch .Handle.Handle ", {
+        color: colorOut(globalVars.border.color),
+    });
+
+    cssOut(".Handle.Handle", {
+        $nest: {
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    cssOut(".AdvancedSearch .Handle.Handle .Arrow::after", {
+        color: "inherit",
+    });
+
+    // Token inputs
+    const verticalPadding = getVerticalPaddingForTextInput(
+        vars.sizing.height,
+        vars.font.size,
+        formElementVars.border.fullWidth,
+    );
+    const horizontalPadding = getHorizontalPaddingForTextInput(
+        vars.sizing.height,
+        vars.font.size,
+        formElementVars.border.fullWidth,
+    );
+
+    const spaceWithoutPaddingInInput =
+        formElementVars.sizing.height - verticalPadding * 2 - formElementVars.border.fullWidth;
+
+    // Container of tokens
+    cssOut(".Container ul.token-input-list", {
+        minHeight: unit(formElementVars.sizing.height),
+        paddingRight: important(0),
+        paddingBottom: important(0),
+    });
+
+    // Real text input
+    cssOut("ul.token-input-list li input", {
+        boxSizing: "border-box",
+        height: unit(spaceWithoutPaddingInInput),
+        paddingTop: important(0),
+        paddingBottom: important(0),
+        paddingLeft: important(0),
+        minHeight: important("initial"),
+        maxWidth: calc(`100% - ${unit(horizontalPadding)}`),
+        lineHeight: important(1),
+        borderRadius: important(0),
+        background: important("transparent"),
+        border: important(0),
+    });
+
+    // Token
+    cssOut("li.token-input-token.token-input-token", {
+        margin: 0,
+        padding: unit(globalVars.meta.spacing.default),
+        marginBottom: unit(verticalPadding),
+        lineHeight: unit(globalVars.meta.lineHeights.default),
+        minHeight: unit(spaceWithoutPaddingInInput),
+        ...borders({
+            color: globalVars.meta.colors.fg,
+        }),
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginRight: important(unit(horizontalPadding) as string),
+    });
+
+    // Text inside token
+    cssOut("li.token-input-token.token-input-token p", {
+        fontSize: unit(globalVars.meta.text.fontSize),
+        lineHeight: unit(globalVars.meta.lineHeights.default),
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    // "x" inside token
+    cssOut("li.token-input-token span.token-input-delete-token", {
+        $nest: {
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 };

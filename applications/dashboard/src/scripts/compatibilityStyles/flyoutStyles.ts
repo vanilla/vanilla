@@ -8,21 +8,26 @@
 import { cssRaw } from "typestyle";
 import {
     borders,
+    buttonStates,
     colorOut,
     IActionStates,
     IStateSelectors,
     negative,
+    paddings,
     pointerEvents,
     setAllLinkColors,
     textInputSizingFromFixedHeight,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important } from "csx";
+import { calc, important, percent } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { actionMixin, dropDownClasses, dropDownVariables } from "@library/flyouts/dropDownStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
@@ -59,5 +64,6 @@ export const flyoutCSS = () => {
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {
     selector = trimTrailingCommas(selector);
-    cssOut(selector, dropDownClasses().actionMixin(classBasedStates));
+    const styles = actionMixin(classBasedStates);
+    cssOut(selector, styles);
 }

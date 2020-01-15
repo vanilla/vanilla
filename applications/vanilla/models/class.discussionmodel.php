@@ -3497,10 +3497,13 @@ class DiscussionModel extends Gdn_Model {
      */
     public function normalizeRow(array $row, $expand = []): array {
         $row['Announce'] = (bool)$row['Announce'];
-        $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
         $this->formatField($row, "Body", $row["Format"]);
         $row['Attributes'] = new Attributes($row['Attributes']);
+
+        if (isset($row["Bookmarked"])) {
+            $row["Bookmarked"] = (bool)$row["Bookmarked"];
+        }
 
         if (ModelUtils::isExpandOption('lastPost', $expand)) {
             $lastPost = [

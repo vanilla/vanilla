@@ -1094,48 +1094,62 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Allow for discussions to be archived.
-        if ($this->isArchived($discussion->DateLastComment)) {
-            $discussion->Closed = '1';
-            if ($discussion->CountCommentWatch) {
-                $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-            } else {
-                $discussion->CountUnreadComments = 0;
-            }
-            // Allow for discussions to just be new.
-        } elseif ($discussion->CountCommentWatch === null) {
-            $discussion->CountUnreadComments = true;
-        } else {
-            $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-        }
+//        if ($this->isArchived($discussion->DateLastComment)) {
+//            $discussion->Closed = '1';
+//            if ($discussion->CountCommentWatch) {
+//                $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
+//            } else {
+//                $discussion->CountUnreadComments = 0;
+//            }
+//            // Allow for discussions to just be new.
+//        } elseif ($discussion->CountCommentWatch === null) {
+//            $discussion->CountUnreadComments = true;
+//        } else {
+//            $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
+//        }
+//        if (!property_exists($discussion, 'Read')) {
+//            $discussion->Read = !(bool)$discussion->CountUnreadComments;
+//            if ($category && !is_null($category['DateMarkedRead'])) {
+//                // If the category was marked explicitly read at some point, see if that applies here
+//                if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
+//                    $discussion->Read = true;
+//                }
+//
+//                if ($discussion->Read) {
+//                    $discussion->CountUnreadComments = 0;
+//                }
+//            }
 
         // Discussions are always unread to guests.
         if (!Gdn::session()->isValid()) {
             $discussion->Read = false;
-        } else {
-            $isRead = null;
-            $countCommentsViewed = 0;
-            $userCommentsViewed = $discussion->CountUnreadComments;
-            $discussionCommentCount = $discussion->CountComments;
-            $userLastViewedDate = $discussion->DateLastViewed;
-            $discussionLastCommentDate = self::getLastCommentDate($discussion->DateLastComment, $category['DateMarkedRead']);
-            [$isRead, $countCommentsViewed] = self::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userCommentsViewed, $userLastViewedDate);
         }
+
+        $isRead = null;
+        $countUnreadComments = 0;
+        $userCommentsViewed = $discussion->CountUnreadComments;
+        $discussionCommentCount = $discussion->CountComments;
+        $userLastViewedDate = $discussion->DateLastViewed;
+        $discussionLastCommentDate = self::getLastCommentDate($discussion->DateLastComment, $category['DateMarkedRead']);
+        list($isRead, $countUnreadComments, $updateUserDiscussionCommentCount) = self::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userCommentsViewed, $userLastViewedDate);
+
 
         // Logic for incomplete comment count.
-        if ($discussion->CountCommentWatch == 0 && $dateLastViewed = val('DateLastViewed', $discussion)) {
-            $discussion->CountUnreadComments = true;
-            if (Gdn_Format::toTimestamp($dateLastViewed) >= Gdn_Format::toTimestamp($discussion->LastDate)) {
-                $discussion->CountCommentWatch = $discussion->CountComments;
-                $discussion->CountUnreadComments = 0;
-            }
-        }
-        if ($discussion->CountUnreadComments === null) {
-            $discussion->CountUnreadComments = 0;
-        } elseif ($discussion->CountUnreadComments < 0) {
-            $discussion->CountUnreadComments = 0;
-        }
+//        if ($discussion->CountCommentWatch == 0 && $dateLastViewed = val('DateLastViewed', $discussion)) {
+//            $discussion->CountUnreadComments = true;
+//            if (Gdn_Format::toTimestamp($dateLastViewed) >= Gdn_Format::toTimestamp($discussion->LastDate)) {
+//                $discussion->CountCommentWatch = $discussion->CountComments;
+//                $discussion->CountUnreadComments = 0;
+//            }
+//        }
+//        if ($discussion->CountUnreadComments === null) {
+//            $discussion->CountUnreadComments = 0;
+//        } elseif ($discussion->CountUnreadComments < 0) {
+//            $discussion->CountUnreadComments = 0;
+//        }
 
-        $discussion->CountCommentWatch = is_numeric($discussion->CountCommentWatch) ? $discussion->CountCommentWatch : null;
+        $discussion->CountCommentWatch = is_numeric($countUnreadComments) ? $countUnreadComments : null;
+        $discussion->Read = $isRead;
 
         if ($discussion->LastUserID == null) {
             $discussion->LastUserID = $discussion->InsertUserID;
@@ -1174,16 +1188,45 @@ class DiscussionModel extends Gdn_Model {
      */
     public static function getUnreadComments(int $discussionCommentCount, $discussionLastCommentDate, int $userReadComments, $userLastReadDate) {
         $isRead = true;
-        $commentCount = 0;
+        $unreadCommentCount = 0;
         if ($discussionLastCommentDate > $userLastReadDate) {
             $isRead = false;
         }
 
+        $unreadCommentCount = $discussionCommentCount - $userReadComments;
+
         if ($discussionCommentCount > $userReadComments) {
-            $commentCount = $discussionCommentCount;
+            $unreadCommentCount = $discussionCommentCount;
         }
 
-        return [$isRead, $commentCount];
+        if (!$userReadComments) {
+            $unreadCommentCount = 0;
+        }
+
+        if ($userReadComments === null) {
+            $unreadCommentCount = true;
+        }
+
+        if ($userReadComments === 0 && $userLastReadDate) {
+            $unreadCommentCount = true;
+        }
+
+        if ($userLastReadDate >= $discussionLastCommentDate) {
+            $userReadComments = $discussionCommentCount;
+            $unreadCommentCount = 0;
+        }
+
+        if ($unreadCommentCount === null) {
+            $unreadCommentCount = 0;
+        } elseif ($unreadCommentCount < 0) {
+            $unreadCommentCount = 0;
+        }
+
+        if ($unreadCommentCount <= 0) {
+            $isRead = false;
+        }
+
+        return [$isRead, $unreadCommentCount, $userReadComments];
     }
 
     /**

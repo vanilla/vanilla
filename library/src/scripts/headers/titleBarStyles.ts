@@ -325,22 +325,16 @@ export const titleBarClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
     });
 
-    const bg2 = style(
-        "bg2",
-        vars.colors.bgImage
-            ? {
-                  willChange: "opacity",
-                  ...absolutePosition.fullSizeOfParent(),
-                  backgroundImage: url(vars.colors.bgImage),
-                  backgroundPosition: "50% 50%",
-                  backgroundSize: "cover",
-              }
-            : {
-                  willChange: "opacity",
-                  ...absolutePosition.fullSizeOfParent(),
-                  backgroundColor: colorOut(vars.colors.bg),
-              },
-    );
+    const bg2 = style("bg2", {
+        willChange: "opacity",
+        ...absolutePosition.fullSizeOfParent(),
+        backgroundColor: colorOut(vars.colors.bg),
+    });
+
+    const bgImage = style("bgImage", {
+        ...absolutePosition.fullSizeOfParent(),
+        objectFit: "cover",
+    });
 
     const negativeSpacer = style(
         "negativeSpacer",
@@ -799,6 +793,7 @@ export const titleBarClasses = useThemeCache(() => {
         root,
         bg1,
         bg2,
+        bgImage,
         negativeSpacer,
         spacer,
         bar,

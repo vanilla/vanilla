@@ -11,8 +11,12 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\HtmlAsset;
+use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\TwigAsset;
+use Vanilla\Web\Asset\AssetPreloader;
+use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\Asset\ExternalAsset;
 use Vanilla\Web\Asset\ThemeScriptAsset;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
@@ -35,6 +39,9 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
+    /** @var AssetPreloadModel */
+    private $assetPreloader;
+
     /** @var array|null */
     private $themeData;
 
@@ -48,17 +55,20 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @param \ThemesApiController $themesApi
      * @param RequestInterface $request
      * @param DeploymentCacheBuster $cacheBuster
+     * @param AssetPreloadModel $assetPreloadModel
      */
     public function __construct(
         SiteMeta $siteMeta,
         \ThemesApiController $themesApi,
         RequestInterface $request,
-        DeploymentCacheBuster $cacheBuster
+        DeploymentCacheBuster $cacheBuster,
+        AssetPreloadModel $assetPreloader
     ) {
         $this->siteMeta = $siteMeta;
         $this->themesApi = $themesApi;
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
+        $this->assetPreloader = $assetPreloader;
     }
 
     /**
@@ -177,6 +187,16 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
+        $jsonAsset = $this->themeData['assets']['variables'];
+        if ($jsonAsset instanceof JsonAsset) {
+            $bgImage = $jsonAsset->getDataArray()['titleBar']['colors']['bgImage'] ?? null;
+            if ($bgImage !== null) {
+                $asset = new ExternalAsset($bgImage);
+                $preloader = new AssetPreloader($asset, AssetPreloader::REL_PRELOAD, AssetPreloader::AS_IMAGE);
+                $this->assetPreloader->addPreload($preloader);
+            }
+        }
+
         return $this->renderAsset($themeData['assets']['header'] ?? null);
     }
 

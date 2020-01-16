@@ -75,12 +75,23 @@ export default function TitleBar(_props: IProps) {
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
 
+    const vars = titleBarVariables();
     const classes = titleBarClasses();
 
     const headerContent = (
         <HashOffsetReporter>
             <animated.div {...bgProps} className={classes.bg1}></animated.div>
-            <animated.div {...bg2Props} className={classes.bg2}></animated.div>
+            <animated.div {...bg2Props} className={classes.bg2}>
+                {/* Cannot be a background image there will be flickering. */}
+                {vars.colors.bgImage && (
+                    <img
+                        src={vars.colors.bgImage}
+                        className={classes.bgImage}
+                        alt={"titleBarImage"}
+                        aria-hidden={true}
+                    />
+                )}
+            </animated.div>
             <Container>
                 <PanelWidgetHorizontalPadding>
                     <div className={classNames("titleBar-bar", classes.bar)}>

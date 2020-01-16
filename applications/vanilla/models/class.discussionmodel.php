@@ -1131,6 +1131,7 @@ class DiscussionModel extends Gdn_Model {
         $discussionCommentCount = $discussion->CountComments;
         $userLastViewedDate = $discussion->DateLastViewed;
         $discussionLastCommentDate = self::getLastCommentDate($discussion->DateLastComment, $category['DateMarkedRead']);
+        /** @var $updateUserDiscussionCommentCount This can be used to correct the UserDiscussion count */
         list($isRead, $countUnreadComments, $updateUserDiscussionCommentCount) = self::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userCommentsViewed, $userLastViewedDate);
 
 

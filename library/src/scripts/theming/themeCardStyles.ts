@@ -394,6 +394,16 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
+    const itemLabel = style("itemLabel", {
+        display: "block",
+        flexGrow: 1,
+    });
+
+    const toolTipBox = style("toolTipBox", {
+        width: "20px",
+        height: "20px",
+    });
+
     return {
         container,
         titlebar,
@@ -426,6 +436,8 @@ export const themeCardClasses = useThemeCache(() => {
         isFocused,
         noOverlay,
         actionDropdown,
+        itemLabel,
+        toolTipBox,
     };
 });
 

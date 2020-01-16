@@ -1108,23 +1108,17 @@ class DiscussionModel extends Gdn_Model {
             $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
         }
 
-        if (!property_exists($discussion, 'Read')) {
-            $discussion->Read = !(bool)$discussion->CountUnreadComments;
-            if (!is_null($category['DateMarkedRead'])) {
-                // If the category was marked explicitly read at some point, see if that applies here
-                if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
-                    $discussion->Read = true;
-                }
-
-                if ($discussion->Read) {
-                    $discussion->CountUnreadComments = 0;
-                }
-            }
-
-            // Discussions are always unread to guests.
-            if (!Gdn::session()->isValid()) {
-                $discussion->Read = false;
-            }
+        // Discussions are always unread to guests.
+        if (!Gdn::session()->isValid()) {
+            $discussion->Read = false;
+        } else {
+            $isRead = null;
+            $countCommentsViewed = 0;
+            $userCommentsViewed = $discussion->CountUnreadComments;
+            $discussionCommentCount = $discussion->CountComments;
+            $userLastViewedDate = $discussion->DateLastViewed;
+            $discussionLastCommentDate = self::getLastCommentDate($discussion->DateLastComment, $category['DateMarkedRead']);
+            [$isRead, $countCommentsViewed] = self::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userCommentsViewed, $userLastViewedDate);
         }
 
         // Logic for incomplete comment count.
@@ -1165,6 +1159,47 @@ class DiscussionModel extends Gdn_Model {
         $discussion->pinLocation = $pinLocation;
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
+    }
+
+    /**
+     * Calculate if the user has read all the Comments in a discussion. The data in the Discussion table
+     * is more likely to be reliable because when Comments are deleted we update the Discussion table
+     * but not the UserDiscussion table.
+     *
+     * @param int $discussionCommentCount Number of Comments according to the Discussion table.
+     * @param $discussionLastCommentDate Date of last Comment according to the Discussion table.
+     * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
+     * @param $userLastReadDate Date of last Comment read according to the UserDiscussion table.
+     * @return array
+     */
+    public static function getUnreadComments(int $discussionCommentCount, $discussionLastCommentDate, int $userReadComments, $userLastReadDate) {
+        $isRead = true;
+        $commentCount = 0;
+        if ($discussionLastCommentDate > $userLastReadDate) {
+            $isRead = false;
+        }
+
+        if ($discussionCommentCount > $userReadComments) {
+            $commentCount = $discussionCommentCount;
+        }
+
+        return [$isRead, $commentCount];
+    }
+
+    /**
+     * Decide which date we want to consider as the date last Comment, either when the
+     * user has marked the Category read or when the user last viewed the Discussion.
+     *
+     * @param $discussionDate
+     * @param $categoryDate
+     * @return mixed
+     */
+    public static function getLastCommentDate($discussionDate, $categoryDate) {
+        if ($discussionDate > $categoryDate) {
+            return $discussionDate;
+        } else {
+            return $categoryDate;
+        }
     }
 
     /**

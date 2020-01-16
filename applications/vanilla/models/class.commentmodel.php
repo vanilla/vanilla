@@ -1737,4 +1737,8 @@ class CommentModel extends Gdn_Model {
 
         return parent::editContentTimeout($comment, $timeLeft);
     }
+
+    protected static function guessCountUnreadComments(array $lastPageOfComments, $userDateLastRead) {
+
+    }
 }

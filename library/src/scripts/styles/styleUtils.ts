@@ -216,7 +216,7 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         }
     } else {
         if (throwOnFailure) {
-            throw new Error("Invalid color detected");
+            throw new Error(`Invalid color detected: ${colorString}`);
         }
 
         return colorString;

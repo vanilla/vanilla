@@ -17,9 +17,13 @@ export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
 
-    const baseColor = titleBarVars.colors.bg.darken(0.05);
+    let baseColor = titleBarVars.colors.bg.darken(0.05);
+    if (titleBarVars.colors.bgImage !== null) {
+        // If we have a BG image, make sure we have some opacity so it shines through.
+        baseColor = baseColor.fade(0.3);
+    }
     const colors = makeVars("colors", {
-        bg: baseColor.fadeOut(0.8),
+        bg: baseColor.fade(0.2),
         fg: titleBarVars.colors.fg,
         placeholder: titleBarVars.colors.fg.fade(0.8),
         active: {

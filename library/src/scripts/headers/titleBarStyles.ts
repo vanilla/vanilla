@@ -340,9 +340,11 @@ export const titleBarClasses = useThemeCache(() => {
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
+            paddingTop: px(vars.sizing.height / 2),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
+            paddingTop: px(vars.sizing.mobile.height / 2),
         }),
     );
 

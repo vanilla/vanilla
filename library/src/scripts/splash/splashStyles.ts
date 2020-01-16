@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper, url, rgba } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -135,6 +135,14 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         bg: colors.contrast,
     });
 
+    enum SearchBarButtonType {
+        TRANSPARENT = "transparent",
+        SOLID = "solid",
+    }
+
+    const searchButtonOptions = makeThemeVars("searchButtonOptions", { type: SearchBarButtonType.SOLID });
+    const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
+
     const searchBar = makeThemeVars("searchBar", {
         sizing: {
             height: formElVars.giantInput.height,
@@ -145,7 +153,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
             size: formElVars.giantInput.fontSize,
         },
         border: {
-            leftColor: colors.borderColor,
+            leftColor: isTransparentButton ? colors.contrast : colors.borderColor,
             width: globalVars.border.width,
             radius: {
                 right: globalVars.border.radius,
@@ -162,16 +170,24 @@ export const splashVariables = useThemeCache(styleOverwrite => {
 
     // clean up and get rid of buttonTypeSplash / searchButton
 
+    const bgColor = isTransparentButton ? "transparent" : colors.bg;
+    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
+    const fgColor = isTransparentButton ? colors.contrast : colors.fg;
+    const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
     const searchButton: any = makeThemeVars("splashSearchButton", {
         name: "splashSearchButton",
         spinnerColor: colors.contrast,
         colors: {
-            fg: colors.fg,
-            bg: colors.bg,
+            fg: fgColor,
+            bg: bgColor,
         },
         borders: {
-            color: colors.bg,
-            width: 0,
+            ...(isTransparentButton
+                ? {
+                      color: colors.contrast,
+                      width: 1,
+                  }
+                : { color: colors.bg, width: 0 }),
             left: {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
@@ -182,17 +198,17 @@ export const splashVariables = useThemeCache(styleOverwrite => {
             },
         },
         fonts: {
-            color: colors.fg,
+            color: fgColor,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
         },
         hover: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.secondary,
+                bg: bgColorActive,
             },
             borders: {
-                color: colors.secondary,
+                color: activeBorderColor,
             },
             fonts: {
                 color: colors.contrast,
@@ -201,10 +217,10 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         active: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.secondary,
+                bg: bgColorActive,
             },
             borders: {
-                color: colors.secondary,
+                color: activeBorderColor,
             },
             fonts: {
                 color: colors.contrast,
@@ -213,10 +229,10 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         focus: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.secondary,
+                bg: bgColorActive,
             },
             borders: {
-                color: colors.secondary,
+                color: activeBorderColor,
             },
             fonts: {
                 color: colors.contrast,
@@ -225,10 +241,10 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         focusAccessible: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.secondary,
+                bg: bgColorActive,
             },
             borders: {
-                color: colors.secondary,
+                color: activeBorderColor,
             },
             fonts: {
                 color: colors.contrast,

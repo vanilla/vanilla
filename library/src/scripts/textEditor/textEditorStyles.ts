@@ -34,14 +34,19 @@ export const textEditorClasses = useThemeCache(() => {
 
     const root = theme => {
         return style({
-            paddingTop: unit(vars.editorPadding.padding.top),
-            paddingLeft: unit(vars.editorPadding.padding.left),
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
             height: viewHeight(90),
             backgroundColor: theme === "dark" ? colorOut("#1f2024") : colorOut(globalVars.elementaryColors.white),
             position: "relative",
+
+            $nest: {
+                "&& .monaco-editor": {
+                    paddingTop: unit(vars.editorPadding.padding.top),
+                    paddingLeft: unit(vars.editorPadding.padding.left),
+                },
+            },
         });
     };
     const themeToggleIcon = style("themeToggleIcon", {
@@ -49,6 +54,10 @@ export const textEditorClasses = useThemeCache(() => {
         zIndex: 12,
         top: vars.themeToggleIcon.top,
         right: vars.themeToggleIcon.right,
+        border: "none",
+        padding: 0,
+        margin: 0,
+        background: "none",
         ...defaultTransition("transform"),
     });
 

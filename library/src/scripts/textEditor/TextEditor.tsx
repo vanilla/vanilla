@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@vanilla/monaco-editor";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
-import {assetUrl} from "@library/utility/appUtils";
-
+import { assetUrl } from "@library/utility/appUtils";
 
 export interface ITextEditorProps {
     language: string;
@@ -19,7 +18,7 @@ export default function TextEditor(props: ITextEditorProps) {
     const classes = textEditorClasses();
 
     // Make sure we have the proper asset root set.
-    window.MONACO_EDITOR_WEB_ROOT = assetUrl('/dist');
+    window.MONACO_EDITOR_WEB_ROOT = assetUrl("/dist");
 
     function handleEditorDidMount() {
         setIsEditorReady(true);
@@ -29,7 +28,7 @@ export default function TextEditor(props: ITextEditorProps) {
         setTheme(intialTheme === "vs-light" ? "vs-dark" : "vs-light");
     }
 
-    const themeModeButton = intialTheme === "light" ? <LightThemeIcon /> : <DarkThemeIcon />;
+    const themeModeButton = intialTheme === "vs-light" ? <LightThemeIcon /> : <DarkThemeIcon />;
 
     return (
         <div className={classes.root(intialTheme)}>

@@ -66,7 +66,7 @@ export const actionBarClasses = useThemeCache(() => {
     const itemMarginLeft = style("itemMarginLeft", {
         marginLeft: unit(globalVars.gutter.half),
         $nest: {
-            "& li.dropDown-item": {
+            "& button": {
                 fontSize: globalVars.fonts.size.medium,
             },
         },

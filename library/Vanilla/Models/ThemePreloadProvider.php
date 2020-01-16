@@ -55,7 +55,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @param \ThemesApiController $themesApi
      * @param RequestInterface $request
      * @param DeploymentCacheBuster $cacheBuster
-     * @param AssetPreloadModel $assetPreloadModel
+     * @param AssetPreloadModel $assetPreloader
      */
     public function __construct(
         SiteMeta $siteMeta,

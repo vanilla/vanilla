@@ -32,11 +32,12 @@ export function useSplashContext() {
  */
 export function useSplashContainerDivRef() {
     const ref = useRef<HTMLDivElement | null>(null);
-    const measure = useMeasure(ref);
+    const measure = useMeasure(ref, true);
     const { setSplashRect, setSplashExists } = useSplashContext();
 
     useEffect(() => {
         if (ref.current) {
+            // Adjust the measure for the current scroll offset.
             setSplashRect(measure);
             setSplashExists(true);
         }

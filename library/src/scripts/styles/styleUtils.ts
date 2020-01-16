@@ -133,9 +133,6 @@ export function variableFactory(componentName: string) {
 
         const normalized = normalizeVariables(customVars, declaredVars);
         const result = merge(declaredVars, normalized);
-        if (Object.entries(customVars).length > 0) {
-            console.log({ declaredVars, customVars, normalized, result });
-        }
         return result;
     };
 }
@@ -157,7 +154,6 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
         const newObj: any = {};
         for (const [key, value] of Object.entries(customVariable)) {
             if (!(key in defaultVariable)) {
-                console.log("could not find key", key, "in", defaultVariable);
                 // If we don't have a default version of this variable, remove it.
                 continue;
             }

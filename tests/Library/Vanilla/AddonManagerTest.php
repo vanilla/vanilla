@@ -23,6 +23,8 @@ use VanillaTests\SharedBootstrapTestCase;
  */
 class AddonManagerTest extends SharedBootstrapTestCase {
 
+    const FIXTURE_ROOT = '/tests/fixtures';
+
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 
     /**
@@ -53,12 +55,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
      * @return AddonManager Returns the manager.
      */
     private static function createTestManager() {
-        $root = '/tests/fixtures';
+        $root = self::FIXTURE_ROOT;
 
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_ADDON => ["$root/addons/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => ["$root/addons/themes", "$root/themes"],
                 Addon::TYPE_LOCALE => "$root/locales"
             ],
             PATH_ROOT.'/tests/cache/am/test-manager'
@@ -108,22 +110,54 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test some addons where we know that plugins exist.
+     *
+     * @param string $addonKey
+     * @param string $addonType
+     * @param string $addonSubDir
+     *
+     * @dataProvider provideAddonExistsTest
      */
-    public function testPluginExists() {
+    public function testAddonExists(string $addonKey, string $addonType, string $addonSubDir = '') {
         $tm = $this->createTestManager();
 
-        $keys = [
-            'test-old-application' => Addon::TYPE_ADDON,
-            'test-old-plugin' => Addon::TYPE_ADDON,
-            'test-old' => Addon::TYPE_THEME
-        ];
+        $addon = $tm->lookupByType($addonKey, $addonType);
+        $this->assertNotNull($addon);
+        $this->assertInstanceOf('\Vanilla\Addon', $addon);
+        $this->assertNotEmpty($addon->getPluginClass());
 
-        foreach ($keys as $key => $type) {
-            $addon = $tm->lookupByType($key, $type);
-            $this->assertNotNull($addon);
-            $this->assertInstanceOf('\Vanilla\Addon', $addon);
-            $this->assertNotEmpty($addon->getPluginClass());
+        if ($addonSubDir) {
+            $this->assertEquals($addonSubDir, $addon->getSubdir());
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideAddonExistsTest(): array {
+        return [
+            'test-old-application' => [
+                'test-old-application',
+                Addon::TYPE_ADDON,
+            ],
+            'test-old-plugin' => [
+                'test-old-plugin',
+                Addon::TYPE_ADDON,
+            ],
+            'test-old' => [
+                'test-old',
+                Addon::TYPE_THEME,
+            ],
+            'theme-in-addons' => [
+                'theme-in-addons',
+                Addon::TYPE_THEME,
+                self::FIXTURE_ROOT.'/addons/themes/theme-in-addons',
+            ],
+            'plugin-in-addons' => [
+                'plugin-in-addons',
+                ADDON::TYPE_ADDON,
+                self::FIXTURE_ROOT.'/addons/addons/plugin-in-addons',
+            ],
+        ];
     }
 
     /**

@@ -1,3 +1,5 @@
+/addons/*
+!/addons/themes/theme-foundation
 /applications/*
 !/applications/conversations/
 !/applications/dashboard/

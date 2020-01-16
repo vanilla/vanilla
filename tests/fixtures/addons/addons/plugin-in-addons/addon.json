@@ -1,0 +1,9 @@
+{
+	"name": "Test Plugin",
+	"description": "This is a test plugin with an addon.json file in the addons directory",
+	"version": "1.0.0",
+	"key": "plugin-in-addons",
+	"type": "addon",
+	"priority": 100,
+	"license": "GPLv2"
+}

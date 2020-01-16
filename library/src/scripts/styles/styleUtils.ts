@@ -140,8 +140,8 @@ export function variableFactory(componentName: string) {
     };
 }
 
-const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)\s?,?(.+)?\)/;
-const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)\s?,?(.+)?\)/;
+const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
+const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.

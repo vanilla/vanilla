@@ -61,7 +61,7 @@ export default function TitleBar(_props: IProps) {
         ..._props,
     };
 
-    const { bgProps, bgImageProps } = useScrollTransition();
+    const { bgProps, bg2Props } = useScrollTransition();
 
     const { pages } = usePageContext();
     const device = useTitleBarDevice();
@@ -79,8 +79,8 @@ export default function TitleBar(_props: IProps) {
 
     const headerContent = (
         <HashOffsetReporter>
-            <animated.div {...bgProps} className={classes.bg}></animated.div>
-            <animated.div {...bgImageProps} className={classes.bgImage}></animated.div>
+            <animated.div {...bgProps} className={classes.bg1}></animated.div>
+            <animated.div {...bg2Props} className={classes.bg2}></animated.div>
             <Container>
                 <PanelWidgetHorizontalPadding>
                     <div className={classNames("titleBar-bar", classes.bar)}>
@@ -225,10 +225,11 @@ export default function TitleBar(_props: IProps) {
  */
 function useScrollTransition() {
     const bgRef = useRef<HTMLDivElement | null>(null);
-    const bgImageRef = useRef<HTMLDivElement | null>(null);
+    const bg2Ref = useRef<HTMLDivElement | null>(null);
     const { splashExists, splashRect } = useSplashContext();
     const [scrollPos, setScrollPos] = useState(0);
-    const shouldOverlay = titleBarVariables().options.integrateWithSplash && splashExists;
+    const fullBleedOptions = titleBarVariables().fullBleed;
+    const shouldOverlay = fullBleedOptions.enabled && splashExists;
 
     // Scroll handler to pass to the form element.
     useEffect(() => {
@@ -248,32 +249,32 @@ function useScrollTransition() {
     // Calculate some dimensions.
     let bgStart = 0;
     let bgEnd = 0;
-    let bgImageStart = 0;
-    let bgImageEnd = 0;
-    if (splashExists && splashRect && bgImageRef.current) {
-        const splashEnd = splashRect.top + splashRect.height;
-        const titleBarHeight = bgImageRef.current.getBoundingClientRect().height;
+    let bg2Start = 0;
+    let bg2End = 0;
+    if (splashExists && splashRect && bg2Ref.current) {
+        const splashEnd = splashRect.bottom;
+        const titleBarHeight = bg2Ref.current.getBoundingClientRect().height;
         bgStart = splashRect.top;
-        bgEnd = splashEnd / 2;
-        bgImageStart = splashEnd - titleBarHeight * 2;
-        bgImageEnd = splashEnd - titleBarHeight;
+        bgEnd = bgStart + titleBarHeight;
+        bg2Start = splashEnd - titleBarHeight * 2;
+        bg2End = splashEnd - titleBarHeight;
     }
 
-    const { bgSpring, bgImageSpring } = useSpring({
+    const { bgSpring, bg2Spring } = useSpring({
         bgSpring: Math.max(bgStart, Math.min(bgEnd, scrollPos)),
-        bgImageSpring: Math.max(bgImageStart, Math.min(bgImageEnd, scrollPos)),
+        bg2Spring: Math.max(bg2Start, Math.min(bg2End, scrollPos)),
         tension: 100,
     });
 
-    // Fades in.
+    // Fades in first.
     let bgOpacity = bgSpring.interpolate({
         range: [bgStart, bgEnd],
-        output: [0, 1],
+        output: [fullBleedOptions.startingOpacity, fullBleedOptions.endingOpacity],
     });
 
-    // Fades out.
-    let bgImageOpacity = bgImageSpring.interpolate({
-        range: [bgImageStart, bgImageEnd],
+    // Fades in second.
+    let bg2Opacity = bg2Spring.interpolate({
+        range: [bg2Start, bg2End],
         output: [0, 1],
     });
 
@@ -287,23 +288,23 @@ function useScrollTransition() {
         };
     }, [bgOpacity, shouldOverlay]);
 
-    const bgImageProps = useMemo(() => {
+    const bg2Props = useMemo(() => {
         if (!shouldOverlay) {
             return {};
         }
         return {
-            style: { opacity: bgImageOpacity },
-            ref: bgImageRef,
+            style: { opacity: bg2Opacity },
+            ref: bg2Ref,
         };
-    }, [bgImageOpacity, shouldOverlay]);
+    }, [bg2Opacity, shouldOverlay]);
 
     useDebugValue({
         bgProps,
-        bgImageProps,
+        bg2Props,
     });
     return {
         bgProps,
-        bgImageProps,
+        bg2Props,
     };
 }
 

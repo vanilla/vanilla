@@ -57,7 +57,7 @@ export default function Splash(props: IProps) {
         <div
             ref={ref}
             className={classNames(className, classes.root, {
-                [classesTitleBar.negativeSpacer]: varsTitleBar.options.integrateWithSplash,
+                [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
             <div

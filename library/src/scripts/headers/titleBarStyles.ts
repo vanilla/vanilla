@@ -43,10 +43,6 @@ export const titleBarVariables = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const makeThemeVars = variableFactory("titleBar");
 
-    const options = makeThemeVars("options", {
-        integrateWithSplash: false,
-    });
-
     const sizing = makeThemeVars("sizing", {
         height: 48,
         spacer: 12,
@@ -61,6 +57,16 @@ export const titleBarVariables = useThemeCache(() => {
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
     });
+
+    const fullBleed = makeThemeVars("fullBleed", {
+        enabled: false,
+        startingOpacity: 0,
+        endingOpacity: 0.15, // Scale of 0 -> 1 where 1 is opaque.
+        bgColor: colors.bg,
+    });
+
+    // Fix up the ending opacity so it is always darker than the starting one.
+    fullBleed.endingOpacity = Math.max(fullBleed.startingOpacity, fullBleed.endingOpacity);
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
@@ -227,7 +233,7 @@ export const titleBarVariables = useThemeCache(() => {
     };
 
     return {
-        options,
+        fullBleed,
         border,
         sizing,
         colors,
@@ -313,27 +319,26 @@ export const titleBarClasses = useThemeCache(() => {
         }).$nest,
     });
 
-    const bg = style("bg", {
+    const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
         backgroundColor: colorOut(vars.colors.bg),
     });
 
-    const bgImage = style(
-        "bgImage",
+    const bg2 = style(
+        "bg2",
         vars.colors.bgImage
             ? {
                   willChange: "opacity",
                   ...absolutePosition.fullSizeOfParent(),
-                  background:
-                      vars.colors.bgImage instanceof ColorHelper
-                          ? colorOut(vars.colors.bgImage)
-                          : url(vars.colors.bgImage),
+                  backgroundImage: url(vars.colors.bgImage),
                   backgroundPosition: "50% 50%",
                   backgroundSize: "cover",
               }
             : {
+                  willChange: "opacity",
                   ...absolutePosition.fullSizeOfParent(),
+                  backgroundColor: colorOut(vars.colors.bg),
               },
     );
 
@@ -792,8 +797,8 @@ export const titleBarClasses = useThemeCache(() => {
 
     return {
         root,
-        bg,
-        bgImage,
+        bg1,
+        bg2,
         negativeSpacer,
         spacer,
         bar,

@@ -87,6 +87,15 @@ interface ThemeProviderInterface {
     public function setCurrent($themeID): array;
 
     /**
+     * Set preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param int|string $themeID Theme ID to set current.
+     * @return array
+     */
+    public function setPreviewTheme($themeID): array;
+
+    /**
      * Get "current" theme.
      *
      * @return array
@@ -100,6 +109,22 @@ interface ThemeProviderInterface {
      * @return string
      */
     public function getThemeViewPath($themeKey): string;
+
+    /**
+     * Get master (parent) theme key.
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getMasterThemeKey($themeKey): string;
+
+    /**
+     * Get theme name.
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getName($themeKey): string;
 
     /**
      * Set theme asset (replace existing or create new if asset does not exist).

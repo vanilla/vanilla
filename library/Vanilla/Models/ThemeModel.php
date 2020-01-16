@@ -6,6 +6,7 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
@@ -77,6 +78,20 @@ class ThemeModel {
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
 
+    /** @var ConfigurationInterface $config */
+    private $config;
+
+    /**
+     * ThemeModel constructor.
+     * @param ConfigurationInterface $config
+     */
+    public function __construct(
+        ConfigurationInterface $config,
+        \Gdn_Session $session
+    ) {
+        $this->config = $config;
+        $this->session = $session;
+    }
 
     /**
      * Add a theme-variable provider.
@@ -195,6 +210,28 @@ class ThemeModel {
         }
 
         return $theme;
+    }
+
+    /**
+     * Set theme as preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param int|string $themeID Theme ID to set current.
+     * @return array
+     */
+    public function setPreviewTheme($themeID): array {
+        $provider = $this->getThemeProvider($themeID);
+        $theme = $provider->setPreviewTheme($themeID);
+        return $theme;
+    }
+
+    public function getViewThemeKey(): string {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            $themeKey = $previewTheme;
+        }
+        return $themeKey;
     }
 
     /**

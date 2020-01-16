@@ -24,6 +24,7 @@ use Garden\Web\Exception\ServerException;
 use Gdn_Request;
 use Gdn_Upload;
 use Vanilla\Theme\TwigAsset;
+use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
@@ -35,6 +36,9 @@ class FsThemeProvider implements ThemeProviderInterface {
 
     /** @var AddonManager */
     private $addonManager;
+
+    /** @var ThemeModelHelper */
+    private $themeHelper;
 
     /** @var Gdn_Request */
     private $request;
@@ -55,12 +59,14 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function __construct(
         AddonManager $addonManager,
         Gdn_Request $request,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        ThemeModelHelper $themeHelper
     ) {
         $this->addonManager = $addonManager;
         $this->request = $request;
         $this->config = $config;
         $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
+        $this->themeHelper = $themeHelper;
     }
 
     /**
@@ -107,6 +113,28 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMasterThemeKey($themeKey): string {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        return $themeKey;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName($themeKey): string {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        return $theme->getInfoValue('name');
     }
 
     /**
@@ -376,6 +404,15 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->config->set('Garden.MobileTheme', $themeKey);
         $this->config->set('Garden.CurrentTheme', $themeKey);
         $theme = $this->getThemeWithAssets($themeKey);
+        return $theme;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPreviewTheme($themeKey): array {
+        $theme = $this->getThemeWithAssets($themeKey);
+        $this->themeHelper->setSessionPreviewTheme($themeKey, $this);
         return $theme;
     }
 

@@ -40,11 +40,8 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
                 <?php endif; ?>
             </div>
-
         <?php endforeach; ?>
-    <?php else:
-        if ($Category->DisplayAs === "Discussions") : ?>
-            <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
-        <?php endif; ?>
+    <?php else: ?>
+        <div class="Empty"><?php echo t('No categories were found.'); ?></div>
     <?php endif; ?>
 </div>

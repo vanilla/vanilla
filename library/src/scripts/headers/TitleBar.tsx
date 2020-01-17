@@ -313,7 +313,7 @@ function useScrollTransition() {
         bg2End = splashEnd - titleBarHeight;
     }
 
-    const clientHeaderStart = 0;
+    const clientHeaderStart = -1;
     const clientHeaderEnd = topOffset;
 
     const { bgSpring, bg2Spring, clientHeaderSpring } = useSpring({
@@ -354,7 +354,6 @@ function useScrollTransition() {
           }
         : {};
 
-    console.log(logoOpacity);
     const logoProps =
         doubleLogoStrategy === "fade-in"
             ? {

@@ -56,7 +56,7 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
-const EmbedContext = React.createContext<IEmbedContext>({});
+export const EmbedContext = React.createContext<IEmbedContext>({});
 export function useEmbedContext() {
     return useContext(EmbedContext);
 }

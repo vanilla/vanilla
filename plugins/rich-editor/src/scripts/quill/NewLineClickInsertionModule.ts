@@ -6,6 +6,7 @@
 import BlockBlot from "quill/blots/block";
 import Quill from "quill/core";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 /**
  * Module to insert a newline on click at the bottom of the document
@@ -13,7 +14,7 @@ import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
  */
 export default class NewLineClickInsertionModule {
     constructor(private quill: Quill) {
-        // this.quill.root.addEventListener("click", this.handleClick);
+        this.quill.root.addEventListener("click", this.handleClick);
     }
 
     /**
@@ -27,7 +28,7 @@ export default class NewLineClickInsertionModule {
 
         // Check that we don't have an embed blot at the end.
         const lastBlot = this.quill.scroll.children.tail;
-        if (!(lastBlot instanceof ExternalEmbedBlot)) {
+        if (!(lastBlot instanceof SelectableEmbedBlot)) {
             return;
         }
 

@@ -5,20 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    fonts,
-    importantUnit,
-    paddings,
-    unit,
-    absolutePosition,
-    margins,
-    colorOut,
-    dropShadow,
-    borders,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, fonts, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { percent } from "csx";
 import { shadowHelper } from "@vanilla/library/src/scripts/styles/shadowHelpers";
+import { percent } from "csx";
 
 export const embedMenuClasses = useThemeCache(() => {
     const style = styleFactory("embedMenu");

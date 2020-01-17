@@ -11,7 +11,7 @@ import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface IProps {
     className?: string;
@@ -28,7 +28,6 @@ export function EmbedContent(props: IProps) {
     const id = useUniqueID("richEditor-embed-description");
     const defaultDesc = t("richEditor.externalEmbed.description");
     const classes = embedContentClasses();
-    console.log({ inEditor, isSelected });
 
     return (
         <div

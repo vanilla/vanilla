@@ -188,7 +188,7 @@ class DiscussionModelTest extends TestCase {
     public function testCanCloseAdminTrue() {
         $this->session->UserID = 123;
         $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
-        $actual = DiscussionModel::canCLose($discussion);
+        $actual = DiscussionModel::canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -207,5 +207,78 @@ class DiscussionModelTest extends TestCase {
         $actual = DiscussionModel::canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test getUnreadComments() against various scenarios.
+     *
+     * @param int $discussionCommentCount The number of comments in the discussion according to the Discussion Table.
+     * @param mixed $discussionLastCommentDate Date of last Comment according to the Discussion table.
+     * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
+     * @param mixed $userLastReadDate Date of last Comment read according to the UserDiscussion table.
+     * @param array $expected The expected result.
+     * @dataProvider provideTestGetUnreadCommentsArrays
+     */
+    public function testGetUnreadComments(
+        int $discussionCommentCount,
+        $discussionLastCommentDate,
+        int $userReadComments,
+        $userLastReadDate,
+        $expected
+    ) {
+        $actual = DiscussionModel::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userReadComments, $userLastReadDate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Provide test data for testGetUnreadComments().
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestGetUnreadCommentsArrays() {
+        $r = [
+            'CommentsAndUserReadEqualDatesConcur' => [
+                10,
+                '2019-12-02 21:55:40',
+                10,
+                '2020-01-09 16:22:42',
+                [true, 0, 10],
+            ],
+            'CommentsAndUserReadEqualDatesDisagree' => [
+                10,
+                '2020-01-09 16:22:42',
+                10,
+                '2019-12-02 21:55:40',
+                [/*what do we want here?*/]
+            ],
+            'MoreCommentsThanReadDatesAgree' => [
+                15,
+                '2020-01-09 16:22:42',
+                10,
+                '2019-12-02 21:55:40',
+                [/*what do we want here?*/],
+            ],
+            'MoreCommentsThanReadDatesDisagree' => [
+                15,
+                '2019-12-02 21:55:40',
+                10,
+                '2020-01-09 16:22:42',
+                [/*what do we want here?*/],
+            ],
+            'MoreReadThanCommentsLastCommentLater' => [
+                5,
+                '2020-01-09 16:22:42',
+                10,
+                '2019-12-02 21:55:40',
+                [/*what do we want here?*/],
+            ],
+            'MoreReadThanCommentsLastCommentEarlier' => [
+                5,
+                '2019-12-02 21:55:40',
+                10,
+                '2020-01-09 16:22:42',
+                [/*what do we want here?*/],
+            ],
+        ];
     }
 }

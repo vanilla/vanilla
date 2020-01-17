@@ -8,7 +8,7 @@ import * as path from "path";
 import webpack from "webpack";
 import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
-import { BuildMode, getOptions } from "../options";
+import { BuildMode, getOptions } from "../buildOptions";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";

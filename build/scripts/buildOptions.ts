@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import yargs from "yargs";
 import { getVanillaConfig } from "./utility/configUtils";
 

@@ -17,9 +17,10 @@ import classNames from "classnames";
 import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import {ToolTip, ToolTipIcon} from "@library/toolTip/ToolTip";
-import {WarningIcon} from "@library/icons/common";
-import {iconClasses} from "@library/icons/iconClasses";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { WarningIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconClasses";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     name?: string;
@@ -134,26 +135,33 @@ export default function ThemePreviewCard(props: IProps) {
                 <div className={props.noActions ? classes.noOverlay : classes.overlay}>
                     {(props.canEdit || props.canDelete) && (
                         <div className={classes.actionDropdown}>
-                            <DropDown flyoutType={FlyoutType.LIST} renderLeft={true}>
+                            <DropDown buttonBaseClass={ButtonTypes.ICON} flyoutType={FlyoutType.LIST} renderLeft={true}>
                                 {props.canEdit && <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />}
                                 <DropDownItemSeparator />
-                                {props.canDelete &&
-                                (props.isActiveTheme) ?
+                                {props.canDelete && props.isActiveTheme ? (
                                     <DropDownItemButton onClick={props.onDelete} disabled={props.isActiveTheme}>
-                                        <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>Delete</span>
-                                        <span  className={classNames("sc-only")}>
-                                            <ToolTip label={"This theme cannot be deleted because it is the currently applied theme"}>
+                                        <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>
+                                            Delete
+                                        </span>
+                                        <span className={classNames("sc-only")}>
+                                            <ToolTip
+                                                label={
+                                                    "This theme cannot be deleted because it is the currently applied theme"
+                                                }
+                                            >
                                                 <ToolTipIcon>
                                                     <span>
-                                                        <WarningIcon className={classNames(iconClasses().errorFgColor)} />
+                                                        <WarningIcon
+                                                            className={classNames(iconClasses().errorFgColor)}
+                                                        />
                                                     </span>
                                                 </ToolTipIcon>
                                             </ToolTip>
                                         </span>
                                     </DropDownItemButton>
-                                    :
-                                    <DropDownItemButton name={t("Delete")} onClick={props.onDelete}/>
-                                }
+                                ) : (
+                                    <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />
+                                )}
                             </DropDown>
                         </div>
                     )}

@@ -4,7 +4,14 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { unit, paddings, defaultTransition, flexHelper } from "@library/styles/styleHelpers";
+import {
+    unit,
+    paddings,
+    defaultTransition,
+    flexHelper,
+    colorOut,
+    emphasizeLightness,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -120,6 +127,11 @@ export const themeCardVariables = useThemeCache(() => {
         width: 4,
         height: 4,
     });
+    const btn_content = makeThemeVars("btn_content", {
+        state: {
+            bg: emphasizeLightness(colors.bg.overlay, 0.04),
+        },
+    });
 
     return {
         colors,
@@ -138,6 +150,7 @@ export const themeCardVariables = useThemeCache(() => {
         tileHeader,
         tileText,
         dots,
+        btn_content,
     };
 });
 
@@ -382,14 +395,25 @@ export const themeCardClasses = useThemeCache(() => {
         position: "absolute",
         top: unit(5),
         right: unit(7),
-
+        color: vars.colors.bg.white.toString(),
         $nest: {
-            "& button": {
-                $nest: {
-                    "&, &:hover, &:focus, &:active": {
-                        color: vars.colors.bg.white.toString(),
-                    },
-                },
+            "& .icon-dropDownMenu": {
+                color: vars.colors.bg.white.toString(),
+            },
+            "&.focus-visible": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
+            },
+            "&:focus": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
+            },
+            "&:hover": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
             },
         },
     });

@@ -355,13 +355,47 @@ if (!function_exists('getDiscussionOptionsDropdown')):
 
         $dropdown->addLinkIf($canDismiss, t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
             ->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
+            ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup');
+
+        if ($canEdit && $canAnnounce) {
+            $dropdown->addDivider();
+        }
+
+        $dropdown
             ->addLinkIf($canAnnounce, t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
             ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
             ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
             ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
-            ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
-            ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
-            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+            ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup');
+
+        $hasDiv = false;
+        if ($canEdit && !empty(val('DateUpdated', $discussion))) {
+            $hasDiv = true;
+            $dropdown
+                ->addDivider()
+                ->addLink(
+                    t('Revision History'),
+                    '/log/filter?'.http_build_query(['recordType' => 'discussion', 'recordID' => $discussionID]),
+                    'discussionRevisionHistory',
+                    'RevisionHistory'
+                );
+        }
+        if (CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Delete')) {
+            $dropdown
+                ->addDividerIf(!$hasDiv)
+                ->addLink(
+                    t('Deleted Comments'),
+                    '/log/filter?'.http_build_query(['parentRecordID' => $discussionID, 'recordType' => 'comment', 'operation' => 'delete']),
+                    'deletedComments',
+                    'DeletedComments'
+                );
+        }
+
+        if ($canDelete) {
+            $dropdown
+                ->addDivider()
+                ->addLink(t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+        }
 
         // DEPRECATED
         $options = [];
@@ -369,7 +403,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $sender->EventArguments['Discussion'] = $discussion;
         $sender->fireEvent('DiscussionOptions');
 
-        // Backwards compatability
+        // Backwards compatibility
         $dropdown = discussionOptionsToDropdown($options, $dropdown);
 
         // Allow plugins to edit the dropdown.
@@ -427,7 +461,7 @@ if (!function_exists('getCommentOptions')) :
      * Get comment options.
      *
      * @since 2.1
-     * @param DataSet $comment .
+     * @param object $comment The comment to get the options for.
      * @return array $options Each element must include keys 'Label' and 'Url'.
      */
     function getCommentOptions($comment) {
@@ -454,6 +488,14 @@ if (!function_exists('getCommentOptions')) :
                 'Url' => '/post/editcomment/'.$comment->CommentID,
                 'EditComment'
             ];
+
+            if (!empty(val('DateUpdated', $comment))) {
+                $options['RevisionHistory'] = [
+                    'Label' => t('Revision History'),
+                    'Url' => '/log/filter?' . http_build_query(['recordType' => 'comment', 'recordID' => $comment->CommentID]),
+                    'RevisionHistory',
+                ];
+            }
         }
 
         // Can the user delete the comment?
@@ -469,6 +511,8 @@ if (!function_exists('getCommentOptions')) :
                 'Class' => 'DeleteComment'
             ];
         }
+
+
 
         // DEPRECATED (as of 2.1)
         $sender->EventArguments['Type'] = 'Comment';

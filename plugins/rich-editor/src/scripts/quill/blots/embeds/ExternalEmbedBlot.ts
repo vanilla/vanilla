@@ -105,6 +105,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
             isSelected: this.isSelected,
             selectSelf: this.select,
             deleteSelf: this.remove,
+            inEditor: true,
         };
 
         await mountEmbed(mountNode, fullData, true);

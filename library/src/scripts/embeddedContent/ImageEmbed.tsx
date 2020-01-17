@@ -9,7 +9,7 @@ import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { ImageEmbedModal } from "@rich-editor/editor/pieces/ImageEmbedModal";
-import { EmbedMenu } from "@rich-editor/editor/pieces/EmbeMenu";
+import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";

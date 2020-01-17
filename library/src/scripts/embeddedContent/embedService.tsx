@@ -18,19 +18,13 @@ import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/Twi
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { onContent } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
-import React from "react";
+import React, { useContext } from "react";
 import Quill from "quill/core";
 import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
-// Methods
-export interface IBaseEmbedProps {
-    // Stored data.
-    embedType: string;
-    url: string;
-    name?: string;
-    // Frontend only
+interface IEmbedContext {
     inEditor?: boolean;
     onRenderComplete?: () => void;
     syncBackEmbedValue?: (values: object) => void;
@@ -38,6 +32,14 @@ export interface IBaseEmbedProps {
     isSelected?: boolean;
     selectSelf?: () => void;
     deleteSelf?: () => void;
+}
+
+// Methods
+export interface IBaseEmbedProps extends IEmbedContext {
+    // Stored data.
+    embedType: string;
+    url: string;
+    name?: string;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
@@ -52,6 +54,11 @@ export function registerEmbed(embedType: string, EmbedComponent: EmbedComponentT
 
 export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
+}
+
+const EmbedContext = React.createContext<IEmbedContext>({});
+export function useEmbedContext() {
+    return useContext(EmbedContext);
 }
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
@@ -82,7 +89,13 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
         // If the component is flagged as async, then it will confirm when the render is complete.
         mountReact(
             <EmbedErrorBoundary url={data.url}>
-                <EmbedClass {...data} inEditor={inEditor} onRenderComplete={isAsync ? onMountComplete : undefined} />
+                <EmbedContext.Provider value={data}>
+                    <EmbedClass
+                        {...data}
+                        inEditor={inEditor}
+                        onRenderComplete={isAsync ? onMountComplete : undefined}
+                    />
+                </EmbedContext.Provider>
             </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,

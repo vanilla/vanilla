@@ -82,7 +82,6 @@ export const embedContainerClasses = useThemeCache(() => {
             textDecoration: "none",
             color: "inherit",
             margin: "auto",
-            overflow: "hidden",
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],

@@ -203,8 +203,34 @@ class ThemeModel {
      * @return array|void If no currnt theme set returns null
      */
     public function getCurrentTheme(): ?array {
-        $provider = $this->getThemeProvider(1);
-        return $provider->getCurrent();
+        $current = null;
+        try {
+            $provider = $this->getThemeProvider(1);
+            $current = $provider->getCurrent();
+        } catch (ClientException $e) {
+            if ($e->getMessage() !== 'No custom theme provider found!') {
+                throw $e;
+            }
+            //do nothing if db provider does not exist
+        }
+
+        if (is_null($current)) {
+            $provider = $this->getThemeProvider("FILE");
+            $current = $provider->getCurrent();
+        }
+        return $current;
+    }
+
+    /**
+     * Get theme view folder path
+     *
+     * @param string|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getThemeViewPath($themeKey): string {
+        $provider = $this->getThemeProvider($themeKey);
+        $path = $provider->getThemeViewPath($themeKey);
+        return $path;
     }
 
     /**

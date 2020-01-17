@@ -76,13 +76,14 @@ export const layoutVariables = useThemeCache(() => {
     const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", {
         margin: {
             top: 0,
-            bottom: 50,
+            bottom: 0,
         },
         padding: {
             top: gutter.halfSize * 1.5,
         },
         extraPadding: {
             top: 32,
+            bottom: 32,
             noBreadcrumbs: {},
             mobile: {
                 noBreadcrumbs: {
@@ -307,6 +308,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexGrow: 1,
         width: percent(100),
         maxWidth: percent(100),
+        paddingBottom: unit(vars.panelLayoutSpacing.extraPadding.bottom),
         ...mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
     });
 

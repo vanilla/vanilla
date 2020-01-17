@@ -75,7 +75,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
 
         return new ThemeScriptAsset(
             $this->request,
-            $this->siteMeta->getActiveTheme()->getKey(),
+            $this->siteMeta->getActiveThemeKey(),
             // Use both the theme version and the deployment to make a more robust cache buster.
             // People often forget to increment their theme version in file based themes
             // so adding the deployment cache buster to the theme version handles this case.
@@ -90,12 +90,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function getThemeData(): ?array {
         if (!$this->themeData) {
-            $theme = $this->siteMeta->getActiveTheme();
-            if ($theme === null) {
-                $this->themeData = null;
-                return null;
-            }
-            $themeKey = $this->siteMeta->getActiveTheme()->getKey();
+            $themeKey = $this->siteMeta->getActiveThemeKey();
             try {
                 $this->themeData = $this->themesApi->get($themeKey);
             } catch (\Throwable $e) {
@@ -147,7 +142,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             if (!$themeData) {
                 return '';
             }
-            $themeKey = $this->siteMeta->getActiveTheme()->getKey();
+            $themeKey = $this->siteMeta->getActiveThemeKey();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {
                 $style = $this->themesApi->get_assets($themeKey, 'styles.css');

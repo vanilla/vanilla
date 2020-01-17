@@ -23,11 +23,13 @@ use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
@@ -203,6 +205,9 @@ class Bootstrap {
             ->addAlias('Request')
             ->addAlias(RequestInterface::class)
 
+            ->rule(UASnifferInterface::class)
+            ->setClass(UASniffer::class)
+
             // Database.
             ->rule('Gdn_Database')
             ->setShared(true)
@@ -263,6 +268,10 @@ class Bootstrap {
 
             ->rule(SearchModel::class)
             ->setShared(true)
+
+            // File base theme api provider
+            ->rule(\Vanilla\Models\ThemeModel::class)
+            ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
 
             ->rule(SSOModel::class)
             ->setShared(true)

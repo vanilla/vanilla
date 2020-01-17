@@ -313,7 +313,7 @@ function useScrollTransition() {
         bg2End = splashEnd - titleBarHeight;
     }
 
-    const clientHeaderStart = -1;
+    const clientHeaderStart = topOffset === 0 ? -1 : 0; // Fix to ensure an empty topOffset starts us at 100% opacity.
     const clientHeaderEnd = topOffset;
 
     const { bgSpring, bg2Spring, clientHeaderSpring } = useSpring({
@@ -354,12 +354,13 @@ function useScrollTransition() {
           }
         : {};
 
+    const actualOpacity = logoOpacity.payload?.[0]?.value ?? 0;
     const logoProps =
         doubleLogoStrategy === "fade-in"
             ? {
                   style: {
                       opacity: logoOpacity,
-                      pointerEvents: (logoOpacity.payload?.[0]?.value ?? 0) <= 0.15 ? "none" : "initial",
+                      pointerEvents: actualOpacity <= 0.15 ? "none" : "initial",
                   },
                   ref: logoRef,
               }

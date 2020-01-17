@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps, FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import classNames from "classnames";
@@ -29,52 +29,51 @@ interface IProps extends IBaseEmbedProps {
 export function ImageEmbed(props: IProps) {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const { isSelected, inEditor } = useEmbedContext();
 
     return (
-        <DeviceProvider>
-            <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
-                <div className="embedImage-link">
-                    <img
-                        className={classNames("embedImage-img", FOCUS_CLASS)}
-                        src={props.url}
-                        alt={props.name}
-                        tabIndex={props.inEditor ? -1 : undefined}
-                    />
-                </div>
-                {props.inEditor && (props.isSelected || isOpen) && (
-                    <EmbedMenu>
-                        <Button
-                            baseClass={ButtonTypes.ICON}
-                            onClick={() => {
-                                setIsOpen(true);
-                            }}
-                        >
-                            <AccessibleImageMenuIcon />
-                        </Button>
-                        <Button baseClass={ButtonTypes.ICON} onClick={props.deleteSelf}>
-                            <DeleteIcon />
-                        </Button>
-                    </EmbedMenu>
-                )}
-                {isOpen && (
-                    <ImageEmbedModal
-                        onSave={newValue => {
-                            props.syncBackEmbedValue &&
-                                props.syncBackEmbedValue({
-                                    name: newValue.alt,
-                                });
-                            props.selectSelf && props.selectSelf();
-                        }}
-                        initialAlt={props.name}
-                        onClose={() => {
-                            setIsOpen(false);
-                            setImmediate(() => {
-                                props.selectSelf?.();
-                            });
-                        }}
-                    />
-                )}
+        <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
+            <div className="embedImage-link">
+                <img
+                    className={classNames("embedImage-img", FOCUS_CLASS)}
+                    src={props.url}
+                    alt={props.name}
+                    tabIndex={props.inEditor ? -1 : undefined}
+                />
             </div>
-        </DeviceProvider>
+            {inEditor && (isSelected || isOpen) && (
+                <EmbedMenu>
+                    <Button
+                        baseClass={ButtonTypes.ICON}
+                        onClick={() => {
+                            setIsOpen(true);
+                        }}
+                    >
+                        <AccessibleImageMenuIcon />
+                    </Button>
+                    <Button baseClass={ButtonTypes.ICON} onClick={props.deleteSelf}>
+                        <DeleteIcon />
+                    </Button>
+                </EmbedMenu>
+            )}
+            {isOpen && (
+                <ImageEmbedModal
+                    onSave={newValue => {
+                        props.syncBackEmbedValue &&
+                            props.syncBackEmbedValue({
+                                name: newValue.alt,
+                            });
+                        props.selectSelf && props.selectSelf();
+                    }}
+                    initialAlt={props.name}
+                    onClose={() => {
+                        setIsOpen(false);
+                        setImmediate(() => {
+                            props.selectSelf?.();
+                        });
+                    }}
+                />
+            )}
+        </div>
     );
 }

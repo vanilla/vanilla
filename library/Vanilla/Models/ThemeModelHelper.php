@@ -26,6 +26,7 @@ class ThemeModelHelper {
 
     /**
      * ThemeModelHelper constructor.
+     *
      * @param AddonManager $addonManager
      * @param SessionInterface $session
      * @param ConfigurationInterface $config
@@ -70,6 +71,9 @@ class ThemeModelHelper {
         return $themeInfo;
     }
 
+    /**
+     * Reset preview theme and switch back to current
+     */
     public function cancelSessionPreviewTheme() {
         $this->session->setPreference(
             [

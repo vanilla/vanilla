@@ -184,7 +184,7 @@ class ThemesApiController extends AbstractApiController {
         $previewThemeKey = $this->getSession()
             ->getPreference('PreviewThemeKey');
 
-        if(!empty($previewThemeKey)) {
+        if (!empty($previewThemeKey)) {
             $theme = $this->themeModel->getThemeWithAssets($previewThemeKey);
         } else {
             $theme = $this->themeModel->getCurrentTheme();

@@ -89,6 +89,8 @@ class ThemeModel {
     /**
      * ThemeModel constructor.
      * @param ConfigurationInterface $config
+     * @param \Gdn_Session $session
+     * @param AddonManager $addonManager
      */
     public function __construct(
         ConfigurationInterface $config,

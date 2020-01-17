@@ -45,19 +45,35 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         bottomSpace: 1,
     });
 
+    const navLinks = makeThemeVars("navLinks", {
+        fontSize: 14,
+        padding: {
+            left: 8,
+            right: 8,
+        },
+    });
+
+    const navPadding = makeThemeVars("navPadding", {
+        padding: {
+            bottom: 4,
+        },
+    });
+
     return {
         border,
         item,
         linkActive,
         padding,
+        navLinks,
+        navPadding,
     };
 });
 
-export default function titleBarNavClasses() {
+const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBarNav");
 
@@ -67,7 +83,7 @@ export default function titleBarNavClasses() {
             position: "relative",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
@@ -81,7 +97,7 @@ export default function titleBarNavClasses() {
             height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),
@@ -132,6 +148,10 @@ export default function titleBarNavClasses() {
 
     const linkContent = style("linkContent", {
         position: "relative",
+        display: "flex",
+        alignItems: "center",
+        minHeight: unit(vars.item.size),
+        height: 0, // IE11 Fix.
     });
 
     const firstItem = style("lastItem", {
@@ -140,6 +160,15 @@ export default function titleBarNavClasses() {
 
     const lastItem = style("lastItem", {
         zIndex: 2,
+    });
+    const navContiner = style("navContiner", {
+        paddingBottom: unit(vars.navPadding.padding.bottom),
+    });
+    const navLinks = style("navLink", {
+        fontSize: unit(vars.navLinks.fontSize),
+        fontWeight: globalVars.fonts.weights.normal,
+        paddingLeft: unit(vars.navLinks.padding.left),
+        paddingRight: unit(vars.navLinks.padding.right),
     });
 
     return {
@@ -151,5 +180,9 @@ export default function titleBarNavClasses() {
         linkContent,
         lastItem,
         firstItem,
+        navLinks,
+        navContiner,
     };
-}
+});
+
+export default titleBarNavClasses;

@@ -5,16 +5,26 @@
  */
 
 import { color, percent } from "csx";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+export const panelWidgetVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("panelWidget");
+
+    const spacing = makeThemeVars("spacing", {
+        padding: 8,
+    });
+
+    return { spacing };
+});
+
 export const panelWidgetClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const vars = layoutVariables();
-    const mediaQueries = vars.mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("panelWidget");
+    const vars = panelWidgetVariables();
 
     const root = style(
         {
@@ -39,7 +49,7 @@ export const panelWidgetClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumnDown({
             ...paddings({
-                all: 8,
+                all: vars.spacing.padding,
             }),
         }),
     );

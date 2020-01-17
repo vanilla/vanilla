@@ -2064,6 +2064,11 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@monaco-editor/react@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@monaco-editor/react/-/react-2.5.0.tgz#30201d942629ab8e57f428e2edaa99570f6792ca"
+  integrity sha512-meD2PqlGW69aI9uVoPVNDfNZ1e7Rq+vWwxgrnMUbO4DrEP5JQttJ0vjxtjAVfZPLzIv1t48q/CuXc5zZh3ZgmQ==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -2144,6 +2149,11 @@
   resolved "https://registry.yarnpkg.com/@reach/auto-id/-/auto-id-0.3.0.tgz#c66b2fc29b5f7e8a7fe1a379dacf33b9b4e27fb1"
   integrity sha512-FANI91t71NpexgYwMwQ9tm6mJinsVtgXJEVGhs1bf6ZN2Kf8gA9hRSlFXU+W19F1WXFkJQPjRLUE0ASAbUZADw==
 
+"@reach/auto-id@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@reach/auto-id/-/auto-id-0.6.1.tgz#af30c153787a335cfb258289537d5ea355688821"
+  integrity sha512-t3uhdZwalO3Mph+CUdFIvMcYsMtRZoBHE5rw/+3UvQxV+AeQGNqmtlOix9mq3rOpxi0KEaf1q4CjWx4myFXkRQ==
+
 "@reach/component-component@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@reach/component-component/-/component-component-0.3.0.tgz#ccf593e26132cbec0ad92774b80356dcf544d5c5"
@@ -2183,6 +2193,16 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
+"@reach/tabs@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@reach/tabs/-/tabs-0.6.4.tgz#26d6dd2f8e8ae5d87a7d939b21385e13c04cb09f"
+  integrity sha512-oNL7lZACapx2FCO3StDwb3kkxdD6aL6A8R3TWdECKBZig/2lEluBtqqVotVVkIdgzixT+ZjC9J+Cym4TwxPF6g==
+  dependencies:
+    "@reach/auto-id" "^0.6.1"
+    "@reach/utils" "^0.6.4"
+    prop-types "^15.7.2"
+    warning "^4.0.3"
+
 "@reach/tooltip@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@reach/tooltip/-/tooltip-0.3.0.tgz#4bd524222aff5e76c364aebaef890b47fea43fa0"
@@ -2199,6 +2219,11 @@
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@reach/utils/-/utils-0.3.0.tgz#2098181aab751f2275cacf219b02a6a8b455be85"
   integrity sha512-dQA1acyNpwqy5ia5yt1lNjaAhm9rrzSurFtlJPoz7ARVPMV1yZ0yfmNotMwwgVbE5q1HnONqszK7oagH86m7Qw==
+
+"@reach/utils@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@reach/utils/-/utils-0.6.4.tgz#be268e1a7d04f921596b3672888a932c1832074a"
+  integrity sha512-jUWNb1STgR69WGkV4O/N4XOcUvM0u5LP1b9SR6VZsPRazpmzM8HUl3WsBVgMOnSCefZtk+wM4ig2/iYgdElwPw==
 
 "@reach/visually-hidden@^0.3.0":
   version "0.3.0"
@@ -16503,6 +16528,14 @@ schema-utils@^2.0.0, schema-utils@^2.4.1:
     ajv "^6.10.2"
     ajv-keywords "^3.4.1"
 
+schema-utils@^2.0.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-2.6.1.tgz#eb78f0b945c7bcfa2082b3565e8db3548011dc4f"
+  integrity sha512-0WXHDs1VDJyo+Zqs9TKLKyD/h7yDpHUhEFsM2CzkICFdoX1av+GBq/J2xRTFfsQO5kBfhZzANf2VcIm84jqDbg==
+  dependencies:
+    ajv "^6.10.2"
+    ajv-keywords "^3.4.1"
+
 seek-bzip@^1.0.3, seek-bzip@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/seek-bzip/-/seek-bzip-1.0.5.tgz#cfe917cb3d274bcffac792758af53173eb1fabdc"
@@ -17541,6 +17574,14 @@ style-loader@^0.23.1:
   dependencies:
     loader-utils "^1.1.0"
     schema-utils "^1.0.0"
+
+style-loader@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-1.0.1.tgz#aec6d4c61d0ed8d0a442faed741d4dfc6573888a"
+  integrity sha512-CnpEkSR1C+REjudiTWCv4+ssP7SCiuaQZJTZDWBRwTJoS90mdqkB8uOGMHKgVeUzpaU7IfLWoyQbvvs5Joj3Xw==
+  dependencies:
+    loader-utils "^1.2.3"
+    schema-utils "^2.0.1"
 
 stylehacks@^4.0.0:
   version "4.0.3"

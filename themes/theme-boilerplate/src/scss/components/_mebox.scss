@@ -78,7 +78,8 @@ $mebox-button_borderRadius:             3px !default;
             justify-content: center;
             right: -8px;
             top: -9px;
-            border: 1px solid;
+            border-width: 1px;
+            border-style: solid;
 
             @include maxWidth {
                 top: 0;

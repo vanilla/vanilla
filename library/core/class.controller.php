@@ -14,12 +14,14 @@
 
 use Garden\Web\Data;
 use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
+use Vanilla\Web\MasterViewRenderer;
 
 /**
  * Controller base class.
@@ -284,9 +286,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $hsts = Gdn::getContainer()->get('HstsModel');
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
-        $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
+        $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
         $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
-
+        $xFrameString = $cspModel->getXFrameString();
+        if ($xFrameString !== null) {
+            $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
+        }
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];
@@ -892,12 +897,14 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
                 foreach ($subPaths as $subPath) {
                     $viewPaths[] = PATH_THEMES."/{$this->Theme}/$applicationFolder/$subPath.*";
+                    $viewPaths[] = PATH_ADDONS_THEMES."/{$this->Theme}/$applicationFolder/$subPath.*";
                     // $ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
                 }
 
                 // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
                 foreach ($subPaths as $subPath) {
                     $viewPaths[] = PATH_THEMES."/{$this->Theme}/$subPath.*";
+                    $viewPaths[] = PATH_ADDONS_THEMES."/{$this->Theme}/$subPath.*";
                     //$ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
                 }
             }
@@ -1528,6 +1535,21 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Return a twig wrapped HTML content of an asset.
+     *
+     * @param string $assetName The name of the asset.
+     *
+     * @return \Twig\Markup
+     */
+    public function renderAssetForTwig(string $assetName): \Twig\Markup {
+        ob_start();
+        $this->renderAsset($assetName);
+        $echoedOutput = ob_get_contents();
+        ob_end_clean();
+        return new \Twig\Markup($echoedOutput, 'utf-8');
+    }
+
+    /**
      * Render the data array.
      *
      * @param null $Data
@@ -1886,7 +1908,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     }
 
-                    list($Path, $UrlPath) = $Search;
+                    [$Path, $UrlPath] = $Search;
 
                     if (isUrl($Path)) {
                         $this->Head->addCss($Path, 'all', val('AddVersion', $Options, true), $Options);
@@ -1944,7 +1966,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     }
 
-                    list($Path, $UrlPath) = $Search;
+                    [$Path, $UrlPath] = $Search;
 
                     if ($Path !== false) {
                         $AddVersion = true;
@@ -2000,8 +2022,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($this->Theme) {
                 // 1. Application-specific theme view. eg. root/themes/theme_name/app_name/views/
                 $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
+                $MasterViewPaths[] = combinePaths([PATH_ADDONS_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
                 $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*']);
+                $MasterViewPaths[] = combinePaths([PATH_ADDONS_THEMES, $this->Theme, 'views', $this->MasterView.'.master*']);
             }
             // 3. Plugin default. eg. root/plugin_name/views/
             $MasterViewPaths[] = combinePaths([PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
@@ -2040,15 +2064,35 @@ class Gdn_Controller extends Gdn_Pluggable {
             $ControllerName = substr($ControllerName, 4);
         }
 
-        $this->setData('CssClass', ucfirst($this->Application).' '.$ControllerName.' is'.ucfirst($ThemeType).' '.$this->RequestMethod.' '.$this->CssClass, true);
+        $themeSections = Gdn_Theme::section(null, 'get');
+        $sectionClasses = array_map(function ($section) {
+            return 'Section-' . $section;
+        }, $themeSections);
 
-        // Check to see if there is a handler for this particular extension.
-        $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($MasterViewPath, '.')));
-        if (is_null($ViewHandler)) {
-            $BodyIdentifier = strtolower($this->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($this->RequestMethod)));
-            include($MasterViewPath);
+        $cssClass = HtmlUtils::classNames(
+            ucfirst($this->Application),
+            $ControllerName,
+            'is'.ucfirst($ThemeType),
+            $this->RequestMethod,
+            $this->CssClass,
+            ...$sectionClasses
+        );
+        $this->setData('CssClass', $cssClass, true);
+
+        if ($this->MasterView === 'default' && Gdn::themeFeatures()->useSharedMasterView()) {
+            /** @var MasterViewRenderer $viewRenderer */
+            $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
+            $result = $viewRenderer->renderGdnController($this);
+            echo $result;
         } else {
-            $ViewHandler->render($MasterViewPath, $this);
+            // Check to see if there is a handler for this particular extension.
+            $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($MasterViewPath, '.')));
+            if (is_null($ViewHandler)) {
+                $BodyIdentifier = strtolower($this->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($this->RequestMethod)));
+                include($MasterViewPath);
+            } else {
+                $ViewHandler->render($MasterViewPath, $this);
+            }
         }
     }
 
@@ -2067,7 +2111,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->registerReduxActionProvider($themeProvider);
         $themeScript = $themeProvider->getThemeScript();
         if ($themeScript !== null) {
-            $this->Head->addScript($themeScript->getWebPath());
+            $this->Head->addScript(
+                $themeScript->getWebPath(),
+                'text/javascript',
+                true,
+                ['static' => $themeScript->isStatic()]
+            );
         }
     }
 
@@ -2086,7 +2135,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
         $jsAssets = $webpackAssetProvider->getScripts($section);
         foreach ($jsAssets as $asset) {
-            $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'defer']);
+            $this->Head->addScript(
+                $asset->getWebPath(),
+                'text/javascript',
+                false,
+                ['defer' => 'defer', 'static' => $asset->isStatic()]
+            );
         }
 
         // The the built stylesheets

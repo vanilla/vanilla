@@ -1,3 +1,5 @@
+/addons/*
+!/addons/themes/theme-foundation
 /applications/*
 !/applications/conversations/
 !/applications/dashboard/
@@ -63,6 +65,7 @@
 !/themes/default/
 !/themes/mobile/
 !/themes/theme-boilerplate/
+!/themes/foundation/
 !/themes/keystone/
 !/themes/theme-api-test/
 /uploads/*
@@ -97,3 +100,4 @@ lerna-debug.log
 git-diff.txt
 phpcs-diff.json
 phpunit.xml.dist
+.phpunit.result.cache

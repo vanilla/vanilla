@@ -25,6 +25,9 @@ class DiscussionModel extends Gdn_Model {
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
+    /** @var string Thus userID of whomever closed the discussion. */
+    const CLOSED_BY_USER_ID = 'ClosedByUserID';
+
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
 
@@ -265,10 +268,44 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Determines whether or not the current user can close a discussion.
+     *
+     * @param object|array $discussion
+     * @return bool Returns true if the user can close or false otherwise.
+     */
+    public static function canClose($discussion): bool {
+        if (is_object($discussion)) {
+            $categoryID = $discussion->CategoryID ?? null;
+            $insertUserID = $discussion->InsertUserID ?? 0;
+            $isClosed = $discussion->Closed ?? null;
+            $attributes = $discussion->Attributes ?? [];
+        } else {
+            $categoryID = $discussion['CategoryID'] ?? null;
+            $insertUserID = $discussion['InsertUserID'] ?? 0;
+            $isClosed = $discussion['Closed'] ?? null;
+            $attributes = $discussion['Attributes'] ?? [];
+        }
+
+        if (CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close')) {
+            return true;
+        }
+
+        if ($isClosed && $attributes[self::CLOSED_BY_USER_ID] !== Gdn::session()->UserID) {
+            return false;
+        }
+
+        if (Gdn::session()->UserID === $insertUserID && Gdn::session()->checkPermission('Vanilla.Discussions.CloseOwn')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Determines whether or not the current user can edit a discussion.
      *
      * @param object|array $discussion The discussion to examine.
-     * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
+     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
      * @return bool Returns true if the user can edit or false otherwise.
      */
     public static function canEdit($discussion, &$timeLeft = 0) {
@@ -374,6 +411,7 @@ class DiscussionModel extends Gdn_Model {
      * @access public
      *
      * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+     * @param bool $join
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
@@ -1027,7 +1065,12 @@ class DiscussionModel extends Gdn_Model {
         // Join in the category.
         $category = CategoryModel::categories($discussion->CategoryID);
         if (empty($category)) {
-            $category = false;
+            $category = [
+                'Name' => '',
+                'UrlCode' => '',
+                'PermissionCategoryID' => -1,
+                'DateMarkedRead' => null,
+            ];
         }
         $discussion->Category = $category['Name'];
         $discussion->CategoryUrlCode = $category['UrlCode'];
@@ -1067,7 +1110,7 @@ class DiscussionModel extends Gdn_Model {
 
         if (!property_exists($discussion, 'Read')) {
             $discussion->Read = !(bool)$discussion->CountUnreadComments;
-            if ($category && !is_null($category['DateMarkedRead'])) {
+            if (!is_null($category['DateMarkedRead'])) {
                 // If the category was marked explicitly read at some point, see if that applies here
                 if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
                     $discussion->Read = true;
@@ -1265,6 +1308,8 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Get announcement cache key.
+     *
      * @param int $categoryID Category ID,
      * @return string $key CacheKey name to be used for cache.
      */
@@ -1295,7 +1340,6 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
      * Get discussions for a user.
      *
      * Events: BeforeGetByUser
@@ -1413,6 +1457,7 @@ class DiscussionModel extends Gdn_Model {
 
     /**
      * Get all the users that have participated in the discussion.
+     *
      * @param int $discussionID
      * @return Gdn_DataSet
      */
@@ -1834,7 +1879,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get views fallback.
      *
      * @param int $discussionID
      * @return mixed|null
@@ -2258,7 +2303,6 @@ class DiscussionModel extends Gdn_Model {
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
-            "Format" => $format ?? null,
             "HeadlineFormat" => t(
                 $code,
                 '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>'
@@ -2266,12 +2310,21 @@ class DiscussionModel extends Gdn_Model {
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
             "Route" => discussionUrl($discussion, "", "/"),
-            "Story" => $body ?? null,
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
-            ]
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $format,
+                    "Story" => $body,
+                ],
+            ],
         ];
+
+        if (!Gdn::config("Vanilla.Email.FullPost")) {
+            $data["Ext"]["Email"] = $activityModel->setStoryExcerpt($data["Ext"]["Email"]);
+        }
 
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];

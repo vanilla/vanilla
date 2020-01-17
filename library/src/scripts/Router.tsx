@@ -10,6 +10,7 @@ import { formatUrl } from "@library/utility/appUtils";
 import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
+import { BackgroundsProvider } from "./layout/Backgrounds";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -23,7 +24,10 @@ export function Router(props: IProps) {
 
     useEffect(() => {
         if (onRouteChange) {
-            const unregister = history.listen(() => onRouteChange(history));
+            const unregister = history.listen(() => {
+                window.scrollTo(0, 0);
+                onRouteChange(history);
+            });
             // Return the cleanup function.
             return unregister;
         }

@@ -11,6 +11,7 @@ import {
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
     ObjectFitProperty,
+    OpacityProperty,
     PositionProperty,
 } from "csstype";
 import { percent, px, quote, url, viewHeight, viewWidth } from "csx";
@@ -20,13 +21,14 @@ import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { styleFactory } from "@library/styles/styleUtils";
 
 export interface IBackground {
-    color: ColorValues;
+    color?: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;
     size?: BackgroundSizeProperty<TLength>;
     image?: BackgroundImageProperty;
     fallbackImage?: BackgroundImageProperty;
+    opacity?: OpacityProperty;
 }
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
@@ -41,7 +43,7 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
         return themeAsset(workingImage.substr(1, workingImage.length - 1));
     }
 
-    if (workingImage.startsWith('"data:image/')) {
+    if (workingImage.startsWith("data:image/")) {
         return workingImage;
     }
 
@@ -59,6 +61,7 @@ export const background = (props: IBackground) => {
         backgroundRepeat: props.repeat || "no-repeat",
         backgroundSize: props.size || "cover",
         backgroundImage: image ? url(image) : undefined,
+        opacity: props.opacity ?? undefined,
     };
 };
 

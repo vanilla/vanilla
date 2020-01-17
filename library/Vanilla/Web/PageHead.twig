@@ -1,0 +1,35 @@
+<title>{{ title }}</title>
+
+{% for meta in metaTags -%}
+    <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+
+{% for link in linkTags -%}
+    <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+
+{% if favIcon -%}
+    <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
+{% endif %}
+
+{% for script in inlineScripts -%}
+    <script nonce="{{ nonce }}">
+        {{- script|raw -}}
+    </script>
+{% endfor %}
+
+{% for script in scripts -%}
+    <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
+{% endfor %}
+
+{%- if jsonLD -%}
+    <script type="application/ld+json">
+        {{- jsonLD|raw -}}
+    </script>
+{%- endif -%}
+
+{% for stylesheet in styles -%}
+    <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
+{% endfor -%}
+
+{{ preloadModel.renderHtml()|raw }}

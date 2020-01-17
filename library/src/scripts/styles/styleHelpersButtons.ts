@@ -30,7 +30,7 @@ export interface IButtonStates {
 
 export const allLinkStates = (styles: ILinkStates) => {
     const output = allButtonStates(styles);
-    const visited = styles.visited !== undefined ? styles.visited : {};
+    const visited = styles.visited !== undefined ? styles.visited : styles.noState || {};
     output.$nest["&:visited"] = { ...styles.allStates, ...visited };
     return output;
 };
@@ -43,11 +43,14 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, debugMod
         ...allStates,
         ...noState,
         $nest: {
-            "&:hover": { ...allStates, ...styles.hover },
+            "&:hover:not(:disabled)": { ...allStates, ...styles.hover },
             "&:focus": { ...allStates, ...styles.focus },
             "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
             "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
-            "&:active": { ...allStates, ...styles.active },
+            "&:active:not(:disabled)": { ...allStates, ...styles.active },
+            "&:disabled": {
+                opacity: 0.5,
+            },
             ...nested,
         },
     };

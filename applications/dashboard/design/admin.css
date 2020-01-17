@@ -12054,6 +12054,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .richEditor .embedImage-img:hover {

@@ -12,6 +12,7 @@
  */
 
 use Vanilla\Formatting\FormatService;
+use Vanilla\Theme\ThemeFeatures;
 
 /**
  * Framework superobject.
@@ -69,9 +70,6 @@ class Gdn {
      * @var \Garden\Container\Container
      */
     private static $container;
-
-    /** @var Gdn_Configuration  */
-    protected static $_Config = null;
 
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
     protected static $_FactoryOverwrite = true;
@@ -142,10 +140,8 @@ class Gdn {
      * @return Gdn_Configuration|mixed The configuration setting.
      */
     public static function config($name = false, $default = false) {
-        if (self::$_Config === null) {
-            self::$_Config = static::getContainer()->get(self::AliasConfig);
-        }
-        $config = self::$_Config;
+        $config = static::getContainer()->get(self::AliasConfig);
+
         if ($name === false) {
             $result = $config;
         } else {
@@ -510,6 +506,13 @@ class Gdn {
     }
 
     /**
+     * Get the theme features instance.
+     */
+    public static function themeFeatures(): ThemeFeatures {
+        return self::getContainer()->get(ThemeFeatures::class);
+    }
+
+    /**
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
@@ -582,7 +585,6 @@ class Gdn {
         /**
          * Reset all of the cached objects that are fetched from the container.
          */
-        self::$_Config = null;
         self::$_FactoryOverwrite = true;
         self::$_Locale = null;
         self::$_Request = null;

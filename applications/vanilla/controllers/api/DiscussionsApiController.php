@@ -11,6 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -160,7 +161,7 @@ class DiscussionsApiController extends AbstractApiController {
                 Schema::parse([
                     'name',
                     'body',
-                    'format:s' => 'The input format of the discussion.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'categoryID',
                     'closed?',
                     'sink?',
@@ -380,8 +381,9 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $isRich = $discussion['Format'] === 'Rich';
+        $isRich = strcasecmp($$discussion['Format'], RichFormat::FORMAT_KEY) === 0;
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
+        $discussion = $this->discussionModel->fixRow($discussion);
 
         $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);
@@ -402,7 +404,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
-            'format:s' => 'The original format of the discussion',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ]);
     }
 
@@ -422,7 +424,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'discussionID',
                 'name',
                 'body',
-                'format:s' => 'The input format of the discussion.',
+                'format' => new \Vanilla\Models\FormatSchema(true),
                 'categoryID',
                 'sink',
                 'closed',

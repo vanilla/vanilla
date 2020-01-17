@@ -503,13 +503,13 @@ class EntryController extends Gdn_Controller {
         }
 
         $isTrustedProvider = $this->data('Trusted');
+        $roles = $this->Form->getFormValue('Roles', $this->Form->getFormValue('roles', null));
 
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
+        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $roles !== null) {
             $saveRoles = $saveRolesRegister = true;
 
             // Translate the role names to IDs.
-            $roles = $this->Form->getFormValue('Roles', null);
             $roles = RoleModel::getByName($roles);
             $roleIDs = array_keys($roles);
 
@@ -1032,6 +1032,7 @@ class EntryController extends Gdn_Controller {
      * @return string Rendered XHTML template.
      */
     public function signIn($method = false, $arg1 = false) {
+        $this->canonicalUrl(url('/entry/signin', true));
         if (!$this->Request->isPostBack()) {
             $this->checkOverride('SignIn', $this->target());
         }
@@ -1056,9 +1057,19 @@ class EntryController extends Gdn_Controller {
             $this->Form->validateRule('Email', 'ValidateRequired', sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
             $this->Form->validateRule('Password', 'ValidateRequired');
 
-            if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
-                $this->Form->addError('Please try again.');
-                Gdn::session()->ensureTransientKey();
+            if (!$this->Request->isAuthenticatedPostBack()) {
+                $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
+                if ($legacyLogin && c('Garden.Embed.Allow')) {
+                    Logger::event(
+                        'legacy_embed_signin',
+                        Logger::INFO,
+                        'Signed in using the legacy embed method',
+                        ['login' => $this->Form->getFormValue('Email')]
+                    );
+                } else {
+                    $this->Form->addError('Please try again.');
+                    Gdn::session()->ensureTransientKey();
+                }
             }
 
             // Check the user.
@@ -1771,6 +1782,7 @@ class EntryController extends Gdn_Controller {
      * @since 2.0.0
      */
     public function passwordRequest() {
+        $this->canonicalUrl(url('/entry/passwordrequest', true));
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
             Gdn::locale()->setTranslation('Email', t('Username'));
         }

@@ -99,7 +99,14 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        BuildMode.PRODUCTION === options.mode ? MiniCssExtractPlugin.loader : "style-loader",
+                        BuildMode.PRODUCTION === options.mode
+                            ? MiniCssExtractPlugin.loader
+                            : {
+                                  loader: "style-loader",
+                                  options: {
+                                      injectType: "singletonStyleTag",
+                                  },
+                              },
                         {
                             loader: "css-loader",
                             options: {
@@ -163,7 +170,7 @@ ${chalk.green(aliases)}`;
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
-                filename: "[name].min.css",
+                filename: "[name].min.css?[chunkhash]",
             }),
         );
     }

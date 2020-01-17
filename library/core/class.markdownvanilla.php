@@ -163,7 +163,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @return string
      */
     protected function doListFix($text) {
-        return preg_replace('/(^[^\n*+-].*\n)([*+-] )/m', "$1\n$2", $text);
+        return preg_replace('/(^(?:[^\n*+-]|[*+-][^ ]).*\n)([*+-] )/m', "$1\n$2", $text);
     }
 
     /**

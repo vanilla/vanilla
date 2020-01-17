@@ -38,33 +38,15 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
     abstract public function getWebPath(): string;
 
     /**
-     * Utility function for calculating a full asset URL w/the domain of site, and the asset root.
+     * Utility function for calculating a relative asset URL
      *
      * @param string[] $pieces The pieces of the web path.
-     * @return string The full web path.
+     * @return string The relative web path.
      */
     protected function makeAssetPath(string ...$pieces): string {
         $path = self::joinWebPath(
             $this->request->urlDomain(),
             $this->request->getAssetRoot(),
-            ...$pieces
-        );
-
-        return $this->addCacheBuster($path);
-    }
-
-    /**
-     * Create a web-root url, not an asset URL. This is useful for application level resources like ones created from
-     * API endpoints.
-     *
-     * @param string[] $pieces The pieces to join together.
-     *
-     * @return string
-     */
-    protected function makeWebPath(string ...$pieces): string {
-        $path = self::joinWebPath(
-            $this->request->urlDomain(),
-            $this->request->getRoot(),
             ...$pieces
         );
 
@@ -126,5 +108,16 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
         }
 
         return rtrim($path, $joiner);
+    }
+
+    /**
+     * The default behaviour is to be non-static
+     *
+     * @inheritDoc
+     *
+     * @return bool
+     */
+    public function isStatic(): bool {
+        return false;
     }
 }

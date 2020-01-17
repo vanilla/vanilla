@@ -371,7 +371,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {
-        Gdn::controller()->addJsFile('colorpicker.js', 'dashboard');
+        $controller = Gdn::controller();
+        if ($controller) {
+            $controller->addJsFile('colorpicker.js', 'dashboard');
+        }
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
@@ -393,7 +396,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'"'.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)
-        .$this->input($fieldName.'-text', 'text', $textAttributes)
+        .$this->input($fieldName.'-text', 'text', $options + $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'
         .$this->input($fieldName.'-color', 'color', $colorAttributes)
         .'</div>';
@@ -771,6 +774,30 @@ class Gdn_Form extends Gdn_Pluggable {
         return '<div class="input-wrap">'.$this->fileUpload($fieldName, $attributes).'</div>';
     }
 
+    /**
+     * A react based image uploader that uploads to the Media table.
+     *
+     * @param string $fieldName The form field name for the input.
+     * @param string $label The label.
+     * @param string $labelDescription The label description.
+     *
+     * @return string
+     */
+    public function imageUploadReact(string $fieldName, string $label = '', string $labelDescription = ''): string {
+        $value = $this->getValue($fieldName, null);
+        if ($value) {
+            $value = Gdn_Upload::url($value);
+        }
+        return $this->react(
+            $fieldName,
+            'imageUploadGroup',
+            [
+                'label' => $label,
+                'description' =>  $labelDescription,
+                'initialValue' => $value,
+            ]
+        );
+    }
 
     /**
      * Outputs the entire form group with both the label and input. Adds an image preview and a link to delete the
@@ -788,7 +815,6 @@ class Gdn_Form extends Gdn_Pluggable {
      *      'Tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
      * @param array $attributes The html attributes to pass to the file upload function.
      * @return string
-
      */
     public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $removeUrl = '', $options = [], $attributes = []) {
 
@@ -1744,11 +1770,17 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $fieldName The name of the field that is being hidden/posted with this input. It
      * should related directly to a field name in $this->_DataArray.
      * @param string $componentKey The key of the of the component registered in the frontend with addComponent.
+     * @param array $props Extra props to pass to the component.
+     *
      * @return string
      */
-    public function react(string $fieldName, string $componentKey) {
+    public function react(string $fieldName, string $componentKey, array $props = []) {
         $value = $attributes['value'] ?? $this->getValue($fieldName);
-        $props = htmlspecialchars(json_encode(['initialValue' => $value]));
+        $props = $props + [
+            'initialValue' => $value,
+            'fieldName'  => $this->escapeFieldName($fieldName),
+        ];
+        $props = htmlspecialchars(json_encode($props), ENT_QUOTES);
 
         return "<div data-react='$componentKey' data-props='$props'></div>";
     }
@@ -2277,7 +2309,7 @@ PASSWORDMETER;
      */
     public function addError($error, $fieldName = '') {
         if (is_string($error)) {
-            $errorCode = $error;
+            $errorCode = htmlspecialchars($error);
         } elseif (is_a($error, 'Exception')) {
             if (debug()) {
                 // Strip the extra information out of the exception.
@@ -2294,8 +2326,10 @@ PASSWORDMETER;
                     '## '.$error->getFile().'('.$error->getLine().")".$fileSuffix."\n".
                     htmlspecialchars($error->getTraceAsString()).
                     '</pre>';
+            } elseif ($error instanceof \Gdn_SanitizedUserException) {
+                $errorCode = '@'.$error->getMessage();
             } else {
-                $errorCode = '@'.htmlspecialchars(strip_tags($error->getMessage()));
+                $errorCode = '@'.htmlspecialchars($error->getMessage());
             }
         }
 
@@ -2935,7 +2969,22 @@ PASSWORDMETER;
             $this->_ValidationResults = [];
         }
 
-        $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $validationResults);
+        // Ensure that our validation results get sanitized properly by adding them through addError.
+        /**
+         * @var string $fieldName
+         * @var string[] $fieldErrors
+         */
+        foreach ($validationResults as $fieldName => $fieldErrors) {
+            if (is_array($fieldErrors)) {
+                foreach ($fieldErrors as $fieldError) {
+                    $this->addError($fieldError, $fieldName);
+                }
+            } elseif (is_string($fieldErrors)) {
+                $this->addError($fieldErrors, $fieldName);
+            }
+        }
+
+//        $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $validationResults);
     }
 
     /**
@@ -2994,6 +3043,9 @@ PASSWORDMETER;
 
             if (strtolower($row['Control']) === 'react') {
                 $result .= $this->react($row['Name'], $row['Component']);
+                continue;
+            } elseif (strtolower($row['Control']) === 'imageUploadReact') {
+                $result .= $this->imageUploadReact($row['Name'], $row['Label'], $row['Description'] ?? '');
                 continue;
             } elseif (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
@@ -3097,7 +3149,7 @@ PASSWORDMETER;
     public function validateModel() {
         $this->_Model->defineSchema();
         if ($this->_Model->Validation->validate($this->formValues()) === false) {
-            $this->_ValidationResults = $this->_Model->validationResults();
+            $this->setValidationResults($this->_Model->validationResults());
         }
         return $this->errorCount();
     }

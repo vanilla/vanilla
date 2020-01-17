@@ -81,6 +81,9 @@ export const buttonVariables = useThemeCache(() => {
             color: globalVars.mainColors.fg,
         },
         hover: {
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
             colors: {
                 bg: globalVars.mainColors.primary,
             },
@@ -89,6 +92,9 @@ export const buttonVariables = useThemeCache(() => {
             },
         },
         active: {
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
             colors: {
                 bg: globalVars.mainColors.primary,
             },
@@ -97,6 +103,9 @@ export const buttonVariables = useThemeCache(() => {
             },
         },
         focus: {
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
             colors: {
                 bg: globalVars.mainColors.primary,
             },
@@ -105,6 +114,9 @@ export const buttonVariables = useThemeCache(() => {
             },
         },
         focusAccessible: {
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
             colors: {
                 bg: globalVars.mainColors.primary,
             },
@@ -404,6 +416,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         buttonAsText,
         buttonAsTextPrimary,
         pushRight,
+        iconMixin,
         buttonIconCompact,
         buttonIcon,
         buttonIconRightMargin,

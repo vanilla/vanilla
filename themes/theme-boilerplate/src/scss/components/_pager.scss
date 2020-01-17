@@ -249,7 +249,7 @@ a.MoreWrap,
 
     .QuickSearchButton {
         height: $formButton_height;
-        width: $formButton_height;
+        min-width: $formButton_height;
         display: inline-flex;
         align-items: center;
         justify-content: center;

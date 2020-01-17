@@ -27,6 +27,7 @@ export function DashboardImageUpload(props: IProps) {
     const { inputID, labelType } = useFormGroup();
     const imageUploader = props.imageUploader || uploadFile;
     const [name, setName] = useState<string | null>(null);
+    const [uploadError, setUploadError] = useState<Error | null>(null);
 
     // Used for stashing the URL we just uploaded so we don't wipe out our name in the next step.
     const valueRef = useRef<string | null>(null);
@@ -39,6 +40,8 @@ export function DashboardImageUpload(props: IProps) {
 
     const classes = classNames("form-control", props.className);
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+
+    const fallbackName = props.value?.substring(props.value?.lastIndexOf("/") + 1);
 
     return (
         <div className={rootClass}>
@@ -59,15 +62,23 @@ export function DashboardImageUpload(props: IProps) {
                         props.onImagePreview && props.onImagePreview(tempUrl);
 
                         // Upload the image.
-                        const uploaded = await imageUploader(file);
-                        valueRef.current = uploaded.url;
-                        props.onChange(uploaded.url);
+                        try {
+                            setUploadError(null);
+                            const uploaded = await imageUploader(file);
+                            valueRef.current = uploaded.url;
+                            props.onChange(uploaded.url);
+                        } catch (e) {
+                            setUploadError(e);
+                        }
                     }}
                 />
-                <span className="file-upload-choose">{name || props.placeholder || t("Choose")}</span>
+                <span className="file-upload-choose">{name || fallbackName || props.placeholder || t("Choose")}</span>
                 <span className="file-upload-browse">{t("Browse")}</span>
             </label>
             {props.errors && <ErrorMessages errors={props.errors} />}
+            {uploadError && (
+                <ErrorMessages errors={[{ message: uploadError.message, code: "UploadError", field: "" }]} />
+            )}
         </div>
     );
 }

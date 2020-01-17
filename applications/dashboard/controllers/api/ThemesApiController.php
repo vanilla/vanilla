@@ -68,6 +68,20 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a theme assets.
+     *
+     * @return array
+     */
+    public function index(): array {
+        $this->permission();
+        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
+
+        $themes = $this->themeModel->getThemes();
+        $result = $out->validate($themes);
+        return $result;
+    }
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.
@@ -100,7 +114,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function patch(int $themeID, array $body): array {
         $this->permission("Garden.Settings.Manage");
-        $in = $this->themePostSchema('in');
+        $in = $this->themePatchSchema('in');
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 

@@ -12,6 +12,7 @@ import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
+import { formatUrl, siteUrl } from "@library/utility/appUtils";
 
 export interface ITitleBarNav {
     className?: string;
@@ -62,7 +63,7 @@ export class TitleBarNavItem extends React.Component<IProps> {
      */
     public currentPage = (): boolean => {
         if (this.props.location && this.props.location.pathname) {
-            return this.props.location.pathname === this.props.to;
+            return siteUrl(window.location.pathname) === formatUrl(this.props.to, true);
         } else {
             return false;
         }

@@ -11,41 +11,39 @@ import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
-import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { ScrollOffsetContext, HashOffsetReporter } from "@library/layout/ScrollOffsetContext";
 import BackLink from "@library/routing/links/BackLink";
 import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
-import { sticky } from "@library/styles/styleHelpers";
 import { LogoType } from "@library/theming/ThemeLogo";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { style } from "typestyle";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SignInIcon } from "@library/icons/common";
-import DropDown from "@library/flyouts/DropDown";
 import Hamburger from "@library/flyouts/Hamburger";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
+import { ITitleBarDeviceProps, TitleBarDevices, withTitleBarDevice } from "@library/layout/TitleBarContext";
 
-interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
-    container?: Element; // Element containing header. Should be the default most if not all of the time.
+interface IProps extends ITitleBarDeviceProps, IInjectableUserState, IWithPagesProps {
+    container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
     isFixed?: boolean;
     useMobileBackButton?: boolean;
     hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
+    logoUrl?: string;
+    backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
 }
 
 interface IState {
@@ -70,6 +68,7 @@ export class TitleBar extends React.Component<IProps, IState> {
      * @param component The component class to be render.
      */
     public static registerBeforeMeBox(component: React.ComponentType) {
+        TitleBar.extraMeBoxComponents.pop();
         TitleBar.extraMeBoxComponents.push(component);
     }
     public static contextType = ScrollOffsetContext;
@@ -86,40 +85,23 @@ export class TitleBar extends React.Component<IProps, IState> {
         openSearch: false,
         showingSuggestions: false,
         isScrolledOff: false,
+        renderComponent: true,
     };
     public render() {
-        const { isFixed, hamburger } = this.props;
-        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
+        const { hamburger } = this.props;
+        const isCompact = this.props.device === TitleBarDevices.COMPACT;
         const classes = titleBarClasses();
-        const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
-        const showHamburger = isMobile && !this.state.openSearch && !!hamburger;
+        const showMobileDropDown = isCompact && !this.state.openSearch && this.props.title;
+        const showHamburger = isCompact && !this.state.openSearch && !!hamburger;
         const classesMeBox = meBoxClasses();
 
-        const fixedClass = style({
-            ...sticky(),
-            $debugName: "isFixed",
-            top: 0,
-            zIndex: 2,
-        });
-
-        const outerCssClasses = classNames(
-            "titleBar",
-            classes.root,
-            this.props.className,
-            { [fixedClass]: isFixed },
-            this.context.offsetClass,
-        );
-
-        const containerElement = this.props.container || document.getElementById("titleBar")!;
-        containerElement.classList.value = outerCssClasses;
-
-        return ReactDOM.createPortal(
+        const headerContent = (
             <HashOffsetReporter>
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("titleBar-bar", classes.bar)}>
                             {!this.state.openSearch &&
-                                isMobile &&
+                                isCompact &&
                                 (this.props.useMobileBackButton ? (
                                     <BackLink
                                         className={classNames(
@@ -132,16 +114,15 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 ) : (
                                     !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                                 ))}
-                            {!isMobile && (
+                            {!isCompact && (
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                     logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
                             )}
-                            {!this.state.openSearch && !isMobile && (
+                            {!this.state.openSearch && !isCompact && (
                                 <TitleBarNav
-                                    {...dummyNavigationData()}
                                     className={classNames("titleBar-nav", classes.nav)}
                                     linkClassName={classNames("titleBar-navLink", classes.topElement)}
                                     linkContentClassName="titleBar-navLinkContent"
@@ -151,6 +132,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                 <MobileDropDown
                                     title={this.props.title!}
                                     buttonClass={classNames("titleBar-mobileDropDown")}
+                                    hasBackgroundColor={this.props.backgroundColorForMobileDropdown}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>
@@ -197,7 +179,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                                     )}
                                     cancelContentClassName="meBox-buttonContent"
                                     buttonClass={classNames(classes.button, {
-                                        [classes.buttonOffset]: !isMobile && this.isGuest,
+                                        [classes.buttonOffset]: !isCompact && this.isGuest,
                                     })}
                                     showingSuggestions={this.state.showingSuggestions}
                                     onOpenSuggestions={this.setOpenSuggestions}
@@ -208,23 +190,47 @@ export class TitleBar extends React.Component<IProps, IState> {
                                     )}
                                     clearButtonClass={classes.clearButtonClass}
                                 />
-                                {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
+                                {isCompact ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
                             </ConditionalWrap>
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-            </HashOffsetReporter>,
-            containerElement,
+            </HashOffsetReporter>
         );
+
+        if (this.containerElement) {
+            return ReactDOM.createPortal(headerContent, this.containerElement);
+        } else {
+            return <header className={this.containerClasses}>{headerContent}</header>;
+        }
     }
 
     public componentDidMount() {
         const titleBarVars = titleBarVariables();
         this.context.setScrollOffset(titleBarVars.sizing.height);
+        if (this.containerElement) {
+            this.containerElement.setAttribute("class", this.containerClasses);
+        }
     }
 
     public componentWillUnmount() {
         this.context.resetScrollOffset();
+    }
+
+    private get containerClasses() {
+        const classes = titleBarClasses();
+
+        return classNames(
+            "titleBar",
+            classes.root,
+            this.props.className,
+            { [classes.isFixed]: this.props.isFixed },
+            this.context.offsetClass,
+        );
+    }
+
+    public get containerElement(): HTMLElement | null {
+        return this.props.container || document.getElementById("titleBar")!;
     }
 
     private renderMobileMeBox() {
@@ -326,4 +332,4 @@ export class TitleBar extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(mapUsersStoreState);
-export default withRedux(withPages(withDevice(TitleBar)));
+export default withRedux(withPages(withTitleBarDevice(TitleBar)));

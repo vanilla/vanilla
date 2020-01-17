@@ -39,12 +39,13 @@
         &:active {
             color: $headerMebutton-hover_fg;
             background-color: $headerMebutton-hover_bg;
-        }
 
-        .Alert {
-            color: $headerMeBoxAlert_fg;
-            background-color: $headerMeBoxAlert_bg;
-            border-color: $headerMeBoxAlert_borderColor;
+
+            .Alert {
+                color: $headerMeBoxAlert_fg;
+                background-color: $headerMeBoxAlert_bg;
+                border-color: $headerMeBoxAlert_borderColor;
+            }
         }
     }
 
@@ -98,7 +99,6 @@
     }
 
     .Navigation-linkContainer a {
-        color: $header-link_color;
         border-radius: 3px;
         margin: 0 6px;
         padding: 0 6px;
@@ -108,11 +108,14 @@
         align-items: center;
         justify-content: center;
 
-        &:hover,
-        &:focus,
-        &:active {
+        @if ($staticVariables) {
             color: $header-link_color;
-            background: $global-color_primaryAlt;
+            &:hover,
+            &:focus,
+            &:active {
+                color: $header-link_color;
+                background: $global-color_primaryAlt;
+            }
         }
     }
 
@@ -149,4 +152,11 @@
     display: flex;
     align-self: stretch;
     align-items: center;
+}
+
+// IE 11 specific bug
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+    .Header .Header-logo img {
+        max-height: initial;
+    }
 }

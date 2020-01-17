@@ -23,6 +23,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
+import { panelBackgroundClasses } from "@library/layout/panelBackgroundStyles";
 
 export interface IProps {
     className?: string;
@@ -31,6 +32,7 @@ export interface IProps {
     children?: React.ReactNode;
     frameClassName?: string;
     frameBodyClassName?: string;
+    hasBackgroundColor?: boolean;
 }
 
 interface IState {
@@ -49,7 +51,6 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
 
     public render() {
         const classes = mobileDropDownClasses();
-        const classesFrameHeader = frameHeaderClasses();
         const { className, children, title, buttonClass } = this.props;
 
         const TitleButton = (props: { icon: React.ReactNode; onClick: React.MouseEventHandler }) => {
@@ -84,6 +85,9 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                         exitHandler={this.close}
                     >
                         <Frame
+                            bodyWrapClass={classNames({
+                                [panelBackgroundClasses().backgroundColor]: this.props.hasBackgroundColor, // Note that it will take the config from the component to decide if it renders the color or not.
+                            })}
                             header={
                                 <header className={classes.header}>
                                     <Container>

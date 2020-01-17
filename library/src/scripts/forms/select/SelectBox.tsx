@@ -34,7 +34,7 @@ interface IProps {
     widthOfParent?: boolean;
     openAsModal?: boolean;
     renderLeft?: boolean;
-    offsetPaddingTop?: boolean;
+    offsetPadding?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -79,7 +79,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                     "selectBox-dropDown",
                     "dropDownItem-verticalPadding",
                     classesDropDown.verticalPadding,
-                    { [classes.noTopPadding]: props.offsetPaddingTop },
+                    { [classes.offsetPadding]: props.offsetPadding },
                 )}
                 buttonContents={<SelectBoxButton activeItem={selectedOption} />}
                 buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
@@ -148,7 +148,7 @@ function SelectBoxContents(props: { item: ISelectBoxItem; isSelected: boolean })
     return (
         <>
             <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
-            <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
+            <span className={classNames("sc-only", classes.checkContainer)}>
                 {isSelected && <CheckCompactIcon className={"selectBox-isSelectedIcon"} />}
                 {!isSelected && (
                     <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>

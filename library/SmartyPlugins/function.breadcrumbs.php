@@ -11,10 +11,9 @@
  * Render a breadcrumb trail for the user based on the page they are on.
  *
  * @param array $params
- * @param object $smarty
  * @return string
  */
-function smarty_function_breadcrumbs($params, &$smarty) {
+function smarty_function_breadcrumbs($params = []) {
     $breadcrumbs = Gdn::controller()->data('Breadcrumbs');
     if (!is_array($breadcrumbs)) {
         $breadcrumbs = [];

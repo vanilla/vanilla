@@ -16,6 +16,7 @@ interface IProps {
     body: React.ReactNode;
     footer?: React.ReactNode;
     canGrow?: boolean; // Use this when the parent has a fixed height we want to fill.
+    bodyWrapClass?: string;
 }
 
 /**
@@ -29,7 +30,7 @@ export default function Frame(props: IProps) {
         <section className={classNames("frame", props.className, classes.root, props.canGrow && inheritHeightClass())}>
             {props.header && <div className={classes.headerWrap}> {props.header}</div>}
             <TouchScrollable>
-                <div className={classes.bodyWrap}>{props.body}</div>
+                <div className={classNames(classes.bodyWrap, props.bodyWrapClass)}>{props.body}</div>
             </TouchScrollable>
             <div className={classes.footerWrap}>{props.footer}</div>
         </section>

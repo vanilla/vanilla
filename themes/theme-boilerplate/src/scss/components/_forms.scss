@@ -17,22 +17,27 @@ input.InputBox,
 select {
     line-height: $formElement_height;
     height: $formElement_height;
-    border: $formElement_border;
-    border-radius: $formElement_borderRadius;
-    color: $formElement_color;
     font-family: $global-body_fontFamily;
-    background: $global-color_white;
+    @if ($staticVariables) {
+        border: $formElement_border;
+        border-radius: $formElement_borderRadius;
+        color: $formElement_color;
+        background: $global-color_white;
+    }
+
     padding: $formElement_paddingVertical $formElement_paddingHorizontal;
     margin: 0;
     width: 100%;
 
     &:focus,
     &:active {
-        background: $global-color_white;
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+            color: $formElement_color;
+        }
         box-shadow: none;
         outline: none;
-        border-color: $global-color_primary;
-        color: $formElement_color;
     }
 }
 
@@ -189,17 +194,19 @@ ul.token-input-list {
     li input {
         margin: 0 !important;
         padding: 0;
-        height: $formElement_height - 2px;
+        height: $formElement_height - 6px;
         line-height: initial;
         font-size: $global-medium_fontSize;
         font-weight: $global-normal_fontWeight !important;
     }
 
     &.token-input-focused {
-        background: $global-color_white;
         box-shadow: none;
         outline: none;
-        border-color: $global-color_primary;
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+        }
     }
 }
 
@@ -212,9 +219,11 @@ div.token-input-dropdown {
     border-top: $component_border;
     visibility: visible !important;
     opacity: 1 !important;
-    border: $component_border;
-    border-radius: $formElement_borderRadius;
-    box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+    @if ($staticVariables) {
+        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        border-radius: $formElement_borderRadius;
+        border: $component_border;
+    }
 
     ul li[class^= "token-input-dropdown-item"],
     p {
@@ -313,20 +322,26 @@ div.token-input-dropdown {
         right: 0;
         top: 0;
         height: 100%;
+        min-width: $formButton_height;
         border-color: $button-primary_border;
-        background-color: $button-primary_bg;
-        color: $button-primary_fg;
+
+        @if ($staticVariables) {
+            background-color: $button-primary_bg;
+            color: $button-primary_fg;
+        }
 
         .SpDropdownHandle::before {
             height: 100%;
             padding: 0 $utility-baseUnitDouble;
         }
 
-        &:hover,
-        &:focus,
-        &:active {
-            background-color: rgba($button-primary-hover_bg, 0.05);
-            color: $button-primary-hover_fg;
+        @if ($staticVariables) {
+            &:hover,
+            &:focus,
+            &:active {
+                background-color: rgba($button-primary-hover_bg, 0.05);
+                color: $button-primary-hover_fg;
+            }
         }
     }
 }
@@ -340,6 +355,7 @@ div.token-input-dropdown {
         .Button.Handle {
             background-color: rgba($button-primary-hover_bg, 0.3);
             color: $button-primary-hover_fg;
+            min-width: $formButton_height;
         }
     }
 }

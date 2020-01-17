@@ -9,6 +9,9 @@ namespace Vanilla\Models;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
+use Vanilla\Theme\Asset;
+use Vanilla\Theme\HtmlAsset;
+use Vanilla\Theme\TwigAsset;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\Asset\ThemeScriptAsset;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -72,7 +75,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
 
         return new ThemeScriptAsset(
             $this->request,
-            $this->siteMeta->getActiveTheme()->getKey(),
+            $this->siteMeta->getActiveThemeKey(),
             // Use both the theme version and the deployment to make a more robust cache buster.
             // People often forget to increment their theme version in file based themes
             // so adding the deployment cache buster to the theme version handles this case.
@@ -87,12 +90,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function getThemeData(): ?array {
         if (!$this->themeData) {
-            $theme = $this->siteMeta->getActiveTheme();
-            if ($theme === null) {
-                $this->themeData = null;
-                return null;
-            }
-            $themeKey = $this->siteMeta->getActiveTheme()->getKey();
+            $themeKey = $this->siteMeta->getActiveThemeKey();
             try {
                 $this->themeData = $this->themesApi->get($themeKey);
             } catch (\Throwable $e) {
@@ -144,7 +142,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             if (!$themeData) {
                 return '';
             }
-            $themeKey = $this->siteMeta->getActiveTheme()->getKey();
+            $themeKey = $this->siteMeta->getActiveThemeKey();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {
                 $style = $this->themesApi->get_assets($themeKey, 'styles.css');
@@ -165,7 +163,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['header'] ?? '');
+
+        return $this->renderAsset($themeData['assets']['footer'] ?? null);
     }
 
     /**
@@ -178,6 +177,25 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$themeData) {
             return '';
         }
-        return $this->getThemeInlineCss() . ($themeData['assets']['footer'] ?? '');
+        return $this->renderAsset($themeData['assets']['header'] ?? null);
+    }
+
+
+    /**
+     * Render a theme asset for the header or footer.
+     *
+     * @param Asset|null $themeAsset
+     *
+     * @return string
+     */
+    private function renderAsset(?Asset $themeAsset): string {
+        $styles = $this->getThemeInlineCss();
+        if ($themeAsset instanceof HtmlAsset) {
+            return $styles . $themeAsset->getData();
+        } elseif ($themeAsset instanceof TwigAsset) {
+            return $styles . $themeAsset->renderHtml([]);
+        } else {
+            return '';
+        }
     }
 }

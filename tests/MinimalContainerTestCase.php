@@ -12,15 +12,20 @@ use Garden\Http\HttpClient;
 use Garden\Web\RequestInterface;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Contracts\Web\UASnifferInterface;
+use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
@@ -51,6 +56,7 @@ class MinimalContainerTestCase extends TestCase {
      */
     private function configureContainer() {
         \Gdn::setContainer(new Container());
+
         self::container()
             ->rule(FormatService::class)
             ->setShared(true)
@@ -92,14 +98,31 @@ class MinimalContainerTestCase extends TestCase {
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
+            ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setShared(true)
+            ->setConstructorArgs([
+                'deploymentTime' => null,
+            ])
+
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
             ->setClass(MockHttpClient::class)
+
+            ->rule(UASnifferInterface::class)
+            ->setClass(MockUASniffer::class)
 
             // Dates
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
+
+            // Logger
+            ->rule(\Vanilla\Logger::class)
+            ->setShared(true)
+            ->addAlias(LoggerInterface::class)
+
+            ->rule(LoggerAwareInterface::class)
+            ->addCall('setLogger')
 
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)
@@ -117,6 +140,11 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(UserProviderInterface::class)
             ->setClass(MockUserProvider::class)
             ->setShared(true)
+
+            ->rule(\Gdn_PluginManager::class)
+            ->addAlias(\Gdn::AliasPluginManager)
+
+            ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
         ;
     }
 

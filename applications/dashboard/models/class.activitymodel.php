@@ -10,6 +10,7 @@
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
+use Vanilla\Formatting\Formats\TextFormat;
 
 /**
  * Activity data management.
@@ -17,6 +18,9 @@ use Vanilla\Dashboard\Models\ActivityEmail;
 class ActivityModel extends Gdn_Model {
 
     use \Vanilla\FloodControlTrait;
+
+    /** Maximum length of activity story excerpts. */
+    private const DEFAULT_EXCERPT_LENGTH = 160;
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
@@ -1318,10 +1322,28 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Get total notifications for a user.
      *
+     * @param integer $notifyUser Enum: NOTIFY_PUBLIC, NOTIFY_MODS, NOTIFY_ADMINS
+     * @return integer
+     */
+    public function getUserTotal(int $notifyUser): int {
+        $notifications = $this->SQL
+            ->select("ActivityID", "count", "total")
+            ->from($this->Name)
+            ->where("NotifyUserID", $notifyUser)
+            ->get()
+            ->resultArray();
+        if (!is_array($notifications) || !isset($notifications[0])) {
+            return 0;
+        }
+        return $notifications[0]["total"] ?? 0;
+    }
+
+    /**
+     * Mark activities as notified
      *
-     * @param $activityIDs
-     * @throws Exception
+     * @param array $activityIDs
      */
     public function setNotified($activityIDs) {
         if (!is_array($activityIDs) || count($activityIDs) == 0) {
@@ -1478,7 +1500,27 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Set the story for an activity to an excerpt of the original.
      *
+     * @param array $activity
+     * @param int $length
+     * @return array
+     */
+    public function setStoryExcerpt(array $activity, int $length = self::DEFAULT_EXCERPT_LENGTH): array {
+        if (!isset($activity["Story"]) || !isset($activity["Format"])) {
+            return $activity;
+        }
+
+        $excerpt = Gdn::formatService()->renderExcerpt($activity["Story"], $activity["Format"]);
+        $excerpt = sliceString(rtrim($excerpt, "…"), $length, "…");
+
+        $activity["Story"] = $excerpt;
+        $activity["Format"] = TextFormat::FORMAT_KEY;
+        return $activity;
+    }
+
+    /**
+     * Save an activity.
      *
      * @param array $data
      * @param bool $preference
@@ -1491,6 +1533,10 @@ class ActivityModel extends Gdn_Model {
         $activity = $data;
         $this->_touch($activity);
         $queueEmail = $options["QueueEmail"] ?? false;
+
+        $extraFields = $data["Ext"] ?? [];
+        unset($data["Ext"]);
+        $emailFields = $extraFields["Email"] ?? [];
 
         if ($activity['ActivityUserID'] == $activity['NotifyUserID'] && !val('Force', $options)) {
             trace('Skipping activity because it would notify the user of something they did.');
@@ -1583,8 +1629,10 @@ class ActivityModel extends Gdn_Model {
 
         $delete = false;
         if ($activity['Emailed'] == self::SENT_PENDING && !$queueEmail) {
-            $this->email($activity, $options);
-            $delete = val('_Delete', $activity);
+            $emailActivity = $emailFields + $activity;
+            $this->email($emailActivity, $options);
+            $delete = val('_Delete', $emailActivity);
+            $activity["Emailed"] = $emailActivity["Emailed"];
         }
 
         $activityData = $activity['Data'];
@@ -1644,7 +1692,7 @@ class ActivityModel extends Gdn_Model {
                 $activity['ActivityID'] = $activityID;
 
                 if ($activity['Emailed'] == self::SENT_PENDING) {
-                    $this->queueEmail($activity, $options);
+                    $this->queueEmail($emailFields + $activity, $options);
                 }
 
                 $this->prune();

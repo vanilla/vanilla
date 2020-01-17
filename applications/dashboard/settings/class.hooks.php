@@ -298,9 +298,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
         $isDefaultMaster = $sender->MasterView == 'default' || $sender->MasterView == '';
         if ($theme != '' && $isDefaultMaster) {
-            $htmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
-            if (file_exists($htmlFile)) {
-                $sender->EventArguments['MasterViewPath'] = $htmlFile;
+            $themeHtmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
+            $themeAddonHtmlFile = paths(PATH_ADDONS_THEMES, $theme, 'views', 'default.master.tpl');
+            if (file_exists($themeHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeHtmlFile;
+            } elseif (file_exists($themeAddonHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeAddonHtmlFile;
             } else {
                 // for default theme
                 $sender->EventArguments['MasterViewPath'] = $sender->fetchViewLocation('default.master', '', 'dashboard');
@@ -338,7 +341,14 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false), 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
 
             ->addGroup(t('Appearance'), 'appearance', '', -1)
-            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Branding'), '/dashboard/settings/branding', 'appearance.banner', '', $sort)
+            ->addLinkIf(
+                $session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false),
+                t('Branding & SEO'),
+                '/dashboard/settings/branding',
+                'appearance.banner',
+                '',
+                $sort
+            )
             ->addLinkIf('Garden.Settings.Manage', t('Layout'), '/dashboard/settings/layout', 'appearance.layout', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)

@@ -54,6 +54,11 @@ export async function scaffoldTheme(themeData: IThemeData) {
     // Write the theme to the config.
     await writeConfigTheme(themeKey);
     print(chalk`{green ✔  Set themeKey {white ${themeKey}} as the active theme in {white config.php}.}`);
+
+    printSection("Next Steps");
+    print(
+        chalk`To finish installing the new theme, start (or restart) your build with {green yarn build} or {green yarn build:dev}.`,
+    );
 }
 
 /**

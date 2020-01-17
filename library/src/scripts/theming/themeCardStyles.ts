@@ -21,7 +21,9 @@ export const themeCardVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: color("#adb2bb"),
+        white: color("#ffffff"),
         imgColor: color("#0291db"),
+
         bg: {
             white: color("#fff"),
             overlay: rgba(103, 105, 109, 0.8),
@@ -369,10 +371,21 @@ export const themeCardClasses = useThemeCache(() => {
 
     const buttons = style("buttons", {
         marginBottom: unit(vars.contentTile.margin.bottom),
-
         $nest: {
             "&&": {
                 width: unit(180),
+            },
+            "& a": {
+                color: globalVariables().mainColors.fg.toString(),
+            },
+            [`&:hover a`]: {
+                color: vars.colors.white.toString(),
+                textTransform: "none",
+                $nest: {
+                    "&:hover": {
+                        textTransform: "none",
+                    },
+                },
             },
         },
     });
@@ -397,21 +410,25 @@ export const themeCardClasses = useThemeCache(() => {
         right: unit(7),
         color: vars.colors.bg.white.toString(),
         $nest: {
+            "&& dropDown-item": {
+                $nest: {
+                    "&:hover": {
+                        textTransform: "none",
+                    },
+                },
+            },
             "& .icon-dropDownMenu": {
                 color: vars.colors.bg.white.toString(),
             },
             "&.focus-visible": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },
             "&:focus": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },
             "&:hover": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },

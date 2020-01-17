@@ -6,9 +6,13 @@
 import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
+import { ImageEmbedModal } from "@rich-editor/editor/pieces/ImageEmbedModal";
+import { EmbedMenu } from "@rich-editor/editor/pieces/EmbeMenu";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -37,9 +41,23 @@ export function ImageEmbed(props: IProps) {
                         tabIndex={props.inEditor ? -1 : undefined}
                     />
                 </div>
-                {props.inEditor && props.isSelected && (
-                    <ImageEmbedMenu
-                        onVisibilityChange={setIsOpen}
+                {props.inEditor && (props.isSelected || isOpen) && (
+                    <EmbedMenu>
+                        <Button
+                            baseClass={ButtonTypes.ICON}
+                            onClick={() => {
+                                setIsOpen(true);
+                            }}
+                        >
+                            <AccessibleImageMenuIcon />
+                        </Button>
+                        <Button baseClass={ButtonTypes.ICON} onClick={props.deleteSelf}>
+                            <DeleteIcon />
+                        </Button>
+                    </EmbedMenu>
+                )}
+                {isOpen && (
+                    <ImageEmbedModal
                         onSave={newValue => {
                             props.syncBackEmbedValue &&
                                 props.syncBackEmbedValue({
@@ -48,6 +66,12 @@ export function ImageEmbed(props: IProps) {
                             props.selectSelf && props.selectSelf();
                         }}
                         initialAlt={props.name}
+                        onClose={() => {
+                            setIsOpen(false);
+                            setImmediate(() => {
+                                props.selectSelf?.();
+                            });
+                        }}
                     />
                 )}
             </div>

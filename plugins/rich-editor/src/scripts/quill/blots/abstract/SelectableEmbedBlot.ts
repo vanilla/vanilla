@@ -35,7 +35,7 @@ export class SelectableEmbedBlot extends BlockEmbed {
      * - Place selection on another FocusableBlot that will be in the same spot as this one after deletion.
      * - Place the selection back in quill where this blot was.
      */
-    public remove() {
+    public remove = () => {
         if (!this.quill) {
             return logWarning("Attempted to focus a an embed blot that has not been mounted yet.");
         }
@@ -55,7 +55,7 @@ export class SelectableEmbedBlot extends BlockEmbed {
                 this.quill.setSelection(offset, 0, Quill.sources.USER);
             }
         }
-    }
+    };
 
     /**
      * Inserts a newline after this blot and places the cursor there.

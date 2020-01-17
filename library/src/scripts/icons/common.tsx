@@ -506,7 +506,8 @@ export function SearchErrorIcon(props: { message?: string; className?: string })
     );
 }
 
-export function accessibleImageMenu(message?: string, className?: string) {
+export function AccessibleImageMenuIcon(props: { message?: string; className?: string }) {
+    const { message, className } = props;
     const title = message ? message : t("Accessibility");
     const classes = iconClasses();
     return (

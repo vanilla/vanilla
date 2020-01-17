@@ -37,6 +37,7 @@ export interface IBaseEmbedProps {
     quill?: Quill | null;
     isSelected?: boolean;
     selectSelf?: () => void;
+    deleteSelf?: () => void;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {

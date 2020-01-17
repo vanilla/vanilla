@@ -18,8 +18,8 @@ import {
     VANILLA_THEMES,
     VANILLA_ADDONS,
     VANILLA_THEMES_LEGACY,
-} from "../env";../buildOptions
-import { BuildMode, IBuildOptions } from "../options";
+} from "../env";
+import { BuildMode, IBuildOptions } from "../buildOptions";
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
 

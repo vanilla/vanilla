@@ -40,8 +40,6 @@ export async function scaffoldTheme(themeData: IThemeData) {
     fse.writeJsonSync(path.resolve(newThemeDir, "addon.json"), addonJson, options);
     fse.writeJsonSync(path.resolve(newThemeDir, "package.json"), packageJson, options);
 
-    print(chalk`{green ✔  Successfuly created new theme {white ${themeName}} at {white ${newThemeDir}}.}`);
-
     // Try to make a symlink.
     if (newThemeDir.startsWith(VANILLA_THEMES)) {
         print(chalk`{green ✔  Theme was created in core, no symlinks required.}`);

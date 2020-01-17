@@ -78,11 +78,48 @@ buttonStory.add("Buttons", () => {
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
+                    text={`Icon Compact (Disabled) (${unit(globalVars.icon.sizes.default)}px x ${unit(
+                        globalVars.icon.sizes.default,
+                    )})`}
+                >
+                    <Button disabled baseClass={ButtonTypes.ICON_COMPACT}>
+                        <CheckCompactIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact
                     text={
                         "If you don't want to fight against existing styles and write your own custom button, use the custom class."
                     }
                 >
                     <Button baseClass={ButtonTypes.CUSTOM}>Custom</Button>
+                </StoryTileAndTextCompact>
+            </StoryTiles>
+            <StoryHeading>Disabled Buttons</StoryHeading>
+            <StoryTiles>
+                <StoryTileAndTextCompact text={"Most common button (Disabled)"}>
+                    <Button disabled>Standard (Disabled)</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Call to action (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.PRIMARY}>
+                        Primary (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Simple text button (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.TEXT}>
+                        Text (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Text with primary color (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.TEXT_PRIMARY}>
+                        Text Primary (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact
+                    text={`Icon (Disabled) (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
+                >
+                    <Button disabled baseClass={ButtonTypes.ICON} title={"Icon"}>
+                        <CloseCompactIcon />
+                    </Button>
                 </StoryTileAndTextCompact>
             </StoryTiles>
 

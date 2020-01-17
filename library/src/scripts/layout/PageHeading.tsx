@@ -14,7 +14,7 @@ import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadin
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 interface IPageHeading {
-    title: string;
+    title: React.ReactNode;
     children?: React.ReactNode;
     className?: string;
     headingClassName?: string;

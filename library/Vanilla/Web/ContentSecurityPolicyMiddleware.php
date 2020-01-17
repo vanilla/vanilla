@@ -51,6 +51,14 @@ class ContentSecurityPolicyMiddleware {
             $this->contentSecurityPolicyModel->getHeaderString($filter)
         );
 
+        $xFrameString = $this->contentSecurityPolicyModel->getXFrameString();
+        if ($xFrameString !== null) {
+            $response->setHeader(
+                ContentSecurityPolicyModel::X_FRAME_OPTIONS,
+                $xFrameString
+            );
+        }
+
         return $response;
     }
 }

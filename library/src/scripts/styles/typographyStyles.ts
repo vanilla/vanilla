@@ -19,7 +19,9 @@ export const typographyClasses = useThemeCache(() => {
     const vars = containerVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const largeTitle = style("largeTitle", {});
+    const largeTitle = style("largeTitle", {
+        width: percent(100),
+    });
 
     const pageTitle = style(
         "pageTitle",

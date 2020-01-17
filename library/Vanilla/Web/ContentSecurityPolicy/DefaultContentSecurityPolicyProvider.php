@@ -6,21 +6,23 @@
 
 namespace Vanilla\Web\ContentSecurityPolicy;
 
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Default content security policy provider.
  */
 class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
 
     /**
-     * @var \Gdn_Configuration
+     * @var ConfigurationInterface
      */
     private $config;
 
     /**
      * DefaultContentSecurityPolicyProvider constructor.
-     * @param \Gdn_Configuration $config
+     * @param ConfigurationInterface $config
      */
-    public function __construct(\Gdn_Configuration $config) {
+    public function __construct(ConfigurationInterface $config) {
         $this->config = $config;
     }
 
@@ -51,7 +53,7 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
     * @return Policy[]
     */
     private function getFrameAncestors(): array {
-        $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, '\'self\'');
+        $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, Policy::FRAME_ANCESTORS_SELF);
         if ($this->config->get("Garden.Embed.Allow")) {
             $whitelist = $this->config->get('Garden.TrustedDomains', false);
             $trusteddDomains = is_string($whitelist) ? array_filter(explode("\n", $whitelist)) : [];

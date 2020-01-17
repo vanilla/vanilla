@@ -489,7 +489,3 @@ foreach ($users as $user) {
             ->put();
     }
 }
-
-// Set current Vanilla.Version
-$appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'vanilla'.DS.'addon.json'), true);
-saveToConfig('Vanilla.Version', val('version', $appInfo, 'Undefined'));

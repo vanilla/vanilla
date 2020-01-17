@@ -1196,12 +1196,21 @@ class DiscussionModel extends Gdn_Model {
 
         $unreadCommentCount = $discussionCommentCount - $userReadComments;
 
-        if ($discussionCommentCount > $userReadComments) {
-            $unreadCommentCount = $discussionCommentCount;
+        //check if there are unread comments even though the last read date is greater than the last comment date
+        //Might be bad to trust the counts over the dates.
+        if ($unreadCommentCount > 0 && $isRead === true) {
+            $isRead === false;
         }
 
+//        if ($discussionCommentCount > $userReadComments) {
+//            $unreadCommentCount = $discussionCommentCount;
+//        }
+
+//        put in case where the discussion has been viewed, but there were no comments at the time.
+
+        //Q: why zero?
         if (!$userReadComments) {
-            $unreadCommentCount = 0;
+            $unreadCommentCount = $discussionCommentCount;
         }
 
         if ($userReadComments === null) {

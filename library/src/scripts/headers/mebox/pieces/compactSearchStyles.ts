@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit, modifyColorBasedOnLightness } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
@@ -17,7 +17,7 @@ export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
 
-    let baseColor = titleBarVars.colors.bg.darken(0.05);
+    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
         baseColor = baseColor.fade(0.3);

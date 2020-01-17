@@ -198,6 +198,8 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const logo = makeThemeVars("logo", {
+        doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
+        offsetRight: globalVars.gutter.size,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
@@ -382,7 +384,7 @@ export const titleBarClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
-            marginRight: unit(globalVars.gutter.size),
+            marginRight: unit(vars.logo.offsetRight),
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),

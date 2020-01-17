@@ -11,8 +11,9 @@ import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
-import { logDebug, logWarning, hashString } from "@vanilla/utils";
+import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
+import { isArray } from "util";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -132,8 +133,7 @@ export function variableFactory(componentName: string) {
         }
 
         const normalized = normalizeVariables(customVars, declaredVars);
-        const result = merge(declaredVars, normalized);
-        return result;
+        return normalized;
     };
 }
 
@@ -148,32 +148,35 @@ const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
  * - Strings starting with `#` get wrapped in `color()`;
  */
 function normalizeVariables(customVariable: any, defaultVariable: any) {
-    if (Array.isArray(customVariable)) {
-        customVariable = customVariable.map(normalizeVariables);
-    } else if (typeof customVariable === "object") {
-        const newObj: any = {};
-        for (const [key, value] of Object.entries(customVariable)) {
-            if (!(key in defaultVariable)) {
-                // If we don't have a default version of this variable, remove it.
-                continue;
+    try {
+        if (Array.isArray(customVariable) && isArray(defaultVariable)) {
+            // We currently can't pre-process arrays.
+            return customVariable;
+        } else if (defaultVariable instanceof ColorHelper) {
+            if (customVariable instanceof ColorHelper) {
+                return customVariable;
+            } else {
+                const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
+                return color;
             }
-            const defaultNested = defaultVariable[key];
-            newObj[key] = normalizeVariables(value, defaultNested);
+        } else if (
+            typeof customVariable === "object" &&
+            typeof defaultVariable === "object" &&
+            defaultVariable !== null
+        ) {
+            const newObj: any = {};
+            for (const [key, defaultValue] of Object.entries(defaultVariable)) {
+                const mergedValue = key in customVariable ? customVariable[key] : defaultValue;
+                newObj[key] = normalizeVariables(mergedValue, defaultValue);
+            }
+            return newObj;
+        } else {
+            return customVariable;
         }
-        return newObj;
+    } catch (e) {
+        logError("Error while evaluation custom variable", customVariable, e);
+        return defaultVariable;
     }
-
-    if (typeof customVariable === "string") {
-        try {
-            const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
-            return color;
-        } catch (e) {
-            logWarning(e);
-            return defaultVariable;
-        }
-    }
-
-    return customVariable;
 }
 
 /**

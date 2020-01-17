@@ -154,8 +154,8 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([
                 [
-                    Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                    Addon::TYPE_THEME => '/themes',
+                    Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+                    Addon::TYPE_THEME => ['/addons/themes', '/themes'],
                     Addon::TYPE_LOCALE => '/locales'
                 ],
                 PATH_ROOT.'/tests/cache/bootstrap'

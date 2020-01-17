@@ -222,11 +222,10 @@ export default class EntryModel {
      * @param rootDir The directory to find addons in.
      */
     private async initAddons(rootDir: string) {
-        const dirExists = await fileExists(rootDir);
+        const dirExists = await fileExists(path.resolve(rootDir));
         if (!dirExists) {
             return;
         }
-
         let addonKeyList = await readDir(path.resolve(rootDir));
 
         // Filter only the enabled addons for a development build.

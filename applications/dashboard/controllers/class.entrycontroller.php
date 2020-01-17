@@ -503,13 +503,13 @@ class EntryController extends Gdn_Controller {
         }
 
         $isTrustedProvider = $this->data('Trusted');
+        $roles = $this->Form->getFormValue('Roles', $this->Form->getFormValue('roles', null));
 
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
+        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $roles !== null) {
             $saveRoles = $saveRolesRegister = true;
 
             // Translate the role names to IDs.
-            $roles = $this->Form->getFormValue('Roles', null);
             $roles = RoleModel::getByName($roles);
             $roleIDs = array_keys($roles);
 

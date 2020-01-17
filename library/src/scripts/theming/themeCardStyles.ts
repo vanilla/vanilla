@@ -4,7 +4,14 @@
  */
 
 import { percent, color, rgba } from "csx";
-import { unit, paddings, defaultTransition, flexHelper } from "@library/styles/styleHelpers";
+import {
+    unit,
+    paddings,
+    defaultTransition,
+    flexHelper,
+    colorOut,
+    emphasizeLightness,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -120,6 +127,11 @@ export const themeCardVariables = useThemeCache(() => {
         width: 4,
         height: 4,
     });
+    const btn_content = makeThemeVars("btn_content", {
+        state: {
+            bg: emphasizeLightness(colors.bg.overlay, 0.04),
+        },
+    });
 
     return {
         colors,
@@ -138,6 +150,7 @@ export const themeCardVariables = useThemeCache(() => {
         tileHeader,
         tileText,
         dots,
+        btn_content,
     };
 });
 
@@ -356,7 +369,12 @@ export const themeCardClasses = useThemeCache(() => {
 
     const buttons = style("buttons", {
         marginBottom: unit(vars.contentTile.margin.bottom),
-        width: unit(180),
+
+        $nest: {
+            "&&": {
+                width: unit(180),
+            },
+        },
     });
     const noOverlay = style("noOverlay", {
         display: "none",
@@ -371,6 +389,43 @@ export const themeCardClasses = useThemeCache(() => {
         bottom: 0,
         width: percent(100),
         height: percent(100),
+    });
+
+    const actionDropdown = style("actionDropdown", {
+        position: "absolute",
+        top: unit(5),
+        right: unit(7),
+        color: vars.colors.bg.white.toString(),
+        $nest: {
+            "& .icon-dropDownMenu": {
+                color: vars.colors.bg.white.toString(),
+            },
+            "&.focus-visible": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
+            },
+            "&:focus": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
+            },
+            "&:hover": {
+                color: vars.colors.bg.white.toString(),
+                borderRadius: "2px",
+                backgroundColor: colorOut(vars.btn_content.state.bg),
+            },
+        },
+    });
+
+    const itemLabel = style("itemLabel", {
+        display: "block",
+        flexGrow: 1,
+    });
+
+    const toolTipBox = style("toolTipBox", {
+        width: "20px",
+        height: "20px",
     });
 
     return {
@@ -404,6 +459,9 @@ export const themeCardClasses = useThemeCache(() => {
         overlay,
         isFocused,
         noOverlay,
+        actionDropdown,
+        itemLabel,
+        toolTipBox,
     };
 });
 

@@ -6,6 +6,8 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
@@ -81,16 +83,21 @@ class ThemeModel {
     /** @var ConfigurationInterface $config */
     private $config;
 
+    /** @var AddonManager $addonManager */
+    private $addonManager;
+
     /**
      * ThemeModel constructor.
      * @param ConfigurationInterface $config
      */
     public function __construct(
         ConfigurationInterface $config,
-        \Gdn_Session $session
+        \Gdn_Session $session,
+        AddonManager $addonManager
     ) {
         $this->config = $config;
         $this->session = $session;
+        $this->addonManager = $addonManager;
     }
 
     /**
@@ -225,6 +232,11 @@ class ThemeModel {
         return $theme;
     }
 
+    /**
+     * Get view theme key
+     *
+     * @return string
+     */
     public function getViewThemeKey(): string {
         $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
 
@@ -232,6 +244,23 @@ class ThemeModel {
             $themeKey = $previewTheme;
         }
         return $themeKey;
+    }
+
+    /**
+     * Get view theme addon
+     *
+     * @return string
+     */
+    public function getThemeAddon(): Addon {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            $themeKey = $previewTheme;
+        }
+        $provider = $this->getThemeProvider($themeKey);
+        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
+        $addon = $this->addonManager->lookupTheme($addonThemeKey);
+        return $addon;
     }
 
     /**

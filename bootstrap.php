@@ -106,9 +106,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
 
-    ->rule(ThemeFeatures::class)
-    ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
-
     // ApplicationManager
     ->rule('Gdn_ApplicationManager')
     ->setShared(true)

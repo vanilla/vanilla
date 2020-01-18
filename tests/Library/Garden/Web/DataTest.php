@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Richard Flynn <richard.flynn@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -415,5 +415,31 @@ class DataTest extends TestCase {
         $expected = ['foo' => 'bar', 'bar' => 'baz'];
         $actual = $this->data->getMetaArray();
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Trying to get a data item from a non-array data is an exception.
+     */
+    public function testGetDataItemException() {
+        $data = new Data('foo');
+        $this->expectException(\Exception::class);
+        $data->getDataItem('0');
+    }
+
+    /**
+     * Trying to get a data item from a non-array data is an exception.
+     */
+    public function testSetDataItemException() {
+        $data = new Data('foo');
+        $this->expectException(\Exception::class);
+        $data->setDataItem('0', 'b');
+    }
+
+    /**
+     * Test the data constructor with an integer status.
+     */
+    public function testIntStatusConstructor() {
+        $data = new Data([], 200);
+        $this->assertSame(200, $data->getStatus());
     }
 }

@@ -369,18 +369,18 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup');
 
         $hasDiv = false;
-        if ($canEdit && !empty(val('DateUpdated', $discussion))) {
-            $hasDiv = true;
-            $dropdown
-                ->addDivider()
-                ->addLink(
-                    t('Revision History'),
-                    '/log/filter?'.http_build_query(['recordType' => 'discussion', 'recordID' => $discussionID]),
-                    'discussionRevisionHistory',
-                    'RevisionHistory'
-                );
-        }
-        if (CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Delete')) {
+        if ($session->checkPermission('Garden.Moderation.Manage')) {
+            if (!empty(val('DateUpdated', $discussion))) {
+                $hasDiv = true;
+                $dropdown
+                    ->addDivider()
+                    ->addLink(
+                        t('Revision History'),
+                        '/log/filter?' . http_build_query(['recordType' => 'discussion', 'recordID' => $discussionID]),
+                        'discussionRevisionHistory',
+                        'RevisionHistory'
+                    );
+            }
             $dropdown
                 ->addDividerIf(!$hasDiv)
                 ->addLink(
@@ -488,14 +488,14 @@ if (!function_exists('getCommentOptions')) :
                 'Url' => '/post/editcomment/'.$comment->CommentID,
                 'EditComment'
             ];
+        }
 
-            if (!empty(val('DateUpdated', $comment))) {
-                $options['RevisionHistory'] = [
-                    'Label' => t('Revision History'),
-                    'Url' => '/log/filter?' . http_build_query(['recordType' => 'comment', 'recordID' => $comment->CommentID]),
-                    'RevisionHistory',
-                ];
-            }
+        if ($session->checkPermission('Garden.Moderation.Manage') && !empty(val('DateUpdated', $comment))) {
+            $options['RevisionHistory'] = [
+                'Label' => t('Revision History'),
+                'Url' => '/log/filter?' . http_build_query(['recordType' => 'comment', 'recordID' => $comment->CommentID]),
+                'RevisionHistory',
+            ];
         }
 
         // Can the user delete the comment?

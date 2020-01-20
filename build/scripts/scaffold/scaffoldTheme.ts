@@ -4,6 +4,7 @@
  */
 
 import path from "path";
+import fs from "fs";
 import fse from "fs-extra";
 import chalk from "chalk";
 import { printSection, print, printError } from "../utility/utils";
@@ -44,8 +45,9 @@ export async function scaffoldTheme(themeData: IThemeData) {
     if (newThemeDir.startsWith(VANILLA_THEMES)) {
         print(chalk`{green ✔  Theme was created in core, no symlinks required.}`);
     } else {
-        const symlinkPath = path.resolve(VANILLA_THEMES, themeKey);
-        fse.ensureSymlinkSync(newThemeDir, symlinkPath);
+        const symlinkFileLocation = path.resolve(VANILLA_THEMES, themeKey);
+        const relativeSymlinkPath = path.relative(VANILLA_THEMES, newThemeDir);
+        fse.ensureSymlinkSync(relativeSymlinkPath, symlinkFileLocation);
         print(chalk`{green ✔  Successfuly created new theme {white ${themeName}} at {white ${newThemeDir}}.}`);
     }
 

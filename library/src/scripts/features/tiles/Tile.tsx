@@ -36,19 +36,13 @@ export default class Tile extends React.Component<IProps> {
         const classes = tileClasses();
         return (
             <div className={classNames(className, classes.root(columns))}>
-                <SmartLink className={classNames("subcommunityTile-link", classes.link(columns))} to={url}>
-                    <div className={classNames("subcommunityTile-iconFrame", classes.frame)}>
-                        {icon && (
-                            <img className={classNames("subcommunityTile-icon", classes.icon)} src={icon} alt={alt} />
-                        )}
+                <SmartLink className={classNames(classes.link(columns))} to={url}>
+                    <div className={classNames(classes.frame(columns))}>
+                        {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} />}
                         {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>
-                    <H className={classNames("subcommunityTile-title", classes.title)}>{title}</H>
-                    {description && (
-                        <Paragraph className={classNames("subcommunityTile-description", classes.description)}>
-                            {description}
-                        </Paragraph>
-                    )}
+                    <H className={classNames(classes.title)}>{title}</H>
+                    {description && <Paragraph className={classNames(classes.description)}>{description}</Paragraph>}
                 </SmartLink>
             </div>
         );

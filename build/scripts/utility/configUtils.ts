@@ -26,3 +26,8 @@ export async function getVanillaConfig(configName: string) {
         return config;
     }
 }
+
+export async function writeConfigTheme(themeKey: string) {
+    const configReaderPath = resolve(__dirname, "../configThemeWriter.php");
+    await execute(`php ${configReaderPath} ${themeKey}`);
+}

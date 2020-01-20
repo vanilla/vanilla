@@ -1,0 +1,10 @@
+{
+    "name": "@vanilla/theme-core",
+    "version": "3.0.1",
+    "devDependencies": {
+        "@vanilla/tsconfig": "^3.0.1"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

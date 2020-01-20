@@ -88,7 +88,14 @@ const titleBarNavClasses = useThemeCache(() => {
         }),
     );
 
-    const navigation = style("navigation", {});
+    const navigation = style(
+        "navigation",
+        titleBarVars.logo.doubleLogoStrategy === "hidden"
+            ? {
+                  marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
+              }
+            : {},
+    );
 
     const items = style(
         "items",

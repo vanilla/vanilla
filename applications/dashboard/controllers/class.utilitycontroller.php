@@ -345,6 +345,7 @@ class UtilityController extends DashboardController {
     public function updateWithToken() {
         $this->ApplicationFolder = 'dashboard';
         $this->MasterView = 'setup';
+        $this->setData('Success', null);
 
         // Do some checks for backwards for behavior for CD.
         if ($this->Request->isPostBack()) {

@@ -21,6 +21,7 @@ import { addComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
+import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -46,4 +47,5 @@ addComponent("title-bar-hamburger", TitleBarHamburger);
 
 if (getMeta("themeFeatures.DataDrivenForumColors", false)) {
     compatibilityStyles();
+    applyCompatibilityIcons();
 }

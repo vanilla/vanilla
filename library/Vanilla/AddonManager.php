@@ -534,6 +534,7 @@ class AddonManager implements Contracts\AddonProviderInterface {
         // Look for the addon itself.
         $addon = false;
         foreach ($this->scanDirs[$type] as $scanDir) {
+            $scanPath = PATH_ROOT."$scanDir/$addonDirName";
             if (file_exists(PATH_ROOT."$scanDir/$addonDirName")) {
                 $addon = new Addon("$scanDir/$addonDirName");
                 break;

@@ -7,7 +7,7 @@
 import path from "path";
 import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
-import { getOptions, BuildMode } from "../options";
+import { getOptions, BuildMode } from "../buildOptions";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { SourceMapDevToolPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";

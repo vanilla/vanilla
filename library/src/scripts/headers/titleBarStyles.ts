@@ -22,7 +22,7 @@ import {
     sticky,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -55,7 +55,18 @@ export const titleBarVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
+        bgImage: null as string | null,
     });
+
+    const fullBleed = makeThemeVars("fullBleed", {
+        enabled: false,
+        startingOpacity: 0,
+        endingOpacity: 0.15, // Scale of 0 -> 1 where 1 is opaque.
+        bgColor: colors.bg,
+    });
+
+    // Fix up the ending opacity so it is always darker than the starting one.
+    fullBleed.endingOpacity = Math.max(fullBleed.startingOpacity, fullBleed.endingOpacity);
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
@@ -84,7 +95,7 @@ export const titleBarVariables = useThemeCache(() => {
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
-            bg: colors.bg,
+            bg: "transparent",
         },
         fonts: {
             color: colors.fg,
@@ -187,8 +198,10 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const logo = makeThemeVars("logo", {
+        doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
+        offsetRight: globalVars.gutter.size,
         maxWidth: 200,
-        heightOffset: 18,
+        heightOffset: sizing.height / 3,
         tablet: {},
     });
 
@@ -222,6 +235,7 @@ export const titleBarVariables = useThemeCache(() => {
     };
 
     return {
+        fullBleed,
         border,
         sizing,
         colors,
@@ -270,8 +284,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const root = style({
         maxWidth: percent(100),
-        backgroundColor: vars.colors.bg.toString(),
-        color: vars.colors.fg.toString(),
+        color: colorOut(vars.colors.fg),
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {
@@ -308,6 +321,35 @@ export const titleBarClasses = useThemeCache(() => {
         }).$nest,
     });
 
+    const bg1 = style("bg1", {
+        willChange: "opacity",
+        ...absolutePosition.fullSizeOfParent(),
+        backgroundColor: colorOut(vars.colors.bg),
+    });
+
+    const bg2 = style("bg2", {
+        willChange: "opacity",
+        ...absolutePosition.fullSizeOfParent(),
+        backgroundColor: colorOut(vars.colors.bg),
+    });
+
+    const bgImage = style("bgImage", {
+        ...absolutePosition.fullSizeOfParent(),
+        objectFit: "cover",
+    });
+
+    const negativeSpacer = style(
+        "negativeSpacer",
+        {
+            marginTop: px(-vars.sizing.height),
+            paddingTop: px(vars.sizing.height / 2),
+        },
+        mediaQueries.compact({
+            marginTop: px(-vars.sizing.mobile.height),
+            paddingTop: px(vars.sizing.mobile.height / 2),
+        }),
+    );
+
     const spacer = style(
         "spacer",
         {
@@ -342,7 +384,7 @@ export const titleBarClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
-            marginRight: unit(globalVars.gutter.size),
+            marginRight: unit(vars.logo.offsetRight),
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -490,11 +532,11 @@ export const titleBarClasses = useThemeCache(() => {
         "button",
         {
             ...buttonResetMixin(),
-            color: colorOut(vars.colors.fg),
             height: px(vars.button.size),
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
+            color: colorOut(vars.colors.fg),
             $nest: {
                 "&&": {
                     ...allButtonStates(
@@ -745,7 +787,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const isFixed = style("isFixed", {
+    const isSticky = style("isSticky", {
         ...sticky(),
         top: 0,
         zIndex: 10,
@@ -753,6 +795,10 @@ export const titleBarClasses = useThemeCache(() => {
 
     return {
         root,
+        bg1,
+        bg2,
+        bgImage,
+        negativeSpacer,
         spacer,
         bar,
         logoContainer,
@@ -786,7 +832,7 @@ export const titleBarClasses = useThemeCache(() => {
         desktopNavWrap,
         logoCenterer,
         hamburger,
-        isFixed,
+        isSticky,
     };
 });
 

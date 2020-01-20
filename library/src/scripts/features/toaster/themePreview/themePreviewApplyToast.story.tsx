@@ -18,7 +18,7 @@ formsStory.add("Toast/ThemePreview/Apply", () =>
         return (
             <>
                 <StoryContent>
-                    <StoryHeading depth={1}>Theme preview toast</StoryHeading>
+                    <StoryHeading depth={1}>Theme preview toast: Apply loading</StoryHeading>
                 </StoryContent>
                 <Toast
                     links={[

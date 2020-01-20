@@ -18,7 +18,7 @@ formsStory.add("Toast/ThemePreview/Cancel", () =>
         return (
             <>
                 <StoryContent>
-                    <StoryHeading depth={1}>Theme preview toast</StoryHeading>
+                    <StoryHeading depth={1}>Theme preview toast: Cancel loading</StoryHeading>
                 </StoryContent>
                 <Toast
                     links={[

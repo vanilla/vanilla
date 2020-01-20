@@ -374,12 +374,13 @@ class ThemeModel {
     /**
      * Basic input string validation function for html and json assets
      *
-     * @param string $data
+     * @param array $data
      * @param ValidationField $field
      * @return bool
      */
-    public static function validator(string $data, ValidationField $field) {
+    public static function validator(array $data, ValidationField $field) {
         $asset = self::ASSET_LIST[$field->getName()];
+        $data = $data['data'];
         switch ($asset['type']) {
             case 'html':
                 libxml_use_internal_errors(true);

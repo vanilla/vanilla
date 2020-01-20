@@ -1402,9 +1402,7 @@ class SettingsController extends DashboardController {
 
         // Retrieve all available plugins from the plugins directory
         $this->EnabledPlugins = Gdn::pluginManager()->enabledPlugins();
-        self::sortAddons($this->EnabledPlugins);
         $this->AvailablePlugins = Gdn::pluginManager()->availablePlugins();
-        self::sortAddons($this->AvailablePlugins);
 
         if ($pluginName != '') {
             if (in_array(strtolower($pluginName), array_map('strtolower', array_keys($this->EnabledPlugins)))) {
@@ -1413,6 +1411,8 @@ class SettingsController extends DashboardController {
                 $this->enablePlugin($pluginName, $filter);
             }
         } else {
+            self::sortAddons($this->EnabledPlugins);
+            self::sortAddons($this->AvailablePlugins);
             $this->render();
         }
     }

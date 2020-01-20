@@ -37,6 +37,7 @@ trait ThemesApiSchemes {
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
+                'preview?' => [":a" => $this->assetsPreviewSchema()]
             ]),
             $type
         );
@@ -96,11 +97,11 @@ trait ThemesApiSchemes {
                     'description' => 'Parent theme template name.',
                 ],
                 'parentVersion:s' => [
-                   'description' => 'Parent theme template version/revision.',
+                    'description' => 'Parent theme template version/revision.',
                 ],
                 'assets?' => Schema::parse([
-                    "header:s?",
-                    "footer:s?",
+                    "header?" => $this->assetsPutArraySchema(),
+                    "footer?" => $this->assetsPutArraySchema(),
                     "variables:s?",
                     "fonts:s?",
                     "scripts:s?",
@@ -137,8 +138,8 @@ trait ThemesApiSchemes {
                     'description' => 'Parent theme template version/revision.',
                 ],
                 'assets?' => Schema::parse([
-                    "header:s?",
-                    "footer:s?",
+                    "header?" => $this->assetsPutArraySchema(),
+                    "footer?" => $this->assetsPutArraySchema(),
                     "variables:s?",
                     "fonts:s?",
                     "scripts:s?",
@@ -200,6 +201,19 @@ trait ThemesApiSchemes {
     private function assetsPutSchema(): Schema {
         $schema = Schema::parse([
             "data:s",
+        ])->setID('themeAssetsPutSchema');
+        return $schema;
+    }
+
+    /**
+     * PUT 'assets' schema
+     *
+     * @return Schema
+     */
+    private function assetsPutArraySchema(): Schema {
+        $schema = Schema::parse([
+            "data",
+            "type"
         ])->setID('themeAssetsPutSchema');
         return $schema;
     }

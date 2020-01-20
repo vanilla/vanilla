@@ -8,7 +8,6 @@
         "@vanilla/theme-core": "^3.0.1"
     },
     "scripts": {
-        "preinstall": "node ./validator.js",
-        "build": "node ./validator.js && sass assets/styles.scss assets/styles.css"
+        "build": "sass assets/styles.scss assets/styles.css"
     }
 }

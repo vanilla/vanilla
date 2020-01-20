@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 $configFile = array_key_exists(1, $argv) ? $argv[1] : "config.php";
 $configPath = realpath(__DIR__."/../../conf/".$configFile);

@@ -95,8 +95,8 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         }
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
+                Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+                Addon::TYPE_THEME => ['/addons/themes', '/themes'],
                 Addon::TYPE_LOCALE => '/locales'
             ],
             PATH_ROOT.'/tests/cache/am/vanilla-manager'

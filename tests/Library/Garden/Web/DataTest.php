@@ -427,7 +427,7 @@ class DataTest extends TestCase {
     }
 
     /**
-     * Trying to get a data item from a non-array data is an exception.
+     * Trying to set a data item on a non-array data is an exception.
      */
     public function testSetDataItemException() {
         $data = new Data('foo');

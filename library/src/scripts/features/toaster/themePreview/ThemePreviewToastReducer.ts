@@ -7,7 +7,7 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemesActions, { PreviewStatusType } from "@themingapi/theming-ui-settings/ThemesActions";
+import ThemesActions, { PreviewStatusType } from "@library/theming/ThemesActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 

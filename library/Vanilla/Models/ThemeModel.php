@@ -14,6 +14,7 @@ use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
 use Garden\Schema\ValidationField;
+use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
@@ -86,21 +87,30 @@ class ThemeModel {
     /** @var AddonManager $addonManager */
     private $addonManager;
 
+    /** @var ThemeModelHelper $themeHelper */
+    private $themeHelper;
+
+    /** @var string $themeManagePageUrl */
+    private $themeManagePageUrl = '/dashboard/settings/themes';
+
     /**
      * ThemeModel constructor.
      *
      * @param ConfigurationInterface $config
      * @param \Gdn_Session $session
      * @param AddonManager $addonManager
+     * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
-        AddonManager $addonManager
+        AddonManager $addonManager,
+        ThemeModelHelper $themeHelper
     ) {
         $this->config = $config;
         $this->session = $session;
         $this->addonManager = $addonManager;
+        $this->themeHelper = $themeHelper;
     }
 
     /**
@@ -230,8 +240,13 @@ class ThemeModel {
      * @return array
      */
     public function setPreviewTheme($themeID): array {
-        $provider = $this->getThemeProvider($themeID);
-        $theme = $provider->setPreviewTheme($themeID);
+        if (empty($themeID)) {
+            $theme = $this->getCurrentTheme();
+            $this->themeHelper->cancelSessionPreviewTheme();
+        } else {
+            $provider = $this->getThemeProvider($themeID);
+            $theme = $provider->setPreviewTheme($themeID);
+        }
         return $theme;
     }
 
@@ -247,6 +262,40 @@ class ThemeModel {
             $themeKey = $previewTheme;
         }
         return $themeKey;
+    }
+
+    /**
+     * Get preview theme properties if exists.
+     *
+     * @return array
+     */
+    public function getPreviewTheme(): array {
+        $previewTheme = [];
+        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+            $previewTheme['themeID'] = $previewThemeKey;
+            $provider = $this->getThemeProvider($previewThemeKey);
+            $previewTheme['name'] = $provider->getName($previewThemeKey);
+            $previewTheme['redirect']= $this->getThemeManagePageUrl();
+        }
+        return $previewTheme;
+    }
+
+    /**
+     * Set theme manage page url
+     *
+     * @param string $url
+     */
+    public function setThemeManagePageUrl(string $url) {
+        $this->themeManagePageUrl = $url;
+    }
+
+    /**
+     * Get theme manage page url
+     *
+     * @return string
+     */
+    private function getThemeManagePageUrl() {
+        return $this->themeManagePageUrl;
     }
 
     /**

@@ -139,43 +139,6 @@ class DashboardHooks extends Gdn_Plugin {
             Gdn::statistics()->check();
         }
 
-        // Inform user of theme previewing
-        if ($session->isValid()) {
-            $previewThemeFolder = htmlspecialchars($session->getPreference('PreviewThemeFolder', ''));
-            $previewMobileThemeFolder = htmlspecialchars($session->getPreference('PreviewMobileThemeFolder', ''));
-            $previewThemeName = htmlspecialchars($session->getPreference(
-                'PreviewThemeName',
-                $previewThemeFolder
-            ));
-            $previewMobileThemeName = htmlspecialchars($session->getPreference(
-                'PreviewMobileThemeName',
-                $previewMobileThemeFolder
-            ));
-
-            if ($previewThemeFolder != '') {
-                $sender->informMessage(
-                    sprintf(t('You are previewing the %s desktop theme.'), wrap($previewThemeName, 'em'))
-                    .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/themes/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .'</div>',
-                    'DoNotDismiss'
-                );
-            }
-
-            if ($previewMobileThemeFolder != '') {
-                $sender->informMessage(
-                    sprintf(t('You are previewing the %s mobile theme.'), wrap($previewMobileThemeName, 'em'))
-                    .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/mobilethemes/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .'</div>',
-                    'DoNotDismiss'
-                );
-            }
-        }
-
-
         if ($session->isValid()) {
             $confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$confirmed) {

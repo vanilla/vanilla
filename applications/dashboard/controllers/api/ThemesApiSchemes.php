@@ -184,7 +184,7 @@ trait ThemesApiSchemes {
     private function themePutPreviewSchema(string $type = 'in'): Schema {
         $schema = $this->schema(
             Schema::parse([
-                'themeID:s' => [
+                'themeID:s?' => [
                     'description' => 'Theme ID or Theme Key',
                 ],
             ]),

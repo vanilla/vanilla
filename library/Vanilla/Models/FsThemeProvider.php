@@ -6,9 +6,7 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\ClientException;
 use Vanilla\Addon;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -24,7 +22,6 @@ use Garden\Web\Exception\ServerException;
 use Gdn_Request;
 use Gdn_Upload;
 use Vanilla\Theme\TwigAsset;
-use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
@@ -55,6 +52,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @param AddonManager $addonManager
      * @param Gdn_Request $request
      * @param ConfigurationInterface $config
+     * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
         AddonManager $addonManager,
@@ -411,7 +409,12 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function setPreviewTheme($themeKey): array {
-        $theme = $this->getThemeWithAssets($themeKey);
+        if (!empty($themeKey)) {
+            $theme = $this->getThemeWithAssets($themeKey);
+        } else {
+            $theme = $this->getCurrent();
+        }
+
         $this->themeHelper->setSessionPreviewTheme($themeKey, $this);
         return $theme;
     }

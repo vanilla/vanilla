@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Toast from "@library/features/toaster/Toast";
 import { getMeta } from "@library/utility/appUtils";
-import { useThemesActions, PreviewStatusType } from "@themingapi/theming-ui-settings/ThemesActions";
+import { useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
 import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { LoadStatus } from "@library/@types/api/core";
 

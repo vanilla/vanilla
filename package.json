@@ -10,7 +10,9 @@
             "library",
             "applications/dashboard",
             "applications/vanilla",
-            "plugins/*"
+            "plugins/*",
+            "addons/themes/*",
+            "addons/addons/*"
         ]
     },
     "engines": {

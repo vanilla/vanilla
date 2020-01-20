@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -15,6 +15,10 @@ export default PageContext;
 export interface IPageProvider {
     autocomplete(query: string): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
+}
+
+export function usePageContext() {
+    return useContext(PageContext);
 }
 
 interface IPageLoader {

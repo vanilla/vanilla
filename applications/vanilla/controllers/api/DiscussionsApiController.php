@@ -11,6 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -380,8 +381,9 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $isRich = $discussion['Format'] === 'Rich';
+        $isRich = strcasecmp($$discussion['Format'], RichFormat::FORMAT_KEY) === 0;
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
+        $discussion = $this->discussionModel->fixRow($discussion);
 
         $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);

@@ -16,6 +16,7 @@ import {
     PACKAGES_DIRECTORY,
     VANILLA_ROOT,
     VANILLA_THEMES,
+    VANILLA_ADDONS,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
@@ -78,6 +79,7 @@ export default class EntryModel {
             this.initAddons(VANILLA_APPS),
             this.initAddons(VANILLA_PLUGINS),
             this.initAddons(VANILLA_THEMES),
+            this.initAddons(VANILLA_ADDONS),
             this.initPackages(),
         ]);
         await this.initEntries();
@@ -143,7 +145,13 @@ export default class EntryModel {
     public async getSections(): Promise<string[]> {
         let names: string[] = [];
         for (const dir of this.entryDirs) {
-            const entryNameList = await readDir(path.resolve(dir));
+            const resolvedPath = path.resolve(dir);
+            const dirExists = await fileExists(resolvedPath);
+            if (!dirExists) {
+                continue;
+            }
+
+            const entryNameList = await readDir(resolvedPath);
             names.push(...entryNameList);
         }
 
@@ -212,6 +220,10 @@ export default class EntryModel {
      * @param rootDir The directory to find addons in.
      */
     private async initAddons(rootDir: string) {
+        const dirExists = await fileExists(path.resolve(rootDir));
+        if (!dirExists) {
+            return;
+        }
         let addonKeyList = await readDir(path.resolve(rootDir));
 
         // Filter only the enabled addons for a development build.

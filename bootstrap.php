@@ -3,6 +3,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Html\HtmlEnhancer;
@@ -18,6 +19,7 @@ use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
 use Vanilla\Web\Page;
 use Vanilla\Web\TwigEnhancer;
+use Vanilla\Web\UASniffer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -94,8 +96,8 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->setConstructorArgs([
         [
-            Addon::TYPE_ADDON => ['/applications', '/plugins'],
-            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
             Addon::TYPE_LOCALE => '/locales'
         ],
         PATH_CACHE
@@ -165,6 +167,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('fromEnvironment')
     ->addAlias('Request')
     ->addAlias(\Garden\Web\RequestInterface::class)
+
+    ->rule(UASnifferInterface::class)
+    ->setClass(UASniffer::class)
 
     // Database.
     ->rule('Gdn_Database')
@@ -358,9 +363,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
-
-    ->rule(Vanilla\Models\SiteMeta::class)
-    ->setConstructorArgs(['activeTheme' => ContainerUtils::currentTheme()])
 
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])

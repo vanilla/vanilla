@@ -7,11 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Error\Error;
+use PHPUnit\Framework\Error\Warning;
 use Vanilla\Contracts\ConfigurationInterface;
+use VanillaTests\Fixtures\MockUASniffer;
+use Vanilla\Logger;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyProviderInterface;
-use VanillaTests\ExpectErrorTrait;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\Fixtures\MockConfig;
+use VanillaTests\MinimalContainerTestCase;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider;
 use Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider;
@@ -21,8 +24,7 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 /**
  * Some basic tests for the `ContentSecurityPolicyModel`.
  */
-class ContentSecurityPolicyModelTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait;
+class ContentSecurityPolicyModelTest extends MinimalContainerTestCase {
 
     /**
      * @var ContentSecurityPolicyModel
@@ -118,5 +120,50 @@ class ContentSecurityPolicyModelTest extends TestCase {
         $this->assertStringContainsString('https://www.instagram.com/embed.js', $header);
         $this->assertStringContainsString('frame-ancestors ', $header);
         $this->assertStringContainsString('unsafe-eval', $header);
+    }
+
+    /**
+     * Test our fallback X-Frame-Options
+     *
+     * @param bool $allowEmbed
+     * @param string $trustedDomains
+     * @param bool $isIE11
+     * @param mixed $expected
+     *
+     * @dataProvider provideXFrameOptions
+     */
+    public function testXFrameOptions(bool $allowEmbed, string $trustedDomains, bool $isIE11, $expected) {
+        $config = new MockConfig([
+            'Garden.TrustedDomains' => $trustedDomains,
+            'Garden.Embed.Allow' => $allowEmbed,
+        ]);
+
+        $uaSniffer = new MockUASniffer($isIE11);
+        $logger = new Logger();
+
+        $cspModel = new ContentSecurityPolicyModel($uaSniffer, $logger);
+        $provider = new DefaultContentSecurityPolicyProvider($config);
+        $cspModel->addProvider($provider);
+
+        if (is_subclass_of($expected, \Exception::class)) {
+            $this->expectException($expected);
+            $cspModel->getXFrameString();
+        } else {
+            $this->assertEquals($expected, $cspModel->getXFrameString());
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideXFrameOptions(): array {
+        return [
+            [false, '', true, 'SAMEORIGIN'],
+            [false, '', false, 'SAMEORIGIN'],
+            [true, 'http://embed.com', false, 'ALLOW-FROM http://embed.com'],
+            [true, '', false, 'SAMEORIGIN'],
+            [true, "http://test.com http://other.com", false, null],
+            [true, "http://test.com http://other.com", true, Warning::class],
+        ];
     }
 }

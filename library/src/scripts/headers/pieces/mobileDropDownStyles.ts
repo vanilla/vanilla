@@ -40,7 +40,7 @@ export const mobileDropDownVariables = useThemeCache(() => {
     });
 
     const header = vars("header", {
-        minHeight: titleBarVars.sizing.height,
+        minHeight: titleBarVars.sizing.mobile,
     });
 
     const padding = vars("padding", {
@@ -178,7 +178,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
-        height: unit(vars.header.minHeight - globalVars.border.width * 4),
+        height: unit(vars.header.minHeight.height),
         margin: "auto",
         width: percent(100),
     });

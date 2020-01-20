@@ -18,6 +18,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { resetStoreState } from "@library/__tests__/testStoreState";
 import merge from "lodash/merge";
 import { Backgrounds } from "@library/layout/Backgrounds";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -27,7 +28,10 @@ function ErrorComponent() {
 
 interface IContext {
     storeState?: DeepPartial<ICoreStoreState>;
-    themeVars?: any;
+    themeVars?: {
+        global: DeepPartial<ReturnType<typeof globalVariables>>;
+        [key: string]: any;
+    };
     useWrappers?: boolean;
     refreshKey?: string;
 }
@@ -75,7 +79,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
                     assets: {
                         data: {
                             variables: {
-                                data: value.themeVars ?? {},
+                                data: (value.themeVars as any) ?? {},
                             },
                         },
                         status: LoadStatus.SUCCESS,
@@ -88,7 +92,6 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
                 storeState: merge(value.storeState ?? {}, themeState),
             };
             if (!isEqual(newState, contextState)) {
-                console.log("uipdate to new state", newState);
                 setContextState(newState);
                 resetStoreState(newState.storeState);
                 setThemeKey(clearThemeCache().toString());

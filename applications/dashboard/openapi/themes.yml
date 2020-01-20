@@ -219,6 +219,8 @@ components:
       properties:
         assets:
           $ref: "#/components/schemas/ThemeAssets"
+        preview:
+          $ref: "#/components/schemas/PreviewAssets"
         type:
           type: string
           enum:

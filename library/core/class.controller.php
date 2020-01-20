@@ -286,9 +286,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         $hsts = Gdn::getContainer()->get('HstsModel');
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
-        $cspModel = Gdn::factory(ContentSecurityPolicyModel::class);
+        $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
         $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
-
+        $xFrameString = $cspModel->getXFrameString();
+        if ($xFrameString !== null) {
+            $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
+        }
 
         $this->_ErrorMessages = '';
         $this->_InformMessages = [];
@@ -894,12 +897,14 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
                 foreach ($subPaths as $subPath) {
                     $viewPaths[] = PATH_THEMES."/{$this->Theme}/$applicationFolder/$subPath.*";
+                    $viewPaths[] = PATH_ADDONS_THEMES."/{$this->Theme}/$applicationFolder/$subPath.*";
                     // $ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
                 }
 
                 // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
                 foreach ($subPaths as $subPath) {
                     $viewPaths[] = PATH_THEMES."/{$this->Theme}/$subPath.*";
+                    $viewPaths[] = PATH_ADDONS_THEMES."/{$this->Theme}/$subPath.*";
                     //$ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
                 }
             }
@@ -2017,8 +2022,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($this->Theme) {
                 // 1. Application-specific theme view. eg. root/themes/theme_name/app_name/views/
                 $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
+                $MasterViewPaths[] = combinePaths([PATH_ADDONS_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
                 $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*']);
+                $MasterViewPaths[] = combinePaths([PATH_ADDONS_THEMES, $this->Theme, 'views', $this->MasterView.'.master*']);
             }
             // 3. Plugin default. eg. root/plugin_name/views/
             $MasterViewPaths[] = combinePaths([PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);

@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit, modifyColorBasedOnLightness } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
@@ -16,11 +16,14 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
-    const globalVars = globalVariables();
 
-    const baseColor = titleBarVars.colors.bg.darken(0.05);
+    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
+    if (titleBarVars.colors.bgImage !== null) {
+        // If we have a BG image, make sure we have some opacity so it shines through.
+        baseColor = baseColor.fade(0.3);
+    }
     const colors = makeVars("colors", {
-        bg: baseColor.fade(0.8),
+        bg: baseColor.fade(0.2),
         fg: titleBarVars.colors.fg,
         placeholder: titleBarVars.colors.fg.fade(0.8),
         active: {
@@ -101,6 +104,7 @@ export const compactSearchClasses = useThemeCache(() => {
     });
 
     const searchAndResults = style("searchAndResults", {
+        flex: 1,
         position: "relative",
         width: percent(100),
         height: unit(formElementsVars.sizing.height),

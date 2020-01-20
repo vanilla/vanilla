@@ -378,7 +378,6 @@ export default class MarkdownModule {
                 this.quill.deleteText(startIndex, annotatedText.length);
                 this.quill.insertText(startIndex, matchedText, { [CodeBlot.blotName]: true });
                 this.quill.format(CodeBlot.blotName, false);
-                this.quill.insertText(this.quill.getSelection().index, " ");
             },
         },
     ];

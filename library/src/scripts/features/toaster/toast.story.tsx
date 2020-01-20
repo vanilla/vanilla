@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import Toast from "./Toast";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import {LoadStatus} from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 
 const formsStory = storiesOf("Toast", module);
 

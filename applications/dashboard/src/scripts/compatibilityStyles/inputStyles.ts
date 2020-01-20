@@ -285,6 +285,7 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     });
 
     cssOut("input[type='checkbox']", {
+        cursor: "pointer",
         $nest: {
             "&:hover, &:focus, &.focus-visible, &:active": {
                 outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,

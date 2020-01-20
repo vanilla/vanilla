@@ -17,15 +17,15 @@ import { TileAlignment } from "@library/features/tiles/Tiles";
 export const tilesVariables = useThemeCache(() => {
     const themeVars = variableFactory("tiles");
     const spacing = themeVars("spacing", {
-        paddingTwoColumns: 25,
-        paddingThreeColumns: 17,
-        paddingFourColumns: 17,
+        paddingTwoColumns: 24,
+        paddingThreeColumns: 14,
+        paddingFourColumns: 14,
     });
 
     const sizing = themeVars("sizing", {
-        containerWidthTwoColumns: spacing.paddingTwoColumns * 10 + 384 * 2,
-        containerWidthThreeColumns: spacing.paddingThreeColumns * 14 + 260 * 3,
-        containerWidthFourColumns: spacing.paddingThreeColumns * 18 + 260 * 4,
+        containerWidthTwoColumns: spacing.paddingTwoColumns * 4 + 384 * 2,
+        containerWidthThreeColumns: spacing.paddingThreeColumns * 6 + 260 * 3,
+        containerWidthFourColumns: spacing.paddingFourColumns * 8 + 260 * 4,
     });
 
     const options = themeVars("options", {

@@ -7,18 +7,18 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import Toast from "./Toast";
+import Toast from "../Toast";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import {LoadStatus} from "@library/@types/api/core";
 
 const formsStory = storiesOf("Toast", module);
 
-formsStory.add("Toast/Base", () =>
+formsStory.add("Toast/ThemePreview/Cancel", () =>
     (() => {
         return (
             <>
                 <StoryContent>
-                    <StoryHeading depth={1}>Toast message</StoryHeading>
+                    <StoryHeading depth={1}>Theme preview toast</StoryHeading>
                 </StoryContent>
                 <Toast
                     links={[
@@ -29,6 +29,7 @@ formsStory.add("Toast/Base", () =>
                         {
                             name: "Cancel",
                             type: ButtonTypes.TEXT_PRIMARY,
+                            isLoading: true
                         },
                     ]}
                     message={

@@ -37,6 +37,7 @@ trait ThemesApiSchemes {
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
+                'preview?' => [":a" => $this->assetsPreviewSchema()]
             ]),
             $type
         );

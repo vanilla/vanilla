@@ -25,9 +25,22 @@ story.add("Preview Card", () => {
                         titleBarBg={"#0291db"}
                         titleBarFg={"#fff"}
                         isActiveTheme={false}
+                        canCopy={true}
                     />
                 </div>
-
+                <StoryHeading depth={1}>Preview Card with dropdown</StoryHeading>
+                <div style={{ paddingBottom: unit(52), textAlign: "center", width: unit(320), minWidth: unit(320) }}>
+                    <ThemePreviewCard
+                        globalBg={"#fff"}
+                        globalPrimary={"#985E6D"}
+                        globalFg={"#555a62"}
+                        titleBarBg={"#0291db"}
+                        titleBarFg={"#fff"}
+                        isActiveTheme={false}
+                        canEdit={true}
+                        canDelete={true}
+                    />
+                </div>
                 <StoryHeading depth={1}>Preview card (with no hover)</StoryHeading>
                 <ThemePreviewCard
                     globalBg={"#fff"}

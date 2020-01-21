@@ -112,24 +112,28 @@ class RichEditorPlugin extends Gdn_Plugin {
             // Render the editor view.
             $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
         } elseif(c('Garden.ForceInputFormatter')) {
-            $form = Gdn::getContainer()->get(Gdn_Form::class);
-            $originalBody = $form->formData();
+
+            $originalRecord = $sender->formData();
             $newBodyValue = null;
-            switch (strtolower(c('Garden.InputFormatterBak', 'unknown'))) {
-                case Formats\TextFormat::FORMAT_KEY:
-                case Formats\TextExFormat::FORMAT_KEY:
-                    $newBodyValue = $this->formatService->renderPlainText();
-                    break;
-                case 'unknown':
-                    // Do nothing
-                    break;
-                default:
-                    $newBodyValue = $this->formatService->renderHTML();
+            $body = $originalRecord['Body'] ?? false;
+            $originalFormat = $originalRecord['Format'] ?? false;
 
+            if ($body && (c('Garden.InputFormatter') !== $originalFormat ) ) {
+                switch (strtolower(c('Garden.InputFormatter', 'unknown'))) {
+                    case Formats\TextFormat::FORMAT_KEY:
+                    case Formats\TextExFormat::FORMAT_KEY:
+                        $newBodyValue = $this->formatService->renderPlainText($body, Formats\RichFormat::FORMAT_KEY);
+                        $sender->setValue("Body", $newBodyValue);
+                        break;
+                    case 'unknown':
+                        // Do nothing
+                        break;
+                    default:
+                        $newBodyValue = $this->formatService->renderHTML($body, Formats\HtmlFormat::FORMAT_KEY);
+                        $sender->setValue("Body", $newBodyValue);
+                    }
+                }
             }
-
-        }
-
     }
 
     /**

@@ -6,6 +6,7 @@
  */
 
 use Vanilla\Formatting\Formats\RichFormat;
+use \Vanilla\Formatting\Formats;
 
 /**
  * Plugin class for the Rich Editor.
@@ -18,11 +19,17 @@ class RichEditorPlugin extends Gdn_Plugin {
     /** @var integer */
     private static $editorID = 0;
 
+    /** @var \Vanilla\Formatting\FormatService */
+    private $formatService;
+
     /**
      * Set some properties we always need.
+     *
+     * @param \Vanilla\Formatting\FormatService $formatService
      */
-    public function __construct() {
+    public function __construct(\Vanilla\Formatting\FormatService $formatService) {
         parent::__construct();
+        $this->formatService = $formatService;
         self::$editorID++;
     }
 
@@ -58,6 +65,10 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function isFormRich(Gdn_Form $form): bool {
         $data = $form->formData();
         $format = $data['Format'] ?? null;
+
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            return $this->isInputFormatterRich();
+        }
 
         return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
     }
@@ -100,7 +111,25 @@ class RichEditorPlugin extends Gdn_Plugin {
 
             // Render the editor view.
             $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
+        } elseif(c('Garden.ForceInputFormatter')) {
+            $form = Gdn::getContainer()->get(Gdn_Form::class);
+            $originalBody = $form->formData();
+            $newBodyValue = null;
+            switch (strtolower(c('Garden.InputFormatterBak', 'unknown'))) {
+                case Formats\TextFormat::FORMAT_KEY:
+                case Formats\TextExFormat::FORMAT_KEY:
+                    $newBodyValue = $this->formatService->renderPlainText();
+                    break;
+                case 'unknown':
+                    // Do nothing
+                    break;
+                default:
+                    $newBodyValue = $this->formatService->renderHTML();
+
+            }
+
         }
+
     }
 
     /**

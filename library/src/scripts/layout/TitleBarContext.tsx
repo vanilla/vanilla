@@ -22,7 +22,7 @@ export interface ITitleBarDeviceProps {
 const TitleBarDeviceContext = React.createContext<TitleBarDevices>(TitleBarDevices.FULL);
 export default TitleBarDeviceContext;
 
-export function useDevice() {
+export function useTitleBarDevice() {
     const device = useContext(TitleBarDeviceContext);
     return device;
 }

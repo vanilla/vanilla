@@ -11,6 +11,7 @@ import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
 import { BackgroundsProvider } from "./layout/Backgrounds";
+import { SplashContextProvider } from "@library/splash/SplashContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -43,7 +44,9 @@ export function Router(props: IProps) {
     if (!props.disableDynamicRouting) {
         routes = (
             <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>
-                <BackRoutingProvider>{routes}</BackRoutingProvider>
+                <BackRoutingProvider>
+                    <SplashContextProvider>{routes}</SplashContextProvider>
+                </BackRoutingProvider>
             </LinkContextProvider>
         );
     }

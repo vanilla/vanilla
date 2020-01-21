@@ -176,6 +176,24 @@ trait ThemesApiSchemes {
     }
 
     /**
+     * PUT preview theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themePutPreviewSchema(string $type = 'in'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'themeID:s?' => [
+                    'description' => 'Theme ID or Theme Key',
+                ],
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    /**
      * PUT 'assets' schema
      *
      * @return Schema

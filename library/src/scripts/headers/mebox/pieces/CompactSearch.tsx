@@ -17,7 +17,7 @@ import { SearchIcon } from "@library/icons/titleBar";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
-import { useEscapeListener, useLastValue } from "@vanilla/react-utils";
+import { useEscapeListener, useLastValue, useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
@@ -84,6 +84,12 @@ export function CompactSearch(props: ICompactSearchProps) {
                 props.onCloseSearch();
             }
         },
+    });
+
+    useFocusWatcher(selfRef, isFocused => {
+        if (!isFocused) {
+            props.onCloseSearch();
+        }
     });
 
     const classesTitleBar = titleBarClasses();

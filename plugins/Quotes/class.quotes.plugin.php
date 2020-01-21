@@ -28,6 +28,9 @@ class QuotesPlugin extends Gdn_Plugin {
     /** @var bool */
     public $HandleRenderQuotes = true;
 
+    /** @var DiscussionModel  */
+    private $discussionModel;
+
     /**
      * Set some properties we always need.
      */
@@ -42,6 +45,8 @@ class QuotesPlugin extends Gdn_Plugin {
 
         // Whether to handle drawing quotes or leave it up to some other plugin
         $this->HandleRenderQuotes = c('Plugins.Quotes.RenderQuotes', true);
+        $discussionModel = new DiscussionModel();
+        $this->discussionModel = $discussionModel;
     }
 
     /**
@@ -422,29 +427,21 @@ BLOCKQUOTE;
             $format = c('Garden.InputFormatter');
         }
 
-        $discussionModel = new DiscussionModel();
         $type = strtolower($type);
         switch ($type) {
             case 'comment':
                 $commentModel = new CommentModel();
                 $data = $commentModel->getID($id);
-                $discussion = $discussionModel->getID(val('DiscussionID', $data));
+                $discussion = $this->discussionModel->getID(val('DiscussionID', $data));
                 break;
             case 'discussion':
-                $data = $discussionModel->getID($id);
+                $data = $this->discussionModel->getID($id);
                 $discussion = $data;
                 break;
         }
 
         if ($discussion) {
-            // Check permission.
-            Gdn::controller()->permission(
-                ['Vanilla.Discussions.Add', 'Vanilla.Discussions.View'],
-                false,
-                'Category',
-                val('PermissionCategoryID', $discussion)
-            );
-
+            $this->canViewDiscussion($discussion);
             $newFormat = $format;
             if ($newFormat == 'Wysiwyg') {
                 $newFormat = 'Html';
@@ -544,6 +541,20 @@ BLOCKQUOTE;
         Emoji::instance()->enabled = $emojiEnabled;
     }
 
+    /**
+     * Checks if the user can view discussion.
+     *
+     * @param object $discussion
+     * @throws Exception If the user cannot view the discussion.
+     */
+    private function canViewDiscussion(object $discussion): void {
+        $userID = Gdn::session()->UserID;
+        $canView = $this->discussionModel->canView($discussion, $userID);
+        $isAdmin = Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
+        if (!$canView && !$isAdmin) {
+            throw permissionException('Vanilla.Discussions.View');
+        }
+    }
     /**
      * Extra parsing for Markdown.
      *

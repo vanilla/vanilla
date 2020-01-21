@@ -8,7 +8,7 @@ import React from "react";
 import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
 import { formatUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
-import { titleBarLogoClasses } from "@library/headers/titleBarStyles";
+import { titleBarLogoClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import classNames from "classnames";
 
 export interface IHeaderLogo {
@@ -28,8 +28,13 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
     };
 
     public render() {
+        const { doubleLogoStrategy } = titleBarVariables().logo;
         const classes = titleBarLogoClasses();
         const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
+
+        if (doubleLogoStrategy === "hidden") {
+            return null;
+        }
 
         return (
             <SmartLink to={this.props.to} className={classNames("headerLogo", this.props.className)}>

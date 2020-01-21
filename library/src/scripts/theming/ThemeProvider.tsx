@@ -43,7 +43,6 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            console.log("fetch assets");
             void getAssets(themeKey);
             return;
         }

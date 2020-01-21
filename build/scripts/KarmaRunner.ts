@@ -7,7 +7,7 @@
 import path from "path";
 import { makeTestConfig } from "./configs/makeTestConfig";
 import { VANILLA_ROOT, TEST_FILE_ROOTS, PACKAGES_TEST_ENTRY } from "./env";
-import { IBuildOptions, BuildMode } from "./options";
+import { IBuildOptions, BuildMode } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
 // tslint:disable-next-line
 const Karma = require("karma");

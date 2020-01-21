@@ -175,7 +175,13 @@ export default function ThemePreviewCard(props: IProps) {
                         >
                             {props.isApplyLoading ? <ButtonLoader /> : t("Apply")}
                         </Button>
-                        <Button className={classes.buttons} onClick={props.onPreview}>
+                        <Button
+                            className={classes.buttons}
+                            onClick={() => {
+                                containerRef.current?.focus();
+                                props.onPreview?.();
+                            }}
+                        >
                             {t("Preview")}
                         </Button>
                         {props.canCopy && (

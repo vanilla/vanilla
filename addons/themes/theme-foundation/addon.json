@@ -1,0 +1,44 @@
+{
+    "key": "theme-foundation",
+    "name": "Foundation",
+    "description": "A responsive, asset-compatible Vanilla Forums theme.",
+    "version": "1.0.0",
+    "hidden": true,
+    "authors": [
+        {
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        },
+        {
+            "name": "Adam (charrondev) Charron",
+            "email": "adam.c@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "isResponsive": true,
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "priority": 1000,
+    "type": "theme",
+    "Features": {
+        "ProfileHeader": true,
+        "SharedMasterView": true,
+        "NewFlyouts": true,
+        "DataDrivenForumColors": true
+    },
+    "assets": {
+        "footer": {
+            "type": "twig",
+            "file": "footer.twig"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
+        }
+    }
+}

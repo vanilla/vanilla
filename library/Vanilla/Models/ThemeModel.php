@@ -6,11 +6,15 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Addon;
+use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
 use Garden\Schema\ValidationField;
+use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
@@ -77,6 +81,37 @@ class ThemeModel {
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
 
+    /** @var ConfigurationInterface $config */
+    private $config;
+
+    /** @var AddonManager $addonManager */
+    private $addonManager;
+
+    /** @var ThemeModelHelper $themeHelper */
+    private $themeHelper;
+
+    /** @var string $themeManagePageUrl */
+    private $themeManagePageUrl = '/dashboard/settings/themes';
+
+    /**
+     * ThemeModel constructor.
+     *
+     * @param ConfigurationInterface $config
+     * @param \Gdn_Session $session
+     * @param AddonManager $addonManager
+     * @param ThemeModelHelper $themeHelper
+     */
+    public function __construct(
+        ConfigurationInterface $config,
+        \Gdn_Session $session,
+        AddonManager $addonManager,
+        ThemeModelHelper $themeHelper
+    ) {
+        $this->config = $config;
+        $this->session = $session;
+        $this->addonManager = $addonManager;
+        $this->themeHelper = $themeHelper;
+    }
 
     /**
      * Add a theme-variable provider.
@@ -198,6 +233,89 @@ class ThemeModel {
     }
 
     /**
+     * Set theme as preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param int|string $themeID Theme ID to set current.
+     * @return array
+     */
+    public function setPreviewTheme($themeID): array {
+        if (empty($themeID)) {
+            $theme = $this->getCurrentTheme();
+            $this->themeHelper->cancelSessionPreviewTheme();
+        } else {
+            $provider = $this->getThemeProvider($themeID);
+            $theme = $provider->setPreviewTheme($themeID);
+        }
+        return $theme;
+    }
+
+    /**
+     * Get view theme key
+     *
+     * @return string
+     */
+    public function getViewThemeKey(): string {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            $themeKey = $previewTheme;
+        }
+        return $themeKey;
+    }
+
+    /**
+     * Get preview theme properties if exists.
+     *
+     * @return array
+     */
+    public function getPreviewTheme(): array {
+        $previewTheme = [];
+        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+            $previewTheme['themeID'] = $previewThemeKey;
+            $provider = $this->getThemeProvider($previewThemeKey);
+            $previewTheme['name'] = $provider->getName($previewThemeKey);
+            $previewTheme['redirect']= $this->getThemeManagePageUrl();
+        }
+        return $previewTheme;
+    }
+
+    /**
+     * Set theme manage page url
+     *
+     * @param string $url
+     */
+    public function setThemeManagePageUrl(string $url) {
+        $this->themeManagePageUrl = $url;
+    }
+
+    /**
+     * Get theme manage page url
+     *
+     * @return string
+     */
+    private function getThemeManagePageUrl() {
+        return $this->themeManagePageUrl;
+    }
+
+    /**
+     * Get view theme addon
+     *
+     * @return string
+     */
+    public function getThemeAddon(): Addon {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            $themeKey = $previewTheme;
+        }
+        $provider = $this->getThemeProvider($themeKey);
+        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
+        $addon = $this->addonManager->lookupTheme($addonThemeKey);
+        return $addon;
+    }
+
+    /**
      * Get current theme.
      *
      * @return array|void If no currnt theme set returns null
@@ -305,12 +423,13 @@ class ThemeModel {
     /**
      * Basic input string validation function for html and json assets
      *
-     * @param string $data
+     * @param array $data
      * @param ValidationField $field
      * @return bool
      */
-    public static function validator(string $data, ValidationField $field) {
+    public static function validator(array $data, ValidationField $field) {
         $asset = self::ASSET_LIST[$field->getName()];
+        $data = $data['data'];
         switch ($asset['type']) {
             case 'html':
                 libxml_use_internal_errors(true);

@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, fonts, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { shadowHelper } from "@vanilla/library/src/scripts/styles/shadowHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@vanilla/library/src/scripts/styles/shadowHelpers";
 import { percent } from "csx";
 
 export const embedMenuClasses = useThemeCache(() => {
@@ -24,8 +24,8 @@ export const embedMenuClasses = useThemeCache(() => {
         ...margins({ horizontal: "auto" }),
         transform: "translate(-50%, -50%)",
         background: colorOut(globalVars.mainColors.bg),
-        ...shadowHelper().dropDown(),
         ...borders(),
+        ...shadowOrBorderBasedOnLightness(),
         zIndex: 100,
         ...paddings({
             vertical: 2,

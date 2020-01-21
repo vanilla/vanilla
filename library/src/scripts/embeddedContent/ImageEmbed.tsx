@@ -29,12 +29,13 @@ interface IProps extends IBaseEmbedProps {
 export function ImageEmbed(props: IProps) {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const { isSelected, inEditor } = useEmbedContext();
+    const { isSelected, inEditor, descriptionID } = useEmbedContext();
 
     return (
         <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
             <div className="embedImage-link">
                 <img
+                    aria-describedBy={descriptionID}
                     className={classNames("embedImage-img", FOCUS_CLASS)}
                     src={props.url}
                     alt={props.name}

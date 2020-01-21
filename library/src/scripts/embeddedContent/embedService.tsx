@@ -21,10 +21,13 @@ import { logWarning } from "@vanilla/utils";
 import React, { useContext } from "react";
 import Quill from "quill/core";
 import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
-import { useUniqueID } from "@library/utility/idUtils";
+import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { visibility } from "@library/styles/styleHelpers";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { mountModal } from "@library/modal/Modal";
 
 export const FOCUS_CLASS = "embed-focusableElement";
+export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
 
 interface IEmbedContext {
     inEditor?: boolean;
@@ -87,21 +90,21 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
         }
         mountPoint.removeAttribute("data-embedJson");
 
-        const descriptionID = useUniqueID("embedDescription");
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
+        if (inEditor) {
+            ensureEmbedDescription();
+        }
+
+        data = {
+            ...data,
+            descriptionID: EMBED_DESCRIPTION_ID,
+        };
+
         // If the component is flagged as async, then it will confirm when the render is complete.
         mountReact(
             <EmbedErrorBoundary url={data.url}>
-                <EmbedContext.Provider
-                    value={{
-                        ...data,
-                        descriptionID,
-                    }}
-                >
-                    <div id={descriptionID} className={visibility().visuallyHidden}>
-                        {t("richEditor.externalEmbed.description")}
-                    </div>
+                <EmbedContext.Provider value={data}>
                     <EmbedClass
                         {...data}
                         inEditor={inEditor}
@@ -113,6 +116,23 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
             !isAsync ? onMountComplete : undefined,
         );
     });
+}
+
+function EmbedDescription() {
+    return (
+        <ScreenReaderContent id={EMBED_DESCRIPTION_ID}>{t("richEditor.externalEmbed.description")}</ScreenReaderContent>
+    );
+}
+
+function ensureEmbedDescription() {
+    // Ensure we have our modal container.
+    let description = document.getElementById(EMBED_DESCRIPTION_ID);
+
+    if (!description) {
+        description = document.createElement("div");
+        document.body.append(description);
+        mountReact(<EmbedDescription />, description);
+    }
 }
 
 export async function mountAllEmbeds(root: HTMLElement = document.body) {

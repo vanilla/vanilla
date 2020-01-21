@@ -111,14 +111,13 @@ class RichEditorPlugin extends Gdn_Plugin {
 
             // Render the editor view.
             $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
-        } elseif(c('Garden.ForceInputFormatter')) {
-
+        } elseif (c('Garden.ForceInputFormatter')) {
             $originalRecord = $sender->formData();
             $newBodyValue = null;
             $body = $originalRecord['Body'] ?? false;
             $originalFormat = $originalRecord['Format'] ?? false;
 
-            if ($body && (c('Garden.InputFormatter') !== $originalFormat ) ) {
+            if ($body && (c('Garden.InputFormatter') !== $originalFormat )) {
                 switch (strtolower(c('Garden.InputFormatter', 'unknown'))) {
                     case Formats\TextFormat::FORMAT_KEY:
                     case Formats\TextExFormat::FORMAT_KEY:
@@ -131,9 +130,9 @@ class RichEditorPlugin extends Gdn_Plugin {
                     default:
                         $newBodyValue = $this->formatService->renderHTML($body, Formats\HtmlFormat::FORMAT_KEY);
                         $sender->setValue("Body", $newBodyValue);
-                    }
                 }
             }
+        }
     }
 
     /**

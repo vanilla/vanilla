@@ -17,6 +17,9 @@ export interface IThemesState {
     }>;
     applyStatus: ILoadable<{ themeID: number | string }>;
     previewStatus: ILoadable<{ themeID: number | string }>;
+    deleteThemeByID: {
+        [themeID: number]: ILoadable<{}>;
+    };
 }
 
 export interface IThemesStoreState extends ICoreStoreState {
@@ -33,6 +36,7 @@ const DEFAULT_THEMES_STATE: IThemesState = {
     previewStatus: {
         status: LoadStatus.PENDING,
     },
+    deleteThemeByID: {},
 };
 
 export const themeSettingsReducer = produce(
@@ -83,6 +87,20 @@ export const themeSettingsReducer = produce(
 
             if (nextState.themes.data) {
                 nextState.themes.data.currentTheme = payload.result;
+
+                nextState.themes.data.themes = nextState.themes.data.themes.map(theme => {
+                    return {
+                        ...theme,
+                        current: theme.themeID === payload.result.themeID,
+                    };
+                });
+
+                nextState.themes.data.templates = nextState.themes.data.templates.map(templates => {
+                    return {
+                        ...templates,
+                        current: templates.themeID === payload.result.themeID,
+                    };
+                });
             }
 
             return nextState;
@@ -108,6 +126,34 @@ export const themeSettingsReducer = produce(
         .case(ThemesActions.putPreviewThemeACs.failed, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.ERROR;
             nextState.applyStatus.error = payload.error;
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.started, (nextState, payload) => {
+            nextState.deleteThemeByID[payload.themeID] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.done, (nextState, payload) => {
+            nextState.deleteThemeByID[payload.params.themeID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            if (nextState.themes.data) {
+                nextState.themes.data.themes = nextState.themes.data?.themes.filter(existingTemplate => {
+                    if (existingTemplate.themeID === payload.params.themeID) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            }
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.failed, (nextState, payload) => {
+            nextState.deleteThemeByID[payload.params.themeID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return nextState;
         }),
 );

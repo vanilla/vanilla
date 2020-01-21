@@ -42,27 +42,37 @@ export const addThemeClasses = useThemeCache(() => {
     const addTheme = style("addTheme", {
         width: unit(vars.addTheme.width),
         height: unit(vars.addTheme.height),
-        border: "1px dashed #979797",
+
         ...paddings({
             top: unit(vars.addTheme.padding.top),
             bottom: unit(vars.addTheme.padding.bottom),
             left: unit(vars.addTheme.padding.left),
             right: unit(vars.addTheme.padding.right),
         }),
-    });
-
-    const button = style("button", {
-        border: 0,
         $nest: {
             "&:hover": {
-                backgroundColor: color("#D0021B").toString(),
+                backgroundColor: color("#fff").toString(),
             },
         },
     });
 
+    const button = style("button", {
+        padding: 0,
+        border: "1px dashed #979797",
+        $nest: {
+            "&&:hover": {
+                backgroundColor: color("#fff").toString(),
+                border: "1px dashed #979797",
+            },
+        },
+    });
+
+    const addThemeLink = style("addThemeLink", {});
+
     return {
         addTheme,
         button,
+        addThemeLink,
     };
 });
 

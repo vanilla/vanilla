@@ -120,7 +120,9 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
 
 function EmbedDescription() {
     return (
-        <ScreenReaderContent id={EMBED_DESCRIPTION_ID}>{t("richEditor.externalEmbed.description")}</ScreenReaderContent>
+        <ScreenReaderContent id={EMBED_DESCRIPTION_ID} aria-hidden={true}>
+            {t("richEditor.externalEmbed.description")}
+        </ScreenReaderContent>
     );
 }
 

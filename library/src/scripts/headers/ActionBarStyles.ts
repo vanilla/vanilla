@@ -91,7 +91,17 @@ export const actionBarClasses = useThemeCache(() => {
     });
 
     const backLink = style("backLink", {
-        marginRight: "auto",
+        $nest: {
+            "&&": {
+                marginRight: "auto",
+
+                $nest: {
+                    "& a": {
+                        textDecoration: "none",
+                    },
+                },
+            },
+        },
     });
 
     const backSpacer = style("backSpacer", {

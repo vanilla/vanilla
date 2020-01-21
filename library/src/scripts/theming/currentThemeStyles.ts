@@ -7,7 +7,7 @@ import { unit, paddings, margins } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themeCardStyles";
-import { percent } from "csx";
+import { percent, color } from "csx";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -15,6 +15,8 @@ export const currentThemeVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
+        white: color("#ffffff"),
+        btnTextColor: color("#555a62"),
     });
 
     const flag = makeThemeVars("flag", {
@@ -53,6 +55,7 @@ export const currentThemeVariables = useThemeCache(() => {
         name,
         authorName,
         themeContainer,
+        colors,
     };
 });
 
@@ -127,7 +130,25 @@ export const currentThemeClasses = useThemeCache(() => {
         $nest: {
             ["& button"]: {
                 marginBottom: unit(vars.flag.margin.bottom),
-                width: unit(144),
+                width: unit(180),
+
+                $nest: {
+                    "& a": {
+                        color: vars.colors.btnTextColor.toString(),
+                    },
+                    [`&:hover a`]: {
+                        color: vars.colors.white.toString(),
+                        justifyContent: "center",
+                        textDecoration: "none",
+                        background: "inherit",
+
+                        $nest: {
+                            "&:hover": {
+                                textDecoration: "none",
+                            },
+                        },
+                    },
+                },
             },
         },
     });

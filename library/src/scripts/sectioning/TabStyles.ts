@@ -88,7 +88,7 @@ export const tabClasses = useThemeCache(() => {
             padding: "2px 0",
             color: colorOut("#48576a"),
             backgroundColor: colorOut("#f5f6f7"),
-            minHeight: unit(18),
+            minHeight: unit(28),
             fontSize: unit(13),
             $nest: {
                 "& + &": {

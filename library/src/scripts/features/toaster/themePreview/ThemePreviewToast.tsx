@@ -11,6 +11,7 @@ import { getMeta } from "@library/utility/appUtils";
 import { useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
 import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { LoadStatus } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 export function ThemePreviewToast() {
     const { applyStatus, cancelStatus } = useThemePreviewToasterState();
@@ -28,8 +29,8 @@ export function ThemePreviewToast() {
 
     useEffect(() => {
         if (
-            showToaster.name &&
-            (applyStatus.status === LoadStatus.SUCCESS || cancelStatus.status === LoadStatus.SUCCESS)
+            (showToaster.name && applyStatus.status === LoadStatus.SUCCESS) ||
+            cancelStatus.status === LoadStatus.SUCCESS
         ) {
             window.location.href = showToaster.redirect;
         }
@@ -58,6 +59,7 @@ export function ThemePreviewToast() {
             message={
                 <>
                     You are previewing the <b>{showToaster.name}</b> theme.
+                    {applyStatus.error && <ErrorMessages errors={[applyStatus.error]} />}
                 </>
             }
         />

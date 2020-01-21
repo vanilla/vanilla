@@ -3,7 +3,7 @@
     "name": "Foundation",
     "description": "A responsive, asset-compatible Vanilla Forums theme.",
     "version": "1.0.0",
-    "hidden": false,
+    "hidden": true,
     "authors": [
         {
             "name": "Stéphane LaFlèche",

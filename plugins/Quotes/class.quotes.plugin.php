@@ -34,7 +34,8 @@ class QuotesPlugin extends Gdn_Plugin {
     /**
      * Set some properties we always need.
      */
-    public function __construct() {
+    public function __construct(DiscussionModel $discussionModel) {
+        $this->discussionModel = $discussionModel;
         parent::__construct();
 
         if (function_exists('ValidateUsernameRegex')) {
@@ -45,8 +46,6 @@ class QuotesPlugin extends Gdn_Plugin {
 
         // Whether to handle drawing quotes or leave it up to some other plugin
         $this->HandleRenderQuotes = c('Plugins.Quotes.RenderQuotes', true);
-        $discussionModel = new DiscussionModel();
-        $this->discussionModel = $discussionModel;
     }
 
     /**
@@ -441,7 +440,7 @@ BLOCKQUOTE;
         }
 
         if ($discussion) {
-            $this->canViewDiscussion($discussion);
+            $this->verifyDiscussionViewPermissions($discussion);
             $newFormat = $format;
             if ($newFormat == 'Wysiwyg') {
                 $newFormat = 'Html';
@@ -542,19 +541,18 @@ BLOCKQUOTE;
     }
 
     /**
-     * Checks if the user can view discussion.
+     * Checks if the user can view a discussion.
      *
      * @param object $discussion
      * @throws Exception If the user cannot view the discussion.
      */
-    private function canViewDiscussion(object $discussion): void {
-        $userID = Gdn::session()->UserID;
-        $canView = $this->discussionModel->canView($discussion, $userID);
-        $isAdmin = Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
-        if (!$canView && !$isAdmin) {
+    private function verifyDiscussionViewPermissions($discussion) {
+        $canView = $this->discussionModel->canViewDiscussion($discussion);
+        if (!$canView) {
             throw permissionException('Vanilla.Discussions.View');
         }
     }
+
     /**
      * Extra parsing for Markdown.
      *

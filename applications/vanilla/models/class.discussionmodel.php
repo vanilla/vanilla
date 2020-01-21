@@ -2986,6 +2986,24 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Tests whether a user/admin has permission to view a specific discussion.
+     *
+     * @param object $discussion
+     * @return bool whether the user can view a discussion.
+     */
+    public function canViewDiscussion($discussion): bool {
+        $canViewDiscussion = true;
+        $session = $this->sessionInterface;
+        $userID = $session->UserID;
+        $canView = $this->canView($discussion, $userID);
+        $isModerator = $session->checkRankedPermission('Garden.Moderation.Manage');
+        if (!$canView && !$isModerator) {
+            $canViewDiscussion = false;
+        }
+        return $canViewDiscussion;
+    }
+
+    /**
      * Tests whether a user has permission for a discussion by checking category-specific permissions.
      *
      * Fires an event that can override the calculated permission.

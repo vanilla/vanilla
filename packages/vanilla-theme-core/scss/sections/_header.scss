@@ -76,6 +76,15 @@
     display: flex;
     align-items: center;
     flex-basis: 160px;
+    @if ($staticVariables) {
+        color: $header-link_color;
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: $header-link-hover_color;
+        }
+    }
 
     img {
         max-height: $header_minHeight - 20px;
@@ -110,10 +119,11 @@
 
         @if ($staticVariables) {
             color: $header-link_color;
+
             &:hover,
             &:focus,
             &:active {
-                color: $header-link_color;
+                color: $header-link-hover_color;
                 background: $global-color_primaryAlt;
             }
         }

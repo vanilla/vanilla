@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { getOptions } from "../options";
+import { getOptions } from "../buildOptions";
 import { print, fail } from "./utils";
 import { spawn } from "child_process";
 import fse from "fs-extra";

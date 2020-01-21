@@ -472,7 +472,7 @@ export const themeCardClasses = useThemeCache(() => {
 
     const action = style("dropDown-item", {
         $nest: {
-            "&&:hover": {
+            "&&:hover, &&:focus, &&active": {
                 textDecoration: "none",
             },
         },

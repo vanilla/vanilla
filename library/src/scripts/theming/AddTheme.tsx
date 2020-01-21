@@ -12,7 +12,7 @@ import Button from "@library/forms/Button";
 import addThemeClasses from "./addThemeStyles";
 
 interface IProps {
-    onAdd: React.ReactNode;
+    onAdd?: React.ReactNode;
 }
 
 export default class AddTheme extends React.Component<IProps> {

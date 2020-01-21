@@ -5,6 +5,7 @@
  */
 
 import React from "react";
+import { visibility } from "@library/styles/styleHelpers";
 
 interface IProps {
     children: React.ReactNode;
@@ -17,6 +18,6 @@ interface IProps {
 export default class ScreenReaderContent extends React.PureComponent<IProps> {
     public render() {
         const Tag = this.props.tag || "div";
-        return <Tag className="sr-only">{this.props.children}</Tag>;
+        return <Tag className={visibility().visuallyHidden}>{this.props.children}</Tag>;
     }
 }

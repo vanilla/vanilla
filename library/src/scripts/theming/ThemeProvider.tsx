@@ -16,6 +16,8 @@ import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
+import {ErrorPage} from "@library/errorPages/ErrorComponent";
+import {DefaultError} from "@library/errorPages/ErrorMessagePage";
 
 interface IProps {
     children: React.ReactNode;
@@ -78,8 +80,13 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         return <Loader />;
     }
 
-    if (assets.status === LoadStatus.ERROR) {
-        return <>{props.errorComponent}</>;
+    if (assets.status === LoadStatus.SUCCESS) {
+        console.log('',assets);
+        return(
+            <BrowserRouter>
+                <ErrorPage defaultError={DefaultError.NOT_FOUND} code={404} />
+            </BrowserRouter>
+        );
     }
 
     if (!assets.data) {
@@ -88,7 +95,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
     // Apply kludged input text styling everywhere.
     inputClasses().applyInputCSSRules();
-
+    console.log(assets.status);
     return (
         <>
             <BrowserRouter>

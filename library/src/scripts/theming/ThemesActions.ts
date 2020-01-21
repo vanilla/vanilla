@@ -57,6 +57,10 @@ export default class ThemesActions extends ReduxActions {
         "PUT_PREVIEW",
     );
 
+    public static readonly deleteThemeACs = actionCreator.async<{ themeID: number | string }, undefined, IApiError>(
+        "DELETE",
+    );
+
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemesActions.getAllThemes_ACS, async () => {
             const params = { expand: "all" };
@@ -85,6 +89,14 @@ export default class ThemesActions extends ReduxActions {
             return response.data;
         })(options);
         return this.dispatch(thunk);
+    };
+
+    public deleteTheme = (themeID: number | string) => {
+        const apiThunk = bindThunkAction(ThemesActions.deleteThemeACs, async () => {
+            const response = await this.api.delete(`/themes/${themeID}`);
+            return response.data;
+        })({ themeID });
+        return this.dispatch(apiThunk);
     };
 }
 

@@ -116,8 +116,8 @@ interface ThemeProviderInterface {
      * Get master (parent) theme key.
      *
      * @param strig|int $themeKey Theme key or id
+     * @throws NotFoundException Throws an exception when theme is not found.
      * @return string
-     * @throws NotFoundException
      */
     public function getMasterThemeKey($themeKey): string;
 

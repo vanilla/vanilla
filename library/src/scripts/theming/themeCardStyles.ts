@@ -470,6 +470,14 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
+    const action = style("dropDown-item", {
+        $nest: {
+            "&&:hover": {
+                textDecoration: "none",
+            },
+        },
+    });
+
     return {
         container,
         titlebar,
@@ -505,6 +513,7 @@ export const themeCardClasses = useThemeCache(() => {
         itemLabel,
         toolTipBox,
         actionLink,
+        action,
     };
 });
 

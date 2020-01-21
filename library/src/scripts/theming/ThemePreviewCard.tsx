@@ -43,6 +43,7 @@ interface IProps {
     canCopy?: boolean;
     canDelete?: boolean;
     canEdit?: boolean;
+    canCopyCustom?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -139,6 +140,7 @@ export default function ThemePreviewCard(props: IProps) {
                         <div className={classes.actionDropdown}>
                             <DropDown buttonBaseClass={ButtonTypes.ICON} flyoutType={FlyoutType.LIST} renderLeft={true}>
                                 {props.canEdit && <DropDownItem>{props.onEdit}</DropDownItem>}
+                                {props.canCopyCustom && <DropDownItem>{props.onCopy}</DropDownItem>}
                                 <DropDownItemSeparator />
                                 {props.canDelete && props.isActiveTheme ? (
                                     <DropDownItemButton onClick={props.onDelete} disabled={props.isActiveTheme}>

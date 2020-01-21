@@ -75,7 +75,7 @@ export function QuoteEmbed(props: IProps) {
 
     return (
         <EmbedContainer withPadding={false} className={classes.root}>
-            <EmbedContent type="Quote" inEditor={props.inEditor}>
+            <EmbedContent type="Quote">
                 <article className={classes.body}>
                     {showHeader && (
                         <header className={classes.header}>

@@ -17,7 +17,9 @@ import EditorContent from "@rich-editor/editor/EditorContent";
  */
 export function setupTestQuill(htmlBody?: string): Quill {
     registerQuill();
-    document.body.innerHTML = htmlBody || `<form class="FormWrapper"><div id='quill' class="richEditor"></div></form>`;
+    document.body.innerHTML =
+        htmlBody ||
+        `<form class="FormWrapper"><div id='quill' class="richEditor"></div><button id="button1"></button></form>`;
     const mountPoint = document.getElementById("quill")!;
     const options = {
         theme: "vanilla",

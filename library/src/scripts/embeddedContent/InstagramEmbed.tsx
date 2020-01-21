@@ -30,8 +30,8 @@ export function InstagramEmbed(props: IProps): JSX.Element {
     const permaLink = `https://www.instagram.com/p/${props.postID}`;
 
     return (
-        <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+        <EmbedContainer>
+            <EmbedContent type={props.embedType}>
                 <div className="embedExternal embedInstagram">
                     <div className="embedExternal-content">
                         <blockquote

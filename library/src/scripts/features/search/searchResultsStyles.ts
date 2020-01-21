@@ -4,7 +4,9 @@
  * @license GPL-2.0-only
  */
 
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/styles/metasStyles";
 import {
     colorOut,
     fonts,
@@ -15,11 +17,8 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { metasVariables } from "@library/styles/metasStyles";
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
-import { embedMenuMediaQueries } from "@rich-editor/editor/pieces/embedMenuStyles";
-import { layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();

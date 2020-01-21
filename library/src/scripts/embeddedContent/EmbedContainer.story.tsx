@@ -8,6 +8,7 @@ import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/Emb
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
+import { EmbedContext } from "@library/embeddedContent/embedService";
 
 const story = storiesOf("Embeds/Pieces", module);
 
@@ -32,7 +33,9 @@ story.add("EmbedContainer", () => {
             <EmbedContainer size={EmbedContainerSize.FULL_WIDTH}>{ipsum}</EmbedContainer>
 
             <StoryHeading>Editor Mode (selection/pointer-events blocked)</StoryHeading>
-            <EmbedContainer inEditor={true}>{ipsum}</EmbedContainer>
+            <EmbedContext.Provider value={{ inEditor: true }}>
+                <EmbedContainer>{ipsum}</EmbedContainer>
+            </EmbedContext.Provider>
         </>
     );
 });

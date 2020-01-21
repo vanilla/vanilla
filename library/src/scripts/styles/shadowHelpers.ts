@@ -7,8 +7,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
-import { TLength } from "typestyle/lib/types";
+import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { ColorValues } from "@library/styles/styleHelpersColors";
+import { borders } from "@library/styles/styleHelpersBorders";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -63,11 +64,24 @@ export const shadowHelper = useThemeCache(() => {
 });
 
 export const shadowOrBorderBasedOnLightness = (
-    referenceColor: ColorValues,
-    borderStyles: object,
-    shadowStyles: object,
+    referenceColor?: ColorValues,
+    borderStyles?: object,
+    shadowStyles?: object,
     flip?: boolean,
-) => {
+): NestedCSSProperties => {
+    const globalVars = globalVariables();
+    if (!referenceColor) {
+        referenceColor = globalVars.mainColors.bg;
+    }
+
+    if (!borderStyles) {
+        borderStyles = borders();
+    }
+
+    if (!shadowStyles) {
+        shadowStyles = shadowHelper().dropDown();
+    }
+
     if (referenceColor instanceof ColorHelper && referenceColor.lightness() >= 0.5 && !flip) {
         // Shadow for light colors
         return shadowStyles;

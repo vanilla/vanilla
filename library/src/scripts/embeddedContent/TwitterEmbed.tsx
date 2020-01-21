@@ -53,7 +53,6 @@ export function TwitterEmbed(props: IProps): JSX.Element {
             )}
             <EmbedContent
                 type={props.embedType}
-                inEditor={props.inEditor}
                 isSmall
                 className={twitterLoaded ? undefined : visibility().displayNone}
             >

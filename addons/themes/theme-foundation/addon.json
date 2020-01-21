@@ -25,7 +25,7 @@
         "ProfileHeader": true,
         "SharedMasterView": true,
         "NewFlyouts": true,
-        "DataDrivenForumColors": true
+        "DataDrivenTheme": true
     },
     "assets": {
         "footer": {
@@ -39,6 +39,10 @@
         "variables": {
             "type": "json",
             "file": "variables.json"
+        },
+        "fonts": {
+            "type": "data",
+            "file": "fonts.json"
         }
     }
 }

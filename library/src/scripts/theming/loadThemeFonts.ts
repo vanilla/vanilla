@@ -12,7 +12,13 @@ const defaultFontConfig: WebFont.Config = {
     },
 };
 
+let loaded = false;
+
 export function loadThemeFonts() {
+    if (loaded) {
+        return;
+    }
+    loaded = true;
     const state = getStore().getState();
     const assets = state.theme.assets.data || {};
     const { fonts } = assets;

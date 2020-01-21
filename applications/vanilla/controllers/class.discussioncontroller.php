@@ -154,19 +154,6 @@ class DiscussionController extends VanillaController {
             $this->Offset = 0;
         }
 
-
-        $LatestItem = $this->Discussion->CountCommentWatch;
-        if ($LatestItem === null) {
-            $LatestItem = 0;
-        } elseif ($LatestItem < $this->Discussion->CountComments) {
-            $LatestItem += 1;
-        } elseif ($LatestItem > $this->Discussion->CountComments) {
-            // If ever the CountCommentWatch is greater than the actual number of comments.
-            $LatestItem = $this->Discussion->CountComments;
-        }
-
-        $this->setData('_LatestItem', $LatestItem);
-
         // Set the canonical url to have the proper page title.
         $canonicalUrl = ($this->Discussion->Attributes['CanonicalUrl'] ?? '');
         if (empty($canonicalUrl)) {
@@ -187,6 +174,18 @@ class DiscussionController extends VanillaController {
 
         // Load the comments
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
+
+        $LatestItem = $this->Discussion->CountCommentWatch;
+        if ($LatestItem === null) {
+            $LatestItem = 0;
+        } elseif ($LatestItem < $this->Discussion->CountComments) {
+            $LatestItem += 1;
+        } elseif ($LatestItem > $this->Discussion->CountComments) {
+            // If ever the CountCommentWatch is greater than the actual number of comments.
+            $LatestItem = $this->Discussion->CountComments;
+        }
+
+        $this->setData('_LatestItem', $LatestItem);
 
         $PageNumber = pageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);

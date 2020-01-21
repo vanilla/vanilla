@@ -39,6 +39,7 @@ export default function Attachment(props) {
     const classes = attachmentClasses();
     const iconClasses = attachmentIconClasses();
     const classesMetas = metasClasses();
+    const { inEditor } = useEmbedContext();
 
     return (
         <EmbedContainer size={EmbedContainerSize.SMALL}>
@@ -48,7 +49,7 @@ export default function Attachment(props) {
                     className={classNames(classes.link, classes.box)}
                     type={mimeType}
                     download={name}
-                    tabIndex={1}
+                    tabIndex={inEditor ? -1 : 0}
                 >
                     {type && (
                         <div className={classNames(classes.format)}>

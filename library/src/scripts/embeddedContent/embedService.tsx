@@ -16,16 +16,19 @@ import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
-import { onContent } from "@library/utility/appUtils";
+import { onContent, t } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
 import React, { useContext } from "react";
 import Quill from "quill/core";
 import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
+import { useUniqueID } from "@library/utility/idUtils";
+import { visibility } from "@library/styles/styleHelpers";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
 interface IEmbedContext {
     inEditor?: boolean;
+    descriptionID?: string;
     onRenderComplete?: () => void;
     syncBackEmbedValue?: (values: object) => void;
     quill?: Quill | null;
@@ -84,12 +87,21 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
         }
         mountPoint.removeAttribute("data-embedJson");
 
+        const descriptionID = useUniqueID("embedDescription");
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
         // If the component is flagged as async, then it will confirm when the render is complete.
         mountReact(
             <EmbedErrorBoundary url={data.url}>
-                <EmbedContext.Provider value={data}>
+                <EmbedContext.Provider
+                    value={{
+                        ...data,
+                        descriptionID,
+                    }}
+                >
+                    <div id={descriptionID} className={visibility().visuallyHidden}>
+                        {t("richEditor.externalEmbed.description")}
+                    </div>
                     <EmbedClass
                         {...data}
                         inEditor={inEditor}

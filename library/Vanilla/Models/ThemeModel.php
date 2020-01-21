@@ -6,6 +6,7 @@
 
 namespace Vanilla\Models;
 
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -305,13 +306,18 @@ class ThemeModel {
      */
     public function getThemeAddon(): Addon {
         $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
-
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
-            $themeKey = $previewTheme;
+            try {
+                $provider = $this->getThemeProvider($previewTheme);
+                $addonThemeKey = $provider->getMasterThemeKey($previewTheme);
+            } catch (NotFoundException $e) {
+                // if we store wrong preview key store in session, lets reset it
+                $this->themeHelper->cancelSessionPreviewTheme();
+                $provider = $this->getThemeProvider($themeKey);
+                $addonThemeKey = $provider->getMasterThemeKey($themeKey);
+            }
         }
-        $provider = $this->getThemeProvider($themeKey);
-        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
-        $addon = $this->addonManager->lookupTheme($addonThemeKey);
+        $addon = $this->addonManager->lookupTheme($addonThemeKey ?? $themeKey);
         return $addon;
     }
 

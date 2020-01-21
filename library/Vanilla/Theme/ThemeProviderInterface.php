@@ -6,6 +6,8 @@
 
  namespace Vanilla\Theme;
 
+ use Garden\Web\Exception\NotFoundException;
+
  /**
   * Interface for providing variables on a theme.
   */
@@ -114,6 +116,7 @@ interface ThemeProviderInterface {
      * Get master (parent) theme key.
      *
      * @param strig|int $themeKey Theme key or id
+     * @throws NotFoundException Throws an exception when theme is not found.
      * @return string
      */
     public function getMasterThemeKey($themeKey): string;

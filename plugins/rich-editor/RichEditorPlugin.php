@@ -117,6 +117,11 @@ class RichEditorPlugin extends Gdn_Plugin {
             $body = $originalRecord['Body'] ?? false;
             $originalFormat = $originalRecord['Format'] ?? false;
 
+            /*
+                Allow rich content to be rendered and modified if the InputFormat
+                is different from the original format in no longer applicable or
+                forced to be different by Garden.ForceInputFormatter.
+            */
             if ($body && (c('Garden.InputFormatter') !== $originalFormat )) {
                 switch (strtolower(c('Garden.InputFormatter', 'unknown'))) {
                     case Formats\TextFormat::FORMAT_KEY:

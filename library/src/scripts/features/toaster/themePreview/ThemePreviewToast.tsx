@@ -27,7 +27,10 @@ export function ThemePreviewToast() {
     };
 
     useEffect(() => {
-        if (applyStatus.status === LoadStatus.SUCCESS || cancelStatus.status === LoadStatus.SUCCESS) {
+        if (
+            showToaster.name &&
+            (applyStatus.status === LoadStatus.SUCCESS || cancelStatus.status === LoadStatus.SUCCESS)
+        ) {
             window.location.href = showToaster.redirect;
         }
     });

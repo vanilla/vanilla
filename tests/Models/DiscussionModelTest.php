@@ -210,75 +210,119 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
-     * Test getUnreadComments() against various scenarios.
+     * Tests for determineLastViewedDate().
+     */
+
+    /**
+     * DiscussionLastViewed > CategoryLastViewed
+     */
+    public function testDetermineLastViewedDateDiscussionGreater() {
+        $discussionLastViewed = '2020-01-09 16:22:42';
+        $categoryLastViewed = '2019-12-02 21:55:40';
+        $expected = $discussionLastViewed;
+        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * CategoryLastViewed > DiscussionLastViewed
+     */
+    public function testDetermineLastViewedDateCategoryGreater() {
+        $discussionLastViewed = '2019-12-02 21:55:40';
+        $categoryLastViewed = '2020-01-09 16:22:42';
+        $expected = $categoryLastViewed;
+        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * DiscussionLastViewed is null
+     */
+    public function testDetermineLastViewedDateDiscussionNull() {
+        $discussionLastViewed = null;
+        $categoryLastViewed = '2020-01-09 16:22:42';
+        $expected = $categoryLastViewed;
+        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test determineReadStatusAndUnreadCount() against various scenarios.
      *
      * @param int $discussionCommentCount The number of comments in the discussion according to the Discussion Table.
      * @param mixed $discussionLastCommentDate Date of last Comment according to the Discussion table.
      * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
      * @param mixed $userLastReadDate Date of last Comment read according to the UserDiscussion table.
      * @param array $expected The expected result.
-     * @dataProvider provideTestGetUnreadCommentsArrays
+     * @dataProvider provideTestDetermineReadStatusAndUnreadCount
      */
-    public function testGetUnreadComments(
+    public function testDetermineReadStatusAndUnreadCount(
         int $discussionCommentCount,
         $discussionLastCommentDate,
         int $userReadComments,
         $userLastReadDate,
         $expected
     ) {
-        $actual = DiscussionModel::getUnreadComments($discussionCommentCount, $discussionLastCommentDate, $userReadComments, $userLastReadDate);
+        $actual = DiscussionModel::determineReadStatusAndUnreadCount(
+            $discussionCommentCount,
+            $discussionLastCommentDate,
+            $userReadComments,
+            $userLastReadDate
+        );
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Provide test data for testGetUnreadComments().
+     * Provide test data for testDetermineReadStatusAndUnreadCount().
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestGetUnreadCommentsArrays() {
+    public function provideTestDetermineReadStatusAndUnreadCount() {
         $r = [
             'CommentsAndUserReadEqualDatesConcur' => [
                 10,
                 '2019-12-02 21:55:40',
                 10,
                 '2020-01-09 16:22:42',
-                [true, 0, 10],
+                [true, 0],
             ],
             'CommentsAndUserReadEqualDatesDisagree' => [
                 10,
                 '2020-01-09 16:22:42',
                 10,
                 '2019-12-02 21:55:40',
-                [/*what do we want here?*/]
+                [false, 1],
             ],
             'MoreCommentsThanReadDatesAgree' => [
                 15,
                 '2020-01-09 16:22:42',
                 10,
                 '2019-12-02 21:55:40',
-                [/*what do we want here?*/],
+                [false, 5],
             ],
             'MoreCommentsThanReadDatesDisagree' => [
                 15,
                 '2019-12-02 21:55:40',
                 10,
                 '2020-01-09 16:22:42',
-                [/*what do we want here?*/],
+                [true, 0],
             ],
             'MoreReadThanCommentsLastCommentLater' => [
                 5,
                 '2020-01-09 16:22:42',
                 10,
                 '2019-12-02 21:55:40',
-                [/*what do we want here?*/],
+                [false, 1],
             ],
             'MoreReadThanCommentsLastCommentEarlier' => [
                 5,
                 '2019-12-02 21:55:40',
                 10,
                 '2020-01-09 16:22:42',
-                [/*what do we want here?*/],
+                [true, 0],
             ],
         ];
+
+        return $r;
     }
 }

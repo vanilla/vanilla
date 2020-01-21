@@ -9,6 +9,7 @@ namespace Vanilla\Theme;
 
 use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ThemeModel;
 
 /**
  * Class to hold information about a theme and it's configuration options.
@@ -34,9 +35,9 @@ class ThemeFeatures {
      * @param ConfigurationInterface $config
      * @param Addon|null $theme
      */
-    public function __construct(ConfigurationInterface $config, ?Addon $theme) {
+    public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
         $this->config = $config;
-        $this->theme = $theme;
+        $this->theme = $themeModel->getThemeAddon();
     }
 
     /**

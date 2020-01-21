@@ -9,7 +9,6 @@ namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
-use Vanilla\Addon;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
@@ -63,6 +62,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var ThemeFeatures */
     private $themeFeatures;
 
+    /** @var array $themePreview */
+    private $themePreview;
+
     /** @var string */
     private $favIcon;
 
@@ -104,7 +106,7 @@ class SiteMeta implements \JsonSerializable {
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param ThemeFeatres $themeFeatures
-     * @param Contracts\AddonInterface $activeTheme
+     * @param ThemeModel $themeModel
      */
     public function __construct(
         RequestInterface $request,
@@ -148,9 +150,10 @@ class SiteMeta implements \JsonSerializable {
         $this->cacheBuster = $deploymentCacheBuster->value();
 
         // Theming
-        $themeKey = $config->get('Garden.CurrentTheme', $config->get('Garden.Theme'));
+        $themeKey = $themeModel->getViewThemeKey();
         $this->activeThemeKey = $themeKey;
         $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
+        $this->themePreview =  $themeModel->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
@@ -210,6 +213,7 @@ class SiteMeta implements \JsonSerializable {
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
+            'themePreview' => $this->themePreview,
         ];
     }
 
@@ -337,5 +341,4 @@ class SiteMeta implements \JsonSerializable {
     public function setDynamicPathFolder(string $dynamicPathFolder) {
         $this->dynamicPathFolder = $dynamicPathFolder;
     }
-
 }

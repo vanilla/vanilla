@@ -35,13 +35,13 @@ export default class Toast extends React.Component<IProps> {
         return (
             <div className={classNames(classes.root())}>
                 <p>{message}</p>
-                <div>
+                <div className={classes.buttons}>
                     {links.map((link, i) => (
                         <Button
                             key={i}
                             baseClass={link.type}
                             title={link.name}
-                            className={classNames(classes.buttons())}
+                            className={classNames(classes.button)}
                             onClick={link.onClick}
                         >
                             {link.isLoading ? <ButtonLoader buttonType={link.type} /> : link.name}

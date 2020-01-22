@@ -43,7 +43,7 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
                             <h3>{name}</h3>
                         </div>
                         {Object.entries(info).map(([key, value], i) => (
-                            <div className={classes.description}>
+                            <div key={i} className={classes.description}>
                                 <p><strong>{key}</strong>: { value.type === 'date' ? <DateTime timestamp={value.info} /> : value.info}</p>
                             </div>
                         ))

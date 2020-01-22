@@ -1189,10 +1189,6 @@ class DiscussionModel extends Gdn_Model {
             $unreadCommentCount = 0;
         }
 
-        if ($unreadCommentCount < 0 && !$isRead) {
-            $unreadCommentCount = 1;
-        }
-
         if ($unreadCommentCount < 0 && $isRead) {
             $unreadCommentCount = 0;
         }

@@ -199,7 +199,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
         $res['preview']['info']['Description'] = ['type'=>'string', 'info' => $theme->getInfoValue('description', '')];
 
-        $themeAuthors = $theme->getInfoValue('authors', false) ;
+        $themeAuthors = $theme->getInfoValue('authors', false);
         if (is_array($themeAuthors)) {
             $authors = '';
             foreach ($themeAuthors as $author) {

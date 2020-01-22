@@ -52,7 +52,7 @@ export function AppContext(props: IProps) {
                             <ScrollOffsetProvider scrollWatchingEnabled={false}>
                                 <ThemeProvider
                                     disabled={props.noTheme}
-                                    errorComponent={<ErrorPage /> || null}
+                                    errorComponent={<ErrorPage /> }
                                     themeKey={getMeta("ui.themeKey", "keystone")}
                                     variablesOnly={props.variablesOnly}
                                 >

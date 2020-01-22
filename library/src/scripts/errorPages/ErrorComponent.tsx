@@ -11,15 +11,13 @@ import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLa
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
-import ErrorMessagePage, {getErrorCode, messageFromErrorCode, IErrorMessageProps} from "@library/errorPages/ErrorMessagePage";
-interface IProps  extends IErrorMessageProps {
-    code?: IErrorMessageProps;
+import ErrorMessagePage, {getErrorCode, messageFromErrorCode, IErrorMessageProps} from "@library/errorPages/CoreErrorMessages";
+
+interface IProps extends IErrorMessageProps {
 }
 
 export function ErrorPage(props: IProps){
-        console.log('ErrorPage');
-        console.log('code', props);
-        const code = getErrorCode(props.code);
+        const code = getErrorCode(props);
         const message = messageFromErrorCode(code);
         const classes = {
             inheritHeight: inheritHeightClass(),
@@ -27,7 +25,6 @@ export function ErrorPage(props: IProps){
 
         return (
             <DocumentTitle title={message}>
-                <TitleBar />
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>

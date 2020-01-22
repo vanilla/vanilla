@@ -28,8 +28,8 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param \Vanilla\Formatting\FormatService $formatService
      */
     public function __construct(\Vanilla\Formatting\FormatService $formatService) {
-        parent::__construct();
         $this->formatService = $formatService;
+        parent::__construct();
         self::$editorID++;
     }
 
@@ -122,7 +122,7 @@ class RichEditorPlugin extends Gdn_Plugin {
                 is different from the original format in no longer applicable or
                 forced to be different by Garden.ForceInputFormatter.
             */
-            if ($body && (c('Garden.InputFormatter') !== $originalFormat )) {
+            if ($body && (c('Garden.InputFormatter') !== $originalFormat)) {
                 switch (strtolower(c('Garden.InputFormatter', 'unknown'))) {
                     case Formats\TextFormat::FORMAT_KEY:
                     case Formats\TextExFormat::FORMAT_KEY:

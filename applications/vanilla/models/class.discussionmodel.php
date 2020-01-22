@@ -13,11 +13,11 @@ use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Exception\PermissionException;
-use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 
@@ -25,8 +25,6 @@ use Vanilla\Utility\ModelUtils;
  * Manages discussions data.
  */
 class DiscussionModel extends Gdn_Model {
-
-    use ExtensibleSchemasTrait;
 
     use StaticInitializer;
 
@@ -3602,8 +3600,8 @@ class DiscussionModel extends Gdn_Model {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => $this->extensibleSchema(new UserFragmentSchema(), "UserFragment"),
-            'lastUser?' => $this->extensibleSchema(new UserFragmentSchema(), "UserFragment"),
+            'insertUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
+            'lastUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -3618,7 +3616,7 @@ class DiscussionModel extends Gdn_Model {
             'score:i|n' => 'Total points associated with this post.',
             'url:s?' => 'The full URL to the discussion.',
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
-            'lastPost?' => $this->extensibleSchema(new PostFragmentSchema(), "PostFragment"),
+            'lastPost?' => SchemaFactory::parse(new PostFragmentSchema(), "PostFragment"),
         ]);
         return $result;
     }

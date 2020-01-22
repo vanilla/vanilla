@@ -10,16 +10,14 @@
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
-use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\SchemaFactory;
 
 /**
  * Manages discussion categories' data.
  */
 class CategoryModel extends Gdn_Model {
-
-    use ExtensibleSchemasTrait;
 
     /** Cache key. */
     const CACHE_KEY = 'Categories';
@@ -3709,7 +3707,7 @@ SQL;
      * @return Schema Returns a schema.
      */
     public function fragmentSchema(): Schema {
-        $result = $this->extensibleSchema([
+        $result = SchemaFactory::parse([
             'categoryID:i' => 'The ID of the category.',
             'name:s' => 'The name of the category.',
             'url:s' => 'Full URL to the category.',

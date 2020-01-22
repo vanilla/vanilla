@@ -8,8 +8,29 @@ namespace Vanilla;
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Gdn;
 
-trait ExtensibleSchemasTrait {
+/**
+ * Factory for schema objects.
+ */
+class SchemaFactory {
+
+    /** @var EventManager */
+    private static $eventManager;
+
+    /**
+     * Get the configured event manager instance.
+     *
+     * @return EventManager
+     */
+    private static function getEventManager(): EventManager {
+        if (!isset(self::$eventManager)) {
+            /** @var EventManager */
+            $eventManager = Gdn::getContainer()->get(EventManager::class);
+            self::setEventManager($eventManager);
+        }
+        return self::$eventManager;
+    }
 
     /**
      * Create a schema, allowing for extension via events.
@@ -18,10 +39,7 @@ trait ExtensibleSchemasTrait {
      * @param string|array $type
      * @return Schema
      */
-    public function extensibleSchema($schema, $type): Schema {
-        /** @var EventManager */
-        $eventManager = \Gdn::getContainer()->get(EventManager::class);
-
+    public static function parse($schema, $type): Schema {
         $id = '';
         if (is_array($type)) {
             $origType = $type;
@@ -43,9 +61,19 @@ trait ExtensibleSchemasTrait {
             // The type is a specific type of schema.
             $schema->setID($id);
 
-            $eventManager->fire("{$id}Schema_init", $schema);
+            self::getEventManager()->fire("{$id}Schema_init", $schema);
         }
 
         return $schema;
+    }
+
+    /**
+     * Set the event manager instance.
+     *
+     * @param EventManager $eventManager
+     * @return void
+     */
+    private static function setEventManager(EventManager $eventManager): void {
+        self::$eventManager = $eventManager;
     }
 }

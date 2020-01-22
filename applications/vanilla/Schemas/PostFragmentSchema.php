@@ -7,15 +7,13 @@
 namespace Vanilla\Community\Schemas;
 
 use Garden\Schema\Schema;
-use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
 
 /**
  * Schema for minimal post fields.
  */
 class PostFragmentSchema extends Schema {
-
-    use ExtensibleSchemasTrait;
 
     /**
      * Setup new schema.
@@ -29,7 +27,7 @@ class PostFragmentSchema extends Schema {
             'url:s' => 'The URL of the post.',
             'dateInserted:dt' => 'The date of the post.',
             'insertUserID:i' => 'The author of the post.',
-            'insertUser?' => $this->extensibleSchema(new UserFragmentSchema(), "UserFragment"),
+            'insertUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
         ]));
     }
 }

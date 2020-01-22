@@ -17,8 +17,8 @@ use Gdn_Locale as LocaleInterface;
 use Gdn_Session as SessionInterface;
 use Gdn_Upload as Upload;
 use Vanilla\Exception\PermissionException;
-use Vanilla\ExtensibleSchemasTrait;
 use Vanilla\InjectableInterface;
+use Vanilla\SchemaFactory;
 use Vanilla\UploadedFile;
 use Vanilla\Utility\ModelUtils;
 
@@ -26,8 +26,6 @@ use Vanilla\Utility\ModelUtils;
  * The controller base class.
  */
 abstract class Controller implements InjectableInterface {
-
-    use ExtensibleSchemasTrait;
 
     /**
      * @var SessionInterface
@@ -116,7 +114,7 @@ abstract class Controller implements InjectableInterface {
      * @return Schema Returns a schema object.
      */
     public function schema($schema, $type = 'in') {
-        $schema = $this->extensibleSchema($schema, $type);
+        $schema = SchemaFactory::parse($schema, $type);
 
         // Fire a generic schema event for documentation.
         if (!empty($type)) {

@@ -13,6 +13,7 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\SchemaFactory;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -216,7 +217,7 @@ class DiscussionsApiController extends AbstractApiController {
             ->schema()
             ->merge($this->discussionModel->userDiscussionSchema())
             ->merge(Schema::parse([
-                'category?' => $this->extensibleSchema(new CategoryFragmentSchema(), 'CategoryFragment'),
+                'category?' => SchemaFactory::parse(new CategoryFragmentSchema(), 'CategoryFragment'),
             ]));
         return $result;
     }

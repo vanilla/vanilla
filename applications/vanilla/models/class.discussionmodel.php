@@ -30,7 +30,7 @@ class DiscussionModel extends Gdn_Model {
 
     use \Vanilla\FloodControlTrait;
 
-    use FormatfieldTrait;
+    use FormatFieldTrait;
 
     use UpdateMediaTrait;
 
@@ -2268,7 +2268,7 @@ class DiscussionModel extends Gdn_Model {
                     (array)$discussion,
                     $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
                 );
-                $this->eventManager->dispatch($discussionEvent);
+                $this->getEventManager()->dispatch($discussionEvent);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
@@ -2972,7 +2972,7 @@ class DiscussionModel extends Gdn_Model {
         $dataObject = (object)$data;
         $this->calculate($dataObject);
         $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
-        $this->eventManager->dispatch($discussionEvent);
+        $this->getEventManager()->dispatch($discussionEvent);
 
         return true;
     }

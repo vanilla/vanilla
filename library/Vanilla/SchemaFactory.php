@@ -73,7 +73,7 @@ class SchemaFactory {
      * @param EventManager $eventManager
      * @return void
      */
-    public static function setEventManager(EventManager $eventManager): void {
+    public static function setEventManager(?EventManager $eventManager): void {
         self::$eventManager = $eventManager;
     }
 }

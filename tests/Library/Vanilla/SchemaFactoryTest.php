@@ -38,13 +38,6 @@ class SchemaFactoryTest extends TestCase {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected function setUp(): void {
-        SchemaFactory::setEventManager($this->container()->get(EventManager::class));
-    }
-
-    /**
      * Verify the expected events are dispatched when the schema is created.
      *
      * @param array|string $type
@@ -64,6 +57,20 @@ class SchemaFactoryTest extends TestCase {
 
         SchemaFactory::parse(["stringField:s"], $type);
         $this->assertTrue($dispatched);
+    }
+
+    /**
+     * Verify the event manager will automatically be retrieved when not explicitly set.
+     *
+     * @return void
+     */
+    public function testGetEventManagerDefault(): void {
+        // Unset the existing event manager.
+        SchemaFactory::setEventManager(null);
+        $this->assertSame(
+            $this->container()->get(EventManager::class),
+            SchemaFactory::getEventManager()
+        );
     }
 
     /**

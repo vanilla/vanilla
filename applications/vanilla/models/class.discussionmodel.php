@@ -1129,7 +1129,7 @@ class DiscussionModel extends Gdn_Model {
                 );
                 $discussion->Read = $updatedReadStatusAndUnreadCount[0];
                 $discussion->CountUnreadComments = $updatedReadStatusAndUnreadCount[1];
-                $discussion->CountCommentWatch = $discussion->CountComments - $discussion->CountUnreadComments;
+//                $discussion->CountCommentWatch = $discussion->CountComments - $discussion->CountUnreadComments;
             }
         }
         if ($discussion->CountUnreadComments === null) {
@@ -1194,11 +1194,11 @@ class DiscussionModel extends Gdn_Model {
             $unreadCommentCount = $discussionCommentCount;
         }
 
-        if ($unreadCommentCount < 0 && $isRead === false) {
+        if ($unreadCommentCount < 0 && !$isRead) {
             $unreadCommentCount = 1;
         }
 
-        if ($unreadCommentCount < 0 && $isRead === true) {
+        if ($unreadCommentCount < 0 && $isRead) {
             $unreadCommentCount = 0;
         }
 

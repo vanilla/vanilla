@@ -844,15 +844,15 @@ class CommentModel extends Gdn_Model {
         // This discussion looks familiar...
         if (is_numeric($discussion->CountCommentWatch)) {
             if ($countWatch < $discussion->CountCommentWatch) {
-                $countWatch = $discussion->CountCommentWatch;
+                $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
             }
 
             if (isset($discussion->DateLastViewed)) {
                 $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
             }
 
-            if ($totalComments > $discussion->CountCommentWatch) {
-                $newComments |= true;
+            if ($totalComments > $discussion->CountCommentWatch || $countWatch != $discussion->CountCommentWatch) {
+                $newComments = true;
             }
 
             // Update the watch data.
@@ -883,6 +883,10 @@ class CommentModel extends Gdn_Model {
                 ]
             );
         }
+
+        // If there is a discrepancy between $countWatch and $discussion->CountCommentWatch,
+        // update CountCommentWatch with the correct value.
+        $discussion->CountCommentWatch = $countWatch;
 
         /**
          * Fuzzy way of trying to automatically mark a category read again

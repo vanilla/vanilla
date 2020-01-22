@@ -2992,13 +2992,13 @@ class DiscussionModel extends Gdn_Model {
      * @return bool whether the user can view a discussion.
      */
     public function canViewDiscussion($discussion): bool {
-        $canViewDiscussion = true;
+        $canViewDiscussion = false;
         $session = $this->sessionInterface;
         $userID = $session->UserID;
         $canView = $this->canView($discussion, $userID);
         $isModerator = $session->checkRankedPermission('Garden.Moderation.Manage');
-        if (!$canView && !$isModerator) {
-            $canViewDiscussion = false;
+        if ($canView || $isModerator) {
+            $canViewDiscussion = true;
         }
         return $canViewDiscussion;
     }

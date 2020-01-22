@@ -17,11 +17,12 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const themeCardVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themePreviewCard");
-    const globalVars = globalVariables();
 
     const colors = makeThemeVars("colors", {
         fg: color("#adb2bb"),
+        white: color("#ffffff"),
         imgColor: color("#0291db"),
+        btnTextColor: color("#555a62"),
         bg: {
             white: color("#fff"),
             overlay: rgba(103, 105, 109, 0.8),
@@ -157,6 +158,7 @@ export const themeCardVariables = useThemeCache(() => {
 export const themeCardClasses = useThemeCache(() => {
     const vars = themeCardVariables();
     const style = styleFactory("themePreviewCard");
+    const globalVars = globalVariables();
 
     const menuBar = style("menuBar", {
         height: unit(vars.titlebar.height),
@@ -369,10 +371,25 @@ export const themeCardClasses = useThemeCache(() => {
 
     const buttons = style("buttons", {
         marginBottom: unit(vars.contentTile.margin.bottom),
-
         $nest: {
-            "&&": {
+            "&& ": {
                 width: unit(180),
+            },
+            "& a": {
+                color: vars.colors.btnTextColor.toString(),
+            },
+
+            [`&:hover a`]: {
+                color: vars.colors.white.toString(),
+                justifyContent: "center",
+                textDecoration: "none",
+                background: "inherit",
+
+                $nest: {
+                    "&:hover": {
+                        textDecoration: "none",
+                    },
+                },
             },
         },
     });
@@ -397,21 +414,25 @@ export const themeCardClasses = useThemeCache(() => {
         right: unit(7),
         color: vars.colors.bg.white.toString(),
         $nest: {
+            "&& dropDown-item": {
+                $nest: {
+                    "&:hover": {
+                        textDecoration: "none",
+                    },
+                },
+            },
             "& .icon-dropDownMenu": {
                 color: vars.colors.bg.white.toString(),
             },
             "&.focus-visible": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },
             "&:focus": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },
             "&:hover": {
-                color: vars.colors.bg.white.toString(),
                 borderRadius: "2px",
                 backgroundColor: colorOut(vars.btn_content.state.bg),
             },
@@ -426,6 +447,35 @@ export const themeCardClasses = useThemeCache(() => {
     const toolTipBox = style("toolTipBox", {
         width: "20px",
         height: "20px",
+    });
+
+    const actionLink = style("actionLink", {
+        textDecoration: "none",
+        paddingBottom: unit(4),
+        paddingLeft: unit(14),
+        paddingRight: unit(14),
+        paddingTop: unit(4),
+        textAlign: "left",
+        color: vars.colors.btnTextColor.toString(),
+        $nest: {
+            "&:hover": {
+                backgroundColor: colorOut(globalVars.states.hover.color, true),
+            },
+            "&:focus": {
+                backgroundColor: colorOut(globalVars.states.focus.color, true),
+            },
+            "&:active": {
+                backgroundColor: colorOut(globalVars.states.active.color, true),
+            },
+        },
+    });
+
+    const action = style("dropDown-item", {
+        $nest: {
+            "&&:hover, &&:focus, &&active": {
+                textDecoration: "none",
+            },
+        },
     });
 
     return {
@@ -462,6 +512,8 @@ export const themeCardClasses = useThemeCache(() => {
         actionDropdown,
         itemLabel,
         toolTipBox,
+        actionLink,
+        action,
     };
 });
 

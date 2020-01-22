@@ -306,6 +306,8 @@ class ThemeModel {
      */
     public function getThemeAddon(): Addon {
         $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $provider = $this->getThemeProvider($themeKey);
+        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
             try {
                 $provider = $this->getThemeProvider($previewTheme);
@@ -313,8 +315,6 @@ class ThemeModel {
             } catch (NotFoundException $e) {
                 // if we store wrong preview key store in session, lets reset it
                 $this->themeHelper->cancelSessionPreviewTheme();
-                $provider = $this->getThemeProvider($themeKey);
-                $addonThemeKey = $provider->getMasterThemeKey($themeKey);
             }
         }
         $addon = $this->addonManager->lookupTheme($addonThemeKey ?? $themeKey);

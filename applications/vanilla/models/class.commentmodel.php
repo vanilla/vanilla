@@ -1244,6 +1244,11 @@ class CommentModel extends Gdn_Model {
                 if ($insert === false) {
                     // Log the save.
                     LogModel::logChange('Edit', 'Comment', array_merge($fields, ['CommentID' => $commentID]));
+
+                    if (c('Garden.ForceInputFormatter')) {
+                        $fields['Format'] = Gdn::config('Garden.InputFormatter', '');
+                    }
+
                     // Save the new value.
                     $this->serializeRow($fields);
                     $this->SQL->put($this->Name, $fields, ['CommentID' => $commentID]);

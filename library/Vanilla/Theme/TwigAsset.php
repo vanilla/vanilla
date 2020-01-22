@@ -37,6 +37,7 @@ class TwigAsset extends Asset {
      */
     public function asArray(): array {
         return [
+            "data" => $this->renderHtml([]),
             "template" => $this->template,
             "type" => $this->type,
         ];

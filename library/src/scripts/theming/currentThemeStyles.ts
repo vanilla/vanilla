@@ -7,7 +7,7 @@ import { unit, paddings, margins } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themeCardStyles";
-import { percent } from "csx";
+import { percent, color } from "csx";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -15,6 +15,8 @@ export const currentThemeVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
+        white: color("#ffffff"),
+        btnTextColor: color("#555a62"),
     });
 
     const flag = makeThemeVars("flag", {
@@ -39,18 +41,6 @@ export const currentThemeVariables = useThemeCache(() => {
         },
     });
 
-    const addTheme = makeThemeVars("addTheme", {
-        width: 310,
-        height: 225,
-
-        padding: {
-            top: 70,
-            bottom: 70,
-            right: 117,
-            left: 117,
-        },
-    });
-
     const themeContainer = makeThemeVars("themeContainer", {
         margin: {
             top: 32,
@@ -64,8 +54,8 @@ export const currentThemeVariables = useThemeCache(() => {
         flag,
         name,
         authorName,
-        addTheme,
         themeContainer,
+        colors,
     };
 });
 
@@ -74,6 +64,14 @@ export const currentThemeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const style = styleFactory("currentThemeInfo");
+
+    const root = style({
+        display: "flex",
+        backgroundColor: "#f6f9fb",
+        padding: 23,
+        marginLeft: -18,
+        marginRight: -18,
+    });
 
     const themeContainer = style("themeContainer", {
         display: "flex",
@@ -137,10 +135,13 @@ export const currentThemeClasses = useThemeCache(() => {
         flexDirection: "column",
         flex: 1,
         marginTop: unit(vars.themeContainer.margin.top + 10),
+    });
+
+    const themeActionButton = style("themeActionButton", {
         $nest: {
-            ["& button"]: {
+            "&&": {
                 marginBottom: unit(vars.flag.margin.bottom),
-                width: unit(144),
+                width: unit(180),
             },
         },
     });
@@ -150,26 +151,15 @@ export const currentThemeClasses = useThemeCache(() => {
         marginRight: unit(vars.themeContainer.margin.right + 20),
     });
 
-    const addTheme = style("addTheme", {
-        width: unit(vars.addTheme.width),
-        height: unit(vars.addTheme.height),
-        border: "1px dashed #979797",
-        ...paddings({
-            top: unit(vars.addTheme.padding.top),
-            bottom: unit(vars.addTheme.padding.bottom),
-            left: unit(vars.addTheme.padding.left),
-            right: unit(vars.addTheme.padding.right),
-        }),
-    });
-
     return {
+        root,
         themeContainer,
         flag,
         name,
         authorName,
         description,
         themeActionButtons,
-        addTheme,
+        themeActionButton,
         themeInfo,
     };
 });

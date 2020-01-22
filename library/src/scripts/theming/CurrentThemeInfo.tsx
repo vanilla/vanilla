@@ -10,13 +10,12 @@ import Button from "@library/forms/Button";
 import { currentThemeClasses } from "./currentThemeStyles";
 
 interface IProps {
-    name: string;
-    authors: string;
-    description: string;
+    name?: string;
+    authors?: string;
+    description?: string;
     support?: string;
-    onEdit?: () => void;
-    onRename?: () => void;
-    onCopy?: () => void;
+    editButton?: React.ReactNode;
+    copyButton?: React.ReactNode;
 }
 interface IState {}
 
@@ -27,7 +26,7 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
 
     public render() {
         const classes = currentThemeClasses();
-        const { name, authors, description, support } = this.props;
+        const { name, authors, description, copyButton, editButton } = this.props;
         return (
             <React.Fragment>
                 <section className={classes.themeContainer}>
@@ -45,9 +44,8 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
                         </div>
                     </div>
                     <div className={classes.themeActionButtons}>
-                        <Button onClick={this.props.onEdit}>{t("Edit")}</Button>
-                        <Button onClick={this.props.onRename}>{t("Rename")}</Button>
-                        <Button onClick={this.props.onCopy}>{t("Copy")}</Button>
+                        {editButton}
+                        {copyButton}
                     </div>
                 </section>
             </React.Fragment>

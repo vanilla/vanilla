@@ -5,6 +5,8 @@
  */
 
 import React from "react";
+import { visibility } from "@library/styles/styleHelpers";
+import classNames from "classnames";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
@@ -18,7 +20,7 @@ export default class ScreenReaderContent extends React.PureComponent<IProps> {
     public render() {
         const Tag = (this.props.tag || "div") as "div";
         return (
-            <Tag {...this.props} className="sr-only">
+            <Tag {...this.props} className={classNames(visibility().visuallyHidden, "sr-only")}>
                 {this.props.children}
             </Tag>
         );

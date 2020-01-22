@@ -16,7 +16,7 @@ story.add("Add Theme", () => {
         <>
             <StoryContent>
                 <StoryHeading depth={1}>Add Theme</StoryHeading>
-                <AddTheme to={"/"} />
+                <AddTheme />
             </StoryContent>
         </>
     );

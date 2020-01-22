@@ -1205,8 +1205,6 @@ class DiscussionModel extends Gdn_Model {
      * @throws Exception Emits Exception in case of an error.
      */
     public static function maxDate($dateOne, $dateTwo) {
-        $dateOne = new DateTimeImmutable($dateOne);
-        $dateTwo = new DateTimeImmutable($dateTwo);
         if (empty($dateOne) || $dateOne < $dateTwo) {
             return $dateTwo;
         } elseif (empty($dateOne) && empty($dateTwo)) {

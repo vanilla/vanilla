@@ -110,19 +110,14 @@
                 box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5) inset;
             }
         }
+    }
 
-        &:focus {
+    .embed-isSelected {
+        .embedExternal-content,
+        .embedLinkLoader-link {
             &:after {
                 box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color inset;
             }
-        }
-
-        > * {
-            pointer-events: none; // In edit mode, we never allow clicking into elements.
-        }
-
-        > .u-excludeFromPointerEvents {
-            pointer-events: initial;
         }
     }
 }

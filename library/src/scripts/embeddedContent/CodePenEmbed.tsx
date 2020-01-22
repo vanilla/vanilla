@@ -24,7 +24,7 @@ export function CodePenEmbed(props: IProps): JSX.Element {
     const src = `https://codepen.io/${props.author}/embed/preview/${props.codePenID}`;
 
     return (
-        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+        <EmbedContent type={props.embedType}>
             <iframe src={src} height={Math.max(props.height || MIN_HEIGHT, MIN_HEIGHT)} width="100%" scrolling="no" />
         </EmbedContent>
     );

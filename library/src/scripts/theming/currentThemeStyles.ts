@@ -65,6 +65,14 @@ export const currentThemeClasses = useThemeCache(() => {
 
     const style = styleFactory("currentThemeInfo");
 
+    const root = style({
+        display: "flex",
+        backgroundColor: "#f6f9fb",
+        padding: 23,
+        marginLeft: -18,
+        marginRight: -18,
+    });
+
     const themeContainer = style("themeContainer", {
         display: "flex",
         ...margins({
@@ -127,28 +135,13 @@ export const currentThemeClasses = useThemeCache(() => {
         flexDirection: "column",
         flex: 1,
         marginTop: unit(vars.themeContainer.margin.top + 10),
+    });
+
+    const themeActionButton = style("themeActionButton", {
         $nest: {
-            ["& button"]: {
+            "&&": {
                 marginBottom: unit(vars.flag.margin.bottom),
                 width: unit(180),
-
-                $nest: {
-                    "& a": {
-                        color: vars.colors.btnTextColor.toString(),
-                    },
-                    [`&:hover a`]: {
-                        color: vars.colors.white.toString(),
-                        justifyContent: "center",
-                        textDecoration: "none",
-                        background: "inherit",
-
-                        $nest: {
-                            "&:hover": {
-                                textDecoration: "none",
-                            },
-                        },
-                    },
-                },
             },
         },
     });
@@ -159,12 +152,14 @@ export const currentThemeClasses = useThemeCache(() => {
     });
 
     return {
+        root,
         themeContainer,
         flag,
         name,
         authorName,
         description,
         themeActionButtons,
+        themeActionButton,
         themeInfo,
     };
 });

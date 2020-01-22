@@ -1112,7 +1112,7 @@ class DiscussionModel extends Gdn_Model {
             $discussion->Read = !(bool)$discussion->CountUnreadComments;
             if ($category && !is_null($category['DateMarkedRead'])) {
                 // If the category was marked explicitly read at some point, see if that applies here
-                $discussion->DateLastViewed = self::determineLastViewedDate($discussion->DateLastComment, $category['DateMarkedRead']);
+                $discussion->DateLastViewed = self::maxDate($discussion->DateLastComment, $category['DateMarkedRead']);
             }
         }
 
@@ -1197,18 +1197,22 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * Decide which date we want to consider as the date last viewed, either when the
-     * user has marked the Category read or when the user last viewed the Discussion.
+     * Decide which of two dates is the most recent.
      *
-     * @param mixed $discussionLastViewedDate Date discussion was last viewed.
-     * @param mixed $categoryLastViewedDate Date category was marked viewed.
+     * @param mixed $dateOne
+     * @param mixed $dateTwo
      * @return mixed Returns most recent date.
+     * @throws Exception Emits Exception in case of an error.
      */
-    public static function determineLastViewedDate($discussionLastViewedDate, $categoryLastViewedDate) {
-        if ($discussionLastViewedDate === null || $discussionLastViewedDate < $categoryLastViewedDate) {
-            return $categoryLastViewedDate;
+    public static function maxDate($dateOne, $dateTwo) {
+        $dateOne = new DateTimeImmutable($dateOne);
+        $dateTwo = new DateTimeImmutable($dateTwo);
+        if (empty($dateOne) || $dateOne < $dateTwo) {
+            return $dateTwo;
+        } elseif (empty($dateOne) && empty($dateTwo)) {
+            return null;
         } else {
-            return $discussionLastViewedDate;
+            return $dateOne;
         }
     }
 

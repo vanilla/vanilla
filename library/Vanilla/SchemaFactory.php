@@ -23,7 +23,7 @@ class SchemaFactory {
      *
      * @return EventManager
      */
-    private static function getEventManager(): EventManager {
+    public static function getEventManager(): EventManager {
         if (!isset(self::$eventManager)) {
             /** @var EventManager */
             $eventManager = Gdn::getContainer()->get(EventManager::class);
@@ -73,7 +73,7 @@ class SchemaFactory {
      * @param EventManager $eventManager
      * @return void
      */
-    private static function setEventManager(EventManager $eventManager): void {
+    public static function setEventManager(EventManager $eventManager): void {
         self::$eventManager = $eventManager;
     }
 }

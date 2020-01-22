@@ -2986,7 +2986,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * Tests whether a user/admin has permission to view a specific discussion.
+     * Tests whether a user has permission to view a specific discussion, with consideration for mod permissions.
      *
      * @param object $discussion
      * @return bool whether the user can view a discussion.

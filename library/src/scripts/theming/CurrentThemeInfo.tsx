@@ -12,8 +12,8 @@ import DateTime from "@library/content/DateTime";
 
 interface IThemeInfo {
     [key: string]: {
-        type: string,
-        info: string
+        type: string;
+        info: string;
     };
 }
 
@@ -44,10 +44,12 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
                         </div>
                         {Object.entries(info).map(([key, value], i) => (
                             <div key={i} className={classes.description}>
-                                <p><strong>{key}</strong>: { value.type === 'date' ? <DateTime timestamp={value.info} /> : value.info}</p>
+                                <p>
+                                    <strong>{key}</strong>:{" "}
+                                    {value.type === "date" ? <DateTime timestamp={value.info} /> : value.info}
+                                </p>
                             </div>
-                        ))
-                        }
+                        ))}
                     </div>
                     <div className={classes.themeActionButtons}>
                         {editButton}

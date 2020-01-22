@@ -32,9 +32,8 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useEffect, useState, useRef, useMemo, useDebugValue } from "react";
 import ReactDOM from "react-dom";
-import { useSplashContext } from "@library/splash/SplashContext";
 import { useSpring, animated } from "react-spring";
-import { pointerEvents } from "@library/styles/styleHelpers";
+import { useHeroContext } from "@library/hero/HeroContext";
 
 interface IProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -277,11 +276,11 @@ function useScrollTransition() {
     const bgRef = useRef<HTMLDivElement | null>(null);
     const bg2Ref = useRef<HTMLDivElement | null>(null);
     const logoRef = useRef<HTMLDivElement | null>(null);
-    const { splashExists, splashRect } = useSplashContext();
+    const { heroExists, heroRect } = useHeroContext();
     const [scrollPos, setScrollPos] = useState(0);
     const fullBleedOptions = titleBarVariables().fullBleed;
     const { doubleLogoStrategy } = titleBarVariables().logo;
-    const shouldOverlay = fullBleedOptions.enabled && splashExists;
+    const shouldOverlay = fullBleedOptions.enabled && heroExists;
     const { topOffset } = useScrollOffset();
 
     // Scroll handler to pass to the form element.
@@ -304,13 +303,13 @@ function useScrollTransition() {
     let bgEnd = 0;
     let bg2Start = 0;
     let bg2End = 0;
-    if (splashExists && splashRect && bg2Ref.current) {
-        const splashEnd = splashRect.bottom;
+    if (heroExists && heroRect && bg2Ref.current) {
+        const heroEnd = heroRect.bottom;
         const titleBarHeight = bg2Ref.current.getBoundingClientRect().height;
-        bgStart = splashRect.top;
+        bgStart = heroRect.top;
         bgEnd = bgStart + titleBarHeight;
-        bg2Start = splashEnd - titleBarHeight * 2;
-        bg2End = splashEnd - titleBarHeight;
+        bg2Start = heroEnd - titleBarHeight * 2;
+        bg2End = heroEnd - titleBarHeight;
     }
 
     const clientHeaderStart = topOffset === 0 ? -1 : 0; // Fix to ensure an empty topOffset starts us at 100% opacity.

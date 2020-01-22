@@ -14,7 +14,7 @@ import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import {splashClasses} from "@library/splash/splashStyles";
+import { heroClasses } from "@library/hero/heroStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -76,7 +76,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const titleBarVars = titleBarVariables();
-    const classesSplash = splashClasses(overwrites);
+    const classesSplash = heroClasses();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");

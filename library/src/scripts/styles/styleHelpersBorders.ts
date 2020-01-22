@@ -122,7 +122,7 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(top);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(top) : top;
+            const value = !isShorthand ? unit(top) : top;
             merge(output, {
                 borderTopRightRadius: value,
                 borderTopLeftRadius: value,
@@ -140,7 +140,7 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(bottom);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(bottom) : bottom;
+            const value = !isShorthand ? unit(bottom) : bottom;
             merge(output, {
                 borderBottomRightRadius: value,
                 borderBottomLeftRadius: value,
@@ -158,13 +158,13 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(left);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(left) : left;
+            const value = !isShorthand ? unit(left) : left;
             merge(output, {
                 borderTopLeftRadius: value,
                 borderBottomLeftRadius: value,
             });
         } else {
-            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
+            const topStyles = top !== undefined ? { borderTopLeftRadius: unit(top) } : {};
             const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
             merge(
                 output,
@@ -177,14 +177,14 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(right);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(right) : right;
+            const value = !isShorthand ? unit(right) : right;
             merge(output, {
                 borderTopRightRadius: value,
                 borderBottomRightRadius: value,
             });
         } else {
-            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
-            const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
+            const topStyles = top !== undefined ? { borderTopRightRadius: unit(top) } : {};
+            const bottomStyles = bottom !== undefined ? { borderBottomRightRadius: unit(bottom) } : {};
             merge(
                 output,
                 !typeIsStringOrNumber(topStyles) ? topStyles : {},

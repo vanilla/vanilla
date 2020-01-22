@@ -20,6 +20,7 @@ import {
     background,
     absolutePosition,
     modifyColorBasedOnLightness,
+    borders,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -51,6 +52,8 @@ export const heroVariables = useThemeCache(styleOverwrite => {
     const inputAndButton = makeThemeVars("inputAndButton", {
         borderRadius: globalVars.border.radius,
     });
+
+    let styleOverwrite = {};
 
     const overwriteColors = styleOverwrite && styleOverwrite.colors ? styleOverwrite.colors : {};
 
@@ -188,12 +191,11 @@ export const heroVariables = useThemeCache(styleOverwrite => {
             left: {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
-
             },
             radius: {
                 left: important(0),
-                right: important(inputAndButton.borderRadius),
-            }
+                right: important(unit(inputAndButton.borderRadius) as string),
+            },
         },
         fonts: {
             color: fgColor,
@@ -269,15 +271,40 @@ export const heroVariables = useThemeCache(styleOverwrite => {
     };
 });
 
-export const heroClasses = useThemeCache((styleOverwrite = {}) => {
-    const vars = heroVariables(styleOverwrite);
+export const heroClasses = useThemeCache(() => {
+    const vars = heroVariables();
     const style = styleFactory("hero");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
 
+    const searchButton = generateButtonClass(vars.searchButton);
+
+    const valueContainer = style("valueContainer", {
+        $nest: {
+            ".inputText": {
+                borderColor: colorOut(vars.colors.borderColor),
+            },
+            ".searchBar__control": {
+                cursor: "text",
+            },
+        },
+    } as NestedCSSProperties);
+
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
+        $nest: {
+            [`.${searchButton}`]: {
+                // I don't know why i need "vars.inputAndButton" and not "vars.inputAndButton.borderRadius" here...
+                borderTopRightRadius: important(unit(vars.inputAndButton) as string),
+                borderBottomRightRadius: important(unit(vars.inputAndButton) as string),
+            },
+            [`.${valueContainer}`]: {
+                // I don't know why i need "vars.inputAndButton" and not "vars.inputAndButton.borderRadius" here...
+                borderTopLeftRadius: important(unit(vars.inputAndButton) as string),
+                borderBottomLeftRadius: important(unit(vars.inputAndButton) as string),
+            },
+        },
     });
 
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
@@ -324,19 +351,6 @@ export const heroClasses = useThemeCache((styleOverwrite = {}) => {
     const text = style("text", {
         color: colorOut(vars.colors.contrast),
     });
-
-    const searchButton = generateButtonClass(vars.searchButton);
-
-    const valueContainer = style("valueContainer", {
-        $nest: {
-            ".inputText": {
-                borderColor: colorOut(vars.colors.borderColor),
-            },
-            ".searchBar__control": {
-                cursor: "text",
-            },
-        },
-    } as NestedCSSProperties);
 
     const searchContainer = style("searchContainer", {
         position: "relative",

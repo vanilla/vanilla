@@ -210,39 +210,61 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
-     * Tests for determineLastViewedDate().
+     * Tests for maxDate().
      */
 
     /**
-     * DiscussionLastViewed > CategoryLastViewed
+     * $dateOne > $dateTwo
      */
-    public function testDetermineLastViewedDateDiscussionGreater() {
-        $discussionLastViewed = '2020-01-09 16:22:42';
-        $categoryLastViewed = '2019-12-02 21:55:40';
-        $expected = $discussionLastViewed;
-        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+    public function testMaxDateDateOneGreater() {
+        $dateOne = '2020-01-09 16:22:42';
+        $dateTwo = '2019-12-02 21:55:40';
+        $expected = $dateOne;
+        $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
     }
 
     /**
-     * CategoryLastViewed > DiscussionLastViewed
+     * $dateTwo > $dateOne
      */
-    public function testDetermineLastViewedDateCategoryGreater() {
-        $discussionLastViewed = '2019-12-02 21:55:40';
-        $categoryLastViewed = '2020-01-09 16:22:42';
-        $expected = $categoryLastViewed;
-        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+    public function testMaxDateDateTwoGreater() {
+        $dateOne = '2019-12-02 21:55:40';
+        $dateTwo = '2020-01-09 16:22:42';
+        $expected = $dateTwo;
+        $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
     }
 
     /**
-     * DiscussionLastViewed is null
+     * $dateOne is null
      */
-    public function testDetermineLastViewedDateDiscussionNull() {
-        $discussionLastViewed = null;
-        $categoryLastViewed = '2020-01-09 16:22:42';
-        $expected = $categoryLastViewed;
-        $actual = DiscussionModel::determineLastViewedDate($discussionLastViewed, $categoryLastViewed);
+    public function testMaxDateDateOneNull() {
+        $dateOne = null;
+        $dateTwo = '2020-01-09 16:22:42';
+        $expected = $dateTwo;
+        $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * $dateTwo is null
+     */
+    public function testMaxDateDateTwoNull() {
+        $dateOne = '2020-01-09 16:22:42';
+        $dateTwo = null;
+        $expected = $dateOne;
+        $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Both dates are null
+     */
+    public function testMaxDateWithTwoNullValues() {
+        $dateOne = null;
+        $dateTwo = null;
+        $expected = null;
+        $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
     }
 
@@ -320,6 +342,13 @@ class DiscussionModelTest extends TestCase {
                 10,
                 '2020-01-09 16:22:42',
                 [true, 0],
+            ],
+            'ReadCommentsNoDiscussionCommentsDiscussionNotRead' => [
+                0,
+                '2020-01-09 16:22:42',
+                50,
+                '2019-12-02 21:55:40',
+                [false, 1],
             ],
         ];
 

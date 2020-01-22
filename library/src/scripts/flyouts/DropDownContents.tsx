@@ -35,6 +35,8 @@ export enum DropDownContentSize {
  * Note that it renders an empty, hidden div when closed so that the aria-labelledby points to an element in the DOM.
  */
 export default class DropDownContents extends React.Component<IProps> {
+    private selfRef = React.createRef<HTMLDivElement>();
+
     public render() {
         const classes = dropDownClasses();
         const asDropDownClasses = !this.props.openAsModal
@@ -47,6 +49,7 @@ export default class DropDownContents extends React.Component<IProps> {
         if (this.props.isVisible) {
             return (
                 <div
+                    ref={this.selfRef}
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
                     className={classNames(
@@ -61,6 +64,7 @@ export default class DropDownContents extends React.Component<IProps> {
                     )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.doNothing}
+                    tabIndex={-1}
                     onMouseDown={this.forceTryFocus}
                 >
                     {this.props.children}
@@ -84,8 +88,8 @@ export default class DropDownContents extends React.Component<IProps> {
     private forceTryFocus = (e: React.MouseEvent) => {
         if (e.target instanceof HTMLElement) {
             if (!TabHandler.isTabbable(e.target)) {
-                e.preventDefault();
-                document.body.focus();
+                // this.doNothing(e);
+                // this.selfRef.current && this.selfRef.current.focus();
             }
         }
     };

@@ -9,6 +9,8 @@
  */
 use Vanilla\Addon;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
+use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Models\FsThemeProvider;
 
 /**
  * Handles /settings endpoint.
@@ -2180,28 +2182,10 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            $themeInfo = Gdn::themeManager()->getThemeInfo($themeName);
-            $previewThemeName = $themeName;
-            $displayName = val('Name', $themeInfo);
-            $isMobile = val('IsMobile', $themeInfo);
-
-            // If we failed to get the requested theme, cancel preview
-            if ($themeInfo === false) {
-                $previewThemeName = '';
-            }
-
-            if ($isMobile) {
-                Gdn::session()->setPreference(
-                    ['PreviewMobileThemeFolder' => $previewThemeName,
-                    'PreviewMobileThemeName' => $displayName]
-                );
-            } else {
-                Gdn::session()->setPreference(
-                    ['PreviewThemeFolder' => $previewThemeName,
-                    'PreviewThemeName' => $displayName]
-                );
-            }
-
+            /** @var ThemeModelHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            $themeProvider = Gdn::getContainer()->get(FsThemeProvider::class);
+            $themeInfo = $themeHelper->setSessionPreviewTheme($themeName, $themeProvider);
             $this->fireEvent('PreviewTheme', ['ThemeInfo' => $themeInfo]);
 
             redirectTo('/');
@@ -2224,20 +2208,9 @@ class SettingsController extends DashboardController {
         $isMobile = false;
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            $themeInfo = Gdn::themeManager()->getThemeInfo($previewThemeFolder);
-            $isMobile = val('IsMobile', $themeInfo);
-
-            if ($isMobile) {
-                Gdn::session()->setPreference(
-                    ['PreviewMobileThemeFolder' => '',
-                    'PreviewMobileThemeName' => '']
-                );
-            } else {
-                Gdn::session()->setPreference(
-                    ['PreviewThemeFolder' => '',
-                    'PreviewThemeName' => '']
-                );
-            }
+            /** @var ThemeModelHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            $themeHelper->cancelSessionPreviewTheme();
         }
 
         if ($isMobile) {

@@ -10,7 +10,7 @@ import { formatUrl } from "@library/utility/appUtils";
 import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
-import {HeroContextProvider} from "@library/hero/HeroContext";
+import { HeroContextProvider } from "@library/hero/HeroContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;

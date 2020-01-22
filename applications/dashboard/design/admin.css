@@ -11894,17 +11894,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedLinkLoader-link:hover:after {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
 }
-.richEditor .embedExternal-content:focus:after,
-.richEditor .embedLinkLoader-link:focus:after {
+.richEditor .embed-isSelected .embedExternal-content:after,
+.richEditor .embed-isSelected .embedLinkLoader-link:after {
   box-shadow: 0 0 0 2px #0291db inset;
-}
-.richEditor .embedExternal-content > *,
-.richEditor .embedLinkLoader-link > * {
-  pointer-events: none;
-}
-.richEditor .embedExternal-content > .u-excludeFromPointerEvents,
-.richEditor .embedLinkLoader-link > .u-excludeFromPointerEvents {
-  pointer-events: initial;
 }
 
 .embed-focusableElement {
@@ -12070,7 +12062,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedImage-img:hover {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
 }
-.richEditor .embedImage-img:focus {
+
+.richEditor .embed-isSelected .embedImage-img {
   box-shadow: 0 0 0 2px #0291db;
 }
 

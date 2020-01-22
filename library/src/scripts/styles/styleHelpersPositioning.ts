@@ -17,7 +17,7 @@ import {
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { percent, px } from "csx";
 import { unit } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
@@ -136,7 +136,7 @@ export function fullSizeOfParent(): NestedCSSProperties {
     };
 }
 
-export const inheritHeightClass = () => {
+export const inheritHeightClass = useThemeCache(() => {
     const style = styleFactory("inheritHeight");
     return style({
         display: "flex",
@@ -144,4 +144,4 @@ export const inheritHeightClass = () => {
         flexGrow: 1,
         position: "relative",
     });
-};
+});

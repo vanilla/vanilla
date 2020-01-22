@@ -11,15 +11,15 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { useSplashContainerDivRef } from "@library/splash/SplashContext";
-import { splashClasses, splashVariables } from "@library/splash/splashStyles";
+import { useHeroContainerDivRef } from "@library/hero/HeroContext";
+import { heroClasses, heroVariables } from "@library/hero/heroStyles";
 import { ColorValues } from "@library/styles/styleHelpersColors";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 
-export interface ISplashStyleOverwrite {
+export interface IHeroStyleOverwrite {
     colors?: {
         bg?: ColorValues;
         fg?: ColorValues;
@@ -35,23 +35,23 @@ interface IProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
-    styleOverwrite?: ISplashStyleOverwrite;
+    styleOverwrite?: IHeroStyleOverwrite;
 }
 
 /**
  * A component representing a single crumb in a breadcrumb component.
  */
-export default function Splash(props: IProps) {
+export default function Hero(props: IProps) {
     const device = useDevice();
-    const ref = useSplashContainerDivRef();
+    const ref = useHeroContainerDivRef();
 
     const { action, className, title } = props;
     const styleOverwrite = props.styleOverwrite || {};
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = splashClasses(styleOverwrite);
-    const vars = splashVariables(styleOverwrite);
+    const classes = heroClasses(styleOverwrite);
+    const vars = heroVariables(styleOverwrite);
 
     return (
         <div

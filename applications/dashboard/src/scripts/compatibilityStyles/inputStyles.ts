@@ -103,7 +103,7 @@ export const inputCSS = () => {
         `);
     mixinInputStyles(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
-    mixinInputStyles(".AdvancedSearch .InputBox", false, true);
+    mixinInputStyles(".AdvancedSearch .InputBox", false, false);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
     // cssOut(".token-input-list", inputClasses().inputMixin);
     cssOut("select", {

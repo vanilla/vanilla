@@ -141,6 +141,16 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
+    cssOut(`.Herobanner-bgImage`, {
+        "-webkit-filter": "none",
+        "filter": "none",
+    });
+
+    cssOut(".Herobanner .SearchBox .AdvancedSearch .BigInput", {
+        borderTopRightRadius: important(0),
+        borderBottomRightRadius: important(0),
+    })
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

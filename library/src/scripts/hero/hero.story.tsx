@@ -8,36 +8,36 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import Splash, { ISplashStyleOverwrite } from "@library/splash/Splash";
+import Hero, { IHeroStyleOverwrite } from "@library/hero/Hero";
 import { MemoryRouter, Router } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import merge from "lodash/merge";
 import { assetUrl } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { splashFallbackBG } from "@library/splash/splashStyles";
+import { heroFallbackBG } from "@library/hero/heroStyles";
 import { color } from "csx";
 
 const story = storiesOf("Home Page", module);
 
-story.add("Splash", () => {
+story.add("Hero", () => {
     const globalVars = globalVariables();
 
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <StoryContent>
-                    <StoryHeading depth={1}>Splash</StoryHeading>
+                    <StoryHeading depth={1}>Hero</StoryHeading>
                     <StoryHeading>Default Background</StoryHeading>
                 </StoryContent>
-                <Splash
+                <Hero
                     title={"How can we help you?"}
                     styleOverwrite={{
                         colors: {
                             bg: globalVars.mainColors.bg,
                             fg: globalVars.mainColors.fg,
                         },
-                        outerBackgroundImage: splashFallbackBG,
+                        outerBackgroundImage: heroFallbackBG,
                         backgrounds: {
                             useOverlay: false,
                         },
@@ -46,7 +46,7 @@ story.add("Splash", () => {
                 <StoryContent>
                     <StoryHeading>Custom Background</StoryHeading>
                 </StoryContent>
-                <Splash
+                <Hero
                     title={"What can we do for you?"}
                     styleOverwrite={{
                         colors: {
@@ -63,7 +63,7 @@ story.add("Splash", () => {
                 <StoryContent>
                     <StoryHeading>Custom Colors</StoryHeading>
                 </StoryContent>
-                <Splash
+                <Hero
                     title={"What's on your mind?"}
                     styleOverwrite={
                         {
@@ -77,7 +77,7 @@ story.add("Splash", () => {
                                 useOverlay: false,
                             },
                             outerBackgroundImage: "none",
-                        } as ISplashStyleOverwrite
+                        } as IHeroStyleOverwrite
                     }
                 />
             </SearchContext.Provider>

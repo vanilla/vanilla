@@ -130,6 +130,8 @@ declare module "quill/core" {
             USER: "user";
         };
 
+        handleDOM: (event: Event, ...args) => void;
+
         on: (
             eventName:
                 | "text-change"
@@ -170,6 +172,7 @@ declare module "quill/core" {
         container: HTMLDivElement;
         options: AnyObject;
         history: HistoryModule;
+        emitter: EventEmitter;
 
         // Custom
         getLastGoodSelection(): RangeStatic;

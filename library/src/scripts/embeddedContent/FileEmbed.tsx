@@ -23,7 +23,6 @@ export function FileEmbed(props: IProps) {
     const attachmentType = mimeTypeToAttachmentType(type);
     return (
         <Attachment
-            inEditor={props.inEditor}
             type={attachmentType}
             size={size}
             name={name}

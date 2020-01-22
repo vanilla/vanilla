@@ -5,17 +5,18 @@
 
 import Quill from "quill/core";
 import { BlockEmbed } from "quill/blots/block";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { logWarning } from "@vanilla/utils";
 import Parchment from "parchment";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
+import EmbedSelectionModule from "@rich-editor/quill/EmbedSelectionModule";
 
 /**
- * A blot that can take focus and still behave as part of the Quill editor.
+ * A blot that can be selectable in Quill and still behave as part of the Quill editor.
  *
- * @see {EmbedFocusModule}
+ * @see {EmbedSelectModule}
  */
-export default class FocusableEmbedBlot extends BlockEmbed {
+export class SelectableEmbedBlot extends BlockEmbed {
+    public static readonly SELECTED_CLASS = "embed-isSelected";
     public static tagName = "div";
     public static className = "js-embed";
     public static blotName = "embed-focusable";
@@ -26,13 +27,7 @@ export default class FocusableEmbedBlot extends BlockEmbed {
     public static create(value?: any) {
         const node = super.create(value) as HTMLElement;
         node.setAttribute("contenteditable", false);
-        node.classList.add(FOCUS_CLASS);
         return node;
-    }
-
-    constructor(domNode) {
-        super(domNode);
-        this.focusableElement.setAttribute("tabindex", -1);
     }
 
     /**
@@ -40,12 +35,12 @@ export default class FocusableEmbedBlot extends BlockEmbed {
      * - Place selection on another FocusableBlot that will be in the same spot as this one after deletion.
      * - Place the selection back in quill where this blot was.
      */
-    public remove() {
+    public remove = () => {
         if (!this.quill) {
             return logWarning("Attempted to focus a an embed blot that has not been mounted yet.");
         }
 
-        const hadFocus = this.focusableElement === document.activeElement;
+        const hadFocus = this.selectableElement.classList.contains(SelectableEmbedBlot.SELECTED_CLASS);
         const offset = this.offset(this.quill.scroll);
         super.remove();
         this.quill.update(Quill.sources.USER);
@@ -53,14 +48,14 @@ export default class FocusableEmbedBlot extends BlockEmbed {
         // If the blot had focus before the removal we need to place the focus either on quill and set the selection
         // To the blot that will take this ones place, or focus another FocusableBlot coming in.
         if (hadFocus) {
-            const potentialNewEmbedToFocus = getBlotAtIndex(this.quill, offset, FocusableEmbedBlot);
+            const potentialNewEmbedToFocus = getBlotAtIndex(this.quill, offset, SelectableEmbedBlot);
             if (potentialNewEmbedToFocus) {
-                potentialNewEmbedToFocus.focus();
+                potentialNewEmbedToFocus.select();
             } else {
                 this.quill.setSelection(offset, 0, Quill.sources.USER);
             }
         }
-    }
+    };
 
     /**
      * Inserts a newline after this blot and places the cursor there.
@@ -81,36 +76,31 @@ export default class FocusableEmbedBlot extends BlockEmbed {
      *
      * The actual act of focusing this blot will cause quill to set it's internal selection to null, but this will still fire out the change anyways. Many of our own listeners cache the last valid selection, and null is not a valid selection.
      */
-    public focus() {
+    public select() {
         if (!this.quill) {
-            return logWarning("Attempted to focus a an embed blot that has not been mounted yet.");
+            return logWarning("Attempted to select a an embed blot that has not been mounted yet.");
         }
 
+        this.clearOtherSelectedEmbeds();
+        this.selectableElement.classList.add(SelectableEmbedBlot.SELECTED_CLASS);
         const selfPosition = this.offset(this.scroll);
         this.quill.setSelection(selfPosition, 0, Quill.sources.API);
-        this.focusableElement.focus();
     }
 
-    /**
-     * Get the focusable element inside of this blot. This is not necessarily the one we set here in child nodes. It will be whatever gets the FOCUS_CLASS.
-     */
-    private get focusableElement(): HTMLElement {
-        if (!(this.domNode instanceof HTMLElement)) {
-            throw new Error("A focusable embed blot must be initialize with an HTMLElement.");
+    public get isSelected(): boolean {
+        return this.selectableElement.classList.contains(SelectableEmbedBlot.SELECTED_CLASS);
+    }
+
+    private clearOtherSelectedEmbeds() {
+        if (!this.quill) {
+            return logWarning("Attempted to select a an embed blot that has not been mounted yet.");
         }
-        if (this.domNode.classList.contains(FOCUS_CLASS)) {
-            return this.domNode;
-        } else {
-            const childToFocus = this.domNode.querySelector("." + FOCUS_CLASS);
-            if (childToFocus instanceof HTMLElement) {
-                return childToFocus;
-            } else {
-                throw new Error(
-                    "Attempting to focus a DOM Node that either does not exist or is not an HTMLElement." +
-                        childToFocus,
-                );
-            }
-        }
+
+        EmbedSelectionModule.clearEmbedSelections(this.quill);
+    }
+
+    public clearSelection() {
+        this.selectableElement.classList.remove(SelectableEmbedBlot.SELECTED_CLASS);
     }
 
     /**
@@ -124,5 +114,9 @@ export default class FocusableEmbedBlot extends BlockEmbed {
         }
 
         return Quill.find(this.scroll.domNode.parentNode!);
+    }
+
+    protected get selectableElement(): HTMLElement {
+        return this.domNode as HTMLElement;
     }
 }

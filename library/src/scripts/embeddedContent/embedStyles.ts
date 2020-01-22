@@ -52,7 +52,7 @@ export const embedContainerClasses = useThemeCache(() => {
                 0.5,
             )} inset`,
         },
-        "&:focus": {
+        ".embed-isSelected &": {
             boxShadow: `0 0 0 ${px(
                 globalVars.embed.select.borderWidth,
             )} ${globalVars.embed.focus.color.toString()} inset`,
@@ -82,7 +82,6 @@ export const embedContainerClasses = useThemeCache(() => {
             textDecoration: "none",
             color: "inherit",
             margin: "auto",
-            overflow: "hidden",
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],

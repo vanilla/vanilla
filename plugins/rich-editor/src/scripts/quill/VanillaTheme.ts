@@ -11,7 +11,7 @@ import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
-import KeyboardModule from "quill/modules/keyboard";
+import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */
@@ -41,7 +41,9 @@ export default class VanillaTheme extends ThemeBase {
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
-        this.addModule("embed/focus");
+        this.addModule("embed/selection");
+        this.applyEmitterHack();
+
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,
@@ -54,6 +56,20 @@ export default class VanillaTheme extends ThemeBase {
 
         // Create the newline insertion module.
         void new NewLineClickInsertionModule(this.quill);
+    }
+
+    /**
+     * Apply our editor event wall checking to quills own event handling.
+     * @see {<EditorEventWall />}
+     */
+    private applyEmitterHack() {
+        const realHandleDOM = this.quill.emitter.handleDOM;
+
+        this.quill.emitter.handleDOM = (event: Event, ...args) => {
+            if (!isEditorWalledEvent(event)) {
+                realHandleDOM.call(this.quill.emitter, event, ...args);
+            }
+        };
     }
 
     /**

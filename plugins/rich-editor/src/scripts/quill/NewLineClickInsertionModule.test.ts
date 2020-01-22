@@ -27,6 +27,7 @@ describe("NewLineClickInsertionModule", () => {
         const event = ({
             y: 10000,
             target: quill.root,
+            currentTarget: quill.root,
         } as any) as MouseEvent;
 
         insertModule.handleClick(event);

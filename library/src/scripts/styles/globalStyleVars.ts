@@ -42,13 +42,18 @@ export const globalVariables = useThemeCache(() => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
+        primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
     });
 
     colorPrimary = initialMainColors.primary;
 
+    const primaryDarkness = colorPrimary.lightness();
+    const backgroundDarkness = initialMainColors.bg.lightness();
+    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.065),
+        secondary: emphasizeLightness(colorPrimary, 0.3, !goodContrast),
     });
 
     const mainColors = {

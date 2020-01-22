@@ -11,7 +11,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders } from "@library/styles/styleHelpers";
+import { borders, negative, unit } from "@library/styles/styleHelpers";
 import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -143,13 +143,35 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.Herobanner-bgImage`, {
         "-webkit-filter": "none",
-        "filter": "none",
+        filter: "none",
     });
 
     cssOut(".Herobanner .SearchBox .AdvancedSearch .BigInput", {
         borderTopRightRadius: important(0),
         borderBottomRightRadius: important(0),
-    })
+    });
+
+    cssOut(
+        `
+        a:hover,
+        a.TextColor:hover,
+        a:hover .TextColor`,
+        {
+            color: colorOut(vars.links.colors.hover),
+        },
+    );
+
+    cssOut(
+        `
+        a.TextColor, a .TextColor`,
+        {
+            color: colorOut(vars.mainColors.fg),
+        },
+    );
+
+    cssOut(".ButtonGroup .Dropdown", {
+        marginTop: unit(negative(vars.border.width)),
+    });
 
     buttonCSS();
     flyoutCSS();

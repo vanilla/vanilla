@@ -30,39 +30,7 @@ export const metaCSS = () => {
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
     const metaFg = colorOut(globalVars.meta.colors.fg);
-};
 
-function mixinMetaLinkContainer(selector: string) {
-    selector = trimTrailingCommas(selector);
-    const vars = globalVariables();
-    const formVars = formElementsVariables();
-    const mainColors = vars.mainColors;
-
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(vars.meta.colors.fg);
-
-    cssOut(
-        `
-        .DataList .Meta .Tag-Announcement,
-        .DataList .NewCommentCount,
-        .DataList .HasNew.HasNew,
-        .MessageList .Tag-Announcement,
-        .MessageList .NewCommentCount,
-        .MessageList .HasNew.HasNew,
-        .DataTableWrap .Tag-Announcement,
-        .DataTableWrap .NewCommentCount,
-        .DataTableWrap .HasNew.HasNew,
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username
-        `,
-        {
-            color: primary,
-            borderColor: primary,
-            textDecoration: "none",
-        },
-    );
     mixinMetaLinkContainer(".DataList .Meta");
     mixinMetaLinkContainer(".MessageList .Meta");
     mixinMetaLinkContainer(".DataList .AuthorInfo");
@@ -88,6 +56,27 @@ function mixinMetaLinkContainer(selector: string) {
     mixinMetaLinkContainer(".MessageList .ItemComment .Username");
     mixinMetaLinkContainer(".MessageList .ItemDiscussion .Username");
 
+    cssOut(
+        `
+        .DataList .Meta .Tag-Announcement,
+        .DataList .NewCommentCount,
+        .DataList .HasNew.HasNew,
+        .MessageList .Tag-Announcement,
+        .MessageList .NewCommentCount,
+        .MessageList .HasNew.HasNew,
+        .DataTableWrap .Tag-Announcement,
+        .DataTableWrap .NewCommentCount,
+        .DataTableWrap .HasNew.HasNew,
+        .MessageList .ItemComment .Username,
+        .MessageList .ItemDiscussion .Username
+        `,
+        {
+            color: primary,
+            borderColor: primary,
+            textDecoration: "none",
+        },
+    );
+
     cssOut(".Meta-Discussion .Tag", {
         ...margins({
             horizontal: 3,
@@ -97,9 +86,22 @@ function mixinMetaLinkContainer(selector: string) {
     cssOut(".Meta-Discussion > .Tag", {
         marginLeft: unit(6),
     });
+};
+
+function mixinMetaLinkContainer(selector: string) {
+    selector = trimTrailingCommas(selector);
+    const vars = globalVariables();
+    const formVars = formElementsVariables();
+    const mainColors = vars.mainColors;
+
+    const fg = colorOut(mainColors.fg);
+    const bg = colorOut(mainColors.bg);
+    const primary = colorOut(mainColors.primary);
+    const metaFg = colorOut(vars.meta.colors.fg);
 
     cssOut(selector, {
         color: metaFg,
+        textDecoration: "none",
         $nest: {
             "& a": {
                 color: metaFg,

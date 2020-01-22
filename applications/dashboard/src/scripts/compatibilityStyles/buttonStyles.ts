@@ -10,8 +10,6 @@ import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariabl
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { inputVariables } from "@library/forms/inputStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
@@ -60,6 +58,12 @@ export const buttonCSS = () => {
         borderColor: primary,
         borderStyle: globalVars.border.style,
         borderWidth: unit(globalVars.border.width),
+        color: colorOut(globalVars.mainColors.primaryContrast),
+        backgroundColor: colorOut(globalVars.mainColors.primary),
+    });
+
+    cssOut(`.Button.Primary:not([disabled]):hover`, {
+        color: colorOut(globalVars.mainColors.primaryContrast),
     });
 };
 

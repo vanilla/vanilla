@@ -6,6 +6,7 @@ helpAsset($this->data('Title'), t('Every edit or deletion is recorded here. Use 
 
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="toolbar flex-wrap js-toolbar-sticky">
         <div class="toolbar-buttons">

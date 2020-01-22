@@ -9,6 +9,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Model base class.
  *
@@ -35,6 +37,9 @@ class Gdn_Model extends Gdn_Pluggable {
      * field will be automatically filled by the model if it exists.
      */
     public $DateUpdated = 'DateUpdated';
+
+    /** @var EventManager */
+    protected $eventManager;
 
     /**
      * @var array The fields that should be filtered out via {@link Gdn_Model::filterForm()}.
@@ -121,6 +126,8 @@ class Gdn_Model extends Gdn_Pluggable {
             'TransientKey' => 0,
             'hpt' => 0
         ];
+
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
 
         parent::__construct();
     }

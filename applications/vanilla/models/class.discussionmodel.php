@@ -8,7 +8,6 @@
  * @since 2.0
  */
 
-use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
@@ -2271,7 +2270,7 @@ class DiscussionModel extends Gdn_Model {
                     (array)$discussion,
                     $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
                 );
-                Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
+                $this->eventManager->dispatch($discussionEvent);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
@@ -2975,7 +2974,7 @@ class DiscussionModel extends Gdn_Model {
         $dataObject = (object)$data;
         $this->calculate($dataObject);
         $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
-        Gdn::getContainer()->get(EventManager::class)->dispatch($discussionEvent);
+        $this->eventManager->dispatch($discussionEvent);
 
         return true;
     }

@@ -2138,7 +2138,7 @@ class DiscussionModel extends Gdn_Model {
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
 
                     // Make sure that the discussion get formatted in the method defined by Garden.
-                    if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
+                    if (c('Garden.ForceInputFormatter')) {
                         $fields['Format'] = Gdn::config('Garden.InputFormatter', '');
                     }
 

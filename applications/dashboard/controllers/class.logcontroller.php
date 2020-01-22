@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+
 /**
  * Handles /log endpoint.
  */
@@ -443,6 +445,62 @@ class LogController extends DashboardController {
 
         Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/log/spam');
+        $this->render();
+    }
+
+    /**
+     * This is a general purpose log page that filters the log according to querystring parameters.
+     *
+     * @param string $page
+     */
+    public function filter($page = '') {
+        $this->permission('Garden.Moderation.Manage');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/edits');
+        if ($this->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $this->View = 'Table';
+        } else {
+            $this->View = 'Edits';
+        }
+
+        list($offset, $limit) = offsetLimit($page, 10);
+        $this->setData('Title', t('Change Log'));
+
+        $in = Schema::parse([
+            'operation:a?' => [
+                'style' => 'form',
+                'items' => [
+                    'type' => 'string',
+                    'enum' => ['edit', 'delete', 'ban'],
+                ],
+            ],
+            // Keep this required to avoid security issues.
+            'recordType:s' => [
+                'enum' => ['comment', 'discussion', 'user'],
+            ],
+            'recordID:i?',
+            'parentRecordID:i?'
+        ])
+            ->requireOneOf(['operation', 'recordID', 'parentRecordID'])
+        ;
+
+        try {
+            $where = $in->validate($this->Request->get());
+        } catch (\Garden\Schema\ValidationException $ex) {
+            $this->Form->addError($ex);
+            $this->render();
+            return;
+        }
+
+        $recordCount = $this->LogModel->getCountWhere($where);
+        $this->setData('RecordCount', $recordCount);
+        if ($offset >= $recordCount) {
+            $offset = $recordCount - $limit;
+        }
+
+        $log = $this->LogModel->getWhere($where, 'LogID', 'Desc', $offset, $limit);
+        $this->setData('Log', $log);
+
         $this->render();
     }
 }

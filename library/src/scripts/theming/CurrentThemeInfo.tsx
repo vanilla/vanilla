@@ -21,9 +21,8 @@ interface IProps {
     name: string;
     info: IThemeInfo;
     support?: string;
-    onEdit?: () => void;
-    onRename?: () => void;
-    onCopy?: () => void;
+    editButton?: React.ReactNode;
+    copyButton?: React.ReactNode;
 }
 interface IState {}
 
@@ -34,7 +33,7 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
 
     public render() {
         const classes = currentThemeClasses();
-        const { name, info, support } = this.props;
+        const { name, info, copyButton, editButton } = this.props;
         return (
             <React.Fragment>
                 <section className={classes.themeContainer}>
@@ -51,9 +50,8 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
                         }
                     </div>
                     <div className={classes.themeActionButtons}>
-                        <Button onClick={this.props.onEdit}>{t("Edit")}</Button>
-                        <Button onClick={this.props.onRename}>{t("Rename")}</Button>
-                        <Button onClick={this.props.onCopy}>{t("Copy")}</Button>
+                        {editButton}
+                        {copyButton}
                     </div>
                 </section>
             </React.Fragment>

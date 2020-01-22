@@ -437,13 +437,6 @@ class ThemeModel {
         $asset = self::ASSET_LIST[$field->getName()];
         $data = $data['data'];
         switch ($asset['type']) {
-            case 'html':
-                libxml_use_internal_errors(true);
-                $doc = new \DOMDocument();
-                $doc->loadHTML($data);
-                $valid = count(libxml_get_errors()) === 0;
-                libxml_clear_errors();
-                break;
             case 'json':
                 $valid = true;
                 if ($asset['default'] === '[]') {
@@ -456,6 +449,7 @@ class ThemeModel {
                 $json = json_decode($data, true);
                 $valid = $valid && $json !== null;
                 break;
+            case 'html':
             case 'css':
             case 'js':
             default:

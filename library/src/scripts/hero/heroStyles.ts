@@ -69,7 +69,7 @@ export const heroVariables = useThemeCache(styleOverwrite => {
 
     const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
     const backgrounds = makeThemeVars("backgrounds", {
-        ...compactSearchVariables().backgrounds,
+        ...compactSearchVars.backgrounds,
     });
 
     const outerBackground = makeThemeVars("outerBackground", {

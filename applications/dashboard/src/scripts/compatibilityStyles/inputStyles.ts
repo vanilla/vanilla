@@ -113,57 +113,6 @@ export const inputCSS = () => {
             },
         },
     });
-};
-
-export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
-    const globalVars = globalVariables();
-    const vars = inputVariables();
-    selector = trimTrailingCommas(selector);
-    const formElementVars = formElementsVariables();
-    const primary = colorOut(globalVars.mainColors.primary);
-    let extraFocus = {};
-    if (focusSelector) {
-        extraFocus = {
-            [focusSelector]: {
-                borderColor: isImportant ? important(primary as string) : primary,
-            },
-        };
-    }
-
-    cssOut(selector, {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
-        borderColor: colorOut(globalVars.border.color),
-        borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
-        borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),
-        borderRadius: isImportant
-            ? important(unit(globalVars.border.radius) as string)
-            : unit(globalVars.border.radius),
-        backgroundColor: isImportant
-            ? important(colorOut(globalVars.mainColors.bg) as string)
-            : colorOut(globalVars.mainColors.bg),
-        color: isImportant
-            ? important(colorOut(globalVars.mainColors.fg) as string)
-            : colorOut(globalVars.mainColors.fg),
-    });
-
-    nestedWorkaround(selector, {
-        "&:active": {
-            borderColor: isImportant ? important(primary as string) : primary,
-        },
-        "&:hover": {
-            borderColor: isImportant ? important(primary as string) : primary,
-        },
-        "&:focus": {
-            borderColor: isImportant ? important(primary as string) : primary,
-        },
-        "&.focus-visible": {
-            borderColor: isImportant ? important(primary as string) : primary,
-        },
-        "&.token-input-highlighted-token": {
-            borderColor: isImportant ? important(primary as string) : primary,
-        },
-        ...extraFocus,
-    });
 
     cssOut("form .SelectWrapper::after", {
         color: "inherit",
@@ -198,14 +147,14 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
 
     // Token inputs
     const verticalPadding = getVerticalPaddingForTextInput(
-        vars.sizing.height,
-        vars.font.size,
-        formElementVars.border.fullWidth,
+        formVars.sizing.height,
+        globalVars.fonts.size.small,
+        formVars.border.fullWidth,
     );
     const horizontalPadding = getHorizontalPaddingForTextInput(
-        vars.sizing.height,
-        vars.font.size,
-        formElementVars.border.fullWidth,
+        formVars.sizing.height,
+        globalVars.fonts.size.small,
+        formVars.border.fullWidth,
     );
 
     const spaceWithoutPaddingInInput =
@@ -295,5 +244,56 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
 
     cssOut("#Form_date", {
         marginRight: unit(globalVars.gutter.half),
+    });
+};
+
+export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
+    const globalVars = globalVariables();
+    const vars = inputVariables();
+    selector = trimTrailingCommas(selector);
+    const formElementVars = formElementsVariables();
+    const primary = colorOut(globalVars.mainColors.primary);
+    let extraFocus = {};
+    if (focusSelector) {
+        extraFocus = {
+            [focusSelector]: {
+                borderColor: isImportant ? important(primary as string) : primary,
+            },
+        };
+    }
+
+    cssOut(selector, {
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
+        borderColor: colorOut(globalVars.border.color),
+        borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
+        borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),
+        borderRadius: isImportant
+            ? important(unit(globalVars.border.radius) as string)
+            : unit(globalVars.border.radius),
+        backgroundColor: isImportant
+            ? important(colorOut(globalVars.mainColors.bg) as string)
+            : colorOut(globalVars.mainColors.bg),
+        color: isImportant
+            ? important(colorOut(globalVars.mainColors.fg) as string)
+            : colorOut(globalVars.mainColors.fg),
+    });
+
+    nestedWorkaround(selector, {
+        "&:active": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        "&:hover": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        "&:focus": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        "&.focus-visible": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        "&.token-input-highlighted-token": {
+            borderColor: isImportant ? important(primary as string) : primary,
+        },
+        ...extraFocus,
     });
 };

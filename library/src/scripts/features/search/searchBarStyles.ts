@@ -14,7 +14,6 @@ import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { heroClasses } from "@library/hero/heroStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -76,7 +75,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const titleBarVars = titleBarVariables();
-    const classesSplash = heroClasses();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
@@ -110,6 +108,8 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                             zIndex: 1,
                         },
                     },
+                    borderTopLeftRadius: important(0),
+                    borderTopRightRadius: important(0),
                 },
                 "& .searchBar__control": {
                     display: "flex",
@@ -304,7 +304,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         height: unit(vars.sizing.height),
         width: percent(100),
         $nest: {
-            [`&:not(.${classesSplash.content}).hasFocus .searchBar-valueContainer`]: {
+            [`&.hasFocus .searchBar-valueContainer`]: {
                 borderColor: colorOut(globalVars.mainColors.primary),
             },
         },

@@ -23,6 +23,7 @@ import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
+import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -180,6 +181,7 @@ export const compatibilityStyles = useThemeCache(() => {
     inputCSS();
     socialConnectCSS();
     reactionsCSS();
+    paginationCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

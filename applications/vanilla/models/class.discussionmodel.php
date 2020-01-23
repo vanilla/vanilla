@@ -152,6 +152,19 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * @param $date
+     * @return DateTimeImmutable|null
+     */
+    private static function forceDateTime($date): ?DateTimeImmutable {
+        try {
+            $date = empty($date) ? null : new DateTimeImmutable($date);
+        } catch (\Exception $ex) {
+            $date = null;
+        }
+        return $date;
+    }
+
+    /**
      * Verify the current user has a permission in a category.
      *
      * @param string|array $permission The permission slug(s) to check (e.g. Vanilla.Discussions.View).
@@ -1199,19 +1212,27 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Decide which of two dates is the most recent.
      *
-     * @param mixed $dateOne
-     * @param mixed $dateTwo
-     * @return mixed Returns most recent date.
+     * @param ?string $dateOne
+     * @param ?string $dateTwo
+     * @return ?string Returns most recent date.
      * @throws Exception Emits Exception in case of an error.
      */
     public static function maxDate($dateOne, $dateTwo) {
-        if (empty($dateOne) || $dateOne < $dateTwo) {
-            return $dateTwo;
+        $dateOne = self::forceDateTime($dateOne);
+        $dateTwo = self::forceDateTime($dateTwo);
+        $result = null;
+
+        if ($dateOne < $dateTwo) {
+            $result = $dateTwo;
         } elseif (empty($dateOne) && empty($dateTwo)) {
-            return null;
+            $result = null;
+            return $result;
         } else {
-            return $dateOne;
+            $result = $dateOne;
         }
+
+        $maxDate = $result->format(MYSQL_DATE_FORMAT);
+        return $maxDate;
     }
 
     /**

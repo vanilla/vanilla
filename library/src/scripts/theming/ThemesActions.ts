@@ -7,6 +7,7 @@ import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/R
 import { actionCreatorFactory } from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
 import { ITheme } from "@library/theming/themeReducer";
+import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 
 const actionCreator = actionCreatorFactory("@@themes");
 
@@ -28,7 +29,8 @@ export interface IManageTheme extends ITheme {
     parentTheme: string;
     parentVersion: string;
     preview: {
-        [key: string]: string;
+        info: IThemeInfo;
+        [key: string]: any;
     };
 }
 

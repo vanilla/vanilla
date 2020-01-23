@@ -10,7 +10,7 @@ import Button from "@library/forms/Button";
 import { currentThemeClasses } from "./currentThemeStyles";
 import DateTime from "@library/content/DateTime";
 
-interface IThemeInfo {
+export interface IThemeInfo {
     [key: string]: {
         type: string;
         info: string;

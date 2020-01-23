@@ -27,7 +27,7 @@ class PostFragmentSchema extends Schema {
             'url:s' => 'The URL of the post.',
             'dateInserted:dt' => 'The date of the post.',
             'insertUserID:i' => 'The author of the post.',
-            'insertUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
         ]));
     }
 }

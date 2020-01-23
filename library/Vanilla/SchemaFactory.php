@@ -9,14 +9,47 @@ namespace Vanilla;
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Gdn;
+use Psr\Container\ContainerInterface;
 
 /**
  * Factory for schema objects.
  */
-class SchemaFactory {
+final class SchemaFactory {
+
+    /** @var ContainerInterface */
+    private static $container;
 
     /** @var EventManager */
     private static $eventManager;
+
+    /**
+     * Get an instance of a schema object by its class name.
+     *
+     * @param string $schema
+     * @param string|null $id
+     * @return Schema
+     */
+    public static function get(string $schema, ?string $id = null): Schema {
+        /** @var Schema */
+        $schema = self::getContainer()->get($schema);
+        if ($id) {
+            $schema->setID($id);
+        }
+        $schema = self::prepare($schema);
+        return $schema;
+    }
+
+    /**
+     * Get the configured container.
+     *
+     * @return ContainerInterface
+     */
+    public static function getContainer(): ContainerInterface {
+        if (!isset(self::$container)) {
+            self::$container = Gdn::getContainer();
+        }
+        return self::$container;
+    }
 
     /**
      * Get the configured event manager instance.
@@ -26,45 +59,60 @@ class SchemaFactory {
     public static function getEventManager(): EventManager {
         if (!isset(self::$eventManager)) {
             /** @var EventManager */
-            $eventManager = Gdn::getContainer()->get(EventManager::class);
+            $eventManager = self::getContainer()->get(EventManager::class);
             self::setEventManager($eventManager);
         }
         return self::$eventManager;
     }
 
     /**
-     * Create a schema, allowing for extension via events.
+     * Create a schema object from an array.
      *
-     * @param array|Schema $schema
-     * @param string|array $type
+     * @param array $schema
+     * @param string|null $id
      * @return Schema
      */
-    public static function parse($schema, $type): Schema {
-        $id = '';
-        if (is_array($type)) {
-            $origType = $type;
-            list($id, $type) = $origType;
-        } elseif (!in_array($type, ['in', 'out'], true)) {
-            $id = $type;
-            $type = '';
+    public static function parse(array $schema, ?string $id = null): Schema {
+        $result = Schema::parse($schema);
+        if ($id) {
+            $result->setID($id);
         }
+        $result = self::prepare($result);
+        return $result;
+    }
 
-        // Figure out the name.
-        if (is_array($schema)) {
-            $schema = Schema::parse($schema);
-        } elseif ($schema instanceof Schema) {
-            $schema = clone $schema;
-        }
+    /**
+     * Final preparations on a schema object before usage.
+     *
+     * @param Schema $schema
+     * @param string|null $id
+     * @return Schema
+     * @internal This method should only be used in this class. The weaker visibility is a BC kludge.
+     */
+    public static function prepare(Schema $schema, ?string $id = null): Schema {
+        $result = clone $schema;
 
-        // Fire an event for schema modification.
+        // Allow the schema ID to be set or overwritten.
         if (!empty($id)) {
-            // The type is a specific type of schema.
-            $schema->setID($id);
-
-            self::getEventManager()->fire("{$id}Schema_init", $schema);
+            $result->setID($id);
         }
 
-        return $schema;
+        if ($schemaID = $schema->getID()) {
+            // Fire an event for schema modification.
+            self::getEventManager()->fire("{$schemaID}Schema_init", $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Set the container used for creating instances.
+     *
+     * @param ContainerInterface $container
+     * @return void
+     */
+    public static function setContainer(?ContainerInterface $container): void {
+        self::$container = $container;
     }
 
     /**

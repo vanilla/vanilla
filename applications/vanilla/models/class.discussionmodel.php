@@ -3600,8 +3600,8 @@ class DiscussionModel extends Gdn_Model {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
-            'lastUser?' => SchemaFactory::parse(new UserFragmentSchema(), "UserFragment"),
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -3616,7 +3616,7 @@ class DiscussionModel extends Gdn_Model {
             'score:i|n' => 'Total points associated with this post.',
             'url:s?' => 'The full URL to the discussion.',
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
-            'lastPost?' => SchemaFactory::parse(new PostFragmentSchema(), "PostFragment"),
+            'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
         ]);
         return $result;
     }

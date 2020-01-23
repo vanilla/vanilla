@@ -114,7 +114,22 @@ abstract class Controller implements InjectableInterface {
      * @return Schema Returns a schema object.
      */
     public function schema($schema, $type = 'in') {
-        $schema = SchemaFactory::parse($schema, $type);
+        if (is_array($type)) {
+            $origType = $type;
+            list($id, $type) = $origType;
+        } elseif (!in_array($type, ['in', 'out'], true)) {
+            $id = $type;
+            $type = '';
+        }
+
+        if (empty($id) || !is_string($id)) {
+            $id = null;
+        }
+        if (is_array($schema)) {
+            $schema = SchemaFactory::parse($schema, $id);
+        } else {
+            $schema = SchemaFactory::prepare($schema, $id);
+        }
 
         // Fire a generic schema event for documentation.
         if (!empty($type)) {

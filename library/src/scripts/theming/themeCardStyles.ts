@@ -30,7 +30,8 @@ export const themeCardVariables = useThemeCache(() => {
     });
 
     const container = makeThemeVars("container", {
-        width: 310,
+        minWidth: 310,
+        maxWidth: 420,
         height: 225,
     });
     const header = makeThemeVars("header", {
@@ -194,8 +195,8 @@ export const themeCardClasses = useThemeCache(() => {
     const wrapper = style("wrapper", {});
 
     const container = style("container", {
-        maxWidth: unit(vars.container.width),
-        width: "auto",
+        minWidth: unit(vars.container.minWidth),
+        maxWidth: unit(vars.container.maxWidth),
         height: unit(vars.container.height),
         overflow: "hidden",
         position: "relative",
@@ -221,7 +222,7 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const noActions = style("noActions", {
-        width: unit(vars.container.width),
+        width: percent(100),
         height: unit(vars.container.height),
         position: "relative",
         borderRadius: unit(2),

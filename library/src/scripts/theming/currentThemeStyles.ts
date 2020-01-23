@@ -6,8 +6,8 @@
 import { unit, paddings, margins } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themeCardStyles";
-import { percent, color } from "csx";
+import { themeCardVariables } from "./themePreviewCardStyles";
+import { percent, color, px } from "csx";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -43,12 +43,11 @@ export const currentThemeVariables = useThemeCache(() => {
 
     const themeContainer = makeThemeVars("themeContainer", {
         margin: {
-            top: 32,
+            top: 18,
             right: 28,
             bottom: 0,
             left: 26,
         },
-        width: 596,
     });
     return {
         flag,
@@ -67,14 +66,24 @@ export const currentThemeClasses = useThemeCache(() => {
 
     const root = style({
         display: "flex",
+        flexWrap: "wrap",
         backgroundColor: "#f6f9fb",
-        padding: 23,
+        ...paddings({
+            horizontal: globalVars.gutter.size,
+            vertical: globalVars.gutter.size + globalVars.gutter.half,
+        }),
         marginLeft: -18,
         marginRight: -18,
     });
 
+    const cardContainer = style("cardContainer", {
+        maxWidth: percent(100),
+        width: unit(400),
+    });
+
     const themeContainer = style("themeContainer", {
         display: "flex",
+        flex: 1,
         ...margins({
             top: unit(vars.themeContainer.margin.top),
             bottom: unit(vars.themeContainer.margin.bottom),
@@ -83,7 +92,6 @@ export const currentThemeClasses = useThemeCache(() => {
         }),
         maxWidth: percent(100),
         position: "relative",
-        width: unit(vars.themeContainer.width),
     });
 
     const flag = style("flag", {
@@ -131,9 +139,10 @@ export const currentThemeClasses = useThemeCache(() => {
         lineHeight: unit(20),
     });
 
-    const themeActionButtons = style("actionButtons", {
+    const themeActionButtons = style("themeActionButtons", {
         flexDirection: "column",
-        flex: 1,
+        display: "flex",
+        flex: 0,
         marginTop: unit(vars.themeContainer.margin.top + 10),
     });
 
@@ -147,12 +156,15 @@ export const currentThemeClasses = useThemeCache(() => {
     });
 
     const themeInfo = style("themeInfo", {
+        flex: 1,
         width: percent(100),
+        minWidth: px(220),
         marginRight: unit(vars.themeContainer.margin.right + 20),
     });
 
     return {
         root,
+        cardContainer,
         themeContainer,
         flag,
         name,

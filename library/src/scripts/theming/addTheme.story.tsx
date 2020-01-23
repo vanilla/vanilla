@@ -7,7 +7,8 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import AddTheme from "./AddTheme";
+import { AddTheme } from "./AddTheme";
+import { PlusIcon } from "@library/icons/common";
 
 const story = storiesOf("Theme", module);
 
@@ -16,7 +17,7 @@ story.add("Add Theme", () => {
         <>
             <StoryContent>
                 <StoryHeading depth={1}>Add Theme</StoryHeading>
-                <AddTheme />
+                <AddTheme onAdd={<PlusIcon />} />
             </StoryContent>
         </>
     );

@@ -123,7 +123,6 @@ export const themeCardClasses = useThemeCache(() => {
         maxWidth: unit(vars.container.maxWidth),
         minWidth: unit(vars.container.minWidth),
         maxHeight: (vars.container.maxWidth * vars.container.ratioHeight) / vars.container.ratioWidth,
-        overflow: "hidden",
         ...shadowHelper().embed(),
     });
 
@@ -148,6 +147,11 @@ export const themeCardClasses = useThemeCache(() => {
                 opacity: 1,
             },
         },
+    });
+
+    const previewContainer = style("container", {
+        ...absolutePosition.fullSizeOfParent(),
+        overflow: "hidden",
     });
 
     const svg = style("svg", {
@@ -242,6 +246,7 @@ export const themeCardClasses = useThemeCache(() => {
         menuBar,
         menuBarDots,
         ratioContainer,
+        previewContainer,
         container,
         constraintContainer,
         actionButtons,

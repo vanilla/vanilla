@@ -152,7 +152,10 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * @param $date
+     * Forces a date string into a DateTimeImmutable object. If the string is not a valid date string,
+     * it returns null.
+     *
+     * @param ?string $date
      * @return DateTimeImmutable|null
      */
     private static function forceDateTime($date): ?DateTimeImmutable {

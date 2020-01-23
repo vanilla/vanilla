@@ -108,7 +108,11 @@ class ComposerHelper {
         passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
 
         // Generate our vendor license file.
-        $licensePath = $vanillaRoot . "/dist/VENDOR_LICENSES.txt";
+        $distDir = $vanillaRoot . '/dist';
+        $licensePath = $distDir . '/VENDOR_LICENSES.txt';
+        if (!file_exists($distDir)) {
+            mkdir($distDir);
+        }
         printf("\nGererating Vendor Licenses for build\n");
         passthru("yarn licenses generate-disclaimer --prod --ignore-engines > $licensePath");
 

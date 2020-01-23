@@ -60,4 +60,3 @@ export default class CurrentThemeInfo extends React.Component<IProps, IState> {
         );
     }
 }
-

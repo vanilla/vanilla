@@ -100,8 +100,6 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     // Apply kludged input text styling everywhere.
     inputClasses().applyInputCSSRules();
 
-
-    console.log("rendering backgrounds");
     return (
         <>
             <BrowserRouter>

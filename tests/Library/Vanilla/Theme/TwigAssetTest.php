@@ -40,6 +40,6 @@ HTML;
         $template = '<div>Hello world</div>';
         $asset = new TwigAsset($template);
         $encoded = json_decode(json_encode($asset), true);
-        $this->assertEquals(['type' => 'twig', 'template' => $template], $encoded);
+        $this->assertEquals(['type' => 'twig', 'template' => $template, 'data' => $template], $encoded);
     }
 }

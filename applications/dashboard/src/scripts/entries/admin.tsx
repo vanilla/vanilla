@@ -12,6 +12,7 @@ import { addComponent, disableComponentTheming } from "@library/utility/componen
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { mountReact } from "@vanilla/react-utils/src";
 import {ErrorPage} from "@library/errorPages/ErrorComponent";
+import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -39,4 +40,3 @@ const render = () => {
     }
 };
 onReady(render);
-

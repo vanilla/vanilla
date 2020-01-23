@@ -7,6 +7,13 @@
 import chalk from "chalk";
 
 /**
+ * Log a title of a section.
+ */
+export function printSection(name: string) {
+    print(`\n==================== ${name} ====================`);
+}
+
+/**
  * Log something to STDOUT. Use this instead of console.log();
  *
  * @param contents - What to print out.

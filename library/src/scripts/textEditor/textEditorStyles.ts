@@ -7,7 +7,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { viewHeight } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, defaultTransition } from "@library/styles/styleHelpers";
+import { unit, defaultTransition, absolutePosition } from "@library/styles/styleHelpers";
 
 export const textEditorVariables = useThemeCache(() => {
     const makeTextEditorVars = variableFactory("textEditor");
@@ -34,19 +34,15 @@ export const textEditorClasses = useThemeCache(() => {
 
     const root = theme => {
         return style({
+            transition: "backgroundColor 0.25s ease",
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
             height: viewHeight(90),
-            backgroundColor: theme === "dark" ? colorOut("#1f2024") : colorOut(globalVars.elementaryColors.white),
+            backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),
             position: "relative",
-
-            $nest: {
-                "&& .monaco-editor": {
-                    paddingTop: unit(vars.editorPadding.padding.top),
-                    paddingLeft: unit(vars.editorPadding.padding.left),
-                },
-            },
+            paddingTop: unit(vars.editorPadding.padding.top),
+            paddingLeft: unit(vars.editorPadding.padding.left),
         });
     };
     const themeToggleIcon = style("themeToggleIcon", {
@@ -61,9 +57,16 @@ export const textEditorClasses = useThemeCache(() => {
         ...defaultTransition("transform"),
     });
 
+    const colorChangeOverlay = theme =>
+        style("colorChangeOverlay", {
+            ...absolutePosition.fullSizeOfParent(),
+            backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),
+        });
+
     return {
         root,
         themeToggleIcon,
+        colorChangeOverlay,
     };
 });
 

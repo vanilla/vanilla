@@ -8,9 +8,11 @@ import React from "react";
 import { PlusIcon } from "@library/icons/common";
 import { currentThemeClasses } from "./currentThemeStyles";
 import SmartLink from "@library/routing/links/SmartLink";
+import Button from "@library/forms/Button";
+import addThemeClasses from "./addThemeStyles";
 
 interface IProps {
-    to: string;
+    onAdd?: React.ReactNode;
 }
 
 export default class AddTheme extends React.Component<IProps> {
@@ -19,13 +21,11 @@ export default class AddTheme extends React.Component<IProps> {
     }
 
     public render() {
-        const classes = currentThemeClasses();
+        const classes = addThemeClasses();
         return (
-            <SmartLink to={this.props.to}>
-                <div className={classes.addTheme}>
-                    <PlusIcon />
-                </div>
-            </SmartLink>
+            <Button className={classes.button}>
+                <div className={classes.addTheme}>{this.props.onAdd}</div>
+            </Button>
         );
     }
 }

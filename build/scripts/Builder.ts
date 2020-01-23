@@ -5,7 +5,7 @@
  */
 
 import chalk from "chalk";
-import * as del from "del";
+import fse from "fs-extra";
 import path from "path";
 import webpack, { Configuration, Stats } from "webpack";
 import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
@@ -13,7 +13,7 @@ import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { DIST_DIRECTORY } from "./env";
-import { BuildMode, getOptions, IBuildOptions } from "./options";
+import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
 import { copyMonacoEditorModule, installLerna } from "./utility/moduleUtils";
 import { fail, print } from "./utility/utils";
@@ -53,7 +53,6 @@ export default class Builder {
     public async build() {
         await this.entryModel.init();
         await installLerna();
-
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -69,7 +68,7 @@ export default class Builder {
      */
     private async runProd() {
         // Cleanup
-        del.sync(path.join(DIST_DIRECTORY, "**"));
+        await fse.emptyDir(path.join(DIST_DIRECTORY));
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
         const configs = await Promise.all([

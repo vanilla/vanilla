@@ -14,7 +14,7 @@ import { prepareShadowRoot } from "@vanilla/dom-utils";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
-import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
+import { Backgrounds, BackgroundsProvider, fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
 
 interface IProps {
@@ -71,15 +71,26 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey]);
 
     if (props.disabled || props.variablesOnly) {
+        fullBackgroundCompat();
         return <>{props.children}</>;
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(assets.status)) {
-        return <Loader />;
+        return (
+            <>
+                <Backgrounds />
+                <Loader />
+            </>
+        );
     }
 
     if (assets.status === LoadStatus.ERROR) {
-        return <>{props.errorComponent}</>;
+        return (
+            <>
+                <Backgrounds />
+                {props.errorComponent}
+            </>
+        );
     }
 
     if (!assets.data) {

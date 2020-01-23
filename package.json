@@ -121,7 +121,6 @@
         "chalk": "^2.4.2",
         "cross-env": "^5.2.0",
         "css-loader": "^2.1.1",
-        "del": "^4.1.0",
         "enzyme": "^3.9.0",
         "enzyme-adapter-react-16": "^1.11.2",
         "eslint": "^6.6.0",
@@ -174,6 +173,7 @@
         "tar": ">=4.4.2"
     },
     "scripts": {
+        "scaffold": "ts-node -P build/tsconfig.json build/scripts/scaffold/index.ts",
         "publish-all": "lerna publish from-package",
         "install-all": "ts-node -P build/tsconfig.json build/scripts/install.ts",
         "pre-push": "yarn build && yarn test && yarn check-types",

@@ -14,13 +14,19 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
-import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+
+type VoidFunction = () => void;
+type ClickHandlerOrUrl = string | VoidFunction;
 
 interface IProps {
     name?: string;
@@ -31,23 +37,25 @@ interface IProps {
     titleBarBg?: string;
     titleBarFg?: string;
     headerImg?: string;
-    onApply?: () => void;
+    onApply?: VoidFunction;
     isApplyLoading?: boolean;
-    onPreview?: () => void;
-    onCopy?: () => void;
-    onEdit?: () => void;
-    onDelete?: () => void;
+    onPreview?: VoidFunction;
+    onCopy?: ClickHandlerOrUrl;
+    onEdit?: ClickHandlerOrUrl;
+    onDelete?: ClickHandlerOrUrl;
     isActiveTheme: boolean;
     noActions?: boolean;
     canCopy?: boolean;
     canDelete?: boolean;
     canEdit?: boolean;
+    canCopyCustom?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
     const tiles = [1, 2, 3, 4];
     const vars = globalVariables();
     const titleVars = titleBarVariables();
+
     const {
         globalBg = colorOut(vars.mainColors.bg),
         globalPrimary = colorOut(vars.mainColors.primary),
@@ -113,7 +121,7 @@ export default function ThemePreviewCard(props: IProps) {
                         </div>
                     </div>
                     <div className={classes.content}>
-                        <ul className={classes.contentList}>
+                        <ul className={classes.contentList} style={containerStyle}>
                             {tiles.map((val, key) => (
                                 <li key={key} className={classes.contentListItem}>
                                     <div className={classes.contentTile}>
@@ -136,7 +144,16 @@ export default function ThemePreviewCard(props: IProps) {
                     {(props.canEdit || props.canDelete) && (
                         <div className={classes.actionDropdown}>
                             <DropDown buttonBaseClass={ButtonTypes.ICON} flyoutType={FlyoutType.LIST} renderLeft={true}>
-                                {props.canEdit && <DropDownItemButton name={t("Edit")} onClick={props.onEdit} />}
+                                {props.canEdit && props.onEdit && (
+                                    <LinkOrButton isDropdown onClick={props.onEdit}>
+                                        {t("Edit")}
+                                    </LinkOrButton>
+                                )}
+                                {props.canCopyCustom && props.onCopy && (
+                                    <LinkOrButton isDropdown onClick={props.onCopy}>
+                                        {t("Copy")}
+                                    </LinkOrButton>
+                                )}
                                 <DropDownItemSeparator />
                                 {props.canDelete && props.isActiveTheme ? (
                                     <DropDownItemButton onClick={props.onDelete} disabled={props.isActiveTheme}>
@@ -175,17 +192,46 @@ export default function ThemePreviewCard(props: IProps) {
                         >
                             {props.isApplyLoading ? <ButtonLoader /> : t("Apply")}
                         </Button>
-                        <Button className={classes.buttons} onClick={props.onPreview}>
+                        <Button
+                            className={classes.buttons}
+                            onClick={() => {
+                                containerRef.current?.focus();
+                                props.onPreview?.();
+                            }}
+                        >
                             {t("Preview")}
                         </Button>
-                        {props.canCopy && (
-                            <Button className={classes.buttons} onClick={props.onCopy}>
-                                {t("Copy")}
-                            </Button>
+                        {props.canCopy && props.onCopy && (
+                            <LinkOrButton onClick={props.onCopy}>{t("Copy")}</LinkOrButton>
                         )}
                     </div>
                 </div>
             )}
         </div>
     );
+}
+
+function LinkOrButton(props: { onClick: ClickHandlerOrUrl; children: React.ReactNode; isDropdown?: boolean }) {
+    const classes = themeCardClasses();
+    if (typeof props.onClick === "string") {
+        if (props.isDropdown) {
+            return <DropDownItemLink to={props.onClick}>{props.children}</DropDownItemLink>;
+        } else {
+            return (
+                <LinkAsButton className={classes.buttons} to={props.onClick}>
+                    {props.children}
+                </LinkAsButton>
+            );
+        }
+    } else {
+        if (props.isDropdown) {
+            return <DropDownItemButton onClick={props.onClick}>{props.children}</DropDownItemButton>;
+        } else {
+            return (
+                <Button className={classes.buttons} onClick={props.onClick}>
+                    {props.children}
+                </Button>
+            );
+        }
+    }
 }

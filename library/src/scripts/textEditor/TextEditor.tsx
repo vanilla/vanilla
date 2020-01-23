@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { ControlledEditor, ControlledEditorOnChange, DiffEditorDidMount } from "@vanilla/monaco-editor";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
@@ -11,9 +11,32 @@ export interface ITextEditorProps {
     editorDidMount?: DiffEditorDidMount;
 }
 
+type VsTheme = "vs-light" | "vs-dark";
+
+interface IContext {
+    theme: VsTheme;
+    setTheme: (theme: VsTheme) => void;
+}
+
+const context = React.createContext<IContext>({
+    theme: "vs-dark",
+    setTheme: () => {},
+});
+
+export function TextEditorContextProvider(props: { children: React.ReactNode }) {
+    const [theme, setTheme] = useState<VsTheme>("vs-dark");
+
+    return <context.Provider value={{ theme, setTheme }}>{props.children}</context.Provider>;
+}
+
+function useTextEditorContext() {
+    return useContext(context);
+}
+
 export default function TextEditor(props: ITextEditorProps) {
     const { language, value, onChange } = props;
-    const [intialTheme, setTheme] = useState("dark");
+    const { theme, setTheme } = useTextEditorContext();
+    const [useColorChangeOverlay, setColorChangeOverlay] = useState(false);
     const [isEditorReady, setIsEditorReady] = useState(false);
     const classes = textEditorClasses();
 
@@ -25,24 +48,32 @@ export default function TextEditor(props: ITextEditorProps) {
     }
 
     function toggleTheme() {
-        setTheme(intialTheme === "vs-light" ? "vs-dark" : "vs-light");
+        setTheme(theme === "vs-light" ? "vs-dark" : "vs-light");
+        setColorChangeOverlay(true);
+
+        setTimeout(() => {
+            setColorChangeOverlay(false);
+        }, 300);
     }
 
-    const themeModeButton = intialTheme === "vs-light" ? <LightThemeIcon /> : <DarkThemeIcon />;
+    const loadingOverlay = useColorChangeOverlay && <div className={classes.colorChangeOverlay(theme)}></div>;
+
+    const themeModeButton = theme === "vs-light" ? <LightThemeIcon /> : <DarkThemeIcon />;
 
     return (
-        <div className={classes.root(intialTheme)}>
+        <div className={classes.root(theme)}>
             <button onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 {themeModeButton}
             </button>
             <ControlledEditor
-                theme={intialTheme}
+                theme={theme}
                 language={language}
                 editorDidMount={handleEditorDidMount}
-                options={{ lineNumbers: "on" }}
+                options={{ lineNumbers: "on", minimap: { enabled: false } }}
                 value={value}
                 onChange={onChange}
             />
+            {loadingOverlay}
         </div>
     );
 }

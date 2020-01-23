@@ -153,6 +153,25 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * Set theme as preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param array $body Array of incoming params.
+     *        fields: themeID (required)
+     * @return array
+     */
+    public function put_preview(array $body): array {
+        $this->permission("Garden.Settings.Manage");
+        $in = $this->themePutPreviewSchema('in');
+        $out = $this->themeResultSchema('out');
+        $body = $in->validate($body);
+
+        $theme = $this->themeModel->setPreviewTheme($body['themeID']);
+        $theme = $out->validate($theme);
+        return $theme;
+    }
+
+    /**
      * Get "current" theme.
      *
      * @return array
@@ -162,8 +181,14 @@ class ThemesApiController extends AbstractApiController {
         $in = $this->schema([], 'in');
         $out = $this->themeResultSchema('out');
 
-        $theme = $this->themeModel->getCurrentTheme();
+        $previewThemeKey = $this->getSession()
+            ->getPreference('PreviewThemeKey');
 
+        if (!empty($previewThemeKey)) {
+            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey);
+        } else {
+            $theme = $this->themeModel->getCurrentTheme();
+        }
         return $out->validate($theme);
     }
 

@@ -6,6 +6,7 @@
  */
 
 use Vanilla\Formatting\Formats\RichFormat;
+use \Vanilla\Formatting\Formats;
 
 /**
  * Plugin class for the Rich Editor.
@@ -18,10 +19,16 @@ class RichEditorPlugin extends Gdn_Plugin {
     /** @var integer */
     private static $editorID = 0;
 
+    /** @var \Vanilla\Formatting\FormatService */
+    private $formatService;
+
     /**
      * Set some properties we always need.
+     *
+     * @param \Vanilla\Formatting\FormatService $formatService
      */
-    public function __construct() {
+    public function __construct(\Vanilla\Formatting\FormatService $formatService) {
+        $this->formatService = $formatService;
         parent::__construct();
         self::$editorID++;
     }
@@ -58,6 +65,10 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function isFormRich(Gdn_Form $form): bool {
         $data = $form->formData();
         $format = $data['Format'] ?? null;
+
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            return $this->isInputFormatterRich();
+        }
 
         return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
     }
@@ -100,6 +111,32 @@ class RichEditorPlugin extends Gdn_Plugin {
 
             // Render the editor view.
             $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
+        } elseif (c('Garden.ForceInputFormatter')) {
+            $originalRecord = $sender->formData();
+            $newBodyValue = null;
+            $body = $originalRecord['Body'] ?? false;
+            $originalFormat = $originalRecord['Format'] ?? false;
+
+            /*
+                Allow rich content to be rendered and modified if the InputFormat
+                is different from the original format in no longer applicable or
+                forced to be different by Garden.ForceInputFormatter.
+            */
+            if ($body && (c('Garden.InputFormatter') !== $originalFormat)) {
+                switch (strtolower(c('Garden.InputFormatter', 'unknown'))) {
+                    case Formats\TextFormat::FORMAT_KEY:
+                    case Formats\TextExFormat::FORMAT_KEY:
+                        $newBodyValue = $this->formatService->renderPlainText($body, Formats\RichFormat::FORMAT_KEY);
+                        $sender->setValue("Body", $newBodyValue);
+                        break;
+                    case 'unknown':
+                        // Do nothing
+                        break;
+                    default:
+                        $newBodyValue = $this->formatService->renderHTML($body, Formats\HtmlFormat::FORMAT_KEY);
+                        $sender->setValue("Body", $newBodyValue);
+                }
+            }
         }
     }
 

@@ -3,13 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps, FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import { ImageEmbedMenu } from "@rich-editor/editor/pieces/ImageEmbedMenu";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
-import { useFocusWatcher } from "@vanilla/react-utils";
+import { ImageEmbedModal } from "@rich-editor/editor/pieces/ImageEmbedModal";
+import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -25,36 +28,53 @@ interface IProps extends IBaseEmbedProps {
  */
 export function ImageEmbed(props: IProps) {
     const contentRef = useRef<HTMLDivElement>(null);
-    const [isFocused, setFocused] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    useFocusWatcher(contentRef, newFocusValue => {
-        setFocused(newFocusValue);
-    });
+    const { isSelected, inEditor, descriptionID } = useEmbedContext();
 
     return (
-        <DeviceProvider>
-            <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
-                <div className="embedImage-link">
-                    <img
-                        className={classNames("embedImage-img", FOCUS_CLASS)}
-                        src={props.url}
-                        alt={props.name}
-                        tabIndex={props.inEditor ? -1 : undefined}
-                    />
-                </div>
-                {props.inEditor && (isFocused || isOpen) && (
-                    <ImageEmbedMenu
-                        onVisibilityChange={setIsOpen}
-                        onSave={newValue => {
-                            props.syncBackEmbedValue &&
-                                props.syncBackEmbedValue({
-                                    name: newValue.alt,
-                                });
-                        }}
-                        initialAlt={props.name}
-                    />
-                )}
+        <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
+            <div className="embedImage-link">
+                <img
+                    aria-describedBy={descriptionID}
+                    className={classNames("embedImage-img", FOCUS_CLASS)}
+                    src={props.url}
+                    alt={props.name}
+                    tabIndex={props.inEditor ? -1 : undefined}
+                />
             </div>
-        </DeviceProvider>
+            {inEditor && (isSelected || isOpen) && (
+                <EmbedMenu>
+                    <Button
+                        baseClass={ButtonTypes.ICON}
+                        onClick={() => {
+                            setIsOpen(true);
+                        }}
+                    >
+                        <AccessibleImageMenuIcon />
+                    </Button>
+                    <Button baseClass={ButtonTypes.ICON} onClick={props.deleteSelf}>
+                        <DeleteIcon />
+                    </Button>
+                </EmbedMenu>
+            )}
+            {isOpen && (
+                <ImageEmbedModal
+                    onSave={newValue => {
+                        props.syncBackEmbedValue &&
+                            props.syncBackEmbedValue({
+                                name: newValue.alt,
+                            });
+                        props.selectSelf && props.selectSelf();
+                    }}
+                    initialAlt={props.name}
+                    onClose={() => {
+                        setIsOpen(false);
+                        setImmediate(() => {
+                            props.selectSelf?.();
+                        });
+                    }}
+                />
+            )}
+        </div>
     );
 }

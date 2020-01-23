@@ -8,17 +8,17 @@ import ReactDOM from "react-dom";
 import { t } from "@library/utility/appUtils";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import { escapeHTML, setData, getData } from "@vanilla/dom-utils";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 const LOADER_DATA_KEY = "loadingDataKey";
 
 /**
  * A loading blot. This should not be created on its own. Instead it should be created throught the ExternalEmbedBlot
  */
-export default class LoadingBlot extends FocusableEmbedBlot {
+export default class LoadingBlot extends SelectableEmbedBlot {
     public static blotName = "embed-loading";
     public static className = "js-embedLoader";
     public static tagName = "div";

@@ -16,25 +16,36 @@ import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
-import { onContent } from "@library/utility/appUtils";
+import { onContent, t } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
-import React from "react";
+import React, { useContext } from "react";
 import Quill from "quill/core";
 import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
+import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { visibility } from "@library/styles/styleHelpers";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { mountModal } from "@library/modal/Modal";
 
 export const FOCUS_CLASS = "embed-focusableElement";
+export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
+
+interface IEmbedContext {
+    inEditor?: boolean;
+    descriptionID?: string;
+    onRenderComplete?: () => void;
+    syncBackEmbedValue?: (values: object) => void;
+    quill?: Quill | null;
+    isSelected?: boolean;
+    selectSelf?: () => void;
+    deleteSelf?: () => void;
+}
 
 // Methods
-export interface IBaseEmbedProps {
+export interface IBaseEmbedProps extends IEmbedContext {
     // Stored data.
     embedType: string;
     url: string;
     name?: string;
-    // Frontend only
-    inEditor?: boolean;
-    onRenderComplete?: () => void;
-    syncBackEmbedValue?: (values: object) => void;
-    quill?: Quill | null;
 }
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
@@ -49,6 +60,11 @@ export function registerEmbed(embedType: string, EmbedComponent: EmbedComponentT
 
 export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
+}
+
+export const EmbedContext = React.createContext<IEmbedContext>({});
+export function useEmbedContext() {
+    return useContext(EmbedContext);
 }
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
@@ -76,15 +92,49 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
 
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
+        if (inEditor) {
+            ensureEmbedDescription();
+        }
+
+        data = {
+            ...data,
+            descriptionID: EMBED_DESCRIPTION_ID,
+        };
+
         // If the component is flagged as async, then it will confirm when the render is complete.
         mountReact(
             <EmbedErrorBoundary url={data.url}>
-                <EmbedClass {...data} inEditor={inEditor} onRenderComplete={isAsync ? onMountComplete : undefined} />
+                <EmbedContext.Provider value={data}>
+                    <EmbedClass
+                        {...data}
+                        inEditor={inEditor}
+                        onRenderComplete={isAsync ? onMountComplete : undefined}
+                    />
+                </EmbedContext.Provider>
             </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,
         );
     });
+}
+
+function EmbedDescription() {
+    return (
+        <ScreenReaderContent id={EMBED_DESCRIPTION_ID} aria-hidden={true}>
+            {t("richEditor.externalEmbed.description")}
+        </ScreenReaderContent>
+    );
+}
+
+function ensureEmbedDescription() {
+    // Ensure we have our modal container.
+    let description = document.getElementById(EMBED_DESCRIPTION_ID);
+
+    if (!description) {
+        description = document.createElement("div");
+        document.body.append(description);
+        mountReact(<EmbedDescription />, description);
+    }
 }
 
 export async function mountAllEmbeds(root: HTMLElement = document.body) {

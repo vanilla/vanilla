@@ -1,0 +1,8 @@
+{
+    "name": "@vanilla/theme-keystone",
+    "version": "3.0.1",
+    "private": true,
+    "dependencies": {
+        "@vanilla/theme-core": "^3.0.1"
+    }
+}

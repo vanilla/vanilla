@@ -41,8 +41,6 @@ export function AppContext(props: IProps) {
         width: percent(100),
     });
 
-    console.log('here');
-
     const content = (
         <Provider store={store}>
             <LocaleProvider>

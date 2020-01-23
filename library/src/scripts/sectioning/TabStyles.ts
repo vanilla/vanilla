@@ -74,13 +74,12 @@ export const tabClasses = useThemeCache(() => {
         width: percent(100),
         justifyContent: "space-between",
         alignItems: "stretch",
-        border: "solid 1px #bfcbd8",
     });
     const tab = style(
         "tab",
         {
             ...userSelect(),
-
+            position: "relative",
             width: percent(25),
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
@@ -88,14 +87,20 @@ export const tabClasses = useThemeCache(() => {
             padding: "2px 0",
             color: colorOut("#48576a"),
             backgroundColor: colorOut("#f5f6f7"),
-            minHeight: unit(18),
+            minHeight: unit(28),
             fontSize: unit(13),
+            transition: "color 0.3s ease",
             $nest: {
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
                 },
                 "&:hover, &:focus, &:active": {
-                    color: colorOut("#48576a"),
+                    border: "1px solid #bfcbd8",
+                    color: colorOut(globalVars.mainColors.primary),
+                    zIndex: 1,
+                },
+                "&&:not(.focus-visible)": {
+                    outline: 0,
                 },
             },
         },

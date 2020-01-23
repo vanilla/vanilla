@@ -58,8 +58,19 @@ if (!function_exists('ValidateRequired')) {
         }
 
         if (is_string($value)) {
-            // Empty strings should pass if the default value of the field is an empty string.
-            if ($value === '' && val('Default', $field, null) === '') {
+            // Empty strings should pass if the default value of the field is an empty string or one of the Enum
+            // values is an empty string.
+
+            // Checking for an Enum with an empty string.
+            $hasEmptyEnum = false;
+            if ($field->offsetExists('Enum')) {
+                $enum = $field->offsetGet('Enum');
+                if (is_array($enum) && in_array('', $enum, true)) {
+                    $hasEmptyEnum = true;
+                }
+            }
+
+            if ($value === '' && (val('Default', $field, null) === '' || $hasEmptyEnum)) {
                 return true;
             }
 

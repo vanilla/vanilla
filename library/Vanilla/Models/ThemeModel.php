@@ -230,6 +230,7 @@ class ThemeModel {
             }
         }
 
+        $theme['preview'] = $this->generateThemePreview($theme) ?? null;
         return $theme;
     }
 
@@ -342,6 +343,7 @@ class ThemeModel {
             $provider = $this->getThemeProvider("FILE");
             $current = $provider->getCurrent();
         }
+        $current['preview'] = $this->generateThemePreview($current) ?? null;
         return $current;
     }
 

@@ -84,6 +84,7 @@ export const themeCardClasses = useThemeCache(() => {
     const actionButtons = style("actionButtons", {
         textAlign: "center",
         margin: "44px 0",
+        paddingTop: unit(vars.menuBar.height),
         ...flexHelper().middle(),
         flexDirection: "column",
     });

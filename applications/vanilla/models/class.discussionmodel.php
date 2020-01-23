@@ -1181,16 +1181,16 @@ class DiscussionModel extends Gdn_Model {
      * but not the UserDiscussion table.
      *
      * @param int $discussionCommentCount Number of Comments according to the Discussion table.
-     * @param mixed $discussionLastCommentDate Date of last Comment according to the Discussion table.
+     * @param string|null $discussionLastCommentDate
      * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
-     * @param mixed $userLastReadDate Date of last Comment read according to the UserDiscussion table.
+     * @param string|null $userLastReadDate
      * @return array
      */
     public static function determineReadStatusAndUnreadCount(
         int $discussionCommentCount,
-        $discussionLastCommentDate,
+        ?string $discussionLastCommentDate,
         int $userReadComments,
-        $userLastReadDate
+        ?string $userLastReadDate
     ) {
         $isRead = true;
         $unreadCommentCount = $discussionCommentCount - $userReadComments;
@@ -1207,6 +1207,10 @@ class DiscussionModel extends Gdn_Model {
 
         if ($unreadCommentCount < 0 && $isRead) {
             $unreadCommentCount = 0;
+        }
+
+        if ($discussionCommentCount === 0 && !$isRead) {
+            $unreadCommentCount = true;
         }
 
         return [$isRead, $unreadCommentCount];

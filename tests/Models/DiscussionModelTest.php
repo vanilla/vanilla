@@ -348,7 +348,7 @@ class DiscussionModelTest extends TestCase {
                 '2020-01-09 16:22:42',
                 50,
                 '2019-12-02 21:55:40',
-                [false, 1],
+                [false, true],
             ],
         ];
 

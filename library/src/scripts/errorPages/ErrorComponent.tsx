@@ -11,31 +11,31 @@ import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLa
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
-import {CoreErrorMessages, getErrorCode, messageFromErrorCode, IErrorMessageProps} from "@library/errorPages/CoreErrorMessages";
+import {
+    CoreErrorMessages,
+    getErrorCode,
+    messageFromErrorCode,
+    IErrorMessageProps,
+} from "@library/errorPages/CoreErrorMessages";
 
-interface IProps extends IErrorMessageProps {
+interface IProps extends IErrorMessageProps {}
+
+export function ErrorPage(props: IProps) {
+    const code = getErrorCode(props);
+    const message = messageFromErrorCode(code);
+    const classes = {
+        inheritHeight: inheritHeightClass(),
+    };
+
+    return (
+        <DocumentTitle title={message}>
+            <Container className={classes.inheritHeight}>
+                <PanelWidgetVerticalPadding className={classes.inheritHeight}>
+                    <PanelWidget className={classes.inheritHeight}>
+                        <CoreErrorMessages {...props} className={classes.inheritHeight} />
+                    </PanelWidget>
+                </PanelWidgetVerticalPadding>
+            </Container>
+        </DocumentTitle>
+    );
 }
-
-export function ErrorPage(props: IProps){
-        const code = getErrorCode(props);
-        const message = messageFromErrorCode(code);
-        const classes = {
-            inheritHeight: inheritHeightClass(),
-        };
-
-        return (
-            <DocumentTitle title={message}>
-                <Container className={classes.inheritHeight}>
-                    <PanelWidgetVerticalPadding className={classes.inheritHeight}>
-                        <PanelWidget className={classes.inheritHeight}>
-                            <CoreErrorMessages {...props} className={classes.inheritHeight} />
-                        </PanelWidget>
-                    </PanelWidgetVerticalPadding>
-                </Container>
-            </DocumentTitle>
-        );
-}
-
-
-
-

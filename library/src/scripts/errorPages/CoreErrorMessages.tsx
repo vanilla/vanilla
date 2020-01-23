@@ -3,34 +3,34 @@
  * @license Proprietary
  */
 
-import {IApiError, LoadStatus} from "@library/@types/api/core";
-import {isUserGuest, useUsersState} from "@library/features/users/userModel";
-import {buttonClasses, ButtonTypes} from "@library/forms/buttonStyles";
-import {SearchErrorIcon} from "@library/icons/common";
+import { IApiError, LoadStatus } from "@library/@types/api/core";
+import { isUserGuest, useUsersState } from "@library/features/users/userModel";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import {formatUrl, t} from "@library/utility/appUtils";
+import { formatUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, {ReactNode} from "react";
-import {pageErrorMessageClasses} from "@knowledge/modules/common/pageErrorMessageStyles";
+import React, { ReactNode } from "react";
+import { pageErrorMessageClasses } from "@knowledge/modules/common/pageErrorMessageStyles";
 
-export function CoreErrorMessages (props: IProps) {
-        const classes = pageErrorMessageClasses();
-        const error = {
-            ...parseErrorCode(getErrorCode(props)),
-            ...(props.error || {}),
-        };
-        const { message, messageAsParagraph, description } = error;
-        return (
-            <div className={classNames(props.className, classes.root)}>
-                {error.icon}
-                {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
-                {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
-                {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
-                {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
-            </div>
-        );
+export function CoreErrorMessages(props: IProps) {
+    const classes = pageErrorMessageClasses();
+    const error = {
+        ...parseErrorCode(getErrorCode(props)),
+        ...(props.error || {}),
+    };
+    const { message, messageAsParagraph, description } = error;
+    return (
+        <div className={classNames(props.className, classes.root)}>
+            {error.icon}
+            {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
+            {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
+            {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
+            {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
+        </div>
+    );
 }
 
 export function parseErrorCode(errorCode?: string | number): IError {
@@ -78,7 +78,7 @@ export function parseErrorCode(errorCode?: string | number): IError {
 }
 
 function ErrorSignIn() {
-    const {currentUser} = useUsersState();
+    const { currentUser } = useUsersState();
     if (currentUser.status === LoadStatus.SUCCESS && currentUser.data && isUserGuest(currentUser.data)) {
         return (
             <LinkAsButton to={formatUrl(`/entry/signin?Target=${encodeURIComponent(window.location.href)}`)}>

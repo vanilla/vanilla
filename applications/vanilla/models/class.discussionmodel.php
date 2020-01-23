@@ -2137,9 +2137,9 @@ class DiscussionModel extends Gdn_Model {
                     // Updating
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
 
-                    // Block Format change if we're forcing the formatter.
+                    // Make sure that the discussion get formatted in the method defined by Garden.
                     if (c('Garden.ForceInputFormatter')) {
-                        unset($fields['Format']);
+                        $fields['Format'] = Gdn::config('Garden.InputFormatter', '');
                     }
 
                     $isValid = true;

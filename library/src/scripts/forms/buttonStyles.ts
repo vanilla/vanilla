@@ -274,6 +274,7 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     background: "none",
     cursor: "pointer",
     color: "inherit",
+    textDecoration: important("none"),
 });
 
 export const overwriteButtonClass = (
@@ -434,13 +435,16 @@ export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
     const style = styleFactory("buttonLoader");
     const buttonVars = buttonVariables();
     let spinnerColor;
+    let stateSpinnerColor;
 
     switch (buttonType) {
         case ButtonTypes.PRIMARY:
             spinnerColor = buttonVars.primary.spinnerColor;
+            stateSpinnerColor = buttonVars.primary.hover?.fonts?.color ?? spinnerColor;
             break;
         default:
-            spinnerColor = globalVars.mainColors.primary;
+            spinnerColor = buttonVars.standard.spinnerColor;
+            stateSpinnerColor = buttonVars.standard.hover?.fonts?.color ?? spinnerColor;
             break;
     }
 
@@ -453,6 +457,10 @@ export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
             $nest: {
                 "&:after": spinnerLoader({
                     color: spinnerColor,
+                    dimensions: 20,
+                }),
+                "&:hover:after": spinnerLoader({
+                    color: stateSpinnerColor,
                     dimensions: 20,
                 }),
             },

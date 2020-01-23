@@ -29,10 +29,14 @@ story.add("Current Theme", () => {
                 />
                 <CurrentThemeInfo
                     name={"Keystone"}
-                    authors={"Author1, Author2, Author3"}
-                    description={
-                        "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options."
-                    }
+                    info={{
+                        Description: {
+                            type: "string",
+                            info:
+                                "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+                        },
+                        Authors: { type: "string", info: "Author1, Author2, Author3" },
+                    }}
                 />
             </div>
         </>

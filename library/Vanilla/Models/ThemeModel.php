@@ -306,6 +306,8 @@ class ThemeModel {
      */
     public function getThemeAddon(): Addon {
         $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $provider = $this->getThemeProvider($themeKey);
+        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
             try {
                 $provider = $this->getThemeProvider($previewTheme);
@@ -313,8 +315,6 @@ class ThemeModel {
             } catch (NotFoundException $e) {
                 // if we store wrong preview key store in session, lets reset it
                 $this->themeHelper->cancelSessionPreviewTheme();
-                $provider = $this->getThemeProvider($themeKey);
-                $addonThemeKey = $provider->getMasterThemeKey($themeKey);
             }
         }
         $addon = $this->addonManager->lookupTheme($addonThemeKey ?? $themeKey);
@@ -437,13 +437,6 @@ class ThemeModel {
         $asset = self::ASSET_LIST[$field->getName()];
         $data = $data['data'];
         switch ($asset['type']) {
-            case 'html':
-                libxml_use_internal_errors(true);
-                $doc = new \DOMDocument();
-                $doc->loadHTML($data);
-                $valid = count(libxml_get_errors()) === 0;
-                libxml_clear_errors();
-                break;
             case 'json':
                 $valid = true;
                 if ($asset['default'] === '[]') {
@@ -456,6 +449,7 @@ class ThemeModel {
                 $json = json_decode($data, true);
                 $valid = $valid && $json !== null;
                 break;
+            case 'html':
             case 'css':
             case 'js':
             default:

@@ -7,6 +7,9 @@
 import { getOptions } from "../buildOptions";
 import { print, fail } from "./utils";
 import { spawn } from "child_process";
+import fse from "fs-extra";
+import path from "path";
+import { DIST_DIRECTORY, VANILLA_ROOT } from "../env";
 
 /**
  * Install dependancies for all requirements.
@@ -22,6 +25,27 @@ export async function installLerna() {
         await spawnChildProcess("yarn", ["bootstrap"], spawnOptions);
     } catch (err) {
         fail(`\nNode module installation failed.\n    ${err}\n`);
+    }
+}
+
+/**
+ * Copy files from the monaco editor the dist directory.
+ */
+export function copyMonacoEditorModule() {
+    fse.ensureDir(DIST_DIRECTORY);
+    const MONACO_PATH = path.join(VANILLA_ROOT, "node_modules", "monaco-editor");
+
+    print("Copying monaco editor to /dist");
+    if (fse.existsSync(MONACO_PATH)) {
+        fse.copySync(MONACO_PATH, path.resolve(DIST_DIRECTORY, "monaco-editor"), {
+            filter: file => {
+                if (file.match(/\/monaco-editor\/node_modules/)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
+        });
     }
 }
 

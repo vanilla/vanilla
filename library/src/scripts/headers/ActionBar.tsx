@@ -32,6 +32,8 @@ interface IProps {
     mobileDropDownTitle?: string; // For mobile
     useShadow?: boolean;
     selfPadded?: boolean;
+    title?: React.ReactNode;
+    fullWidth?: boolean;
 }
 
 /**
@@ -40,16 +42,15 @@ interface IProps {
 export function ActionBar(props: IProps) {
     const device = useDevice();
     const showMobileDropDown = (device === Devices.MOBILE || device === Devices.XS) && props.mobileDropDownTitle;
-
     const restoreRef = useRef<HTMLLIElement | null>(null);
     const restoreSize = useMeasure(restoreRef);
     const backRef = useRef<HTMLLIElement | null>(null);
     const backSize = useMeasure(backRef);
     const largerWidth = backSize.width > restoreSize.width ? backSize.width : restoreSize.width;
-
     const classesModal = modalClasses();
     const classes = actionBarClasses();
     const globalVars = globalVariables();
+    const Wrapper = props.fullWidth ? React.Fragment : Container;
 
     const minButtonSizeStyles: React.CSSProperties =
         restoreSize.width && backSize.width
@@ -69,6 +70,7 @@ export function ActionBar(props: IProps) {
                     </MobileDropDown>
                 </li>
             ) : null}
+            {props.title}
             <li ref={restoreRef} className={classNames(classes.item, "isPullRight")} style={minButtonSizeStyles}>
                 <Button
                     submit={true}
@@ -92,9 +94,15 @@ export function ActionBar(props: IProps) {
         >
             {!props.selfPadded && (
                 <PanelArea>
-                    <Container>
-                        <PanelWidgetHorizontalPadding>{content}</PanelWidgetHorizontalPadding>
-                    </Container>
+                    <Wrapper>
+                        <div
+                            className={classNames({
+                                [classes.fullWidth]: props.fullWidth,
+                            })}
+                        >
+                            <PanelWidgetHorizontalPadding>{content}</PanelWidgetHorizontalPadding>
+                        </div>
+                    </Wrapper>
                 </PanelArea>
             )}
             {props.selfPadded && content}

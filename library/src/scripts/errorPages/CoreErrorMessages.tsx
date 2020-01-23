@@ -15,7 +15,7 @@ import classNames from "classnames";
 import React, {ReactNode} from "react";
 import {pageErrorMessageClasses} from "@knowledge/modules/common/pageErrorMessageStyles";
 
-export default function CoreErrorMessages (props: IProps) {
+export function CoreErrorMessages (props: IProps) {
         const classes = pageErrorMessageClasses();
         const error = {
             ...parseErrorCode(getErrorCode(props)),

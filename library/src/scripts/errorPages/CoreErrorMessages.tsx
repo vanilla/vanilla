@@ -13,7 +13,7 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import { formatUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
-import { pageErrorMessageClasses } from "@knowledge/modules/common/pageErrorMessageStyles";
+import { pageErrorMessageClasses } from "@library/errorPages/pageErrorMessageStyles";
 
 export function CoreErrorMessages(props: IProps) {
     const classes = pageErrorMessageClasses();

@@ -20,6 +20,7 @@ import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
+import {ErrorPage} from "@library/errorPages/ErrorComponent";
 
 interface IProps {
     children: React.ReactNode;
@@ -49,7 +50,7 @@ export function AppContext(props: IProps) {
                             <ScrollOffsetProvider scrollWatchingEnabled={false}>
                                 <ThemeProvider
                                     disabled={props.noTheme}
-                                    errorComponent={props.errorComponent || null}
+                                    errorComponent={<ErrorPage /> }
                                     themeKey={getMeta("ui.themeKey", "keystone")}
                                     variablesOnly={props.variablesOnly}
                                 >

@@ -62,7 +62,8 @@ class SchemaFactoryTest extends TestCase {
     /**
      * Verify the expected events are dispatched when the schema is retrieved from the container.
      *
-     * @param array|string $type
+     * @param string $class
+     * @param string $id
      * @param string $event
      * @return void
      * @dataProvider provideGetEvents
@@ -84,12 +85,12 @@ class SchemaFactoryTest extends TestCase {
     /**
      * Verify the expected events are dispatched when the schema is parsed from an array.
      *
-     * @param array|string $type
+     * @param string $id
      * @param string $event
      * @return void
      * @dataProvider provideParseEvents
      */
-    public function testParseEventDispatched($type, string $event): void {
+    public function testParseEventDispatched(string $id, string $event): void {
         // Start with a clean slate.
         $eventManager = new EventManager($this->container());
         SchemaFactory::setEventManager($eventManager);
@@ -99,7 +100,7 @@ class SchemaFactoryTest extends TestCase {
             $dispatched = true;
         });
 
-        SchemaFactory::parse(["stringField:s"], $type);
+        SchemaFactory::parse(["stringField:s"], $id);
         $this->assertTrue($dispatched);
     }
 

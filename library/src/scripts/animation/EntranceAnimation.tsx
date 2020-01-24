@@ -3,18 +3,41 @@
  * @license GPL-2.0-only
  */
 
-import React, { CSSProperties, useMemo } from "react";
-import { useTransition, animated } from "react-spring";
+import React, { useMemo } from "react";
+import { animated, useTransition } from "react-spring";
 
 interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
-    children?: React.ReactNode;
-    delay?: number;
-    fade?: boolean;
-    fromDirection?: FromDirection;
-    halfDirection?: boolean;
+    // Whether or not the element has entered the screen and should be visible.
+    // NOTE: For animations OUT to work, you need to continue to render the element throughout it's transition.
+    // This means you can't do {isVisible && <EntranceAnimation />}
     isEntered: boolean;
-    targetTransform?: Partial<ITargetTransform>;
+
+    // The element to render as. All HTML props are supported.
+    // If using a fixed position element, make you apply all position to THIS element.
+    // Eg. <EntranceAnimation asElement="header" /> === <header {...transitionProps} {...otherProps} />
     asElement?: string;
+
+    // The contents that are being transitioned.
+    children?: React.ReactNode;
+
+    // A delay before the transition starts.
+    delay?: number;
+
+    // Whether or not the element should fade in.
+    fade?: boolean;
+
+    // The direction to transition in from (if applicable).
+    fromDirection?: FromDirection;
+
+    // If set the element will transition from the fromDirection, but it will start halfway away.
+    halfDirection?: boolean;
+
+    // For elements that are already transformed through CSS
+    // The transition may apply it's own transform that conflicts.
+    // Give the target transform percentages here so that calculations can be correct.
+    targetTransform?: Partial<ITargetTransform>;
+
+    // Callback that is called when the animated element is removed from the DOM (transition out complete).
     onDestroyed?: () => void;
 }
 
@@ -30,6 +53,11 @@ export interface ITargetTransform {
     yPercent?: number;
 }
 
+/**
+ * A component for transitioning some child entering in.
+ *
+ * It's transition is configurable through props.
+ */
 export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(function EntranceAnimation(
     _props: IProps,
     ref,

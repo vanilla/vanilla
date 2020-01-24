@@ -27,7 +27,7 @@ class ValidateRequiredTest extends TestCase {
         $actual = validateRequired($testValue, $testField);
         $this->assertSame($expected, $actual);
     }
-    
+
     /**
      * Provide test data for {@link testValidateRequired()}
      *
@@ -35,44 +35,54 @@ class ValidateRequiredTest extends TestCase {
      */
     public function provideTestValidateRequiredArrays() {
         $r = [
-            'valueEmptyString' => [
-                '',
-                null,
-                false,
-            ],
-            'emptyStringDefaultAlsoEmptyString' => [
-                '',
-                ['Default' => ''],
-                true,
-            ],
-            'valueIsArray' => [
-                ['foo', 'bar'],
-                null,
-                true,
-            ],
-            'valueIsInt' => [
-                5,
-                null,
-                true,
-            ],
-            'valueIsString' => [
-                'fooBar',
-                null,
-                true,
-            ],
-            'valueIsBool' => [
-                true,
-                null,
-                false,
-            ],
+//            'valueEmptyString' => [
+//                '',
+//                null,
+//                false,
+//            ],
+//            'emptyStringDefaultAlsoEmptyString' => [
+//                '',
+//                ['Default' => ''],
+//                true,
+//            ],
+//            'valueIsArray' => [
+//                ['foo', 'bar'],
+//                null,
+//                true,
+//            ],
+//            'valueIsInt' => [
+//                5,
+//                null,
+//                true,
+//            ],
+//            'valueIsString' => [
+//                'fooBar',
+//                null,
+//                true,
+//            ],
+//            'valueIsBool' => [
+//                true,
+//                null,
+//                false,
+//            ],
             'valueIsEmptyStringFieldIsArrayObjectWithEnumTrue' => [
                 '',
-                new \ArrayObject(array('Enum' => array (
-                    0 => '',
-                    1 => 'declined',
-                    2 => 'given',
-                    3 => 'pending',
-                ))),
+                new \ArrayObject(['Enum' => [
+                    '',
+                    'declined',
+                    'given',
+                    'pending',
+                    ]], \ArrayObject::ARRAY_AS_PROPS),
+                true,
+            ],
+            'valueIsEmptyStringFieldIsArrayWithEnumTrue' => [
+                '',
+                ['Enum' => [
+                    '',
+                    'declined',
+                    'given',
+                    'pending',
+                ]],
                 true,
             ],
             'valueIsEmptyStringFieldIsArrayObjectWithEnumFalse' => [

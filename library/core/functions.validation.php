@@ -63,11 +63,8 @@ if (!function_exists('ValidateRequired')) {
 
             // Checking for an Enum with an empty string.
             $hasEmptyEnum = false;
-            if ($field instanceof ArrayObject && $field->offsetExists('Enum')) {
-                $enum = $field->offsetGet('Enum');
-                if (is_array($enum) && in_array('', $enum, true)) {
-                    $hasEmptyEnum = true;
-                }
+            if (is_array($enum = val('Enum', $field, null))) {
+                $hasEmptyEnum = in_array('', $enum, true);
             }
 
             if ($value === '' && (val('Default', $field, null) === '' || $hasEmptyEnum)) {

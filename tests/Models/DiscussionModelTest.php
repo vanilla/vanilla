@@ -269,23 +269,23 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
-     * Test determineReadStatusAndUnreadCount() against various scenarios.
+     * Test {@link reconcileDiscrepantCommentData()} against various scenarios.
      *
      * @param int $discussionCommentCount The number of comments in the discussion according to the Discussion Table.
-     * @param mixed $discussionLastCommentDate Date of last Comment according to the Discussion table.
+     * @param string|null $discussionLastCommentDate Date of last Comment according to the Discussion table.
      * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
-     * @param mixed $userLastReadDate Date of last Comment read according to the UserDiscussion table.
+     * @param string|null $userLastReadDate Date of last Comment read according to the UserDiscussion table.
      * @param array $expected The expected result.
-     * @dataProvider provideTestDetermineReadStatusAndUnreadCount
+     * @dataProvider provideTestReconcileDiscrepantCommentData
      */
-    public function testDetermineReadStatusAndUnreadCount(
+    public function testReconcileDiscrepantCommentData(
         int $discussionCommentCount,
-        $discussionLastCommentDate,
+        ?string $discussionLastCommentDate,
         int $userReadComments,
-        $userLastReadDate,
+        ?string $userLastReadDate,
         $expected
     ) {
-        $actual = DiscussionModel::determineReadStatusAndUnreadCount(
+        $actual = DiscussionModel::reconcileDiscrepantCommentData(
             $discussionCommentCount,
             $discussionLastCommentDate,
             $userReadComments,
@@ -295,11 +295,11 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
-     * Provide test data for testDetermineReadStatusAndUnreadCount().
+     * Provide test data for testReconcileDiscrepantCommentData().
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestDetermineReadStatusAndUnreadCount() {
+    public function provideTestReconcileDiscrepantCommentData() {
         $r = [
             'CommentsAndUserReadEqualDatesConcur' => [
                 10,
@@ -349,6 +349,20 @@ class DiscussionModelTest extends TestCase {
                 50,
                 '2019-12-02 21:55:40',
                 [false, true],
+            ],
+            'NullUserReadDateNoReadComments' => [
+                5,
+                '2020-01-09 16:22:42',
+                0,
+                null,
+                [false, 5],
+            ],
+            'NullUserCountWithReadComments' => [
+                5,
+                '2020-01-09 16:22:42',
+                10,
+                null,
+                [false, 1],
             ],
         ];
 

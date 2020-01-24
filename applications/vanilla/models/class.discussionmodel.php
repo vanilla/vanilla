@@ -1136,8 +1136,8 @@ class DiscussionModel extends Gdn_Model {
         if (!Gdn::session()->isValid()) {
             $discussion->Read = false;
         } else {
-            if (!is_null($discussion->DateLastViewed) && is_numeric($discussion->CountUnreadComments)) {
-                $updatedReadStatusAndUnreadCount = self::determineReadStatusAndUnreadCount(
+            if (is_numeric($discussion->CountUnreadComments)) {
+                $updatedReadStatusAndUnreadCount = self::reconcileDiscrepantCommentData(
                     $discussion->CountComments,
                     $discussion->DateLastComment,
                     $discussion->CountCommentWatch,
@@ -1176,39 +1176,50 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * Calculate if the user has read all the Comments in a discussion. The data in the Discussion table
-     * is more likely to be reliable because when Comments are deleted we update the Discussion table
-     * but not the UserDiscussion table.
+     * Calculate if the user has read all the Comments in a discussion. If the data in the UserDiscussion Table
+     * and the Discussion Table conflict, it returns the best guess of what the read status and number of
+     * unread comments are. The data in the Discussion table
+     * is more likely to be reliable, so when in doubt, rely on that data.
      *
      * @param int $discussionCommentCount Number of Comments according to the Discussion table.
-     * @param string|null $discussionLastCommentDate
+     * @param string $discussionLastCommentDate Date of the last comment according to the Discussion table.
      * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
-     * @param string|null $userLastReadDate
-     * @return array
+     * @param string|null $userLastReadDate Date the user last viewed the discussion or marked the
+     * category read (or null), according to the UserDiscussion table.
+     * @return array Returns an array where the first item is a boolean value and the second is a int > 0 or true.
      */
-    public static function determineReadStatusAndUnreadCount(
+    public static function reconcileDiscrepantCommentData(
         int $discussionCommentCount,
-        ?string $discussionLastCommentDate,
+        string $discussionLastCommentDate,
         int $userReadComments,
         ?string $userLastReadDate
-    ) {
+    ): array {
+        $discussionLastCommentDate = self::forceDateTime($discussionLastCommentDate);
+        $userLastReadDate = self::forceDateTime($userLastReadDate);
         $isRead = true;
         $unreadCommentCount = $discussionCommentCount - $userReadComments;
         if ($discussionLastCommentDate > $userLastReadDate) {
             $isRead = false;
+
+            // If the latest comment is later than last viewed and there are more comments read than comments,
+            // set unread count to 1.
             if ($discussionCommentCount > 0 && $userReadComments >= $discussionCommentCount) {
                 $unreadCommentCount = 1;
             }
         }
 
+        // If the user has viewed the discussion more recently than the last comment, but there are unread comments,
+        // set unread comments to 0.
         if ($userLastReadDate > $discussionLastCommentDate && $unreadCommentCount > 0) {
             $unreadCommentCount = 0;
         }
 
+        // If the calculated number of unread comments is negative, set it to 0.
         if ($unreadCommentCount < 0 && $isRead) {
             $unreadCommentCount = 0;
         }
 
+        // If the discussion has no comments and read status is false, set unread comments to true.
         if ($discussionCommentCount === 0 && !$isRead) {
             $unreadCommentCount = true;
         }
@@ -1219,12 +1230,12 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Decide which of two dates is the most recent.
      *
-     * @param ?string $dateOne
-     * @param ?string $dateTwo
-     * @return ?string Returns most recent date.
+     * @param string|null $dateOne
+     * @param string|null $dateTwo
+     * @return string|null Returns most recent date.
      * @throws Exception Emits Exception in case of an error.
      */
-    public static function maxDate($dateOne, $dateTwo) {
+    public static function maxDate(?string $dateOne, ?string $dateTwo): ?string {
         $dateOne = self::forceDateTime($dateOne);
         $dateTwo = self::forceDateTime($dateTwo);
         $result = null;

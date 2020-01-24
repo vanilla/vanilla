@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\Controller;
@@ -65,9 +66,9 @@ class OpenApiApiController extends Controller {
      * Get the Open API object for endpoints on add-ons.
      *
      * @param array $query The querystring.
-     * @return array Returns the OpenAPI object as an array.
+     * @return Data Returns the OpenAPI object as an array.
      */
-    public function get_v3(array $query = []) {
+    public function get_v3(array $query = []): Data {
         $this->permission();
 
         $in = $this->schema([
@@ -87,7 +88,11 @@ class OpenApiApiController extends Controller {
         }
 
         $result = $this->openApiBuilder->getEnabledOpenAPI($query['disabled'], $query['hidden']);
-        return $result;
+        $response = new Data($result);
+
+        // If we've gotten this far, allow any domain to access our schema.
+        $response->setHeader('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     /**

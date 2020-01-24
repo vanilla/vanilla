@@ -37,9 +37,25 @@ const fontFallbacks = [
     "Segoe UI Symbol",
 ];
 
-export function fontFamilyWithDefaults(fontFamilies: string[]): string {
+const monoFallbacks = [
+    "Consolas",
+    "Andale Mono WT",
+    "Andale Mono",
+    "Lucida Console",
+    "Lucida Sans Typewriter",
+    "DejaVu Sans Mono",
+    "Bitstream Vera Sans Mono",
+    "Liberation Mono",
+    "Nimbus Mono L",
+    "Monaco",
+    "Courier New",
+    "Courier",
+    "monospace",
+];
+
+export function fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
     return fontFamilies
-        .concat(fontFallbacks)
+        .concat(options.isMonospaced ? monoFallbacks : fontFallbacks)
         .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
         .join(", ");
 }

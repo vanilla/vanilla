@@ -22,7 +22,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = sectionEntries;
-    baseConfig.devtool = "eval-source-map";
+    baseConfig.devtool = "source-map";
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,

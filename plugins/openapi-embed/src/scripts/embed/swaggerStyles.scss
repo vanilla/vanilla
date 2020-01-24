@@ -1,0 +1,73 @@
+@import "~swagger-ui-react/swagger-ui.css";
+
+.swagger-ui.swagger-ui {
+    text-align: left;
+    font-family: inherit !important;
+    .wrapper {
+        padding: 0;
+        margin: 0;
+    }
+
+    // Widen the min-width on the first table column.
+    table tbody tr td:first-of-type {
+        min-width: 12em;
+    }
+
+    // Hide this unwanted tag.
+    .response-col_links {
+        display: none;
+    }
+
+    .opblock-summary {
+        flex-direction: column;
+        align-items: center;
+        min-height: 42px;
+        padding-left: 105px;
+        position: relative;
+        align-items: flex-start;
+    }
+
+    .opblock-summary-method {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        bottom: 5px;
+        width: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .opblock-summary-description {
+        padding: 0 10px;
+        padding-top: 5px;
+    }
+
+    table.model {
+        margin-top: 24px;
+    }
+
+    .try-out {
+        display: none;
+    }
+
+    .model-example .tab {
+        margin-bottom: 10px;
+    }
+
+    .parameters-col_description {
+        input, select {
+            display: none;
+        }
+    }
+
+    .opblock-tag {
+        margin-top: 0;
+        margin-bottom: 12px;
+    }
+
+    .opblock-tag + div {
+        display: flex;
+        flex-direction: column;
+    }
+}

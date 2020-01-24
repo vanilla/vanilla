@@ -21,14 +21,18 @@ export const frameBodyClasses = useThemeCache(() => {
         position: "relative",
         width: percent(100),
         ...paddings({
-            left: vars.spacing.padding,
-            right: vars.spacing.padding,
+            horizontal: vars.spacing.padding,
         }),
         $nest: {
             "&.isSelfPadded": {
                 ...paddings({
                     left: 0,
                     right: 0,
+                }),
+            },
+            "&.hasVerticalPadding": {
+                ...paddings({
+                    vertical: vars.spacing.padding,
                 }),
             },
             [`& > .${classesInputBlock.root}`]: {

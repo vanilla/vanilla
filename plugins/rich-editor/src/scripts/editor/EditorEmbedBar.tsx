@@ -81,8 +81,8 @@ export function EditorEmbedBar(props: IProps) {
 }
 
 EditorEmbedBar.Item = function EditorEmbedBarItem(props: { children: React.ReactNode }) {
-    const { isMobile, legacyMode } = useEditor();
-    const classesRichEditor = richEditorClasses(legacyMode, isMobile);
+    const { legacyMode } = useEditor();
+    const classesRichEditor = richEditorClasses(legacyMode);
 
     return (
         <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">

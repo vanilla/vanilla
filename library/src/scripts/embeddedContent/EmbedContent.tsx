@@ -20,10 +20,10 @@ interface IProps {
     children?: React.ReactNode;
     noBaseClass?: boolean;
     isSmall?: boolean;
-    setContentRef?: (element: HTMLElement | null) => void;
+    embedActions?: React.ReactNode;
 }
 
-export function EmbedContent(props: IProps) {
+export const EmbedContent = React.forwardRef<HTMLDivElement, IProps>(function EmbedContent(props: IProps, ref) {
     const { inEditor, isSelected, deleteSelf, descriptionID } = useEmbedContext();
     const classes = embedContentClasses();
 
@@ -36,11 +36,12 @@ export function EmbedContent(props: IProps) {
                 [classes.small]: props.isSmall,
             })}
             tabIndex={inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
-            ref={props.setContentRef}
+            ref={ref}
         >
             {props.children}
             {inEditor && isSelected && (
                 <EmbedMenu>
+                    {props.embedActions}
                     <Button baseClass={ButtonTypes.ICON} onClick={deleteSelf}>
                         <DeleteIcon />
                     </Button>
@@ -48,4 +49,4 @@ export function EmbedContent(props: IProps) {
             )}
         </div>
     );
-}
+});

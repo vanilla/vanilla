@@ -70,6 +70,7 @@ export const embedContainerClasses = useThemeCache(() => {
         },
         [EmbedContainerSize.FULL_WIDTH]: {
             maxWidth: percent(100),
+            width: percent(100),
         },
     };
 

@@ -3,71 +3,56 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useRef, useEffect } from "react";
-import { IBaseEmbedProps, FOCUS_CLASS } from "@library/embeddedContent/embedService";
-import { SwaggerUIBundle } from "swagger-ui-dist";
-import "./openapi-embed.scss";
-import { formatUrl, getMeta } from "@library/utility/appUtils";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { OpenApiEmbedPlaceholder } from "@openapi-embed/embed/OpenApiEmbedPlaceholder";
+import { EmbedContainer, EmbedContainerSize } from "@vanilla/library/src/scripts/embeddedContent/EmbedContainer";
+import { EmbedContent } from "@vanilla/library/src/scripts/embeddedContent/EmbedContent";
+import Button from "@vanilla/library/src/scripts/forms/Button";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
+import React, { useState } from "react";
+import { OpenApiModal } from "@openapi-embed/embed/OpenApiModal";
 
 interface IProps extends IBaseEmbedProps {}
 
 export function OpenApiEmbed(props: IProps) {
-    const [savedUrl, setSavedUrl] = useState("http://dev.vanilla.localhost/api/v2/openapi/v3");
-    const [url, setUrl] = useState("");
-    const swaggerRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        swaggerRef.current!.addEventListener("submit", e => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-    });
-
-    useEffect(() => {
-        SwaggerUIBundle({
-            domNode: swaggerRef.current,
-            plugins: [SwaggerUIBundle.plugins.DownloadUrl],
-            presets: [SwaggerUIBundle.presets.apis],
-            requestInterceptor: (request: Request) => {
-                request.headers["x-transient-key"] = getMeta("TransientKey");
-                return request;
-            },
-            // docExpansion: "none",
-            deepLinking: false,
-            url: formatUrl("/api/v2/open-api/v3" + window.location.search),
-            validatorUrl: null,
-            onComplete: () => {
-                console.log("complete");
-                const opblocks = swaggerRef.current!.querySelectorAll(".opblock-tag");
-                const headings = Array.from(opblocks)
-                    .map(blockNode => {
-                        const text = blockNode.getAttribute("data-tag");
-                        const ref = blockNode.id;
-
-                        if (!text || !ref) {
-                            return null;
-                        }
-                        return {
-                            text,
-                            ref,
-                            level: 2,
-                        };
-                    })
-                    .filter(item => item !== null);
-                console.log("found headings", headings);
-                props.syncBackEmbedValue({ headings });
-            },
-        });
-    }, [savedUrl]);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     return (
-        // <EmbedContent type="OpenApi" inEditor={props.inEditor}>
-        <div className="u-excludeFromPointerEvents" className={FOCUS_CLASS}>
-            {/* <TextInput value={url} onChange={e => setUrl(e.target.value)} className={FOCUS_CLASS} /> */}
-            {/* <Button onClick={() => setSavedUrl(url)}>Check API definition</Button> */}
-            <div ref={swaggerRef} />
-            {/* {savedUrl && <SwaggerUI url={savedUrl} docExpansion="list" />} */}
-        </div>
-        // </EmbedContent>
+        <EmbedContainer size={EmbedContainerSize.FULL_WIDTH}>
+            <EmbedContent
+                type="OpenApi"
+                embedActions={
+                    <Button
+                        baseClass={ButtonTypes.ICON}
+                        onClick={() => {
+                            setShowEditModal(true);
+                        }}
+                    >
+                        <EditIcon />
+                    </Button>
+                }
+            >
+                <OpenApiEmbedPlaceholder name="test" embedUrl={props.url} />
+            </EmbedContent>
+            {showEditModal && (
+                <OpenApiModal
+                    onDismiss={() => {
+                        setShowEditModal(false);
+                    }}
+                />
+            )}
+        </EmbedContainer>
     );
+
+    // return (
+    //     // <EmbedContent type="OpenApi" inEditor={props.inEditor}>
+    //     // <div className="u-excludeFromPointerEvents" className={FOCUS_CLASS}>
+    //         {/* <TextInput value={url} onChange={e => setUrl(e.target.value)} className={FOCUS_CLASS} /> */}
+    //         {/* <Button onClick={() => setSavedUrl(url)}>Check API definition</Button> */}
+    //         // <div ref={swaggerRef} />
+    //         {/* {savedUrl && <SwaggerUI url={savedUrl} docExpansion="list" />} */}
+    //     // </div>
+    //     // </EmbedContent>
+    // );
 }

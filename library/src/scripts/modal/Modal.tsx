@@ -10,6 +10,7 @@ import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
+import { ModalTransitionType, IModalTransitioner } from "@library/modal/ModalTransition";
 
 interface IHeadingDescription {
     titleID: string;
@@ -19,7 +20,7 @@ interface ITextDescription {
     label: string; // Necessary if there's no proper title
 }
 
-interface IModalCommonProps {
+interface IModalCommonProps extends Partial<IModalTransitioner> {
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element | null;
@@ -31,6 +32,8 @@ interface IModalCommonProps {
     scrollable?: boolean;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
+    isVisible?: boolean;
+    transitionType?: ModalTransitionType;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -84,6 +87,8 @@ export function mountModal(element: ReactElement<any>) {
 export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         isWholePage: false,
+        isVisible: true,
+        transitionType: ModalTransitionType.FADE_IN,
     };
 
     public static stack: Modal[] = [];
@@ -105,6 +110,8 @@ export default class Modal extends React.Component<IProps, IState> {
                 modalRef={this.selfRef}
                 titleID={"titleID" in this.props ? this.props.titleID : undefined}
                 label={"label" in this.props ? this.props.label : undefined}
+                transitionType={this.props.transitionType!}
+                isVisible={this.props.isVisible!}
             >
                 {this.props.children}
             </ModalView>,
@@ -119,8 +126,8 @@ export default class Modal extends React.Component<IProps, IState> {
      * Since the contents of the modal could be changing constantly
      * we are creating a new instance every time we need it.
      */
-    private get tabHandler(): TabHandler {
-        return new TabHandler(this.selfRef.current!);
+    private get tabHandler(): TabHandler | null {
+        return this.selfRef.current ? new TabHandler(this.selfRef.current) : null;
     }
 
     /**
@@ -192,7 +199,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      * Focus the initial element in the Modal.
      */
     private focusInitialElement() {
-        const focusElement = this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler.getInitial();
+        const focusElement = this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler?.getInitial();
         if (focusElement) {
             focusElement!.focus();
         }
@@ -284,7 +291,7 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleShiftTab(event: React.KeyboardEvent) {
-        const nextElement = this.tabHandler.getNext(undefined, true);
+        const nextElement = this.tabHandler?.getNext(undefined, true);
         if (nextElement) {
             event.preventDefault();
 
@@ -302,7 +309,7 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleTab(event: React.KeyboardEvent) {
-        const previousElement = this.tabHandler.getNext();
+        const previousElement = this.tabHandler?.getNext();
         if (previousElement) {
             event.preventDefault();
             event.stopPropagation();

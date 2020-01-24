@@ -35,36 +35,36 @@ class ValidateRequiredTest extends TestCase {
      */
     public function provideTestValidateRequiredArrays() {
         $r = [
-//            'valueEmptyString' => [
-//                '',
-//                null,
-//                false,
-//            ],
-//            'emptyStringDefaultAlsoEmptyString' => [
-//                '',
-//                ['Default' => ''],
-//                true,
-//            ],
-//            'valueIsArray' => [
-//                ['foo', 'bar'],
-//                null,
-//                true,
-//            ],
-//            'valueIsInt' => [
-//                5,
-//                null,
-//                true,
-//            ],
-//            'valueIsString' => [
-//                'fooBar',
-//                null,
-//                true,
-//            ],
-//            'valueIsBool' => [
-//                true,
-//                null,
-//                false,
-//            ],
+            'valueEmptyString' => [
+                '',
+                null,
+                false,
+            ],
+            'emptyStringDefaultAlsoEmptyString' => [
+                '',
+                ['Default' => ''],
+                true,
+            ],
+            'valueIsArray' => [
+                ['foo', 'bar'],
+                null,
+                true,
+            ],
+            'valueIsInt' => [
+                5,
+                null,
+                true,
+            ],
+            'valueIsString' => [
+                'fooBar',
+                null,
+                true,
+            ],
+            'valueIsBool' => [
+                true,
+                null,
+                false,
+            ],
             'valueIsEmptyStringFieldIsArrayObjectWithEnumTrue' => [
                 '',
                 new \ArrayObject(['Enum' => [

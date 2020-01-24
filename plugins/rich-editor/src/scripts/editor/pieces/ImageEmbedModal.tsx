@@ -24,6 +24,7 @@ interface IProps {
     className?: string;
     initialAlt: string;
     onClose: () => void;
+    isVisible: boolean;
 }
 
 export interface IImageMeta {
@@ -62,7 +63,7 @@ export function ImageEmbedModal(props: IProps) {
     const titleID = useUniqueID("modalTitle");
 
     return (
-        <Modal size={ModalSizes.SMALL} titleID={titleID}>
+        <Modal isVisible={props.isVisible} size={ModalSizes.SMALL} titleID={titleID} exitHandler={props.onClose}>
             <EditorEventWall>
                 <form className={classes.form}>
                     <Frame

@@ -11,6 +11,7 @@ import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { forceRenderStyles } from "typestyle";
+import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 
 interface IProps {
     onOverlayClick: React.MouseEventHandler;
@@ -24,6 +25,8 @@ interface IProps {
     size: ModalSizes;
     modalRef?: React.RefObject<HTMLDivElement>;
     children?: React.ReactNode;
+    isVisible: boolean;
+    onDestroyed?: () => void;
 }
 
 /**
@@ -58,39 +61,106 @@ export function ModalView(props: IProps) {
         );
     }
 
+    const targetTransform: Partial<ITargetTransform> | undefined = useMemo(() => {
+        switch (size) {
+            case ModalSizes.SMALL:
+            case ModalSizes.MEDIUM:
+            case ModalSizes.LARGE:
+            case ModalSizes.XL:
+                return {
+                    xPercent: -50,
+                    yPercent: -50,
+                };
+            default:
+                return undefined;
+        }
+    }, [size]);
+
+    const contentTransition = (() => {
+        switch (props.size) {
+            case ModalSizes.SMALL:
+            case ModalSizes.MEDIUM:
+            case ModalSizes.LARGE:
+                return {
+                    fade: true,
+                    fromDirection: FromDirection.BOTTOM,
+                    halfDirection: true,
+                };
+            case ModalSizes.XL:
+                return {
+                    fade: true,
+                };
+            case ModalSizes.FULL_SCREEN:
+                return {
+                    fade: false,
+                };
+            case ModalSizes.MODAL_AS_DROP_DOWN:
+                return {
+                    fade: false,
+                    fromDirection: FromDirection.TOP,
+                };
+            case ModalSizes.MODAL_AS_SIDE_PANEL:
+                return {
+                    fade: false,
+                    fromDirection: FromDirection.RIGHT,
+                };
+        }
+    })();
+
+    contents = (
+        <div
+            className={classes.overlayContent}
+            onClick={props.onOverlayClick}
+            style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
+        >
+            <EntranceAnimation
+                {...contentTransition}
+                targetTransform={targetTransform}
+                isEntered={props.isVisible}
+                role="dialog"
+                aria-modal={true}
+                className={classNames(
+                    classes.root,
+                    {
+                        isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                        isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                        isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                        isXL: size === ModalSizes.XL,
+                        isLarge: size === ModalSizes.LARGE,
+                        isMedium: size === ModalSizes.MEDIUM,
+                        isSmall: size === ModalSizes.SMALL,
+                        isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                    },
+                    props.className,
+                )}
+                ref={modalRef}
+                onKeyDown={props.onKeyDown}
+                onClick={props.onModalClick}
+                aria-label={label}
+                aria-labelledby={titleID}
+                aria-describedby={props.description ? descriptionID : undefined}
+            >
+                {contents}
+            </EntranceAnimation>
+        </div>
+    );
+
+    if (props.isVisible) {
+        contents = <ScrollLock>{contents}</ScrollLock>;
+    }
+
     // We HAVE to render force the styles to render before componentDidMount
     // And our various focusing tricks or the page will jump.
     forceRenderStyles();
     return (
-        <ScrollLock>
-            <div className={classes.overlay} onClick={props.onOverlayClick}>
-                <div
-                    role="dialog"
-                    aria-modal={true}
-                    className={classNames(
-                        classes.root,
-                        {
-                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                            isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                            isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
-                            isXL: size === ModalSizes.XL,
-                            isLarge: size === ModalSizes.LARGE,
-                            isMedium: size === ModalSizes.MEDIUM,
-                            isSmall: size === ModalSizes.SMALL,
-                            isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                        },
-                        props.className,
-                    )}
-                    ref={modalRef}
-                    onKeyDown={props.onKeyDown}
-                    onClick={props.onModalClick}
-                    aria-label={label}
-                    aria-labelledby={titleID}
-                    aria-describedby={props.description ? descriptionID : undefined}
-                >
-                    {contents}
-                </div>
-            </div>
-        </ScrollLock>
+        <div>
+            <EntranceAnimation
+                fade
+                isEntered={props.isVisible}
+                className={classes.overlayScrim}
+                onDestroyed={props.onDestroyed}
+            ></EntranceAnimation>
+            {contents}
+        </div>
     );
 }

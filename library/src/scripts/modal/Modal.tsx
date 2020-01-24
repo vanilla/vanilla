@@ -168,6 +168,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         }
 
         if (!prevProps.isVisible && this.props.isVisible) {
+            this.focusInitialElement();
             this.setCloseFocusElement();
             this.setState({ hasGainedVisibility: true });
         }

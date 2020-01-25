@@ -31,7 +31,6 @@ interface IProps {
 
 interface IState {
     wasDestroyed: boolean;
-    hasGainedVisibility: boolean;
 }
 
 export const MODAL_CONTAINER_ID = "modals";
@@ -78,15 +77,14 @@ export default class Modal extends React.Component<IProps, IState> {
     private selfRef = React.createRef<HTMLDivElement>();
 
     public state: IState = {
-        wasDestroyed: false,
-        hasGainedVisibility: this.props.isVisible,
+        wasDestroyed: !this.props.isVisible,
     };
 
     /**
      * Render the contents into a portal.
      */
     public render() {
-        if (this.state.wasDestroyed || !this.state.hasGainedVisibility) {
+        if (this.state.wasDestroyed) {
             return null;
         }
 
@@ -103,7 +101,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     modalRef={this.selfRef}
                     titleID={"titleID" in this.props ? this.props.titleID : undefined}
                     label={"label" in this.props ? this.props.label : undefined}
-                    isVisible={this.props.isVisible!}
+                    isVisible={this.props.isVisible}
                 >
                     {this.props.children}
                 </ModalView>
@@ -154,12 +152,10 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         // When we set this to true we render null once.
         // The in the update we set back to false.
         // The second render will re-create the portal.
-        if (!this.props.isVisible) {
-            this.setState({ wasDestroyed: true });
+        this.setState({ wasDestroyed: true });
 
-            // We were destroyed so we should focus back to the last element.
-            this.closeFocusElement?.focus();
-        }
+        // We were destroyed so we should focus back to the last element.
+        this.closeFocusElement?.focus();
     };
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
@@ -170,10 +166,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         if (!prevProps.isVisible && this.props.isVisible) {
             this.focusInitialElement();
             this.setCloseFocusElement();
-            this.setState({ hasGainedVisibility: true });
-        }
-
-        if (!prevState.wasDestroyed && this.state.wasDestroyed) {
             this.setState({ wasDestroyed: false });
         }
     }

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import { Router as ReactRouter, Switch, Route } from "react-router-dom";
 import { formatUrl } from "@library/utility/appUtils";
@@ -22,17 +22,21 @@ interface IProps {
 export function Router(props: IProps) {
     const { onRouteChange } = props;
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
+    const [previousPath, setPreviousPath] = useState(window.location.pathname);
 
     useEffect(() => {
         if (onRouteChange) {
             const unregister = history.listen(() => {
-                window.scrollTo(0, 0);
-                onRouteChange(history);
+                if (previousPath !== window.location.pathname) {
+                    window.scrollTo(0, 0);
+                    onRouteChange(history);
+                    setPreviousPath(window.location.pathname);
+                }
             });
             // Return the cleanup function.
             return unregister;
         }
-    }, [history, onRouteChange]);
+    }, [history, onRouteChange, previousPath]);
 
     let routes = (
         <Switch>

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import { Router as ReactRouter, Switch, Route } from "react-router-dom";
 import { formatUrl } from "@library/utility/appUtils";
@@ -12,7 +12,7 @@ import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
 import { BackgroundsProvider } from "./layout/Backgrounds";
 import { SplashContextProvider } from "@library/splash/SplashContext";
-import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
+import { initPageViewTracking, usePageChangeListener } from "@library/pageViews/pageViewTracking";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -23,25 +23,17 @@ interface IProps {
 export function Router(props: IProps) {
     const { onRouteChange } = props;
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
-    const [previousPath, setPreviousPath] = useState(window.location.pathname);
 
     useEffect(() => {
         initPageViewTracking(history);
     }, [history]);
 
-    useEffect(() => {
-        if (onRouteChange) {
-            const unregister = history.listen(() => {
-                if (previousPath !== window.location.pathname) {
-                    window.scrollTo(0, 0);
-                    onRouteChange(history);
-                    setPreviousPath(window.location.pathname);
-                }
-            });
-            // Return the cleanup function.
-            return unregister;
-        }
-    }, [history, onRouteChange, previousPath]);
+    const pageChangeHandler = useCallback(() => {
+        window.scrollTo(0, 0);
+        onRouteChange?.(history);
+    }, [history, onRouteChange]);
+
+    usePageChangeListener(pageChangeHandler);
 
     let routes = (
         <Switch>

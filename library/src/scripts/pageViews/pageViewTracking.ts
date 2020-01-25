@@ -4,9 +4,11 @@
  */
 
 import { History } from "history";
+import { useEffect } from "react";
 
 export type PageViewHandler = (params: { history: History }) => void | Promise<void>;
-const handlers: PageViewHandler[] = [];
+
+const EVENT_NAME = "pageView";
 
 /**
  * Register a callback for a when a pageview is triggered.
@@ -14,10 +16,21 @@ const handlers: PageViewHandler[] = [];
  * @param handler The handler for the page view.
  */
 export function onPageView(handler: PageViewHandler) {
-    handlers.push(handler);
+    const eventListener = (e: CustomEvent) => {
+        const history = e.detail;
+        handler(history);
+    };
+    document.addEventListener(EVENT_NAME, eventListener);
+    return () => {
+        document.removeEventListener(EVENT_NAME, eventListener);
+    };
 }
 
-export function registerTick() {}
+export function usePageChangeListener(handler: PageViewHandler) {
+    useEffect(() => {
+        return onPageView(handler);
+    }, [handler]);
+}
 
 window.onPageView = onPageView;
 
@@ -35,14 +48,12 @@ function setPreviousPath(path: string) {
  * Initialize tracking of the page history and fire the handlers for the current page.
  */
 export function initPageViewTracking(history: History) {
-    const callHandlers = () => {
-        handlers.forEach(handler => handler({ history }));
-    };
+    document.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: history }));
+    setPreviousPath(history.location.pathname);
 
-    callHandlers();
     history.listen(() => {
         if (getPreviousPath() !== history.location.pathname) {
-            callHandlers();
+            document.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: history }));
         }
 
         setPreviousPath(history.location.pathname);

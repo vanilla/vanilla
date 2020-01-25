@@ -386,6 +386,11 @@ class FsThemeProvider implements ThemeProviderInterface {
             $hidden = true;
             $sites = $themeInfo['sites'] ?? [];
             $site = $themeInfo['site'] ?? '';
+            $key = $themeInfo['key'] ?? '';
+
+            if ($key === $this->getConfigThemeKey()) {
+                $hidden = false;
+            }
 
             if ($site) {
                 array_push($sites, $site);
@@ -434,7 +439,16 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getCurrent(): ?array {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $themeKey = $this->getConfigThemeKey();
         return $this->getThemeWithAssets($themeKey);
+    }
+
+    /**
+     * Get the current theme key from the config.
+     *
+     * @return string
+     */
+    public function getConfigThemeKey(): string {
+        return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
     }
 }

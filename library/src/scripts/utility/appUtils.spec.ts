@@ -51,4 +51,11 @@ describe("formatUrl", () => {
 
         expect(application.formatUrl("/discussions")).toEqual("/test/discussions");
     });
+
+    it("does site root relativeURLs", () => {
+        application.setMeta("context.basePath", "/community/subcommunity");
+        application.setMeta("context.host", "/community");
+        expect(application.formatUrl("/discussions")).toEqual("/community/subcommunity/discussions");
+        expect(application.formatUrl("~/discussions")).toEqual("/community/discussions");
+    });
 });

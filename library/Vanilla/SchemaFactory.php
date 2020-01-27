@@ -95,11 +95,13 @@ final class SchemaFactory {
         // Allow the schema ID to be set or overwritten.
         if (!empty($id)) {
             $result->setID($id);
+        } elseif ($schemaID = $schema->getID()) {
+            $id = $schemaID;
         }
 
-        if ($schemaID = $schema->getID()) {
+        if ($id) {
             // Fire an event for schema modification.
-            self::getEventManager()->fire("{$schemaID}Schema_init", $result);
+            self::getEventManager()->fire("{$id}Schema_init", $result);
         }
 
         return $result;

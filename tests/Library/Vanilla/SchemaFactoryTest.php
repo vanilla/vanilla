@@ -7,6 +7,7 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
@@ -102,6 +103,31 @@ class SchemaFactoryTest extends TestCase {
 
         SchemaFactory::parse(["stringField:s"], $id);
         $this->assertTrue($dispatched);
+    }
+
+    /**
+     * Verify the proper ID is used to dispatch events from the prepare method.
+     *
+     * @return void
+     */
+    public function testPrepareEventDispatched(): void {
+        $eventManager = new EventManager($this->container());
+        SchemaFactory::setEventManager($eventManager);
+
+        $dispatched = false;
+        $eventManager->bind("fooSchema_init", function () use (&$dispatched) {
+            $dispatched = true;
+        });
+
+        $schema = Schema::parse(["stringField:s"]);
+        SchemaFactory::prepare($schema, "foo");
+        $this->assertTrue($dispatched, "No existing schema ID.");
+
+        $dispatched = false;
+        $schema = Schema::parse(["stringField:s"]);
+        $schema->setID("bar");
+        SchemaFactory::prepare($schema, "foo");
+        $this->assertTrue($dispatched, "Overwriting an existing schema ID.");
     }
 
     /**

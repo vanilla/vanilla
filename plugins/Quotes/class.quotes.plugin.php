@@ -28,10 +28,14 @@ class QuotesPlugin extends Gdn_Plugin {
     /** @var bool */
     public $HandleRenderQuotes = true;
 
+    /** @var DiscussionModel  */
+    private $discussionModel;
+
     /**
      * Set some properties we always need.
      */
-    public function __construct() {
+    public function __construct(DiscussionModel $discussionModel) {
+        $this->discussionModel = $discussionModel;
         parent::__construct();
 
         if (function_exists('ValidateUsernameRegex')) {
@@ -422,29 +426,21 @@ BLOCKQUOTE;
             $format = c('Garden.InputFormatter');
         }
 
-        $discussionModel = new DiscussionModel();
         $type = strtolower($type);
         switch ($type) {
             case 'comment':
                 $commentModel = new CommentModel();
                 $data = $commentModel->getID($id);
-                $discussion = $discussionModel->getID(val('DiscussionID', $data));
+                $discussion = $this->discussionModel->getID(val('DiscussionID', $data));
                 break;
             case 'discussion':
-                $data = $discussionModel->getID($id);
+                $data = $this->discussionModel->getID($id);
                 $discussion = $data;
                 break;
         }
 
         if ($discussion) {
-            // Check permission.
-            Gdn::controller()->permission(
-                ['Vanilla.Discussions.Add', 'Vanilla.Discussions.View'],
-                false,
-                'Category',
-                val('PermissionCategoryID', $discussion)
-            );
-
+            $this->verifyDiscussionViewPermissions($discussion);
             $newFormat = $format;
             if ($newFormat == 'Wysiwyg') {
                 $newFormat = 'Html';
@@ -542,6 +538,19 @@ BLOCKQUOTE;
 
         // Undo Emoji disable.
         Emoji::instance()->enabled = $emojiEnabled;
+    }
+
+    /**
+     * Checks if the user can view a discussion.
+     *
+     * @param object $discussion
+     * @throws Exception If the user cannot view the discussion.
+     */
+    private function verifyDiscussionViewPermissions($discussion) {
+        $canView = $this->discussionModel->canViewDiscussion($discussion);
+        if (!$canView) {
+            throw permissionException('Vanilla.Discussions.View');
+        }
     }
 
     /**

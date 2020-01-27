@@ -8,6 +8,7 @@ import { openApiEmbedClasses, openApiEmbedPlaceholderClasses } from "@openapi-em
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import Heading from "@vanilla/library/src/scripts/layout/Heading";
 import { IOpenApiEmbedData } from "@openapi-embed/embed/OpenApiEmbed";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     data: IOpenApiEmbedData;
@@ -27,7 +28,7 @@ export function OpenApiEmbedPlaceholder(props: IProps) {
     return (
         <div className={classes.root}>
             <Heading depth={4} className={classes.name}>
-                {name}
+                {t("API Reference")}
             </Heading>
             <SmartLink className={classes.url} to={url}>
                 {url}

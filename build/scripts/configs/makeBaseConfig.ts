@@ -65,7 +65,7 @@ ${chalk.green(aliases)}`;
                             return true;
                         }
 
-                        if (modulePath.includes("swagger-ui")) {
+                        if (modulePath.includes("swagger-ui-react")) {
                             // Do not do additional transpilation of swagger-ui.
                             return true;
                         }

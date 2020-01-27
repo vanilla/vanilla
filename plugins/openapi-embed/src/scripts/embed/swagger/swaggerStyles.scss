@@ -18,6 +18,10 @@
         display: none;
     }
 
+    .opblock {
+        line-height: 1;
+    }
+
     .opblock-summary {
         flex-direction: column;
         align-items: center;
@@ -52,12 +56,28 @@
     }
 
     .model-example .tab {
+        margin: 0;
         margin-bottom: 10px;
+    }
+
+    .tabitem::before {
+        display: none;
     }
 
     .parameters-col_description {
         input, select {
             display: none;
+        }
+    }
+
+    // Fix wrapping and alignmenet of "required" markers.
+    .opblock-title {
+        display: flex;
+        align-items: center;
+
+        &:after {
+            // This is some pseudo-text.
+            white-space: nowrap;
         }
     }
 

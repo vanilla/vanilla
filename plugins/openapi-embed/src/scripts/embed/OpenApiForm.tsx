@@ -36,7 +36,7 @@ export function OpenApiForm(props: IProps) {
     const titleID = useUniqueID("title");
 
     const handleSubmit = () => {
-        props.onSave({ url, name: url || t("(Untitled)"), embedType: "openapi", headings });
+        props.onSave({ url, name: name || t("(Untitled)"), embedType: "openapi", headings });
     };
 
     return (

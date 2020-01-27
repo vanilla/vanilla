@@ -13,6 +13,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\Controller;
 use Vanilla\Dashboard\Models\SwaggerModel;
+use Vanilla\Web\CacheControlMiddleware;
 
 /**
  * Returns the swagger spec for the APIv2.
@@ -92,6 +93,7 @@ class OpenApiApiController extends Controller {
 
         // If we've gotten this far, allow any domain to access our schema.
         $response->setHeader('Access-Control-Allow-Origin', '*');
+        $response->setHeader('Cache-Control', CacheControlMiddleware::PUBLIC_CACHE);
         return $response;
     }
 

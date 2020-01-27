@@ -12,20 +12,35 @@ use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 
+/**
+ * Embed class for an OpenAPI spec.
+ */
 class OpenApiEmbed extends AbstractEmbed implements HeadingProviderInterface {
 
     const TYPE = "openapi";
 
+    /**
+     * @inheritdoc
+     */
     protected function getAllowedTypes(): array {
         return [self::TYPE];
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function schema(): Schema {
         return Schema::parse([
-            'headings:a?',
+            'name:s',
+            'headings:a',
         ]);
     }
 
+    /**
+     * Get headings of an OpenAPI spec.
+     *
+     * @return array
+     */
     public function getHeadings(): array {
         $headings = $this->data['headings'] ?? [];
 

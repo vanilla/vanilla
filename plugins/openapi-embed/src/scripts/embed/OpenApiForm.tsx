@@ -15,26 +15,46 @@ import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { OpenApiPreview } from "@openapi-embed/embed/OpenApiPreview";
 import { frameFooterClasses } from "@vanilla/library/src/scripts/layout/frame/frameFooterStyles";
-import { isAllowedUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { isAllowedUrl, t } from "@vanilla/library/src/scripts/utility/appUtils";
+import { IOpenApiEmbedData } from "@openapi-embed/embed/OpenApiEmbed";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import { ISwaggerHeading } from "@openapi-embed/embed/swagger/useSwaggerUI";
 
 interface IProps {
-    currentUrl?: string;
+    data: Partial<IOpenApiEmbedData>;
     onDismiss: () => void;
-    onSave: (specUrl: string) => void;
+    onSave: (data: IOpenApiEmbedData) => void;
 }
 
-export function OpenApiModal(props: IProps) {
-    const [url, setUrl] = useState(props.currentUrl ?? "");
+export function OpenApiForm(props: IProps) {
+    const [name, setName] = useState(props.data.name ?? "");
+    const [url, setUrl] = useState(props.data.url ?? "");
+    const [headings, setHeadings] = useState<ISwaggerHeading[]>([]);
     const [showPreview, setShowPreview] = useState(false);
 
     const { actionButton } = frameFooterClasses();
+    const titleID = useUniqueID("title");
+
+    const handleSubmit = () => {
+        props.onSave({ url, name: url || t("(Untitled)"), embedType: "openapi", headings });
+    };
 
     return (
-        <Modal size={ModalSizes.MEDIUM} titleID="">
+        <Modal size={ModalSizes.MEDIUM} titleID={titleID}>
             <Frame
-                header={<FrameHeader closeFrame={props.onDismiss} title={"Configure OpenApi Spec"} />}
+                header={<FrameHeader titleID={titleID} closeFrame={props.onDismiss} title={"Configure OpenApi Spec"} />}
                 body={
                     <FrameBody hasVerticalPadding>
+                        <InputTextBlock
+                            label={"Name"}
+                            inputProps={{
+                                placeholder: "Users API",
+                                value: name,
+                                onChange: e => {
+                                    setName(e.target.value);
+                                },
+                            }}
+                        />
                         <InputTextBlock
                             label={"Spec URL"}
                             inputProps={{
@@ -57,11 +77,7 @@ export function OpenApiModal(props: IProps) {
                         >
                             Preview
                         </Button>
-                        <Button
-                            className={actionButton}
-                            baseClass={ButtonTypes.TEXT_PRIMARY}
-                            onClick={() => props.onSave(url)}
-                        >
+                        <Button className={actionButton} baseClass={ButtonTypes.TEXT_PRIMARY} onClick={handleSubmit}>
                             Save
                         </Button>
                     </FrameFooter>
@@ -69,6 +85,7 @@ export function OpenApiModal(props: IProps) {
             />
             {showPreview && (
                 <OpenApiPreview
+                    onLoadHeadings={setHeadings}
                     previewUrl={url}
                     onDismiss={() => {
                         setShowPreview(false);

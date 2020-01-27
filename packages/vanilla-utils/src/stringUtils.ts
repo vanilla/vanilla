@@ -164,7 +164,7 @@ export function matchAtMention(
     return null;
 }
 
-const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/|\/)/;
+const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/|\/|\#)/;
 
 /**
  * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
@@ -174,6 +174,7 @@ const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/|\/)/;
  * - "https://",
  * - "tel:",
  * - "mailto://",
+ * - "#"
  *
  * @param url The url to sanitize.
  */

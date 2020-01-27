@@ -41,7 +41,8 @@ yargs
         default: false,
         boolean: true,
     })
-    .options("debug", { default: false, boolean: true });
+    .options("debug", { default: false, boolean: true })
+    .options("sections", { default: "all", string: true });
 
 export interface IBuildOptions {
     mode: BuildMode;
@@ -54,6 +55,7 @@ export interface IBuildOptions {
     phpConfig: any;
     devIp: string;
     debug: boolean;
+    sections: null | string[];
 }
 
 /**
@@ -95,7 +97,11 @@ export async function getOptions(): Promise<IBuildOptions> {
         enabledAddonKeys = parseEnabledAddons(config);
     }
 
+    const sectionString = yargs.argv["sections"] as string;
+    const sections = sectionString === "all" ? null : sectionString.split(",").map(str => str.trim());
+
     return {
+        sections,
         mode: yargs.argv.mode as BuildMode,
         verbose: yargs.argv.verbose as boolean,
         enabledAddonKeys,

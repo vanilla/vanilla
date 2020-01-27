@@ -7,6 +7,8 @@ import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { useEffect } from "react";
 import { initAllUserContent } from "@library/content/index";
 
+let previousHashOffset = 0;
+
 /**
  * Hook for handling hash scrolling and user content rendering.
  *
@@ -16,6 +18,7 @@ import { initAllUserContent } from "@library/content/index";
 export function useHashScrolling(content: string, disabled?: boolean) {
     const { temporarilyDisabledWatching, getCalcedHashOffset } = useScrollOffset();
     const calcedOffset = getCalcedHashOffset();
+    previousHashOffset = calcedOffset;
 
     useEffect(() => {
         if (disabled) {
@@ -27,30 +30,41 @@ export function useHashScrolling(content: string, disabled?: boolean) {
     }, [calcedOffset, temporarilyDisabledWatching, disabled, content]);
 }
 
-export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () => void) {
-    /**
-     * Scroll to the window's current hash value.
-     */
-    const scrollToHash = (event?: HashChangeEvent) => {
-        event && event.preventDefault();
+/**
+ * Scroll to a particular HTML element.
+ */
+export function scrollToElement(element?: HTMLElement, offset?: number, beforeScrollHandler?: () => void) {
+    const currentOffset = offset == null ? previousHashOffset : offset;
+    if (element) {
+        forceRenderStyles();
+        beforeScrollHandler && beforeScrollHandler();
+        setTimeout(() => {
+            const top = window.pageYOffset + element.getBoundingClientRect().top - currentOffset;
+            window.scrollTo({ top, behavior: "smooth" });
+        }, 10);
+    }
+}
 
-        const targetID = window.location.hash.replace("#", "");
-        const element =
-            (document.querySelector(`[data-id="${targetID}"]`) as HTMLElement) || document.getElementById(targetID);
-        if (element) {
-            forceRenderStyles();
-            beforeScrollHandler && beforeScrollHandler();
-            setTimeout(() => {
-                const top = window.pageYOffset + element.getBoundingClientRect().top - offset;
-                window.scrollTo({ top, behavior: "smooth" });
-            }, 10);
-        }
+/**
+ * Scroll to the window's current hash value.
+ */
+export function scrollToCurrentHash(offset?: number, beforeScrollHandler?: () => void) {
+    const currentOffset = offset == null ? previousHashOffset : offset;
+    const targetID = window.location.hash.replace("#", "");
+    const element =
+        (document.querySelector(`[data-id="${targetID}"]`) as HTMLElement) || document.getElementById(targetID);
+    scrollToElement(element, currentOffset, beforeScrollHandler);
+}
+
+export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () => void) {
+    scrollToCurrentHash(offset, beforeScrollHandler);
+    const hashChangeHandler = (e: HashChangeEvent) => {
+        e.preventDefault();
+        scrollToCurrentHash(offset, beforeScrollHandler);
     };
 
-    scrollToHash();
-
-    window.addEventListener("hashchange", scrollToHash);
+    window.addEventListener("hashchange", hashChangeHandler);
     return () => {
-        window.removeEventListener("hashchange", scrollToHash);
+        window.removeEventListener("hashchange", hashChangeHandler);
     };
 }

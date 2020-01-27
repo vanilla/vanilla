@@ -40,13 +40,13 @@ interface IEmbedContext {
     deleteSelf?: () => void;
 }
 
-// Methods
-export interface IBaseEmbedProps extends IEmbedContext {
-    // Stored data.
+export interface IBaseEmbedData {
     embedType: string;
     url: string;
     name?: string;
 }
+
+export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {}
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
     async?: boolean;

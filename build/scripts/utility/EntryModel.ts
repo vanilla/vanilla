@@ -163,6 +163,10 @@ export default class EntryModel {
             // Filter out unwanted sections (special cases).
             .filter(name => !this.excludedSections.includes(name));
 
+        if (this.options.sections !== null) {
+            names = names.filter(name => this.options.sections?.includes(name));
+        }
+
         names = Array.from(new Set(names));
 
         return names;

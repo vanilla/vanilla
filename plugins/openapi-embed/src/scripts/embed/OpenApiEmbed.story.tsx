@@ -6,10 +6,10 @@
 import React from "react";
 import { StoryContent } from "@vanilla/library/src/scripts/storybook/StoryContent";
 import { StoryHeading } from "@vanilla/library/src/scripts/storybook/StoryHeading";
-import { EmbedContent } from "@vanilla/library/src/scripts/embeddedContent/EmbedContent";
 import { OpenApiEmbedPlaceholder } from "@openapi-embed/embed/OpenApiEmbedPlaceholder";
 import { EmbedContainer } from "@vanilla/library/src/scripts/embeddedContent/EmbedContainer";
-import { OpenApiModal } from "@openapi-embed/embed/OpenApiModal";
+import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
+import { OPEN_API_EMBED_TYPE } from "@openapi-embed/embed/OpenApiEmbed";
 
 export default {
     title: "Embeds/OpenApi",
@@ -20,12 +20,18 @@ export function Embed() {
         <StoryContent>
             <StoryHeading>OpenAPI placeholder</StoryHeading>
             <EmbedContainer>
-                <OpenApiEmbedPlaceholder embedUrl="https://dev.test.com/openapi/v3" name="Test OpenApi Specification" />
+                <OpenApiEmbedPlaceholder
+                    data={{
+                        url: "https://dev.test.com/openapi/v3",
+                        name: "Vanilla API Spec",
+                        embedType: OPEN_API_EMBED_TYPE,
+                    }}
+                />
             </EmbedContainer>
         </StoryContent>
     );
 }
 
 export function ConfigurationModal() {
-    return <OpenApiModal onSave={() => {}} onDismiss={() => {}} />;
+    return <OpenApiForm onSave={() => {}} onDismiss={() => {}} data={{}} />;
 }

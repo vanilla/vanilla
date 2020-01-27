@@ -65,13 +65,23 @@ interface IProps {
 export default function PanelLayout(props: IProps) {
     const { topPadding, className, growMiddleBottom, isFixed, ...childComponents } = props;
 
+    // Handle window resizes
+
+    // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const device = useDevice();
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
-    const overflowOffset = sidePanelMeasure.top - topOffset;
+    const measuredPanelTop = sidePanelMeasure.top;
+    const sidePanelDistanceFromTop = useMemo(() => {
+        return measuredPanelTop + window.scrollY; // Every time this changes, adjust for the scroll height.
+    }, [measuredPanelTop]);
 
-    const panelOffsetClass = useMemo(() => style({ top: overflowOffset }), [overflowOffset]);
+    const overflowOffset = sidePanelDistanceFromTop - topOffset;
+
+    const panelOffsetClass = useMemo(() => style({ top: overflowOffset, $debugName: "stickyOffset" }), [
+        overflowOffset,
+    ]);
 
     // Calculate some rendering variables.
     const isMobile = device === Devices.MOBILE || device === Devices.XS;

@@ -3,43 +3,61 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { registerEmbed } from "@library/embeddedContent/embedService";
-import { OpenApiEmbed } from "../embed/OpenApiEmbed";
+import { OpenApiEmbed, IOpenApiEmbedData } from "../embed/OpenApiEmbed";
 import { useEditor } from "@rich-editor/editor/context";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
 
 registerEmbed("openapi", OpenApiEmbed);
 
 function InsertOpenApiEmbedButton() {
     const { quill } = useEditor();
+    const [showForm, setShowForm] = useState(false);
     const embedInserter = quill && (quill.getModule("embed/insertion") as EmbedInsertionModule);
 
-    const clickHandler = () => {
+    const insertEmbed = (data: IOpenApiEmbedData) => {
         if (!embedInserter) {
             return;
         }
 
+        setShowForm(false);
+
+        console.log("creating with data", data);
         embedInserter.createEmbed({
             loaderData: {
                 type: "image",
             },
-            data: {
-                embedType: "openapi",
-                url: "https://dev.vanilla.localhost/api/v2/openapi/v3",
-            },
+            data,
         });
     };
 
     return (
-        <EditorEmbedBar.Item>
-            <Button baseClass={ButtonTypes.TEXT} onClick={clickHandler}>
-                OpenAPI
-            </Button>
-        </EditorEmbedBar.Item>
+        <>
+            <EditorEmbedBar.Item>
+                <Button
+                    baseClass={ButtonTypes.TEXT}
+                    onClick={() => {
+                        setShowForm(true);
+                    }}
+                >
+                    OpenAPI
+                </Button>
+            </EditorEmbedBar.Item>
+            {showForm && (
+                <OpenApiForm
+                    data={{}}
+                    onSave={insertEmbed}
+                    onDismiss={() => {
+                        setShowForm(false);
+                    }}
+                />
+            )}
+        </>
     );
 }
 

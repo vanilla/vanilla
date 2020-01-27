@@ -9,8 +9,10 @@
  */
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\SchemaFactory;
 
 /**
  * Manages discussion categories' data.
@@ -3697,5 +3699,19 @@ SQL;
             $targetID = val('CategoryID', $current);
             self::instance()->setField($targetID, ['LastCategoryID' => $categoryID]);
         }
+    }
+
+    /**
+     * Get the schema for categories joined to records.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function fragmentSchema(): Schema {
+        $result = SchemaFactory::parse([
+            'categoryID:i' => 'The ID of the category.',
+            'name:s' => 'The name of the category.',
+            'url:s' => 'Full URL to the category.',
+        ], 'CategoryFragment');
+        return $result;
     }
 }

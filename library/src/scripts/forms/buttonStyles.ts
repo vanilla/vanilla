@@ -51,9 +51,6 @@ export const buttonGlobalVariables = useThemeCache(() => {
         minHeight: formElVars.sizing.height,
         minWidth: 104,
         compactHeight: 24,
-        mobile: {
-            minHeight: 24,
-        },
     });
 
     const border = makeThemeVars("border", globalVars.border);
@@ -371,7 +368,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         "icon",
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
-            height: vars.sizing.mobile.minHeight,
+            height: vars.sizing.compactHeight,
         }),
     );
 

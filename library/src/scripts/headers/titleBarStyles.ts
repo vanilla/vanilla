@@ -149,7 +149,6 @@ export const titleBarVariables = useThemeCache(() => {
     const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
-            //flexBasis: button.mobile.width * 2,
             flexBasis: button.mobile.width - 20,
         },
     });

@@ -148,7 +148,7 @@ export default function TitleBar(_props: IProps) {
                         )}
                         {showHamburger && (
                             <>
-                                <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
+                                <Hamburger buttonClassName={classes.hamburger} contents={""} />
 
                                 <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>

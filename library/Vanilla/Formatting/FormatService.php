@@ -28,7 +28,7 @@ class FormatService {
      *
      * @return string
      */
-    public function renderHTML(string $content, string $format): string {
+    public function renderHTML(string $content, ?string $format): string {
         return $this
             ->getFormatter($format)
             ->renderHTML($content);
@@ -45,7 +45,7 @@ class FormatService {
      * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
      * @throws FormatterNotFoundException If the format doesn't have a match.
      */
-    public function filter(string $content, string $format): string {
+    public function filter(string $content, ?string $format): string {
         return $this
             ->getFormatter($format, true)
             ->filter($content);
@@ -60,7 +60,7 @@ class FormatService {
      *
      * @return string
      */
-    public function renderExcerpt(string $content, string $format): string {
+    public function renderExcerpt(string $content, ?string $format ): string {
         return $this
             ->getFormatter($format)
             ->renderExcerpt($content);
@@ -74,7 +74,7 @@ class FormatService {
      *
      * @return string
      */
-    public function renderPlainText(string $content, string $format): string {
+    public function renderPlainText(string $content, ?string $format): string {
         return $this
             ->getFormatter($format)
             ->renderPlainText($content);
@@ -88,7 +88,7 @@ class FormatService {
      *
      * @return string
      */
-    public function renderQuote(string $content, string $format): string {
+    public function renderQuote(string $content, ?string $format): string {
         return $this
             ->getFormatter($format)
             ->renderQuote($content);
@@ -102,7 +102,7 @@ class FormatService {
      *
      * @return Attachment[]
      */
-    public function parseAttachments(string $content, string $format): array {
+    public function parseAttachments(string $content, ?string $format): array {
         return $this
             ->getFormatter($format)
             ->parseAttachments($content);
@@ -116,7 +116,7 @@ class FormatService {
      *
      * @return string[]
      */
-    public function parseImageUrls(string $content, string $format): array {
+    public function parseImageUrls(string $content, ?string $format): array {
         return $this
             ->getFormatter($format)
             ->parseImageUrls($content);
@@ -130,7 +130,7 @@ class FormatService {
      *
      * @return Heading[]
      */
-    public function parseHeadings(string $content, string $format): array {
+    public function parseHeadings(string $content, ?string $format): array {
         return $this
             ->getFormatter($format)
             ->parseHeadings($content);
@@ -144,7 +144,7 @@ class FormatService {
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content, string $format): array {
+    public function parseMentions(string $content, ?string $format): array {
         return $this
             ->getFormatter($format)
             ->parseMentions($content);
@@ -193,8 +193,8 @@ class FormatService {
      * @return FormatInterface
      * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    private function getFormatter(string $formatKey, $throw = false): FormatInterface {
-        $formatKey = strtolower($formatKey);
+    private function getFormatter(?string $formatKey, $throw = false): FormatInterface {
+        $formatKey = strtolower($formatKey) ?? null;
         $format = $this->formats[$formatKey] ?? null;
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
         if (!$format) {

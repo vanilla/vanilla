@@ -12,6 +12,7 @@ import {
     placeholderStyles,
     textInputSizingFromFixedHeight,
     unit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { cssRule } from "typestyle";
@@ -73,6 +74,14 @@ export const inputClasses = useThemeCache(() => {
         },
     };
 
+    const inputPaddingMixin: NestedCSSProperties = {
+        padding: inputMixin.padding,
+        paddingTop: inputMixin.paddingTop,
+        paddingBottom: inputMixin.paddingBottom,
+        paddingLeft: inputMixin.paddingLeft,
+        paddingRight: inputMixin.paddingRight,
+    };
+
     // Use as assignable unique style.
     const text = style("text", inputMixin);
 
@@ -88,5 +97,5 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, inputMixin, applyInputCSSRules };
+    return { text, inputText, inputPaddingMixin, inputMixin, applyInputCSSRules };
 });

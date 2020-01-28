@@ -51,6 +51,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
             left: 8,
             right: 8,
         },
+        justifyContent: "flex-start",
     });
 
     const navPadding = makeThemeVars("navPadding", {
@@ -176,6 +177,7 @@ const titleBarNavClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.normal,
         paddingLeft: unit(vars.navLinks.padding.left),
         paddingRight: unit(vars.navLinks.padding.right),
+        flexGrow: 1,
     });
 
     return {

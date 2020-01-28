@@ -1206,7 +1206,7 @@ class DiscussionModel extends Gdn_Model {
         // and the discussion is only one page long, set unread comments to 0.
         if ($userLastReadDate > $discussionLastCommentDate
             && $unreadCommentCount > 0
-            && $discussionCommentCount < intval(Gdn::config('Vanilla.Comments.PerPage'))) {
+            && $discussionCommentCount < intval(Gdn::config('Vanilla.Comments.PerPage', '60'))) {
             $unreadCommentCount = 0;
         }
 

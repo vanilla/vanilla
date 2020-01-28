@@ -92,6 +92,10 @@ export const titleBarVariables = useThemeCache(() => {
         },
     });
 
+    const titleBarNavAlignment = makeThemeVars("titleBarNavAlignment", {
+        justifyContent: "flex-start",
+    });
+
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
@@ -255,6 +259,7 @@ export const titleBarVariables = useThemeCache(() => {
         logo,
         mediaQueries,
         breakpoints,
+        titleBarNavAlignment,
     };
 });
 
@@ -421,6 +426,8 @@ export const titleBarClasses = useThemeCache(() => {
             flexWrap: "wrap",
             height: px(vars.sizing.height),
             color: "inherit",
+            flexGrow: 1,
+            justifyContent: vars.titleBarNavAlignment.justifyContent,
         },
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );

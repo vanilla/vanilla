@@ -6,9 +6,7 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\ClientException;
 use Vanilla\Addon;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -36,6 +34,9 @@ class FsThemeProvider implements ThemeProviderInterface {
     /** @var AddonManager */
     private $addonManager;
 
+    /** @var ThemeModelHelper */
+    private $themeHelper;
+
     /** @var Gdn_Request */
     private $request;
 
@@ -51,16 +52,19 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @param AddonManager $addonManager
      * @param Gdn_Request $request
      * @param ConfigurationInterface $config
+     * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
         AddonManager $addonManager,
         Gdn_Request $request,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        ThemeModelHelper $themeHelper
     ) {
         $this->addonManager = $addonManager;
         $this->request = $request;
         $this->config = $config;
         $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
+        $this->themeHelper = $themeHelper;
     }
 
     /**
@@ -107,6 +111,28 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMasterThemeKey($themeKey): string {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        return $themeKey;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName($themeKey): string {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        return $theme->getInfoValue('name');
     }
 
     /**
@@ -171,7 +197,18 @@ class FsThemeProvider implements ThemeProviderInterface {
 
         $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
+        $res['preview']['info']['Description'] = ['type'=>'string', 'info' => $theme->getInfoValue('description', '')];
 
+        $themeAuthors = $theme->getInfoValue('authors', false);
+        if (is_array($themeAuthors)) {
+            $authors = '';
+            foreach ($themeAuthors as $author) {
+                $authors .= empty($authors) ? '' : ', ';
+                $authors .= $author['name'] ?? '';
+            }
+
+            $res['preview']['info']['Authors'] = ['type'=>'string', 'info' => $authors];
+        }
         return $res;
     }
 
@@ -349,6 +386,11 @@ class FsThemeProvider implements ThemeProviderInterface {
             $hidden = true;
             $sites = $themeInfo['sites'] ?? [];
             $site = $themeInfo['site'] ?? '';
+            $key = $themeInfo['key'] ?? '';
+
+            if ($key === $this->getConfigThemeKey()) {
+                $hidden = false;
+            }
 
             if ($site) {
                 array_push($sites, $site);
@@ -382,8 +424,31 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
+    public function setPreviewTheme($themeKey): array {
+        if (!empty($themeKey)) {
+            $theme = $this->getThemeWithAssets($themeKey);
+        } else {
+            $theme = $this->getCurrent();
+        }
+
+        $this->themeHelper->setSessionPreviewTheme($themeKey, $this);
+        return $theme;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getCurrent(): ?array {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $themeKey = $this->getConfigThemeKey();
         return $this->getThemeWithAssets($themeKey);
+    }
+
+    /**
+     * Get the current theme key from the config.
+     *
+     * @return string
+     */
+    public function getConfigThemeKey(): string {
+        return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
     }
 }

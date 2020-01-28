@@ -17,6 +17,27 @@ use Gdn_Validation;
  */
 class ModelUtils {
 
+    // Expand field value to indicate expanding all fields.
+    public const EXPAND_ALL = "all";
+
+    /**
+     * Given an array of expand options, determine if a value matches any of them.
+     *
+     * @param string $value The field name to search for.
+     * @param array|bool $options An array of fields to expand, or true for all.
+     * @return bool
+     */
+    public static function isExpandOption(string $value, $options): bool {
+        $result = false;
+        if ($options === true) {
+            // A boolean true allows everything.
+            $result = true;
+        } elseif (is_array($options)) {
+            $result = !empty(array_intersect([self::EXPAND_ALL, 'true', '1', $value], $options));
+        }
+        return $result;
+    }
+
     /**
      * Convert a Garden Schema validation exception into a Gdn_Validation instance.
      *

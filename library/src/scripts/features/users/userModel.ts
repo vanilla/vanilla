@@ -13,6 +13,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import { IThemeState } from "@library/theming/themeReducer";
 import { ILocaleState } from "@library/locales/localeReducer";
+import { useSelector } from "react-redux";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -106,4 +107,8 @@ export function mapUsersStoreState(state: ICoreStoreState): IInjectableUserState
     return {
         currentUser: state.users.current,
     };
+}
+
+export function useUsersState(): IInjectableUserState {
+    return useSelector(mapUsersStoreState);
 }

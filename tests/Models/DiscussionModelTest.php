@@ -7,10 +7,11 @@
 
 namespace VanillaTests\Models;
 
-
 use DiscussionModel;
+use Garden\EventManager;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
 
@@ -19,6 +20,9 @@ use VanillaTests\SiteTestTrait;
  */
 class DiscussionModelTest extends TestCase {
     use SiteTestTrait, ExpectErrorTrait;
+
+    /** @var DiscussionEvent */
+    private $lastEvent;
 
     /**
      * @var \DiscussionModel
@@ -36,6 +40,17 @@ class DiscussionModelTest extends TestCase {
     private $session;
 
     /**
+     * A test listener that increments the counter.
+     *
+     * @param TestEvent $e
+     * @return TestEvent
+     */
+    public function handleDiscussionEvent(DiscussionEvent $e): DiscussionEvent {
+        $this->lastEvent = $e;
+        return $e;
+    }
+
+    /**
      * Get a new model for each test.
      */
     public function setUp(): void {
@@ -44,6 +59,14 @@ class DiscussionModelTest extends TestCase {
         $this->model = $this->container()->get(\DiscussionModel::class);
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
+
+        // Make event testing a little easier.
+        $this->container()->setInstance(self::class, $this);
+        $this->lastEvent = null;
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
+        $eventManager->unbindClass(self::class);
+        $eventManager->addListenerMethod(self::class, "handleDiscussionEvent");
     }
 
     /**
@@ -388,5 +411,57 @@ class DiscussionModelTest extends TestCase {
         ];
 
         return $r;
+    }
+
+    /**
+     * Verify delete event dispatched during deletion.
+     *
+     * @return void
+     */
+    public function testDeleteEventDispatched(): void {
+        $discussionID = $this->model->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+        ]);
+        $this->model->deleteID($discussionID);
+
+        $this->assertInstanceOf(DiscussionEvent::class, $this->lastEvent);
+        $this->assertEquals(DiscussionEvent::ACTION_DELETE, $this->lastEvent->getAction());
+    }
+
+    /**
+     * Verify insert event dispatched during save.
+     *
+     * @return void
+     */
+    public function testSaveInsertEventDispatched(): void {
+        $this->model->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+        ]);
+        $this->assertInstanceOf(DiscussionEvent::class, $this->lastEvent);
+        $this->assertEquals(DiscussionEvent::ACTION_INSERT, $this->lastEvent->getAction());
+    }
+
+    /**
+     * Verify update event dispatched during save.
+     *
+     * @return void
+     */
+    public function testSaveUpdateEventDispatched(): void {
+        $discussionID = $this->model->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+        ]);
+        $this->model->save([
+            "DiscussionID" => $discussionID,
+            "Body" => "Hello again, world.",
+        ]);
+
+        $this->assertInstanceOf(DiscussionEvent::class, $this->lastEvent);
+        $this->assertEquals(DiscussionEvent::ACTION_UPDATE, $this->lastEvent->getAction());
     }
 }

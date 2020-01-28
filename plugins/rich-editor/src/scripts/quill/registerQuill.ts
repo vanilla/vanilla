@@ -33,7 +33,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 // Custom Modules/Themes
 import VanillaTheme from "@rich-editor/quill/VanillaTheme";
-import FocusModule from "@rich-editor/quill/FocusModule";
+import EmbedSelectionModule from "@rich-editor/quill/EmbedSelectionModule";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import HistoryModule from "@rich-editor/quill/HistoryModule";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
@@ -88,7 +88,7 @@ export default function registerQuill() {
             "formats/indent": Indent,
             "themes/vanilla": VanillaTheme,
             "modules/embed/insertion": EmbedInsertionModule,
-            "modules/embed/focus": FocusModule,
+            "modules/embed/selection": EmbedSelectionModule,
             "modules/history": HistoryModule,
             "modules/clipboard": ClipboardModule,
             "modules/syntax": SyntaxModule,

@@ -6,8 +6,8 @@
 import { unit, paddings, margins } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themeCardStyles";
-import { percent } from "csx";
+import { themeCardVariables } from "./themePreviewCardStyles";
+import { percent, color, px } from "csx";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -15,6 +15,8 @@ export const currentThemeVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.messageColors.warning.fg,
+        white: color("#ffffff"),
+        btnTextColor: color("#555a62"),
     });
 
     const flag = makeThemeVars("flag", {
@@ -39,33 +41,20 @@ export const currentThemeVariables = useThemeCache(() => {
         },
     });
 
-    const addTheme = makeThemeVars("addTheme", {
-        width: 310,
-        height: 225,
-
-        padding: {
-            top: 70,
-            bottom: 70,
-            right: 117,
-            left: 117,
-        },
-    });
-
     const themeContainer = makeThemeVars("themeContainer", {
         margin: {
-            top: 32,
+            top: 18,
             right: 28,
             bottom: 0,
             left: 26,
         },
-        width: 596,
     });
     return {
         flag,
         name,
         authorName,
-        addTheme,
         themeContainer,
+        colors,
     };
 });
 
@@ -75,8 +64,26 @@ export const currentThemeClasses = useThemeCache(() => {
 
     const style = styleFactory("currentThemeInfo");
 
+    const root = style({
+        display: "flex",
+        flexWrap: "wrap",
+        backgroundColor: "#f6f9fb",
+        ...paddings({
+            horizontal: globalVars.gutter.size,
+            vertical: globalVars.gutter.size + globalVars.gutter.half,
+        }),
+        marginLeft: -18,
+        marginRight: -18,
+    });
+
+    const cardContainer = style("cardContainer", {
+        maxWidth: percent(100),
+        width: unit(400),
+    });
+
     const themeContainer = style("themeContainer", {
         display: "flex",
+        flex: 1,
         ...margins({
             top: unit(vars.themeContainer.margin.top),
             bottom: unit(vars.themeContainer.margin.bottom),
@@ -85,7 +92,6 @@ export const currentThemeClasses = useThemeCache(() => {
         }),
         maxWidth: percent(100),
         position: "relative",
-        width: unit(vars.themeContainer.width),
     });
 
     const flag = style("flag", {
@@ -133,43 +139,39 @@ export const currentThemeClasses = useThemeCache(() => {
         lineHeight: unit(20),
     });
 
-    const themeActionButtons = style("actionButtons", {
+    const themeActionButtons = style("themeActionButtons", {
         flexDirection: "column",
-        flex: 1,
+        display: "flex",
+        flex: 0,
         marginTop: unit(vars.themeContainer.margin.top + 10),
+    });
+
+    const themeActionButton = style("themeActionButton", {
         $nest: {
-            ["& button"]: {
+            "&&": {
                 marginBottom: unit(vars.flag.margin.bottom),
-                width: unit(144),
+                width: unit(180),
             },
         },
     });
 
     const themeInfo = style("themeInfo", {
+        flex: 1,
         width: percent(100),
+        minWidth: px(220),
         marginRight: unit(vars.themeContainer.margin.right + 20),
     });
 
-    const addTheme = style("addTheme", {
-        width: unit(vars.addTheme.width),
-        height: unit(vars.addTheme.height),
-        border: "1px dashed #979797",
-        ...paddings({
-            top: unit(vars.addTheme.padding.top),
-            bottom: unit(vars.addTheme.padding.bottom),
-            left: unit(vars.addTheme.padding.left),
-            right: unit(vars.addTheme.padding.right),
-        }),
-    });
-
     return {
+        root,
+        cardContainer,
         themeContainer,
         flag,
         name,
         authorName,
         description,
         themeActionButtons,
-        addTheme,
+        themeActionButton,
         themeInfo,
     };
 });

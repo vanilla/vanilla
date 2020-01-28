@@ -14,8 +14,12 @@ use Vanilla\Utility\CapitalCaseScheme;
 
 class ApiUtils {
 
-    // Expand field value to indicate expanding all fields.
-    const EXPAND_ALL = "all";
+    /**
+     * Expand field value to indicate expanding all fields.
+     *
+     * @deprecated
+     */
+    const EXPAND_ALL = \Vanilla\Utility\ModelUtils::EXPAND_ALL;
 
     /**
      * Convert array keys for functions that aren't compatible with camelCase.

@@ -17,15 +17,16 @@ import { TileAlignment } from "@library/features/tiles/Tiles";
 export const tilesVariables = useThemeCache(() => {
     const themeVars = variableFactory("tiles");
     const spacing = themeVars("spacing", {
-        paddingTwoColumns: 25,
-        paddingThreeColumns: 17,
-        paddingFourColumns: 17,
+        paddingOneColumn: 14,
+        paddingTwoColumns: 24,
+        paddingThreeColumns: 14,
+        paddingFourColumns: 14,
     });
 
     const sizing = themeVars("sizing", {
-        containerWidthTwoColumns: spacing.paddingTwoColumns * 10 + 384 * 2,
-        containerWidthThreeColumns: spacing.paddingThreeColumns * 14 + 260 * 3,
-        containerWidthFourColumns: spacing.paddingThreeColumns * 18 + 260 * 4,
+        containerWidthTwoColumns: spacing.paddingTwoColumns * 4 + 384 * 2,
+        containerWidthThreeColumns: spacing.paddingThreeColumns * 6 + 260 * 3,
+        containerWidthFourColumns: spacing.paddingFourColumns * 8 + 260 * 4,
     });
 
     const options = themeVars("options", {
@@ -45,7 +46,7 @@ export const tilesClasses = useThemeCache(() => {
     const style = styleFactory("tiles");
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = (columns?: number) => {
+    const root = useThemeCache((columns?: number) => {
         let columnCount = columns ?? vars.options.columns;
         let maxWidth = vars.sizing.containerWidthTwoColumns;
         let itemPadding = vars.spacing.paddingTwoColumns;
@@ -71,9 +72,9 @@ export const tilesClasses = useThemeCache(() => {
                 padding: 0,
             }),
         );
-    };
+    });
 
-    const items = (alignment: TileAlignment) => {
+    const items = useThemeCache((alignment: TileAlignment) => {
         const vars = tilesVariables();
         const isCentered = (alignment ?? vars.options.alignment) === TileAlignment.CENTER;
         return style(
@@ -89,9 +90,9 @@ export const tilesClasses = useThemeCache(() => {
                 display: "block",
             }),
         );
-    };
+    });
 
-    const item = (columns?: number) => {
+    const item = useThemeCache((columns?: number) => {
         const globalVars = globalVariables();
         let columnCount = columns ?? vars.options.columns;
         let width: CSSPercentage = "50%";
@@ -132,10 +133,10 @@ export const tilesClasses = useThemeCache(() => {
             mediaQueries.oneColumnDown({
                 display: "block",
                 width: percent(100),
-                padding: 0,
+                padding: unit(vars.spacing.paddingOneColumn),
             }),
         );
-    };
+    });
 
     return { root, items, item };
 });

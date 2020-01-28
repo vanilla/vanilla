@@ -27,7 +27,7 @@ export const tileVariables = useThemeCache(() => {
 
     const spacing = themeVars("spacing", {
         twoColumns: 24,
-        threeColumns: 17,
+        threeColumns: 9,
         fourColumns: 17,
         color: globalVars.mainColors.primary as ColorHelper,
     });
@@ -87,24 +87,13 @@ export const tileClasses = useThemeCache(() => {
     const shadow = shadowHelper();
 
     const root = (columns?: number) => {
-        let padding = vars.spacing.twoColumns;
-
-        switch (columns) {
-            case 3:
-                padding = vars.spacing.threeColumns;
-                break;
-            case 4:
-                padding = vars.spacing.fourColumns;
-                break;
-        }
-
         return style({
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",
             width: percent(100),
-            padding: unit(columns === 2 ? vars.spacing.twoColumns : vars.spacing.threeColumns),
             flexGrow: 1,
+            margin: "auto",
             ...userSelect(),
         });
     };
@@ -145,6 +134,7 @@ export const tileClasses = useThemeCache(() => {
                 shadow.embed(),
             ),
             textDecoration: "none",
+            boxSizing: "border-box",
             $nest: {
                 "&:hover": {
                     textDecoration: "none",
@@ -164,18 +154,37 @@ export const tileClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const frame = style("iconFrame", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        height: unit(vars.frame.height),
-        width: unit(vars.frame.width),
-        marginTop: "auto",
-        marginRight: "auto",
-        marginLeft: "auto",
-        marginBottom: unit(vars.frame.bottomMargin),
-    });
+    const frame = (columns?: number) => {
+        let height;
+        let width;
+
+        height = vars.frame.height;
+        width = vars.frame.width;
+
+        switch (columns) {
+            case 2:
+                height = vars.frame.height;
+                width = vars.frame.width;
+                break;
+            case 3:
+            case 4:
+            default:
+                height = 72;
+                width = 72;
+        }
+        return style("iconFrame", {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            height: unit(height),
+            width: unit(width),
+            marginTop: "auto",
+            marginRight: "auto",
+            marginLeft: "auto",
+            marginBottom: unit(vars.frame.bottomMargin),
+        });
+    };
 
     const icon = style("icon", {
         display: "block",

@@ -58,6 +58,7 @@ class SocialController extends DashboardController {
         $addons = Gdn::addonManager()->lookupAllByType(\Vanilla\Addon::TYPE_ADDON);
 
         foreach ($addons as $addonName => $addon) {
+            /* @var \Vanilla\Addon $addon */
             $addonInfo = $addon->getInfo();
 
             // Limit to designated social addons.
@@ -68,6 +69,11 @@ class SocialController extends DashboardController {
             // See if addon is enabled.
             $isEnabled = Gdn::addonManager()->isEnabled($addonName, \Vanilla\Addon::TYPE_ADDON);
             setValue('enabled', $addonInfo, $isEnabled);
+
+            if (!$isEnabled && !empty($addonInfo['hidden'])) {
+                // Don't show hidden addons unless they are enabled.
+                continue;
+            }
 
             // See if we can detect whether connection is configured.
             $isConfigured = null;

@@ -8,6 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
+import { EmbedContext } from "@library/embeddedContent/embedService";
 
 const story = storiesOf("Embeds", module);
 
@@ -40,6 +41,16 @@ story.add("LinkEmbed", () => {
                 embedType="link"
                 body={ipsum}
             />
+            <StoryHeading>In Editor</StoryHeading>
+            <EmbedContext.Provider value={{ inEditor: true, isSelected: true }}>
+                <LinkEmbed
+                    url="https://vanillaforums.com/en/"
+                    photoUrl="https://vanillaforums.com/images/metaIcons/vanillaForums.png"
+                    name="Online Community Software and Customer Forum Software by Vanilla Forums"
+                    embedType="link"
+                    body="Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback."
+                />
+            </EmbedContext.Provider>
         </>
     );
 });

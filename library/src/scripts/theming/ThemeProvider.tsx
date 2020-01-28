@@ -43,7 +43,6 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            console.log("fetch assets");
             void getAssets(themeKey);
             return;
         }
@@ -76,11 +75,21 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(assets.status)) {
-        return <Loader />;
+        return (
+            <>
+                <Backgrounds />
+                <Loader />
+            </>
+        );
     }
 
     if (assets.status === LoadStatus.ERROR) {
-        return <>{props.errorComponent}</>;
+        return (
+            <>
+                <Backgrounds />
+                {props.errorComponent}
+            </>
+        );
     }
 
     if (!assets.data) {

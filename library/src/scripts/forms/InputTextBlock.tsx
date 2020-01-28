@@ -33,6 +33,7 @@ export interface IInputProps {
     multiline?: boolean;
     maxLength?: number;
     className?: string;
+    autoComplete?: boolean;
 }
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
@@ -105,6 +106,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             onChange={this.onChange}
                             ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
                             onKeyPress={inputProps.onKeyPress}
+                            autoComplete={inputProps.autoComplete ? "on" : "off"}
                         />
                     ) : (
                         <TextareaAutosize

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * A trait for a sortable list.
  *
@@ -72,7 +71,9 @@ trait NestedCollection {
     private $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes', 'listItemCssClasses'];
 
     /**
-     * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
+     * Set whether to separate groups with a <hr> element. Only supported for flattened lists.
+     *
+     * @param boolean $forceDivider
      * @return $this
      */
     public function setForceDivider($forceDivider) {
@@ -88,6 +89,8 @@ trait NestedCollection {
     }
 
     /**
+     * The CSS class to apply to an active item.
+     *
      * @param string $activeCssClass
      * @return $this
      */
@@ -97,6 +100,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set whether or not to prefix CSS classes.
+     *
      * @param boolean $useCssPrefix
      * @return $this
      */
@@ -113,6 +118,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set the header CSS class prefix.
+     *
      * @param string $headerCssClassPrefix
      * @return $this
      */
@@ -129,6 +136,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set the link CSS class prefix.
+     *
      * @param string $linkCssClassPrefix
      * @return $this
      */
@@ -145,6 +154,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set the divider CSS class prefix.
+     *
      * @param string $dividerCssClassPrefix
      * @return $this
      */
@@ -154,6 +165,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set whether or not to flatten the nested list.
+     *
      * @param boolean $flatten
      * @return $this
      */
@@ -170,6 +183,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set the highlighted route.
+     *
      * @param string $highlightRoute
      * @return $this
      */
@@ -186,6 +201,8 @@ trait NestedCollection {
     }
 
     /**
+     * Set the items in the set.
+     *
      * @param array $items
      * @return $this
      */
@@ -200,10 +217,9 @@ trait NestedCollection {
      * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
      * or a permission string or array of permission strings (full match) to check.
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
-     * @return object $this The calling object.
-     * @throws Exception
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @return $this The calling object.
      */
     public function addDividerIf($isAllowed = true, $key = '', $cssClass = '', $sort = []) {
         if (!$this->isAllowed($isAllowed)) {
@@ -217,10 +233,9 @@ trait NestedCollection {
      * Add a divider to the items array.
      *
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @param string $cssClass The divider's CSS class.
-     * @return object $this The calling object.
-     * @throws Exception
+     * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
+     * @return $this
      */
     public function addDivider($key = '', $cssClass = '', $sort = []) {
         $divider = ['key' => $key];
@@ -248,8 +263,7 @@ trait NestedCollection {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return object $this The calling object.
-     * @throws Exception
+     * @return $this
      */
     public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
@@ -289,8 +303,7 @@ trait NestedCollection {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
-     * @return SortableModule $this The calling object.
-     * @throws Exception
+     * @return $this
      */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         $group = [
@@ -331,9 +344,9 @@ trait NestedCollection {
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
      * @param bool $disabled Whether to disable the link.
-     * @return object $this The calling object.
+     * @return $this
      */
-    public function addLinkIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkIf($isAllowed, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -356,7 +369,6 @@ trait NestedCollection {
      * - **listItemCssClasses**: array - Array of class names to be applied to the list item.
      * @param bool $disabled Whether to disable the link.
      * @return $this The calling object.
-     * @throws Exception
      */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         $link = [
@@ -423,7 +435,6 @@ trait NestedCollection {
      *
      * @param string $type The type of the item: link, group or divider.
      * @param array $item The item to add to the array.
-     * @throws Exception
      */
     private function addItem($type, array $item) {
         $this->touchKey($item);
@@ -442,13 +453,13 @@ trait NestedCollection {
         // Walk into the items list to set the item.
         $items =& $this->items;
         foreach ($item['key'] as $i => $key_part) {
-
             if ($i === count($item['key'] ?? false) - 1) {
                 // Add the item here.
                 if (array_key_exists($key_part, $items)) {
                     // The item is already here so merge this one on top of it.
-                    if ($items[$key_part]['type'] !== $type)
-                        throw new \Exception(($item['key'] ?? '')." of type $type does not match existing type {$items[$key_part]['type']}.", 500);
+                    if ($items[$key_part]['type'] !== $type) {
+                        throw new \Exception(($item['key'] ?? '') . " of type $type does not match existing type {$items[$key_part]['type']}.", 500);
+                    }
 
                     $items[$key_part] = array_merge($items[$key_part], $item);
                 } else {
@@ -514,8 +525,7 @@ trait NestedCollection {
         if ($cssClass = ($item['key'] ?? false)) {
             if (is_array($cssClass)) {
                 $result .= $prefix.implode('-', $cssClass);
-            }
-            else {
+            } else {
                 $result .= $prefix.str_replace('.', '-', $cssClass);
             }
         }
@@ -546,7 +556,7 @@ trait NestedCollection {
     /**
      * Recursive function to sort the items in a given array.
      *
-     * @param array &$items The items to sort.
+     * @param array $items The items to sort.
      */
     protected function sortItems(&$items) {
         $i = 0;
@@ -636,7 +646,7 @@ trait NestedCollection {
      * @param array $items The item list to parse.
      */
     private function prepareData(&$items) {
-        foreach($items as $key => &$item) {
+        foreach ($items as $key => &$item) {
             unset($item['_sort'], $item['key']);
             $subItems = false;
 
@@ -668,7 +678,7 @@ trait NestedCollection {
     /**
      * Recursive utility function to support returning this object as an array.
      *
-     * @param $obj The object to transform.
+     * @param object $obj The object to transform.
      * @param array $blackList Blacklisted property names.
      * @param array $whiteList Whitelisted property names. If set, only whitelisted properties will appear in the result.
      * @return array An array transformation of this object.
@@ -710,7 +720,7 @@ trait NestedCollection {
         $newItems = [];
         $itemslength = sizeof($items);
         $index = 0;
-        foreach($items as $key => $item) {
+        foreach ($items as $key => $item) {
             $subItems = [];
 
             // Group item

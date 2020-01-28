@@ -10,7 +10,9 @@
             "library",
             "applications/dashboard",
             "applications/vanilla",
-            "plugins/*"
+            "plugins/*",
+            "addons/themes/*",
+            "addons/addons/*"
         ]
     },
     "engines": {
@@ -21,6 +23,7 @@
         "@monaco-editor/react": "^2.5.0",
         "@reach/tabs": "^0.6.4",
         "@reach/tooltip": "^0.3.0",
+        "@vanilla/monaco-editor": "^3.0.2",
         "axios": "0.18.1",
         "classnames": "2.2.6",
         "csx": "9.0.0",
@@ -30,6 +33,7 @@
         "lodash": "^4.17.11",
         "lodash.debounce": "^4.0.8",
         "moment": "2.24.0",
+        "monaco-editor": "^0.19.3",
         "normalize.css": "8.0.1",
         "numeral": "2.0.6",
         "p-debounce": "1.0.0",
@@ -77,6 +81,7 @@
         "@types/chai-as-promised": "^7.1.0",
         "@types/classnames": "^2.2.7",
         "@types/enzyme": "^3.9.1",
+        "@types/fs-extra": "^8.0.1",
         "@types/highlight.js": "^9.12.3",
         "@types/jest": "^24.0.22",
         "@types/jquery": "^3.3.29",
@@ -116,10 +121,10 @@
         "chalk": "^2.4.2",
         "cross-env": "^5.2.0",
         "css-loader": "^2.1.1",
-        "del": "^4.1.0",
         "enzyme": "^3.9.0",
         "enzyme-adapter-react-16": "^1.11.2",
         "eslint": "^6.6.0",
+        "fs-extra": "^8.1.0",
         "glob": "^7.1.3",
         "html-loader": "^0.5.5",
         "jest": "^24.9.0",
@@ -168,6 +173,7 @@
         "tar": ">=4.4.2"
     },
     "scripts": {
+        "scaffold": "ts-node -P build/tsconfig.json build/scripts/scaffold/index.ts",
         "publish-all": "lerna publish from-package",
         "install-all": "ts-node -P build/tsconfig.json build/scripts/install.ts",
         "pre-push": "yarn build && yarn test && yarn check-types",

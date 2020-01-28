@@ -28,6 +28,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
@@ -154,8 +155,8 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([
                 [
-                    Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                    Addon::TYPE_THEME => '/themes',
+                    Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+                    Addon::TYPE_THEME => ['/addons/themes', '/themes'],
                     Addon::TYPE_LOCALE => '/locales'
                 ],
                 PATH_ROOT.'/tests/cache/bootstrap'
@@ -512,6 +513,9 @@ class Bootstrap {
         if (class_exists(\CategoryModel::class)) {
             \CategoryModel::$Categories = null;
         }
+
+        SchemaFactory::setContainer(null);
+        SchemaFactory::setEventManager(null);
 
         unset($GLOBALS['dic']);
         Gdn::setContainer(new NullContainer());

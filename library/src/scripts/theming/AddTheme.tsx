@@ -4,28 +4,27 @@
  * @license GPL-2.0-only
  */
 
+import Button from "@library/forms/Button";
+import classNames from "classnames";
 import React from "react";
-import { PlusIcon } from "@library/icons/common";
-import { currentThemeClasses } from "./currentThemeStyles";
-import SmartLink from "@library/routing/links/SmartLink";
+import addThemeClasses from "./addThemeStyles";
+import { t } from "@vanilla/i18n";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
-    to: string;
+    onAdd?: React.ReactNode;
+    className?: string;
 }
 
-export default class AddTheme extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-    }
-
-    public render() {
-        const classes = currentThemeClasses();
-        return (
-            <SmartLink to={this.props.to}>
-                <div className={classes.addTheme}>
-                    <PlusIcon />
-                </div>
-            </SmartLink>
-        );
-    }
+export function AddTheme(props: IProps) {
+    const classes = addThemeClasses();
+    return (
+        <Button
+            baseClass={ButtonTypes.ICON}
+            className={classNames(classes.button, props.className)}
+            title={t("Add Theme")}
+        >
+            <div className={classes.addTheme}>{props.onAdd}</div>
+        </Button>
+    );
 }

@@ -5,18 +5,19 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { useSplashContainerDivRef } from "@library/splash/SplashContext";
 import { splashClasses, splashVariables } from "@library/splash/splashStyles";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { url } from "csx";
+import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 
 export interface ISplashStyleOverwrite {
     colors?: {
@@ -30,7 +31,7 @@ export interface ISplashStyleOverwrite {
     outerBackgroundImage?: string;
 }
 
-interface IProps extends IDeviceProps {
+interface IProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
@@ -40,55 +41,60 @@ interface IProps extends IDeviceProps {
 /**
  * A component representing a single crumb in a breadcrumb component.
  */
-export class Splash extends React.Component<IProps> {
-    public render() {
-        const { action, className, title } = this.props;
-        const styleOverwrite = this.props.styleOverwrite || {};
+export default function Splash(props: IProps) {
+    const device = useDevice();
+    const ref = useSplashContainerDivRef();
 
-        const classes = splashClasses(styleOverwrite);
-        const vars = splashVariables(styleOverwrite);
+    const { action, className, title } = props;
+    const styleOverwrite = props.styleOverwrite || {};
 
-        return (
-            <div className={classNames(className, classes.root)}>
-                <div
-                    className={classNames(
-                        classes.outerBackground(
-                            styleOverwrite.outerBackgroundImage ? styleOverwrite.outerBackgroundImage : undefined,
-                        ),
-                    )}
-                />
-                {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) ||
-                    vars.backgrounds.useOverlay) && <div className={classes.backgroundOverlay} />}
-                <Container>
-                    <div className={classes.innerContainer}>
-                        <PanelWidgetHorizontalPadding>
-                            <div className={classes.titleWrap}>
-                                <FlexSpacer className={classes.titleFlexSpacer} />
-                                {title && <Heading title={title} className={classes.title} />}
-                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                            </div>
-                            <div className={classes.searchContainer}>
-                                <IndependentSearch
-                                    buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    isLarge={true}
-                                    placeholder={t("Search")}
-                                    inputClass={classes.input}
-                                    iconClass={classes.icon}
-                                    buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={
-                                        this.props.device === Devices.MOBILE || this.props.device === Devices.XS
-                                    }
-                                    contentClass={classes.content}
-                                    valueContainerClasses={classes.valueContainer}
-                                />
-                            </div>
-                        </PanelWidgetHorizontalPadding>
-                    </div>
-                </Container>
-            </div>
-        );
-    }
+    const varsTitleBar = titleBarVariables();
+    const classesTitleBar = titleBarClasses();
+    const classes = splashClasses(styleOverwrite);
+    const vars = splashVariables(styleOverwrite);
+
+    return (
+        <div
+            ref={ref}
+            className={classNames(className, classes.root, {
+                [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
+            })}
+        >
+            <div
+                className={classNames(
+                    classes.outerBackground(
+                        styleOverwrite.outerBackgroundImage ? styleOverwrite.outerBackgroundImage : undefined,
+                    ),
+                )}
+            />
+            {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) || vars.backgrounds.useOverlay) && (
+                <div className={classes.backgroundOverlay} />
+            )}
+            <Container>
+                <div className={classes.innerContainer}>
+                    <PanelWidgetHorizontalPadding>
+                        <div className={classes.titleWrap}>
+                            <FlexSpacer className={classes.titleFlexSpacer} />
+                            {title && <Heading title={title} className={classes.title} />}
+                            <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                        </div>
+                        <div className={classes.searchContainer}>
+                            <IndependentSearch
+                                buttonClass={classes.searchButton}
+                                buttonBaseClass={ButtonTypes.CUSTOM}
+                                isLarge={true}
+                                placeholder={t("Search")}
+                                inputClass={classes.input}
+                                iconClass={classes.icon}
+                                buttonLoaderClassName={classes.buttonLoader}
+                                hideSearchButton={device === Devices.MOBILE || device === Devices.XS}
+                                contentClass={classes.content}
+                                valueContainerClasses={classes.valueContainer}
+                            />
+                        </div>
+                    </PanelWidgetHorizontalPadding>
+                </div>
+            </Container>
+        </div>
+    );
 }
-
-export default withDevice(Splash);

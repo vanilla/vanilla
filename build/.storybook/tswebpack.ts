@@ -5,7 +5,7 @@
  */
 
 import { makeStoryConfig } from "../scripts/configs/makeStoryConfig";
-import { getOptions } from "../scripts/options";
+import { getOptions } from "../scripts/buildOptions";
 import EntryModel from "../scripts/utility/EntryModel";
 
 export default async function startStorybook({ config, mode }: any) {

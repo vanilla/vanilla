@@ -506,7 +506,8 @@ export function SearchErrorIcon(props: { message?: string; className?: string })
     );
 }
 
-export function accessibleImageMenu(message?: string, className?: string) {
+export function AccessibleImageMenuIcon(props: { message?: string; className?: string }) {
+    const { message, className } = props;
     const title = message ? message : t("Accessibility");
     const classes = iconClasses();
     return (
@@ -637,11 +638,11 @@ export function HamburgerIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
-export function ToggleIcon(props: { className?: string; title?: string }) {
+export function DarkThemeIcon(props: { className?: string; title?: string }) {
     const classes = iconClasses();
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-            <g fill="none" fillRule="evenodd">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g fill="none" fillRule="evenodd" transform="translate(2 2)">
                 <circle cx="10" cy="10" r="10" fill="#42464C" stroke="#DDDEE0" transform="rotate(-180 10 10)" />
                 <path fill="#DDDEE0" d="M10 19.986V.014C15.573.288 20 4.654 20 10c0 5.346-4.428 9.712-10 9.986z" />
                 <circle cx="4.444" cy="4.444" r="3.951" stroke="#DDDEE0" transform="rotate(-90 10 4.444)" />
@@ -649,6 +650,36 @@ export function ToggleIcon(props: { className?: string; title?: string }) {
                     fill="#D8D8D8"
                     d="M6.097 5.564l-.305-1.392-1.348-.279 1.348-.318.305-1.353.239 1.353 1.462.314-1.462.283zM3.875 8.898L3.57 7.506l-1.348-.28 1.348-.318.305-1.352.238 1.352 1.462.314-1.462.284z"
                 />
+            </g>
+        </svg>
+    );
+}
+
+export function LightThemeIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g fill="none" fillRule="evenodd" transform="translate(2 2)">
+                <circle cx="10" cy="10" r="10" fill="#555A62" stroke="#555A62" />
+                <path fill="#DDDEE0" d="M10 .556v18.888A9.444 9.444 0 1 1 10 .556z" />
+                <g transform="rotate(90 8.889 10)">
+                    <path
+                        fill="#555A62"
+                        fillRule="nonzero"
+                        d="M17.18 7.901h-1.768c-.322 0-.597.228-.597.494s.275.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494zM8.395 14.815c-.266 0-.494.275-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597v-1.769c0-.322-.228-.597-.494-.597zM8.395 0c-.266 0-.494.276-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597V.597C8.889.276 8.66 0 8.395 0zM12.71 12.779c-.184.182-.145.535.084.763l1.255 1.256c.229.228.581.267.764.084.183-.183.144-.535-.084-.763l-1.256-1.256c-.228-.229-.58-.267-.764-.084zM2.484 2.553c-.183.183-.144.536.084.764l1.256 1.256c.228.228.581.267.764.084.183-.183.144-.535-.084-.764L3.248 2.638c-.228-.229-.58-.268-.764-.085zM4.588 12.779c-.183-.183-.536-.145-.764.084l-1.256 1.256c-.228.228-.267.58-.084.763.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.763zM14.813 2.553c-.183-.183-.535-.144-.764.085l-1.255 1.255c-.229.229-.268.581-.085.764.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.764zM2.366 7.901H.597c-.321 0-.597.228-.597.494s.253.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494z"
+                    />
+                    <circle cx="8.889" cy="8.889" r="3.951" stroke="#555A62" />
+                </g>
+                <circle cx="10" cy="10" r="10" fill="#555A62" stroke="#555A62" />
+                <path fill="#FFF" d="M10 .556v18.888A9.444 9.444 0 1 1 10 .556z" />
+                <g transform="rotate(90 8.889 10)">
+                    <path
+                        fill="#555A62"
+                        fillRule="nonzero"
+                        d="M17.18 7.901h-1.768c-.322 0-.597.228-.597.494s.275.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494zM8.395 14.815c-.266 0-.494.275-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597v-1.769c0-.322-.228-.597-.494-.597zM8.395 0c-.266 0-.494.276-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597V.597C8.889.276 8.66 0 8.395 0zM12.71 12.779c-.184.182-.145.535.084.763l1.255 1.256c.229.228.581.267.764.084.183-.183.144-.535-.084-.763l-1.256-1.256c-.228-.229-.58-.267-.764-.084zM2.484 2.553c-.183.183-.144.536.084.764l1.256 1.256c.228.228.581.267.764.084.183-.183.144-.535-.084-.764L3.248 2.638c-.228-.229-.58-.268-.764-.085zM4.588 12.779c-.183-.183-.536-.145-.764.084l-1.256 1.256c-.228.228-.267.58-.084.763.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.763zM14.813 2.553c-.183-.183-.535-.144-.764.085l-1.255 1.255c-.229.229-.268.581-.085.764.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.764zM2.366 7.901H.597c-.321 0-.597.228-.597.494s.253.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494z"
+                    />
+                    <circle cx="8.889" cy="8.889" r="3.951" stroke="#555A62" />
+                </g>
             </g>
         </svg>
     );

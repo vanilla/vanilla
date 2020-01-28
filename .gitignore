@@ -1,3 +1,8 @@
+/addons/themes/*
+/addons/addons/*
+!/addons/themes/theme-foundation/
+!/addons/themes/theme-boilerplate/
+!/addons/themes/keystone/
 /applications/*
 !/applications/conversations/
 !/applications/dashboard/
@@ -62,10 +67,6 @@
 !/themes/bittersweet/
 !/themes/default/
 !/themes/mobile/
-!/themes/theme-boilerplate/
-!/themes/foundation/
-!/themes/keystone/
-!/themes/theme-api-test/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*

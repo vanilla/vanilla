@@ -34,9 +34,12 @@ window.gdn.apiv2 = apiv2;
 
 // Record the page view.
 onPageView((params: { history: History }) => {
-    void apiv2.post("/tick").then(() => {
-        window.dispatchEvent(new CustomEvent("analyticsTick"));
-    });
+    // Low priority so put a slight delay so other network requests run first.
+    setTimeout(() => {
+        void apiv2.post("/tick").then(() => {
+            window.dispatchEvent(new CustomEvent("analyticsTick"));
+        });
+    }, 50);
 });
 
 logDebug("Bootstrapping");

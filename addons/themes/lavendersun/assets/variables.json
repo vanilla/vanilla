@@ -1,0 +1,36 @@
+{
+    "global": {
+        "mainColors": {
+            "primary": "#b10bff",
+            "fg": "#424242"
+        },
+        "fonts": {
+            "families": {
+                "body": ["Nunito"]
+            }
+        },
+        "hero": {
+            "title": {
+                "font": {
+                    "color": "#424242"
+                }
+            },
+            "backgrounds": {
+                "useOverlay": false
+            },
+            "searchButtonOptions": {
+                "type": "solid"
+            },
+            "inputAndButton": "50%"
+        }
+    },
+    "titleBar": {
+        "colors": {
+            "fg": "#fff",
+            "bg": "#6c1794"
+        },
+        "border": {
+            "type": "shadow"
+        }
+    }
+}

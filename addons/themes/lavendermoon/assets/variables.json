@@ -1,0 +1,40 @@
+{
+    "global": {
+        "mainColors": {
+            "primary": "#6c1794",
+            "fg": "#fff",
+            "bg": "#323639"
+        },
+        "fonts": {
+            "families": {
+                "body": ["Nunito"]
+            }
+        }
+    },
+    "hero": {
+        "title": {
+            "font": {
+                "color": "#424242"
+            }
+        },
+        "backgrounds": {
+            "useOverlay": false
+        },
+        "outerBackground": {
+            "backgroundPosition": "0% 50%"
+        },
+        "searchButtonOptions": {
+            "type": "solid"
+        },
+        "inputAndButton": "36px"
+    },
+    "titleBar": {
+        "colors": {
+            "fg": "#fff",
+            "bg": "#6c1794"
+        },
+        "border": {
+            "type": "border"
+        }
+    }
+}

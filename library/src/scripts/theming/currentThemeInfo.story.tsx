@@ -19,14 +19,16 @@ story.add("Current Theme", () => {
             <StoryHeading depth={1}>Current Theme</StoryHeading>
 
             <div style={{ display: "flex" }}>
-                <ThemePreviewCard
-                    globalBg={"#fff"}
-                    globalPrimary={"#985E6D"}
-                    globalFg={"#555a62"}
-                    titleBarBg={"#0291db"}
-                    titleBarFg={"#fff"}
-                    isActiveTheme={true}
-                />
+                <div style={{ width: 400 }}>
+                    <ThemePreviewCard
+                        globalBg={"#fff"}
+                        globalPrimary={"#985E6D"}
+                        globalFg={"#555a62"}
+                        titleBarBg={"#0291db"}
+                        titleBarFg={"#fff"}
+                        isActiveTheme={true}
+                    />
+                </div>
                 <CurrentThemeInfo
                     name={"Keystone"}
                     info={{

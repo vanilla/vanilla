@@ -9519,59 +9519,52 @@ ul {
   padding-left: 39px;
 }
 
-h1, .h1,
-h2,
-.analytics-widget-header .title, .h2, .hero .hero-title,
-h3, .h3,
-h4, .h4,
-h5, .h5,
-h6, .h6 {
+.content h1, .content .h1,
+.content h2,
+.content .analytics-widget-header .title,
+.analytics-widget-header .content .title, .content .h2, .content .hero .hero-title, .hero .content .hero-title,
+.content h3, .content .h3,
+.content h4, .content .h4,
+.content h5, .content .h5,
+.content h6, .content .h6 {
   font-family: inherit;
   font-weight: 600;
   line-height: 1.1;
   color: inherit;
 }
-
-h1, .h1 {
+.content h1, .content .h1 {
   font-size: 32px;
 }
-
-h2, .analytics-widget-header .title, .h2, .hero .hero-title {
+.content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .content .h2, .content .hero .hero-title, .hero .content .hero-title {
   font-size: 18px;
 }
-
-h3, .h3 {
+.content h3, .content .h3 {
   font-size: 16px;
 }
-
-h4, .h4 {
+.content h4, .content .h4 {
   font-size: 16px;
 }
-
-h5, .h5 {
+.content h5, .content .h5 {
   font-size: 14px;
 }
-
-h6, .h6 {
+.content h6, .content .h6 {
   font-size: 14px;
 }
-
-h1, .h1,
-h2,
-.analytics-widget-header .title, .h2, .hero .hero-title,
-h3, .h3,
-h4, .h4,
-h5, .h5,
-h6, .h6 {
+.content h1, .content .h1,
+.content h2,
+.content .analytics-widget-header .title,
+.analytics-widget-header .content .title, .content .h2, .content .hero .hero-title, .hero .content .hero-title,
+.content h3, .content .h3,
+.content h4, .content .h4,
+.content h5, .content .h5,
+.content h6, .content .h6 {
   margin-top: 18px;
   margin-bottom: 9px;
 }
-
-p {
+.content p {
   margin-bottom: 9px;
 }
-
-pre {
+.content pre {
   margin-bottom: 0;
   white-space: pre-wrap;
 }

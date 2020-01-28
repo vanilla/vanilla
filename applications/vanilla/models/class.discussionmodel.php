@@ -8,9 +8,18 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Attributes;
+use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussions data.
@@ -18,7 +27,10 @@ use Vanilla\Formatting\UpdateMediaTrait;
 class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
+
     use \Vanilla\FloodControlTrait;
+
+    use FormatFieldTrait;
 
     use UpdateMediaTrait;
 
@@ -2252,6 +2264,12 @@ class DiscussionModel extends Gdn_Model {
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
 
+                $discussionEvent = $this->eventFromRow(
+                    (array)$discussion,
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
+                );
+                $this->getEventManager()->dispatch($discussionEvent);
+
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
@@ -2264,6 +2282,28 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Generate a discussion event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return DiscussionEvent
+     */
+    private function eventFromRow(array $row, string $action): DiscussionEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+
+        $userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
+        $discussion = $this->normalizeRow($row, true);
+        $discussion = $this->schema()->validate($discussion);
+        $result = new DiscussionEvent(
+            $action,
+            ["discussion" => $discussion]
+        );
+        return $result;
+    }
+
+    /**
+     * Notify users of new discussions.
      *
      * @param int|array|stdClass $discussion
      * @param ActivityModel $activityModel
@@ -2929,6 +2969,11 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
+        $dataObject = (object)$data;
+        $this->calculate($dataObject);
+        $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+        $this->getEventManager()->dispatch($discussionEvent);
+
         return true;
     }
 
@@ -2983,6 +3028,24 @@ class DiscussionModel extends Gdn_Model {
     public function canView($discussion, $userID = 0) {
         $canView = $this->checkPermission($discussion, 'Vanilla.Discussions.View', $userID);
         return $canView;
+    }
+
+    /**
+     * Tests whether a user has permission to view a specific discussion, with consideration for mod permissions.
+     *
+     * @param object $discussion
+     * @return bool whether the user can view a discussion.
+     */
+    public function canViewDiscussion($discussion): bool {
+        $canViewDiscussion = false;
+        $session = $this->sessionInterface;
+        $userID = $session->UserID;
+        $canView = $this->canView($discussion, $userID);
+        $isModerator = $session->checkRankedPermission('Garden.Moderation.Manage');
+        if ($canView || $isModerator) {
+            $canViewDiscussion = true;
+        }
+        return $canViewDiscussion;
     }
 
     /**
@@ -3443,6 +3506,60 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        $row['Announce'] = (bool)$row['Announce'];
+        $row['Url'] = discussionUrl($row);
+        $this->formatField($row, "Body", $row["Format"]);
+        $row['Attributes'] = new Attributes($row['Attributes']);
+
+        if (array_key_exists("Bookmarked", $row)) {
+            $row["Bookmarked"] = (bool)$row["Bookmarked"];
+        }
+
+        if (ModelUtils::isExpandOption('lastPost', $expand)) {
+            $lastPost = [
+                'discussionID' => $row['DiscussionID'],
+                'dateInserted' => $row['DateLastComment'],
+                "insertUserID" => $row["LastUserID"],
+            ];
+            if ($row['LastCommentID']) {
+                $lastPost['CommentID'] = $row['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $row['Name']);
+                $lastPost['url'] = commentUrl($lastPost, true);
+            } else {
+                $lastPost['name'] = $row['Name'];
+                $lastPost['url'] = $row['Url'];
+            }
+
+            if (ModelUtils::isExpandOption('lastPost.insertUser', $expand) || ModelUtils::isExpandOption('lastUser', $expand) && array_key_exists('LastUser', $row)) {
+                $lastPost['insertUser'] = $row['LastUser'];
+                if (!ModelUtils::isExpandOption('lastUser', $expand)) {
+                    unset($row['LastUser']);
+                }
+            }
+
+            $row['lastPost'] = $lastPost;
+        }
+
+        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
+        if (empty($row['DateLastComment'])) {
+            $row['DateLastComment'] = $row['DateInserted'];
+        }
+
+        $scheme = new CamelCaseScheme;
+        $result = $scheme->convertArrayKeys($row);
+        $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
+
+        return $result;
+    }
+
+    /**
      * Method to prevent encoding data twice.
      *
      * DiscussionModel::calculate applies htmlspecialchars to discussion name which could conflict when
@@ -3481,5 +3598,58 @@ class DiscussionModel extends Gdn_Model {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get a schema instance comprised of standard discussion fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'discussionID:i' => 'The ID of the discussion.',
+            'type:s|n' => [
+                'description' => 'The type of this discussion if any.',
+            ],
+            'name:s' => 'The title of the discussion.',
+            'body:s' => 'The body of the discussion.',
+            'categoryID:i' => 'The category the discussion is in.',
+            'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'dateLastComment:dt|n' => 'When the last comment was posted.',
+            'insertUserID:i' => 'The user that created the discussion.',
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
+            'pinLocation:s|n' => [
+                'enum' => ['category', 'recent'],
+                'description' => 'The location for the discussion, if pinned. '
+                    . '"category" are pinned to their own category. '
+                    . '"recent" are pinned to the recent discussions list, as well as their own category.',
+            ],
+            'closed:b' => 'Whether the discussion is closed or open.',
+            'sink:b' => 'Whether or not the discussion has been sunk.',
+            'countComments:i' => 'The number of comments on the discussion.',
+            'countViews:i' => 'The number of views on the discussion.',
+            'score:i|n' => 'Total points associated with this post.',
+            'url:s?' => 'The full URL to the discussion.',
+            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
+            'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
+        ]);
+        return $result;
+    }
+
+    /**
+     * Get a schema representing ser-specific discussion fields.
+     *
+     * @return Schema
+     */
+    public function userDiscussionSchema(): Schema {
+        $result = Schema::parse([
+            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
+        ]);
+        return $result;
     }
 }

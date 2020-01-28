@@ -6,11 +6,17 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Formatting\FormatFieldTrait;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Base API controller for APIv2.
  */
 abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface {
+
+    use FormatFieldTrait;
 
     /** @var Schema */
     private $categoryFragmentSchema;
@@ -39,30 +45,13 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
     }
 
     /**
-     * Format a specific field.
-     *
-     * @param array $row An array representing a database row.
-     * @param string $field The field name.
-     * @param string $format The source format.
-     */
-    public function formatField(array &$row, $field, $format) {
-        if (array_key_exists($field, $row)) {
-            $row[$field] = \Gdn::formatService()->renderHTML($row[$field], $format) ?: '<!-- empty -->';
-        }
-    }
-
-    /**
      * Get the schema for categories joined to records.
      *
      * @return Schema Returns a schema.
      */
     public function getCategoryFragmentSchema() {
         if ($this->categoryFragmentSchema === null) {
-            $this->categoryFragmentSchema = $this->schema([
-                'categoryID:i' => 'The ID of the category.',
-                'name:s' => 'The name of the category.',
-                'url:s' => 'Full URL to the category.',
-            ], 'CategoryFragment');
+            $this->categoryFragmentSchema = $this->schema(new CategoryFragmentSchema(), 'CategoryFragment');
         }
         return $this->categoryFragmentSchema;
     }
@@ -88,16 +77,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      */
     public function getPostFragmentSchema() {
         if ($this->postFragmentSchema === null) {
-            $this->postFragmentSchema = $this->schema([
-                'discussionID:i?' => 'The discussion ID of the post.',
-                'commentID:i?' => 'The comment ID of the post, if any.',
-                'name:s' => 'The title of the post.',
-                'body:s?' => 'The HTML body of the post.',
-                'url:s' => 'The URL of the post.',
-                'dateInserted:dt' => 'The date of the post.',
-                'insertUserID:i' => 'The author of the post.',
-                'insertUser?' => $this->getUserFragmentSchema(),
-            ], 'PostFragment');
+            $this->postFragmentSchema = $this->schema(new PostFragmentSchema(), 'PostFragment');
         }
         return $this->postFragmentSchema;
     }
@@ -110,13 +90,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @return bool
      */
     public function isExpandField($field, $expand) {
-        $result = false;
-        if ($expand === true) {
-            // A boolean true allows everything.
-            $result = true;
-        } elseif (is_array($expand)) {
-            $result = !empty(array_intersect([\Vanilla\ApiUtils::EXPAND_ALL, 'true', '1', $field], $expand));
-        }
+        $result = ModelUtils::isExpandOption($field, $expand);
         return $result;
     }
 

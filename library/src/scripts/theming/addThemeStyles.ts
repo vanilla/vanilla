@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, margins } from "@library/styles/styleHelpers";
+import { unit, paddings, margins, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themeCardStyles";
+import { themeCardVariables } from "./themePreviewCardStyles";
 import { percent, color } from "csx";
 
 export const addthemeVariables = useThemeCache(() => {
@@ -17,15 +17,9 @@ export const addthemeVariables = useThemeCache(() => {
         fg: globalVars.messageColors.warning.fg,
     });
     const addTheme = makeThemeVars("addTheme", {
-        width: 310,
-        height: 225,
-
-        padding: {
-            top: 70,
-            bottom: 70,
-            right: 117,
-            left: 117,
-        },
+        width: percent(100),
+        height: percent(100),
+        padding: globalVars.gutter.size,
     });
 
     return {
@@ -40,15 +34,13 @@ export const addThemeClasses = useThemeCache(() => {
     const style = styleFactory("addTheme");
 
     const addTheme = style("addTheme", {
+        display: "block",
+        ...flexHelper().middle(),
+        ...paddings({
+            all: vars.addTheme.padding,
+        }),
         width: unit(vars.addTheme.width),
         height: unit(vars.addTheme.height),
-
-        ...paddings({
-            top: unit(vars.addTheme.padding.top),
-            bottom: unit(vars.addTheme.padding.bottom),
-            left: unit(vars.addTheme.padding.left),
-            right: unit(vars.addTheme.padding.right),
-        }),
         $nest: {
             "&:hover": {
                 backgroundColor: color("#fff").toString(),
@@ -58,8 +50,15 @@ export const addThemeClasses = useThemeCache(() => {
 
     const button = style("button", {
         padding: 0,
-        border: "1px dashed #979797",
+        minHeight: 100,
+        minWidth: themeCardVariables().container.minWidth,
+        maxWidth: themeCardVariables().container.maxWidth,
         $nest: {
+            "&&": {
+                width: unit(vars.addTheme.width),
+                height: unit(vars.addTheme.height),
+                border: "1px dashed #979797",
+            },
             "&&:hover": {
                 backgroundColor: color("#fff").toString(),
                 border: "1px dashed #979797",

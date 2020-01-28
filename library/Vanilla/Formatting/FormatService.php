@@ -38,7 +38,7 @@ class FormatService {
      * Format a particular string.
      *
      * @param string $content The content to render.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string
      *
@@ -56,11 +56,11 @@ class FormatService {
      * Render a safe, sanitized, short version of some content.
      *
      * @param string $content The content to render.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string
      */
-    public function renderExcerpt(string $content, ?string $format ): string {
+    public function renderExcerpt(string $content, ?string $format): string {
         return $this
             ->getFormatter($format)
             ->renderExcerpt($content);
@@ -70,7 +70,7 @@ class FormatService {
      * Render a plain text version of some content.
      *
      * @param string $content The content to render.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string
      */
@@ -84,7 +84,7 @@ class FormatService {
      * Render a version of the content suitable to be quoted in other content.
      *
      * @param string $content The raw content to render.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string
      */
@@ -98,7 +98,7 @@ class FormatService {
      * Parse attachment data from a message.
      *
      * @param string $content The content the parse.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return Attachment[]
      */
@@ -112,7 +112,7 @@ class FormatService {
      * Parse images out of the post contents.
      *
      * @param string $content
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string[]
      */
@@ -126,7 +126,7 @@ class FormatService {
      * Parse out a list of headings from the post contents.
      *
      * @param string $content The raw content to parse.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return Heading[]
      */
@@ -140,7 +140,7 @@ class FormatService {
      * Parse out a list of usernames mentioned in the post contents.
      *
      * @param string $content The content the parse.
-     * @param string $format The format of the content.
+     * @param string|null $format The format of the content.
      *
      * @return string[] A list of usernames.
      */

@@ -60,7 +60,7 @@ export const compatibilityStyles = useThemeCache(() => {
         color: fg,
     });
 
-    cssOut(".DataTable .Item td", {
+    cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
         background: bg,
         color: fg,
     });
@@ -172,6 +172,11 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".ButtonGroup .Dropdown", {
         marginTop: unit(negative(vars.border.width)),
+    });
+
+    cssOut(`.QuickSearchButton`, {
+        color: fg,
+        ...borders(),
     });
 
     buttonCSS();

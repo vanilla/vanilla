@@ -41,4 +41,12 @@ export const paginationCSS = () => {
             color: colorOut(globalVars.mainColors.fg),
         },
     );
+
+    cssOut(`.Pager span`, {
+        $nest: {
+            [`&:hover, &:focus, &:active`]: {
+                color: primary,
+            },
+        },
+    });
 };

@@ -157,12 +157,11 @@ export const inputCSS = () => {
         formVars.border.fullWidth,
     );
 
-    const spaceWithoutPaddingInInput =
-        formElementVars.sizing.height - verticalPadding * 2 - formElementVars.border.fullWidth;
+    const spaceWithoutPaddingInInput = formVars.sizing.height - verticalPadding * 2 - formVars.border.fullWidth;
 
     // Container of tokens
     cssOut(".Container ul.token-input-list", {
-        minHeight: unit(formElementVars.sizing.height),
+        minHeight: unit(formVars.sizing.height),
         paddingRight: important(0),
         paddingBottom: important(0),
     });
@@ -251,7 +250,7 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     const globalVars = globalVariables();
     const vars = inputVariables();
     selector = trimTrailingCommas(selector);
-    const formElementVars = formElementsVariables();
+    const formVars = formElementsVariables();
     const primary = colorOut(globalVars.mainColors.primary);
     let extraFocus = {};
     if (focusSelector) {
@@ -263,7 +262,7 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     }
 
     cssOut(selector, {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formVars.border.fullWidth),
         borderColor: colorOut(globalVars.border.color),
         borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
         borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),

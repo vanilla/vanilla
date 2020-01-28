@@ -41,7 +41,6 @@ export const textLinkCSS = () => {
     mixinTextLink("div.Popup .Body a");
     mixinTextLink(".selectBox-toggle");
     mixinTextLink(".followButton");
-    mixinTextLink(".QuickSearchButton");
     mixinTextLink(".SelectWrapper::after");
     mixinTextLink(".Back a");
     mixinTextLink(".OptionsLink-Clipboard");

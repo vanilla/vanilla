@@ -82,7 +82,7 @@ export const shadowOrBorderBasedOnLightness = (
         shadowStyles = shadowHelper().dropDown();
     }
 
-    if (referenceColor instanceof ColorHelper && referenceColor.lightness() >= 0.5 && !flip) {
+    if (referenceColor instanceof ColorHelper && referenceColor.lightness() >= 0.45 && !flip) {
         // Shadow for light colors
         return shadowStyles;
     } else {

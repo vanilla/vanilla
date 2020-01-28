@@ -22,7 +22,7 @@ import {
     sticky,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -869,10 +869,17 @@ export const titleBarLogoClasses = useThemeCache(() => {
         justifyContent: vars.mobileLogo.align,
     });
 
+    const isCenter = style("isCenter", {
+        position: "absolute",
+        left: percent(50),
+        transform: translate(`-50%`, `-50%`),
+    });
+
     return {
         logoFrame,
         logo,
         mobileLogo,
+        isCenter,
     };
 });
 

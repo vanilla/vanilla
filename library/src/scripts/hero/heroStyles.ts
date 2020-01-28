@@ -171,8 +171,8 @@ export const heroVariables = useThemeCache(styleOverwrite => {
     };
 });
 
-export const heroClasses = useThemeCache(styleOverwrite => {
-    const vars = heroVariables(styleOverwrite);
+export const heroClasses = useThemeCache((styleOverwrite?: {}) => {
+    const vars = heroVariables(styleOverwrite || {});
     const style = styleFactory("hero");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();

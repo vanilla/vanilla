@@ -32,25 +32,22 @@ export function StoryExampleModalConfirm(props: IProps) {
             >
                 Confirm Modal
             </Button>
-            {open && (
-                <ModalConfirm
-                    title={"Do you agree?"}
-                    onCancel={() => {
-                        /* do something before closing */
-                        setOpen(false);
-                    }}
-                    onConfirm={() => {
-                        /* do something on confirm */
-                        setOpen(false);
-                    }}
-                    confirmTitle={"I Concur!"}
-                    elementToFocusOnExit={
-                        openButtonRef.current ? (openButtonRef.current as HTMLButtonElement) : undefined
-                    }
-                >
-                    {"Do you agree with this statement?"}
-                </ModalConfirm>
-            )}
+            <ModalConfirm
+                isVisible={open}
+                title={"Do you agree?"}
+                onCancel={() => {
+                    /* do something before closing */
+                    setOpen(false);
+                }}
+                onConfirm={() => {
+                    /* do something on confirm */
+                    setOpen(false);
+                }}
+                confirmTitle={"I Concur!"}
+                elementToFocusOnExit={openButtonRef.current ? (openButtonRef.current as HTMLButtonElement) : undefined}
+            >
+                {"Do you agree with this statement?"}
+            </ModalConfirm>
         </>
     );
 }

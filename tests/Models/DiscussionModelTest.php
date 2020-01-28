@@ -366,7 +366,7 @@ class DiscussionModelTest extends TestCase {
                 '2019-12-02 21:55:40',
                 [false, 5],
             ],
-            'MoreCommentsThanReadDatesDisagree' => [
+            'MoreCommentsThanReadDatesDisagreeOnePage' => [
                 15,
                 '2019-12-02 21:55:40',
                 10,

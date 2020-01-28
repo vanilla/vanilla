@@ -81,7 +81,6 @@ export default function TitleBar(_props: IProps) {
     const classesMeBox = meBoxClasses();
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
-
     const vars = titleBarVariables();
     const classes = titleBarClasses();
     const logoClasses = titleBarLogoClasses();

@@ -4,9 +4,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import "./swaggerStyles.scss";
 import { VanillaSwaggerPlugin } from "@openapi-embed/embed/swagger/VanillaSwaggerPlugin";
-import { patchSwaggerDeepLinks } from "@openapi-embed/embed/swagger/deepLinkPatch";
 import { DEEP_LINK_ATTR } from "@openapi-embed/embed/swagger/VanillaSwaggerDeepLink";
 
 export interface ISwaggerHeading {
@@ -15,15 +13,13 @@ export interface ISwaggerHeading {
     level: number;
 }
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-    return value !== null && value !== undefined;
+async function importSwagger() {
+    const imported = await import(/* webpackChunkName: "swagger-ui-react" */ "@openapi-embed/embed/swagger/SwaggerUI");
+    return imported.SwaggerUI;
 }
 
-async function importSwagger() {
-    const imported = await import(/* webpackChunkName: "swagger-ui-react" */ "swagger-ui-react/swagger-ui");
-    const swagger = imported.default;
-    patchSwaggerDeepLinks(swagger);
-    return swagger;
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+    return value !== null && value !== undefined;
 }
 
 export function useSwaggerUI(_options: { url?: string; spec?: object }) {
@@ -82,13 +78,6 @@ export function useSwaggerUI(_options: { url?: string; spec?: object }) {
             }
         });
     }, [spec, url]);
-
-    useEffect(() => {
-        swaggerRef.current!.addEventListener("submit", e => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-    }, []);
 
     return { swaggerRef, headings, isLoading };
 }

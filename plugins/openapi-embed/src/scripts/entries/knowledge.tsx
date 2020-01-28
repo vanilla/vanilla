@@ -12,6 +12,8 @@ import { OpenApiEmbed, IOpenApiEmbedData } from "../embed/OpenApiEmbed";
 import { useEditor } from "@rich-editor/editor/context";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
+import { SwaggerIcon } from "@openapi-embed/embed/swagger/SwaggerIcon";
+import classNames from "classnames";
 
 registerEmbed("openapi", OpenApiEmbed);
 
@@ -27,7 +29,6 @@ function InsertOpenApiEmbedButton() {
 
         setShowForm(false);
 
-        console.log("creating with data", data);
         embedInserter.createEmbed({
             loaderData: {
                 type: "image",
@@ -40,12 +41,12 @@ function InsertOpenApiEmbedButton() {
         <>
             <EditorEmbedBar.Item>
                 <Button
-                    baseClass={ButtonTypes.TEXT}
+                    baseClass={ButtonTypes.ICON}
                     onClick={() => {
                         setShowForm(true);
                     }}
                 >
-                    OpenAPI
+                    <SwaggerIcon title={"Add OpenApi Embed"} />
                 </Button>
             </EditorEmbedBar.Item>
             {showForm && (
@@ -61,4 +62,4 @@ function InsertOpenApiEmbedButton() {
     );
 }
 
-EditorEmbedBar.addAdditionItem(<InsertOpenApiEmbedButton />);
+EditorEmbedBar.addExtraButton(<InsertOpenApiEmbedButton />);

@@ -72,7 +72,12 @@ export function EditorEmbedBar(props: IProps) {
                         <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>
-                {EditorEmbedBar.extraComponents.map((item, i) => (
+                {getExtraComponents().length > 0 && (
+                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="separator">
+                        <hr className={classesRichEditor.embedBarSeparator} />
+                    </li>
+                )}
+                {getExtraComponents().map((item, i) => (
                     <React.Fragment key={i}>{item}</React.Fragment>
                 ))}
             </ul>
@@ -91,8 +96,11 @@ EditorEmbedBar.Item = function EditorEmbedBarItem(props: { children: React.React
     );
 };
 
-EditorEmbedBar.extraComponents = [] as React.ReactNode[];
+const extraComponents: React.ReactNode[] = [];
+function getExtraComponents() {
+    return extraComponents;
+}
 
-EditorEmbedBar.addAdditionItem = (node: React.ReactNode) => {
-    EditorEmbedBar.extraComponents.push(node);
+EditorEmbedBar.addExtraButton = (node: React.ReactNode) => {
+    extraComponents.push(node);
 };

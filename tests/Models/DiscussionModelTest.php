@@ -308,7 +308,7 @@ class DiscussionModelTest extends TestCase {
         ?string $userLastReadDate,
         $expected
     ) {
-        $actual = DiscussionModel::calculateCommentReadData(
+        $actual = $this->model->calculateCommentReadData(
             $discussionCommentCount,
             $discussionLastCommentDate,
             $userReadComments,

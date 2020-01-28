@@ -1124,11 +1124,6 @@ class DiscussionModel extends Gdn_Model {
         // Allow for discussions to be archived.
         if ($this->isArchived($discussion->DateLastComment)) {
             $discussion->Closed = '1';
-            if ($discussion->CountCommentWatch) {
-                $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-            } else {
-                $discussion->CountUnreadComments = 0;
-            }
         }
 
         // Discussions are always unread to guests. Otherwise check Read status and Unread count.
@@ -1140,7 +1135,7 @@ class DiscussionModel extends Gdn_Model {
                 // If the category was marked explicitly read at some point, see if that applies here
                 $discussion->DateLastViewed = self::maxDate($discussion->DateLastComment, $category['DateMarkedRead']);
             }
-            list($read, $count) = self::calculateCommentReadData(
+            list($read, $count) = $this->calculateCommentReadData(
                 $discussion->CountComments,
                 $discussion->DateLastComment,
                 $discussion->CountCommentWatch,
@@ -1187,7 +1182,7 @@ class DiscussionModel extends Gdn_Model {
      * category read (or null), according to the UserDiscussion table.
      * @return array Returns an array where the first item is a boolean value and the second is a int > 0 or true.
      */
-    public static function calculateCommentReadData(
+    public function calculateCommentReadData(
         int $discussionCommentCount,
         string $discussionLastCommentDate,
         ?int $userReadComments,
@@ -1208,8 +1203,10 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // If the user has viewed the discussion more recently than the last comment, but there are unread comments,
-        // set unread comments to 0.
-        if ($userLastReadDate > $discussionLastCommentDate && $unreadCommentCount > 0) {
+        // and the discussion is only one page long, set unread comments to 0.
+        if ($userLastReadDate > $discussionLastCommentDate
+            && $unreadCommentCount > 0
+            && $discussionCommentCount < intval(Gdn::config('Vanilla.Comments.PerPage'))) {
             $unreadCommentCount = 0;
         }
 
@@ -1219,9 +1216,9 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // If the discussion has no comments and read status is false or both user categories are null,
-        // set unread comments to true.
+        // set unread comments to true unless the discussion is archived (in which case, we don't want it showing up as new).
         if (($discussionCommentCount === 0 && !$isRead) | ($userReadComments === null && $userLastReadDate === null)) {
-            $unreadCommentCount = true;
+            $this->isArchived($discussionLastCommentDate->format(MYSQL_DATE_FORMAT)) ? $unreadCommentCount = 0 : $unreadCommentCount = true;
         }
 
         return [$isRead, $unreadCommentCount];

@@ -269,38 +269,59 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
-     * Test {@link reconcileDiscrepantCommentData()} against various scenarios.
+     * Test {@link calculateCommentReadData()} against various scenarios.
      *
      * @param int $discussionCommentCount The number of comments in the discussion according to the Discussion Table.
      * @param string|null $discussionLastCommentDate Date of last Comment according to the Discussion table.
-     * @param int $userReadComments Number of Comments the user has read according to the UserDiscussion table.
+     * @param int|null $userReadComments Number of Comments the user has read according to the UserDiscussion table.
      * @param string|null $userLastReadDate Date of last Comment read according to the UserDiscussion table.
      * @param array $expected The expected result.
-     * @dataProvider provideTestReconcileDiscrepantCommentData
+     * @dataProvider provideTestCalculateCommentReadData
      */
-    public function testReconcileDiscrepantCommentData(
+    public function testCalculateCommentReadData(
         int $discussionCommentCount,
         ?string $discussionLastCommentDate,
-        int $userReadComments,
+        ?int $userReadComments,
         ?string $userLastReadDate,
         $expected
     ) {
-        $actual = DiscussionModel::reconcileDiscrepantCommentData(
+        $actual = DiscussionModel::calculateCommentReadData(
             $discussionCommentCount,
             $discussionLastCommentDate,
             $userReadComments,
             $userLastReadDate
         );
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
-     * Provide test data for testReconcileDiscrepantCommentData().
+     * Provide test data for testCalculateCommentReadData().
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestReconcileDiscrepantCommentData() {
+    public function provideTestCalculateCommentReadData() {
         $r = [
+            'userReadCommentIsNullWithReadDate' => [
+                10,
+                '2019-12-02 21:55:40',
+                null,
+                '2020-01-09 16:22:42',
+                [true, 0],
+            ],
+            'userReadCommentIsNullWithUnreadDate' => [
+                10,
+                '2020-01-09 16:22:42',
+                null,
+                '2019-12-02 21:55:40',
+                [false, 1],
+            ],
+            'userReadCommentsIsNullWithoutReadDate' => [
+                10,
+                '2019-12-02 21:55:40',
+                null,
+                null,
+                [false, true],
+            ],
             'CommentsAndUserReadEqualDatesConcur' => [
                 10,
                 '2019-12-02 21:55:40',

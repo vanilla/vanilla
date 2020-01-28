@@ -115,13 +115,13 @@ export default function TitleBar(_props: IProps) {
                                 !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
-                            <animated.span {...logoProps}>
+                            <animated.div className={classes.logoAnimationWrap} {...logoProps}>
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                     logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
-                            </animated.span>
+                            </animated.div>
                         )}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav

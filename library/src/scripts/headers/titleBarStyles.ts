@@ -793,6 +793,11 @@ export const titleBarClasses = useThemeCache(() => {
         zIndex: 10,
     });
 
+    const logoAnimationWrap = style("logoAnimationWrap", {
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
     return {
         root,
         bg1,
@@ -833,6 +838,7 @@ export const titleBarClasses = useThemeCache(() => {
         logoCenterer,
         hamburger,
         isSticky,
+        logoAnimationWrap,
     };
 });
 

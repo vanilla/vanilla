@@ -16,7 +16,12 @@ import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import { titleBarClasses, titleBarVariables, titleBarHomeClasses } from "@library/headers/titleBarStyles";
+import {
+    titleBarClasses,
+    titleBarVariables,
+    titleBarHomeClasses,
+    titleBarLogoClasses,
+} from "@library/headers/titleBarStyles";
 import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -79,8 +84,10 @@ export default function TitleBar(_props: IProps) {
 
     const vars = titleBarVariables();
     const classes = titleBarClasses();
+    const logoClasses = titleBarLogoClasses();
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
+
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
 
     const headerContent = (
@@ -143,10 +150,10 @@ export default function TitleBar(_props: IProps) {
                         {showHamburger && (
                             <>
                                 <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
-                                <FlexSpacer
+                                {/*<FlexSpacer
                                     className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
-                                />
-                                <div className={classes.logoCenterer}>
+                                />*/}
+                                <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>
                                         <HeaderLogo
                                             className={classNames("titleBar-logoContainer", classes.logoContainer)}
@@ -280,8 +287,10 @@ function useScrollTransition() {
     const { splashExists, splashRect } = useSplashContext();
     const [scrollPos, setScrollPos] = useState(0);
     const fullBleedOptions = titleBarVariables().fullBleed;
+
     const { doubleLogoStrategy } = titleBarVariables().logo;
     const shouldOverlay = fullBleedOptions.enabled && splashExists;
+
     const { topOffset } = useScrollOffset();
 
     // Scroll handler to pass to the form element.

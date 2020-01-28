@@ -149,7 +149,8 @@ export const titleBarVariables = useThemeCache(() => {
     const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: button.mobile.width * 2,
+            //flexBasis: button.mobile.width * 2,
+            flexBasis: button.mobile.width - 20,
         },
     });
 
@@ -205,6 +206,10 @@ export const titleBarVariables = useThemeCache(() => {
         tablet: {},
     });
 
+    const mobileLogo = makeThemeVars("mobileLogo", {
+        align: "center",
+    });
+
     const breakpoints = makeThemeVars("breakpoints", {
         compact: 850,
     });
@@ -255,6 +260,7 @@ export const titleBarVariables = useThemeCache(() => {
         logo,
         mediaQueries,
         breakpoints,
+        mobileLogo,
     };
 });
 
@@ -776,6 +782,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const hamburger = style("hamburger", {
+        marginRight: unit(12),
         $nest: {
             "&&": {
                 ...allButtonStates({
@@ -859,7 +866,15 @@ export const titleBarLogoClasses = useThemeCache(() => {
         },
     });
 
-    return { logoFrame, logo };
+    const mobileLogo = style("mobileLogo", {
+        justifyContent: vars.mobileLogo.align,
+    });
+
+    return {
+        logoFrame,
+        logo,
+        mobileLogo,
+    };
 });
 
 export const titleBarHomeClasses = useThemeCache(() => {

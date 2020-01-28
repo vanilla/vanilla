@@ -101,7 +101,7 @@ export const modalClasses = useThemeCache(() => {
         // When nesting our modals on top we need to be higher.
     });
 
-    const overlay = style("overlay", {
+    const overlayMixin: NestedCSSProperties = {
         position: "fixed",
         // Viewport units are useful here because
         // we're actually fine this being taller than the initially visible viewport.
@@ -111,8 +111,16 @@ export const modalClasses = useThemeCache(() => {
         left: 0,
         right: 0,
         bottom: 0,
-        background: colorOut(vars.colors.overlayBg),
         zIndex: 10,
+    };
+
+    const overlayScrim = style("overlayScrim", {
+        ...overlayMixin,
+        background: colorOut(vars.colors.overlayBg),
+    });
+
+    const overlayContent = style("overlayContent", {
+        ...overlayMixin,
     });
 
     const root = style({
@@ -181,11 +189,10 @@ export const modalClasses = useThemeCache(() => {
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: globalVars.gutter.size,
                 width: percent(100),
                 marginBottom: "auto",
                 transform: "none",
-                maxHeight: percent(100),
+                maxHeight: calc(`100% - ${unit(globalVars.gutter.size)}`),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
                 border: "none",
@@ -251,7 +258,8 @@ export const modalClasses = useThemeCache(() => {
         scroll,
         content,
         pageHeader,
-        overlay,
+        overlayScrim,
+        overlayContent,
         frameWrapper,
     };
 });

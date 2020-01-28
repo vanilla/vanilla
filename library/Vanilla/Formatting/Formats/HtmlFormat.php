@@ -185,6 +185,9 @@ class HtmlFormat extends BaseFormat {
         /** @var \DOMNode $domImages */
         foreach ($domImages as $domImage) {
             $src = $domImage->getAttribute('src');
+            if (preg_match("/emoji/", $src)) {
+                continue;
+            }
             if ($src) {
                 $imageUrls[] = $src;
             }

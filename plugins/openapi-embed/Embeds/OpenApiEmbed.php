@@ -31,8 +31,8 @@ class OpenApiEmbed extends AbstractEmbed implements HeadingProviderInterface {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            'name:s',
             'headings:a',
+            'specJson:s',
         ]);
     }
 

@@ -10,15 +10,15 @@ import { EmbedContent } from "@vanilla/library/src/scripts/embeddedContent/Embed
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
 import { useSwaggerUI, ISwaggerHeading } from "@openapi-embed/embed/swagger/useSwaggerUI";
 
 export const OPEN_API_EMBED_TYPE = "openapi";
 
 export interface IOpenApiEmbedData extends IBaseEmbedData {
-    name: string;
     headings: ISwaggerHeading[];
+    specJson: string;
 }
 
 interface IProps extends IBaseEmbedProps, IOpenApiEmbedData {
@@ -32,7 +32,7 @@ export function OpenApiEmbed(props: IProps) {
         return (
             <EmbedContainer size={EmbedContainerSize.FULL_WIDTH}>
                 <EmbedContent
-                    type="OpenApi"
+                    type={OPEN_API_EMBED_TYPE}
                     embedActions={
                         <Button
                             baseClass={ButtonTypes.ICON}
@@ -66,7 +66,11 @@ export function OpenApiEmbed(props: IProps) {
 }
 
 function FullOpenApiSpec(props: IProps) {
-    const { swaggerRef } = useSwaggerUI(props.url, true);
+    const { specJson } = props;
+    const decoded = useMemo(() => {
+        return JSON.parse(specJson);
+    }, [specJson]);
+    const { swaggerRef } = useSwaggerUI({ spec: decoded, url: props.url });
 
     return <div ref={swaggerRef}></div>;
 }

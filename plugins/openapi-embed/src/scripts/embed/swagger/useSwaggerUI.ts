@@ -26,7 +26,8 @@ async function importSwagger() {
     return swagger;
 }
 
-export function useSwaggerUI(specUrl: string, withDeepLinking: boolean = false) {
+export function useSwaggerUI(_options: { url?: string; spec?: object }) {
+    const { url, spec } = _options;
     const [headings, setHeadings] = useState<ISwaggerHeading[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const swaggerRef = useRef<HTMLDivElement | null>(null);
@@ -39,8 +40,9 @@ export function useSwaggerUI(specUrl: string, withDeepLinking: boolean = false) 
                     domNode: swaggerRef.current,
                     plugins: [VanillaSwaggerPlugin()],
                     layout: "VanillaSwaggerLayout",
-                    deepLinking: withDeepLinking,
-                    url: specUrl,
+                    url,
+                    spec,
+                    deepLinking: true,
                     onComplete: () => {
                         const opblocks = swaggerRef.current!.querySelectorAll(".opblock-tag, .opblock");
                         const headings = Array.from(opblocks)
@@ -79,7 +81,7 @@ export function useSwaggerUI(specUrl: string, withDeepLinking: boolean = false) 
                 });
             }
         });
-    }, [specUrl, withDeepLinking]);
+    }, [spec, url]);
 
     useEffect(() => {
         swaggerRef.current!.addEventListener("submit", e => {

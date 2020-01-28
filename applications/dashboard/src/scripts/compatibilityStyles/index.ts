@@ -11,7 +11,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, negative, unit } from "@library/styles/styleHelpers";
+import { borders, importantUnit, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -42,6 +42,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
     cssOut(".Frame", {
         background: "none",
+        overflow: "auto",
     });
 
     cssOut(".DataList .Item, .MessageList .Item", {
@@ -177,6 +178,13 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(`.QuickSearchButton`, {
         color: fg,
         ...borders(),
+    });
+
+    cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
+        ...paddings({
+            vertical: vars.gutter.size,
+            horizontal: importantUnit(vars.gutter.half),
+        }),
     });
 
     buttonCSS();

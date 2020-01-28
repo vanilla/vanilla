@@ -36,3 +36,11 @@ As such while working on the isolated header/footer stylesheet, it can be rebuil
 - Navigate to the theme's root directory in your terminal. 
 - To build it once: `yarn build`
 - To build it and watch for changes: `yarn build --watch`
+
+### Config
+Requires the following config:
+
+`$Configuration['Garden']['CurrentTheme'] = 'theme-foundation';`
+`$Configuration['themeFeatures']['DataDrivenForum'] = true;`
+
+Note that the `DataDrivenForum` config will use the React based header. 

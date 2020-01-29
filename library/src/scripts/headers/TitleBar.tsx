@@ -87,8 +87,8 @@ export default function TitleBar(_props: IProps) {
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
-    const logoAlignment = titleBarVariables().mobileLogo.align;
-    const logoAlign = logoAlignment === "center" ? true : false;
+    // const logoAlignment = titleBarVariables().mobileLogo.justifyContent;
+    // const logoAlign = logoAlignment === "center" ? true : false;
 
     const headerContent = (
         <HashOffsetReporter>
@@ -154,9 +154,7 @@ export default function TitleBar(_props: IProps) {
                                 <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>
                                         <HeaderLogo
-                                            className={classNames("titleBar-logoContainer", classes.logoContainer, {
-                                                [logoClasses.isCenter]: logoAlign,
-                                            })}
+                                            className={classNames("titleBar-logoContainer", classes.logoContainer, {})}
                                             logoClassName="titleBar-logo"
                                             logoType={LogoType.MOBILE}
                                         />

@@ -193,6 +193,10 @@ export const compatibilityStyles = useThemeCache(() => {
         ...borders(),
     });
 
+    cssOut(`.Frame-content`, {
+        marginTop: unit(),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -201,6 +205,7 @@ export const compatibilityStyles = useThemeCache(() => {
     socialConnectCSS();
     reactionsCSS();
     paginationCSS();
+    layoutCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -17,6 +17,9 @@ use Psr\Container\ContainerInterface;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 
+/**
+ * Dispatches requests and receives responses.
+ */
 class Dispatcher {
     use MiddlewareAwareTrait;
 
@@ -274,9 +277,8 @@ class Dispatcher {
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Throwable) {
-
             // Let's not mask errors when in debug mode!
-            if ($raw instanceof \Error && debug())  {
+            if ($raw instanceof \Error && debug()) {
                 throw $raw;
             }
 

@@ -6,10 +6,12 @@
             "bg": "#323639"
         },
         "fonts": {
-            "families": {}
+            "families": {
+                "body": ["Nunito"]
+            }
         }
     },
-    "hero": {
+    "banner": {
         "title": {
             "font": {
                 "color": "#424242"

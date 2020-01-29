@@ -24,6 +24,8 @@ import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
+import { layoutCSS } from "@dashboard/compatibilityStyles/layoutStyles";
+import { fontCSS } from "./fontStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -194,7 +196,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(),
+        marginTop: unit(vars.gutter.size),
     });
 
     buttonCSS();
@@ -206,6 +208,7 @@ export const compatibilityStyles = useThemeCache(() => {
     reactionsCSS();
     paginationCSS();
     layoutCSS();
+    fontCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

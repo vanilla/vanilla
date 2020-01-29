@@ -8,7 +8,7 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { ColorValues } from "@library/styles/styleHelpersColors";
+import { ColorValues, isLightColor } from "@library/styles/styleHelpersColors";
 import { borders } from "@library/styles/styleHelpersBorders";
 
 export const shadowHelper = useThemeCache(() => {
@@ -82,7 +82,7 @@ export const shadowOrBorderBasedOnLightness = (
         shadowStyles = shadowHelper().dropDown();
     }
 
-    if (referenceColor instanceof ColorHelper && referenceColor.lightness() >= 0.45 && !flip) {
+    if (referenceColor instanceof ColorHelper && isLightColor(referenceColor) && !flip) {
         // Shadow for light colors
         return shadowStyles;
     } else {

@@ -9,7 +9,7 @@
                 "body": ["Nunito"]
             }
         },
-        "hero": {
+        "banner": {
             "title": {
                 "font": {
                     "color": "#424242"

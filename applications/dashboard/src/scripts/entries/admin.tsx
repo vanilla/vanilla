@@ -33,7 +33,7 @@ const render = () => {
         mountReact(
             // Error component is set as null until we can refactor a non-kb specific Error page.
             <AppContext errorComponent={<ErrorPage /> || null}>
-                <Router sectionRoot="/theme" />
+                <Router disableDynamicRouting />
             </AppContext>,
             app,
         );

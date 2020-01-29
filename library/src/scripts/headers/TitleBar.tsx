@@ -147,7 +147,7 @@ export default function TitleBar(_props: IProps) {
                                 {props.mobileDropDownContent}
                             </MobileDropDown>
                         )}
-                        {showHamburger && (
+                        {isCompact && (
                             <>
                                 <Hamburger buttonClassName={classes.hamburger} contents={""} />
 

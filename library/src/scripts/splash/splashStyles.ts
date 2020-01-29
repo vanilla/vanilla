@@ -37,6 +37,10 @@ export const splashVariables = useThemeCache(styleOverwrite => {
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
 
+    const options = makeThemeVars("options", {
+        alignment: "left" as "left" | "center",
+    });
+
     const topPadding = 69;
     const spacing = makeThemeVars("spacing", {
         padding: {
@@ -101,7 +105,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
             color: colors.contrast,
             size: globalVars.fonts.size.largeTitle,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
-            align: "center",
+            align: options.alignment,
             shadow: `0 1px 1px ${colorOut(
                 modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity),
             )}, 0 1px 25px ${colorOut(
@@ -253,6 +257,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
     });
 
     return {
+        options,
         outerBackground,
         backgrounds,
         spacing,
@@ -343,7 +348,7 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         position: "relative",
         maxWidth: percent(100),
         width: px(vars.searchContainer.width),
-        margin: "auto",
+        margin: vars.options.alignment === "center" ? "auto" : undefined,
         $nest: {
             ".search-results": {
                 maxWidth: percent(100),
@@ -368,10 +373,11 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         alignItems: "center",
         width: unit(vars.searchContainer.width),
         maxWidth: percent(100),
-        margin: "auto",
+        margin: vars.options.alignment === "center" ? "auto" : undefined,
     });
 
     const titleFlexSpacer = style("titleFlexSpacer", {
+        display: vars.options.alignment === "center" ? "block" : "none",
         position: "relative",
         height: unit(formElementVars.sizing.height),
         width: unit(formElementVars.sizing.height),

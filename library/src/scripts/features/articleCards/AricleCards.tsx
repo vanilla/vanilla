@@ -7,7 +7,7 @@ import React from "react";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import Card from "@library/features/articleCards/Card";
-import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
+import { articleCardsVariables, articleCardsClasses } from "./articleCardsStyles";
 
 interface ICard {
     icon: string;
@@ -38,9 +38,9 @@ export enum TileAlignment {
  */
 export default class ArticleCards extends React.Component<IProps> {
     public render() {
-        const vars = tilesVariables();
+        const vars = articleCardsVariables();
         const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
-        const classes = tilesClasses();
+        const classes = articleCardsClasses();
 
         if (items.length === 0) {
             return (
@@ -57,7 +57,7 @@ export default class ArticleCards extends React.Component<IProps> {
                                 <Card
                                     icon={tile.icon}
                                     fallbackIcon={this.props.fallbackIcon}
-                                    title={tile.name}
+                                    title={tile.title}
                                     description={tile.description}
                                     url={tile.url}
                                     columns={columns}

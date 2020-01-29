@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import { tileClasses } from "@library/features/tiles/titleStyles";
+import { cardClasses } from "@library/features/articleCards/cardStyles";
 
 interface IProps {
     icon: string;
@@ -33,7 +33,7 @@ export default class Card extends React.Component<IProps> {
         const { icon, title, description, url, className, iconAltText, headingLevel, columns } = this.props;
         const H = `h${headingLevel}` as "h1";
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
-        const classes = tileClasses();
+        const classes = cardClasses();
         return (
             <div className={classNames(className, classes.root(columns))}>
                 <SmartLink className={classNames(classes.link(columns))} to={url}>
@@ -41,8 +41,12 @@ export default class Card extends React.Component<IProps> {
                         {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} />}
                         {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>
-                    <H className={classNames(classes.title)}>{title}</H>
-                    {description && <Paragraph className={classNames(classes.description)}>{description}</Paragraph>}
+                    <div>
+                        <H className={classNames(classes.title)}>{title}</H>
+                        {description && (
+                            <Paragraph className={classNames(classes.description)}>{description}</Paragraph>
+                        )}
+                    </div>
                 </SmartLink>
             </div>
         );

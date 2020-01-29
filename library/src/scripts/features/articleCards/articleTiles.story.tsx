@@ -24,7 +24,7 @@ formsStory.add(
                         <StoryHeading>As Tiles - 3 columns </StoryHeading>
                     </StoryContent>
                     <ArticleCards
-                        columns={2}
+                        columns={3}
                         alignment={TileAlignment.LEFT}
                         items={dummyRecommendedArticles.items}
                         title={"Recommended Articles"}

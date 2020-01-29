@@ -19,7 +19,7 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { heroClasses } from "@library/hero/heroStyles";
+import { bannerClasses } from "@library/banner/bannerStyles";
 
 const story = storiesOf("Search", module);
 
@@ -31,7 +31,7 @@ story.add("Search Components", () => {
         dateLastActive: "2016-07-25 17:51:15",
     };
 
-    const classesSearch = heroClasses();
+    const classesSearch = bannerClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Elements</StoryHeading>

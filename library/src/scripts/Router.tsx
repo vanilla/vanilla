@@ -11,7 +11,7 @@ import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
 import { initPageViewTracking, usePageChangeListener } from "@library/pageViews/pageViewTracking";
-import { HeroContextProvider } from "./hero/HeroContext";
+import { BannerContextProvider } from "./banner/BannerContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -45,7 +45,7 @@ export function Router(props: IProps) {
         routes = (
             <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>
                 <BackRoutingProvider>
-                    <HeroContextProvider>{routes}</HeroContextProvider>
+                    <BannerContextProvider>{routes}</BannerContextProvider>
                 </BackRoutingProvider>
             </LinkContextProvider>
         );

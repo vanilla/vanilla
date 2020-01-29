@@ -8,36 +8,36 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import Hero, { IHeroStyleOverwrite } from "@library/hero/Hero";
+import Banner, { IBannerStyleOverwrite } from "@library/banner/Banner";
 import { MemoryRouter, Router } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import merge from "lodash/merge";
 import { assetUrl } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { heroFallbackBG } from "@library/hero/heroStyles";
+import { bannerFallbackBG } from "@library/banner/bannerStyles";
 import { color } from "csx";
 
 const story = storiesOf("Home Page", module);
 
-story.add("Hero", () => {
+story.add("Banner", () => {
     const globalVars = globalVariables();
 
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <StoryContent>
-                    <StoryHeading depth={1}>Hero</StoryHeading>
+                    <StoryHeading depth={1}>Banner</StoryHeading>
                     <StoryHeading>Default Background</StoryHeading>
                 </StoryContent>
-                <Hero
+                <Banner
                     title={"How can we help you?"}
                     styleOverwrite={{
                         colors: {
                             bg: globalVars.mainColors.bg,
                             fg: globalVars.mainColors.fg,
                         },
-                        outerBackgroundImage: heroFallbackBG,
+                        outerBackgroundImage: bannerFallbackBG,
                         backgrounds: {
                             useOverlay: false,
                         },
@@ -46,7 +46,7 @@ story.add("Hero", () => {
                 <StoryContent>
                     <StoryHeading>Custom Background</StoryHeading>
                 </StoryContent>
-                <Hero
+                <Banner
                     title={"What can we do for you?"}
                     styleOverwrite={{
                         colors: {
@@ -63,7 +63,7 @@ story.add("Hero", () => {
                 <StoryContent>
                     <StoryHeading>Custom Colors</StoryHeading>
                 </StoryContent>
-                <Hero
+                <Banner
                     title={"What's on your mind?"}
                     styleOverwrite={
                         {
@@ -77,7 +77,7 @@ story.add("Hero", () => {
                                 useOverlay: false,
                             },
                             outerBackgroundImage: "none",
-                        } as IHeroStyleOverwrite
+                        } as IBannerStyleOverwrite
                     }
                 />
             </SearchContext.Provider>

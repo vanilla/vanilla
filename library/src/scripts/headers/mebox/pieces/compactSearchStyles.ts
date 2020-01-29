@@ -10,14 +10,13 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
 
-    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
+    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.08);
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
         baseColor = baseColor.fade(0.3);

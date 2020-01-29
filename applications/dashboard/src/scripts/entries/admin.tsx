@@ -12,7 +12,7 @@ import { addComponent, disableComponentTheming } from "@library/utility/componen
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { mountReact } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import "@library/theming/reset";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -33,7 +33,7 @@ const render = () => {
         mountReact(
             // Error component is set as null until we can refactor a non-kb specific Error page.
             <AppContext errorComponent={<ErrorPage /> || null}>
-                <Router sectionRoot="/theme" />
+                <Router disableDynamicRouting />
             </AppContext>,
             app,
         );

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Richard Flynn <richard.flynn@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -63,6 +63,36 @@ class ValidateRequiredTest extends TestCase {
             'valueIsBool' => [
                 true,
                 null,
+                false,
+            ],
+            'valueIsEmptyStringFieldIsArrayObjectWithEnumTrue' => [
+                '',
+                new \ArrayObject(['Enum' => [
+                    '',
+                    'declined',
+                    'given',
+                    'pending',
+                    ]], \ArrayObject::ARRAY_AS_PROPS),
+                true,
+            ],
+            'valueIsEmptyStringFieldIsArrayWithEnumTrue' => [
+                '',
+                ['Enum' => [
+                    '',
+                    'declined',
+                    'given',
+                    'pending',
+                ]],
+                true,
+            ],
+            'valueIsEmptyStringFieldIsArrayObjectWithEnumFalse' => [
+                '',
+                new \ArrayObject(array('Enum' => array (
+                    0 => 'foo',
+                    1 => 'declined',
+                    2 => 'given',
+                    3 => 'pending',
+                ))),
                 false,
             ],
         ];

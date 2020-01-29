@@ -9,6 +9,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Model base class.
  *
@@ -35,6 +37,9 @@ class Gdn_Model extends Gdn_Pluggable {
      * field will be automatically filled by the model if it exists.
      */
     public $DateUpdated = 'DateUpdated';
+
+    /** @var EventManager */
+    private $eventManager;
 
     /**
      * @var array The fields that should be filtered out via {@link Gdn_Model::filterForm()}.
@@ -122,6 +127,8 @@ class Gdn_Model extends Gdn_Pluggable {
             'hpt' => 0
         ];
 
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+
         parent::__construct();
     }
 
@@ -144,6 +151,15 @@ class Gdn_Model extends Gdn_Pluggable {
      * A overridable function called before the various get queries.
      */
     protected function _beforeGet() {
+    }
+
+    /**
+     * Get the configured event mnager instance.
+     *
+     * @return EventManager
+     */
+    public function getEventManager(): EventManager {
+        return $this->eventManager;
     }
 
     /**

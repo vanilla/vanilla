@@ -1,14 +1,12 @@
 {
     "global": {
         "mainColors": {
-            "primary": "#dbd1e8",
+            "primary": "#6c1794",
             "fg": "#fff",
             "bg": "#323639"
         },
         "fonts": {
-            "families": {
-                "body": ["Nunito"]
-            }
+            "families": {}
         }
     },
     "hero": {
@@ -31,7 +29,7 @@
     "titleBar": {
         "colors": {
             "fg": "#fff",
-            "bg": "#dbd1e8"
+            "bg": "#6c1794"
         },
         "border": {
             "type": "border"

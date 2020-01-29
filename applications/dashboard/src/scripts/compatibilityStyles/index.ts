@@ -40,6 +40,7 @@ export const compatibilityStyles = useThemeCache(() => {
         backgroundColor: bg,
         color: fg,
     });
+
     cssOut(".Frame", {
         background: "none",
         overflow: "auto",
@@ -47,6 +48,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".DataList .Item, .MessageList .Item", {
         background: "none",
+        borderColor: colorOut(vars.border.color),
     });
 
     // @mixin font-style-base()
@@ -185,6 +187,10 @@ export const compatibilityStyles = useThemeCache(() => {
             vertical: vars.gutter.size,
             horizontal: importantUnit(vars.gutter.half),
         }),
+    });
+
+    cssOut(".MenuItems, .Flyout.Flyout", {
+        ...borders(),
     });
 
     buttonCSS();

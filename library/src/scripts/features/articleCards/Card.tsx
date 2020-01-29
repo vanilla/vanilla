@@ -9,6 +9,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import { cardClasses } from "@library/features/articleCards/cardStyles";
+import TruncatedText from "@library/content/TruncatedText";
 
 interface IProps {
     icon: string;
@@ -27,7 +28,7 @@ interface IProps {
  */
 export default class Card extends React.Component<IProps> {
     public static defaultProps = {
-        headingLevel: 3,
+        headingLevel: 5,
     };
     public render() {
         const { icon, title, description, url, className, iconAltText, headingLevel, columns } = this.props;
@@ -41,10 +42,12 @@ export default class Card extends React.Component<IProps> {
                         {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} />}
                         {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>
-                    <div>
+                    <div className={classes.content}>
                         <H className={classNames(classes.title)}>{title}</H>
                         {description && (
-                            <Paragraph className={classNames(classes.description)}>{description}</Paragraph>
+                            <Paragraph className={classNames(classes.description)}>
+                                <TruncatedText>{description}</TruncatedText>
+                            </Paragraph>
                         )}
                     </div>
                 </SmartLink>

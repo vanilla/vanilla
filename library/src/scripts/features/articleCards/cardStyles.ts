@@ -12,6 +12,7 @@ import {
     paddings,
     unit,
     userSelect,
+    IBackground,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
@@ -19,6 +20,10 @@ import { TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent } from "csx";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
+import { url } from "inspector";
+interface IBody {
+    backgroundImage: IBackground;
+}
 
 export const cardVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,16 +56,23 @@ export const cardVariables = useThemeCache(() => {
 
     const link = themeVars("link", {
         padding: {
-            top: 36,
+            top: 0,
             bottom: 24,
-            left: 24,
-            right: 24,
+            left: 0,
+            right: 0,
         },
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         twoColumnsMinHeight: 0,
         threeColumnsMinHeight: 0,
         fourColumnsMinHeight: 0,
+    });
+
+    const content = themeVars("content", {
+        padding: {
+            left: 16,
+            right: 16,
+        },
     });
 
     const fallBackIcon = themeVars("fallBackIcon", {
@@ -76,6 +88,7 @@ export const cardVariables = useThemeCache(() => {
         description,
         link,
         fallBackIcon,
+        content,
     };
 });
 
@@ -153,7 +166,7 @@ export const cardClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const frame = (columns?: number) => {
+    const frame: IBody = (columns?: number) => {
         let height;
         let width;
 
@@ -173,15 +186,18 @@ export const cardClasses = useThemeCache(() => {
         }
         return style("iconFrame", {
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            //alignItems: "center",
+            //justifyContent: "center",
             position: "relative",
             height: unit(height),
             width: unit(width),
             marginTop: "auto",
-            marginRight: "auto",
-            marginLeft: "auto",
+            // marginRight: "auto",
+            // marginLeft: "auto",
             marginBottom: unit(vars.frame.bottomMargin),
+            backgroundImage: {
+                color: "red",
+            },
         });
     };
 
@@ -201,7 +217,6 @@ export const cardClasses = useThemeCache(() => {
     const title = style("title", {
         fontSize: unit(vars.title.fontSize),
         lineHeight: vars.title.lineHeight,
-        textAlign: "center",
         marginBottom: unit(vars.title.marginBottom),
     });
 
@@ -210,7 +225,6 @@ export const cardClasses = useThemeCache(() => {
         marginTop: unit(vars.description.marginTop),
         fontSize: unit(vars.description.fontSize),
         lineHeight: vars.description.lineHeight,
-        textAlign: "center",
     });
 
     const fallBackIcon = style("fallbackIcon", {
@@ -220,10 +234,16 @@ export const cardClasses = useThemeCache(() => {
         color: vars.fallBackIcon.fg.toString(),
     });
 
+    const content = style("content", {
+        ...paddings(vars.content.padding),
+        textAlign: "left",
+    });
+
     return {
         root,
         link,
         frame,
+        content,
         icon,
         main,
         title,

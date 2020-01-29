@@ -19,7 +19,7 @@ export const bodyCSS = useThemeCache(() => {
     });
 
     cssRule("html, body", {
-        backgroundColor: colorOut(globalVars.body.backgroundImage.color),
+        background: colorOut(globalVars.body.backgroundImage.color),
         ...fonts({
             size: globalVars.fonts.size.medium,
             family: globalVars.fonts.families.body,

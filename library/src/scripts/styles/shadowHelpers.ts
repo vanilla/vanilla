@@ -4,26 +4,80 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { ColorValues } from "@library/styles/styleHelpersColors";
 import { borders } from "@library/styles/styleHelpersBorders";
+import { unit } from "@library/styles/styleHelpers";
+
+interface IShadowSizing {
+    horizontalOffset: number;
+    verticalOffset: number;
+    blur: number;
+    spread: number;
+    opacity: number;
+}
+
+export const shadowVariables = useThemeCache(() => {
+    const makeVariables = variableFactory("shadow");
+
+    const widget: IShadowSizing = makeVariables("widget", {
+        horizontalOffset: 0,
+        verticalOffset: 1,
+        blur: 3,
+        spread: 0,
+        opacity: 0.22,
+    });
+
+    const widgetHover: IShadowSizing = makeVariables("widgetHover", {
+        horizontalOffset: 0,
+        verticalOffset: 2,
+        blur: 4,
+        spread: 0,
+        opacity: 0.22,
+    });
+
+    const dropDown: IShadowSizing = makeVariables("dropDown", {
+        horizontalOffset: 0,
+        verticalOffset: 5,
+        blur: 10,
+        spread: 0,
+        opacity: 0.3,
+    });
+
+    const modal: IShadowSizing = makeVariables("modal", {
+        horizontalOffset: 0,
+        verticalOffset: 5,
+        blur: 20,
+        spread: 0,
+        opacity: 0.5,
+    });
+
+    return { widget, widgetHover, dropDown, modal };
+});
 
 export const shadowHelper = useThemeCache(() => {
+    const vars = shadowVariables();
     const globalVars = globalVariables();
     const shadowBaseColor = globalVars.mainColors.fg;
     const makeShadow = (opacity: number = 0.3) => `0 1px 3px 0 ${shadowBaseColor.fade(opacity)}`;
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.widget;
         return {
-            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}`,
+            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
+                opacity,
+            )}`,
         };
     };
 
     const embedHover = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.widgetHover;
         return {
-            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}, 0 2px 4px 0 ${baseColor.darken(0.5).fade(0.22)}`,
+            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor
+                .darken(0.5)
+                .fade(opacity)}`,
         };
     };
 

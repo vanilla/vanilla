@@ -11,6 +11,7 @@ import {
     IBorderRadiusOutput,
     modifyColorBasedOnLightness,
     radiusValue,
+    EMPTY_BACKGROUND,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
@@ -105,6 +106,7 @@ export const globalVariables = useThemeCache(() => {
 
     const body: IBody = makeThemeVars("body", {
         backgroundImage: {
+            ...EMPTY_BACKGROUND,
             color: mainColors.bg,
         },
     });

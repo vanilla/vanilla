@@ -19,6 +19,9 @@ import { resetStoreState } from "@library/__tests__/testStoreState";
 import merge from "lodash/merge";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { tileVariables } from "@library/features/tiles/tileStyles";
+import { tilesVariables } from "@library/features/tiles/tilesStyles";
+import { splashVariables } from "@library/splash/splashStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -29,7 +32,10 @@ function ErrorComponent() {
 interface IContext {
     storeState?: DeepPartial<ICoreStoreState>;
     themeVars?: {
-        global: DeepPartial<ReturnType<typeof globalVariables>>;
+        global?: DeepPartial<ReturnType<typeof globalVariables>>;
+        tiles?: DeepPartial<ReturnType<typeof tilesVariables>>;
+        tile?: DeepPartial<ReturnType<typeof tileVariables>>;
+        splash?: DeepPartial<ReturnType<typeof splashVariables>>;
         [key: string]: any;
     };
     useWrappers?: boolean;

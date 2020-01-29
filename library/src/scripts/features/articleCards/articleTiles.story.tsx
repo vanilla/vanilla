@@ -12,8 +12,7 @@ import { dummyRecommendedArticles } from "./recommendedArticle.storyData";
 import Tiles, { TileAlignment } from "../tiles/Tiles";
 import ArticleCards from "./AricleCards";
 
-const formsStory = storiesOf("Tiles", module);
-
+const formsStory = storiesOf("Home Page", module);
 formsStory.add(
     "Recommended Articles",
     () =>
@@ -21,56 +20,15 @@ formsStory.add(
             return (
                 <Container>
                     <StoryContent>
-                        <StoryHeading depth={1}>Sub community List</StoryHeading>
-                        <StoryHeading>As Tiles - 2 columns left aligned</StoryHeading>
+                        <StoryHeading depth={1}>Recommended Articles</StoryHeading>
+                        <StoryHeading>As Tiles - 3 columns </StoryHeading>
                     </StoryContent>
                     <ArticleCards
                         columns={2}
                         alignment={TileAlignment.LEFT}
-                        items={[
-                            {
-                                name: "Development",
-                                description: "Processes and guidance for developers.",
-                                url: "https://staff.vanillaforums.com/kb/dev",
-                                icon: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
-                            },
-                            {
-                                name: "Success",
-                                description: "Information for CSMs about troubleshooting & working with Vanilla.",
-                                url: "https://staff.vanillaforums.com/kb/success",
-                                icon: "https://us.v-cdn.net/5022541/uploads/466/WCXDHD4UMW3K.png",
-                            },
-                            {
-                                name: "Internal Testing",
-                                description: "Knowledge for us in internal tests. Don't put anything important here.",
-                                url: "https://staff.vanillaforums.com/kb/testing",
-                                icon: "https://us.v-cdn.net/5022541/uploads/048/66SQHHGSZT2R.png",
-                            },
-                            {
-                                name: "Information Security",
-                                description: "Internal company security practices.",
-                                url: "https://staff.vanillaforums.com/kb/infosec",
-                                icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
-                            },
-                            {
-                                name: "Information Security",
-                                description: "Internal company security practices.",
-                                url: "https://staff.vanillaforums.com/kb/infosec",
-                                icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
-                            },
-                        ]}
-                        title={"Our Games"}
-                        emptyMessage={"No subcommunities found"}
-                    />
-                    <StoryContent>
-                        <StoryHeading>As Tiles - 3 columns centered</StoryHeading>
-                    </StoryContent>
-                    <Tiles
-                        columns={3}
-                        alignment={TileAlignment.CENTER}
                         items={dummyRecommendedArticles.items}
                         title={"Recommended Articles"}
-                        emptyMessage={"No subcommunities found"}
+                        emptyMessage={"No Articles found"}
                     />
                 </Container>
             );

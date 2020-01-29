@@ -11,7 +11,7 @@ import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyle
 
 interface ICard {
     icon: string;
-    name: string;
+    title: string;
     description: string;
     url: string;
 }

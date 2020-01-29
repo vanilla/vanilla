@@ -38,7 +38,7 @@ include $this->fetchViewLocation('helper_functions');
                 } elseif ($Row['Operation'] === 'Delete') {
                     switch (strtolower($Row['RecordType'])) {
                         case 'comment':
-                            $Url = "/discussion/{$Row['ParentRecordID']}/x/p1";
+                            $Url = "/log/filter?recordType=comment&recordID={$Row['RecordID']}";
                     }
                 }
 

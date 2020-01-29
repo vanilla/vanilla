@@ -1140,9 +1140,6 @@ class EntryController extends Gdn_Controller {
                                 'Reason' => 'Password',
                             ]);
                         }
-                    } catch (Gdn_SanitizedUserException $ex) {
-                        $errorMessage = $ex->getMessage();
-                        $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
                     }

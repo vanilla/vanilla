@@ -55,7 +55,7 @@ trait MiddlewareAwareTrait {
      */
     public function callMiddleware(RequestInterface $request): Data {
         if ($this->middleware === null) {
-            throw new \RuntimeException("Cannot add middleware before the inner middleware is initialized.", 500);
+            throw new \RuntimeException("Cannot call middleware before the inner middleware is initialized.", 500);
         }
         $response = call_user_func($this->middleware, $request);
 

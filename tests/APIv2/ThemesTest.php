@@ -175,7 +175,7 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testIndex() {
         $response = $this->api()->get("themes");
         $body = $response->getBody();
-        $this->assertEquals(2, count($body));
+        $this->assertEquals(3, count($body), 'The 2 unhidden files, and the current are returned');
     }
 
     /**

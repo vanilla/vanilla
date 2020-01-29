@@ -35,7 +35,7 @@ export function ImageEmbed(props: IProps) {
         <div ref={contentRef} className={classNames("embedImage", embedMenuClasses().imageContainer)}>
             <div className="embedImage-link">
                 <img
-                    aria-describedBy={descriptionID}
+                    aria-describedby={descriptionID}
                     className={classNames("embedImage-img", FOCUS_CLASS)}
                     src={props.url}
                     alt={props.name}
@@ -57,24 +57,24 @@ export function ImageEmbed(props: IProps) {
                     </Button>
                 </EmbedMenu>
             )}
-            {isOpen && (
-                <ImageEmbedModal
-                    onSave={newValue => {
-                        props.syncBackEmbedValue &&
-                            props.syncBackEmbedValue({
-                                name: newValue.alt,
-                            });
-                        props.selectSelf && props.selectSelf();
-                    }}
-                    initialAlt={props.name}
-                    onClose={() => {
-                        setIsOpen(false);
-                        setImmediate(() => {
-                            props.selectSelf?.();
+
+            <ImageEmbedModal
+                isVisible={isOpen}
+                onSave={newValue => {
+                    props.syncBackEmbedValue &&
+                        props.syncBackEmbedValue({
+                            name: newValue.alt,
                         });
-                    }}
-                />
-            )}
+                    props.selectSelf && props.selectSelf();
+                }}
+                initialAlt={props.name}
+                onClose={() => {
+                    setIsOpen(false);
+                    setImmediate(() => {
+                        props.selectSelf?.();
+                    });
+                }}
+            />
         </div>
     );
 }

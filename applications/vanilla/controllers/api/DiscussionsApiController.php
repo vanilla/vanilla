@@ -11,7 +11,9 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\SchemaFactory;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -211,39 +213,13 @@ class DiscussionsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return Schema::parse([
-            'discussionID:i' => 'The ID of the discussion.',
-            'type:s|n' => [
-                //'enum' => [] // Let's find a way to fill that properly.
-                'description' => 'The type of this discussion if any.',
-            ],
-            'name:s' => 'The title of the discussion.',
-            'body:s' => 'The body of the discussion.',
-            'categoryID:i' => 'The category the discussion is in.',
-            'category?' => $this->getCategoryFragmentSchema(),
-            'dateInserted:dt' => 'When the discussion was created.',
-            'dateUpdated:dt|n' => 'When the discussion was last updated.',
-            'dateLastComment:dt|n' => 'When the last comment was posted.',
-            'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'lastUser?' => $this->getUserFragmentSchema(),
-            'pinned:b?' => 'Whether or not the discussion has been pinned.',
-            'pinLocation:s|n' => [
-                'enum' => ['category', 'recent'],
-                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
-            ],
-            'closed:b' => 'Whether the discussion is closed or open.',
-            'sink:b' => 'Whether or not the discussion has been sunk.',
-            'countComments:i' => 'The number of comments on the discussion.',
-            'countViews:i' => 'The number of views on the discussion.',
-            'score:i|n' => 'Total points associated with this post.',
-            'url:s?' => 'The full URL to the discussion.',
-            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
-            'lastPost?' => $this->getPostFragmentSchema(),
-            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
-            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
-            'countUnread:i?' => 'The number of unread comments.',
-        ]);
+        $result = $this->discussionModel
+            ->schema()
+            ->merge($this->discussionModel->userDiscussionSchema())
+            ->merge(Schema::parse([
+                'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
+            ]));
+        return $result;
     }
 
     /**
@@ -294,12 +270,6 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord, $expand = []) {
-        $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
-        $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
-        $dbRecord['Url'] = discussionUrl($dbRecord);
-        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
-        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
-
         if ($this->getSession()->User) {
             $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
                 && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
@@ -310,47 +280,21 @@ class DiscussionsApiController extends AbstractApiController {
             $dbRecord['unread'] = false;
         }
 
-        if ($this->isExpandField('lastPost', $expand)) {
-            $lastPost = [
-                'discussionID' => $dbRecord['DiscussionID'],
-                'dateInserted' => $dbRecord['DateLastComment'],
-                "insertUserID" => $dbRecord["LastUserID"],
-            ];
-            if ($dbRecord['LastCommentID']) {
-                $lastPost['CommentID'] = $dbRecord['LastCommentID'];
-                $lastPost['name'] = sprintft('Re: %s', $dbRecord['Name']);
-                $lastPost['url'] = commentUrl($lastPost, true);
-            } else {
-                $lastPost['name'] = $dbRecord['Name'];
-                $lastPost['url'] = $dbRecord['Url'];
-            }
-
-            if ($this->isExpandField('lastPost.insertUser', $expand) || $this->isExpandField('lastUser', $expand) && array_key_exists('LastUser', $dbRecord)) {
-                $lastPost['insertUser'] = $dbRecord['LastUser'];
-                if (!$this->isExpandField('lastUser', $expand)) {
-                    unset($dbRecord['LastUser']);
-                }
-            }
-
-            $dbRecord['lastPost'] = $lastPost;
-        }
-
-        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
-        if (empty($dbRecord['DateLastComment'])) {
-            $dbRecord['DateLastComment'] = $dbRecord['DateInserted'];
-        }
-
         // The Category key will hold a category fragment in API responses. Ditch the default string.
         if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
             unset($dbRecord['Category']);
         }
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
+        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
 
         // Allow addons to hook into the normalization process.
         $options = ['expand' => $expand];
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
+        $result = $this->getEventManager()->fireFilter(
+            'discussionsApiController_normalizeOutput',
+            $normalizedRow,
+            $this,
+            $options
+        );
 
         return $result;
     }

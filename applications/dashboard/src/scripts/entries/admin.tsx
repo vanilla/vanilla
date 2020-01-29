@@ -11,7 +11,8 @@ import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { mountReact } from "@vanilla/react-utils/src";
-import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import "@library/theming/reset";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -31,8 +32,7 @@ const render = () => {
     if (app) {
         mountReact(
             // Error component is set as null until we can refactor a non-kb specific Error page.
-            <AppContext errorComponent={null} noTheme>
-                <Backgrounds />
+            <AppContext errorComponent={<ErrorPage /> || null}>
                 <Router sectionRoot="/theme" />
             </AppContext>,
             app,

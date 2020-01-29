@@ -23,7 +23,7 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.5;
+    return color.lightness() >= 0.45;
 };
 
 /*

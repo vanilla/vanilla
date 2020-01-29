@@ -112,7 +112,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
             case 405:
                 $method = empty($context['method']) ? '' : $context['method'];
                 $allow = empty($context['allow']) ? [] : $context['allow'];
-                unset ($context['method'], $context['allow']);
+                unset($context['method'], $context['allow']);
 
                 return new MethodNotAllowedException($method, $allow, $context);
         }

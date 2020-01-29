@@ -76,6 +76,6 @@ yarn build
 Requires the following config:
 
 `$Configuration['Garden']['CurrentTheme'] = 'theme-foundation';`
-`$Configuration['themeFeatures']['DataDrivenForum'] = true;`
+`$Configuration['themeFeatures']['DataDrivenTheme'] = true;`
 
-Note that the `DataDrivenForum` config will use the React based header. 
+Note that the `DataDrivenTheme` config will use the React based header. 

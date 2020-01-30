@@ -18,25 +18,14 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
-
-export interface IBannerStyleOverwrite {
-    colors?: {
-        bg?: ColorValues;
-        fg?: ColorValues;
-        borderColor?: ColorValues;
-    };
-    backgrounds?: {
-        useOverlay?: boolean;
-    };
-    outerBackgroundImage?: string;
-}
+import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 
 interface IProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     description?: React.ReactNode;
     className?: string;
-    styleOverwrite?: IBannerStyleOverwrite;
+    image?: string;
 }
 
 /**
@@ -47,12 +36,12 @@ export default function Banner(props: IProps) {
     const ref = useBannerContainerDivRef();
 
     const { action, className, title, description } = props;
-    const styleOverwrite = props.styleOverwrite || {};
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = bannerClasses(styleOverwrite);
-    const vars = bannerVariables(styleOverwrite);
+    const classes = bannerClasses();
+    const vars = bannerVariables();
+    const { options } = vars;
 
     const isImageBg = vars.options.imageType === "background";
 
@@ -63,15 +52,10 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div
-                className={classNames(
-                    classes.outerBackground(
-                        styleOverwrite.outerBackgroundImage ? styleOverwrite.outerBackgroundImage : undefined,
-                    ),
-                )}
-            />
-            {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) || vars.backgrounds.useOverlay) &&
-                isImageBg && <div className={classes.backgroundOverlay} />}
+            <div className={classNames(classes.outerBackground(props.image ?? undefined))}>
+                {!props.image && !vars.outerBackground.image && <DefaultBannerBg />}
+            </div>
+            {vars.backgrounds.useOverlay && isImageBg && <div className={classes.backgroundOverlay} />}
             <Container>
                 <div className={classes.innerContainer}>
                     <PanelWidgetHorizontalPadding>
@@ -80,25 +64,27 @@ export default function Banner(props: IProps) {
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
                         </div>
-                        {description && (
+                        {!options.hideDesciption && description && (
                             <div className={classes.descriptionWrap}>
-                                <p className={classes.description}>{description}</p>
+                                <p className={classNames(classes.description, classes.text)}>{description}</p>
                             </div>
                         )}
-                        <div className={classes.searchContainer}>
-                            <IndependentSearch
-                                buttonClass={classes.searchButton}
-                                buttonBaseClass={ButtonTypes.CUSTOM}
-                                isLarge={true}
-                                placeholder={t("Search")}
-                                inputClass={classes.input}
-                                iconClass={classes.icon}
-                                buttonLoaderClassName={classes.buttonLoader}
-                                hideSearchButton={device === Devices.MOBILE || device === Devices.XS}
-                                contentClass={classes.content}
-                                valueContainerClasses={classes.valueContainer}
-                            />
-                        </div>
+                        {!options.hideSearch && (
+                            <div className={classes.searchContainer}>
+                                <IndependentSearch
+                                    buttonClass={classes.searchButton}
+                                    buttonBaseClass={ButtonTypes.CUSTOM}
+                                    isLarge={true}
+                                    placeholder={t("Search")}
+                                    inputClass={classes.input}
+                                    iconClass={classes.icon}
+                                    buttonLoaderClassName={classes.buttonLoader}
+                                    hideSearchButton={device === Devices.MOBILE || device === Devices.XS}
+                                    contentClass={classes.content}
+                                    valueContainerClasses={classes.valueContainer}
+                                />
+                            </div>
+                        )}
                     </PanelWidgetHorizontalPadding>
                 </div>
             </Container>

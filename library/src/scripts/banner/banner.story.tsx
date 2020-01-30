@@ -12,9 +12,10 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color } from "csx";
 import Banner from "@library/banner/Banner";
+import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 
 export default {
-    title: "Splash",
+    title: "Banner",
     params: {
         chromatic: {
             // viewports: [1400],
@@ -22,16 +23,12 @@ export default {
     },
 };
 
-function StorySplash(props: { title: string }) {
+function StoryBanner(props: { title: string }) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <StoryContent>
-                    <StoryHeading depth={1}>Splash</StoryHeading>
-                    <StoryHeading>{props.title}</StoryHeading>
-                </StoryContent>
                 <Banner
-                    title={"How can we help you?"}
+                    title={props.title}
                     description="This is a description. They're pretty great, you should try one sometime."
                 />
             </SearchContext.Provider>
@@ -39,44 +36,104 @@ function StorySplash(props: { title: string }) {
     );
 }
 
-export const Standard = storyWithConfig({}, () => <StorySplash title="Standard" />);
+export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryBanner title="Standard" />);
+
+export const NoDescription = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    hideDesciption: true,
+                },
+                colors: {
+                    primary: color("#9279a8"),
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Description" />,
+);
+
+export const NoSearch = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    hideSearch: true,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Search" />,
+);
+
+export const NoBackground = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                colors: {
+                    contrast: color("rgb(42,42,42)"),
+                    primary: color("#9279a8"),
+                    bg: color("#699dff"),
+                    fg: color("rgb(255,254,250)"),
+                },
+                backgrounds: {
+                    useOverlay: false,
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.SOLID,
+                },
+                outerBackground: {
+                    image: "none",
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Background" />,
+);
 
 export const LeftAligned = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            splash: {
+            banner: {
                 options: {
                     alignment: "left",
                 },
             },
         },
     },
-    () => <StorySplash title="Left Aligned" />,
+    () => <StoryBanner title="Left Aligned" />,
 );
 
 export const BackgroundImage = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            splash: {
+            banner: {
                 outerBackground: {
                     image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
                 },
                 backgrounds: {
                     useOverlay: true,
                 },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.TRANSPARENT,
+                },
             },
         },
     },
-    () => <StorySplash title="With a background image" />,
+    () => <StoryBanner title="With a background image" />,
 );
 
 export const CustomOverlay = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            splash: {
+            banner: {
                 outerBackground: {
                     image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
                 },
@@ -87,28 +144,5 @@ export const CustomOverlay = storyWithConfig(
             },
         },
     },
-    () => <StorySplash title="With a background image (and colored overlay)" />,
-);
-
-export const CustomColors = storyWithConfig(
-    {
-        useWrappers: false,
-        themeVars: {
-            splash: {
-                colors: {
-                    contrast: color("rgb(42,42,42)"),
-                    primary: color("#9279a8"),
-                    bg: color("#699dff"),
-                    fg: color("rgb(255,254,250)"),
-                },
-                backgrounds: {
-                    useOverlay: false,
-                },
-                outerBackground: {
-                    image: "none",
-                },
-            },
-        },
-    },
-    () => <StorySplash title="Custom Colors" />,
+    () => <StoryBanner title="With a background image (and colored overlay)" />,
 );

@@ -82,14 +82,20 @@ export const shadowHelper = useThemeCache(() => {
     };
 
     const dropDown = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.dropDown;
         return {
-            boxShadow: `0 5px 10px 0 ${baseColor.fade(0.3)}`,
+            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
+                opacity,
+            )}`,
         };
     };
 
     const modal = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.modal;
         return {
-            boxShadow: `0 5px 20px ${baseColor.fade(0.5)}`,
+            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
+                opacity,
+            )}`,
         };
     };
 

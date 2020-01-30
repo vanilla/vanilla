@@ -53,6 +53,8 @@ export default function Splash(props: IProps) {
     const classes = splashClasses(styleOverwrite);
     const vars = splashVariables(styleOverwrite);
 
+    const isImageBg = vars.options.imageType === "background";
+
     return (
         <div
             ref={ref}
@@ -67,9 +69,8 @@ export default function Splash(props: IProps) {
                     ),
                 )}
             />
-            {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) || vars.backgrounds.useOverlay) && (
-                <div className={classes.backgroundOverlay} />
-            )}
+            {((styleOverwrite.backgrounds && styleOverwrite.backgrounds.useOverlay) || vars.backgrounds.useOverlay) &&
+                isImageBg && <div className={classes.backgroundOverlay} />}
             <Container>
                 <div className={classes.innerContainer}>
                     <PanelWidgetHorizontalPadding>

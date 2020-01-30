@@ -39,6 +39,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
 
     const options = makeThemeVars("options", {
         alignment: "left" as "left" | "center",
+        imageType: "background" as "background" | "element",
     });
 
     const topPadding = 69;
@@ -281,6 +282,9 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
 
+    const isCentered = vars.options.alignment === "center";
+    const isImageBg = vars.options.imageType === "background";
+
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
@@ -348,7 +352,7 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         position: "relative",
         maxWidth: percent(100),
         width: px(vars.searchContainer.width),
-        margin: vars.options.alignment === "center" ? "auto" : undefined,
+        margin: isCentered ? "auto" : undefined,
         $nest: {
             ".search-results": {
                 maxWidth: percent(100),
@@ -373,11 +377,11 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         alignItems: "center",
         width: unit(vars.searchContainer.width),
         maxWidth: percent(100),
-        margin: vars.options.alignment === "center" ? "auto" : undefined,
+        margin: isCentered ? "auto" : undefined,
     });
 
     const titleFlexSpacer = style("titleFlexSpacer", {
-        display: vars.options.alignment === "center" ? "block" : "none",
+        display: isCentered ? "block" : "none",
         position: "relative",
         height: unit(formElementVars.sizing.height),
         width: unit(formElementVars.sizing.height),

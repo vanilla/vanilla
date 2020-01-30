@@ -10,7 +10,7 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { containerMainStyles } from "@library/layout/components/containerStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { paddings } from "@library/styles/styleHelpersfPadding";
+import { paddings } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, color, percent } from "csx";
 import { unit } from "@library/styles/styleHelpers";

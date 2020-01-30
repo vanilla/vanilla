@@ -92,8 +92,8 @@ export const titleBarVariables = useThemeCache(() => {
         },
     });
 
-    const titleBarNavAlignment = makeThemeVars("NavAlignment", {
-        justifyContent: "flex-start",
+    const navAlignment = makeThemeVars("navAlignment", {
+        alignment: "left",
     });
 
     const linkButtonDefaults: IButtonType = {
@@ -259,7 +259,7 @@ export const titleBarVariables = useThemeCache(() => {
         logo,
         mediaQueries,
         breakpoints,
-        titleBarNavAlignment,
+        navAlignment,
     };
 });
 
@@ -427,7 +427,7 @@ export const titleBarClasses = useThemeCache(() => {
             height: px(vars.sizing.height),
             color: "inherit",
             flexGrow: 1,
-            justifyContent: vars.titleBarNavAlignment.justifyContent,
+            justifyContent: vars.navAlignment.alignment === "left" ? "flex-start" : "center",
         },
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );

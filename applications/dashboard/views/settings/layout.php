@@ -89,7 +89,7 @@ function writeHomepageOption($title, $url, $iconPath, $current, $description = '
             }
 
             if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON)) {
-                echo writeHomepageOption('Best Of', 'bestof', $imgFolder.'images/best-of.png', $CurrentTarget);
+                echo writeHomepageOption('Best Of', 'bestof', $imgFolder.'best-of.png', $CurrentTarget);
             }
             ?>
         </div>

@@ -10,9 +10,8 @@ import { formatUrl } from "@library/utility/appUtils";
 import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
-import { BackgroundsProvider } from "./layout/Backgrounds";
-import { SplashContextProvider } from "@library/splash/SplashContext";
 import { initPageViewTracking, usePageChangeListener } from "@library/pageViews/pageViewTracking";
+import { BannerContextProvider } from "./banner/BannerContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -44,7 +43,7 @@ export function Router(props: IProps) {
 
     routes = (
         <BackRoutingProvider>
-            <SplashContextProvider>{routes}</SplashContextProvider>
+            <BannerContextProvider>{routes}</BannerContextProvider>
         </BackRoutingProvider>
     );
     if (!props.disableDynamicRouting) {

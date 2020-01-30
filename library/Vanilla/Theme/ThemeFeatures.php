@@ -26,7 +26,7 @@ class ThemeFeatures {
         'NewFlyouts' => false,
         'SharedMasterView' => false,
         'ProfileHeader' => false,
-        'DataDrivenForumColors' => false,
+        'DataDrivenTheme' => false,
     ];
 
     /**
@@ -73,5 +73,12 @@ class ThemeFeatures {
      */
     public function useProfileHeader(): bool {
         return (bool) $this->allFeatures()['ProfileHeader'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function useDataDrivenTheme(): bool {
+        return (bool) $this->allFeatures()['DataDrivenTheme'];
     }
 }

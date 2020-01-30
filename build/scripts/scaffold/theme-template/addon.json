@@ -11,7 +11,7 @@
         "ProfileHeader": true,
         "SharedMasterView": true,
         "NewFlyouts": true,
-        "DataDrivenForumColors": true
+        "DataDrivenTheme": true
     },
     "assets": {
         "footer": {

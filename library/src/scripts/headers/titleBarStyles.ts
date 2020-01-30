@@ -93,7 +93,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const navAlignment = makeThemeVars("navAlignment", {
-        alignment: "left",
+        alignment: "left" as "left" | "center",
     });
 
     const linkButtonDefaults: IButtonType = {

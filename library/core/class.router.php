@@ -287,7 +287,7 @@ class Gdn_Router extends Gdn_Pluggable {
     /**
      * Public method for _parseRoute
      *
-     * @param mixed $destination
+     * @param $destination
      * @return array|mixed
      */
     public function parseRoute($destination) {
@@ -295,13 +295,13 @@ class Gdn_Router extends Gdn_Pluggable {
     }
 
     /**
+     * Format route
      *
-     *
-     * @param $destination
-     * @param $routeType
+     * @param mixed $destination
+     * @param string $routeType
      * @return array
      */
-    private function _formatRoute($destination, $routeType) {
+    private function _formatRoute($destination, $routeType): array {
         return [
             'Destination' => $destination,
             'Type' => $routeType

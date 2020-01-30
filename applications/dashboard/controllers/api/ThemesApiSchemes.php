@@ -102,7 +102,7 @@ trait ThemesApiSchemes {
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),
                     "footer?" => $this->assetsPutArraySchema(),
-                    "variables:s?",
+                    "variables?" => $this->assetsPutArraySchema(),
                     "fonts:s?",
                     "scripts:s?",
                     "styles:s?",
@@ -140,7 +140,7 @@ trait ThemesApiSchemes {
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),
                     "footer?" => $this->assetsPutArraySchema(),
-                    "variables:s?",
+                    "variables?" => $this->assetsPutArraySchema(),
                     "fonts:s?",
                     "scripts:s?",
                     "styles:s?",

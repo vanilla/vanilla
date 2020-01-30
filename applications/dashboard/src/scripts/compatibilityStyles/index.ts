@@ -196,7 +196,15 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(vars.gutter.size),
+        marginTop: unit(vars.gutter.size * 2),
+    });
+
+    cssOut(`.PageControls.PageControls .selectBox`, {
+        height: "auto",
+    });
+
+    cssOut(`.Content .PageControls`, {
+        marginBottom: unit(24),
     });
 
     buttonCSS();

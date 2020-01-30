@@ -32,6 +32,7 @@ export const globalVariables = useThemeCache(() => {
 
     const constants = makeThemeVars("constants", {
         linkStateColorEmphasis: 0.15,
+        fullGutter: 48,
     });
 
     const elementaryColors = {

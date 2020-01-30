@@ -287,7 +287,7 @@ class Gdn_Router extends Gdn_Pluggable {
     /**
      * Public method for _parseRoute
      *
-     * @param $destination
+     * @param mixed $destination
      * @return array|mixed
      */
     public function parseRoute($destination) {

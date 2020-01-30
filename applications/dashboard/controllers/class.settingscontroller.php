@@ -691,6 +691,10 @@ class SettingsController extends DashboardController {
             $this->informMessage(t("Your changes were saved successfully."));
         }
 
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $this->setData('defaultRouteOptions', $siteSectionModel->getDefaultRoutes());
+
         // Add warnings for layouts that have been specified by the theme.
         $themeManager = Gdn::themeManager();
         $theme = $themeManager->enabledThemeInfo();

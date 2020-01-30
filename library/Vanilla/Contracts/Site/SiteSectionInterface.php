@@ -53,4 +53,11 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return string
      */
     public function getSectionGroup(): string;
+
+    /**
+     * Get default root controller route
+     *
+     * @return array
+     */
+    public function getDefaultRoute(): array;
 }

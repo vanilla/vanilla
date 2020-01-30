@@ -360,17 +360,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             'query' => array_change_key_case($request->get()),
             'post' => $request->post()
         ];
-
-        // Here is the basic format of a request:
-        // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
-
-        // Here are some examples of what this method could/would receive:
-        // /application/controller/method/argn
-        // /controller/method/argn
-        // /application/controller/argn
-        // /controller/argn
-        // /controller
-
         $parts = explode('/', str_replace('\\', '/', $request->path()));
         // Decode path parts at the dispatcher level.
         array_walk($parts, function(&$value) {
@@ -751,7 +740,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         } elseif (in_array($request->path(), ['', '/'])) {
             $this->isHomepage = true;
-            $defaultController = Gdn::router()->getRoute('DefaultController');
+            $defaultController = Gdn::router()->getDefaultRoute();
             $originalGet = $request->get();
             $request->pathAndQuery($defaultController['Destination']);
             if (is_array($originalGet) && count($originalGet) > 0) {

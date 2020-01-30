@@ -34,6 +34,7 @@ export interface ISplashStyleOverwrite {
 interface IProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
+    description?: React.ReactNode;
     className?: string;
     styleOverwrite?: ISplashStyleOverwrite;
 }
@@ -45,7 +46,7 @@ export default function Splash(props: IProps) {
     const device = useDevice();
     const ref = useSplashContainerDivRef();
 
-    const { action, className, title } = props;
+    const { action, className, title, description } = props;
     const styleOverwrite = props.styleOverwrite || {};
 
     const varsTitleBar = titleBarVariables();
@@ -79,6 +80,11 @@ export default function Splash(props: IProps) {
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
                         </div>
+                        {description && (
+                            <div className={classes.descriptionWrap}>
+                                <p className={classes.description}>{description}</p>
+                            </div>
+                        )}
                         <div className={classes.searchContainer}>
                             <IndependentSearch
                                 buttonClass={classes.searchButton}

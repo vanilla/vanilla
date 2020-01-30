@@ -88,6 +88,17 @@ export interface IFont {
     transform?: TextTransformProperty;
 }
 
+export const EMPTY_FONTS: IFont = {
+    color: undefined,
+    size: undefined,
+    weight: undefined,
+    lineHeight: undefined,
+    shadow: undefined,
+    align: undefined,
+    family: undefined,
+    transform: undefined,
+};
+
 export const fonts = (props: IFont): NestedCSSProperties => {
     if (props) {
         const fontSize = props.size !== undefined ? unit(props.size) : undefined;

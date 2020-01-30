@@ -20,6 +20,8 @@ import {
     background,
     absolutePosition,
     modifyColorBasedOnLightness,
+    EMPTY_FONTS,
+    EMPTY_SPACING,
 } from "@library/styles/styleHelpers";
 import { assetUrl } from "@library/utility/appUtils";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -38,7 +40,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
     const formElVars = formElementsVariables();
 
     const options = makeThemeVars("options", {
-        alignment: "left" as "left" | "center",
+        alignment: "center" as "left" | "center",
         imageType: "background" as "background" | "element",
     });
 
@@ -103,6 +105,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
     const title = makeThemeVars("title", {
         maxWidth: 700,
         font: {
+            ...EMPTY_FONTS,
             color: colors.contrast,
             size: globalVars.fonts.size.largeTitle,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
@@ -116,6 +119,21 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         marginTop: 28,
         marginBottom: 40,
         text: "How can we help you?",
+    });
+
+    const description = makeThemeVars("description", {
+        font: {
+            ...EMPTY_FONTS,
+            color: colors.contrast,
+            size: globalVars.fonts.size.large,
+            align: options.alignment,
+        },
+        maxWidth: 700,
+        padding: {
+            ...EMPTY_SPACING,
+            top: 28,
+            bottom: 40,
+        },
     });
 
     const searchContainer = makeThemeVars("searchContainer", {
@@ -266,6 +284,7 @@ export const splashVariables = useThemeCache(styleOverwrite => {
         innerBackground,
         text,
         title,
+        description,
         paragraph,
         search,
         searchDrawer,
@@ -321,32 +340,13 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         backgroundColor: vars.innerBackground.bg,
     });
 
-    const title = style("title", {
-        display: "block",
-        ...fonts(vars.title.font as IFont),
-        ...paddings({
-            top: unit(vars.title.marginTop),
-            bottom: unit(vars.title.marginBottom),
-        }),
-        flexGrow: 1,
-    });
-
     const text = style("text", {
         color: colorOut(vars.colors.contrast),
     });
 
     const searchButton = generateButtonClass(vars.searchButton);
 
-    const valueContainer = style("valueContainer", {
-        $nest: {
-            // [`&, &.${searchBarClasses().valueContainer}`]: {
-            //     ...borders({
-            //         color: vars.colors.contrast,
-            //         radius: vars.searchBar.border.radius,
-            //     } as any),
-            // },
-        },
-    } as NestedCSSProperties);
+    const valueContainer = style("valueContainer", {});
 
     const searchContainer = style("searchContainer", {
         position: "relative",
@@ -368,17 +368,27 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
 
     const buttonLoader = style("buttonLoader", {});
 
-    const titleAction = style("titleAction", {
-        // color: colorOut(vars.colors.fg),
+    const title = style("title", {
+        display: "block",
+        ...fonts(vars.title.font as IFont),
+        ...paddings({
+            top: unit(vars.title.marginTop),
+            bottom: unit(vars.title.marginBottom),
+        }),
+        flexGrow: 1,
     });
-    const titleWrap = style("titleWrap", {
+
+    const textWrapMixin: NestedCSSProperties = {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
         width: unit(vars.searchContainer.width),
         maxWidth: percent(100),
         margin: isCentered ? "auto" : undefined,
-    });
+    };
+
+    const titleAction = style("titleAction", {});
+    const titleWrap = style("titleWrap", textWrapMixin);
 
     const titleFlexSpacer = style("titleFlexSpacer", {
         display: isCentered ? "block" : "none",
@@ -410,6 +420,15 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         },
     });
 
+    const descriptionWrap = style("descriptionWrap", textWrapMixin);
+
+    const description = style("description", {
+        display: "block",
+        ...fonts(vars.description.font as IFont),
+        ...paddings(vars.description.padding),
+        // flexGrow: 1,
+    });
+
     const content = style("content", {
         $nest: {
             "&&.hasFocus .searchBar-valueContainer": {
@@ -423,16 +442,18 @@ export const splashClasses = useThemeCache((styleOverwrite = {}) => {
         root,
         outerBackground,
         innerContainer,
-        title,
         text,
         icon,
         searchContainer,
         searchButton,
         input,
         buttonLoader,
+        title,
         titleAction,
         titleFlexSpacer,
         titleWrap,
+        description,
+        descriptionWrap,
         content,
         valueContainer,
         backgroundOverlay,

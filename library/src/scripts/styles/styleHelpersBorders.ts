@@ -95,10 +95,10 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
     if (typeIsStringOrNumber(radii)) {
         const value = unit(radii as number | string);
         return {
-            borderTopRightRadius: value,
-            borderBottomRightRadius: value,
-            borderBottomLeftRadius: value,
-            borderTopLeftRadius: value,
+            borderTopRightRadius: unit(value),
+            borderBottomRightRadius: unit(value),
+            borderBottomLeftRadius: unit(value),
+            borderTopLeftRadius: unit(value),
         };
     }
 
@@ -160,8 +160,8 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         if (isShorthand) {
             const value = !isShorthand ? unit(left) : left;
             merge(output, {
-                borderTopLeftRadius: value,
-                borderBottomLeftRadius: value,
+                borderTopLeftRadius: unit(value),
+                borderBottomLeftRadius: unit(value),
             });
         } else {
             const topStyles = top !== undefined ? { borderTopLeftRadius: unit(top) } : {};
@@ -179,8 +179,8 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         if (isShorthand) {
             const value = !isShorthand ? unit(right) : right;
             merge(output, {
-                borderTopRightRadius: value,
-                borderBottomRightRadius: value,
+                borderTopRightRadius: unit(value),
+                borderBottomRightRadius: unit(value),
             });
         } else {
             const topStyles = top !== undefined ? { borderTopRightRadius: unit(top) } : {};

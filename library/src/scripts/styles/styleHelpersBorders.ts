@@ -72,10 +72,10 @@ const typeIsStringOrNumber = (variable: unknown): variable is number | string =>
 
 const setAllRadii = (radius: BorderRadiusProperty<TLength>) => {
     return {
-        borderTopRightRadius: radius,
-        borderBottomRightRadius: radius,
-        borderBottomLeftRadius: radius,
-        borderTopLeftRadius: radius,
+        borderTopRightRadius: unit(radius),
+        borderBottomRightRadius: unit(radius),
+        borderBottomLeftRadius: unit(radius),
+        borderTopLeftRadius: unit(radius),
     };
 };
 
@@ -124,8 +124,8 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         if (isShorthand) {
             const value = !isShorthand ? unit(top) : top;
             merge(output, {
-                borderTopRightRadius: value,
-                borderTopLeftRadius: value,
+                borderTopRightRadius: unit(value),
+                borderTopLeftRadius: unit(value),
             });
         } else {
             merge(

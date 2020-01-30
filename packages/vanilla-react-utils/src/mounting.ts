@@ -77,6 +77,8 @@ export function mountPortal(element: ReactElement<any>, containerID: string, asP
     if (asPortal) {
         return ReactDOM.createPortal(element, container);
     } else {
-        ReactDOM.render(element, container);
+        return new Promise(resolve => {
+            ReactDOM.render(element, container, () => resolve());
+        });
     }
 }

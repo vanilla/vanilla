@@ -33,7 +33,7 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
         $router = self::container()->get(\Gdn_Router::class);
         $provider = new SingleSiteSectionProvider(new DefaultSiteSection($config, $router));
         static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
-        $model = new SiteSectionModel($config);
+        $model = new SiteSectionModel($config, $router);
         $model->addProvider($provider);
         self::$siteSectionModel = $model;
     }

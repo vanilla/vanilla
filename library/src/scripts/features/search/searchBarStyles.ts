@@ -99,7 +99,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    // marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -109,7 +108,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                         },
                     },
                     borderTopLeftRadius: important(0),
-                    borderTopRightRadius: important(0),
+                    borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
                     display: "flex",

@@ -22,6 +22,7 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     borders,
+    IButtonStates,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -178,11 +179,88 @@ export const bannerVariables = useThemeCache(styleOverwrite => {
         background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.1) as BackgroundColorProperty,
     });
 
-    const searchButton = makeThemeVars("searchButton", {
-        ...compactSearchVars.searchButton,
+    const bgColor = isTransparentButton ? "transparent" : colors.bg;
+    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
+    const fgColor = isTransparentButton ? colors.contrast : colors.fg;
+    const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
+    const searchButton: IButtonStates = makeThemeVars("splashSearchButton", {
+        name: "splashSearchButton",
+        spinnerColor: colors.contrast,
+        colors: {
+            fg: fgColor,
+            bg: bgColor,
+        },
+        borders: {
+            ...(isTransparentButton
+                ? {
+                      color: colors.contrast,
+                      width: 1,
+                  }
+                : { color: colors.bg, width: 0 }),
+            left: {
+                color: searchBar.border.leftColor,
+                width: searchBar.border.width,
+            },
+            radius: {
+                left: 0,
+                ...searchBar.border.radius,
+            },
+        },
+        fonts: {
+            ...searchBar.font,
+            color: fgColor,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+        },
+        hover: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        active: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        focus: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
     });
-
-    // clean up and get rid of buttonTypeBanner / searchButton
 
     return {
         options,

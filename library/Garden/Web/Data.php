@@ -1,11 +1,12 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Garden\Web;
+
 use Garden\JsonFilterTrait;
 use Traversable;
 
@@ -14,7 +15,7 @@ use Garden\MetaTrait;
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
+class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate {
     use MetaTrait, JsonFilterTrait;
 
     private $data;
@@ -235,6 +236,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
 
     /**
      * Render the response to the output.
+     *
+     * @codeCoverageIgnore
      */
     public function render() {
         http_response_code($this->getStatus());
@@ -323,7 +326,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     /**
      * Box a value into a data object.
      *
-     * If the argument is already a data object then it will simply be returned, otherwise a new data object is created and returned with the argument as its data.
+     * If the argument is already a data object then it will simply be returned, otherwise a new data object is created
+     * and returned with the argument as its data.
      *
      * @param Data|array $data The data to box.
      * @return Data Returns the boxed data.

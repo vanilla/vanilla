@@ -43,6 +43,7 @@ export const Standard = storyWithConfig({}, () => <StorySplash title="Standard" 
 
 export const LeftAligned = storyWithConfig(
     {
+        useWrappers: false,
         themeVars: {
             splash: {
                 options: {
@@ -56,6 +57,7 @@ export const LeftAligned = storyWithConfig(
 
 export const BackgroundImage = storyWithConfig(
     {
+        useWrappers: false,
         themeVars: {
             splash: {
                 outerBackground: {
@@ -72,6 +74,7 @@ export const BackgroundImage = storyWithConfig(
 
 export const CustomOverlay = storyWithConfig(
     {
+        useWrappers: false,
         themeVars: {
             splash: {
                 outerBackground: {
@@ -89,6 +92,7 @@ export const CustomOverlay = storyWithConfig(
 
 export const CustomColors = storyWithConfig(
     {
+        useWrappers: false,
         themeVars: {
             splash: {
                 colors: {

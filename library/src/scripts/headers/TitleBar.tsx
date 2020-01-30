@@ -54,6 +54,11 @@ interface IProps {
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
 }
 
+export enum LogoAlignment {
+    LEFT = "left",
+    CENTER = "center",
+}
+
 /**
  * Implements Vanilla Header component. Note that this component uses a react portal.
  * That means the exact location in the page is not that important, since it will
@@ -87,8 +92,8 @@ export default function TitleBar(_props: IProps) {
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
-    // const logoAlignment = titleBarVariables().mobileLogo.justifyContent;
-    // const logoAlign = logoAlignment === "center" ? true : false;
+    //const logoAlignment = titleBarVariables().mobileLogo.justifyContent;
+    //const logoAlign = logoAlignment === "center" ? true : false;
 
     const headerContent = (
         <HashOffsetReporter>
@@ -109,7 +114,6 @@ export default function TitleBar(_props: IProps) {
                     <div className={classNames("titleBar-bar", classes.bar, { isHome: showSubNav })}>
                         {!isSearchOpen &&
                             isCompact &&
-                            !showSubNav &&
                             (props.useMobileBackButton ? (
                                 <BackLink
                                     className={classNames(
@@ -120,7 +124,7 @@ export default function TitleBar(_props: IProps) {
                                     linkClassName={classes.button}
                                 />
                             ) : (
-                                !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
+                                hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
                             <animated.span {...logoProps}>
@@ -150,11 +154,10 @@ export default function TitleBar(_props: IProps) {
                         {isCompact && (
                             <>
                                 <Hamburger buttonClassName={classes.hamburger} contents={""} />
-
                                 <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>
                                         <HeaderLogo
-                                            className={classNames("titleBar-logoContainer", classes.logoContainer, {})}
+                                            className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                             logoClassName="titleBar-logo"
                                             logoType={LogoType.MOBILE}
                                         />

@@ -31,6 +31,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
+import { LogoAlignment } from "./TitleBar";
 
 enum TitleBarBorderType {
     BORDER = "border",
@@ -206,7 +207,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const mobileLogo = makeThemeVars("mobileLogo", {
-        justifyContent: "center",
+        align: LogoAlignment.CENTER,
     });
 
     const breakpoints = makeThemeVars("breakpoints", {
@@ -390,7 +391,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
-            justifyContent: vars.mobileLogo.justifyContent,
+            justifyContent: vars.mobileLogo.align,
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -867,7 +868,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
     });
 
     const mobileLogo = style("mobileLogo", {
-        justifyContent: vars.mobileLogo.justifyContent,
+        justifyContent: vars.mobileLogo.align,
     });
 
     const isCenter = style("isCenter", {

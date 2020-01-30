@@ -5,12 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit, modifyColorBasedOnLightness } from "@library/styles/styleHelpers";
+import { colorOut, unit, modifyColorBasedOnLightness, IButtonStates } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 
 export enum SearchBarButtonType {
     TRANSPARENT = "transparent",
@@ -75,7 +76,7 @@ export const compactSearchVariables = useThemeCache(() => {
         },
     });
 
-    const searchButton: any = makeThemeVars("searchButton", {
+    const searchButton: IButtonType = makeThemeVars("searchButton", {
         name: "heroSearchButton",
         spinnerColor: colors.contrast,
         colors: {

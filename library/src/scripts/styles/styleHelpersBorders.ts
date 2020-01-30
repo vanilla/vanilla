@@ -142,8 +142,8 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         if (isShorthand) {
             const value = !isShorthand ? unit(bottom) : bottom;
             merge(output, {
-                borderBottomRightRadius: value,
-                borderBottomLeftRadius: value,
+                borderBottomRightRadius: unit(value),
+                borderBottomLeftRadius: unit(value),
             });
         } else {
             merge(

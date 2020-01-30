@@ -207,7 +207,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const mobileLogo = makeThemeVars("mobileLogo", {
-        align: LogoAlignment.CENTER,
+        justifyContent: LogoAlignment.CENTER,
     });
 
     const breakpoints = makeThemeVars("breakpoints", {
@@ -391,7 +391,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
-            justifyContent: vars.mobileLogo.align,
+            justifyContent: vars.mobileLogo.justifyContent,
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -868,7 +868,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
     });
 
     const mobileLogo = style("mobileLogo", {
-        justifyContent: vars.mobileLogo.align,
+        justifyContent: vars.mobileLogo.justifyContent,
     });
 
     const isCenter = style("isCenter", {

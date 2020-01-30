@@ -8,10 +8,10 @@ import { MemoryRouter } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import Splash from "@library/splash/Splash";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color } from "csx";
+import Banner from "@library/banner/Banner";
 
 export default {
     title: "Splash",
@@ -30,7 +30,7 @@ function StorySplash(props: { title: string }) {
                     <StoryHeading depth={1}>Splash</StoryHeading>
                     <StoryHeading>{props.title}</StoryHeading>
                 </StoryContent>
-                <Splash
+                <Banner
                     title={"How can we help you?"}
                     description="This is a description. They're pretty great, you should try one sometime."
                 />

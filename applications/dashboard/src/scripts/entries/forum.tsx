@@ -46,7 +46,7 @@ addComponent("App", () => (
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
 
-if (getMeta("themeFeatures.DataDrivenForumColors", false)) {
+if (getMeta("themeFeatures.DataDrivenTheme", false)) {
     fullBackgroundCompat();
     compatibilityStyles();
     applyCompatibilityIcons();

@@ -37,10 +37,11 @@ $global-normal_fontWeight:              400 !default;
 $global-semibold_fontWeight:            600 !default;
 $global-bold_fontWeight:                700 !default;
 
-$global-heading_fontFamily:             "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$fontStack:                             "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-heading_fontFamily:             if($staticVariables, $fontStack, inherit);
 $global-heading_fontWeight:             $global-bold_fontWeight !default;
 
-$global-body_fontFamily:                "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-body_fontFamily:                if($staticVariables, $fontStack, inherit);
 $global-body_fontWeight:                $global-normal_fontWeight !default;
 
 $global-large_fontSize:                 16px !default;

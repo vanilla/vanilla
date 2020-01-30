@@ -12,6 +12,7 @@ import {
     modifyColorBasedOnLightness,
     radiusValue,
     EMPTY_BACKGROUND,
+    getRatioBasedOnDarkness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
@@ -31,6 +32,7 @@ export const globalVariables = useThemeCache(() => {
 
     const constants = makeThemeVars("constants", {
         linkStateColorEmphasis: 0.15,
+        fullGutter: 48,
     });
 
     const elementaryColors = {
@@ -43,13 +45,18 @@ export const globalVariables = useThemeCache(() => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
+        primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
     });
 
     colorPrimary = initialMainColors.primary;
 
+    const primaryDarkness = colorPrimary.lightness();
+    const backgroundDarkness = initialMainColors.bg.lightness();
+    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.065),
+        secondary: emphasizeLightness(colorPrimary, 0.3, !goodContrast),
     });
 
     const mainColors = {
@@ -57,16 +64,21 @@ export const globalVariables = useThemeCache(() => {
         ...generatedMainColors,
     };
 
+    // Shorthand checking bg color for darkness
+    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
+        return getRatioBasedOnDarkness(weight, bgColor);
+    };
+
     const mixBgAndFg = (weight: number) => {
-        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
+        return mainColors.fg.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
     };
 
     const mixPrimaryAndFg = (weight: number) => {
-        return mainColors.primary.mix(mainColors.fg, weight) as ColorHelper;
+        return mainColors.primary.mix(mainColors.fg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
     };
 
     const mixPrimaryAndBg = (weight: number) => {
-        return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
+        return mainColors.primary.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
     };
 
     const messageColors = makeThemeVars("messageColors", {
@@ -390,6 +402,8 @@ export const globalVariables = useThemeCache(() => {
         separator,
         userContentHyphenation,
         findColorMatch,
+        constants,
+        getRatioBasedOnBackgroundDarkness,
     };
 });
 

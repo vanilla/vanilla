@@ -92,7 +92,7 @@ export const titleBarVariables = useThemeCache(() => {
         },
     });
 
-    const titleBarNavAlignment = makeThemeVars("titleBarNavAlignment", {
+    const titleBarNavAlignment = makeThemeVars("NavAlignment", {
         justifyContent: "flex-start",
     });
 

@@ -71,6 +71,11 @@ class Gdn_Router extends Gdn_Pluggable {
         ]);
     }
 
+    /**
+     * Get default route for home page
+     *
+     * @return array
+     */
     public function getDefaultRoute(): array {
         /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
         $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
@@ -279,6 +284,12 @@ class Gdn_Router extends Gdn_Pluggable {
         return $destination;
     }
 
+    /**
+     * Public method for _parseRoute
+     *
+     * @param $destination
+     * @return array|mixed
+     */
     public function parseRoute($destination) {
         return $this->_parseRoute($destination);
     }

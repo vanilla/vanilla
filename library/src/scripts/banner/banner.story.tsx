@@ -19,7 +19,7 @@ export default {
     title: "Banner",
     params: {
         chromatic: {
-            // viewports: [1400],
+            viewports: [1400, 400],
         },
     },
 };

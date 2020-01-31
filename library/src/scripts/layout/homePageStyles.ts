@@ -4,13 +4,13 @@
  */
 
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { IBackground } from "@library/styles/styleHelpers";
+import { IBackground, EMPTY_BACKGROUND } from "@library/styles/styleHelpers";
 
 export const homePageVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("homePage");
 
     // See IBackground for options
-    const backgroundImage: IBackground = makeThemeVars("backgroundImage", {});
+    const backgroundImage: IBackground = makeThemeVars("backgroundImage", EMPTY_BACKGROUND);
 
     return {
         backgroundImage,

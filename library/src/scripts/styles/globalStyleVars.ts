@@ -9,9 +9,9 @@ import {
     emphasizeLightness,
     IBackground,
     IBorderRadiusOutput,
-    isLightColor,
     modifyColorBasedOnLightness,
     radiusValue,
+    EMPTY_BACKGROUND,
     getRatioBasedOnDarkness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -118,6 +118,7 @@ export const globalVariables = useThemeCache(() => {
 
     const body: IBody = makeThemeVars("body", {
         backgroundImage: {
+            ...EMPTY_BACKGROUND,
             color: mainColors.bg,
         },
     });

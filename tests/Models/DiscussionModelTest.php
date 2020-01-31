@@ -596,4 +596,51 @@ class DiscussionModelTest extends TestCase {
         $this->assertInstanceOf(DiscussionEvent::class, $this->lastEvent);
         $this->assertEquals(DiscussionEvent::ACTION_UPDATE, $this->lastEvent->getAction());
     }
+
+    /**
+     * Test inserting and updating a user's watch status of comments in a discussion.
+     *
+     * @return void
+     */
+    public function testSetWatch(): void {
+        $discussionModel = new DiscussionModel();
+
+        $countComments = 5;
+        $discussion = [
+            "CategoryID" => 1,
+            "Name" => "Comment Watch Test",
+            "Body" => "foo bar baz",
+            "Format" => "Text",
+            "CountComments" => $countComments,
+            "InsertUserID" => 1,
+        ];
+
+        // Confirm the initial state, so changes are easy to detect.
+        $discussionID = $discussionModel->save($discussion);
+        $discussion = $discussionModel->getID($discussionID);
+        $this->assertNull(
+            $discussion->CountCommentWatch,
+            "Initial comment watch status not null."
+        );
+
+        // Create a comment watch status.
+        $discussionModel->setWatch($discussion, 10, 0, $discussion->CountComments);
+        $discussionFirstVisit = $discussionModel->getID($discussionID);
+        $this->assertSame(
+            $discussionFirstVisit->CountComments,
+            $discussionFirstVisit->CountCommentWatch,
+            "Creating new comment watch status failed."
+        );
+
+        // Update an existing comment watch status.
+        $updatedCountComments = $countComments + 1;
+        $discussionModel->setField($discussionID, "CountComments", $updatedCountComments);
+        $discussionModel->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
+        $discussionSecondVisit = $discussionModel->getID($discussionID);
+        $this->assertSame(
+            $discussionSecondVisit->CountComments,
+            $discussionSecondVisit->CountCommentWatch,
+            "Updating comment watch status failed."
+        );
+    }
 }

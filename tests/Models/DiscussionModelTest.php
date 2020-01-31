@@ -302,10 +302,10 @@ class DiscussionModelTest extends TestCase {
      * @param string|null $testMaxDateInserted The most recent insert date of the viewed comments.
      * @param array $expected The expected result.
      * @dataProvider provideTestCalculateWatchArrays
-     * @throws \Exception Some Exception.
+     * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testCalculateWatch(
-        iterable $testDiscussionArray,
+        $testDiscussionArray,
         int $testLimit,
         int $testOffset,
         int $testTotalComments,

@@ -3731,9 +3731,9 @@ class DiscussionModel extends Gdn_Model {
      * @param int $totalComments Total in entire discussion (hard limit).
      * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
      * @return array Returns a 3-item array of types int, string|null, string|null.
-     * @throws Exception Some exception.
+     * @throws Exception Throws an exception if given an invalid timestamp.
      */
-    public function calculateWatch(iterable $discussion, int $limit, int $offset, int $totalComments, ?string $maxDateInserted) {
+    public function calculateWatch($discussion, int $limit, int $offset, int $totalComments, ?string $maxDateInserted) {
         $newComments = false;
         // Max comments we could have seen.
         $countWatch = $limit + $offset;
@@ -3745,7 +3745,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // This discussion looks familiar...
-        if ((is_numeric($discussion->CountCommentWatch) && $discussion->CountCommentWatch > 0) | !is_null($discussion->DateLastViewed)) {
+        if ($discussion->CountCommentWatch > 0 | !is_null($discussion->DateLastViewed)) {
             if ($countWatch < $discussion->CountCommentWatch) {
                 $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
             }

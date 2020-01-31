@@ -33,7 +33,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 
 export const bannerVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("banner");
+    const makeThemeVars = variableFactory(["banner", "splash"]);
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
@@ -503,6 +503,7 @@ export const bannerClasses = useThemeCache(() => {
             height: percent(100),
             objectFit: "contain",
             ...paddings(vars.imageElement.padding),
+            objectPosition: "100% 50%",
         },
         mediaQueries.oneColumnDown({
             display: "none",

@@ -59,8 +59,8 @@ export default function Banner(props: IProps) {
                 {!props.image && !vars.outerBackground.image && <DefaultBannerBg />}
             </div>
             {vars.backgrounds.useOverlay && isImageBg && <div className={classes.backgroundOverlay} />}
-            {options.imageType === "element" && <img className={classes.imageElement} src={imageSrc}></img>}
             <Container>
+                {options.imageType === "element" && <img className={classes.imageElement} src={imageSrc}></img>}
                 <div className={classes.innerContainer}>
                     <PanelWidgetHorizontalPadding className={classes.widget}>
                         <div className={classes.titleWrap}>

@@ -16,6 +16,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 export enum SearchBarButtonType {
     TRANSPARENT = "transparent",
     SOLID = "solid",
+    NONE = "none",
 }
 
 export const compactSearchVariables = useThemeCache(() => {

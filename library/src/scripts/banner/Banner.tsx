@@ -14,11 +14,13 @@ import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { ColorValues } from "@library/styles/styleHelpersColors";
-import { t } from "@library/utility/appUtils";
+import { t, assetUrl } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
+import { getBackgroundImage } from "@library/styles/styleHelpers";
+import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 
 interface IProps {
     action?: React.ReactNode;
@@ -44,6 +46,7 @@ export default function Banner(props: IProps) {
     const { options } = vars;
 
     const isImageBg = vars.options.imageType === "background";
+    const imageSrc = assetUrl(props.image ?? vars.outerBackground.image ?? "");
 
     return (
         <div
@@ -56,6 +59,7 @@ export default function Banner(props: IProps) {
                 {!props.image && !vars.outerBackground.image && <DefaultBannerBg />}
             </div>
             {vars.backgrounds.useOverlay && isImageBg && <div className={classes.backgroundOverlay} />}
+            {options.imageType === "element" && <img className={classes.imageElement} src={imageSrc}></img>}
             <Container>
                 <div className={classes.innerContainer}>
                     <PanelWidgetHorizontalPadding className={classes.widget}>
@@ -79,7 +83,11 @@ export default function Banner(props: IProps) {
                                     inputClass={classes.input}
                                     iconClass={classes.icon}
                                     buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={device === Devices.MOBILE || device === Devices.XS}
+                                    hideSearchButton={
+                                        device === Devices.MOBILE ||
+                                        device === Devices.XS ||
+                                        vars.searchButtonOptions.type === SearchBarButtonType.NONE
+                                    }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}
                                 />

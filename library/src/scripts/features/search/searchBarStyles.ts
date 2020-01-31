@@ -306,11 +306,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         position: "relative",
         height: unit(vars.sizing.height),
         width: percent(100),
-        $nest: {
-            [`&.hasFocus .searchBar-valueContainer`]: {
-                borderColor: colorOut(vars.input.bg),
-            },
-        },
     });
 
     const form = style("form", {

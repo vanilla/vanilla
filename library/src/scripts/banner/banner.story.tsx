@@ -149,3 +149,54 @@ export const CustomOverlay = storyWithConfig(
     },
     () => <StoryBanner title="With a background image (and colored overlay)" />,
 );
+
+export const ImageAsElement = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                colors: {
+                    bg: "#fff",
+                    contrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73575470-438dfe00-4446-11ea-8db7-c3d36da2b3cb.png",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                options: {
+                    alignment: "left",
+                    imageType: "element",
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+                searchBar: {
+                    sizing: { maxWidth: 400 },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+);

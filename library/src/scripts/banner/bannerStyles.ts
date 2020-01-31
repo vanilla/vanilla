@@ -28,7 +28,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
+import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 
@@ -82,6 +82,14 @@ export const bannerVariables = useThemeCache(() => {
 
     const backgrounds = makeThemeVars("backgrounds", {
         ...compactSearchVars.backgrounds,
+    });
+
+    const imageElement = makeThemeVars("imageElement", {
+        width: percent(60),
+        padding: {
+            ...EMPTY_SPACING,
+            all: globalVars.gutter.size,
+        },
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
@@ -159,11 +167,6 @@ export const bannerVariables = useThemeCache(() => {
             weight: 300,
         },
     });
-
-    enum SearchBarButtonType {
-        TRANSPARENT = "transparent",
-        SOLID = "solid",
-    }
 
     const searchButtonOptions = makeThemeVars("searchButtonOptions", { type: SearchBarButtonType.TRANSPARENT });
     const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
@@ -299,6 +302,7 @@ export const bannerVariables = useThemeCache(() => {
         searchButtonOptions,
         colors,
         inputAndButton,
+        imageElement,
     };
 });
 
@@ -338,6 +342,12 @@ export const bannerClasses = useThemeCache(() => {
             ...vars.outerBackground,
             image: finalUrl,
         };
+
+        if (vars.options.imageType !== "background") {
+            delete finalVars.image;
+            delete finalVars.fallbackImage;
+        }
+
         return style("outerBackground", {
             ...centeredBackgroundProps(),
             display: "block",
@@ -422,6 +432,9 @@ export const bannerClasses = useThemeCache(() => {
         width: percent(100),
         marginLeft: isCentered ? "auto" : undefined,
         marginRight: isCentered ? "auto" : undefined,
+        ...mediaQueries.oneColumnDown({
+            maxWidth: percent(100),
+        }),
     };
 
     const titleAction = style("titleAction", {});
@@ -472,11 +485,29 @@ export const bannerClasses = useThemeCache(() => {
     const content = style("content", {
         $nest: {
             "&&.hasFocus .searchBar-valueContainer": {
+                borderColor: colorOut(vars.colors.contrast),
                 boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
                 zIndex: 1,
             },
         },
     });
+
+    const imageElement = style(
+        "imageElement",
+        {
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: unit(vars.imageElement.width),
+            height: percent(100),
+            objectFit: "contain",
+            ...paddings(vars.imageElement.padding),
+        },
+        mediaQueries.oneColumnDown({
+            display: "none",
+        }),
+    );
 
     return {
         widget,
@@ -499,5 +530,6 @@ export const bannerClasses = useThemeCache(() => {
         content,
         valueContainer,
         backgroundOverlay,
+        imageElement,
     };
 });

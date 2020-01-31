@@ -827,112 +827,15 @@ class CommentModel extends Gdn_Model {
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
      * @param int $totalComments Total in entire discussion (hard limit).
+     * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
+     * @deprecated Use `DiscussionModel::setWatch()` instead.
      */
-    public function setWatch($discussion, $limit, $offset, $totalComments) {
-        $userID = Gdn::session()->UserID;
-        if (!$userID) {
-            return;
-        }
+    public function setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted = null) {
+        deprecated('CommentModel::setWatch()', 'DiscussionModel::setWatch()');
 
-        $newComments = false;
-        // Max comments we could have seen.
-        $countWatch = $limit + $offset;
-        if ($countWatch > $totalComments) {
-            $countWatch = $totalComments;
-        }
-
-        // This discussion looks familiar...
-        if (is_numeric($discussion->CountCommentWatch)) {
-            if ($countWatch < $discussion->CountCommentWatch) {
-                $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
-            }
-
-            if (isset($discussion->DateLastViewed)) {
-                $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
-            }
-
-            if ($totalComments > $discussion->CountCommentWatch || $countWatch != $discussion->CountCommentWatch) {
-                $newComments = true;
-            }
-
-            // Update the watch data.
-            if ($newComments) {
-                // Only update the watch if there are new comments.
-                $this->SQL->put(
-                    'UserDiscussion',
-                    [
-                        'CountComments' => $countWatch,
-                        'DateLastViewed' => Gdn_Format::toDateTime()
-                    ],
-                    [
-                        'UserID' => $userID,
-                        'DiscussionID' => $discussion->DiscussionID
-                    ]
-                );
-            }
-        } else {
-            // Insert watch data.
-            $this->SQL->options('Ignore', true);
-            $this->SQL->insert(
-                'UserDiscussion',
-                [
-                    'UserID' => $userID,
-                    'DiscussionID' => $discussion->DiscussionID,
-                    'CountComments' => $countWatch,
-                    'DateLastViewed' => DateTimeFormatter::timeStampToDateTime(time())
-                ]
-            );
-        }
-
-        // If there is a discrepancy between $countWatch and $discussion->CountCommentWatch,
-        // update CountCommentWatch with the correct value.
-        $discussion->CountCommentWatch = $countWatch;
-
-        /**
-         * Fuzzy way of trying to automatically mark a category read again
-         * if the user reads all the comments on the first few pages.
-         */
-
-        // If this discussion is in a category that has been marked read,
-        // check if reading this thread causes it to be completely read again.
-        $categoryID = $discussion->CategoryID;
-        if (!$categoryID) {
-            return;
-        }
-        $category = CategoryModel::categories($categoryID);
-        if (!$category) {
-            return;
-        }
-        $wheres = ['CategoryID' => $categoryID];
-        $dateMarkedRead = $category['DateMarkedRead'];
-        if ($dateMarkedRead) {
-            $wheres['DateLastComment>'] = $dateMarkedRead;
-        }
-        // Fuzzy way of looking back about 2 pages into the past.
-        $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
-
-        // Find all discussions with content from after DateMarkedRead.
-        $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
-        unset($discussionModel);
-
-        // Abort if we get back as many as we asked for, meaning a
-        // lot has happened.
-        if ($discussions->numRows() > $lookBackCount) {
-            return;
-        }
-
-        // Loop over these discussions and exit if there are any unread discussions
-        while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
-            if (!$discussion['Read']) {
-                return;
-            }
-        }
-
-        // Mark this category read if all the new content is read.
-        $categoryModel = new CategoryModel();
-        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
-        unset($categoryModel);
+        /* @var DiscussionModel $discussionModel */
+        $discussionModel = gdn::getContainer()->get(DiscussionModel::class);
+        $discussionModel->setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
     }
 
     /**

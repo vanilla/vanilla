@@ -10,6 +10,7 @@ namespace VanillaTests\Models;
 use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
+use mysql_xdevapi\Exception;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\ExpectErrorTrait;
@@ -289,6 +290,130 @@ class DiscussionModelTest extends TestCase {
         $expected = null;
         $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Tests for calculateWatch().
+     *
+     * @param object $testDiscussionArray Data to plug into discussion object.
+     * @param int $testLimit Max number to get.
+     * @param int $testOffset Number to skip.
+     * @param int $testTotalComments Total in entire discussion (hard limit).
+     * @param string|null $testMaxDateInserted The most recent insert date of the viewed comments.
+     * @param array $expected The expected result.
+     * @throws Exception Some exception.
+     * @dataProvider provideTestCalculateWatchArrays
+     */
+    public function testCalculateWatch($testDiscussionArray, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted, $expected) {
+        $this->model->DateLastViewed = $testDiscussionArray['DateLastViewed'];
+        $this->model->CountCommentWatch = $testDiscussionArray['CountCommentWatch'];
+        $this->model->DateInserted = $testDiscussionArray['DateInserted'];
+        $this->model->DateLastComment = $testDiscussionArray['DateLastComment'];
+        $actual = $this->model->calculateWatch($this->model, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide test data for {@link testCalculateWatch}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestCalculateWatchArrays() {
+        $r = [
+            'Unread Discussion With No Comments' => [
+                [
+                    'DateLastViewed' => null,
+                    'CountCommentWatch' => null,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-17 19:20:02',
+                ],
+                30,
+                0,
+                0,
+                null,
+                [0, '2020-01-17 19:20:02', 'insert'],
+            ],
+            'Unread Discussion with One Comment' => [
+                [
+                    'DateLastViewed' => null,
+                    'CountCommentWatch' => null,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-18 19:20:02',
+                ],
+                30,
+                0,
+                1,
+                '2020-01-18 19:20:02',
+                [1, '2020-01-18 19:20:02', 'insert'],
+            ],
+            'Unread Discussion with One More Total Comments than the Limit' => [
+                [
+                    'DateLastViewed' => null,
+                    'CountCommentWatch' => null,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-19 19:20:02',
+                ],
+                30,
+                0,
+                31,
+                '2020-01-18 19:20:02',
+                [30, '2020-01-18 19:20:02', 'insert'],
+            ],
+            'Read Discussion with No Comments' => [
+                [
+                    'DateLastViewed' => '2020-01-17 19:20:02',
+                    'CountCommentWatch' => 0,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-17 19:20:02',
+                ],
+                30,
+                0,
+                0,
+                '2020-01-17 19:20:02',
+                [0, '2020-01-17 19:20:02', null],
+            ],
+            'Read Discussion with New Comments' => [
+                [
+                    'DateLastViewed' => '2020-01-18 19:20:02',
+                    'CountCommentWatch' => 5,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-19 19:20:02',
+                ],
+                30,
+                5,
+                20,
+                '2020-01-19 19:20:02',
+                [20, '2020-01-19 19:20:02', 'update'],
+            ],
+            'User Has Read Page One, but not Page Two' => [
+                [
+                    'DateLastViewed' =>  '2020-01-18 19:20:02',
+                    'CountCommentWatch' => 30,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-19 19:20:02',
+                ],
+                30,
+                30,
+                31,
+                '2020-01-19 19:20:02',
+                [31, '2020-01-19 19:20:02', 'update'],
+            ],
+            'Comments Read is Greater than Total Comments' => [
+                [
+                    'DateLastViewed' => '2020-01-18 19:20:02',
+                    'CountCommentWatch' => 6,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-18 19:20:02',
+                ],
+                30,
+                5,
+                5,
+                'DateLastComment' => '2020-01-18 19:20:02',
+                [5, '2020-01-18 19:20:02', 'update'],
+            ],
+        ];
+
+        return $r;
     }
 
     /**

@@ -57,6 +57,25 @@ class DiscussionController extends VanillaController {
     }
 
     /**
+     * Get the most recent date inserted from an array of comments.
+     *
+     * @param iterable|null $comments The comments from a page.
+     * @return string|null $maxDateInserted.
+     * @throws Exception Some exception.
+     */
+    public function maxDateInserted(?iterable $comments): ?string {
+        if (is_null($comments)) {
+            return null;
+        }
+
+        $maxDate = null;
+        foreach ($comments as $comment) {
+            $maxDate = DiscussionModel::maxDate($maxDate, val('DateInserted', $comment));
+        }
+        return $maxDate;
+    }
+
+    /**
      * Default single discussion display.
      *
      * @since 2.0.0
@@ -213,9 +232,12 @@ class DiscussionController extends VanillaController {
             }
         }
 
+        // Save the insert date of the last comment viewed to set in the user's discussion watch table.
+
         // Make sure to set the user's discussion watch records if this is not an API request.
         if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $this->CommentModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+            $maxDateInserted = $this->maxDateInserted($this->data('Comments'));
+            $this->CommentModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments, $maxDateInserted);
         }
 
         // Build a pager

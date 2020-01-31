@@ -3733,7 +3733,7 @@ class DiscussionModel extends Gdn_Model {
      * @return array Returns a 3-item array of types int, string|null, string|null.
      * @throws Exception Some exception.
      */
-    public function calculateWatch($discussion, int $limit, int $offset, int $totalComments, ?string $maxDateInserted) {
+    public function calculateWatch(iterable $discussion, int $limit, int $offset, int $totalComments, ?string $maxDateInserted) {
         $newComments = false;
         // Max comments we could have seen.
         $countWatch = $limit + $offset;

@@ -295,16 +295,23 @@ class DiscussionModelTest extends TestCase {
     /**
      * Tests for calculateWatch().
      *
-     * @param object $testDiscussionArray Data to plug into discussion object.
+     * @param object|array $testDiscussionArray Data to plug into discussion object.
      * @param int $testLimit Max number to get.
      * @param int $testOffset Number to skip.
      * @param int $testTotalComments Total in entire discussion (hard limit).
      * @param string|null $testMaxDateInserted The most recent insert date of the viewed comments.
      * @param array $expected The expected result.
-     * @throws Exception Some exception.
      * @dataProvider provideTestCalculateWatchArrays
+     * @throws \Exception Some Exception.
      */
-    public function testCalculateWatch($testDiscussionArray, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted, $expected) {
+    public function testCalculateWatch(
+        iterable $testDiscussionArray,
+        int $testLimit,
+        int $testOffset,
+        int $testTotalComments,
+        ?string $testMaxDateInserted,
+        $expected
+    ) {
         $this->model->DateLastViewed = $testDiscussionArray['DateLastViewed'];
         $this->model->CountCommentWatch = $testDiscussionArray['CountCommentWatch'];
         $this->model->DateInserted = $testDiscussionArray['DateInserted'];

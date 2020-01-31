@@ -68,9 +68,8 @@
         );
     }
 
-    .ButtonGroup.Multi {
-
-        @if ($staticVariables) {
+    @if ($staticVariables) {
+        .ButtonGroup.Multi {
             &:focus,
             &:hover,
             &:active {

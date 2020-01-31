@@ -326,7 +326,9 @@ div.token-input-dropdown {
         right: 0;
         top: 0;
         height: 100%;
-        min-width: $formButton_height;
+        @if ($staticVariables) {
+            min-width: $formButton_height;
+        }
         border-color: $button-primary_border;
 
         @if ($staticVariables) {
@@ -350,16 +352,17 @@ div.token-input-dropdown {
     }
 }
 
-.ButtonGroup.Multi {
+@if($staticVariables) {
+    .ButtonGroup.Multi {
+        &:focus,
+        &:hover,
+        &:active {
 
-    &:focus,
-    &:hover,
-    &:active {
-
-        .Button.Handle {
-            background-color: rgba($button-primary-hover_bg, 0.3);
-            color: $button-primary-hover_fg;
-            min-width: $formButton_height;
+            .Button.Handle {
+                background-color: rgba($button-primary-hover_bg, 0.3);
+                color: $button-primary-hover_fg;
+                min-width: $formButton_height;
+            }
         }
     }
 }

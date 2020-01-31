@@ -60,18 +60,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
             : {};
 
-    if (buttonTypeVars.name === ButtonTypes.PRIMARY) {
-        console.log("buttonTypeVars.colors.fg", buttonTypeVars.colors!.fg.toHexString());
-        console.log("buttonTypeVars.colors.bg", buttonTypeVars.colors!.bg.toHexString());
-        console.log("buttonGlobals.colors.fg", buttonGlobals.colors.fg.toHexString());
-        console.log(
-            "buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg",
-            buttonTypeVars.colors && buttonTypeVars.colors.fg
-                ? buttonTypeVars.colors.fg.toHexString()
-                : buttonGlobals.colors.fg.toHexString(),
-        );
-    }
-
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",

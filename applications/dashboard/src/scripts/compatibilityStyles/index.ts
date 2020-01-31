@@ -24,8 +24,8 @@ import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
-import { forumLayoutVariables, layoutCSS } from "@dashboard/compatibilityStyles/layoutStyles";
 import { fontCSS } from "./fontStyles";
+import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -263,7 +263,7 @@ export const compatibilityStyles = useThemeCache(() => {
     socialConnectCSS();
     reactionsCSS();
     paginationCSS();
-    layoutCSS();
+    forumLayoutCSS();
     fontCSS();
 });
 

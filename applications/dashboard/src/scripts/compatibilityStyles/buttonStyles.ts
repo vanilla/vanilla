@@ -8,11 +8,14 @@
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { important, percent } from "csx";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
     const primary = colorOut(mainColors.primary);
 
@@ -35,9 +38,66 @@ export const buttonCSS = () => {
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
-    cssOut(`.Button.Primary:not([disabled]):hover`, {
-        color: colorOut(globalVars.mainColors.primaryContrast),
+    mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
+    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+    // mixinButton(".ButtonGroup.Multi.Open .Button.Handle", ButtonTypes.PRIMARY);
+
+    cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
+        width: unit(formElementVars.sizing.height),
+        background: important("none"),
+        backgroundColor: important("none"),
+        ...borders({
+            color: "transparent",
+        }),
     });
+
+    cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
+        position: "relative",
+        maxWidth: percent(100),
+        $nest: {
+            "& .Button.Primary": {
+                maxWidth: percent(100),
+                width: percent(100),
+                ...paddings({
+                    horizontal: formElementVars.sizing.height,
+                }),
+            },
+            "& .Sprite.SpDropdownHandle": {
+                ...absolutePosition.fullSizeOfParent(),
+                minWidth: importantUnit(formElementVars.sizing.height),
+                padding: important(0),
+                border: important(0),
+                borderRadius: important(0),
+            },
+            "& .Button.Handle": {
+                ...absolutePosition.middleRightOfParent(),
+                width: unit(formElementVars.sizing.height),
+                maxWidth: unit(formElementVars.sizing.height),
+                minWidth: unit(formElementVars.sizing.height),
+                height: unit(formElementVars.sizing.height),
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: important(0),
+            },
+            "& .Button.Handle .SpDropdownHandle::before": {
+                padding: important(0),
+            },
+        },
+    });
+
+    // cssOut(`.Button.Primary:not([disabled]):hover`, {
+    //     color: colorOut(globalVars.mainColors.primaryContrast),
+    // });
+
+    // cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
+    //     borderColor: primary,
+    //     borderStyle: globalVars.border.style,
+    //     borderWidth: unit(globalVars.border.width),
+    //     color: colorOut(button),
+    //     backgroundColor: colorOut(globalVars.mainColors.primary),
+    // });
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);
@@ -55,14 +115,6 @@ export const buttonCSS = () => {
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",
-    });
-
-    cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
-        borderColor: primary,
-        borderStyle: globalVars.border.style,
-        borderWidth: unit(globalVars.border.width),
-        color: colorOut(globalVars.mainColors.primaryContrast),
-        backgroundColor: colorOut(globalVars.mainColors.primary),
     });
 };
 

@@ -25,7 +25,6 @@ export const siteNavVariables = useThemeCache(() => {
             fg: globalVars.links.colors.default,
             fontWeight: globalVars.fonts.weights.bold,
         },
-        backgroundColor: "orange",
     });
 
     const title = makeThemeVars("title", {

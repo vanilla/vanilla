@@ -11,6 +11,7 @@ import { emojiCSS } from "@rich-editor/quill/components/emojiStyles";
 import { spoilerCSS } from "@rich-editor/quill/components/spoilerStyles";
 import { codeBlockCSS } from "@rich-editor/quill/components/codeBlockStyles";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const blotCSS = () => {
     accessibilityCSS();

@@ -3774,7 +3774,7 @@ class DiscussionModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param object $discussion Discussion being watched.
+     * @param object|array $discussion Discussion being watched.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
      * @param int $totalComments Total in entire discussion (hard limit).

@@ -601,6 +601,7 @@ class DiscussionModelTest extends TestCase {
      * Test inserting and updating a user's watch status of comments in a discussion.
      *
      * @return void
+     * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void {
         $discussionModel = new DiscussionModel();

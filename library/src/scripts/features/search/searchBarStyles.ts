@@ -81,6 +81,10 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
 
+    const independantRoot = style("independantRoot", {
+        position: "relative",
+    });
+
     const root = style(
         {
             cursor: "pointer",
@@ -207,7 +211,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         },
     });
 
-    const resultsAsModal = style("results", {
+    const resultsAsModal = style("resultsAsModal", {
         position: "absolute",
         top: unit(vars.sizing.height),
         left: 0,
@@ -304,7 +308,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         width: percent(100),
         $nest: {
             [`&.hasFocus .searchBar-valueContainer`]: {
-                borderColor: colorOut(globalVars.mainColors.primary),
+                borderColor: colorOut(vars.input.bg),
             },
         },
     });
@@ -393,6 +397,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     return {
         root,
+        independantRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

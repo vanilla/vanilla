@@ -52,13 +52,13 @@ type IRadiusInput = IRadiusShorthand | IBorderRadiusOutput | IRadiusValue;
 export type IBorderRadiusValue = BorderRadiusProperty<TLength> | number | string | undefined;
 
 export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
-    all?: ISimpleBorderStyle;
-    topBottom?: ISimpleBorderStyle;
-    leftRight?: ISimpleBorderStyle;
-    top?: ISimpleBorderStyle;
-    bottom?: ISimpleBorderStyle;
-    left?: ISimpleBorderStyle;
-    right?: ISimpleBorderStyle;
+    all?: ISimpleBorderStyle & IRadiusFlex;
+    topBottom?: ISimpleBorderStyle & IRadiusFlex;
+    leftRight?: ISimpleBorderStyle & IRadiusFlex;
+    top?: ISimpleBorderStyle & IRadiusFlex;
+    bottom?: ISimpleBorderStyle & IRadiusFlex;
+    left?: ISimpleBorderStyle & IRadiusFlex;
+    right?: ISimpleBorderStyle & IRadiusFlex;
 }
 
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
@@ -280,10 +280,6 @@ const setAllBorders = (
             borderBottomStyle: style,
             borderLeftStyle: style,
         });
-    }
-
-    if (typeof radius === "object") {
-        merge(output, radius);
     }
 
     return output;

@@ -26,7 +26,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
+import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { paddings } from "@library/styles/styleHelpersSpacing";
@@ -171,11 +171,12 @@ export const bannerVariables = useThemeCache(() => {
             top: 24,
         },
         border: {
+            color: colors.contrast,
             leftColor: isTransparentButton ? colors.contrast : colors.borderColor,
             width: globalVars.border.width,
             radius: {
-                right: globalVars.border.radius,
-                left: 0,
+                left: globalVars.border.radius,
+                right: 0,
             },
         },
     });
@@ -208,9 +209,8 @@ export const bannerVariables = useThemeCache(() => {
                 color: searchBar.border.leftColor,
                 width: searchBar.border.width,
             },
-            radius: {
-                left: 0,
-                ...searchBar.border.radius,
+            right: {
+                radius: globalVars.border.radius,
             },
         },
         fonts: {
@@ -296,12 +296,15 @@ export const bannerClasses = useThemeCache(() => {
 
     const isCentered = vars.options.alignment === "center";
     const isImageBg = vars.options.imageType === "background";
-    const searchButton = generateButtonClass(vars.searchButton);
+    const searchButton = style("searchButton", generateButtonStyleProperties(vars.searchButton), { left: -1 });
 
     const valueContainer = style("valueContainer", {
         $nest: {
+            "&&": {
+                ...borders(vars.searchBar.border),
+            },
             ".inputText": {
-                borderColor: colorOut(vars.colors.borderColor),
+                borderColor: colorOut(vars.searchBar.border.color),
             },
             ".searchBar__control": {
                 cursor: "text",
@@ -312,16 +315,6 @@ export const bannerClasses = useThemeCache(() => {
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
-        $nest: {
-            [`.${searchButton}`]: {
-                borderTopRightRadius: important(unit(vars.inputAndButton.borderRadius) as string),
-                borderBottomRightRadius: important(unit(vars.inputAndButton.borderRadius) as string),
-            },
-            [`.${valueContainer}`]: {
-                borderTopLeftRadius: important(unit(vars.inputAndButton.borderRadius) as string),
-                borderBottomLeftRadius: important(unit(vars.inputAndButton.borderRadius) as string),
-            },
-        },
     });
 
     const outerBackground = (url?: string) => {

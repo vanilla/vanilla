@@ -13,6 +13,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color } from "csx";
 import Banner from "@library/banner/Banner";
 import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 
 export default {
     title: "Banner",
@@ -27,10 +28,12 @@ function StoryBanner(props: { title: string }) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <Banner
-                    title={props.title}
-                    description="This is a description. They're pretty great, you should try one sometime."
-                />
+                <DeviceProvider>
+                    <Banner
+                        title={props.title}
+                        description="This is a description. They're pretty great, you should try one sometime."
+                    />
+                </DeviceProvider>
             </SearchContext.Provider>
         </MemoryRouter>
     );

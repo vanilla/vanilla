@@ -285,6 +285,7 @@ export const titleBarClasses = useThemeCache(() => {
     const root = style({
         maxWidth: percent(100),
         color: colorOut(vars.colors.fg),
+        position: "relative",
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {

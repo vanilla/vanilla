@@ -35,6 +35,9 @@ export const buttonCSS = () => {
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
+    cssOut(`.Button.Primary:not([disabled]):hover`, {
+        color: colorOut(globalVars.mainColors.primaryContrast),
+    });
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);
@@ -60,10 +63,6 @@ export const buttonCSS = () => {
         borderWidth: unit(globalVars.border.width),
         color: colorOut(globalVars.mainColors.primaryContrast),
         backgroundColor: colorOut(globalVars.mainColors.primary),
-    });
-
-    cssOut(`.Button.Primary:not([disabled]):hover`, {
-        color: colorOut(globalVars.mainColors.primaryContrast),
     });
 };
 

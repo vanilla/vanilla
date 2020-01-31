@@ -283,14 +283,16 @@
         visibility: visible;
 
         .OptionsLink {
-            @include Button(
-                    $button-basic_bg,
-                    $button-basic_fg,
-                    $button-basic_border,
-                    $button-basic-hover_bg,
-                    $button-basic-hover_fg,
-                    $button-basic-hover_border
-            );
+            @if ($staticVariables) {
+                @include Button(
+                        $button-basic_bg,
+                        $button-basic_fg,
+                        $button-basic_border,
+                        $button-basic-hover_bg,
+                        $button-basic-hover_fg,
+                        $button-basic-hover_border
+                );
+            }
             margin-left: $utility-baseUnitHalf;
         }
 

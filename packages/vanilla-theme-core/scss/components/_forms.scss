@@ -143,19 +143,21 @@ select::-ms-expand {
         }
     }
 
-    .Buttons .Button {
-        @include Button;
-    }
+    @if ($staticVariables) {
+        .Buttons .Button {
+            @include Button;
+        }
 
-    .Buttons .Button.Primary {
-        @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
-        );
+        .Buttons .Button.Primary {
+            @include Button(
+                $button-primary_bg,
+                $button-primary_fg,
+                $button-primary_border,
+                $button-primary-hover_bg,
+                $button-primary-hover_fg,
+                $button-primary-hover_border
+            );
+        }
     }
 
     .Buttons .Button.Hidden {
@@ -263,30 +265,33 @@ div.token-input-dropdown {
     }
 }
 
-.Button-Controls .Button.Primary,
-.BigButton:not(.Danger),
-.NewConversation.NewConversation {
-
-    @include Button(
-        $button-primary_bg,
-        $button-primary_fg,
-        $button-primary_border,
-        $button-primary-hover_bg,
-        $button-primary-hover_fg,
-        $button-primary-hover_border
-    );
+@if ($staticVariables) {
+    .Button-Controls .Button.Primary,
+    .BigButton:not(.Danger),
+    .NewConversation.NewConversation {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
+    }
 }
 
-.groupToolbar .Button.Primary,
-.BoxButtons .Button.Primary {
-    @include Button(
-        $button-primary_bg,
-        $button-primary_fg,
-        $button-primary_border,
-        $button-primary-hover_bg,
-        $button-primary-hover_fg,
-        $button-primary-hover_border
-    );
+@if ($staticVariables) {
+    .groupToolbar .Button.Primary,
+    .BoxButtons .Button.Primary {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
+    }
 }
 
 .BigButton,

@@ -91,7 +91,9 @@ div.Popup {
     a.Close {
         top: 24px;
         right: 28px;
-        @include CloseButton($popup_fg);
+        @if ($staticVariables) {
+            @include CloseButton($popup_fg);
+        }
     }
 
     .Buttons {
@@ -100,19 +102,21 @@ div.Popup {
         }
     }
 
-    .Button.change-picture-new {
-        @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
-        );
-    }
+    @if ($staticVariables) {
+        .Button.change-picture-new {
+            @include Button(
+                $button-primary_bg,
+                $button-primary_fg,
+                $button-primary_border,
+                $button-primary-hover_bg,
+                $button-primary-hover_fg,
+                $button-primary-hover_border
+            );
+        }
 
-    .Button.change-picture-remove {
-        @include Button;
+        .Button.change-picture-remove {
+            @include Button;
+        }
     }
 }
 
@@ -128,11 +132,13 @@ div.Popup {
         color: $popup-link_color;
     }
 
-    .Close {
-        @include CloseButton($popup_fg);
-        display: flex !important;
-        margin: $utility-baseUnitHalf;
-        font-size: $icon-default_size !important;
+    @if ($staticVariables) {
+        .Close {
+            @include CloseButton($popup_fg);
+            display: flex !important;
+            margin: $utility-baseUnitHalf;
+            font-size: $icon-default_size !important;
+        }
     }
 }
 

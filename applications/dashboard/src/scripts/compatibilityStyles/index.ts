@@ -24,13 +24,14 @@ import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
-import { layoutCSS } from "@dashboard/compatibilityStyles/layoutStyles";
+import { forumLayoutVariables, layoutCSS } from "@dashboard/compatibilityStyles/layoutStyles";
 import { fontCSS } from "./fontStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export const compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
+    const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
@@ -48,9 +49,10 @@ export const compatibilityStyles = useThemeCache(() => {
         overflow: "auto",
     });
 
-    cssOut(".DataList .Item, .MessageList .Item", {
+    cssOut(`.Content .DataList .Item, .Content .MessageList .Item`, {
         background: "none",
         borderColor: colorOut(vars.border.color),
+        ...paddings(layoutVars.cell.paddings),
     });
 
     // @mixin font-style-base()
@@ -74,15 +76,33 @@ export const compatibilityStyles = useThemeCache(() => {
         color: primary,
     });
 
-    cssOut("a.Bookmark &::before", {
-        color: primary,
+    cssOut(`a.Bookmark`, {
+        opacity: 1,
         $nest: {
+            "&::before": {
+                color: primary,
+            },
             "&:hover::before": {
                 color: colorOut(mainColors.secondary),
             },
         },
     });
+
+    cssOut(
+        `
+        .Content a.Bookmarked::before,
+        .Content a.Bookmarked:hover::before
+        `,
+        {
+            color: important(colorOut(mainColors.primary) as string),
+        },
+    );
+
     cssOut(".Box h4", { color: fg });
+
+    cssOut(`.CategoryBox > .OptionsMenu`, {
+        marginRight: unit(layoutVars.cell.paddings.horizontal),
+    });
 
     // Panel
     cssOut(".Panel a", {
@@ -205,6 +225,34 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.Content .PageControls`, {
         marginBottom: unit(24),
+    });
+
+    cssOut(
+        `
+        .Content .DataList .Tag,
+        .Content .DataList .Tag-Poll,
+        .Content .DataList .RoleTracker,
+        .Content .DataList .IdeationTag,
+        .Content .MessageList .Tag,
+        .Content .MessageList .Tag-Poll,
+        .Content .MessageList .RoleTracker,
+        .Content .MessageList .IdeationTag,
+        .Content .DataTableWrap .Tag,
+        .Content .DataTableWrap .Tag-Poll,
+        .Content .DataTableWrap .RoleTracker,
+        .Content .DataTableWrap .IdeationTag
+        `,
+        {
+            textDecoration: "none",
+            ...fonts({
+                color: vars.meta.text.color,
+                size: vars.meta.text.fontSize,
+            }),
+        },
+    );
+
+    cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
+        borderTopColor: colorOut(vars.border.color),
     });
 
     buttonCSS();

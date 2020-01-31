@@ -16,6 +16,7 @@ import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
+import { Color } from "csstype";
 
 export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
     const formElVars = formElementsVariables();
@@ -59,21 +60,32 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
             : {};
 
+    if (buttonTypeVars.name === ButtonTypes.PRIMARY) {
+        console.log("buttonTypeVars.colors.fg", buttonTypeVars.colors!.fg.toHexString());
+        console.log("buttonTypeVars.colors.bg", buttonTypeVars.colors!.bg.toHexString());
+        console.log("buttonGlobals.colors.fg", buttonGlobals.colors.fg.toHexString());
+        console.log(
+            "buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg",
+            buttonTypeVars.colors && buttonTypeVars.colors.fg
+                ? buttonTypeVars.colors.fg.toHexString()
+                : buttonGlobals.colors.fg.toHexString(),
+        );
+    }
+
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),
-        color: colorOut(
-            buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
-        ),
         backgroundColor: colorOut(
             buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
         ),
         ...fonts({
-            ...buttonGlobals.font,
+            size: buttonGlobals.font.size,
             ...buttonTypeVars.fonts,
+            color:
+                buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
         }),
         ...defaultBorder,
         ...buttonSizing(
@@ -118,7 +130,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.hover.colors.bg
                                 : undefined,
                         ),
-                        ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
+                        // ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
                         ...hoverBorder,
                     },
                     "&:focus": {
@@ -134,7 +146,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 : undefined,
                         ),
 
-                        ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
+                        // ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
                         ...focusBorder,
                     },
                     "&:active": {
@@ -149,9 +161,9 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.active!.colors.bg
                                 : undefined,
                         ),
-                        ...fonts(
-                            buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
-                        ),
+                        // ...fonts(
+                        //     buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
+                        // ),
                         ...activeBorder,
                     },
                     "&.focus-visible": {
@@ -166,11 +178,11 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.focusAccessible!.colors.bg
                                 : undefined,
                         ),
-                        ...fonts(
-                            buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
-                                ? buttonTypeVars.focusAccessible.fonts
-                                : {},
-                        ),
+                        // ...fonts(
+                        //     buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
+                        //         ? buttonTypeVars.focusAccessible.fonts
+                        //         : {},
+                        // ),
                         ...focusAccessibleBorder,
                     },
                 },

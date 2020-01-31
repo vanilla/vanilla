@@ -46,10 +46,18 @@ export const forumLayoutVariables = useThemeCache(() => {
         width: calc(`100% - ${unit(panel.paddedWidth)}`),
     });
 
+    const cell = makeThemeVars("cell", {
+        paddings: {
+            horizontal: 8,
+            vertical: 12,
+        },
+    });
+
     return {
         gutter,
         panel,
         main,
+        cell,
     };
 });
 

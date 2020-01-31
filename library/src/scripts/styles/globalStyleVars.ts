@@ -15,7 +15,7 @@ import {
     getRatioBasedOnDarkness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
@@ -33,7 +33,38 @@ export const globalVariables = useThemeCache(() => {
     const constants = makeThemeVars("constants", {
         linkStateColorEmphasis: 0.15,
         fullGutter: 48,
+        stateEmphasis: 0.06,
+        states: {
+            hover: {
+                stateEmphasis: null as number | null,
+            },
+            selected: {
+                stateEmphasis: null as number | null,
+            },
+            active: {
+                stateEmphasis: null as number | null,
+            },
+            focus: {
+                stateEmphasis: null as number | null,
+            },
+        },
     });
+
+    if (!constants.states.hover.stateEmphasis) {
+        constants.states.hover.stateEmphasis = constants.stateEmphasis;
+    }
+
+    if (!constants.states.selected.stateEmphasis) {
+        constants.states.selected.stateEmphasis = constants.stateEmphasis;
+    }
+
+    if (!constants.states.active.stateEmphasis) {
+        constants.states.active.stateEmphasis = constants.stateEmphasis;
+    }
+
+    if (!constants.states.focus.stateEmphasis) {
+        constants.states.focus.stateEmphasis = constants.stateEmphasis;
+    }
 
     const elementaryColors = {
         black: color("#000"),
@@ -55,6 +86,11 @@ export const globalVariables = useThemeCache(() => {
     const backgroundDarkness = initialMainColors.bg.lightness();
     const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
 
+    // Shorthand checking bg color for darkness
+    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
+        return getRatioBasedOnDarkness(weight, bgColor);
+    };
+
     const generatedMainColors = makeThemeVars("mainColors", {
         secondary: emphasizeLightness(colorPrimary, 0.3, !goodContrast),
     });
@@ -64,13 +100,8 @@ export const globalVariables = useThemeCache(() => {
         ...generatedMainColors,
     };
 
-    // Shorthand checking bg color for darkness
-    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
-    };
-
     const mixBgAndFg = (weight: number) => {
-        return mainColors.fg.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
     const mixPrimaryAndFg = (weight: number) => {
@@ -267,19 +298,19 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.08),
+            color: emphasizeLightness(mainColors.primary, constants.states.hover.stateEmphasis),
             opacity: 1,
         },
         selected: {
-            color: mixPrimaryAndBg(0.5),
+            color: emphasizeLightness(mainColors.primary, constants.states.selected.stateEmphasis),
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.2),
+            color: emphasizeLightness(mainColors.primary, constants.states.active.stateEmphasis),
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.15),
+            color: emphasizeLightness(mainColors.primary, constants.states.focus.stateEmphasis),
             opacity: 1,
         },
     });

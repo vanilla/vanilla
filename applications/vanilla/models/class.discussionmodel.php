@@ -3759,7 +3759,6 @@ class DiscussionModel extends Gdn_Model {
             }
 
             $operation = $newComments ? 'update' : null;
-
         } else {
             $operation = 'insert';
         }
@@ -3768,6 +3767,7 @@ class DiscussionModel extends Gdn_Model {
 
         return [$countWatch, $dateLastViewed, $operation];
     }
+
     /**
      * Record the user's watch data.
      *
@@ -3779,6 +3779,7 @@ class DiscussionModel extends Gdn_Model {
      * @param int $offset Number to skip.
      * @param int $totalComments Total in entire discussion (hard limit).
      * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
+     * @throws Exception Throws an exception if given an invalid timestamp.
      */
     public function setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted = null) {
         $userID = Gdn::session()->UserID;

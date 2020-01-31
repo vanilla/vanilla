@@ -14,6 +14,7 @@
  * http, to other locations.
  */
 class Gdn_Router extends Gdn_Pluggable {
+    const DEFAULT_CONTROLLER_KEY = 'DefaultController';
 
     /** @var array */
     public $Routes;
@@ -64,13 +65,25 @@ class Gdn_Router extends Gdn_Pluggable {
             return false;
         }
 
-        //return $this->Routes[$Route];
-
         return array_merge($this->Routes[$route], [
             'TypeLocale' => t($this->RouteTypes[$this->Routes[$route]['Type']]),
             'FinalDestination' => $this->Routes[$route]['Destination']
         ]);
+    }
 
+    /**
+     * Get default route for home page
+     *
+     * @return array
+     */
+    public function getDefaultRoute(): array {
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $route = $siteSectionModel->getCurrentSiteSection()->getDefaultRoute();
+        return array_merge($route, [
+            'TypeLocale' => t($this->RouteTypes[$this->Routes[self::DEFAULT_CONTROLLER_KEY]['Type']]),
+            'FinalDestination' => $this->Routes[self::DEFAULT_CONTROLLER_KEY]['Destination']
+        ]);
     }
 
     /**
@@ -272,13 +285,23 @@ class Gdn_Router extends Gdn_Pluggable {
     }
 
     /**
-     *
+     * Public method for _parseRoute
      *
      * @param $destination
-     * @param $routeType
+     * @return array|mixed
+     */
+    public function parseRoute($destination) {
+        return $this->_parseRoute($destination);
+    }
+
+    /**
+     * Format route
+     *
+     * @param mixed $destination
+     * @param string $routeType
      * @return array
      */
-    private function _formatRoute($destination, $routeType) {
+    private function _formatRoute($destination, $routeType): array {
         return [
             'Destination' => $destination,
             'Type' => $routeType

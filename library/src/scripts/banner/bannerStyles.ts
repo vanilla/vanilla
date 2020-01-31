@@ -85,7 +85,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
-        color: colors.primary,
+        color: colors.primary.lighten("12%"),
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
         image: undefined as undefined | string,
@@ -124,6 +124,11 @@ export const bannerVariables = useThemeCache(() => {
         font: {
             ...textMixin,
             size: globalVars.fonts.size.largeTitle,
+            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
+        },
+        fontMobile: {
+            ...textMixin,
+            size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
         margins: {
@@ -174,6 +179,10 @@ export const bannerVariables = useThemeCache(() => {
         margin: {
             ...EMPTY_SPACING,
             top: 24,
+        },
+        marginMobile: {
+            ...EMPTY_SPACING,
+            top: 16,
         },
         border: {
             color: colors.contrast,
@@ -298,6 +307,7 @@ export const bannerClasses = useThemeCache(() => {
     const style = styleFactory("banner");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const isCentered = vars.options.alignment === "center";
     const isImageBg = vars.options.imageType === "background";
@@ -356,43 +366,53 @@ export const bannerClasses = useThemeCache(() => {
             ...paddings(vars.spacing.padding),
             backgroundColor: vars.innerBackground.bg,
         },
-        layoutVariables()
-            .mediaQueries()
-            .oneColumnDown({
-                ...paddings(vars.spacing.paddingMobile),
-            }),
+        mediaQueries.oneColumnDown({
+            ...paddings(vars.spacing.paddingMobile),
+        }),
     );
 
     const text = style("text", {
         color: colorOut(vars.colors.contrast),
     });
 
-    const searchContainer = style("searchContainer", {
-        position: "relative",
-        width: percent(100),
-        maxWidth: unit(vars.searchBar.sizing.maxWidth),
-        margin: isCentered ? "auto" : undefined,
-        ...margins(vars.searchBar.margin),
-        $nest: {
-            ".search-results": {
-                width: percent(100),
-                maxWidth: unit(vars.searchBar.sizing.maxWidth),
-                margin: "auto",
-                zIndex: 2,
+    const searchContainer = style(
+        "searchContainer",
+        {
+            position: "relative",
+            width: percent(100),
+            maxWidth: unit(vars.searchBar.sizing.maxWidth),
+            margin: isCentered ? "auto" : undefined,
+            ...margins(vars.searchBar.margin),
+            $nest: {
+                ".search-results": {
+                    width: percent(100),
+                    maxWidth: unit(vars.searchBar.sizing.maxWidth),
+                    margin: "auto",
+                    zIndex: 2,
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            ...margins(vars.searchBar.marginMobile),
+        }),
+    );
 
     const icon = style("icon", {});
     const input = style("input", {});
 
     const buttonLoader = style("buttonLoader", {});
 
-    const title = style("title", {
-        display: "block",
-        ...fonts(vars.title.font as IFont),
-        flexGrow: 1,
-    });
+    const title = style(
+        "title",
+        {
+            display: "block",
+            ...fonts(vars.title.font),
+            flexGrow: 1,
+        },
+        mediaQueries.oneColumnDown({
+            ...fonts(vars.title.fontMobile),
+        }),
+    );
 
     const textWrapMixin: NestedCSSProperties = {
         display: "flex",

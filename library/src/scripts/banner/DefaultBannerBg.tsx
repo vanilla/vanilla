@@ -75,16 +75,16 @@ export function DefaultBannerBg() {
                     xlinkHref="#a"
                 ></linearGradient>
                 <clipPath id="g">
-                    <path fill="none" d="M-1.2 0.455H1598.8V250.455H-1.2z"></path>
+                    <path fill="none" d="M-1.2 0H1598.8V250H-1.2z"></path>
                 </clipPath>
             </defs>
             <g style={{ isolation: "isolate" }}>
-                <path fill={colorOut(vars.outerBackground.color)} d="M-0.4 0.455H1599.6V250.455H-0.4z"></path>
+                <path fill={colorOut(vars.outerBackground.color)} d="M-0 0H1600V250H-0z"></path>
                 <path
                     fill="url(#a)"
                     fillRule="evenodd"
                     style={{ mixBlendMode: "multiply" }}
-                    d="M-.4 250.455s157.2-125.2 321.9-125 217.6 87.3 488.1 87.3 408-149.6 565.9-149.6 224.1 118.4 224.1 118.4v68.9z"
+                    d="M-.4 250s157.2-125.2 321.9-125 217.6 87.3 488.1 87.3 408-149.6 565.9-149.6 224.1 118.4 224.1 118.4v68.9z"
                 ></path>
                 <path
                     fill="url(#b)"
@@ -104,7 +104,7 @@ export function DefaultBannerBg() {
                     fill="url(#d)"
                     fillRule="evenodd"
                     style={{ mixBlendMode: "multiply", isolation: "isolate" }}
-                    d="M-.4 250.455s176.8-94.5 537.2-94.5 363.8 74.6 525 74.6 218-203.1 356.4-203.1 181.4 223 181.4 223H-.4z"
+                    d="M-.4 250s176.8-94.5 537.2-94.5 363.8 74.6 525 74.6 218-203.1 356.4-203.1 181.4 223 181.4 223H-.4z"
                     opacity="0.4"
                 ></path>
                 <path

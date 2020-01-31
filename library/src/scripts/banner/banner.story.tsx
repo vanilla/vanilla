@@ -17,7 +17,7 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 
 export default {
     title: "Banner",
-    params: {
+    parameters: {
         chromatic: {
             viewports: [1400, 400],
         },

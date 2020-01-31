@@ -14,7 +14,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {
     title: "Widgets",
-    params: {
+    parameters: {
         chromatic: {
             viewports: [1400],
         },

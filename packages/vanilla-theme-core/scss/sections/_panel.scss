@@ -36,9 +36,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: $global-subTitle_fontSize;
-            font-weight: $global-heading_fontWeight;
             @if ($staticVariables) {
+                font-size: $global-subTitle_fontSize;
+                font-weight: $global-heading_fontWeight;
                 color: $global-color_fg;
             }
         }
@@ -70,7 +70,6 @@
 .Panel {
 
     @if($staticVariables) {
-
         width: $panel_width;
         background: $panel_bg;
         padding: $panel_padding;
@@ -87,11 +86,15 @@
     }
 
     h4 {
-        font-weight: bold;
+        @if ($staticVariables) {
+            font-weight: bold;
+        }
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: $panel-item_padding;
+        @if ($staticVariables) {
+            padding: $panel-item_padding;
+        }
         margin-bottom: 0;
 
         .Count {
@@ -158,7 +161,9 @@
     .PanelInThisDiscussion {
 
         a {
-            padding: $panel-item_padding;
+            @if ($staticVariables) {
+                padding: $panel-item_padding;
+            }
             border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
@@ -187,18 +192,22 @@
     .Leaderboard,
     .InThisConversation {
 
-        li:not(.Heading) + li:not(.Heading) {
-            margin-top: $panel_item-spacing;
+        @if($staticVariables) {
+            li:not(.Heading) + li:not(.Heading) {
+                margin-top: $panel_item-spacing;
 
-            @if($panel-item_spacing == 0) {
-                a {
-                    margin-top: -1px;
+                @if($panel-item_spacing == 0) {
+                    a {
+                        margin-top: -1px;
+                    }
                 }
             }
         }
 
         a {
-            padding: $panel-item_padding;
+            @if ($staticVariables) {
+                padding: $panel-item_padding;
+            }
             border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
@@ -260,32 +269,34 @@
 body.Section-EditProfile .Box,
 .BoxFilter:not(.BoxBestOfFilter),
 .BoxCategories.BoxCategories {
+    @if ($staticVariables) {
+        .PanelCategories li {
+            padding: 0;
 
-    .PanelCategories li {
-        padding: 0;
+            &.Depth2,
+            &.Depth3,
+            &.Depth4,
+            &.Depth5 {
+                position: relative;
 
-        &.Depth2,
-        &.Depth3,
-        &.Depth4,
-        &.Depth5 {
-            position: relative;
+                a {
+                    padding-left: 24px;
+                }
 
-            a {
-                padding-left: 24px;
-            }
+                &::before {
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    left: 7px;
+                    top: 50%;
+                    width: 6px;
+                    height: 6px;
+                    border-bottom: 2px solid mix($global-color_fg, $global-color_white, 20%);
+                    border-left: 2px solid mix($global-color_fg, $global-color_white, 20%);
+                    transform: translateY(-50%);
+                    z-index: 1;
 
-            &::before {
-                content: "";
-                display: block;
-                position: absolute;
-                left: 7px;
-                top: 50%;
-                width: 6px;
-                height: 6px;
-                border-bottom: 2px solid mix($global-color_fg, $global-color_white, 20%);
-                border-left: 2px solid mix($global-color_fg, $global-color_white, 20%);
-                transform: translateY(-50%);
-                z-index: 1;
+                }
             }
         }
     }
@@ -294,26 +305,29 @@ body.Section-EditProfile .Box,
         border-radius: $formElement_borderRadius;
     }
 
-    li:not(.Heading) + li:not(.Heading) {
-        margin-top: $panel_item-spacing;
+    @if($staticVariables) {
+        li:not(.Heading) + li:not(.Heading) {
+            margin-top: $panel_item-spacing;
 
-        @if($panel-item_spacing == 0) {
-             a {
-                 margin-top: -1px;
-             }
+            @if($panel-item_spacing == 0) {
+                 a {
+                     margin-top: -1px;
+                 }
+            }
         }
     }
 
     li.Heading {
         display: flex;
         align-items: center;
-        padding: $panel-item_padding;
-        border: $panel-item_border;
-        border-radius: $panel_item-borderRadius;
+
         @if ($staticVariables) {
+            padding: $panel-item_padding;
+            border: $panel-item_border;
+            border-radius: $panel_item-borderRadius;
             color: $panel_fg;
+            font-weight: $global-semibold_fontWeight;
         }
-        font-weight: $global-semibold_fontWeight;
 
         .Aside {
             order: 2;
@@ -324,9 +338,13 @@ body.Section-EditProfile .Box,
     a {
         display: flex;
         align-items: center;
-        padding: $panel-item_padding;
+        @if ($staticVariables) {
+            padding: $panel-item_padding;
+        }
         border: $panel-item_border;
-        border-radius: $panel_item-borderRadius;
+        @if ($staticVariables) {
+            border-radius: $panel_item-borderRadius;
+        }
         width: 100%;
         @if ($staticVariables) {
             color: $panel_fg;
@@ -346,13 +364,15 @@ body.Section-EditProfile .Box,
         }
     }
 
-    li:not(.Heading) + li:not(.Heading) {
+    @if($staticVariables) {
+        li:not(.Heading) + li:not(.Heading) {
 
-         @if($panel-item_spacing == 0) {
-             a {
-                 margin-top: -1px;
+             @if($panel-item_spacing == 0) {
+                 a {
+                     margin-top: -1px;
+                 }
              }
-         }
+        }
     }
 
     &.BadgeGrid a {
@@ -361,10 +381,11 @@ body.Section-EditProfile .Box,
         padding: 0;
     }
 
-    .Active {
-
-        a {
-            font-weight: $global-semibold_fontWeight;
+    @if ($staticVariables) {
+        .Active {
+            a {
+                font-weight: $global-semibold_fontWeight;
+            }
         }
     }
 

@@ -29,7 +29,7 @@ import { widgetVariables } from "@library/styles/widgetStyleVars";
 import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
-import { paddings } from "@library/styles/styleHelpersSpacing";
+import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 
 export const bannerVariables = useThemeCache(() => {
@@ -48,16 +48,21 @@ export const bannerVariables = useThemeCache(() => {
     const compactSearchVars = compactSearchVariables();
 
     const topPadding = 69;
+    const horizontalPadding = unit(
+        widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter,
+    ) as PaddingProperty<TLength>;
     const spacing = makeThemeVars("spacing", {
         padding: {
+            ...EMPTY_SPACING,
             top: topPadding as PaddingProperty<TLength>,
             bottom: (topPadding * 0.8) as PaddingProperty<TLength>,
-            right: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter) as PaddingProperty<
-                TLength
-            >,
-            left: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter) as PaddingProperty<
-                TLength
-            >,
+            horizontal: horizontalPadding,
+        },
+        paddingMobile: {
+            ...EMPTY_SPACING,
+            top: 0,
+            bottom: globalVars.gutter.size,
+            horizontal: horizontalPadding,
         },
     });
 
@@ -121,7 +126,7 @@ export const bannerVariables = useThemeCache(() => {
             size: globalVars.fonts.size.largeTitle,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
-        paddings: {
+        margins: {
             ...EMPTY_SPACING,
             top: 24,
             bottom: 12,
@@ -136,7 +141,7 @@ export const bannerVariables = useThemeCache(() => {
             size: globalVars.fonts.size.large,
         },
         maxWidth: 400,
-        padding: {
+        margins: {
             ...EMPTY_SPACING,
             bottom: 12,
         },
@@ -166,7 +171,7 @@ export const bannerVariables = useThemeCache(() => {
             color: colors.fg,
             size: formElVars.giantInput.fontSize,
         },
-        padding: {
+        margin: {
             ...EMPTY_SPACING,
             top: 24,
         },
@@ -345,10 +350,18 @@ export const bannerClasses = useThemeCache(() => {
         background: colorOut(vars.backgrounds.overlayColor),
     });
 
-    const innerContainer = style("innerContainer", {
-        ...paddings(vars.spacing.padding),
-        backgroundColor: vars.innerBackground.bg,
-    });
+    const innerContainer = style(
+        "innerContainer",
+        {
+            ...paddings(vars.spacing.padding),
+            backgroundColor: vars.innerBackground.bg,
+        },
+        layoutVariables()
+            .mediaQueries()
+            .oneColumnDown({
+                ...paddings(vars.spacing.paddingMobile),
+            }),
+    );
 
     const text = style("text", {
         color: colorOut(vars.colors.contrast),
@@ -359,7 +372,7 @@ export const bannerClasses = useThemeCache(() => {
         width: percent(100),
         maxWidth: unit(vars.searchBar.sizing.maxWidth),
         margin: isCentered ? "auto" : undefined,
-        ...paddings(vars.searchBar.padding),
+        ...margins(vars.searchBar.margin),
         $nest: {
             ".search-results": {
                 width: percent(100),
@@ -378,7 +391,6 @@ export const bannerClasses = useThemeCache(() => {
     const title = style("title", {
         display: "block",
         ...fonts(vars.title.font as IFont),
-        ...paddings(vars.title.paddings),
         flexGrow: 1,
     });
 
@@ -388,11 +400,12 @@ export const bannerClasses = useThemeCache(() => {
         alignItems: "center",
         maxWidth: unit(vars.searchBar.sizing.maxWidth),
         width: percent(100),
-        margin: isCentered ? "auto" : undefined,
+        marginLeft: isCentered ? "auto" : undefined,
+        marginRight: isCentered ? "auto" : undefined,
     };
 
     const titleAction = style("titleAction", {});
-    const titleWrap = style("titleWrap", textWrapMixin);
+    const titleWrap = style("titleWrap", { ...margins(vars.title.margins), ...textWrapMixin });
 
     const titleFlexSpacer = style("titleFlexSpacer", {
         display: isCentered ? "block" : "none",
@@ -424,12 +437,15 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
-    const descriptionWrap = style("descriptionWrap", textWrapMixin);
+    const widget = style("widget", {
+        display: "block",
+    });
+
+    const descriptionWrap = style("descriptionWrap", { ...margins(vars.description.margins), ...textWrapMixin });
 
     const description = style("description", {
         display: "block",
         ...fonts(vars.description.font as IFont),
-        ...paddings(vars.description.padding),
         flexGrow: 1,
     });
 
@@ -443,6 +459,7 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     return {
+        widget,
         root,
         outerBackground,
         innerContainer,

@@ -58,7 +58,7 @@ export default function Banner(props: IProps) {
             {vars.backgrounds.useOverlay && isImageBg && <div className={classes.backgroundOverlay} />}
             <Container>
                 <div className={classes.innerContainer}>
-                    <PanelWidgetHorizontalPadding>
+                    <PanelWidgetHorizontalPadding className={classes.widget}>
                         <div className={classes.titleWrap}>
                             <FlexSpacer className={classes.titleFlexSpacer} />
                             {title && <Heading title={title} className={classes.title} />}

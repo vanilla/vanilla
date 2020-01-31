@@ -8,7 +8,7 @@ import { colorOut } from "@library/styles/styleHelpers";
 
 export function DefaultBannerBg() {
     const classes = bannerClasses();
-    const vars = bannerVariables({});
+    const vars = bannerVariables();
 
     return (
         <svg

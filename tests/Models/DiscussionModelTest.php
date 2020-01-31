@@ -604,7 +604,7 @@ class DiscussionModelTest extends TestCase {
      * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void {
-        $discussionModel = new DiscussionModel();
+        $this->model = new DiscussionModel();
 
         $countComments = 5;
         $discussion = [
@@ -617,16 +617,16 @@ class DiscussionModelTest extends TestCase {
         ];
 
         // Confirm the initial state, so changes are easy to detect.
-        $discussionID = $discussionModel->save($discussion);
-        $discussion = $discussionModel->getID($discussionID);
+        $discussionID = $this->model->save($discussion);
+        $discussion = $this->model->getID($discussionID);
         $this->assertNull(
             $discussion->CountCommentWatch,
             "Initial comment watch status not null."
         );
 
         // Create a comment watch status.
-        $discussionModel->setWatch($discussion, 10, 0, $discussion->CountComments);
-        $discussionFirstVisit = $discussionModel->getID($discussionID);
+        $this->model->setWatch($discussion, 10, 0, $discussion->CountComments);
+        $discussionFirstVisit = $this->model->getID($discussionID);
         $this->assertSame(
             $discussionFirstVisit->CountComments,
             $discussionFirstVisit->CountCommentWatch,
@@ -635,9 +635,9 @@ class DiscussionModelTest extends TestCase {
 
         // Update an existing comment watch status.
         $updatedCountComments = $countComments + 1;
-        $discussionModel->setField($discussionID, "CountComments", $updatedCountComments);
-        $discussionModel->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
-        $discussionSecondVisit = $discussionModel->getID($discussionID);
+        $this->model->setField($discussionID, "CountComments", $updatedCountComments);
+        $this->model->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
+        $discussionSecondVisit = $this->model->getID($discussionID);
         $this->assertSame(
             $discussionSecondVisit->CountComments,
             $discussionSecondVisit->CountCommentWatch,

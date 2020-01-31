@@ -237,7 +237,7 @@ class DiscussionController extends VanillaController {
         // Make sure to set the user's discussion watch records if this is not an API request.
         if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
             $maxDateInserted = $this->maxDateInserted($this->data('Comments'));
-            $this->CommentModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments, $maxDateInserted);
+            $this->DiscussionModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments, $maxDateInserted);
         }
 
         // Build a pager
@@ -361,7 +361,12 @@ class DiscussionController extends VanillaController {
             $lastComment = $comments[count($comments) - 1];
             // Mark the comment read.
             $this->setData('Offset', $this->Discussion->CountComments, true);
-            $this->CommentModel->setWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
+            $this->DiscussionModel->setWatch(
+                $this->Discussion,
+                $this->Discussion->CountComments,
+                $this->Discussion->CountComments,
+                $this->Discussion->CountComments
+            );
 
             $lastCommentID = $this->json('LastCommentID');
             if (is_null($lastCommentID) || $lastComment->CommentID > $lastCommentID) {

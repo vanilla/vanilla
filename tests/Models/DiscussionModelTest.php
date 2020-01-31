@@ -10,7 +10,6 @@ namespace VanillaTests\Models;
 use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
-use mysql_xdevapi\Exception;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\ExpectErrorTrait;
@@ -171,7 +170,7 @@ class DiscussionModelTest extends TestCase {
      */
     public function testCanCloseCloseOwnTrueNotOwn() {
         $this->session->UserID = 123;
-        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
+        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
         $this->session->getPermissions()->setAdmin(false);
         $discussion = [
             'DiscussionID' => 0,
@@ -604,7 +603,8 @@ class DiscussionModelTest extends TestCase {
      * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void {
-        $this->model = new DiscussionModel();
+        $userID = $this->session->UserID;
+        $this->session->start(self::$siteInfo['adminUserID']);
 
         $countComments = 5;
         $discussion = [
@@ -618,7 +618,9 @@ class DiscussionModelTest extends TestCase {
 
         // Confirm the initial state, so changes are easy to detect.
         $discussionID = $this->model->save($discussion);
+        $this->assertNotEmpty($discussionID, $this->model->Validation->resultsText());
         $discussion = $this->model->getID($discussionID);
+        $this->assertIsObject($discussion);
         $this->assertNull(
             $discussion->CountCommentWatch,
             "Initial comment watch status not null."
@@ -643,5 +645,7 @@ class DiscussionModelTest extends TestCase {
             $discussionSecondVisit->CountCommentWatch,
             "Updating comment watch status failed."
         );
+
+//        $this->session->start($userID);
     }
 }

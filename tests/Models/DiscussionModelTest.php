@@ -59,6 +59,7 @@ class DiscussionModelTest extends TestCase {
         $this->model = $this->container()->get(\DiscussionModel::class);
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
+        $this->backupSession();
 
         // Make event testing a little easier.
         $this->container()->setInstance(self::class, $this);
@@ -67,6 +68,14 @@ class DiscussionModelTest extends TestCase {
         $eventManager = $this->container()->get(EventManager::class);
         $eventManager->unbindClass(self::class);
         $eventManager->addListenerMethod(self::class, "handleDiscussionEvent");
+    }
+
+    /**
+     * Restore the session after tests.
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->restoreSession();
     }
 
     /**
@@ -603,7 +612,6 @@ class DiscussionModelTest extends TestCase {
      * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void {
-        $userID = $this->session->UserID;
         $this->session->start(self::$siteInfo['adminUserID']);
 
         $countComments = 5;
@@ -645,7 +653,5 @@ class DiscussionModelTest extends TestCase {
             $discussionSecondVisit->CountCommentWatch,
             "Updating comment watch status failed."
         );
-
-//        $this->session->start($userID);
     }
 }

@@ -9,7 +9,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssRule } from "typestyle";
 import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { em, percent } from "csx";
-import { paddings } from "@library/styles/styleHelpersfPadding";
+import { paddings } from "@vanilla/library/src/scripts/styles/styleHelpersSpacing";
 import { userContentVariables } from "@library/content/userContentStyles";
 
 export const codeBlockVariables = useThemeCache(() => {

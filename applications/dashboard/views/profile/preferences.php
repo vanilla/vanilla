@@ -23,9 +23,9 @@
         text-align: center;
     }
 
-    table.PreferenceGroup tbody tr:hover td {
-        background: #efefef;
-    }
+    <?php if (!c("Feature.DataDrivenTheme.Enabled")){
+      echo "table.PreferenceGroup tbody tr:hover td {background: #efefef;}";
+    }?>
 
     .Info {
         width: 486px;

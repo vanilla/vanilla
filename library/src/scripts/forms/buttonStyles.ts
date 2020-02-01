@@ -34,6 +34,8 @@ export const buttonGlobalVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        primary: globalVars.mainColors.primary,
+        primaryTextColor: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
@@ -67,6 +69,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
 export const buttonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("button");
+    const vars = buttonGlobalVariables();
 
     const standard: IButtonType = makeThemeVars("basic", {
         name: ButtonTypes.STANDARD,
@@ -130,10 +133,10 @@ export const buttonVariables = useThemeCache(() => {
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
-            bg: globalVars.mainColors.primary,
+            bg: vars.colors.primary,
         },
         fonts: {
-            color: globalVars.mainColors.bg,
+            color: vars.colors.primaryTextColor,
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
@@ -142,7 +145,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         hover: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -150,7 +153,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         active: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -158,7 +161,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focus: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -166,7 +169,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focusAccessible: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,

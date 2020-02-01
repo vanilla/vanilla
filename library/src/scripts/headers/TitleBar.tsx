@@ -37,9 +37,8 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useEffect, useState, useRef, useMemo, useDebugValue } from "react";
 import ReactDOM from "react-dom";
-import { useSplashContext } from "@library/splash/SplashContext";
 import { useSpring, animated } from "react-spring";
-import { pointerEvents } from "@library/styles/styleHelpers";
+import { useBannerContext } from "@library/banner/BannerContext";
 
 interface IProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -127,13 +126,13 @@ export default function TitleBar(_props: IProps) {
                                 hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
-                            <animated.span {...logoProps}>
+                            <animated.div className={classes.logoAnimationWrap} {...logoProps}>
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                     logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
-                            </animated.span>
+                            </animated.div>
                         )}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
@@ -285,13 +284,12 @@ function useScrollTransition() {
     const bgRef = useRef<HTMLDivElement | null>(null);
     const bg2Ref = useRef<HTMLDivElement | null>(null);
     const logoRef = useRef<HTMLDivElement | null>(null);
-    const { splashExists, splashRect } = useSplashContext();
+    const { bannerExists, bannerRect } = useBannerContext();
     const [scrollPos, setScrollPos] = useState(0);
     const fullBleedOptions = titleBarVariables().fullBleed;
 
     const { doubleLogoStrategy } = titleBarVariables().logo;
-    const shouldOverlay = fullBleedOptions.enabled && splashExists;
-
+    const shouldOverlay = fullBleedOptions.enabled && bannerExists;
     const { topOffset } = useScrollOffset();
 
     // Scroll handler to pass to the form element.
@@ -314,13 +312,13 @@ function useScrollTransition() {
     let bgEnd = 0;
     let bg2Start = 0;
     let bg2End = 0;
-    if (splashExists && splashRect && bg2Ref.current) {
-        const splashEnd = splashRect.bottom;
+    if (bannerExists && bannerRect && bg2Ref.current) {
+        const bannerEnd = bannerRect.bottom;
         const titleBarHeight = bg2Ref.current.getBoundingClientRect().height;
-        bgStart = splashRect.top;
+        bgStart = bannerRect.top;
         bgEnd = bgStart + titleBarHeight;
-        bg2Start = splashEnd - titleBarHeight * 2;
-        bg2End = splashEnd - titleBarHeight;
+        bg2Start = bannerEnd - titleBarHeight * 2;
+        bg2End = bannerEnd - titleBarHeight;
     }
 
     const clientHeaderStart = topOffset === 0 ? -1 : 0; // Fix to ensure an empty topOffset starts us at 100% opacity.

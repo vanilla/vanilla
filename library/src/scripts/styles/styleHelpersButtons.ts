@@ -18,6 +18,16 @@ export interface IActionStates {
     active?: object;
 }
 
+export interface IStateSelectors {
+    noState?: string;
+    allStates?: string; // Applies to all
+    hover?: string;
+    focus?: string;
+    focusNotKeyboard?: string; // Focused, not through keyboard?: object;
+    accessibleFocus?: string; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: string;
+}
+
 export interface IButtonStates {
     allStates?: object; // Applies to all
     noState?: object; // Applies to stateless link
@@ -69,7 +79,7 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, debugMod
  * Helper to write CSS state styles. Note this one is for buttons or links
  * *** You must use this inside of a "$nest" ***
  */
-export const buttonStates = (styles: IActionStates, nest?: object) => {
+export const buttonStates = (styles: IActionStates, nest?: object, classBasedStates?: IStateSelectors) => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const hover = styles.hover !== undefined ? styles.hover : {};
     const focus = styles.focus !== undefined ? styles.focus : {};
@@ -78,13 +88,31 @@ export const buttonStates = (styles: IActionStates, nest?: object) => {
     const active = styles.active !== undefined ? styles.active : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
 
+    if (!classBasedStates) {
+        classBasedStates = {};
+    }
+
     return {
-        "&": { ...allStates, ...noState },
-        "&:hover": { ...allStates, ...hover },
-        "&:focus": { ...allStates, ...focus },
-        "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
-        "&.focus-visible": { ...allStates, ...accessibleFocus },
-        "&&:active": { ...allStates, ...active },
+        [appendExtraSelector("&", classBasedStates.allStates)]: { ...allStates, ...noState },
+        [appendExtraSelector("&:hover", classBasedStates.hover)]: { ...allStates, ...hover },
+        [appendExtraSelector("&:focus", classBasedStates.focus)]: { ...allStates, ...focus },
+        [appendExtraSelector("&:focus:not(.focus-visible)", classBasedStates.focusNotKeyboard)]: {
+            ...allStates,
+            ...focusNotKeyboard,
+        },
+        [appendExtraSelector("&.focus-visible", classBasedStates.accessibleFocus)]: {
+            ...allStates,
+            ...accessibleFocus,
+        },
+        [appendExtraSelector("&&:active", classBasedStates.active)]: { ...allStates, ...active },
         ...nest,
     };
+};
+
+const appendExtraSelector = (currentSelector: string, additionnalSelector) => {
+    if (additionnalSelector) {
+        return `${currentSelector}, ${additionnalSelector}`;
+    } else {
+        return currentSelector;
+    }
 };

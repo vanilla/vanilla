@@ -27,7 +27,7 @@ export const layoutVariables = useThemeCache(() => {
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
-        fullGutter: 48,
+        fullGutter: globalVars.constants.fullGutter,
         panelWidth: 216,
         middleColumnWidth: 700,
         minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.

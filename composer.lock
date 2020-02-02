@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "026f2da4bd00ad08ea10b07a542c2859",
+    "content-hash": "d5f5fc9fc6577d85cc26c708754a9cbb",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -177,6 +177,44 @@
             "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
             "homepage": "https://github.com/firebase/php-jwt",
             "time": "2017-06-27T22:17:23+00:00"
+        },
+        {
+            "name": "metasyntactical/composer-plugin-license-check",
+            "version": "v0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/metasyntactical/composer-plugin-license-check.git",
+                "reference": "526172ce6659629bfc3d89bf1469b487e0577984"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/metasyntactical%2Fcomposer-plugin-license-check/repository/archive.zip?sha=526172ce6659629bfc3d89bf1469b487e0577984",
+                "reference": "526172ce6659629bfc3d89bf1469b487e0577984",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0",
+                "php": ">=7.1.0,<7.4.0"
+            },
+            "require-dev": {
+                "composer/composer": "^1.4",
+                "phpunit/phpunit": "^6.1"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Metasyntactical\\Composer\\LicenseCheck\\LicenseCheckPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Metasyntactical\\Composer\\LicenseCheck\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Plugin for Composer to restrict installation of packages to valid licenses via whitelist.",
+            "time": "2019-05-14T14:10:09+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -3652,8 +3690,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",

@@ -131,6 +131,7 @@ export const modalClasses = useThemeCache(() => {
         maxHeight: unit(vars.sizing.height),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
+        color: colorOut(vars.colors.fg),
         position: "fixed",
         top: percent(50),
         left: percent(50),

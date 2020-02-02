@@ -7,7 +7,7 @@
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { negative, unit, colorOut } from "@library/styles/styleHelpers";
+import { negative, unit, colorOut, allLinkStates } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
@@ -122,13 +122,21 @@ export const siteNavNodeClasses = useThemeCache(() => {
         outline: 0,
         padding: 0,
         width: percent(100),
+        ...allLinkStates({
+            hover: {
+                color: globalVars.links.colors.hover,
+            },
+            focus: { color: globalVars.links.colors.focus },
+            accessibleFocus: { color: globalVars.links.colors.accessibleFocus },
+            active: { color: globalVars.links.colors.active },
+        }),
         $nest: {
-            "&:active, &:focus": {
+            "&:not(.focus-visible):active, &:focus": {
                 outline: 0,
             },
-            "&:hover": {
-                color: colorOut(globalVars.links.colors.default.toString()),
-            },
+            // "&:hover": {
+            //     color: colorOut(globalVars.links.colors.default.toString()),
+            // },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
                 color: "inherit",

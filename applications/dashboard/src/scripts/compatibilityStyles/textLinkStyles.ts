@@ -37,7 +37,9 @@ export const textLinkCSS = () => {
     mixinTextLink(".Panel .Leaderboard a");
     mixinTextLink(".Panel .InThisConversation a");
     mixinTextLink(".FilterMenu a", true);
-    mixinTextLink(".Breadcrumbs a", true);
+    mixinTextLink(".Breadcrumbs a", true, {
+        textDecoration: "none",
+    });
     mixinTextLink("div.Popup .Body a");
     mixinTextLink(".selectBox-toggle");
     mixinTextLink(".followButton");
@@ -46,6 +48,7 @@ export const textLinkCSS = () => {
     mixinTextLink(".OptionsLink-Clipboard");
     mixinTextLink("a.OptionsLink");
     mixinTextLink(".MorePager a");
+    mixinTextLink(`body.Section-BestOf .Tile .Message a`);
     // Links that have FG color by default but regular state colors.
     mixinTextLink(".ItemContent a", true);
     mixinTextLink(".DataList .Item h3 a", true);
@@ -60,13 +63,14 @@ export const textLinkCSS = () => {
 };
 
 // Mixins replacement
-export const mixinTextLink = (selector: string, skipDefaultColor = false) => {
+export const mixinTextLink = (selector: string, skipDefaultColor = false, overwrite?: {}) => {
     const linkColors = setAllLinkColors();
     selector = trimTrailingCommas(selector);
 
     if (!skipDefaultColor) {
         cssOut(selector, {
             color: linkColors.color,
+            ...overwrite,
         });
     }
     nestedWorkaround(selector, linkColors.nested);

@@ -14,7 +14,7 @@ import { fonts } from "@library/styles/styleHelpersTypography";
 import { borders, importantUnit, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
-import { siteNavNodeClasses, siteNavVariables } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
+import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
 import * as types from "typestyle/lib/types";
@@ -26,6 +26,8 @@ import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
 import { fontCSS } from "./fontStyles";
 import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
+import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -190,6 +192,7 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(
         `
         a.TextColor, a .TextColor`,
+
         {
             color: colorOut(vars.mainColors.fg),
         },
@@ -265,6 +268,8 @@ export const compatibilityStyles = useThemeCache(() => {
     paginationCSS();
     forumLayoutCSS();
     fontCSS();
+    categoriesCSS();
+    bestOfCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

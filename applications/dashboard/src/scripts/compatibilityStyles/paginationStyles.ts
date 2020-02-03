@@ -49,4 +49,16 @@ export const paginationCSS = () => {
             },
         },
     });
+
+    cssOut(`.Content .PageControls`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexDirection: "row-reverse",
+        marginBottom: unit(16),
+    });
+
+    cssOut(`.ToggleFlyout.selectBox`, {
+        marginRight: "auto",
+    });
 };

@@ -239,8 +239,28 @@ export const compatibilityStyles = useThemeCache(() => {
         marginBottom: unit(24),
     });
 
+    cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
+        borderTopColor: colorOut(vars.border.color),
+    });
+
+    cssOut(`.Author a:not(.PhotoWrap)`, {
+        fontWeight: vars.fonts.weights.bold,
+    });
+
     cssOut(
         `
+        .Tag,
+        .DataList .Meta .Tag-Announcement,
+        .DataList .NewCommentCount,
+        .DataList .HasNew.HasNew,
+        .MessageList .Tag-Announcement,
+        .MessageList .NewCommentCount,
+        .MessageList .HasNew.HasNew,
+        .DataTableWrap .Tag-Announcement,
+        .DataTableWrap .NewCommentCount,
+        .DataTableWrap .HasNew.HasNew,
+        .MessageList .ItemComment .Username,
+        .MessageList .ItemDiscussion .Username,
         .Content .DataList .Tag,
         .Content .DataList .Tag-Poll,
         .Content .DataList .RoleTracker,
@@ -255,40 +275,14 @@ export const compatibilityStyles = useThemeCache(() => {
         .Content .DataTableWrap .IdeationTag
         `,
         {
-            textDecoration: "none",
+            ...borders(),
+            background: "none",
+            backgroundColor: "transparent",
             ...fonts({
                 color: vars.meta.text.color,
                 size: vars.meta.text.fontSize,
             }),
-        },
-    );
-
-    cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
-        borderTopColor: colorOut(vars.border.color),
-    });
-
-    cssOut(`.Author a:not(.PhotoWrap)`, {
-        fontWeight: vars.fonts.weights.bold,
-    });
-
-    cssOut(
-        `.DataList .Meta .Tag-Announcement,
-        .DataList .NewCommentCount,
-        .DataList .HasNew.HasNew,
-        .MessageList .Tag-Announcement,
-        .MessageList .NewCommentCount,
-        .MessageList .HasNew.HasNew,
-        .DataTableWrap .Tag-Announcement,
-        .DataTableWrap .NewCommentCount,
-        .DataTableWrap .HasNew.HasNew,
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        .Tag
-        `,
-        {
-            ...borders(),
-            background: "none",
-            backgroundColor: "transparent",
+            textDecoration: "none",
         },
     );
 

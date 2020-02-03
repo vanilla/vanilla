@@ -5,12 +5,17 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, unit, borders } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
+
+const mixinMetaContainer = (selector: string, overwrites = {}) => {
+    cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
+};
 
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
@@ -46,8 +51,8 @@ export const forumMetaCSS = () => {
         .MessageList .ItemDiscussion .Username,
         `,
         {
-            color: primary,
-            borderColor: primary,
+            color: fg,
+            ...borders(),
             textDecoration: "none",
         },
     );
@@ -126,10 +131,10 @@ export const forumMetaCSS = () => {
             marginRight: unit(globalVars.meta.spacing.default),
         },
     );
-};
 
-const mixinMetaContainer = (selector: string) => {
-    // ".Container .DataTable .DiscussionName .Meta.Meta-Discussion"
+    mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
+        overflow: "visible",
+    });
 };
 
 function mixinMetaLinkContainer(selector: string) {

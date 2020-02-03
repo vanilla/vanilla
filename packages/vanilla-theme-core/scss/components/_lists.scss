@@ -268,13 +268,15 @@
         margin-right: 0;
     }
 
-    // overwrite ideation plugin styles
-    .ItemIdea.ItemIdea.ItemIdea {
-        .PhotoWrap.IndexPhoto,
-        .idea-counter-module .idea-counter-box {
-            margin: 0 $utility-baseUnitHalf 0 0;
-            width: $theme-photo_size;
-            height: $theme-photo_size;
+    @if($staticVariables) {
+        // overwrite ideation plugin styles
+        .ItemIdea.ItemIdea.ItemIdea {
+            .PhotoWrap.IndexPhoto,
+            .idea-counter-module .idea-counter-box {
+                margin: 0 $utility-baseUnitHalf 0 0;
+                width: $theme-photo_size;
+                height: $theme-photo_size;
+            }
         }
     }
 

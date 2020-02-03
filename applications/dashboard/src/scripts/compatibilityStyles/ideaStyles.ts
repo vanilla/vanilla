@@ -63,4 +63,13 @@ export const ideaCSS = () => {
     cssOut(`.idea-counter-module .score`, {
         color: colorOut(globalVars.mainColors.fg),
     });
+
+    cssOut(
+        `
+        .Groups .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap,
+        .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap`,
+        {
+            paddingLeft: unit(50),
+        },
+    );
 };

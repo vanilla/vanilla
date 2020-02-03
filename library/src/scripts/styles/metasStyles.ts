@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { allLinkStates, colorOut, margins, unit } from "@library/styles/styleHelpers";
 import { calc } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const metasVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -49,7 +50,11 @@ export const metasVariables = useThemeCache(() => {
     };
 });
 
-export const metaContainerStyles = () => {
+export const metaContainerStyles = (overwrites?: any) => {
+    const vars = metasVariables();
+    const globalVars = globalVariables();
+    const flexed = { display: "flex", flexWrap: "wrap", justifyContent: "flex-start", alignItems: "center" };
+    const flexContents = overwrites.flexContents ? flexed : {};
     return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
@@ -81,14 +86,11 @@ export const metaContainerStyles = () => {
                     },
                 }),
             },
-            "&.isFlexed": {
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "flex-start",
-                alignItems: "center",
-            },
+            "&.isFlexed": flexed,
         },
-    };
+        ...overwrites,
+        ...flexContents,
+    } as NestedCSSProperties;
 };
 
 export const metasClasses = useThemeCache(() => {

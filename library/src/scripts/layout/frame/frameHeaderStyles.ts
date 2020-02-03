@@ -133,6 +133,7 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const closeMinimal = style("closeMinimal", {
+        color: colorOut(globalVars.mixBgAndFg(0.6)),
         position: "absolute",
         top: 0,
         bottom: 0,

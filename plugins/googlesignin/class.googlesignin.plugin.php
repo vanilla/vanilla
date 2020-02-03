@@ -94,7 +94,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', t('You must provide a Secret'));
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
-            $baseUrl = $this->getBaseUrl($form->getValue('AuthorizeUrl'));
+            $baseUrl = $this->getBaseUrl(self::AUTHORIZE_URL);
 
             if ($baseUrl) {
                 $form->setFormValue('BaseUrl', $baseUrl);

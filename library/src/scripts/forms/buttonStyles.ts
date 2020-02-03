@@ -23,6 +23,7 @@ import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     // Fetch external global variables
@@ -326,6 +327,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const pushLeft = style("pushLeft", {
         marginRight: important("auto"),
@@ -365,7 +367,13 @@ export const buttonUtilityClasses = useThemeCache(() => {
         }),
     });
 
-    const buttonIcon = style("icon", iconMixin(formElementVars.sizing.height));
+    const buttonIcon = style(
+        "icon",
+        iconMixin(formElementVars.sizing.height),
+        mediaQueries.oneColumnDown({
+            height: vars.sizing.compactHeight,
+        }),
+    );
 
     const buttonIconCompact = style("iconCompact", iconMixin(vars.sizing.compactHeight));
 

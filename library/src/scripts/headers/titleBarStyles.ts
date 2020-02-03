@@ -22,7 +22,7 @@ import {
     sticky,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -31,6 +31,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
+import { LogoAlignment } from "./TitleBar";
 
 enum TitleBarBorderType {
     BORDER = "border",
@@ -149,7 +150,7 @@ export const titleBarVariables = useThemeCache(() => {
     const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: button.mobile.width * 2,
+            flexBasis: button.mobile.width - 20,
         },
     });
 
@@ -205,6 +206,10 @@ export const titleBarVariables = useThemeCache(() => {
         tablet: {},
     });
 
+    const mobileLogo = makeThemeVars("mobileLogo", {
+        justifyContent: LogoAlignment.CENTER,
+    });
+
     const breakpoints = makeThemeVars("breakpoints", {
         compact: 850,
     });
@@ -255,6 +260,7 @@ export const titleBarVariables = useThemeCache(() => {
         logo,
         mediaQueries,
         breakpoints,
+        mobileLogo,
     };
 });
 
@@ -386,6 +392,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
+            justifyContent: vars.mobileLogo.justifyContent,
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -777,6 +784,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const hamburger = style("hamburger", {
+        marginRight: unit(12),
         $nest: {
             "&&": {
                 ...allButtonStates({
@@ -866,7 +874,22 @@ export const titleBarLogoClasses = useThemeCache(() => {
         },
     });
 
-    return { logoFrame, logo };
+    const mobileLogo = style("mobileLogo", {
+        justifyContent: vars.mobileLogo.justifyContent,
+    });
+
+    const isCenter = style("isCenter", {
+        position: "absolute",
+        left: percent(50),
+        transform: translate(`-50%`, `-50%`),
+    });
+
+    return {
+        logoFrame,
+        logo,
+        mobileLogo,
+        isCenter,
+    };
 });
 
 export const titleBarHomeClasses = useThemeCache(() => {

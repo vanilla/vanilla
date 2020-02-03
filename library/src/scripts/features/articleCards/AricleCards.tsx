@@ -10,7 +10,7 @@ import Card from "@library/features/articleCards/Card";
 import { articleCardsVariables, articleCardsClasses } from "./articleCardsStyles";
 
 interface ICard {
-    icon: string;
+    image?: string;
     title: string;
     description: string;
     url: string;
@@ -40,6 +40,7 @@ export default class ArticleCards extends React.Component<IProps> {
     public render() {
         const vars = articleCardsVariables();
         const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
+        console.log("colums--->", columns);
         const classes = articleCardsClasses();
 
         if (items.length === 0) {
@@ -55,7 +56,7 @@ export default class ArticleCards extends React.Component<IProps> {
                         {items.map((tile, i) => (
                             <li key={i} className={classNames(classes.item(columns))}>
                                 <Card
-                                    icon={tile.icon}
+                                    image={tile.image}
                                     fallbackIcon={this.props.fallbackIcon}
                                     title={tile.title}
                                     description={tile.description}

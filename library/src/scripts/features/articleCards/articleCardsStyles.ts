@@ -23,13 +23,14 @@ export const articleCardsVariables = useThemeCache(() => {
     });
 
     const sizing = themeVars("sizing", {
+        containerWidthOneColumn: spacing.paddingOneColumn * 2 + 160 * 2,
         containerWidthTwoColumns: spacing.paddingTwoColumns * 4 + 384 * 2,
         containerWidthThreeColumns: spacing.paddingThreeColumns * 6 + 260 * 3,
         containerWidthFourColumns: spacing.paddingFourColumns * 8 + 260 * 4,
     });
 
     const options = themeVars("options", {
-        columns: 2,
+        columns: 1,
         alignment: TileAlignment.CENTER,
     });
 
@@ -50,6 +51,10 @@ export const articleCardsClasses = useThemeCache(() => {
         let maxWidth = vars.sizing.containerWidthTwoColumns;
         let itemPadding = vars.spacing.paddingTwoColumns;
         switch (columnCount) {
+            /* case 1:
+                maxWidth = vars.sizing.containerWidthOneColumn;
+                itemPadding = vars.spacing.paddingOneColumn;
+                break;*/
             case 3:
                 maxWidth = vars.sizing.containerWidthThreeColumns;
                 itemPadding = vars.spacing.paddingThreeColumns;
@@ -97,7 +102,11 @@ export const articleCardsClasses = useThemeCache(() => {
         let width: CSSPercentage = "50%";
         let additionnalMediaQueries = [] as NestedCSSProperties[];
         let padding = vars.spacing.paddingTwoColumns;
+        console.log("columnCount-->", columnCount);
         switch (columnCount) {
+            case 1:
+                width = "100%";
+                break;
             case 3:
                 width = globalVars.utility["percentage.third"];
                 additionnalMediaQueries.push(

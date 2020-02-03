@@ -27,34 +27,34 @@ interface IBody {
 
 export const cardVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("card");
+    const cardVars = variableFactory("card");
 
-    const spacing = themeVars("spacing", {
+    const spacing = cardVars("spacing", {
         twoColumns: 24,
         threeColumns: 9,
         fourColumns: 17,
         color: globalVars.mainColors.primary as ColorHelper,
     });
 
-    const frame = themeVars("frame", {
+    const frame = cardVars("frame", {
         height: 90 as PaddingProperty<TLength>,
         width: 90 as PaddingProperty<TLength>,
         bottomMargin: 16 as MarginProperty<TLength>,
     });
 
-    const title = themeVars("title", {
+    const title = cardVars("title", {
         fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
         lineHeight: globalVars.lineHeights.condensed,
         marginBottom: 6,
     });
 
-    const description = themeVars("description", {
+    const description = cardVars("description", {
         fontSize: globalVars.fonts.size.medium as FontSizeProperty<TLength>,
         marginTop: 6,
         lineHeight: globalVars.lineHeights.excerpt,
     });
 
-    const link = themeVars("link", {
+    const link = cardVars("link", {
         padding: {
             top: 0,
             bottom: 24,
@@ -68,17 +68,21 @@ export const cardVariables = useThemeCache(() => {
         fourColumnsMinHeight: 0,
     });
 
-    const content = themeVars("content", {
+    const content = cardVars("content", {
         padding: {
             left: 16,
             right: 16,
         },
     });
 
-    const fallBackIcon = themeVars("fallBackIcon", {
+    const fallBackIcon = cardVars("fallBackIcon", {
         width: 90 as WidthProperty<TLength>,
         height: 90 as HeightProperty<TLength>,
         fg: globalVars.mainColors.primary,
+    });
+
+    const cardBox = cardVars("cardBox", {
+        enabled: false,
     });
 
     return {
@@ -89,6 +93,7 @@ export const cardVariables = useThemeCache(() => {
         link,
         fallBackIcon,
         content,
+        cardBox,
     };
 });
 
@@ -128,7 +133,7 @@ export const cardClasses = useThemeCache(() => {
         }
 
         return style("link", {
-            ...defaultTransition("box-shadow", "border"),
+            // ...defaultTransition("box-shadow", "border"),
             ...paddings(vars.link.padding),
             display: "block",
             position: "relative",
@@ -138,35 +143,57 @@ export const cardClasses = useThemeCache(() => {
             backgroundColor: colorOut(vars.link.bg),
             borderRadius: unit(2),
             minHeight: unit(minHeight ?? 0),
-            ...shadowOrBorderBasedOnLightness(
+            /* ...shadowOrBorderBasedOnLightness(
                 globalVars.body.backgroundImage.color,
                 borders({
                     color: vars.link.fg.fade(0.3),
                 }),
                 shadow.embed(),
-            ),
+            ),*/
             textDecoration: "none",
             boxSizing: "border-box",
             $nest: {
                 "&:hover": {
                     textDecoration: "none",
-                    ...shadowOrBorderBasedOnLightness(
+                    /* ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
                         borders({
                             color: vars.link.fg.fade(0.5),
                         }),
                         shadow.embedHover(),
-                    ),
+                    ),*/
                 },
             },
         });
     };
 
+    const cardBorder = style("cardBorder", {
+        ...defaultTransition("box-shadow", "border"),
+        ...shadowOrBorderBasedOnLightness(
+            globalVars.body.backgroundImage.color,
+            borders({
+                color: vars.link.fg.fade(0.3),
+            }),
+            shadow.embed(),
+        ),
+        $nest: {
+            "&:hover": {
+                ...shadowOrBorderBasedOnLightness(
+                    globalVars.body.backgroundImage.color,
+                    borders({
+                        color: vars.link.fg.fade(0.5),
+                    }),
+                    shadow.embedHover(),
+                ),
+            },
+        },
+    });
+
     const main = style("main", {
         position: "relative",
     });
 
-    const frame: IBody = (columns?: number) => {
+    const frame = (columns?: number) => {
         let height;
         let width;
 
@@ -195,9 +222,6 @@ export const cardClasses = useThemeCache(() => {
             // marginRight: "auto",
             // marginLeft: "auto",
             marginBottom: unit(vars.frame.bottomMargin),
-            backgroundImage: {
-                color: "red",
-            },
         });
     };
 
@@ -249,5 +273,6 @@ export const cardClasses = useThemeCache(() => {
         title,
         description,
         fallBackIcon,
+        cardBorder,
     };
 });

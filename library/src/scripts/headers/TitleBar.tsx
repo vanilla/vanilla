@@ -16,7 +16,12 @@ import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import { titleBarClasses, titleBarVariables, titleBarHomeClasses } from "@library/headers/titleBarStyles";
+import {
+    titleBarClasses,
+    titleBarVariables,
+    titleBarHomeClasses,
+    titleBarLogoClasses,
+} from "@library/headers/titleBarStyles";
 import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -32,9 +37,8 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useEffect, useState, useRef, useMemo, useDebugValue } from "react";
 import ReactDOM from "react-dom";
-import { useSplashContext } from "@library/splash/SplashContext";
 import { useSpring, animated } from "react-spring";
-import { pointerEvents } from "@library/styles/styleHelpers";
+import { useBannerContext } from "@library/banner/BannerContext";
 
 interface IProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -47,6 +51,11 @@ interface IProps {
     logoUrl?: string;
     hasSubNav?: boolean;
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
+}
+
+export enum LogoAlignment {
+    LEFT = "left",
+    CENTER = "center",
 }
 
 /**
@@ -76,9 +85,9 @@ export default function TitleBar(_props: IProps) {
     const classesMeBox = meBoxClasses();
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
-
     const vars = titleBarVariables();
     const classes = titleBarClasses();
+    const logoClasses = titleBarLogoClasses();
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
@@ -102,7 +111,6 @@ export default function TitleBar(_props: IProps) {
                     <div className={classNames("titleBar-bar", classes.bar, { isHome: showSubNav })}>
                         {!isSearchOpen &&
                             isCompact &&
-                            !showSubNav &&
                             (props.useMobileBackButton ? (
                                 <BackLink
                                     className={classNames(
@@ -113,16 +121,16 @@ export default function TitleBar(_props: IProps) {
                                     linkClassName={classes.button}
                                 />
                             ) : (
-                                !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
+                                hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
-                            <animated.span {...logoProps}>
+                            <animated.div className={classes.logoAnimationWrap} {...logoProps}>
                                 <HeaderLogo
                                     className={classNames("titleBar-logoContainer", classes.logoContainer)}
                                     logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
-                            </animated.span>
+                            </animated.div>
                         )}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
@@ -140,13 +148,10 @@ export default function TitleBar(_props: IProps) {
                                 {props.mobileDropDownContent}
                             </MobileDropDown>
                         )}
-                        {showHamburger && (
+                        {isCompact && (
                             <>
-                                <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
-                                <FlexSpacer
-                                    className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
-                                />
-                                <div className={classes.logoCenterer}>
+                                <Hamburger buttonClassName={classes.hamburger} contents={""} />
+                                <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>
                                         <HeaderLogo
                                             className={classNames("titleBar-logoContainer", classes.logoContainer)}
@@ -277,11 +282,12 @@ function useScrollTransition() {
     const bgRef = useRef<HTMLDivElement | null>(null);
     const bg2Ref = useRef<HTMLDivElement | null>(null);
     const logoRef = useRef<HTMLDivElement | null>(null);
-    const { splashExists, splashRect } = useSplashContext();
+    const { bannerExists, bannerRect } = useBannerContext();
     const [scrollPos, setScrollPos] = useState(0);
     const fullBleedOptions = titleBarVariables().fullBleed;
+
     const { doubleLogoStrategy } = titleBarVariables().logo;
-    const shouldOverlay = fullBleedOptions.enabled && splashExists;
+    const shouldOverlay = fullBleedOptions.enabled && bannerExists;
     const { topOffset } = useScrollOffset();
 
     // Scroll handler to pass to the form element.
@@ -304,13 +310,13 @@ function useScrollTransition() {
     let bgEnd = 0;
     let bg2Start = 0;
     let bg2End = 0;
-    if (splashExists && splashRect && bg2Ref.current) {
-        const splashEnd = splashRect.bottom;
+    if (bannerExists && bannerRect && bg2Ref.current) {
+        const bannerEnd = bannerRect.bottom;
         const titleBarHeight = bg2Ref.current.getBoundingClientRect().height;
-        bgStart = splashRect.top;
+        bgStart = bannerRect.top;
         bgEnd = bgStart + titleBarHeight;
-        bg2Start = splashEnd - titleBarHeight * 2;
-        bg2End = splashEnd - titleBarHeight;
+        bg2Start = bannerEnd - titleBarHeight * 2;
+        bg2End = bannerEnd - titleBarHeight;
     }
 
     const clientHeaderStart = topOffset === 0 ? -1 : 0; // Fix to ensure an empty topOffset starts us at 100% opacity.

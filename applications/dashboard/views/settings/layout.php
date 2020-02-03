@@ -9,9 +9,7 @@ $CurrentCategoriesLayout = c('Vanilla.Categories.Layout', 'modern');
 if ($CurrentCategoriesLayout == '')
     $CurrentCategoriesLayout = 'modern';
 
-function writeHomepageOption($title, $url, $iconName, $current, $description = '') {
-    $iconPath = 'applications/dashboard/design/images/'.$iconName.'.png';
-
+function writeHomepageOption($title, $url, $iconPath, $current, $description = '') {
     $cssClass = '';
     if ($current == $url) {
         $cssClass = 'active';
@@ -64,7 +62,7 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
     </script>
     <?php
     $links = '<ul>';
-    $links .= wrap(anchor(t("Configuring Vanilla's Homepage"), 'http://docs.vanillaforums.com/developers/configuration/homepage/'), 'li');
+    $links .= wrap(anchor(t("Configuring Vanilla's Homepage"), 'https://docs.vanillaforums.com/developer/configuration/homepage/'), 'li');
     $links .= wrap(anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
     $links .= '</ul>';
     helpAsset(t('Need More Help?'), $links);
@@ -77,18 +75,21 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
         ); ?>
         <div class="HomeOptions label-selector">
             <?php
+            $imgFolder = 'applications/dashboard/design/images/';
             // Only show the vanilla pages if Vanilla is enabled
             $CurrentTarget = $this->data('CurrentTarget');
 
             if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)) {
-                echo writeHomepageOption('Discussions', 'discussions', 'disc-modern', $CurrentTarget);
-                echo writeHomepageOption('Categories', 'categories', 'cat-modern', $CurrentTarget);
-                // echo writeHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
+                echo writeHomepageOption('Discussions', 'discussions',  $imgFolder.'disc-modern.png', $CurrentTarget);
+                echo writeHomepageOption('Categories', 'categories',  $imgFolder.'cat-modern.png', $CurrentTarget);
             }
-            //echo writeHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
+            $defaultRouteOptions = $this->data('defaultRouteOptions');
+            foreach ($defaultRouteOptions as $option => $route) {
+                echo writeHomepageOption($option, $route['Destination'], $route['ImageUrl'], $CurrentTarget);
+            }
 
             if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON)) {
-                echo writeHomepageOption('Best Of', 'bestof', 'best-of', $CurrentTarget);
+                echo writeHomepageOption('Best Of', 'bestof', $imgFolder.'best-of.png', $CurrentTarget);
             }
             ?>
         </div>
@@ -100,8 +101,8 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
         ?>
         <div class="LayoutOptions DiscussionsLayout label-selector">
             <?php
-            echo writeHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
-            echo writeHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
+            echo writeHomepageOption('Modern Layout', 'modern', $imgFolder.'disc-modern.png', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
+            echo writeHomepageOption('Table Layout', 'table', $imgFolder.'disc-table.png', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
             ?>
         </div>
         <?php
@@ -110,9 +111,9 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
         ?>
         <div class="LayoutOptions CategoriesLayout label-selector">
             <?php
-            echo writeHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
-            echo writeHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
-            echo writeHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
+            echo writeHomepageOption('Modern Layout', 'modern', $imgFolder.'cat-modern.png', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
+            echo writeHomepageOption('Table Layout', 'table', $imgFolder.'cat-table.png', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
+            echo writeHomepageOption('Mixed Layout', 'mixed', $imgFolder.'cat-mixed.png', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
             ?>
         </div>
 

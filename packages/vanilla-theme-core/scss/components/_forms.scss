@@ -8,36 +8,35 @@
     Styles
 \* -------------------------------------------------------------- */
 
-input[type= "text"],
-textarea,
-ul.token-input-list,
-input.InputBox,
-.AdvancedSearch .InputBox,
-.AdvancedSearch select,
-select {
-    line-height: $formElement_height;
-    height: $formElement_height;
-    font-family: $global-body_fontFamily;
-    @if ($staticVariables) {
+@if $staticVariables {
+    input[type= "text"],
+    textarea,
+    ul.token-input-list,
+    input.InputBox,
+    .AdvancedSearch .InputBox,
+    .AdvancedSearch select,
+    select {
+        line-height: $formElement_height;
+        height: $formElement_height;
+        font-family: $global-body_fontFamily;
         border: $formElement_border;
         border-radius: $formElement_borderRadius;
         color: $formElement_color;
         background: $global-color_white;
-    }
+        padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+        margin: 0;
+        width: 100%;
 
-    padding: $formElement_paddingVertical $formElement_paddingHorizontal;
-    margin: 0;
-    width: 100%;
-
-    &:focus,
-    &:active {
-        @if ($staticVariables) {
-            background: $global-color_white;
-            border-color: $global-color_primary;
-            color: $formElement_color;
+        &:focus,
+        &:active {
+            @if ($staticVariables) {
+                background: $global-color_white;
+                border-color: $global-color_primary;
+                color: $formElement_color;
+            }
+            box-shadow: none;
+            outline: none;
         }
-        box-shadow: none;
-        outline: none;
     }
 }
 

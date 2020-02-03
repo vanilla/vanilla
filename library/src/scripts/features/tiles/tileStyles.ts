@@ -18,12 +18,19 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent } from "csx";
+import { ColorHelper, percent, color } from "csx";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
+import { TileAlignment } from "@library/features/tiles/Tiles";
+import { tilesVariables } from "@library/features/tiles/tilesStyles";
 
 export const tileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("tiles");
+    const themeVars = variableFactory("tile");
+    const tileVariables = tilesVariables();
+
+    const options = themeVars("options", {
+        alignment: TileAlignment.CENTER,
+    });
 
     const spacing = themeVars("spacing", {
         twoColumns: 24,
@@ -32,10 +39,18 @@ export const tileVariables = useThemeCache(() => {
         color: globalVars.mainColors.primary as ColorHelper,
     });
 
+    let frameHeight = 90;
+    let frameWidth = 90;
+
+    if (tileVariables.options.columns >= 3) {
+        frameHeight = 72;
+        frameWidth = 72;
+    }
+
     const frame = themeVars("frame", {
-        height: 90 as PaddingProperty<TLength>,
-        width: 90 as PaddingProperty<TLength>,
-        bottomMargin: 16 as MarginProperty<TLength>,
+        height: frameHeight as PaddingProperty<TLength>,
+        width: frameWidth as PaddingProperty<TLength>,
+        marginBottom: 16 as MarginProperty<TLength>,
     });
 
     const title = themeVars("title", {
@@ -57,20 +72,25 @@ export const tileVariables = useThemeCache(() => {
             left: 24,
             right: 24,
         },
+        borderRadius: 2,
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        bgHover: globalVars.mainColors.bg,
+        bgImage: undefined as string | undefined,
+        bgImageHover: undefined as string | undefined,
         twoColumnsMinHeight: 0,
         threeColumnsMinHeight: 0,
         fourColumnsMinHeight: 0,
     });
 
     const fallBackIcon = themeVars("fallBackIcon", {
-        width: 90 as WidthProperty<TLength>,
-        height: 90 as HeightProperty<TLength>,
+        width: frame.height,
+        height: frame.width,
         fg: globalVars.mainColors.primary,
     });
 
     return {
+        options,
         spacing,
         frame,
         title,
@@ -86,19 +106,17 @@ export const tileClasses = useThemeCache(() => {
     const style = styleFactory("tile");
     const shadow = shadowHelper();
 
-    const root = (columns?: number) => {
-        return style({
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            width: percent(100),
-            flexGrow: 1,
-            margin: "auto",
-            ...userSelect(),
-        });
-    };
+    const root = style({
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        width: percent(100),
+        flexGrow: 1,
+        margin: "auto",
+        ...userSelect(),
+    });
 
-    const link = (columns?: number) => {
+    const link = useThemeCache((columns?: number) => {
         let minHeight;
 
         switch (columns) {
@@ -124,7 +142,8 @@ export const tileClasses = useThemeCache(() => {
             flexGrow: 1,
             color: colorOut(globalVars.mainColors.fg),
             backgroundColor: colorOut(vars.link.bg),
-            borderRadius: unit(2),
+            background: colorOut(vars.link.bgImage),
+            borderRadius: unit(vars.link.borderRadius),
             minHeight: unit(minHeight ?? 0),
             ...shadowOrBorderBasedOnLightness(
                 globalVars.body.backgroundImage.color,
@@ -135,8 +154,11 @@ export const tileClasses = useThemeCache(() => {
             ),
             textDecoration: "none",
             boxSizing: "border-box",
+            ...defaultTransition("background", "backgroundColor", "box-shadow"),
             $nest: {
                 "&:hover": {
+                    backgroundColor: colorOut(vars.link.bgHover),
+                    background: colorOut(vars.link.bgImageHover),
                     textDecoration: "none",
                     ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
@@ -148,43 +170,25 @@ export const tileClasses = useThemeCache(() => {
                 },
             },
         });
-    };
+    });
 
     const main = style("main", {
         position: "relative",
     });
 
-    const frame = (columns?: number) => {
-        let height;
-        let width;
-
-        height = vars.frame.height;
-        width = vars.frame.width;
-
-        switch (columns) {
-            case 2:
-                height = vars.frame.height;
-                width = vars.frame.width;
-                break;
-            case 3:
-            case 4:
-            default:
-                height = 72;
-                width = 72;
-        }
-        return style("iconFrame", {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            height: unit(height),
-            width: unit(width),
-            marginTop: "auto",
-            marginRight: "auto",
-            marginLeft: "auto",
-            marginBottom: unit(vars.frame.bottomMargin),
-        });
-    };
+    const { height, width } = vars.frame;
+    const frame = style("iconFrame", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: vars.options.alignment,
+        position: "relative",
+        height: unit(height),
+        width: unit(width),
+        marginTop: "auto",
+        marginRight: "auto",
+        marginLeft: vars.options.alignment === TileAlignment.CENTER ? "auto" : undefined,
+        marginBottom: unit(vars.frame.marginBottom),
+    });
 
     const icon = style("icon", {
         display: "block",
@@ -193,7 +197,7 @@ export const tileClasses = useThemeCache(() => {
         right: 0,
         bottom: 0,
         left: 0,
-        margin: "auto",
+        margin: vars.options.alignment === TileAlignment.CENTER ? "auto" : undefined,
         height: "auto",
         maxWidth: percent(100),
         maxHeight: percent(100),
@@ -202,7 +206,7 @@ export const tileClasses = useThemeCache(() => {
     const title = style("title", {
         fontSize: unit(vars.title.fontSize),
         lineHeight: vars.title.lineHeight,
-        textAlign: "center",
+        textAlign: vars.options.alignment,
         marginBottom: unit(vars.title.marginBottom),
     });
 
@@ -211,15 +215,18 @@ export const tileClasses = useThemeCache(() => {
         marginTop: unit(vars.description.marginTop),
         fontSize: unit(vars.description.fontSize),
         lineHeight: vars.description.lineHeight,
-        textAlign: "center",
+        textAlign: vars.options.alignment,
     });
 
-    const fallBackIcon = style("fallbackIcon", {
-        ...absolutePosition.middleOfParent(),
-        width: unit(vars.fallBackIcon.width),
-        height: unit(vars.fallBackIcon.height),
-        color: vars.fallBackIcon.fg.toString(),
-    });
+    const fallBackIcon = style(
+        "fallbackIcon",
+        {
+            width: unit(vars.fallBackIcon.width),
+            height: unit(vars.fallBackIcon.height),
+            color: vars.fallBackIcon.fg.toString(),
+        },
+        vars.options.alignment === TileAlignment.CENTER ? absolutePosition.middleOfParent() : {},
+    );
 
     return {
         root,

@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Formatting\FormatService;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\Formatting\FormatFixture;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
@@ -214,6 +215,15 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
             $expectedOutput,
             $format->parseMentions($input)
         );
+    }
+
+    /**
+     * Test parseImageUrls when the format is null.
+     */
+    public function testParseImageUrlsNullFormat() {
+        $formatService =  self::container()->get(FormatService::class);
+        $result = $formatService->parseImageUrls('test content', null);
+        $this->assertEquals([], $result, 'NotFoundFormat::parseImageUrl returns an empty array');
     }
 
     /**

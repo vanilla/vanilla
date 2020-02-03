@@ -70,59 +70,55 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                         size={UserPhotoSize.SMALL}
                     />
                 </Button>
-                {this.state.open && (
-                    <Modal
-                        size={ModalSizes.MODAL_AS_SIDE_PANEL}
-                        label={t("Article Revisions")}
-                        elementToFocusOnExit={this.buttonRef.current!}
-                        exitHandler={this.close}
-                    >
-                        <Tabs
-                            label={t("My Account Tab")}
-                            tabListClass={classNames(classes.tabList)}
-                            tabPanelsClass={classNames(classes.tabPanels, inheritHeightClass())}
-                            tabPanelClass={classNames(inheritHeightClass(), classes.panel)}
-                            buttonClass={classNames(classes.tabButton)}
-                            extraTabContent={
-                                <CloseButton onClick={this.close} className={classNames(classes.closeModal)} />
-                            }
-                            tabs={[
-                                {
-                                    buttonContent: (
-                                        <MeBoxIcon compact={true}>
-                                            <UserIcon filled={false} />
-                                        </MeBoxIcon>
-                                    ),
-                                    openButtonContent: (
-                                        <MeBoxIcon compact={true}>
-                                            <UserIcon filled={true} />
-                                        </MeBoxIcon>
-                                    ),
-                                    panelContent: (
-                                        <TouchScrollable>
-                                            <UserDropDownContents className={classes.scrollContainer} />
-                                        </TouchScrollable>
-                                    ),
-                                },
-                                {
-                                    buttonContent: <NotificationsCount open={false} compact={true} />,
-                                    openButtonContent: <NotificationsCount open={true} compact={true} />,
-                                    panelContent: (
-                                        <NotificationsContents
-                                            panelBodyClass={panelBodyClass}
-                                            userSlug={userInfo.name}
-                                        />
-                                    ),
-                                },
-                                {
-                                    buttonContent: <MessagesCount open={false} compact={true} />,
-                                    openButtonContent: <MessagesCount open={true} compact={true} />,
-                                    panelContent: <MessagesContents className={panelBodyClass} />,
-                                },
-                            ]}
-                        />
-                    </Modal>
-                )}
+                <Modal
+                    isVisible={!!this.state.open}
+                    size={ModalSizes.MODAL_AS_SIDE_PANEL}
+                    label={t("Article Revisions")}
+                    elementToFocusOnExit={this.buttonRef.current!}
+                    exitHandler={this.close}
+                >
+                    <Tabs
+                        label={t("My Account Tab")}
+                        tabListClass={classNames(classes.tabList)}
+                        tabPanelsClass={classNames(classes.tabPanels, inheritHeightClass())}
+                        tabPanelClass={classNames(inheritHeightClass(), classes.panel)}
+                        buttonClass={classNames(classes.tabButton)}
+                        extraTabContent={
+                            <CloseButton onClick={this.close} className={classNames(classes.closeModal)} />
+                        }
+                        tabs={[
+                            {
+                                buttonContent: (
+                                    <MeBoxIcon compact={true}>
+                                        <UserIcon filled={false} />
+                                    </MeBoxIcon>
+                                ),
+                                openButtonContent: (
+                                    <MeBoxIcon compact={true}>
+                                        <UserIcon filled={true} />
+                                    </MeBoxIcon>
+                                ),
+                                panelContent: (
+                                    <TouchScrollable>
+                                        <UserDropDownContents className={classes.scrollContainer} />
+                                    </TouchScrollable>
+                                ),
+                            },
+                            {
+                                buttonContent: <NotificationsCount open={false} compact={true} />,
+                                openButtonContent: <NotificationsCount open={true} compact={true} />,
+                                panelContent: (
+                                    <NotificationsContents panelBodyClass={panelBodyClass} userSlug={userInfo.name} />
+                                ),
+                            },
+                            {
+                                buttonContent: <MessagesCount open={false} compact={true} />,
+                                openButtonContent: <MessagesCount open={true} compact={true} />,
+                                panelContent: <MessagesContents className={panelBodyClass} />,
+                            },
+                        ]}
+                    />
+                </Modal>
             </div>
         );
     }

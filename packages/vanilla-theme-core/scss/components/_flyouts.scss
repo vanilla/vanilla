@@ -77,10 +77,12 @@ $flyout-progress_size:                  24px !default;
     @include shadow-dropDown;
     padding: $dropDown-item_verticalPadding 0;
     position: absolute;
-    background-color: $flyout_bg;
-    color: $flyout_fg;
-    border: $flyout_border;
-    border-radius: $flyout_borderRadius;
+    @if $staticVariables {
+        background-color: $flyout_bg;
+        color: $flyout_fg;
+        border: $flyout_border;
+        border-radius: $flyout_borderRadius;
+    }
     z-index: 1;
     @include maxWidth {
         z-index: 1;
@@ -457,10 +459,12 @@ $flyout-progress_size:                  24px !default;
 .OnlineUserWrap .OnlineUserName.OnlineUserName,
 .MenuItems-Reactions {
     @include shadow-dropDown;
-    color: $flyout_fg !important;
-    border: $flyout_border;
-    border-radius: $flyout_borderRadius;
-    background-color: $flyout_bg;
+    @if $staticVariables {
+        color: $flyout_fg !important;
+        border: $flyout_border;
+        border-radius: $flyout_borderRadius;
+        background-color: $flyout_bg;
+    }
     z-index: 1;
 
     @include maxWidth {
@@ -500,11 +504,13 @@ $flyout-progress_size:                  24px !default;
         line-height: 20px;
         max-width: calc(100% - 20px - (#{$flyoutMenuItems_padding} * 2));
 
-        &:hover,
-        &:focus,
-        &:active {
-            background-color: transparent !important;
-            color: $flyout-link-hover_color !important;
+        @if $staticVariables {
+            &:hover,
+            &:focus,
+            &:active {
+                background-color: transparent !important;
+                color: $flyout-link-hover_color !important;
+            }
         }
     }
 
@@ -542,21 +548,25 @@ $flyout-progress_size:                  24px !default;
 }
 
 .MenuItems.ui-autocomplete {
-    color: $flyout_fg;
+    @if $staticVariables {
+        color: $flyout_fg;
+    }
 
     .ui-menu-item,
     .ui-menu-item > a {
         display: block;
     }
 
-    a {
-        &:hover,
-        &:focus,
-        &:active {
-            color: $flyout_fg;
+    @if $staticVariables {
+        a {
+            &:hover,
+            &:focus,
+            &:active {
+                color: $flyout_fg;
 
-            .Gloss {
-                color: inherit;
+                .Gloss {
+                    color: inherit;
+                }
             }
         }
     }
@@ -648,7 +658,9 @@ $flyout-progress_size:                  24px !default;
         position: fixed;
         display: block;
         visibility: hidden;
-        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        @if $staticVariables {
+            box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        }
         opacity: 0;
         cursor: pointer;
         max-height: 80vh;
@@ -659,12 +671,14 @@ $flyout-progress_size:                  24px !default;
             opacity $global-default_easing $global-default_timing;
         z-index: 100;
 
-        a {
-            color: $flyout-link_color;
+        @if $staticVariables {
+            a {
+                color: $flyout-link_color;
 
-            &:focus,
-            &:hover {
-                color: $flyout-link-hover_color;
+                &:focus,
+                &:hover {
+                    color: $flyout-link-hover_color;
+                }
             }
         }
     }

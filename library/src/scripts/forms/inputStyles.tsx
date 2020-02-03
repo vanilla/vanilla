@@ -13,7 +13,6 @@ import {
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
-import { px } from "csx";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -67,8 +66,10 @@ export const inputClasses = useThemeCache(() => {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),
-            "&:focus, &.focus-visible": {
-                borderColor: colorOut(vars.colors.state.fg),
+            "&:active, &:hover, &:focus, &.focus-visible": {
+                ...borders({
+                    color: vars.colors.state.fg,
+                }),
             },
         },
     };

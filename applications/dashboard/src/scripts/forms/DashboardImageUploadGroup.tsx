@@ -83,20 +83,19 @@ export function DashboardImageUploadGroup(props: IProps) {
                     errors={props.errors}
                 />
             </DashboardFormGroup>
-            {wantsDelete && (
-                <ModalConfirm
-                    title={t("Confirm Deletion")}
-                    onConfirm={() => {
-                        onChange(null);
-                        setWantsDelete(false);
-                    }}
-                    onCancel={() => {
-                        setWantsDelete(false);
-                    }}
-                >
-                    {t("Are you sure you want to delete this image? You won't be able to recover it.")}
-                </ModalConfirm>
-            )}
+            <ModalConfirm
+                isVisible={wantsDelete}
+                title={t("Confirm Deletion")}
+                onConfirm={() => {
+                    onChange(null);
+                    setWantsDelete(false);
+                }}
+                onCancel={() => {
+                    setWantsDelete(false);
+                }}
+            >
+                {t("Are you sure you want to delete this image? You won't be able to recover it.")}
+            </ModalConfirm>
         </>
     );
 }

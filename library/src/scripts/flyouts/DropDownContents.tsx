@@ -46,35 +46,29 @@ export default class DropDownContents extends React.Component<IProps> {
             : undefined;
         const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
 
-        if (this.props.isVisible) {
-            return (
-                <div
-                    ref={this.selfRef}
-                    id={this.props.id}
-                    aria-labelledby={this.props.parentID}
-                    className={classNames(
-                        asDropDownClasses,
-                        asModalClasses,
-                        this.props.className,
-                        !this.props.selfPadded ? classes.verticalPadding : "",
-                        {
-                            [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
-                            [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
-                        },
-                    )}
-                    style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
-                    onClick={this.doNothing}
-                    tabIndex={-1}
-                    onMouseDown={this.forceTryFocus}
-                >
-                    {this.props.children}
-                </div>
-            );
-        } else {
-            return (
-                <div id={this.props.id} aria-hidden={true} aria-labelledby={this.props.parentID} className="sr-only" />
-            ); // for accessibility
-        }
+        return (
+            <div
+                ref={this.selfRef}
+                id={this.props.id}
+                aria-labelledby={this.props.parentID}
+                className={classNames(
+                    asDropDownClasses,
+                    asModalClasses,
+                    this.props.className,
+                    !this.props.selfPadded ? classes.verticalPadding : "",
+                    {
+                        [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
+                        [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
+                    },
+                )}
+                style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
+                onClick={this.doNothing}
+                tabIndex={-1}
+                onMouseDown={this.forceTryFocus}
+            >
+                {this.props.children}
+            </div>
+        );
     }
 
     /**

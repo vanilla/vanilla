@@ -1,0 +1,30 @@
+{
+    "key": "lavendermoon",
+    "type": "theme",
+    "version": "1.0.0",
+    "name": "Lavender 🌚",
+    "description": "A responsive, asset-compatible Vanilla Forums theme.",
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "isResponsive": true,
+    "Features": {
+        "ProfileHeader": true,
+        "SharedMasterView": true,
+        "NewFlyouts": true,
+        "DataDrivenTheme": true
+    },
+    "assets": {
+        "footer": {
+            "type": "twig",
+            "file": "footer.twig"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
+        }
+    }
+}

@@ -11,7 +11,6 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@library/utility/appUtils";
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { splashClasses } from "@library/splash/splashStyles";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { MemoryRouter } from "react-router";
@@ -20,6 +19,7 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { bannerClasses } from "@library/banner/bannerStyles";
 
 const story = storiesOf("Search", module);
 
@@ -31,7 +31,7 @@ story.add("Search Components", () => {
         dateLastActive: "2016-07-25 17:51:15",
     };
 
-    const classesSearch = splashClasses();
+    const classesSearch = bannerClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Elements</StoryHeading>

@@ -28,14 +28,18 @@ class DefaultSiteSection implements SiteSectionInterface {
     /** @var string */
     private $configLocaleKey;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
     /**
      * DI.
      *
      * @param ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config, \Gdn_Router $router) {
         $this->configSiteName = $config->get('Garden.Title', 'Vanilla');
         $this->configLocaleKey = $config->get('Garden.Locale', 'en');
+        $configDefaultController = $config->get('Routes.DefaultController');
+        $this->defaultRoute = $router->parseRoute($configDefaultController);
     }
 
     /**
@@ -78,5 +82,12 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function jsonSerialize() {
         return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
     }
 }

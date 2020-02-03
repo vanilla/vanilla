@@ -285,6 +285,7 @@ export const titleBarClasses = useThemeCache(() => {
     const root = style({
         maxWidth: percent(100),
         color: colorOut(vars.colors.fg),
+        position: "relative",
         ...getBorderVars(),
         $nest: {
             "& .searchBar__control": {
@@ -793,6 +794,11 @@ export const titleBarClasses = useThemeCache(() => {
         zIndex: 10,
     });
 
+    const logoAnimationWrap = style("logoAnimationWrap", {
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
     return {
         root,
         bg1,
@@ -833,6 +839,7 @@ export const titleBarClasses = useThemeCache(() => {
         logoCenterer,
         hamburger,
         isSticky,
+        logoAnimationWrap,
     };
 });
 

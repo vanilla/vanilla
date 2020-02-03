@@ -83,7 +83,7 @@ export const tabClasses = useThemeCache(() => {
             width: percent(25),
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
-            borderRight: "1px solid #bfcbd8",
+            border: "1px solid #bfcbd8",
             padding: "2px 0",
             color: colorOut("#48576a"),
             backgroundColor: colorOut("#f5f6f7"),

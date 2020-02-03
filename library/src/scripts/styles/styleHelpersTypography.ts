@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { ColorValues, paddings, unit } from "@library/styles/styleHelpers";
 import {
     FontFamilyProperty,
@@ -21,8 +21,10 @@ import {
 } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { Col } from "@jest/types/build/Global";
 
-const fontFallbacks = [
+export const fontFallbacks = [
     "-apple-system",
     "BlinkMacSystemFont",
     "HelveticaNeue-Light",
@@ -62,17 +64,25 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
     };
 };
 
+export const getVerticalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {
+    return (height - fullBorderWidth - fontSize * 1.5) / 2;
+};
+
+export const getHorizontalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {
+    return getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth) * 2;
+};
+
 export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
-    const paddingTop = (height - fullBorderWidth - fontSize * 1.5) / 2;
+    const paddingVertical = getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth);
+    const paddingHorizontal = getHorizontalPaddingForTextInput(height, fontSize, fullBorderWidth);
     return {
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
+        minHeight: unit(formElementsVariables().sizing.height),
         ...paddings({
-            top: unit(paddingTop),
-            bottom: unit(paddingTop),
-            left: unit(paddingTop * 2),
-            right: unit(paddingTop * 2),
+            vertical: unit(paddingVertical),
+            horizontal: unit(paddingHorizontal),
         }),
     };
 };
@@ -87,6 +97,17 @@ export interface IFont {
     family?: FontFamilyProperty[];
     transform?: TextTransformProperty;
 }
+
+export const EMPTY_FONTS: IFont = {
+    color: undefined,
+    size: undefined,
+    weight: undefined,
+    lineHeight: undefined,
+    shadow: undefined,
+    align: undefined,
+    family: undefined,
+    transform: undefined,
+};
 
 export const fonts = (props: IFont): NestedCSSProperties => {
     if (props) {
@@ -131,6 +152,19 @@ export const placeholderStyles = (styles: NestedCSSProperties) => {
     };
 };
 
+export const autoFillReset = (fg: ColorValues, bg: ColorValues) => {
+    return {
+        "&&&:-webkit-autofill, &&&&:-webkit-autofill:hover, &&&&:-webkit-autofill:focus": {
+            ["-webkit-text-fill-color"]: important(colorOut(fg) as string),
+            ["-webkit-box-shadow"]: important(`0 0 0px 1000px ${colorOut(bg)} inset`),
+            ["transition"]: important(`background-color 5000s ease-in-out 0s`),
+        },
+        "&&&:-webkit-autofill": {
+            fontSize: important("inherit"),
+        },
+    };
+};
+
 export const singleLineEllipsis = () => {
     return {
         whiteSpace: "nowrap" as WhiteSpaceProperty,
@@ -139,6 +173,7 @@ export const singleLineEllipsis = () => {
         maxWidth: percent(100) as MaxWidthProperty<TLength>,
     };
 };
+
 export const longWordEllipsis = () => {
     return {
         textOverflow: "ellipsis" as TextOverflowProperty,

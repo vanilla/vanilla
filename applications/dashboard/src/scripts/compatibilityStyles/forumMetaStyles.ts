@@ -5,23 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
-import {
-    borders,
-    colorOut,
-    margins,
-    negative,
-    pointerEvents,
-    textInputSizingFromFixedHeight,
-    unit,
-} from "@library/styles/styleHelpers";
+import { colorOut, margins, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const metaCSS = () => {
+export const forumMetaCSS = () => {
     const globalVars = globalVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
@@ -66,10 +57,16 @@ export const metaCSS = () => {
         color: colorOut(globalVars.meta.text.color),
     });
 
-    cssOut(`.Container .Frame-contentWrap .ChildCategories a`, {
-        fontSize: unit(globalVars.meta.text.fontSize),
-        color: colorOut(globalVars.meta.text.color),
-    });
+    cssOut(
+        `
+        .Container .Frame-contentWrap .ChildCategories a,
+        .DiscussionName .Wrap > a
+        `,
+        {
+            fontSize: unit(globalVars.meta.text.fontSize),
+            color: colorOut(globalVars.meta.text.color),
+        },
+    );
 
     cssOut(
         `
@@ -83,7 +80,10 @@ export const metaCSS = () => {
         .MessageList .MItem.Category,
         .MessageList .ChildCategories
         .Container .Frame-contentWrap .ChildCategories > b,
-        .Container .Frame-contentWrap .ChildCategories a
+        .Container .Frame-contentWrap .ChildCategories a,
+        .Groups .DataTable .MItem a,
+        .DataTable .MItem a,
+        .Container .DataTable .MItem.Category
         `,
         {
             textDecoration: important("none"),

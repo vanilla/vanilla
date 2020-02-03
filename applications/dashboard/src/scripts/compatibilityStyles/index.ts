@@ -22,7 +22,7 @@ import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStyles";
 import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
-import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
+import { forumMetaCSS } from "@dashboard/compatibilityStyles/forumMetaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
 import { fontCSS } from "./fontStyles";
 import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
@@ -322,7 +322,7 @@ export const compatibilityStyles = useThemeCache(() => {
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
-    metaCSS();
+    forumMetaCSS();
     inputCSS();
     socialConnectCSS();
     reactionsCSS();

@@ -63,11 +63,15 @@ export const fontCSS = () => {
         }),
     });
 
-    cssOut(`.Title, .Title a`, {
-        ...fonts({
-            size: vars.fonts.sizes.title,
-        }),
-    });
+    cssOut(
+        `
+        .Content .Title,
+        .Content .Title a
+    `,
+        {
+            ...forumTitleMixin(),
+        },
+    );
 
     // Panel Headings
     cssOut(`.Panel h4`, {
@@ -148,4 +152,14 @@ export const fontCSS = () => {
             },
         );
     }
+};
+
+export const forumTitleMixin = () => {
+    const vars = forumFontsVariables();
+    return {
+        ...fonts({
+            size: vars.fonts.sizes.title,
+        }),
+        textDecoration: "none",
+    };
 };

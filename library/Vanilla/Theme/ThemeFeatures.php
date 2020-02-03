@@ -27,13 +27,14 @@ class ThemeFeatures {
         'SharedMasterView' => false,
         'ProfileHeader' => false,
         'DataDrivenTheme' => false,
+        'DisableKludgedVars' => false,
     ];
 
     /**
      * Constuctor.
      *
      * @param ConfigurationInterface $config
-     * @param Addon|null $theme
+     * @param ThemeModel $themeModel
      */
     public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
         $this->config = $config;
@@ -51,6 +52,14 @@ class ThemeFeatures {
             'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
         ];
         $themeValues = $this->theme->getInfoValue('Features', []);
+        if ($themeValues['DataDrivenTheme'] ?? false) {
+            // Data driven themes automatically enables other theme features.
+            $themeValues['DisableKludgedVars'] = true;
+            $themeValues['ProfileHeader'] = true;
+            $themeValues['SharedMasterView'] = true;
+            $themeValues['NewFlyouts'] = true;
+        }
+
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues);
     }
 
@@ -80,5 +89,12 @@ class ThemeFeatures {
      */
     public function useDataDrivenTheme(): bool {
         return (bool) $this->allFeatures()['DataDrivenTheme'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function disableKludgedVars(): bool {
+        return (bool) $this->allFeatures()['DisableKludgedVars'];
     }
 }

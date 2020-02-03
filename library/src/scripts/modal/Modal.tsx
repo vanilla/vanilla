@@ -10,6 +10,7 @@ import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
+import { mountPortal } from "@vanilla/react-utils";
 
 interface IProps {
     className?: string;
@@ -37,28 +38,12 @@ export const MODAL_CONTAINER_ID = "modals";
 export const PAGE_CONTAINER_ID = "page";
 
 /**
- * Mount a modal with ReactDOM. This is only needed at the top level context.
+ * Mount a modal from a top level context.
  *
  * If you are already in a react context, just use `<Modal />`.
- * Note: Using this will clear any other modals mounted with this component.
- *
- * @param element The <Modal /> element to render.
  */
-export function mountModal(element: ReactElement<any>) {
-    // Ensure we have our modal container.
-    let modals = document.getElementById(MODAL_CONTAINER_ID);
-    if (!modals) {
-        modals = document.createElement("div");
-        modals.id = MODAL_CONTAINER_ID;
-        document.body.appendChild(modals);
-    } else {
-        ReactDOM.unmountComponentAtNode(modals);
-    }
-
-    ReactDOM.render(
-        element,
-        modals, // Who cares where we go. This is a portal anyways.
-    );
+export function mountModal(node: ReactElement<any>) {
+    return mountPortal(node, MODAL_CONTAINER_ID);
 }
 
 /**
@@ -88,7 +73,7 @@ export default class Modal extends React.Component<IProps, IState> {
             return null;
         }
 
-        const portal = ReactDOM.createPortal(
+        return mountPortal(
             <>
                 <ModalView
                     onDestroyed={this.handleDestroyed}
@@ -107,9 +92,9 @@ export default class Modal extends React.Component<IProps, IState> {
                 </ModalView>
                 {this.props.afterContent}
             </>,
-            this.getModalContainer(),
+            MODAL_CONTAINER_ID,
+            true,
         );
-        return portal;
     }
 
     /**
@@ -188,16 +173,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         }
 
         this.closeFocusElement?.focus();
-    }
-
-    private getModalContainer(): HTMLElement {
-        let container = document.getElementById(MODAL_CONTAINER_ID)!;
-        if (container === null) {
-            container = document.createElement("div");
-            container.id = MODAL_CONTAINER_ID;
-            document.body.appendChild(container);
-        }
-        return container;
     }
 
     private getPageContainer(): HTMLElement | null {

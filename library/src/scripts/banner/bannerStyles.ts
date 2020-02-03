@@ -23,6 +23,7 @@ import {
     EMPTY_SPACING,
     borders,
     IButtonStates,
+    EMPTY_BACKGROUND,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -31,17 +32,21 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { media } from "typestyle";
+
+export enum BannerAlignment {
+    LEFT = "left",
+    CENTER = "center",
+}
 
 export const bannerVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory(["banner", "splash"]);
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
-    const layoutVars = layoutVariables();
 
     const options = makeThemeVars("options", {
-        alignment: "center" as "left" | "center",
-        imageType: "background" as "background" | "element",
+        alignment: BannerAlignment.CENTER,
         hideDesciption: false,
         hideSearch: false,
     });
@@ -85,7 +90,9 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const imageElement = makeThemeVars("imageElement", {
-        width: percent(60),
+        image: undefined as string | undefined,
+        minWidth: 600,
+        disappearingWidth: 500,
         padding: {
             ...EMPTY_SPACING,
             all: globalVars.gutter.size,
@@ -93,11 +100,10 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
+        ...EMPTY_BACKGROUND,
         color: colors.primary.lighten("12%"),
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
-        image: undefined as undefined | string,
-        fallbackImage: undefined as undefined | string,
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -148,6 +154,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const description = makeThemeVars("description", {
+        text: undefined as string | undefined,
         font: {
             ...textMixin,
             color: colors.contrast,
@@ -173,7 +180,7 @@ export const bannerVariables = useThemeCache(() => {
 
     const searchBar = makeThemeVars("searchBar", {
         sizing: {
-            maxWidth: options.alignment === "left" ? layoutVars.contentSizes.full / 2 : 705,
+            maxWidth: 705,
         },
         font: {
             color: colors.fg,
@@ -314,7 +321,6 @@ export const bannerClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
 
     const isCentered = vars.options.alignment === "center";
-    const isImageBg = vars.options.imageType === "background";
     const searchButton = style("searchButton", generateButtonStyleProperties(vars.searchButton), { left: -1 });
 
     const valueContainer = style("valueContainer", {
@@ -334,6 +340,7 @@ export const bannerClasses = useThemeCache(() => {
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
+        overflow: "hidden",
     });
 
     const outerBackground = (url?: string) => {
@@ -342,11 +349,6 @@ export const bannerClasses = useThemeCache(() => {
             ...vars.outerBackground,
             image: finalUrl,
         };
-
-        if (vars.options.imageType !== "background") {
-            delete finalVars.image;
-            delete finalVars.fallbackImage;
-        }
 
         return style("outerBackground", {
             ...centeredBackgroundProps(),
@@ -370,12 +372,19 @@ export const bannerClasses = useThemeCache(() => {
         background: colorOut(vars.backgrounds.overlayColor),
     });
 
-    const innerContainer = style(
-        "innerContainer",
+    const contentContainer = style(
+        "contentContainer",
         {
             ...paddings(vars.spacing.padding),
             backgroundColor: vars.innerBackground.bg,
+            minWidth: 500,
         },
+        media(
+            { maxWidth: 500 },
+            {
+                minWidth: "initial",
+            },
+        ),
         mediaQueries.oneColumnDown({
             ...paddings(vars.spacing.paddingMobile),
         }),
@@ -470,10 +479,6 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
-    const widget = style("widget", {
-        display: "block",
-    });
-
     const descriptionWrap = style("descriptionWrap", { ...margins(vars.description.margins), ...textWrapMixin });
 
     const description = style("description", {
@@ -492,29 +497,44 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
+    const imagePositioner = style("imagePositioner", {
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "nowrap",
+        alignItems: "center",
+    });
+
+    const imageElementContainer = style(
+        "imageElementContainer",
+        {
+            alignSelf: "stretch",
+            minWidth: unit(vars.imageElement.minWidth),
+            flexGrow: 1,
+            position: "relative",
+        },
+        media(
+            { maxWidth: 500 },
+            {
+                display: "none",
+            },
+        ),
+    );
+
     const imageElement = style(
         "imageElement",
         {
-            position: "absolute",
-            top: 0,
-            right: 0,
-            bottom: 0,
-            width: unit(vars.imageElement.width),
-            height: percent(100),
+            ...absolutePosition.fullSizeOfParent(),
             objectFit: "contain",
             ...paddings(vars.imageElement.padding),
             objectPosition: "100% 50%",
         },
-        mediaQueries.oneColumnDown({
-            display: "none",
-        }),
+        mediaQueries.oneColumnDown({ objectPosition: "0% 100%" }),
     );
 
     return {
-        widget,
         root,
         outerBackground,
-        innerContainer,
+        contentContainer,
         text,
         icon,
         defaultBannerSVG,
@@ -531,6 +551,8 @@ export const bannerClasses = useThemeCache(() => {
         content,
         valueContainer,
         backgroundOverlay,
+        imageElementContainer,
         imageElement,
+        imagePositioner,
     };
 });

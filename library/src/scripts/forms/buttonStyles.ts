@@ -5,7 +5,18 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allButtonStates, colorOut, flexHelper, spinnerLoader, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    allButtonStates,
+    colorOut,
+    ColorValues,
+    flexHelper,
+    IFont,
+    modifyColorBasedOnLightness,
+    spinnerLoader,
+    unit,
+    userSelect,
+    spinnerLoaderAnimationProperties,
+} from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -25,9 +36,11 @@ export const buttonGlobalVariables = useThemeCache(() => {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         primary: globalVars.mainColors.primary,
+        primaryTextColor: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
+        color: globalVars.mainColors.fg,
         size: globalVars.fonts.size.medium,
     });
 
@@ -42,10 +55,6 @@ export const buttonGlobalVariables = useThemeCache(() => {
         minWidth: 104,
         compactHeight: 24,
     });
-
-    const primary = {
-        // primaryContrast: globalVars.mainColors.fg,
-    };
 
     const border = makeThemeVars("border", globalVars.border);
 
@@ -65,49 +74,59 @@ export const buttonVariables = useThemeCache(() => {
 
     const standard: IButtonType = makeThemeVars("basic", {
         name: ButtonTypes.STANDARD,
-        spinnerColor: vars.colors.fg,
+        spinnerColor: globalVars.mainColors.fg,
         colors: {
-            fg: vars.colors.fg,
-            bg: vars.colors.bg,
+            bg: globalVars.mainColors.bg,
         },
         borders: {
             color: globalVars.mixBgAndFg(0.24),
             radius: globalVars.border.radius,
         },
+        fonts: {
+            color: globalVars.mainColors.fg,
+        },
         hover: {
             borders: {
-                color: vars.colors.primary,
+                color: globalVars.mainColors.primary,
             },
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.primary,
+                bg: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: globalVars.mainColors.bg,
             },
         },
         active: {
             borders: {
-                color: vars.colors.primary,
+                color: globalVars.mainColors.primary,
             },
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.primary,
+                bg: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: globalVars.mainColors.bg,
             },
         },
         focus: {
             borders: {
-                color: vars.colors.primary,
+                color: globalVars.mainColors.primary,
             },
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.primary,
+                bg: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: globalVars.mainColors.bg,
             },
         },
         focusAccessible: {
             borders: {
-                color: vars.colors.primary,
+                color: globalVars.mainColors.primary,
             },
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.primary,
+                bg: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: globalVars.mainColors.bg,
             },
         },
     });
@@ -115,36 +134,46 @@ export const buttonVariables = useThemeCache(() => {
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
-            fg: vars.colors.bg,
             bg: vars.colors.primary,
         },
-        spinnerColor: vars.colors.bg,
+        fonts: {
+            color: vars.colors.primaryTextColor,
+        },
+        spinnerColor: globalVars.mainColors.bg,
         borders: {
-            color: vars.colors.primary,
+            color: globalVars.mainColors.primary,
             radius: globalVars.border.radius,
         },
         hover: {
+            fonts: {
+                color: globalVars.mainColors.primaryContrast,
+            },
             colors: {
-                fg: vars.colors.bg,
-                bg: globalVars.states.hover.color,
+                bg: globalVars.mainColors.secondary,
             },
         },
         active: {
+            fonts: {
+                color: globalVars.mainColors.primaryContrast,
+            },
             colors: {
-                fg: vars.colors.bg,
-                bg: globalVars.states.active.color,
+                bg: globalVars.mainColors.secondary,
             },
         },
         focus: {
+            fonts: {
+                color: globalVars.mainColors.primaryContrast,
+            },
             colors: {
-                fg: vars.colors.bg,
-                bg: globalVars.states.focus.color,
+                bg: globalVars.mainColors.secondary,
             },
         },
         focusAccessible: {
+            fonts: {
+                color: globalVars.mainColors.primaryContrast,
+            },
             colors: {
-                fg: vars.colors.bg,
-                bg: globalVars.states.focus.color,
+                bg: globalVars.mainColors.secondary,
             },
         },
     });
@@ -152,35 +181,34 @@ export const buttonVariables = useThemeCache(() => {
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
         colors: {
-            fg: vars.colors.bg,
-            bg: vars.colors.fg.fade(0.1),
+            fg: globalVars.mainColors.bg,
+            bg: globalVars.mainColors.fg.fade(0.1),
+        },
+        fonts: {
+            color: globalVars.mainColors.bg,
         },
         borders: {
-            color: vars.colors.bg,
+            color: globalVars.mainColors.bg,
             radius: globalVars.border.radius,
         },
         hover: {
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.fg.fade(0.2),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         active: {
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.fg.fade(0.2),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         focus: {
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.fg.fade(0.2),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
         focusAccessible: {
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.fg.fade(0.2),
+                bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
     });
@@ -188,36 +216,34 @@ export const buttonVariables = useThemeCache(() => {
     const translucid: IButtonType = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
         colors: {
-            fg: vars.colors.primary,
-            bg: vars.colors.bg,
+            bg: globalVars.mainColors.bg,
         },
-        spinnerColor: vars.colors.bg,
+        fonts: {
+            color: globalVars.mainColors.primary,
+        },
+        spinnerColor: globalVars.mainColors.bg,
         borders: {
-            color: vars.colors.bg,
+            color: globalVars.mainColors.bg,
             radius: globalVars.border.radius,
         },
         hover: {
             colors: {
-                fg: vars.colors.primary,
-                bg: vars.colors.bg.fade(0.8),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
         active: {
             colors: {
-                fg: vars.colors.primary,
-                bg: vars.colors.bg.fade(0.8),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
         focus: {
             colors: {
-                fg: vars.colors.primary,
-                bg: vars.colors.bg.fade(0.8),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
         focusAccessible: {
             colors: {
-                fg: vars.colors.primary,
-                bg: vars.colors.bg.fade(0.8),
+                bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
     });
@@ -324,20 +350,20 @@ export const buttonUtilityClasses = useThemeCache(() => {
         padding: 0,
         ...allButtonStates({
             hover: {
-                color: colorOut(vars.colors.primary),
+                color: colorOut(globalVars.mainColors.primary),
             },
             focusNotKeyboard: {
                 outline: 0,
-                color: colorOut(globalVars.states.focus.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
             focus: {
-                color: colorOut(globalVars.states.focus.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
             accessibleFocus: {
-                color: colorOut(globalVars.states.focus.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
             active: {
-                color: colorOut(globalVars.states.active.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
         }),
     });
@@ -369,7 +395,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
                 outline: 0,
             },
             "&:focus, &:active, &:hover": {
-                color: colorOut(globalVars.states.hover.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
         },
     });
@@ -377,13 +403,13 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
         $nest: {
             "&&": {
-                color: colorOut(vars.colors.primary),
+                color: colorOut(globalVars.mainColors.primary),
             },
             "&&:not(.focus-visible)": {
                 outline: 0,
             },
             "&&:hover, &&:focus, &&:active": {
-                color: colorOut(globalVars.states.hover.color),
+                color: colorOut(globalVars.mainColors.secondary),
             },
         },
     });
@@ -412,7 +438,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
+export const buttonLoaderClasses = useThemeCache((buttonType?: ButtonTypes) => {
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
@@ -431,22 +457,23 @@ export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
             break;
     }
 
-    const root = (alignment: "left" | "center" = "center") =>
+    const root = useThemeCache((alignment: "left" | "center" = "center") =>
         style({
             ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
             padding: unit(4),
             height: percent(100),
             width: percent(100),
-            $nest: {
-                "&:after": spinnerLoader({
-                    color: spinnerColor,
-                    dimensions: 20,
-                }),
-                "&:hover:after": spinnerLoader({
-                    color: stateSpinnerColor,
-                    dimensions: 20,
-                }),
+        }),
+    );
+
+    const reducedPadding = style("reducedPadding", {
+        $nest: {
+            "&&": {
+                padding: unit(3),
             },
-        });
-    return { root };
-};
+        },
+    });
+
+    const svg = style("svg", spinnerLoaderAnimationProperties());
+    return { root, svg, reducedPadding };
+});

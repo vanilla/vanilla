@@ -5,10 +5,11 @@
  */
 
 import React from "react";
-import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { buttonLoaderClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { LoaderIcon } from "@library/icons/common";
+import classNames from "classnames";
 
 interface IProps {
     className?: string;
@@ -19,17 +20,17 @@ interface IProps {
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarios.
  */
-export default class ButtonLoader extends React.Component<IProps> {
-    public render() {
-        const classes = buttonLoaderClasses(this.props.buttonType ? this.props.buttonType : undefined);
-        return (
-            <React.Fragment>
-                <div
-                    className={classNames(classes.root(this.props.alignLeft ? "left" : "center"), this.props.className)}
-                    aria-hidden="true"
-                />
-                <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
-            </React.Fragment>
-        );
-    }
+export default function ButtonLoader(props: IProps) {
+    const classes = buttonLoaderClasses();
+    return (
+        <span
+            className={classNames(
+                classes.root(props.alignLeft ? "left" : "center"),
+                props.buttonType?.startsWith("dashboard") && classes.reducedPadding,
+            )}
+        >
+            <LoaderIcon className={classes.svg} />
+            <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
+        </span>
+    );
 }

@@ -15,6 +15,7 @@ import {
     spinnerLoader,
     unit,
     userSelect,
+    spinnerLoaderAnimationProperties,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -429,7 +430,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
+export const buttonLoaderClasses = useThemeCache((buttonType?: ButtonTypes) => {
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
@@ -448,22 +449,23 @@ export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
             break;
     }
 
-    const root = (alignment: "left" | "center" = "center") =>
+    const root = useThemeCache((alignment: "left" | "center" = "center") =>
         style({
             ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
             padding: unit(4),
             height: percent(100),
             width: percent(100),
-            $nest: {
-                "&:after": spinnerLoader({
-                    color: spinnerColor,
-                    dimensions: 20,
-                }),
-                "&:hover:after": spinnerLoader({
-                    color: stateSpinnerColor,
-                    dimensions: 20,
-                }),
+        }),
+    );
+
+    const reducedPadding = style("reducedPadding", {
+        $nest: {
+            "&&": {
+                padding: unit(3),
             },
-        });
-    return { root };
-};
+        },
+    });
+
+    const svg = style("svg", spinnerLoaderAnimationProperties());
+    return { root, svg, reducedPadding };
+});

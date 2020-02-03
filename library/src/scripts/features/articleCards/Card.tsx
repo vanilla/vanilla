@@ -32,6 +32,7 @@ export default class Card extends React.Component<IProps> {
     };
     public render() {
         const { image, title, description, url, className, imageAltText, headingLevel, columns } = this.props;
+        console.log("==>", this.props);
         const H = `h${headingLevel}` as "h1";
         const alt = imageAltText ? imageAltText : `${t("Icon for: ")} ${this.props.title}`;
         const classes = cardClasses();
@@ -39,10 +40,13 @@ export default class Card extends React.Component<IProps> {
         return (
             <div className={classNames(className, classes.root(columns))}>
                 <SmartLink className={classNames(classes.link(columns), { [classes.cardBorder]: showCard })} to={url}>
-                    <div className={classNames(classes.frame(columns))}>
-                        {image && <img className={classNames(classes.icon)} src={image} alt={alt} />}
-                        {!image && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
-                    </div>
+                    {image !== undefined && (
+                        <div className={classNames(classes.frame(columns))}>
+                            {image && <img className={classNames(classes.image)} src={image} alt={alt} />}
+                            {!image && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
+                        </div>
+                    )}
+
                     <div className={classes.content}>
                         <H className={classNames(classes.title)}>{title}</H>
                         {description && (

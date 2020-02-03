@@ -211,7 +211,7 @@ export const cardClasses = useThemeCache(() => {
                 height = 72;
                 width = 72;
         }
-        return style("iconFrame", {
+        return style("imageFrame", {
             display: "flex",
             //alignItems: "center",
             //justifyContent: "center",
@@ -225,7 +225,7 @@ export const cardClasses = useThemeCache(() => {
         });
     };
 
-    const icon = style("icon", {
+    const image = style("image", {
         display: "block",
         position: "absolute",
         top: 0,
@@ -268,7 +268,7 @@ export const cardClasses = useThemeCache(() => {
         link,
         frame,
         content,
-        icon,
+        image,
         main,
         title,
         description,

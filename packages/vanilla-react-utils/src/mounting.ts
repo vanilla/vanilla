@@ -5,6 +5,7 @@
 
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
+import { ReactElement } from "react";
 
 export interface IComponentMountOptions {
     overwrite?: boolean;
@@ -50,4 +51,34 @@ export function mountReact(
         forceRenderStyles();
         callback && callback();
     });
+}
+
+/**
+ * Mount a modal with ReactDOM. This is only needed at the top level context.
+ *
+ * If you are already in a react context, just use `<Modal />`.
+ * Note: Using this will clear any other modals mounted with this component.
+ *
+ * @param element The <Modal /> element to render.
+ * @param containerID The container to render the modal into. Defaults to modal container.
+ * @param asPortal Whether or not we should render as a portal or a render.
+ */
+export function mountPortal(element: ReactElement<any>, containerID: string, asPortal: boolean = false) {
+    // Ensure we have our modal container.
+    let container = document.getElementById(containerID);
+    if (!container) {
+        container = document.createElement("div");
+        container.id = containerID;
+        document.body.appendChild(container);
+    } else {
+        ReactDOM.unmountComponentAtNode(container);
+    }
+
+    if (asPortal) {
+        return ReactDOM.createPortal(element, container);
+    } else {
+        return new Promise(resolve => {
+            ReactDOM.render(element, container, () => resolve());
+        });
+    }
 }

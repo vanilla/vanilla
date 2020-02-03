@@ -21,6 +21,10 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
     }
 };
 
+export const importantColorOut = (colorValue: ColorValues | string) => {
+    return colorOut(colorValue, true);
+};
+
 /*
  * Check if it's a light color or dark color based on lightness
  * @param color - The color we're checking

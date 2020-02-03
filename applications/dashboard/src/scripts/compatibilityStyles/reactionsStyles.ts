@@ -6,7 +6,7 @@
  */
 
 import { cssRaw } from "typestyle";
-import { colorOut, negative, pointerEvents, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, negative, pointerEvents, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
@@ -34,7 +34,9 @@ export const reactionsCSS = () => {
         .MessageList .Reactions .ReactButton
     `,
         {
+            fontSize: unit(vars.meta.text.fontSize),
             margin: unit(vars.meta.spacing.default),
+            textDecoration: "none",
         },
     );
 
@@ -48,5 +50,19 @@ export const reactionsCSS = () => {
 
     cssOut(`.Reactions .ReactButton`, {
         color: colorOut(vars.meta.colors.fg),
+        ...allLinkStates({
+            // noState: {
+            //     color: colorOut(vars.links.colors.default),
+            // },
+            hover: {
+                color: colorOut(vars.links.colors.hover),
+            },
+            focus: {
+                color: colorOut(vars.links.colors.focus),
+            },
+            active: {
+                color: colorOut(vars.links.colors.active),
+            },
+        }),
     });
 };

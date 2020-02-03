@@ -30,6 +30,7 @@ import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
 import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
+import { discussionCSS } from "./discussionStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -327,6 +328,7 @@ export const compatibilityStyles = useThemeCache(() => {
     bestOfCSS();
     ideaCSS();
     tableCSS();
+    discussionCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

@@ -130,7 +130,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(linkColorDefault, constants.linkStateColorEmphasis, true);
+    const linkColorState = emphasizeLightness(linkColorDefault, constants.linkStateColorEmphasis);
 
     const links = makeThemeVars("links", {
         colors: {

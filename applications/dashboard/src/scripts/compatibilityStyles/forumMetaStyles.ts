@@ -65,7 +65,8 @@ export const forumMetaCSS = () => {
     cssOut(
         `
         .Container .Frame-contentWrap .ChildCategories a,
-        .DiscussionName .Wrap > a
+        .DiscussionName .Wrap > a,
+        .Gloss
         `,
         {
             fontSize: unit(globalVars.meta.text.fontSize),

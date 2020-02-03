@@ -11,7 +11,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, negative, paddings, srOnly, unit } from "@library/styles/styleHelpers";
+import { borders, importantUnit, negative, paddings, singleBorder, srOnly, unit } from "@library/styles/styleHelpers";
 import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -29,6 +29,7 @@ import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilitySt
 import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
+import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -66,9 +67,12 @@ export const compatibilityStyles = useThemeCache(() => {
         }),
     });
 
-    cssOut(".DismissMessage", {
-        color: fg,
-    });
+    cssOut(
+        ".DismissMessage, .DataList .Excerpt, .DataList .CategoryDescription, .MessageList .Excerpt, .MessageList .CategoryDescription",
+        {
+            color: fg,
+        },
+    );
 
     cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
         background: bg,
@@ -153,6 +157,10 @@ export const compatibilityStyles = useThemeCache(() => {
         ...borders(),
         backgroundColor: bg,
         color: fg,
+    });
+
+    cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
+        borderBottom: singleBorder(),
     });
 
     cssOut(`div.Popup p`, {
@@ -301,6 +309,16 @@ export const compatibilityStyles = useThemeCache(() => {
         ...srOnly(),
     });
 
+    cssOut(
+        `
+        .Container a.UserLink,
+        .Container a.UserLink.BlockTitle
+    `,
+        {
+            fontWeight: vars.fonts.weights.bold,
+        },
+    );
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -314,6 +332,7 @@ export const compatibilityStyles = useThemeCache(() => {
     categoriesCSS();
     bestOfCSS();
     ideaCSS();
+    tableCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

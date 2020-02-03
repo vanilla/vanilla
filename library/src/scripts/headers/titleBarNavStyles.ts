@@ -41,7 +41,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
-        bg: globalVars.mainColors.primary,
+        bg: globalVars.mainColors.fg,
         bottomSpace: 1,
     });
 

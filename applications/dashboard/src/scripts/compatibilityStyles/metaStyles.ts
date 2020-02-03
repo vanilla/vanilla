@@ -38,7 +38,7 @@ export const metaCSS = () => {
     mixinMetaLinkContainer(".MessageList");
     mixinMetaLinkContainer(".MessageList");
     mixinMetaLinkContainer(".DataTableWrap");
-    // mixinMetaLinkContainer(".Meta.Meta-Discussion");
+    mixinMetaLinkContainer(`.Container .Frame-contentWrap .ChildCategories`);
 
     cssOut(
         `
@@ -61,6 +61,16 @@ export const metaCSS = () => {
         },
     );
 
+    cssOut(`.Container .Frame-contentWrap .ChildCategories`, {
+        fontSize: unit(globalVars.meta.text.fontSize),
+        color: colorOut(globalVars.meta.text.color),
+    });
+
+    cssOut(`.Container .Frame-contentWrap .ChildCategories a`, {
+        fontSize: unit(globalVars.meta.text.fontSize),
+        color: colorOut(globalVars.meta.text.color),
+    });
+
     cssOut(
         `
         .Meta-Discussion .Tag,
@@ -72,6 +82,8 @@ export const metaCSS = () => {
         .MessageList .MItem,
         .MessageList .MItem.Category,
         .MessageList .ChildCategories
+        .Container .Frame-contentWrap .ChildCategories > b,
+        .Container .Frame-contentWrap .ChildCategories a
         `,
         {
             textDecoration: important("none"),

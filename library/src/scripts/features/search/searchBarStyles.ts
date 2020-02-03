@@ -81,6 +81,10 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
 
+    const independantRoot = style("independantRoot", {
+        position: "relative",
+    });
+
     const root = style(
         {
             cursor: "pointer",
@@ -99,7 +103,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    // marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -109,7 +112,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                         },
                     },
                     borderTopLeftRadius: important(0),
-                    borderTopRightRadius: important(0),
+                    borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
                     display: "flex",
@@ -208,7 +211,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         },
     });
 
-    const resultsAsModal = style("results", {
+    const resultsAsModal = style("resultsAsModal", {
         position: "absolute",
         top: unit(vars.sizing.height),
         left: 0,
@@ -303,11 +306,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         position: "relative",
         height: unit(vars.sizing.height),
         width: percent(100),
-        $nest: {
-            [`&.hasFocus .searchBar-valueContainer`]: {
-                borderColor: colorOut(globalVars.mainColors.primary),
-            },
-        },
     });
 
     const form = style("form", {
@@ -394,6 +392,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     return {
         root,
+        independantRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

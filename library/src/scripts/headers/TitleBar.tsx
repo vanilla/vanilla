@@ -16,7 +16,12 @@ import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import { titleBarClasses, titleBarVariables, titleBarHomeClasses } from "@library/headers/titleBarStyles";
+import {
+    titleBarClasses,
+    titleBarVariables,
+    titleBarHomeClasses,
+    titleBarLogoClasses,
+} from "@library/headers/titleBarStyles";
 import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -48,6 +53,11 @@ interface IProps {
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
 }
 
+export enum LogoAlignment {
+    LEFT = "left",
+    CENTER = "center",
+}
+
 /**
  * Implements Vanilla Header component. Note that this component uses a react portal.
  * That means the exact location in the page is not that important, since it will
@@ -75,9 +85,9 @@ export default function TitleBar(_props: IProps) {
     const classesMeBox = meBoxClasses();
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
-
     const vars = titleBarVariables();
     const classes = titleBarClasses();
+    const logoClasses = titleBarLogoClasses();
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
@@ -101,7 +111,6 @@ export default function TitleBar(_props: IProps) {
                     <div className={classNames("titleBar-bar", classes.bar, { isHome: showSubNav })}>
                         {!isSearchOpen &&
                             isCompact &&
-                            !showSubNav &&
                             (props.useMobileBackButton ? (
                                 <BackLink
                                     className={classNames(
@@ -112,7 +121,7 @@ export default function TitleBar(_props: IProps) {
                                     linkClassName={classes.button}
                                 />
                             ) : (
-                                !hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
+                                hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
                             <animated.div className={classes.logoAnimationWrap} {...logoProps}>
@@ -139,13 +148,10 @@ export default function TitleBar(_props: IProps) {
                                 {props.mobileDropDownContent}
                             </MobileDropDown>
                         )}
-                        {showHamburger && (
+                        {isCompact && (
                             <>
-                                <Hamburger buttonClassName={classes.hamburger} contents={hamburger} />
-                                <FlexSpacer
-                                    className={hamburgerClasses().spacer(1 + TitleBar.extraMeBoxComponents.length)}
-                                />
-                                <div className={classes.logoCenterer}>
+                                <Hamburger buttonClassName={classes.hamburger} contents={""} />
+                                <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                     <animated.span {...logoProps}>
                                         <HeaderLogo
                                             className={classNames("titleBar-logoContainer", classes.logoContainer)}
@@ -279,6 +285,7 @@ function useScrollTransition() {
     const { bannerExists, bannerRect } = useBannerContext();
     const [scrollPos, setScrollPos] = useState(0);
     const fullBleedOptions = titleBarVariables().fullBleed;
+
     const { doubleLogoStrategy } = titleBarVariables().logo;
     const shouldOverlay = fullBleedOptions.enabled && bannerExists;
     const { topOffset } = useScrollOffset();

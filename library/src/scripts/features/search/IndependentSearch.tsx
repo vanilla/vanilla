@@ -57,7 +57,7 @@ export function IndependentSearch(props: IProps) {
 
     const classesSearchBar = searchBarClasses();
     return (
-        <div className={classNames(props.className)}>
+        <div className={classNames(classesSearchBar.independantRoot, props.className)}>
             <SearchBar
                 id={id}
                 placeholder={props.placeholder}

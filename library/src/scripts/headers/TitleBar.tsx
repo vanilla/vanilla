@@ -81,14 +81,12 @@ export default function TitleBar(_props: IProps) {
     const { hamburger } = props;
     const isCompact = device === TitleBarDevices.COMPACT;
     const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
-    const showHamburger = isCompact && !isSearchOpen && !!hamburger;
     const classesMeBox = meBoxClasses();
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
     const vars = titleBarVariables();
     const classes = titleBarClasses();
     const logoClasses = titleBarLogoClasses();
-    const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
 
@@ -108,18 +106,10 @@ export default function TitleBar(_props: IProps) {
             </animated.div>
             <Container>
                 <PanelWidgetHorizontalPadding>
-                    <div className={classNames("titleBar-bar", classes.bar, { isHome: showSubNav })}>
-                        {!isSearchOpen &&
-                            isCompact &&
+                    <div className={classNames(classes.bar, { isHome: showSubNav })}>
+                        {isCompact &&
                             (props.useMobileBackButton ? (
-                                <BackLink
-                                    className={classNames(
-                                        "titleBar-leftFlexBasis",
-                                        "titleBar-backLink",
-                                        classes.leftFlexBasis,
-                                    )}
-                                    linkClassName={classes.button}
-                                />
+                                <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
                             ) : (
                                 hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
@@ -134,110 +124,66 @@ export default function TitleBar(_props: IProps) {
                         )}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
-                                className={classNames("titleBar-nav", classes.nav)}
-                                linkClassName={classNames("titleBar-navLink", classes.topElement)}
+                                className={classes.nav}
+                                linkClassName={classes.topElement}
                                 linkContentClassName="titleBar-navLinkContent"
                             />
                         )}
-                        {showMobileDropDown && !showHamburger && (
-                            <MobileDropDown
-                                title={props.title!}
-                                buttonClass={classNames("titleBar-mobileDropDown")}
-                                hasBackgroundColor={props.backgroundColorForMobileDropdown}
-                            >
-                                {props.mobileDropDownContent}
-                            </MobileDropDown>
-                        )}
                         {isCompact && (
                             <>
-                                <Hamburger buttonClassName={classes.hamburger} contents={""} />
-                                <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
-                                    <animated.span {...logoProps}>
-                                        <HeaderLogo
-                                            className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                            logoClassName="titleBar-logo"
-                                            logoType={LogoType.MOBILE}
-                                        />
-                                    </animated.span>
-                                </div>
-                            </>
-                        )}
-                        {showSubNav && !showHamburger && (
-                            <>
-                                <FlexSpacer className={homeClasses.left} />
-                                <animated.span {...logoProps}>
-                                    <HeaderLogo
-                                        className={classes.logoContainer}
-                                        logoClassName="titleBar-logo isCentred"
-                                        logoType={LogoType.MOBILE}
-                                    />
-                                </animated.span>
-                            </>
-                        )}
-                        {!showSubNav ? (
-                            <ConditionalWrap
-                                className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
-                                condition={!!showMobileDropDown}
-                            >
+                                <Hamburger className={classes.hamburger} />
                                 {!isSearchOpen && (
-                                    <div className={classes.extraMeBoxIcons}>
-                                        {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                            return <ComponentName key={index} />;
-                                        })}
+                                    <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
+                                        <animated.span {...logoProps}>
+                                            <HeaderLogo
+                                                className={classes.logoContainer}
+                                                logoClassName="titleBar-logo"
+                                                logoType={LogoType.MOBILE}
+                                            />
+                                        </animated.span>
                                     </div>
                                 )}
-                                <CompactSearch
-                                    className={classNames("titleBar-compactSearch", classes.compactSearch, {
-                                        isCentered: isSearchOpen,
-                                    })}
-                                    focusOnMount
-                                    open={isSearchOpen}
-                                    onSearchButtonClick={() => {
-                                        if (pages.search) {
-                                            pages.search.preload();
-                                        }
-                                        setIsSearchOpen(true);
-                                    }}
-                                    onCloseSearch={() => {
-                                        setIsSearchOpen(false);
-                                    }}
-                                    cancelButtonClassName={classNames(
-                                        "titleBar-searchCancel",
-                                        classes.topElement,
-                                        classes.searchCancel,
-                                    )}
-                                    cancelContentClassName="meBox-buttonContent"
-                                    buttonClass={classNames(classes.button, {
-                                        [classes.buttonOffset]: !isCompact && isGuest,
-                                    })}
-                                    showingSuggestions={isShowingSuggestions}
-                                    onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                                    onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                                    buttonContentClassName={classNames(
-                                        classesMeBox.buttonContent,
-                                        "meBox-buttonContent",
-                                    )}
-                                    clearButtonClass={classes.clearButtonClass}
-                                />
-                                {meBox}
-                            </ConditionalWrap>
-                        ) : (
-                            meBox
+                            </>
                         )}
+                        <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
+                            {!isSearchOpen && (
+                                <div className={classes.extraMeBoxIcons}>
+                                    {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                        return <ComponentName key={index} />;
+                                    })}
+                                </div>
+                            )}
+                            <CompactSearch
+                                className={classNames(classes.compactSearch, {
+                                    isCentered: isSearchOpen,
+                                })}
+                                focusOnMount
+                                open={isSearchOpen}
+                                onSearchButtonClick={() => {
+                                    if (pages.search) {
+                                        pages.search.preload();
+                                    }
+                                    setIsSearchOpen(true);
+                                }}
+                                onCloseSearch={() => {
+                                    setIsSearchOpen(false);
+                                }}
+                                cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
+                                cancelContentClassName="meBox-buttonContent"
+                                buttonClass={classNames(classes.button, {
+                                    [classes.buttonOffset]: !isCompact && isGuest,
+                                })}
+                                showingSuggestions={isShowingSuggestions}
+                                onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                                onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
+                                clearButtonClass={classes.clearButtonClass}
+                            />
+                            {meBox}
+                        </ConditionalWrap>
                     </div>
                 </PanelWidgetHorizontalPadding>
             </Container>
-            {showSubNav && (
-                <div className={homeClasses.bottom}>
-                    <div className={classes.scroll}>
-                        <TitleBarNav
-                            className={classNames("titleBar-nav", classes.nav)}
-                            linkClassName={classNames("titleBar-navLink", classes.topElement)}
-                            linkContentClassName="titleBar-navLinkContent"
-                        />
-                    </div>
-                </div>
-            )}
         </HashOffsetReporter>
     );
 

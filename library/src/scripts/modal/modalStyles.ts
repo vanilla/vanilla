@@ -123,6 +123,18 @@ export const modalClasses = useThemeCache(() => {
         ...overlayMixin,
     });
 
+    const sidePanelMixin: NestedCSSProperties = {
+        left: unit(vars.dropDown.padding),
+        width: calc(`100% - ${unit(vars.dropDown.padding)}`),
+        display: "flex",
+        flexDirection: "column",
+        top: 0,
+        bottom: 0,
+        transform: "none",
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    };
+
     const root = style({
         display: "flex",
         flexDirection: "column",
@@ -173,17 +185,15 @@ export const modalClasses = useThemeCache(() => {
                 width: unit(vars.sizing.small),
                 maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
-            "&&&.isSidePanel": {
-                left: unit(vars.dropDown.padding),
-                width: calc(`100% - ${unit(vars.dropDown.padding)}`),
-                display: "flex",
-                flexDirection: "column",
-                top: 0,
-                bottom: 0,
+            "&&&.isSidePanelRight": {
+                ...sidePanelMixin,
                 right: 0,
-                transform: "none",
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                left: "initial",
+            },
+            "&&&.isSidePanelLeft": {
+                ...sidePanelMixin,
+                left: 0,
+                right: "initial",
             },
             "&&.isDropDown": {
                 top: 0,

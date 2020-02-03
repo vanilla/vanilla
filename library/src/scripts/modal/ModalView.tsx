@@ -115,10 +115,15 @@ export function ModalView(props: IProps) {
                     fade: false,
                     fromDirection: FromDirection.TOP,
                 };
-            case ModalSizes.MODAL_AS_SIDE_PANEL:
+            case ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT:
                 return {
                     fade: false,
                     fromDirection: FromDirection.RIGHT,
+                };
+            case ModalSizes.MODAL_AS_SIDE_PANEL_LEFT:
+                return {
+                    fade: false,
+                    fromDirection: FromDirection.LEFT,
                 };
         }
     })();
@@ -150,8 +155,11 @@ export function ModalView(props: IProps) {
                             classes.root,
                             {
                                 isFullScreen:
-                                    size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                                isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                                    size === ModalSizes.FULL_SCREEN ||
+                                    size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT ||
+                                    size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
+                                isSidePanelRight: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT,
+                                isSidePanelLeft: size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
                                 isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
                                 isXL: size === ModalSizes.XL,
                                 isLarge: size === ModalSizes.LARGE,

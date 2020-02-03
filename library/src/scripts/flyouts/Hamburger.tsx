@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
@@ -13,31 +13,61 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import { HamburgerIcon } from "@library/icons/common";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import { siteNavVariables } from "@library/navigation/siteNavStyles";
+import { navigationVariables } from "@library/headers/navigationVariables";
+import { getCurrentLocale } from "@vanilla/i18n";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import Permission from "@library/features/users/Permission";
+
+interface IProps {
+    className?: string;
+}
 
 /**
- * Creates a drop down menu
+ * Creates a hamburger menu.
  */
-export default function Hamburger(props) {
+export default function Hamburger(props: IProps) {
+    const [isOpen, setIsOpen] = useState(false);
     const classes = hamburgerClasses();
 
+    const closeDrawer = () => {
+        setIsOpen(false);
+    };
+
+    const toggleDrawer = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const navItems = navigationVariables().getNavItemsForLocale();
+
     return (
-        <DropDown
-            name={t("Messages")}
-            buttonClassName={classNames(props.buttonClassName, classes.root)}
-            buttonContents={<HamburgerIcon />}
-            flyoutType={FlyoutType.FRAME}
-        >
-            <Frame
-                body={
-                    <FrameBody className={classNames("isSelfPadded")}>
-                        <div
-                            className={classNames(classes.content)}
-                            dangerouslySetInnerHTML={{ __html: props.contents }}
-                        />
-                        <TitleBarMobileNav />
-                    </FrameBody>
-                }
-            />
-        </DropDown>
+        <>
+            <Button
+                baseClass={ButtonTypes.ICON}
+                className={classNames(classes.root, props.className)}
+                onClick={toggleDrawer}
+            >
+                <HamburgerIcon />
+            </Button>
+            <Modal isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
+                <div>
+                    <DropDownSection title={t("Site Navigation")}>
+                        {navItems.map((item, i) => {
+                            return (
+                                <Permission key={i} permission={item.permission}>
+                                    <DropDownItemLink to={item.to}>{item.children}</DropDownItemLink>
+                                </Permission>
+                            );
+                        })}
+                    </DropDownSection>
+                </div>
+            </Modal>
+        </>
     );
 }

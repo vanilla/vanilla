@@ -73,8 +73,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                 </Button>
                 <Modal
                     isVisible={!!this.state.open}
-                    size={ModalSizes.MODAL_AS_SIDE_PANEL}
-                    label={t("Article Revisions")}
+                    size={ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT}
                     elementToFocusOnExit={this.buttonRef.current!}
                     exitHandler={this.close}
                 >

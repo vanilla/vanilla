@@ -27,7 +27,8 @@ interface IProps {
     title?: string; // Often the message to display isn't the real H1
     description?: React.ReactNode;
     className?: string;
-    image?: string;
+    backgroundImage?: string;
+    contentImage?: string;
 }
 
 /**
@@ -45,8 +46,8 @@ export default function Banner(props: IProps) {
     const vars = bannerVariables();
     const { options } = vars;
 
-    const isImageBg = vars.options.imageType === "background";
-    const imageSrc = assetUrl(props.image ?? vars.outerBackground.image ?? "");
+    let imageElementSrc = props.contentImage || vars.imageElement.image || null;
+    imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
 
     return (
         <div
@@ -55,46 +56,52 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div className={classNames(classes.outerBackground(props.image ?? undefined))}>
-                {!props.image && !vars.outerBackground.image && <DefaultBannerBg />}
+            <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
+                {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
             </div>
-            {vars.backgrounds.useOverlay && isImageBg && <div className={classes.backgroundOverlay} />}
+            {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
             <Container>
-                {options.imageType === "element" && <img className={classes.imageElement} src={imageSrc}></img>}
-                <div className={classes.innerContainer}>
-                    <PanelWidgetHorizontalPadding className={classes.widget}>
-                        <div className={classes.titleWrap}>
-                            <FlexSpacer className={classes.titleFlexSpacer} />
-                            {title && <Heading title={title} className={classes.title} />}
-                            <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                <PanelWidgetHorizontalPadding>
+                    <div className={imageElementSrc ? classes.imagePositioner : ""}>
+                        <div className={classes.contentContainer}>
+                            <div className={classes.titleWrap}>
+                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                {title && <Heading title={title} className={classes.title} />}
+                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                            </div>
+                            {!options.hideDesciption && description && (
+                                <div className={classes.descriptionWrap}>
+                                    <p className={classNames(classes.description, classes.text)}>{description}</p>
+                                </div>
+                            )}
+                            {!options.hideSearch && (
+                                <div className={classes.searchContainer}>
+                                    <IndependentSearch
+                                        buttonClass={classes.searchButton}
+                                        buttonBaseClass={ButtonTypes.CUSTOM}
+                                        isLarge={true}
+                                        placeholder={t("Search")}
+                                        inputClass={classes.input}
+                                        iconClass={classes.icon}
+                                        buttonLoaderClassName={classes.buttonLoader}
+                                        hideSearchButton={
+                                            device === Devices.MOBILE ||
+                                            device === Devices.XS ||
+                                            vars.searchButtonOptions.type === SearchBarButtonType.NONE
+                                        }
+                                        contentClass={classes.content}
+                                        valueContainerClasses={classes.valueContainer}
+                                    />
+                                </div>
+                            )}
                         </div>
-                        {!options.hideDesciption && description && (
-                            <div className={classes.descriptionWrap}>
-                                <p className={classNames(classes.description, classes.text)}>{description}</p>
+                        {imageElementSrc && (
+                            <div className={classes.imageElementContainer}>
+                                <img className={classes.imageElement} src={imageElementSrc}></img>
                             </div>
                         )}
-                        {!options.hideSearch && (
-                            <div className={classes.searchContainer}>
-                                <IndependentSearch
-                                    buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    isLarge={true}
-                                    placeholder={t("Search")}
-                                    inputClass={classes.input}
-                                    iconClass={classes.icon}
-                                    buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={
-                                        device === Devices.MOBILE ||
-                                        device === Devices.XS ||
-                                        vars.searchButtonOptions.type === SearchBarButtonType.NONE
-                                    }
-                                    contentClass={classes.content}
-                                    valueContainerClasses={classes.valueContainer}
-                                />
-                            </div>
-                        )}
-                    </PanelWidgetHorizontalPadding>
-                </div>
+                    </div>
+                </PanelWidgetHorizontalPadding>
             </Container>
         </div>
     );

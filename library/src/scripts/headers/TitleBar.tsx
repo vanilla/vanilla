@@ -91,8 +91,6 @@ export default function TitleBar(_props: IProps) {
     const homeClasses = titleBarHomeClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
-    //const logoAlignment = titleBarVariables().mobileLogo.justifyContent;
-    //const logoAlign = logoAlignment === "center" ? true : false;
 
     const headerContent = (
         <HashOffsetReporter>

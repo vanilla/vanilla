@@ -270,9 +270,11 @@ a.ChangePicture {
     }
 }
 
-[class*="Status-Tag-"] {
-    padding: 0 !important;
-    background-color: transparent !important;
+@if($staticVariables){
+    [class*="Status-Tag-"] {
+        padding: 0 !important;
+        background-color: transparent !important;
+    }
 }
 
 .Leaderboard-User {

@@ -27,12 +27,48 @@ export const bestOfCSS = () => {
         color: colorOut(globalVars.mainColors.fg),
     });
 
-    cssOut(`body.Section-BestOf .Tile .Author a, body.Section-BestOf .Item .Author a`, {
-        color: colorOut(globalVars.mainColors.fg),
-        fontSize: unit(globalVars.meta.text.fontSize),
-    });
-
     cssOut(`body.Section-BestOf .Tile .Message`, {
         overflow: "auto",
     });
+
+    cssOut(
+        `
+    body.Section-BestOf .Tile .Author a,
+    body.Section-BestOf .Item .Author a
+    `,
+        {
+            color: colorOut(globalVars.links.colors.default),
+            fontSize: unit(globalVars.meta.text.fontSize),
+        },
+    );
+
+    cssOut(
+        `
+    body.Section-BestOf .Tile .Author a:hover,
+    body.Section-BestOf .Item .Author a:hover,
+    `,
+        {
+            color: colorOut(globalVars.links.colors.hover),
+        },
+    );
+
+    cssOut(
+        `
+    body.Section-BestOf .Tile .Author a:focus,
+    body.Section-BestOf .Item .Author a:focus,
+    `,
+        {
+            color: colorOut(globalVars.links.colors.focus),
+        },
+    );
+
+    cssOut(
+        `
+    body.Section-BestOf .Tile .Author a:active,
+    body.Section-BestOf .Item .Author a:active
+    `,
+        {
+            color: colorOut(globalVars.links.colors.active),
+        },
+    );
 };

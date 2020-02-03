@@ -49,6 +49,19 @@ export const textLinkCSS = () => {
     mixinTextLink("a.OptionsLink");
     mixinTextLink(".MorePager a");
     mixinTextLink(`body.Section-BestOf .Tile .Message a`);
+    mixinTextLink(
+        `
+        .DataList .IdeationTag,
+        .DataList .tag-tracker,
+        .DataList .MItem.RoleTracker,
+        .MessageList .IdeationTag,
+        .MessageList .tag-tracker,
+        .MessageList .MItem.RoleTracker,
+        .DataTableWrap .IdeationTag,
+        .DataTableWrap .tag-tracker,
+        .DataTableWrap .MItem.RoleTracker
+        `,
+    );
     // Links that have FG color by default but regular state colors.
     mixinTextLink(".ItemContent a", true);
     mixinTextLink(".DataList .Item h3 a", true);

@@ -11,7 +11,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, negative, paddings, unit } from "@library/styles/styleHelpers";
+import { borders, importantUnit, negative, paddings, srOnly, unit } from "@library/styles/styleHelpers";
 import { ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -28,6 +28,7 @@ import { fontCSS } from "./fontStyles";
 import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
+import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -258,6 +259,48 @@ export const compatibilityStyles = useThemeCache(() => {
         borderTopColor: colorOut(vars.border.color),
     });
 
+    cssOut(`.Author a:not(.PhotoWrap)`, {
+        fontWeight: vars.fonts.weights.bold,
+    });
+
+    cssOut(
+        `.DataList .Meta .Tag-Announcement,
+        .DataList .NewCommentCount,
+        .DataList .HasNew.HasNew,
+        .MessageList .Tag-Announcement,
+        .MessageList .NewCommentCount,
+        .MessageList .HasNew.HasNew,
+        .DataTableWrap .Tag-Announcement,
+        .DataTableWrap .NewCommentCount,
+        .DataTableWrap .HasNew.HasNew,
+        .MessageList .ItemComment .Username,
+        .MessageList .ItemDiscussion .Username,
+        .Tag
+        `,
+        {
+            ...borders(),
+            background: "none",
+            backgroundColor: "transparent",
+        },
+    );
+
+    cssOut(`a.Tag`, {
+        $nest: {
+            "&:hover, &:focus, &:active": {
+                textDecoration: important("none"),
+                borderColor: colorOut(vars.mainColors.fg),
+            },
+        },
+    });
+
+    cssOut(`.DataList.Discussions .Item .Title a`, {
+        textDecoration: important("none"),
+    });
+
+    cssOut(`a.Bookmark`, {
+        ...srOnly(),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -270,6 +313,7 @@ export const compatibilityStyles = useThemeCache(() => {
     fontCSS();
     categoriesCSS();
     bestOfCSS();
+    ideaCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

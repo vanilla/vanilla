@@ -31,30 +31,14 @@ export const metaCSS = () => {
     const primary = colorOut(mainColors.primary);
     const metaFg = colorOut(globalVars.meta.colors.fg);
 
-    mixinMetaLinkContainer(".DataList .Meta");
-    mixinMetaLinkContainer(".MessageList .Meta");
-    mixinMetaLinkContainer(".DataList .AuthorInfo");
-    mixinMetaLinkContainer(".MessageList .AuthorInfo");
-    mixinMetaLinkContainer(".DataList-Search .MItem-Author");
-    mixinMetaLinkContainer(".DataList .Excerpt");
-    mixinMetaLinkContainer(".DataList .CategoryDescription");
-    mixinMetaLinkContainer(".MessageList .Excerpt");
-    mixinMetaLinkContainer(".MessageList .CategoryDescription");
+    mixinMetaLinkContainer(".DataList");
+    mixinMetaLinkContainer(".DataList-Search");
     mixinMetaLinkContainer(".Breadcrumbs");
-    mixinMetaLinkContainer(".DataList .Tag");
-    mixinMetaLinkContainer(".DataList .Tag-Poll");
-    mixinMetaLinkContainer(".DataList .RoleTracker");
-    mixinMetaLinkContainer(".DataList .IdeationTag");
-    mixinMetaLinkContainer(".MessageList .Tag");
-    mixinMetaLinkContainer(".MessageList .Tag-Poll");
-    mixinMetaLinkContainer(".MessageList .RoleTracker");
-    mixinMetaLinkContainer(".MessageList .IdeationTag");
-    mixinMetaLinkContainer(".DataTableWrap .Tag");
-    mixinMetaLinkContainer(".DataTableWrap .Tag-Poll");
-    mixinMetaLinkContainer(".DataTableWrap .RoleTracker");
-    mixinMetaLinkContainer(".DataTableWrap .IdeationTag");
-    mixinMetaLinkContainer(".MessageList .ItemComment .Username");
-    mixinMetaLinkContainer(".MessageList .ItemDiscussion .Username");
+    mixinMetaLinkContainer(".DataList");
+    mixinMetaLinkContainer(".MessageList");
+    mixinMetaLinkContainer(".MessageList");
+    mixinMetaLinkContainer(".DataTableWrap");
+    // mixinMetaLinkContainer(".Meta.Meta-Discussion");
 
     cssOut(
         `
@@ -68,7 +52,7 @@ export const metaCSS = () => {
         .DataTableWrap .NewCommentCount,
         .DataTableWrap .HasNew.HasNew,
         .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username
+        .MessageList .ItemDiscussion .Username,
         `,
         {
             color: primary,
@@ -77,15 +61,59 @@ export const metaCSS = () => {
         },
     );
 
-    cssOut(".Meta-Discussion .Tag", {
-        ...margins({
-            horizontal: 3,
-        }),
+    cssOut(
+        `
+        .Meta-Discussion .Tag,
+        .DataList .Author .Username,
+        .DataList .MItem,
+        .DataList .MItem.Category,
+        .DataList .ChildCategories,
+        .MessageList .Author .Username,
+        .MessageList .MItem,
+        .MessageList .MItem.Category,
+        .MessageList .ChildCategories
+        `,
+        {
+            textDecoration: important("none"),
+            ...margins({
+                all: globalVars.meta.spacing.default,
+            }),
+        },
+    );
+
+    cssOut(".MItem .Tag", {
+        ...margins({ all: important(0) }),
     });
 
-    cssOut(".Meta-Discussion > .Tag", {
-        marginLeft: unit(6),
-    });
+    cssOut(
+        `
+        .ItemDiscussion.ItemIdea .Title a,
+        .Content .DataList .Tag,
+        .Content .DataList .Tag-Poll,
+        .Content .DataList .RoleTracker,
+        .Content .DataList .IdeationTag,
+        .Content .MessageList .Tag,
+        .Content .MessageList .Tag-Poll,
+        .Content .MessageList .RoleTracker,
+        .Content .MessageList .IdeationTag,
+        .Content .DataTableWrap .Tag,
+        .Content .DataTableWrap .Tag-Poll,
+        .Content .DataTableWrap .RoleTracker,
+        .Content .DataTableWrap .IdeationTag
+        `,
+        {
+            marginLeft: unit(globalVars.meta.spacing.default),
+        },
+    );
+
+    cssOut(
+        `
+        .Meta-Discussion > .Tag,
+        .idea-counter-module`,
+        {
+            marginRight: unit(globalVars.meta.spacing.default),
+        },
+    );
 };
 
 function mixinMetaLinkContainer(selector: string) {

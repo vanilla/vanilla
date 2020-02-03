@@ -10,10 +10,9 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { containerMainStyles } from "@library/layout/components/containerStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { paddings } from "@library/styles/styleHelpersfPadding";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, color, percent, px } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { paddings, unit } from "@library/styles/styleHelpers";
 import { media } from "typestyle";
 
 export const forumLayoutVariables = useThemeCache(() => {

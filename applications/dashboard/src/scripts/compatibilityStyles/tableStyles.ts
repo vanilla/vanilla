@@ -47,7 +47,14 @@ export const tableCSS = () => {
     );
 
     cssOut(
-        `.Groups .DataTable tbody td.LatestPost a, .Groups .DataTable tbody td.LastUser a, .Groups .DataTable tbody td.FirstUser a, .DataTable tbody td.LatestPost a, .DataTable tbody td.LastUser a, .DataTable tbody td.FirstUser a`,
+        `
+        .Groups .DataTable tbody td.LatestPost a,
+        .Groups .DataTable tbody td.LastUser a,
+        .Groups .DataTable tbody td.FirstUser a,
+        .DataTable tbody td.LatestPost a,
+        .DataTable tbody td.LastUser a,
+        .DataTable tbody td.FirstUser a
+        `,
         {
             color: colorOut(vars.mainColors.fg),
             fontSize: unit(vars.meta.text.fontSize),
@@ -55,5 +62,16 @@ export const tableCSS = () => {
         },
     );
 
-    // cssOut(``, {});
+    cssOut(`.Container .DataTable .DiscussionName > .Wrap > .MItem.Category`, {
+        color: colorOut(vars.mainColors.fg),
+        fontSize: unit(vars.meta.text.fontSize),
+        marginLeft: 0,
+        $nest: {
+            a: {
+                color: "inherit",
+            },
+        },
+    });
+
+    cssOut(".Container .DataTable .DiscussionName .Meta.Meta-Discussion");
 };

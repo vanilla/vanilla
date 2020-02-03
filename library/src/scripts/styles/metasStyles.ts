@@ -49,12 +49,8 @@ export const metasVariables = useThemeCache(() => {
     };
 });
 
-export const metasClasses = useThemeCache(() => {
-    const vars = metasVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("metas");
-
-    const root = style({
+export const metaContainerStyles = () => {
+    return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
         color: colorOut(vars.colors.fg),
@@ -92,7 +88,15 @@ export const metasClasses = useThemeCache(() => {
                 alignItems: "center",
             },
         },
-    });
+    };
+};
+
+export const metasClasses = useThemeCache(() => {
+    const vars = metasVariables();
+    const globalVars = globalVariables();
+    const style = styleFactory("metas");
+
+    const root = style(metaContainerStyles());
 
     const meta = style("meta", {
         display: "inline-block",

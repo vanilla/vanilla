@@ -83,7 +83,7 @@ export const forumMetaCSS = () => {
         .Container .Frame-contentWrap .ChildCategories a,
         .Groups .DataTable .MItem a,
         .DataTable .MItem a,
-        .Container .DataTable .MItem.Category
+        .Container .DataTable .MItem.Category,
         `,
         {
             textDecoration: important("none"),
@@ -126,6 +126,10 @@ export const forumMetaCSS = () => {
             marginRight: unit(globalVars.meta.spacing.default),
         },
     );
+};
+
+const mixinMetaContainer = (selector: string) => {
+    // ".Container .DataTable .DiscussionName .Meta.Meta-Discussion"
 };
 
 function mixinMetaLinkContainer(selector: string) {

@@ -9,6 +9,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -37,30 +38,32 @@ export const containerVariables = useThemeCache(() => {
     };
 });
 
-export const containerClasses = useThemeCache(() => {
-    const style = styleFactory("container");
+export const containerMainStyles = () => {
     const globalVars = globalVariables();
     const vars = containerVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    return {
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        boxSizing: "border-box",
+        width: percent(100),
+        maxWidth: globalVars.content.width,
+        marginLeft: "auto",
+        marginRight: "auto",
+        ...paddings(vars.spacing.padding),
+    };
+};
 
+export const containerClasses = useThemeCache(() => {
+    const style = styleFactory("container");
+    const mediaQueries = layoutVariables().mediaQueries();
     const root = style(
-        {
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            boxSizing: "border-box",
-            width: percent(100),
-            maxWidth: globalVars.content.width,
-            marginLeft: "auto",
-            marginRight: "auto",
-            ...paddings(vars.spacing.padding),
-        },
+        containerMainStyles() as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             ...paddings({
                 horizontal: 8,
             }),
         }),
     );
-
     return { root };
 });

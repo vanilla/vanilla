@@ -11,7 +11,6 @@ import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import SearchBar from "@library/features/search/SearchBar";
 import { useUniqueID } from "@library/utility/idUtils";
-import { searchClasses } from "@library/features/search/searchStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
@@ -56,10 +55,9 @@ export function IndependentSearch(props: IProps) {
         [setQuery],
     );
 
-    const classes = searchClasses();
     const classesSearchBar = searchBarClasses();
     return (
-        <div className={classNames(classes.root, props.className)}>
+        <div className={classNames(classesSearchBar.independantRoot, props.className)}>
             <SearchBar
                 id={id}
                 placeholder={props.placeholder}
@@ -74,7 +72,6 @@ export function IndependentSearch(props: IProps) {
                 resultsRef={resultsRef}
                 buttonClassName={props.buttonClass}
                 buttonBaseClass={props.buttonBaseClass}
-                className={classes.root}
                 isBigInput={props.isLarge}
                 buttonLoaderClassName={props.buttonLoaderClassName}
                 hideSearchButton={props.hideSearchButton}

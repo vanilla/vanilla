@@ -14,7 +14,6 @@ import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { splashClasses } from "@library/splash/splashStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -72,16 +71,19 @@ export const searchBarVariables = useThemeCache(() => {
     };
 });
 
-export const searchBarClasses = useThemeCache(() => {
+export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const titleBarVars = titleBarVariables();
-    const classesButton = buttonClasses();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
+
+    const independantRoot = style("independantRoot", {
+        position: "relative",
+    });
 
     const root = style(
         {
@@ -101,7 +103,6 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    // marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -110,6 +111,8 @@ export const searchBarClasses = useThemeCache(() => {
                             zIndex: 1,
                         },
                     },
+                    borderTopLeftRadius: important(0),
+                    borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
                     display: "flex",
@@ -208,7 +211,7 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
-    const resultsAsModal = style("results", {
+    const resultsAsModal = style("resultsAsModal", {
         position: "absolute",
         top: unit(vars.sizing.height),
         left: 0,
@@ -263,10 +266,10 @@ export const searchBarClasses = useThemeCache(() => {
 
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
-        ...borderRadii({
-            left: important("0"),
-            right: important(vars.border.radius),
-        }),
+        // ...borderRadii({
+        //     left: important(0),
+        //     right: important(unit(splashVars.inputAndButton.borderRadius) as string),
+        // }),
     });
 
     const label = style("label", {
@@ -303,11 +306,6 @@ export const searchBarClasses = useThemeCache(() => {
         position: "relative",
         height: unit(vars.sizing.height),
         width: percent(100),
-        $nest: {
-            [`&:not(.${splashClasses({}).content}).hasFocus .searchBar-valueContainer`]: {
-                borderColor: colorOut(globalVars.mainColors.primary),
-            },
-        },
     });
 
     const form = style("form", {
@@ -394,6 +392,7 @@ export const searchBarClasses = useThemeCache(() => {
 
     return {
         root,
+        independantRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

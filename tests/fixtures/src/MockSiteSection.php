@@ -29,6 +29,9 @@ class MockSiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
     /**
      * MockSiteSection constructor.
      *
@@ -43,13 +46,15 @@ class MockSiteSection implements SiteSectionInterface {
         string $locale,
         string $basePath,
         string $sectionID,
-        string $sectionGroup
+        string $sectionGroup,
+        array $defaultRoute
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
         $this->siteSectionPath = $basePath;
         $this->sectionID = $sectionID;
         $this->sectionGroup = $sectionGroup;
+        $this->defaultRoute = $defaultRoute;
     }
     /**
      * @inheritdoc
@@ -91,5 +96,12 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function jsonSerialize() {
         return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
     }
 }

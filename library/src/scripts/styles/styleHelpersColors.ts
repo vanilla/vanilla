@@ -6,6 +6,9 @@
 
 import { color, ColorHelper, important } from "csx";
 import { throwError } from "rxjs";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { useThrowError } from "@vanilla/react-utils/src/useThrowError";
+import { logError } from "@vanilla/utils/src/debugUtils";
 
 export type ColorValues = ColorHelper | "transparent" | undefined;
 
@@ -23,7 +26,28 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.5;
+    return color.lightness() >= 0.45;
+};
+
+/*
+ * Maintain good contrast by flipping ratios when we're in a dark theme
+ * @param weight - The weight for the color mix
+ * @param bgColor - Check background color to determine if we're in a dark theme
+ */
+export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) => {
+    if (weight > 1) {
+        logError("The weight cannot be greater than 1.");
+        weight = 1;
+    } else if (weight < 0) {
+        logError("The weight cannot be smaller than 0.");
+        weight = 0;
+    }
+
+    if (isLightColor(bgColor)) {
+        return weight;
+    } else {
+        return 1 - weight;
+    }
 };
 
 /*

@@ -170,17 +170,31 @@ export const mobileDropDownClasses = useThemeCache(() => {
         height: percent(100),
     });
 
+    const headerSizing = {
+        height: unit(vars.header.minHeight.height),
+        width: percent(100),
+    };
+
     const header = style("header", {
         ...shadowHelper().embed(),
+        background: colorOut(frameVars.colors.bg),
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10000,
     });
 
     const headerContent = style("headerContent", {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
-        height: unit(vars.header.minHeight.height),
         margin: "auto",
-        width: percent(100),
+        height: unit(vars.header.minHeight.height),
+    });
+
+    const headerSpacer = style("headerSpacer", {
+        ...headerSizing,
     });
 
     const closeWidth =
@@ -229,6 +243,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         closeModal,
         header,
         headerContent,
+        headerSpacer,
         listContainer,
         subTitle,
     };

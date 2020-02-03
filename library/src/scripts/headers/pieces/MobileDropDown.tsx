@@ -24,6 +24,7 @@ import classNames from "classnames";
 import * as React from "react";
 import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
 import { panelBackgroundClasses } from "@library/layout/panelBackgroundStyles";
+import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAnimation";
 
 export interface IProps {
     className?: string;
@@ -76,44 +77,50 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     icon={<DownTriangleIcon className={"mobileDropDown-downTriangle"} />}
                     onClick={this.open}
                 />
-                {this.state.open && (
-                    <Modal
-                        size={ModalSizes.MODAL_AS_DROP_DOWN}
-                        label={t("Menu")}
-                        elementToFocusOnExit={this.buttonRef.current!}
-                        className={classes.modal}
-                        exitHandler={this.close}
-                    >
-                        <Frame
-                            bodyWrapClass={classNames({
-                                [panelBackgroundClasses().backgroundColor]: this.props.hasBackgroundColor, // Note that it will take the config from the component to decide if it renders the color or not.
-                            })}
-                            header={
-                                <header className={classes.header}>
-                                    <Container>
-                                        <PanelWidgetHorizontalPadding>
-                                            <div className={classes.headerContent}>
-                                                <TitleButton onClick={this.close} icon={<UpTriangleIcon />} />
-                                            </div>
-                                        </PanelWidgetHorizontalPadding>
-                                    </Container>
-                                </header>
-                            }
-                            body={<FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>}
-                            footer={
-                                <FrameFooter>
-                                    <Button
-                                        onClick={this.close}
-                                        baseClass={ButtonTypes.CUSTOM}
-                                        className={classes.closeModal}
-                                    >
-                                        <ChevronUpIcon className={classes.closeModalIcon} />
-                                    </Button>
-                                </FrameFooter>
-                            }
-                        />
-                    </Modal>
-                )}
+                <Modal
+                    isVisible={this.state.open}
+                    size={ModalSizes.MODAL_AS_DROP_DOWN}
+                    label={t("Menu")}
+                    elementToFocusOnExit={this.buttonRef.current as HTMLElement}
+                    className={classes.modal}
+                    exitHandler={this.close}
+                    afterContent={
+                        <EntranceAnimation
+                            delay={50}
+                            fromDirection={FromDirection.TOP}
+                            asElement="header"
+                            isEntered={this.state.open}
+                            className={classes.header}
+                        >
+                            <Container>
+                                <PanelWidgetHorizontalPadding>
+                                    <div className={classes.headerContent}>
+                                        <TitleButton onClick={this.close} icon={<UpTriangleIcon />} />
+                                    </div>
+                                </PanelWidgetHorizontalPadding>
+                            </Container>
+                        </EntranceAnimation>
+                    }
+                >
+                    <Frame
+                        bodyWrapClass={classNames({
+                            [panelBackgroundClasses().backgroundColor]: this.props.hasBackgroundColor, // Note that it will take the config from the component to decide if it renders the color or not.
+                        })}
+                        header={<div className={classes.headerSpacer}></div>}
+                        body={<FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>}
+                        footer={
+                            <FrameFooter>
+                                <Button
+                                    onClick={this.close}
+                                    baseClass={ButtonTypes.CUSTOM}
+                                    className={classes.closeModal}
+                                >
+                                    <ChevronUpIcon className={classes.closeModalIcon} />
+                                </Button>
+                            </FrameFooter>
+                        }
+                    />
+                </Modal>
             </div>
         ) : (
             <div className={classes.toggleButton}>

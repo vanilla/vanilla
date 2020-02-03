@@ -13,7 +13,7 @@
  * are: (string) Name, (bool) PrimaryKey, (string) Type, (bool) AllowNull,
  * (string) Default, (int) Length, (array) Enum.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -58,8 +58,16 @@ if (!function_exists('ValidateRequired')) {
         }
 
         if (is_string($value)) {
-            // Empty strings should pass if the default value of the field is an empty string.
-            if ($value === '' && val('Default', $field, null) === '') {
+            // Empty strings should pass if the default value of the field is an empty string or one of the Enum
+            // values is an empty string.
+
+            // Checking for an Enum with an empty string.
+            $hasEmptyEnum = false;
+            if (is_array($enum = val('Enum', $field, null))) {
+                $hasEmptyEnum = in_array('', $enum, true);
+            }
+
+            if ($value === '' && (val('Default', $field, null) === '' || $hasEmptyEnum)) {
                 return true;
             }
 

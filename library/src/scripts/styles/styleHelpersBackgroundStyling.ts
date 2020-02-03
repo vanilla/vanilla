@@ -31,6 +31,17 @@ export interface IBackground {
     opacity?: OpacityProperty;
 }
 
+export const EMPTY_BACKGROUND: IBackground = {
+    color: undefined,
+    attachment: undefined,
+    position: undefined,
+    repeat: undefined,
+    size: undefined,
+    image: undefined,
+    fallbackImage: undefined,
+    opacity: undefined,
+};
+
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
     // Get either image or fallback
     const workingImage = image ? image : fallbackImage;
@@ -44,11 +55,15 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
     }
 
     if (workingImage.startsWith("data:image/")) {
+        return `url(${workingImage})`;
+    }
+
+    if (workingImage.startsWith("linear-gradient(")) {
         return workingImage;
     }
 
     // Fallback to a general asset URL.
-    const assetImage = assetUrl(workingImage);
+    const assetImage = `url(${assetUrl(workingImage)})`;
     return assetImage;
 };
 
@@ -60,7 +75,7 @@ export const background = (props: IBackground) => {
         backgroundPosition: props.position || `50% 50%`,
         backgroundRepeat: props.repeat || "no-repeat",
         backgroundSize: props.size || "cover",
-        backgroundImage: image ? url(image) : undefined,
+        background: image,
         opacity: props.opacity ?? undefined,
     };
 };

@@ -36,17 +36,19 @@
     }
 }
 
-.Frame-contentWrap {
-    background-color: $frame_bg;
-    border: $frame_border;
-    box-shadow: $frame_boxShadow;
-    padding-top: $frame_padding;
-    padding-bottom: 48px;
-    @include framePaddingReverse();
+@if ($staticVariables) {
+    .Frame-contentWrap {
+        background-color: $frame_bg;
+        border: $frame_border;
+        box-shadow: $frame_boxShadow;
+        padding-top: $frame_padding;
+        padding-bottom: 48px;
+        @include framePaddingReverse();
 
-    @include maxWidth {
-        padding-top: $frame-mobile_padding;
-        padding-bottom: $frame-mobile_padding;
+        @include maxWidth {
+            padding-top: $frame-mobile_padding;
+            padding-bottom: $frame-mobile_padding;
+        }
     }
 }
 
@@ -75,16 +77,18 @@
 }
 
 .MainContent.Content {
-    background-color: $content_bg;
-    border: $frame_border;
-    padding: $content_padding;
-    border-radius: $content_borderRadius;
-    border: $content_border;
-    width: calc(100% - #{$panel_width + $panel_gap});
+    @if ($staticVariables) {
+        background-color: $content_bg;
+        border: $frame_border;
+        padding: $content_padding;
+        border-radius: $content_borderRadius;
+        border: $content_border;
+        width: calc(100% - #{$panel_width + $panel_gap});
 
-    @if ($panel_toLeft) {
-        order: 2;
-        margin-left: auto;
+        @if ($panel_toLeft) {
+            order: 2;
+            margin-left: auto;
+        }
     }
 
     @include maxWidth($theme-breakpoint_tablet) {

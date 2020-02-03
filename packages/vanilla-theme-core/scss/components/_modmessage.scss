@@ -16,6 +16,16 @@
     a {
         text-decoration: underline;
     }
+
+    ul {
+        list-style: initial;
+        padding-inline-start: 40px;
+    }
+
+    ol {
+        list-style: decimal;
+        padding-inline-start: 40px;
+    }
 }
 
 a.Dismiss.Dismiss {

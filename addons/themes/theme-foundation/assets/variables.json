@@ -4,6 +4,11 @@
             "primary": "#3ebdff",
             "fg": "#fff",
             "bg": "#0e0f19"
+        },
+        "fonts": {
+            "families": {
+                "body": ["Nunito"]
+            }
         }
     },
     "titleBar": {

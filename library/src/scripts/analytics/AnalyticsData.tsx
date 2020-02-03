@@ -18,7 +18,9 @@ export const AnalyticsData: FC<IProps> = (props: IProps) => {
 
     useEffect(() => {
         document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail: data }));
-    }, [uniqueKey, data]);
+        // Setting data here will cause the analytics event to fired far to often.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [uniqueKey]);
     return <>{null}</>;
 };
 

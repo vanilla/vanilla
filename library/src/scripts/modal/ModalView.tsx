@@ -8,10 +8,12 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { modalClasses } from "@library/modal/modalStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { forceRenderStyles } from "typestyle";
 import { IModalTransitioner, ModalTransition } from "@library/modal/ModalTransition";
+import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
+import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps extends IModalTransitioner {
     onOverlayClick: React.MouseEventHandler;
@@ -25,19 +27,35 @@ interface IProps extends IModalTransitioner {
     size: ModalSizes;
     modalRef?: React.RefObject<HTMLDivElement>;
     children?: React.ReactNode;
+    isVisible: boolean;
+    onDestroyed: () => void;
 }
 
 /**
  * Render the contents into a portal.
  */
 export function ModalView(props: IProps) {
+    const { titleID, label, size, isVisible, onDestroyed } = props;
+    const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+
+    const lastVisible = useLastValue(isVisible);
+    useLayoutEffect(() => {
+        if (lastVisible && !isVisible) {
+            setIsAnimatingOut(true);
+        }
+    }, [isVisible, lastVisible]);
+
+    const handleDestroy = useCallback(() => {
+        setIsAnimatingOut(false);
+        onDestroyed();
+    }, [onDestroyed]);
+
     const domID = useMemo(() => uniqueIDFromPrefix("modal"), []);
     const descriptionID = domID + "-description";
 
     const ownRef = useRef<HTMLDivElement>(null);
     const modalRef = props.modalRef || ownRef;
 
-    const { titleID, label, size } = props;
     const classes = modalClasses();
 
     let contents = (
@@ -59,14 +77,73 @@ export function ModalView(props: IProps) {
         );
     }
 
+    const targetTransform: Partial<ITargetTransform> | undefined = useMemo(() => {
+        switch (size) {
+            case ModalSizes.SMALL:
+            case ModalSizes.MEDIUM:
+            case ModalSizes.LARGE:
+            case ModalSizes.XL:
+                return {
+                    xPercent: -50,
+                    yPercent: -50,
+                };
+            default:
+                return undefined;
+        }
+    }, [size]);
+
+    const contentTransition = (() => {
+        switch (props.size) {
+            case ModalSizes.SMALL:
+            case ModalSizes.MEDIUM:
+            case ModalSizes.LARGE:
+                return {
+                    fade: true,
+                    fromDirection: FromDirection.BOTTOM,
+                    halfDirection: true,
+                };
+            case ModalSizes.XL:
+                return {
+                    fade: true,
+                };
+            case ModalSizes.FULL_SCREEN:
+                return {
+                    fade: false,
+                };
+            case ModalSizes.MODAL_AS_DROP_DOWN:
+                return {
+                    fade: false,
+                    fromDirection: FromDirection.TOP,
+                };
+            case ModalSizes.MODAL_AS_SIDE_PANEL:
+                return {
+                    fade: false,
+                    fromDirection: FromDirection.RIGHT,
+                };
+        }
+    })();
+
     // We HAVE to render force the styles to render before componentDidMount
     // And our various focusing tricks or the page will jump.
     forceRenderStyles();
     return (
-        <ModalTransition {...props}>
-            <ScrollLock>
-                <div className={classes.overlay} onClick={props.onOverlayClick}>
-                    <div
+        <div>
+            <EntranceAnimation
+                fade
+                isEntered={props.isVisible}
+                className={classes.overlayScrim}
+                onDestroyed={handleDestroy}
+            ></EntranceAnimation>
+            <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
+                <div
+                    className={classes.overlayContent}
+                    onClick={props.onOverlayClick}
+                    style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
+                >
+                    <EntranceAnimation
+                        {...contentTransition}
+                        targetTransform={targetTransform}
+                        isEntered={props.isVisible}
                         role="dialog"
                         aria-modal={true}
                         className={classNames(
@@ -92,9 +169,9 @@ export function ModalView(props: IProps) {
                         aria-describedby={props.description ? descriptionID : undefined}
                     >
                         {contents}
-                    </div>
+                    </EntranceAnimation>
                 </div>
             </ScrollLock>
-        </ModalTransition>
+        </div>
     );
 }

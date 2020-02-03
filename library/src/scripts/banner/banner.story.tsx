@@ -14,6 +14,7 @@ import { color } from "csx";
 import Banner from "@library/banner/Banner";
 import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
+import { BannerAlignment } from "@library/banner/bannerStyles";
 
 export default {
     title: "Banner",
@@ -104,7 +105,7 @@ export const LeftAligned = storyWithConfig(
         themeVars: {
             banner: {
                 options: {
-                    alignment: "left",
+                    alignment: BannerAlignment.LEFT,
                 },
             },
         },
@@ -165,23 +166,25 @@ export const ImageAsElement = storyWithConfig(
                 },
             },
             banner: {
+                options: {
+                    alignment: BannerAlignment.LEFT,
+                },
                 colors: {
                     bg: "#fff",
                     contrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73575470-438dfe00-4446-11ea-8db7-c3d36da2b3cb.png",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
                 },
                 description: {
                     font: {
                         color: "#323232",
                     },
                 },
-                options: {
-                    alignment: "left",
-                    imageType: "element",
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 searchButtonOptions: {
                     type: SearchBarButtonType.NONE,
@@ -191,9 +194,6 @@ export const ImageAsElement = storyWithConfig(
                         top: 87,
                         bottom: 87,
                     },
-                },
-                searchBar: {
-                    sizing: { maxWidth: 400 },
                 },
             },
         },

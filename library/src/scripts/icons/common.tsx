@@ -695,3 +695,35 @@ export function PlusIcon(props: { className?: string; title?: string }) {
         </svg>
     );
 }
+
+export function LoaderIcon(props: { className?: string }) {
+    return (
+        <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18px"
+            height="18px"
+            viewBox="0 0 18 18"
+            version="1.1"
+            className={props.className}
+        >
+            <title>{t("Loader")}</title>
+            <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <g id="Artboard" fill="currentColor">
+                    <g id="Loader">
+                        <path
+                            d="M9,0 C13.9705627,0 18,4.02943725 18,9 C18,13.9705627 13.9705627,18 9,18 C4.07738737,18 0,13.97 0,9 C0,8.99144674 1,8.99144674 3,9 C3,12.3137085 5.6862915,15 9,15 C12.3137085,15 15,12.3137085 15,9 C15,5.6862915 12.3137085,3 9,3 L9,0 Z"
+                            id="Path"
+                            opacity="0.3"
+                        ></path>
+                        <path
+                            d="M9,5.1159077e-13 C9,5 4.97,9 1.42108547e-14,9 C1.42108547e-14,9 1.42108547e-14,6 1.42108547e-14,6 C3.31,6 5.95313475,3.31 6,5.1159077e-13 C6,5.1159077e-13 9,5.1159077e-13 9,5.1159077e-13 Z"
+                            id="Path"
+                            transform="translate(4.500000, 4.500000) rotate(180.000000) translate(-4.500000, -4.500000) "
+                        ></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    );
+}

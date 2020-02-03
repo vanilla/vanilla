@@ -48,10 +48,6 @@
         width: inherit;
         display: table;
 
-        @include maxWidth {
-            display: none;
-        }
-
         tr {
             border: none;
         }
@@ -508,7 +504,7 @@
                 }
 
                 .Wrap {
-                    padding-left: $theme-photo_size;
+                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
                 }
             }
         }

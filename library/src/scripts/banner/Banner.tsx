@@ -38,7 +38,7 @@ export default function Banner(props: IProps) {
     const device = useDevice();
     const ref = useBannerContainerDivRef();
 
-    const { action, className, title, description } = props;
+    const { action, className, title } = props;
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
@@ -48,6 +48,7 @@ export default function Banner(props: IProps) {
 
     let imageElementSrc = props.contentImage || vars.imageElement.image || null;
     imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
+    const description = props.description ?? vars.description.text;
 
     return (
         <div

@@ -154,6 +154,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const description = makeThemeVars("description", {
+        text: undefined as string | undefined,
         font: {
             ...textMixin,
             color: colors.contrast,

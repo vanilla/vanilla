@@ -99,6 +99,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             if ($baseUrl) {
                 $form->setFormValue('BaseUrl', $baseUrl);
                 $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
+                $form->setFormValue('RegisterUrl', $baseUrl); // kludge for default provider
             }
             if ($form->save()) {
                 $sender->informMessage(t('Saved'));

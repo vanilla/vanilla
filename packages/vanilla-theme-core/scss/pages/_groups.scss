@@ -300,15 +300,19 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     height: $GroupIcon-size;
     width: $GroupIcon-size;
     background-color: $global-color_white;
-    margin: -$GroupIcon-overlap $utility-baseUnitTriple $utility-baseUnitTriple $utility-baseUnitTriple;
-    border-radius: $component_borderRadius;
-    box-shadow: 0 0 0 1px rgba($global-color_black, 0.2);
+    @if ($staticVariables) {
+        margin: -$GroupIcon-overlap $utility-baseUnitTriple $utility-baseUnitTriple $utility-baseUnitTriple;
+        border-radius: $component_borderRadius;
+        box-shadow: 0 0 0 1px rgba($global-color_black, 0.2);
+    }
 
     .Group-Icon-Big {
         width: 100%;
         height: 100%;
         border-radius: inherit;
-        border: 3px solid $global-color_white;
+        @if ($staticVariables) {
+            border: 3px solid $global-color_white;
+        }
     }
 
     @include maxWidth {
@@ -430,11 +434,13 @@ body.noGroupIcon {
         }
     }
 
-    .Group-Icon-Big-Wrap {
-        position: absolute;
-        margin: 0 $utility-baseUnitTriple 0 0;
-        z-index: 1;
-        flex: 1 0 $GroupIcon-size;
+    @if ($staticVariables) {
+        .Group-Icon-Big-Wrap {
+            position: absolute;
+            margin: 0 $utility-baseUnitTriple 0 0;
+            z-index: 1;
+            flex: 1 0 $GroupIcon-size;
+        }
     }
 
 
@@ -456,10 +462,12 @@ body.noGroupIcon {
                 order: 2;
             }
 
-            .PhotoWrap {
-                position: absolute;
-                top: $component-base_padding;
-                left: $component-base_padding;
+            @if ($staticVariables) {
+                .PhotoWrap {
+                    position: absolute;
+                    top: $component-base_padding;
+                    left: $component-base_padding;
+                }
             }
 
             .Meta {

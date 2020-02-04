@@ -7,6 +7,7 @@
 
 import { cssRaw } from "typestyle";
 import {
+    absolutePosition,
     borders,
     buttonStates,
     colorOut,
@@ -56,4 +57,30 @@ export const groupsCSS = () => {
             marginRight: unit(6),
         },
     );
+
+    cssOut(`.Group-Header.NoBanner .Group-Header-Info`, {
+        paddingLeft: unit(0),
+    });
+
+    cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
+        position: "relative",
+    });
+
+    cssOut(`.Group-Header`, {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+    });
+
+    cssOut(`a.ChangePicture`, {
+        ...absolutePosition.fullSizeOfParent(),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity: 0,
+    });
+
+    cssOut(`.Group-Banner`, {
+        ...absolutePosition.fullSizeOfParent(),
+    });
 };

@@ -25,17 +25,17 @@ body.Section-Entry {
     }
 
     .ForgotPassword {
-        margin-left: 0;
+        margin-left: $utility-baseUnit;
     }
 
     .ForgotPassword,
     .CreateAccount a {
-        color: $component-meta-link_color;
+        color: $link-default_color;
 
         &:focus,
         &:hover {
             text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+            color: $link-default-hover_color;
         }
     }
 
@@ -45,12 +45,12 @@ body.Section-Entry {
 
         a {
             font-size: inherit;
-            color: $component-meta-link_color;
+            color: $link-default_color;
 
             &:focus,
             &:hover {
                 text-decoration: $theme-link-hover_textDecoration;
-                color: $component-meta-link-hover_color;
+                color: $link-default-hover_color;
             }
         }
     }
@@ -71,6 +71,18 @@ body.Section-Entry {
             display: block;
             padding: 0;
             margin-bottom: $component-item_spacing;
+        }
+
+        .Methods {
+            a {
+                color: $link-default_color;
+
+                &:hover,
+                &:focus,
+                &:active {
+                    color: $link-default-hover_color;
+                }
+            }
         }
 
         .MainForm {

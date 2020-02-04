@@ -42,6 +42,9 @@ class TwigEnhancer {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var BannerImageModel */
+    private $bannerImageModel;
+
     /** @var string|null The directory to cache compiled twig templates in. */
     private $compileCacheDirectory = null;
 
@@ -62,6 +65,7 @@ class TwigEnhancer {
      * @param ConfigurationInterface $config
      * @param LocaleInterface $locale
      * @param Gdn_Request $request
+     * @param BannerImageModel $bannerImageModel
      */
     public function __construct(
         AddonProviderInterface $addonProvider,
@@ -69,7 +73,8 @@ class TwigEnhancer {
         \Gdn_Session $session,
         ConfigurationInterface $config,
         LocaleInterface $locale,
-        Gdn_Request $request
+        Gdn_Request $request,
+        BannerImageModel $bannerImageModel
     ) {
         $this->addonProvider = $addonProvider;
         $this->eventManager = $eventManager;
@@ -77,6 +82,7 @@ class TwigEnhancer {
         $this->config = $config;
         $this->locale = $locale;
         $this->request = $request;
+        $this->bannerImageModel = $bannerImageModel;
     }
 
     /**
@@ -261,7 +267,7 @@ class TwigEnhancer {
             't' => [$this, 'getTranslation'],
             'sprintf',
 
-            // Utility
+            // Utility`
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
 
@@ -269,7 +275,7 @@ class TwigEnhancer {
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
             'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
-            'renderBanner' => [BannerImageModel::class, 'renderBanner'],
+            'renderBanner' => [$this->bannerImageModel, 'renderBanner'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',

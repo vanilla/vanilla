@@ -142,7 +142,7 @@ export const frameHeaderClasses = useThemeCache(() => {
 
     const categoryIcon = style("categoryIcon", {
         flexBasis: unit(18),
-        marginRight: ".6em",
+        marginRight: 0,
         opacity: 0.8,
     });
 

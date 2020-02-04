@@ -163,7 +163,6 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin: 0 $utility-baseUnit;
         display: inline-block;
 
         a {
@@ -179,6 +178,14 @@
                     color: $component-meta-link-hover_color;
                 }
             }
+        }
+    }
+
+    .Tag,
+    .MItem {
+        margin: {
+            left: $utility-baseUnit;
+            right: $utility-baseUnit;
         }
     }
 
@@ -268,14 +275,20 @@
         margin-right: 0;
     }
 
-    @if($staticVariables) {
-        // overwrite ideation plugin styles
-        .ItemIdea.ItemIdea.ItemIdea {
+    // overwrite ideation plugin styles
+    .ItemIdea.ItemIdea.ItemIdea {
+        @if($staticVariables) {
             .PhotoWrap.IndexPhoto,
             .idea-counter-module .idea-counter-box {
-                margin: 0 $utility-baseUnitHalf 0 0;
+                margin: 0 $utility-baseUnitDouble 0 0;
                 width: $theme-photo_size;
                 height: $theme-photo_size;
+            }
+        }
+
+        .Meta {
+            .ViewCount {
+                margin-left: 0;
             }
         }
     }
@@ -405,7 +418,7 @@
 
     //overwrite indexphoto plugin styles
     .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto .Discussion.ItemContent {
-        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
     }
 }
 
@@ -532,13 +545,13 @@
                 }
             }
 
-        .MItem {
-            margin-bottom: 0;
+            .MItem {
+                margin-bottom: 0;
 
-            @include maxWidth {
-                margin-bottom: $utility-baseUnitHalf;
+                @include maxWidth {
+                    margin-bottom: $utility-baseUnitHalf;
+                }
             }
-        }
 
             .AuthorWrap {
                 max-width: calc(100% - 45px);

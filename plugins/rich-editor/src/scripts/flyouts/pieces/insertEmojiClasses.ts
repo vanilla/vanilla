@@ -27,6 +27,7 @@ export const insertEmojiClasses = useThemeCache(() => {
         opacity: globalVars.states.text.opacity,
         cursor: "pointer",
         borderRadius: unit(3),
+        background: "transparent",
         $nest: {
             ...buttonStates(
                 {

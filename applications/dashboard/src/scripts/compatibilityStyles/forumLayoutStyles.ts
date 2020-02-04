@@ -26,7 +26,7 @@ export const forumLayoutVariables = useThemeCache(() => {
         breakPoints: {
             // Other break points are calculated
             oneColumn: 1200,
-            xs: 815,
+            xs: 991,
         },
     });
 

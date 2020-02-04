@@ -19,6 +19,16 @@ class BannerImageModel {
 
     const DEFAULT_CONFIG_KEY = "Garden.BannerImage";
 
+    /** @var SiteMeta */
+    private $siteMeta;
+
+    /**
+     * BannerImageModel constructor.
+     *
+     * @param SiteMeta $siteMeta
+     */
+    public function __construct(SiteMeta $siteMeta) { $this->siteMeta = $siteMeta; }
+
     /**
      * Render the Banner.
      *
@@ -27,12 +37,11 @@ class BannerImageModel {
      * @return \Twig\Markup
      */
     public function renderBanner(array $props = []): \Twig\Markup {
-        $siteMeta = \Gdn::getContainer()->get(SiteMeta::class);
         $controller = \Gdn::controller();
         $defaultProps = [
             'title' => $controller->data(
                 'Category.Name',
-                $siteMeta->getSiteTitle()
+                $this->siteMeta->getSiteTitle()
             ),
             'description' => $controller->data(
                 'Category.Description',

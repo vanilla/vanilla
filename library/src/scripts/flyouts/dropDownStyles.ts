@@ -17,6 +17,7 @@ import {
     negative,
     IStateSelectors,
     importantColorOut,
+    isLightColor,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -172,11 +173,14 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const likeDropDownContent = style("likeDropDownContent", {
-        ...shadows.dropDown(),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...borders(),
-    } as NestedCSSProperties);
+    const likeDropDownContent = style(
+        "likeDropDownContent",
+        !isLightColor(globalVars.mainColors.bg) ? {} : shadows.dropDown(),
+        {
+            backgroundColor: colorOut(globalVars.mainColors.bg),
+            ...borders(),
+        } as NestedCSSProperties,
+    );
 
     const items = style("items", {
         paddingTop: 3,

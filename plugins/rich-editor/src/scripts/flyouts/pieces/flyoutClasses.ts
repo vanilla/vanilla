@@ -5,7 +5,15 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, colorOut, longWordEllipsis, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    isLightColor,
+    longWordEllipsis,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
@@ -18,8 +26,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const globalVars = globalVariables();
 
-    const root = style({
-        ...shadows.dropDown(),
+    const root = style(!isLightColor(globalVars.mainColors.bg) ? {} : shadows.dropDown(), {
         position: "absolute",
         left: unit(0),
         width: unit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),

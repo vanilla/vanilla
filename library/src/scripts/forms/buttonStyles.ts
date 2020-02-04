@@ -90,7 +90,7 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
+                bg: globalVars.mainColors.secondary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -101,7 +101,7 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
+                bg: globalVars.mainColors.secondary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -112,7 +112,7 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
+                bg: globalVars.mainColors.secondary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -123,7 +123,7 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
+                bg: globalVars.mainColors.secondary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,

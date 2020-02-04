@@ -356,6 +356,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         cursor: "pointer",
         border: 0,
         outline: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
     });
 
     const flyoutDescription = style("flyoutDescription", {

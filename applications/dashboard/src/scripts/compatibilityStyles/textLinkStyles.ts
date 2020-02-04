@@ -47,7 +47,7 @@ export const textLinkCSS = () => {
     mixinTextLink(".Back a");
     mixinTextLink(".OptionsLink-Clipboard");
     mixinTextLink("a.OptionsLink");
-    mixinTextLink(".MorePager a");
+    mixinTextLink("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
     mixinTextLink(`body.Section-BestOf .Tile .Message a`);
     mixinTextLink(
         `

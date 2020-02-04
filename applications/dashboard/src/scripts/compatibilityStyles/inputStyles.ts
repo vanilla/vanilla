@@ -244,6 +244,11 @@ export const inputCSS = () => {
     cssOut("#Form_date", {
         marginRight: unit(globalVars.gutter.half),
     });
+
+    cssOut(`.FormWrapper label`, {
+        fontSize: globalVars.fonts.size.medium,
+        color: colorOut(globalVars.mainColors.fg),
+    });
 };
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {

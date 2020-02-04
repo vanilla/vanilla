@@ -35,6 +35,7 @@ export const forumMetaCSS = () => {
     mixinMetaLinkContainer(".MessageList");
     mixinMetaLinkContainer(".DataTableWrap");
     mixinMetaLinkContainer(`.Container .Frame-contentWrap .ChildCategories`);
+    mixinMetaLinkContainer(`.Item.Application .Meta`);
 
     cssOut(
         `
@@ -118,7 +119,8 @@ export const forumMetaCSS = () => {
         .Container .DataTable .MItem.Category,
         .DiscussionHeader .AuthorWrap .Username,
         .Content .MessageList .Tag,
-        .DataList.DataList-Search .CrumbLabel
+        .DataList.DataList-Search .CrumbLabel,
+        .Item.Application .MItem
         `,
         {
             textDecoration: important("none"),

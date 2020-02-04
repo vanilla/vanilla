@@ -33,6 +33,7 @@ import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
 import { discussionCSS } from "./discussionStyles";
 import { searchPageCSS } from "./searchPageStyles";
 import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
+import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -115,7 +116,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     // Panel
-    cssOut(".Panel a", {
+    cssOut(".Panel a, .About a", {
         ...siteNavNodeClasses().linkMixin,
     });
 
@@ -323,6 +324,10 @@ export const compatibilityStyles = useThemeCache(() => {
         marginTop: unit(vars.gutter.size * 2),
     });
 
+    cssOut(`#ConversationForm label`, {
+        color: colorOut(vars.mainColors.fg),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -340,6 +345,7 @@ export const compatibilityStyles = useThemeCache(() => {
     discussionCSS();
     searchPageCSS();
     groupsCSS();
+    profilePageCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

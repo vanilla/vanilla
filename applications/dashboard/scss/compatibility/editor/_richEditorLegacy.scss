@@ -50,14 +50,16 @@ body {
         margin-top: $global-medium_fontSize;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        line-height: $global-condensed_lineHeight;
-        color: $global-color_fg;
+    @if ($staticVariables) {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            line-height: $global-condensed_lineHeight;
+            color: $global-color_fg;
+        }
     }
 
     > *:not(.emoji) {

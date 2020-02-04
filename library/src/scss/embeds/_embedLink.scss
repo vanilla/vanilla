@@ -63,7 +63,9 @@ $embedLink-excerpt_lineHeight: 1.4 !default;
 }
 
 .embedLink-excerpt {
-    color: #555A62;
+    @if ($staticVariables) {
+        color: #555A62;
+    }
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;

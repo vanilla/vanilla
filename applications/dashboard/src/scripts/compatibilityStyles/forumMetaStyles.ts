@@ -5,13 +5,23 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, margins, unit, borders, paddings, allLinkStates } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    margins,
+    unit,
+    borders,
+    paddings,
+    allLinkStates,
+    ISimpleBorderStyle,
+    importantColorOut,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -51,11 +61,17 @@ export const forumMetaCSS = () => {
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
         .Item .Author a,
+        a.Tag
         `,
         {
-            color: fg,
+            color: importantColorOut(fg),
             ...borders(),
             textDecoration: "none",
+            ...allLinkStates({
+                allStates: {
+                    borderColor: colorOut(globalVars.mainColors.fg),
+                },
+            }),
         },
     );
 

@@ -15,6 +15,7 @@ use Twig\TwigFunction;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\HtmlUtils;
 
@@ -268,6 +269,7 @@ class TwigEnhancer {
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
             'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
+            'renderBanner' => [BannerImageModel::class, 'renderBanner'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',
@@ -280,4 +282,5 @@ class TwigEnhancer {
             'url' => [$this->request, 'url'],
         ];
     }
+
 }

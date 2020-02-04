@@ -76,17 +76,7 @@ class MasterViewRenderer {
     public function renderGdnController(\Gdn_Controller $controller): string {
         $data = array_merge(
             $controller->Data,
-            $this->getSharedData(),
-            [
-                'splashTitle' => $controller->data(
-                    'Category.Name',
-                    $this->siteMeta->getSiteTitle()
-                ),
-                'splashDescription' => $controller->data(
-                    'Category.Description',
-                    $controller->description()
-                ),
-            ]
+            $this->getSharedData()
         );
 
         $extraData = [

@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Models;
 
 use Vanilla\AliasLoader;
+use Vanilla\Models\SiteMeta;
 
 /**
  * Banner Image Model.
@@ -17,6 +18,36 @@ use Vanilla\AliasLoader;
 class BannerImageModel {
 
     const DEFAULT_CONFIG_KEY = "Garden.BannerImage";
+
+    /**
+     * Render the Banner.
+     *
+     * @param array $props
+     *
+     * @return \Twig\Markup
+     */
+    public function renderBanner(array $props = []): \Twig\Markup {
+        $siteMeta = \Gdn::getContainer()->get(SiteMeta::class);
+        $controller = \Gdn::controller();
+        $defaultProps = [
+            'title' => $controller->data(
+                'Category.Name',
+                $siteMeta->getSiteTitle()
+            ),
+            'description' => $controller->data(
+                'Category.Description',
+                $controller->description()
+            ),
+            'backgroundImage' => self::getCurrentBannerImageLink(),
+        ];
+        $props = array_merge($defaultProps, $props);
+        $html = "";
+        $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE));
+        if (inSection(c("Theme.Banner.VisibleSections"))) {
+            $html = "<div data-react='community-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
+        }
+        return new \Twig\Markup($html, 'utf-8');
+    }
 
     /**
      * Get the slug of the banner image for a given category

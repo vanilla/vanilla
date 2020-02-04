@@ -23,6 +23,7 @@ import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import { fullBackgroundCompat } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import CommunityBanner from "@library/banner/CommunityBanner";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -45,9 +46,9 @@ addComponent("App", () => (
 ));
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
+addComponent("community-banner", CommunityBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    fullBackgroundCompat();
     compatibilityStyles();
     applyCompatibilityIcons();
 }

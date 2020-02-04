@@ -1,20 +1,7 @@
 <div class="Frame" id="page">
     <div class="Frame-top">
         <div class="Frame-body">
-
-            <!-- Hero Banner -->
-            <div class="Herobanner">
-                {% if siteMeta.ui.bannerImage %}
-                    <div class="Herobanner-bgImage" style="background-image:url('{{ siteMeta.ui.bannerImage }}')"></div>
-                {% endif %}
-                <div class="Container">
-                    <div class="SearchBox js-sphinxAutoComplete" role="search">
-                        {{ renderModule("AdvancedSearchModule") }}
-                    </div>
-                </div>
-            </div>
-            <!-- Hero Banner END -->
-
+            {{ renderBanner() }}
             <div class="Frame-content">
                 <div class="Container">
                     <div class="Frame-contentWrap">

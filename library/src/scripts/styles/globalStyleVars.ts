@@ -19,6 +19,7 @@ import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
+import main from "@storybook/api/dist/initial-state";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -84,10 +85,13 @@ export const globalVariables = useThemeCache(() => {
 
     const primaryDarkness = colorPrimary.lightness();
     const backgroundDarkness = initialMainColors.bg.lightness();
-    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.8;
 
     // Shorthand checking bg color for darkness
-    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
+    const getRatioBasedOnBackgroundDarkness = (
+        weight: number,
+        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+    ) => {
         return getRatioBasedOnDarkness(weight, bgColor);
     };
 

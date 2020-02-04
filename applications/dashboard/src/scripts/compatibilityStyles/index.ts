@@ -32,6 +32,7 @@ import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
 import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
 import { discussionCSS } from "./discussionStyles";
 import { searchPageCSS } from "./searchPageStyles";
+import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -338,6 +339,7 @@ export const compatibilityStyles = useThemeCache(() => {
     tableCSS();
     discussionCSS();
     searchPageCSS();
+    groupsCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

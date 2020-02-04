@@ -558,13 +558,15 @@ div.FileUpload .CurrentImage {
   border-right-width: 1px;
 }
 
-.Button.Active,
-.ButtonGroup.Open .Button.Handle,
-.Button:focus,
-.Button:active {
-  border-color: $grey-b;
-  color: $grey-1;
-  background: $grey-g;
+@if ($staticVariables) {
+    .Button.Active,
+    .ButtonGroup.Open .Button.Handle,
+    .Button:focus,
+    .Button:active {
+      border-color: $grey-b;
+      color: $grey-1;
+      background: $grey-g;
+    }
 }
 
 .Button.FileInput > input {
@@ -633,9 +635,11 @@ div.FileUpload .CurrentImage {
   background-color: $grey-c;
 }
 
-.ButtonGroup.Open .NavButton.Handle {
-  color: $grey-1;
-  background: $grey-5;
+@if ($staticVariables) {
+    .ButtonGroup.Open .NavButton.Handle {
+      color: $grey-1;
+      background: $grey-5;
+    }
 }
 
 /* Split Button Dropdown */

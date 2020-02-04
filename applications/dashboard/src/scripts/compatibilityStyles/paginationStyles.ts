@@ -61,4 +61,13 @@ export const paginationCSS = () => {
     cssOut(`.ToggleFlyout.selectBox`, {
         marginRight: "auto",
     });
+
+    cssOut(`.MorePager`, {
+        textAlign: "right",
+        $nest: {
+            "& a": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
 };

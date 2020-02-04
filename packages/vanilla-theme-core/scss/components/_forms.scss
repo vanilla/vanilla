@@ -329,9 +329,9 @@ div.token-input-dropdown {
         @if ($staticVariables) {
             min-width: $formButton_height;
         }
-        border-color: $button-primary_border;
 
         @if ($staticVariables) {
+            border-color: $button-primary_border;
             background-color: $button-primary_bg;
             color: $button-primary_fg;
         }

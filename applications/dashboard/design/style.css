@@ -566,8 +566,8 @@ div.FileUpload .CurrentImage {
 .ButtonGroup.Open .Button.Handle,
 .Button:focus,
 .Button:active {
-  border-color: #aaa;
-  color: #333;
+  /* border-color: #aaa; */
+  /* color: #333; */
   background: #f7f7f7;
 }
 
@@ -635,8 +635,8 @@ div.FileUpload .CurrentImage {
 }
 
 .ButtonGroup.Open .NavButton.Handle {
-  color: #333;
-  background: #eee;
+  /* color: #333; */
+  /* background: #eee; */
 }
 
 /* Split Button Dropdown */

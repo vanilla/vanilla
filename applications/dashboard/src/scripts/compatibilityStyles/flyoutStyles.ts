@@ -11,6 +11,7 @@ import {
     buttonStates,
     colorOut,
     IActionStates,
+    importantUnit,
     IStateSelectors,
     negative,
     paddings,
@@ -60,6 +61,29 @@ export const flyoutCSS = () => {
             background: bg,
         },
     );
+
+    // Flip Checkbox in dropdown for consistency with KB
+
+    cssOut(`.selectBox-item .dropdown-menu-link.selectBox-link`, {
+        ...paddings({
+            left: importantUnit(26),
+            right: importantUnit(30),
+        }),
+    });
+
+    cssOut(`.selectBox-item.isActive .dropdown-menu-link.selectBox-link`, {
+        backgroundColor: colorOut(globalVars.mainColors.primary),
+        $nest: {
+            "& .dropdown-menu-link.selectBox-link": {
+                cursor: "pointer",
+            },
+        },
+    });
+
+    cssOut(".selectBox-selectedIcon", {
+        left: "auto",
+        right: unit(5),
+    });
 };
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {

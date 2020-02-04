@@ -199,26 +199,28 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     clear: both;
 }
 
-.ButtonGroup.Open .Button.GroupOptionsTitle,
-.Button.GroupOptionsTitle,
-.Button.GroupOptionsTitle:active,
-.Button.GroupOptionsTitle:focus {
-    padding: 0;
-    border: none;
-    background-color: transparent;
-    color: transparent;
-    max-width: 20px;
+@if ($staticVariables) {
+    .ButtonGroup.Open .Button.GroupOptionsTitle,
+    .Button.GroupOptionsTitle,
+    .Button.GroupOptionsTitle:active,
+    .Button.GroupOptionsTitle:focus {
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        color: transparent;
+        max-width: 20px;
 
-    .SpDropdownHandle {
-        display: none;
-    }
+        .SpDropdownHandle {
+            display: none;
+        }
 
-    &::before {
-        @include icon;
-        content: $icon-cog;
-        color: $global-color_fg;
-        font-size: $icon-default_size;
-        line-height: $icon-default_size;
+        &::before {
+            @include icon;
+            content: $icon-cog;
+            color: $global-color_fg;
+            font-size: $icon-default_size;
+            line-height: $icon-default_size;
+        }
     }
 }
 
@@ -267,11 +269,13 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         border-color: $global-color_primary;
         color: $global-color_primary;
 
-        &:focus,
-        &:hover {
-            border-color: $global-color_primary;
-            background-color: $global-color_primary;
-            color: $global-color_white;
+        @if ($staticVariables) {
+            &:focus,
+            &:hover {
+                border-color: $global-color_primary;
+                background-color: $global-color_primary;
+                color: $global-color_white;
+            }
         }
 
         @include maxWidth {
@@ -317,14 +321,16 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     font-size: $global-subTitle_fontSize;
     padding-right: 20px;
 
-    a {
-        @include font-heading-link;
-        font-size: inherit;
-        text-shadow: none;
+    @if ($staticVariables) {
+        a {
+            @include font-heading-link;
+            font-size: inherit;
+            text-shadow: none;
 
-        &:focus,
-        &:hover {
-            color: $theme-heading-hover_color;
+            &:focus,
+            &:hover {
+                color: $theme-heading-hover_color;
+            }
         }
     }
 }
@@ -487,15 +493,17 @@ body.noGroupIcon {
         margin-bottom: $utility-baseUnitTriple;
     }
 
-    .Group-RemoveMember {
-        @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
-        );
+    @if ($staticVariables) {
+        .Group-RemoveMember {
+            @include Button(
+                $button-primary_bg,
+                $button-primary_fg,
+                $button-primary_border,
+                $button-primary-hover_bg,
+                $button-primary-hover_fg,
+                $button-primary-hover_border
+            );
+        }
     }
 }
 
@@ -606,22 +614,26 @@ body.noGroupIcon {
          justify-content: flex-end;
      }
 
-    .Button {
-        @include Button;
+    @if ($staticVariables) {
+        .Button {
+            @include Button;
+        }
     }
 
     .Button + .Button {
         margin-left: $utility-baseUnitHalf;
     }
 
-    .Button.search {
-        @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
-        );
+    @if ($staticVariables) {
+        .Button.search {
+            @include Button(
+                $button-primary_bg,
+                $button-primary_fg,
+                $button-primary_border,
+                $button-primary-hover_bg,
+                $button-primary-hover_fg,
+                $button-primary-hover_border
+            );
+        }
     }
 }

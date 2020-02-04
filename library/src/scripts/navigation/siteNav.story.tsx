@@ -7,29 +7,35 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import { LoadStatus } from "@library/@types/api/core";
 import SiteNav from "@library/navigation/SiteNav";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
-import { siteNavStoryData } from "@library/navigation/siteNav.storyData";
+import { STORY_SITE_NAV_ACTIVE_RECORD, STORY_SITE_NAV_ITEMS } from "@library/navigation/siteNav.storyData";
+import { StoryContent } from "@library/storybook/StoryContent";
 
-const story = storiesOf("Navigation", module);
+export default {
+    title: "Navigation",
+    parameters: {
+        chromatic: {
+            // viewports: [1400, 400],
+        },
+    },
+};
 
-const data = siteNavStoryData;
-
-story.add("Navigation", () => {
+export function SiteNavCollapser() {
     return (
-        <>
-            <StoryHeading depth={1}>Navigation</StoryHeading>
+        <StoryContent>
             <StoryHeading>Guide</StoryHeading>
             <SiteNavProvider categoryRecordType="knowledgeCategory">
-                <SiteNav {...data} clickableCategoryLabels={true} collapsible={true}>
-                    {data.navItems.data}
+                <SiteNav activeRecord={STORY_SITE_NAV_ACTIVE_RECORD} clickableCategoryLabels={true} collapsible={true}>
+                    {STORY_SITE_NAV_ITEMS}
                 </SiteNav>
             </SiteNavProvider>
             <StoryHeading>Help</StoryHeading>
             <SiteNavProvider categoryRecordType="article">
-                <SiteNav {...data}>{data.navItems.data}</SiteNav>
+                <SiteNav activeRecord={STORY_SITE_NAV_ACTIVE_RECORD} collapsible={true}>
+                    {STORY_SITE_NAV_ITEMS}
+                </SiteNav>
             </SiteNavProvider>
-        </>
+        </StoryContent>
     );
-});
+}

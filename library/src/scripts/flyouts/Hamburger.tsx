@@ -24,6 +24,7 @@ import { navigationVariables } from "@library/headers/navigationVariables";
 import { getCurrentLocale } from "@vanilla/i18n";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import Permission from "@library/features/users/Permission";
+import { Navigation } from "@knowledge/navigation/Navigation";
 
 interface IProps {
     className?: string;
@@ -66,6 +67,7 @@ export default function Hamburger(props: IProps) {
                             );
                         })}
                     </DropDownSection>
+                    <DropDownSection title="KB"></DropDownSection>
                 </div>
             </Modal>
         </>

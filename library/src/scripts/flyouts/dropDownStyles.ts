@@ -16,6 +16,7 @@ import {
     userSelect,
     negative,
     IStateSelectors,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -235,6 +236,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const text = style("text", {
         display: "block",
+        flex: 1,
     });
 
     const separator = style("separator", {
@@ -242,6 +244,47 @@ export const dropDownClasses = useThemeCache(() => {
         height: unit(globalVars.separator.size),
         backgroundColor: colorOut(globalVars.separator.color),
         ...margins(vars.spacer.margin),
+
+        $nest: {
+            "&:first-child": {
+                height: 0,
+                ...margins({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
+            },
+        },
+    });
+
+    const panelNavItems = style("panelNavItems", {
+        display: "flex",
+        alignItems: "flex-start",
+    });
+
+    const panel = style("panel", {
+        backgroundColor: colorOut(vars.contents.bg),
+        ...absolutePosition.fullSizeOfParent(),
+        zIndex: 2,
+    });
+
+    const panelFirst = style("panelFirst", {
+        $nest: {
+            "&&": {
+                position: "relative",
+                height: "initial",
+                zIndex: 0,
+            },
+        },
+    });
+
+    const panelLast = style("panelLast", {
+        $nest: {
+            "&&": {},
+        },
+    });
+
+    const panelContent = style("panelContent", {
+        flex: 1,
+        $nest: {
+            "&.isNested": {},
+        },
     });
 
     const sectionHeading = style("sectionHeading", {
@@ -255,7 +298,35 @@ export const dropDownClasses = useThemeCache(() => {
 
     const sectionContents = style("sectionContents", {
         display: "block",
+        position: "relative",
     });
+
+    const icon = style("icon", {
+        $nest: {
+            "&&": {
+                padding: unit(globalVars.gutter.quarter),
+            },
+        },
+    });
+
+    const backButton = style(
+        "backButton",
+        {
+            $nest: {
+                "&&": {
+                    minHeight: unit(vars.item.minHeight),
+                    transform: "translateX(12px)",
+                },
+            },
+        },
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&&": {
+                    minHeight: unit(vars.item.mobile.minHeight),
+                },
+            },
+        }),
+    );
 
     const count = style("count", {
         fontSize: unit(globalVars.fonts.size.small),
@@ -333,10 +404,17 @@ export const dropDownClasses = useThemeCache(() => {
         sectionHeading,
         sectionContents,
         count,
+        icon,
         verticalPadding,
         title,
         noVerticalPadding,
         paddedFrame,
+        panelFirst,
+        panelLast,
+        panelNavItems,
+        panel,
+        panelContent,
+        backButton,
         check,
         contentOffsetLeft,
         contentOffsetRight,

@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+export * from "./createContextProvider";
 export * from "./Hoverable";
 export * from "./mounting";
 export * from "./useEscapeListener";

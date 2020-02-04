@@ -26,6 +26,8 @@ $reactions_bg:                        rgba(0,0,0,0.5) !default;
 .RecordReactions {
     margin-left: -$utility-baseUnitHalf;
     margin-right: -$utility-baseUnitHalf;
+    display: flex;
+    flex-wrap: wrap;
 
     .PhotoWrap {
         position: relative;

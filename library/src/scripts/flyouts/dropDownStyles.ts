@@ -16,6 +16,7 @@ import {
     userSelect,
     negative,
     IStateSelectors,
+    importantColorOut,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -58,6 +59,9 @@ export const dropDownVariables = useThemeCache(() => {
     const item = makeThemeVars("item", {
         colors: {
             fg: globalVars.mainColors.fg,
+            active: {
+                fg: globalVars.mainColors.fg,
+            },
         },
         minHeight: 30,
         mobile: {
@@ -368,25 +372,29 @@ export const actionMixin = (classBasedStates?: IStateSelectors) => {
             color: "transparent",
             radius: 0,
         }),
-        color: colorOut(vars.item.colors.fg, true),
         ...userSelect("none"),
         ...buttonStates(
             {
                 allStates: {
                     textShadow: "none",
                     outline: 0,
+                    color: importantColorOut(vars.item.colors.fg),
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.color, true),
+                    color: importantColorOut(vars.item.colors.active.fg),
+                    backgroundColor: importantColorOut(globalVars.mainColors.primary),
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.color, true),
+                    color: importantColorOut(vars.item.colors.active.fg),
+                    backgroundColor: importantColorOut(globalVars.mainColors.primary),
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.active.color, true),
+                    color: importantColorOut(vars.item.colors.active.fg),
+                    backgroundColor: importantColorOut(globalVars.mainColors.primary),
                 },
                 accessibleFocus: {
-                    borderColor: colorOut(globalVars.mainColors.primary, true),
+                    color: importantColorOut(vars.item.colors.active.fg),
+                    borderColor: importantColorOut(globalVars.mainColors.primary),
                 },
             },
             undefined,

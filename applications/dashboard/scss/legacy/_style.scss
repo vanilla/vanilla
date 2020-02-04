@@ -204,16 +204,19 @@ h4 {
 h5 {
   font-size: 100%;
 }
-
-a {
-  text-decoration: none;
-  color: $vanilla-blue;
+@if ($staticVariables) {
+    a {
+      text-decoration: none;
+      color: $vanilla-blue;
+    }
 }
 
-a:hover,
-a.TextColor:hover,
-a:hover .TextColor {
-  color: $vanilla-pink;
+@if ($staticVariables) {
+    a:hover,
+    a.TextColor:hover,
+    a:hover .TextColor {
+      color: $vanilla-pink;
+    }
 }
 
 a.TextColor, a .TextColor {
@@ -1135,14 +1138,15 @@ body > #Frame > .Head {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
-  display: block;
-  text-decoration: none;
-  white-space: nowrap;
-  color: $grey-1 !important;
-  padding: 3px 15px;
-  line-height: 18px;
-}
+ @if ($staticVariables) {
+    .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+      display: block;
+      text-decoration: none;
+      white-space: nowrap;
+      color: $grey-1 !important;
+      padding: 3px 15px;
+      line-height: 18px;
+    }
 
 .MenuItems a:hover {
   color: $white !important;
@@ -1152,6 +1156,7 @@ body > #Frame > .Head {
 
 .MenuItems a:hover .Gloss {
   color: $white !important;
+}
 }
 
 .MenuItems li > strong {
@@ -1269,7 +1274,9 @@ a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
   display: inline-block;
-  background: url('images/ui_sprites.png') 0 -2px no-repeat;
+  @if ($staticVariables) {
+    background: url('images/ui_sprites.png') 0 -2px no-repeat;
+  }
   height: 18px;
   width: 18px;
   /*	margin: 0 4px;*/
@@ -1418,14 +1425,16 @@ overflow: hidden;
   display: inline-block;
 }
 
-.MeButton:hover {
-  background: $grey-5;
-  background: rgba(0, 0, 0, 0.07);
-}
+@if ($staticVariables) {
+    .MeButton:hover {
+      background: $grey-5;
+      background: rgba(0, 0, 0, 0.07);
+    }
 
-.MeButton:hover {
-  background: $grey-5;
-  background: rgba(0, 0, 0, 0.07);
+    .MeButton:hover {
+      background: $grey-5;
+      background: rgba(0, 0, 0, 0.07);
+    }
 }
 
 .MeButton .Alert {
@@ -1917,10 +1926,12 @@ overflow: hidden;
   opacity: .9;
 }
 
-.Item.Read:hover {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  filter: alpha(opacity=100);
-  opacity: 1;
+ @if ($staticVariables) {
+    .Item.Read:hover {
+      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+      filter: alpha(opacity=100);
+      opacity: 1;
+    }
 }
 
 .Item.Read .Title, .Item.Read .BlockTitle {
@@ -1953,16 +1964,18 @@ overflow: hidden;
   visibility: hidden;
 }
 
-.DataList a.Delete:hover {
-  text-decoration: none;
-  border: none;
-  background: $grey-1;
-  color: $white;
-  visibility: visible;
-}
+ @if ($staticVariables) {
+    .DataList a.Delete:hover {
+      text-decoration: none;
+      border: none;
+      background: $grey-1;
+      color: $white;
+      visibility: visible;
+    }
 
-.Item:hover a.Delete {
-  visibility: visible;
+    .Item:hover a.Delete {
+      visibility: visible;
+    }
 }
 
 /* Condensed datalists make the main link & excerpt inline. */
@@ -2026,13 +2039,15 @@ overflow: hidden;
   padding: 4px 0;
 }
 
-.PopList .Item:hover {
-  background: $grey-5;
-  background: rgba(0, 0, 0, 0.03);
-}
+ @if ($staticVariables) {
+    .PopList .Item:hover {
+      background: $grey-5;
+      background: rgba(0, 0, 0, 0.03);
+    }
 
-.PopList .Item.Title:hover {
-  background: inherit;
+    .PopList .Item.Title:hover {
+      background: inherit;
+    }
 }
 
 .PopList .Item.Title {
@@ -2145,18 +2160,20 @@ overflow: hidden;
   width: 32px;
 }
 
-.Activities a.CommentLink,
-.Activities a.CommentLink:hover {
-  font-size: 12px;
-  cursor: text;
-  background: $white;
-  color: $grey-d !important;
-  padding: 5px;
-  text-decoration: none;
-  border: 1px solid $grey-b;
-  display: block;
-  line-height: 100%;
-  font-weight: normal;
+ @if ($staticVariables) {
+    .Activities a.CommentLink,
+    .Activities a.CommentLink:hover {
+      font-size: 12px;
+      cursor: text;
+      background: $white;
+      color: $grey-d !important;
+      padding: 5px;
+      text-decoration: none;
+      border: 1px solid $grey-b;
+      display: block;
+      line-height: 100%;
+      font-weight: normal;
+    }
 }
 
 /* ============================================================== MessageList */
@@ -2358,9 +2375,11 @@ a.ChangePicture {
   display: block;
 }
 
-a.ChangePicture:hover {
-  color: $white;
-  text-decoration: underline;
+@if ($staticVariables) {
+  a.ChangePicture:hover {
+    color: $white;
+    text-decoration: underline;
+  }
 }
 
 .ProfileOptions {
@@ -2942,9 +2961,11 @@ tr.CategoryHeading td {
   font-size: 11px;
 }
 
-.DiscussionSorter:hover {
-  cursor: pointer;
-  background: $grey-h;
+@if ($staticVariables) {
+    .DiscussionSorter:hover {
+      cursor: pointer;
+      background: $grey-h;
+    }
 }
 
 .DiscussionSorter .MenuItems {
@@ -3301,9 +3322,11 @@ ul.Tabs li a {
   padding: 2px 8px 1px;
 }
 
-ul.Tabs li a:hover {
-  background: $grey-8;
-  color: $grey-7;
+@if ($staticVariables) {
+    ul.Tabs li a:hover {
+      background: $grey-8;
+      color: $grey-7;
+    }
 }
 
 ul.Tabs li a.Active {
@@ -3687,18 +3710,22 @@ position on the page to notify users of things like drafts being saved, etc. */
   line-height: 1.6;
 }
 
-.InformMessages .InformMessage:hover {
-  background: $grey-1;
-  background: rgba(0, 0, 0, 0.8) !important;
+@if ($staticVariables) {
+    .InformMessages .InformMessage:hover {
+      background: $grey-1;
+      background: rgba(0, 0, 0, 0.8) !important;
+    }
 }
 
 .InformMessages .InformMessage a {
   color: $blue-b;
 }
 
-.InformMessages .InformMessage a:hover {
-  color: $blue-c;
-  text-decoration: underline;
+@if ($staticVariables) {
+    .InformMessages .InformMessage a:hover {
+      color: $blue-c;
+      text-decoration: underline;
+    }
 }
 
 .InformMessages .InformMessage strong {
@@ -3726,13 +3753,15 @@ position on the page to notify users of things like drafts being saved, etc. */
   display: inline;
 }
 
-.InformMessages .InformMessage a.Close:hover {
-  background: $black;
-  color: $white;
-}
+@if ($staticVariables) {
+    .InformMessages .InformMessage a.Close:hover {
+      background: $black;
+      color: $white;
+    }
 
-.InformMessages .InformMessage:hover a.Close {
-  display: block;
+    .InformMessages .InformMessage:hover a.Close {
+        display: block;
+    }
 }
 
 /* iPad/iPhone */

@@ -180,7 +180,7 @@ export const navLinksClasses = useThemeCache(() => {
         $nest: linkColors.nested,
     });
 
-    const viewAllitem = style(
+    const viewAllItem = style(
         "viewAllItem",
         {
             display: "block",
@@ -243,7 +243,7 @@ export const navLinksClasses = useThemeCache(() => {
         item,
         title,
         link,
-        viewAllitem,
+        viewAllItem,
         viewAll,
         linksWithHeadings,
         separator,

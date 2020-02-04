@@ -64,4 +64,26 @@ export const discussionCSS = () => {
             opacity: 1,
         },
     );
+
+    cssOut(
+        `
+        .DiscussionHeader .AuthorWrap,
+        .MessageList .ItemComment .AuthorWrap,
+        .MessageList .ItemDiscussion .AuthorWrap,
+        `,
+        {
+            position: "relative",
+        },
+    );
+
+    cssOut(
+        `
+        .MessageList .ItemDiscussion .Item-Header.DiscussionHeader .PhotoWrap,
+        .MessageList .ItemComment .Item-Header .PhotoWrap,
+        .MessageList .ItemDiscussion .Item-Header .PhotoWrap
+        `,
+        {
+            top: unit(4),
+        },
+    );
 };

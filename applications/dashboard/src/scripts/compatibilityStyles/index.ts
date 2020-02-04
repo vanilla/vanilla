@@ -31,6 +31,7 @@ import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
 import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
 import { discussionCSS } from "./discussionStyles";
+import { searchPageCSS } from "./searchPageStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -238,6 +239,9 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.Content .PageControls`, {
         marginBottom: unit(24),
+        ...paddings({
+            horizontal: layoutVars.cell.paddings.horizontal,
+        }),
     });
 
     cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
@@ -314,6 +318,10 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
+    cssOut(".Panel > * + *", {
+        marginTop: unit(vars.gutter.size * 2),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -329,6 +337,7 @@ export const compatibilityStyles = useThemeCache(() => {
     ideaCSS();
     tableCSS();
     discussionCSS();
+    searchPageCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

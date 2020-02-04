@@ -54,7 +54,7 @@ export const metaContainerStyles = (overwrites?: any) => {
     const vars = metasVariables();
     const globalVars = globalVariables();
     const flexed = { display: "flex", flexWrap: "wrap", justifyContent: "flex-start", alignItems: "center" };
-    const flexContents = overwrites.flexContents ? flexed : {};
+    const flexContents = overwrites && overwrites.flexContents ? flexed : {};
     return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,

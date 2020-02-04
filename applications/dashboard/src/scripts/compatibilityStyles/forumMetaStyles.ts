@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, margins, unit, borders } from "@library/styles/styleHelpers";
+import { colorOut, margins, unit, borders, paddings, allLinkStates } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
@@ -13,7 +13,7 @@ import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 
-const mixinMetaContainer = (selector: string, overwrites = {}) => {
+export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
 };
 
@@ -49,6 +49,7 @@ export const forumMetaCSS = () => {
         .DataTableWrap .HasNew.HasNew,
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
+        .Item .Author a,
         `,
         {
             color: fg,
@@ -57,13 +58,38 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(`.Container .Frame-contentWrap .ChildCategories`, {
-        fontSize: unit(globalVars.meta.text.fontSize),
-        color: colorOut(globalVars.meta.text.color),
-    });
+    cssOut(
+        `
+        .MessageList .ItemDiscussion a.Username,
+        .MessageList .ItemDiscussion .Username,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a,
+        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MessageList .ItemComment a.Username,
+        .MessageList .ItemComment .Username,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment a.Username,
+        .MainContent.Content .MessageList.Discussion .Item.ItemDiscussion a.Username,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
+        `,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+            opacity: important(1),
+            ...allLinkStates({
+                hover: {
+                    color: colorOut(globalVars.links.colors.hover),
+                },
+                focus: {
+                    color: colorOut(globalVars.links.colors.focus),
+                },
+                active: {
+                    color: colorOut(globalVars.links.colors.active),
+                },
+            }),
+        },
+    );
 
     cssOut(
         `
+        .Container .Frame-contentWrap .ChildCategories,
         .Container .Frame-contentWrap .ChildCategories a,
         .DiscussionName .Wrap > a,
         .Gloss
@@ -90,14 +116,27 @@ export const forumMetaCSS = () => {
         .Groups .DataTable .MItem a,
         .DataTable .MItem a,
         .Container .DataTable .MItem.Category,
+        .DiscussionHeader .AuthorWrap .Username,
+        .Content .MessageList .Tag,
+        .DataList.DataList-Search .CrumbLabel
         `,
         {
             textDecoration: important("none"),
+            color: colorOut(globalVars.mainColors.fg),
+            ...paddings({
+                horizontal: 3,
+            }),
             ...margins({
                 all: globalVars.meta.spacing.default,
             }),
         },
     );
+
+    cssOut(`.Content .MessageList .RoleTracker > .Tag`, {
+        color: colorOut(globalVars.mainColors.fg),
+        border: important(0),
+        padding: important(0),
+    });
 
     cssOut(".MItem .Tag", {
         ...margins({ all: important(0) }),
@@ -136,6 +175,16 @@ export const forumMetaCSS = () => {
     mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
         overflow: "visible",
     });
+
+    cssOut(
+        `
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment a.Username,
+        .MainContent.Content .MessageList.Discussion .Item.ItemDiscussion a.Username,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a`,
+        {
+            opacity: important(1),
+        },
+    );
 };
 
 function mixinMetaLinkContainer(selector: string) {

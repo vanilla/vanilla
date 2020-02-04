@@ -10,7 +10,7 @@ import { t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import FrameBody from "@library/layout/frame/FrameBody";
-import { HamburgerIcon } from "@library/icons/common";
+import { HamburgerIcon, CloseTinyIcon } from "@library/icons/common";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
 import Button from "@library/forms/Button";
@@ -28,6 +28,7 @@ import { Navigation } from "@knowledge/navigation/Navigation";
 
 interface IProps {
     className?: string;
+    extraBurgerNavigation?: React.ReactNode;
 }
 
 /**
@@ -56,7 +57,14 @@ export default function Hamburger(props: IProps) {
             >
                 <HamburgerIcon />
             </Button>
-            <Modal isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
+            <Modal scrollable isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
+                <Button
+                    className={classes.closeButton}
+                    baseClass={ButtonTypes.ICON_COMPACT}
+                    onClick={() => setIsOpen(false)}
+                >
+                    <CloseTinyIcon />
+                </Button>
                 <div>
                     <DropDownSection title={t("Site Navigation")}>
                         {navItems.map((item, i) => {
@@ -67,7 +75,7 @@ export default function Hamburger(props: IProps) {
                             );
                         })}
                     </DropDownSection>
-                    <DropDownSection title="KB"></DropDownSection>
+                    {props.extraBurgerNavigation}
                 </div>
             </Modal>
         </>

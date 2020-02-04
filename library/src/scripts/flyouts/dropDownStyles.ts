@@ -314,6 +314,7 @@ export const dropDownClasses = useThemeCache(() => {
         {
             $nest: {
                 "&&": {
+                    zIndex: 2,
                     minHeight: unit(vars.item.minHeight),
                     transform: "translateX(12px)",
                 },

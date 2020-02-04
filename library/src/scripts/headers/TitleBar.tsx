@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
+import { useBannerContext } from "@library/banner/BannerContext";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
-import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
@@ -15,13 +15,7 @@ import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
-import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import {
-    titleBarClasses,
-    titleBarVariables,
-    titleBarHomeClasses,
-    titleBarLogoClasses,
-} from "@library/headers/titleBarStyles";
+import { titleBarClasses, titleBarLogoClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -35,10 +29,9 @@ import { usePageContext } from "@library/routing/PagesContext";
 import { LogoType } from "@library/theming/ThemeLogo";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { useEffect, useState, useRef, useMemo, useDebugValue } from "react";
+import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { useSpring, animated } from "react-spring";
-import { useBannerContext } from "@library/banner/BannerContext";
+import { animated, useSpring } from "react-spring";
 
 interface IProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -51,6 +44,7 @@ interface IProps {
     logoUrl?: string;
     hasSubNav?: boolean;
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
+    extraBurgerNavigation?: React.ReactNode;
 }
 
 export enum LogoAlignment {
@@ -131,7 +125,10 @@ export default function TitleBar(_props: IProps) {
                         )}
                         {isCompact && (
                             <>
-                                <Hamburger className={classes.hamburger} />
+                                <Hamburger
+                                    className={classes.hamburger}
+                                    extraBurgerNavigation={props.extraBurgerNavigation}
+                                />
                                 {!isSearchOpen && (
                                     <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
                                         <animated.span {...logoProps}>

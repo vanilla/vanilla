@@ -14,7 +14,6 @@ export enum ModalTransitionType {
 
 export interface IModalTransitioner {
     isVisible: boolean;
-    transitionType: ModalTransitionType;
 }
 
 interface IProps extends IModalTransitioner {

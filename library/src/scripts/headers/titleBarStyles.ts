@@ -482,7 +482,7 @@ export const titleBarClasses = useThemeCache(() => {
             $nest: {
                 "&.isOpen": {
                     width: unit(vars.compactSearch.maxWidth),
-                    flexBasis: "auto",
+                    flex: 1,
                 },
             },
         },

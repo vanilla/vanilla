@@ -81,6 +81,13 @@ export const hamburgerClasses = useThemeCache(() => {
         },
     });
 
+    const closeButton = style("closeButton", {
+        position: "absolute",
+        top: unit(globalVars.gutter.half),
+        right: unit(globalVars.gutter.half),
+        zIndex: 10,
+    });
+
     const spacer = (count: number) => {
         const formElVars = formElementsVariables();
         return style("spacer", {
@@ -93,5 +100,6 @@ export const hamburgerClasses = useThemeCache(() => {
         root,
         content,
         spacer,
+        closeButton,
     };
 });

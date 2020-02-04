@@ -7,11 +7,13 @@ import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAni
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import Heading from "@library/layout/Heading";
-import { useSiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import classNames from "classnames";
 import React, { useState } from "react";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import Button from "@library/forms/Button";
+import { CloseTinyIcon } from "@library/icons/common";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     title: string;
@@ -21,18 +23,15 @@ interface IProps {
 }
 
 export function DropDownPanelNav(props: IProps) {
-    const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([null]);
+    const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([]);
     const [isPopping, setIsPopping] = useState(false);
 
     const classes = dropDownClasses();
 
     const popParentItem = () => {
-        if (parentNavItems.length > 1) {
-            // We can't pop off the root.
-            parentNavItems.pop();
-            setIsPopping(true);
-            setParentNavItems(Array.from(parentNavItems));
-        }
+        parentNavItems.pop();
+        setIsPopping(true);
+        setParentNavItems(Array.from(parentNavItems));
     };
 
     const pushParentItem = (item: INavigationTreeItem) => {
@@ -43,7 +42,23 @@ export function DropDownPanelNav(props: IProps) {
     return (
         <>
             <DropDownItemSeparator />
-            <Heading title={props.title} className={classNames("dropDown-sectionHeading", classes.sectionHeading)} />
+            <Heading
+                title={props.title}
+                className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
+                aria-hidden={parentNavItems.length > 0}
+            />
+            <div className={classNames(classes.panel, classes.panelFirst)} aria-hidden={parentNavItems.length > 0}>
+                <PanelNavItems
+                    isActive={false}
+                    navItems={props.navItems}
+                    isNestable={props.isNestable}
+                    popParentItem={popParentItem}
+                    pushParentItem={pushParentItem}
+                    canGoBack={false}
+                    // The first page gets the extra sections.
+                    extraSections={props.afterNavSections}
+                />
+            </div>
             <EntranceAnimation
                 onDestroyed={() => {
                     setIsPopping(false);
@@ -52,12 +67,7 @@ export function DropDownPanelNav(props: IProps) {
                 fromDirection={FromDirection.RIGHT}
                 className={classes.panel}
                 aria-hidden={true}
-                firstItemProps={{ className: classes.panelFirst }}
-                lastItemProps={
-                    isPopping || parentNavItems.length > 1
-                        ? { className: classes.panelLast, "aria-hidden": "false" }
-                        : undefined
-                }
+                lastItemProps={{ className: classes.panelLast, "aria-hidden": "false" }}
             >
                 {parentNavItems.map((parent, i) => {
                     const currentItems = parent ? parent.children : props.navItems;
@@ -76,8 +86,6 @@ export function DropDownPanelNav(props: IProps) {
                             pushParentItem={pushParentItem}
                             canGoBack={parent !== null}
                             nestedTitle={parent?.name}
-                            // The first page gets the extra sections.
-                            extraSections={parent === null && props.afterNavSections}
                         />
                     );
                 })}

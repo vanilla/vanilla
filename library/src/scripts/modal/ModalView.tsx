@@ -138,7 +138,9 @@ export function ModalView(props: IProps) {
                 isEntered={props.isVisible}
                 className={classes.overlayScrim}
                 onDestroyed={handleDestroy}
-            ></EntranceAnimation>
+            >
+                <span></span>
+            </EntranceAnimation>
             <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
                 <div
                     className={classes.overlayContent}

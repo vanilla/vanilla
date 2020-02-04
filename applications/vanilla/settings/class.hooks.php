@@ -276,6 +276,7 @@ class VanillaHooks implements Gdn_IPlugin {
             // Break apart our tags and lowercase them all for comparisons.
             $tags = TagModel::splitTags($tagsString);
             $tags = array_map('strtolower', $tags);
+            // Create userTag array that doesn't include default tag ID's when validating, so that user can always add 5 tags.
             $userTags = [];
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {

@@ -276,18 +276,24 @@ class VanillaHooks implements Gdn_IPlugin {
             // Break apart our tags and lowercase them all for comparisons.
             $tags = TagModel::splitTags($tagsString);
             $tags = array_map('strtolower', $tags);
+            $userTags = [];
+            foreach ($tags as $tag) {
+                if (!is_numeric($tag)) {
+                    $userTags[] = $tag;
+                };
+            }
             $reservedTags = array_map('strtolower', $reservedTags);
             $maxTags = c('Vanilla.Tagging.Max', 5);
 
             // Validate our tags.
-            if ($reservedTags = array_intersect($tags, $reservedTags)) {
+            if ($reservedTags = array_intersect($userTags, $reservedTags)) {
                 $names = implode(', ', $reservedTags);
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
             }
-            if (!TagModel::validateTags($tags)) {
+            if (!TagModel::validateTags($userTags)) {
                 $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             }
-            if (count($tags) > $maxTags) {
+            if (count($userTags) > $maxTags) {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
             }
         }

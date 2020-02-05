@@ -15,7 +15,7 @@ export const tableCSS = () => {
 
     cssOut(
         `
-        .DataTable.DiscussionsTable.DiscussionsTable thead td,
+        .DataTable thead td,
         .DataTableWrap.GroupWrap thead td,
     `,
         {

@@ -855,10 +855,10 @@ class VanillaHooks implements Gdn_IPlugin {
     /**
      * Detect if forum application is enabled for current site section
      *
-     * @param $sender
+     * @param mixed $sender
      * @return bool
      */
-    private function linksEnabled($sender) {
+    private function linksEnabled($sender): bool {
         $enabled = true;
         if ($sender instanceof VanillaController) {
             if ($sender->disabled()) {

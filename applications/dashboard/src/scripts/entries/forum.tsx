@@ -23,6 +23,8 @@ import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import { fullBackgroundCompat } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import { applySharedPortalContext } from "@vanilla/react-utils";
+import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -36,6 +38,14 @@ Router.addRoutes([
     <Route exact path="/authenticate/password" component={PasswordPage} key="password" />,
     <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} key="recover" />,
 ]);
+
+applySharedPortalContext(props => {
+    return (
+        <AppContext variablesOnly={!getMeta("themeFeatures.DataDrivenTheme", false)} errorComponent={ErrorPage}>
+            {props.children}
+        </AppContext>
+    );
+});
 
 // Routing
 addComponent("App", () => (

@@ -89,9 +89,7 @@ export function _mountComponents(parent: Element) {
 
         if (registeredComponent) {
             mountReact(
-                <AppContext variablesOnly noTheme={!useTheme} noWrap={registeredComponent?.mountOptions?.overwrite}>
-                    <registeredComponent.Component {...props} contents={children} />
-                </AppContext>,
+                <registeredComponent.Component {...props} contents={children} />,
                 node,
                 () => {
                     if (node.getAttribute("data-unhide") === "true") {

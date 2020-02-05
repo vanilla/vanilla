@@ -6,10 +6,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { cssRule } from "typestyle";
+import { cssRule, style } from "typestyle";
 import { colorOut, background, margins, paddings, fonts } from "@library/styles/styleHelpers";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -18,7 +19,7 @@ export const bodyCSS = useThemeCache(() => {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
     });
 
-    cssRule("html, body", {
+    const htmlBodyMixin: NestedCSSProperties = {
         background: colorOut(globalVars.body.backgroundImage.color),
         ...fonts({
             size: globalVars.fonts.size.medium,
@@ -28,7 +29,14 @@ export const bodyCSS = useThemeCache(() => {
         wordBreak: "break-word",
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
         $unique: true, // This doesn't refresh without this for some reason.
+    };
+
+    cssRule("html", htmlBodyMixin);
+    const bodyClass = style({
+        ...htmlBodyMixin,
+        $debugName: "vanillaBodyReset",
     });
+    document.body.classList.add(bodyClass);
 
     cssRule("*", {
         // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior

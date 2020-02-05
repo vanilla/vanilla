@@ -94,7 +94,6 @@ export default class Modal extends React.Component<IProps, IState> {
             </>,
             MODAL_CONTAINER_ID,
             true,
-            Modal.stack.length === 0,
         );
     }
 

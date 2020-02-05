@@ -55,6 +55,7 @@ class MockSiteSection implements SiteSectionInterface {
         $this->sectionID = $sectionID;
         $this->sectionGroup = $sectionGroup;
         $this->defaultRoute = $defaultRoute;
+        ['forum' => true];
     }
     /**
      * @inheritdoc
@@ -103,5 +104,19 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function getDefaultRoute(): array {
         return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
     }
 }

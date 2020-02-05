@@ -12,7 +12,6 @@
  * Master application controller for Vanilla, extended by all others except Settings.
  */
 class VanillaController extends Gdn_Controller {
-
     /**
      * Include JS, CSS, and modules used by all methods.
      *
@@ -68,5 +67,26 @@ class VanillaController extends Gdn_Controller {
         if ($offset > 0 && $offset >= $totalCount) {
             throw notFoundException();
         }
+    }
+
+    /**
+     * Get vanilla controllers status.
+     * Returns true when forum is disabled for root or specific site section.
+     *
+     * @return bool
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function disabled(): bool {
+        $enabled = true;
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $apps = $siteSectionModel->applications();
+        if (count($apps) > 1) {
+            $enabled = $siteSectionModel
+                ->getCurrentSiteSection()
+                ->applications()[\Vanilla\Contracts\Site\SiteSectionInterface::APP_FORUM];
+        }
+        return !$enabled;
     }
 }

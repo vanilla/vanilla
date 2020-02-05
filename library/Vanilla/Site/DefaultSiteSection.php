@@ -30,6 +30,10 @@ class DefaultSiteSection implements SiteSectionInterface {
 
     /** @var array $defaultRoute */
     private $defaultRoute;
+
+    /** @var array $apps */
+    private $apps;
+
     /**
      * DI.
      *
@@ -40,6 +44,7 @@ class DefaultSiteSection implements SiteSectionInterface {
         $this->configLocaleKey = $config->get('Garden.Locale', 'en');
         $configDefaultController = $config->get('Routes.DefaultController');
         $this->defaultRoute = $router->parseRoute($configDefaultController);
+        $this->apps = ['forum' => !(bool)$config->get('Vanilla.Forum.Disabled')];
     }
 
     /**
@@ -89,5 +94,19 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getDefaultRoute(): array {
         return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
     }
 }

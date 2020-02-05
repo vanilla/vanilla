@@ -13,6 +13,8 @@ namespace Vanilla\Contracts\Site;
  * Through this mechanism content across the site may be separated and filtered.
  */
 interface SiteSectionInterface extends \JsonSerializable {
+    const APP_FORUM = 'forum';
+    const APP_KB = 'knowledgeBase';
     /**
      * Get the base path for the section of the site.
      *
@@ -60,4 +62,20 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return array
      */
     public function getDefaultRoute(): array;
+
+    /**
+     * Get enabled applications
+     *
+     * @return array
+     */
+    public function applications(): array;
+
+    /**
+     * Set application enabled or disabled.
+     *
+     * @param string $app
+     * @param bool $enable
+     * @return array
+     */
+    public function setApplication(string $app, bool $enable);
 }

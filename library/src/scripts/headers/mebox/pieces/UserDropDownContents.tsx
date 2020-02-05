@@ -14,7 +14,7 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { t } from "@library/utility/appUtils";
+import { getSiteSection, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
@@ -24,6 +24,7 @@ import { connect } from "react-redux";
  */
 function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
+    const siteSection = getSiteSection();
     if (!userInfo) {
         return null;
     }
@@ -43,21 +44,23 @@ function UserDropDownContents(props: IProps) {
             {UserDropDownContents.extraUserDropDownComponents.map((ComponentName, index) => {
                 return <ComponentName key={index} getCountByName={getCountByName} />;
             })}
-            <DropDownSection title={t("Discussions")}>
-                <DropDownItemLinkWithCount
-                    to={"/discussions/bookmarked"}
-                    name={t("Bookmarks")}
-                    count={getCountByName("Bookmarks")}
-                />
-                <Permission permission="discussions.add">
-                    <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
-                </Permission>
-                <DropDownItemLinkWithCount
-                    to="/discussions/mine"
-                    name={t("My Discussions")}
-                    count={getCountByName("Discussions")}
-                />
-            </DropDownSection>
+            {siteSection.apps.forum ? (
+                <DropDownSection title={t("Discussions")}>
+                    <DropDownItemLinkWithCount
+                        to={"/discussions/bookmarked"}
+                        name={t("Bookmarks")}
+                        count={getCountByName("Bookmarks")}
+                    />
+                    <Permission permission="discussions.add">
+                        <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                    </Permission>
+                    <DropDownItemLinkWithCount
+                        to="/discussions/mine"
+                        name={t("My Discussions")}
+                        count={getCountByName("Discussions")}
+                    />
+                </DropDownSection>
+            ) : null}
             <Permission permission={["community.moderate"]}>
                 <DropDownSection title={t("Moderation")}>
                     <DropDownItemLinkWithCount

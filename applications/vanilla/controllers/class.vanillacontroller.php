@@ -74,8 +74,6 @@ class VanillaController extends Gdn_Controller {
      * Returns true when forum is disabled for root or specific site section.
      *
      * @return bool
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
     public function disabled(): bool {
         $enabled = true;

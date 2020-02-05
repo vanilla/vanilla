@@ -57,7 +57,9 @@
                 background: transparent;
                 width: calc(100% - (#{$component_borderWidth} * 2));
                 position: absolute;
-                top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+                @if ($staticVariables) {
+                    top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+                }
             }
         }
     }

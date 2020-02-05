@@ -7,8 +7,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { allLinkStates, colorOut, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -69,7 +70,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         }),
         display: "block",
         width: percent(100),
-        color: colorOut(globalVars.mainColors.fg),
+        color: important(colorOut(globalVars.mainColors.fg) as string),
         fontSize: globalVars.fonts.size.medium,
         fontWeight: globalVars.fonts.weights.bold,
         lineHeight: globalVars.lineHeights.condensed,

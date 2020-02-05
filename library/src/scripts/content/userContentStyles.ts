@@ -12,6 +12,7 @@ import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -33,7 +34,7 @@ export const userContentVariables = useThemeCache(() => {
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
         fg: mainColors.fg,
-        bg: globalVars.mixBgAndFg(globalVars.getRatioBasedOnBackgroundDarkness(0.05)),
+        bg: globalVars.mixBgAndFg(0.05),
     });
 
     const embeds = makeThemeVars("embeds", {
@@ -383,3 +384,23 @@ export const userContentClasses = useThemeCache(() => {
 
     return { root };
 });
+
+export const userContentCSS = () => {
+    const globalVars = globalVariables();
+    cssOut(
+        `
+        .Container .userContent h1,
+        .Container .userContent h2,
+        .Container.userContent h3,
+        .Container .userContent h4,
+        .Container .userContent h5,
+        .Container .userContent h6`,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
+
+    cssOut(`body.Vanilla .userContent`, {
+        fontSize: unit(globalVars.fonts.size.medium),
+    });
+};

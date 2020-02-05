@@ -224,4 +224,8 @@ export const groupsCSS = () => {
     cssOut(`.groupsMemberFilter`, {
         marginTop: unit(100),
     });
+
+    cssOut(`.Event-Title`, {
+        marginTop: unit(75),
+    });
 };

@@ -175,7 +175,8 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
-        borderBottom: singleBorder(),
+        marginTop: unit(vars.gutter.size * 2.5),
+        border: "none",
     });
 
     cssOut(`div.Popup p`, {

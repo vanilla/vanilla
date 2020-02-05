@@ -36,10 +36,8 @@ export const textLinkCSS = () => {
     mixinTextLink(".Panel .PanelInThisDiscussion a");
     mixinTextLink(".Panel .Leaderboard a");
     mixinTextLink(".Panel .InThisConversation a");
-    mixinTextLink(".FilterMenu a", true);
-    mixinTextLink(".Breadcrumbs a", true, {
-        textDecoration: "none",
-    });
+    mixinTextLink(".FieldInfo a");
+
     mixinTextLink("div.Popup .Body a");
     mixinTextLink(".selectBox-toggle");
     mixinTextLink(".followButton");
@@ -74,6 +72,10 @@ export const textLinkCSS = () => {
     mixinTextLink(".DataTable h3 a", true);
     mixinTextLink(".DataTable .Title.Title a", true);
     mixinTextLink(".Timebased.EndTime a", true);
+    mixinTextLink(".FilterMenu a", true);
+    mixinTextLink(".Breadcrumbs a", true, {
+        textDecoration: "none",
+    });
 };
 
 // Mixins replacement

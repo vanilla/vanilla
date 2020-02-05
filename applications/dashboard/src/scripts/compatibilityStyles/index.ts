@@ -113,10 +113,11 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(
         `
         .Content a.Bookmarked::before,
-        .Content a.Bookmarked:hover::before
+        .Content a.Bookmark::before,
+        .Content a.Bookmarking::before
         `,
         {
-            color: important(colorOut(mainColors.primary) as string),
+            color: important(colorOut(mainColors.fg.fade(0.5)) as string),
         },
     );
 
@@ -283,7 +284,6 @@ export const compatibilityStyles = useThemeCache(() => {
         .Content .DataList .Tag,
         .Content .DataList .Tag-Poll,
         .Content .DataList .RoleTracker,
-        .Content .DataList .IdeationTag,
         .Content .MessageList .Tag,
         .Content .MessageList .Tag-Poll,
         .Content .MessageList .RoleTracker,
@@ -318,8 +318,8 @@ export const compatibilityStyles = useThemeCache(() => {
         textDecoration: important("none"),
     });
 
-    cssOut(`a.Bookmark`, {
-        ...srOnly(),
+    cssOut(`.Container .DataList .Meta .Tag-Announcement`, {
+        opacity: 1,
     });
 
     cssOut(

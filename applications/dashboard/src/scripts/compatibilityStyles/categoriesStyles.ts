@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, importantUnit, unit } from "@library/styles/styleHelpers";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
@@ -70,6 +70,19 @@ export const categoriesCSS = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
+    });
+
+    cssOut(`a.Bookmark`, {
+        backgroundImage: important("none"),
+        color: important("transparent"),
+        font: `0/0 a`,
+        height: "auto",
+        textIndent: "0",
+        width: "auto",
+        verticalAlign: "top",
+        overflow: "hidden",
+        fontSize: importantUnit(1),
+        textDecoration: important("none"),
     });
 
     cssOut(

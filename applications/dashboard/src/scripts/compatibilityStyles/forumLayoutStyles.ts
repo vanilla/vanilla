@@ -111,7 +111,7 @@ export const forumLayoutCSS = () => {
     const mediaQueries = vars.mediaQueries();
 
     cssOut(
-        `.Container`,
+        `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
         containerMainStyles() as NestedCSSProperties,
         mediaQueries.xs({
             ...paddings({

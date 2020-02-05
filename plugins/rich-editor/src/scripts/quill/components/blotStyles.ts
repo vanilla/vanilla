@@ -21,4 +21,5 @@ export const blotCSS = () => {
     spoilerCSS();
     codeBlockCSS();
     loadedCSS();
+    embedCSS();
 };

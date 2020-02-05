@@ -73,6 +73,7 @@ export const textLinkCSS = () => {
     mixinTextLink(".DataTable h2 a", true);
     mixinTextLink(".DataTable h3 a", true);
     mixinTextLink(".DataTable .Title.Title a", true);
+    mixinTextLink(".Timebased.EndTime a", true);
 };
 
 // Mixins replacement

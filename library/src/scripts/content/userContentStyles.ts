@@ -33,7 +33,7 @@ export const userContentVariables = useThemeCache(() => {
     const blocks = makeThemeVars("blocks", {
         margin: fonts.size,
         fg: mainColors.fg,
-        bg: globalVars.mixBgAndFg(0.05),
+        bg: globalVars.mixBgAndFg(globalVars.getRatioBasedOnBackgroundDarkness(0.05)),
     });
 
     const embeds = makeThemeVars("embeds", {

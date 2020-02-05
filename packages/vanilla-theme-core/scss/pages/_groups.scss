@@ -237,7 +237,9 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 }
 
 .Group-Banner {
-    height: $GroupBanner-height;
+    @if ($staticVariables) {
+        height: $GroupBanner-height;
+    }
     background-size: cover;
     background-position: 50% 50%;
     background-repeat: no-repeat;

@@ -955,6 +955,7 @@ body {
 .userContent p {
   word-break: break-word;
   text-overflow: ellipsis;
+  border-radius: 0;
 }
 .userContent .CommentHeader {
   margin-bottom: 14px;
@@ -1609,6 +1610,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   overflow: hidden;
   text-align: left;
   pointer-events: initial !important;
+  overflow: hidden;
 }
 
 .embedText-main {

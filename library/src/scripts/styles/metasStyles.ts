@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { allLinkStates, colorOut, margins, unit } from "@library/styles/styleHelpers";
-import { calc } from "csx";
+import { calc, important } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const metasVariables = useThemeCache(() => {
@@ -129,10 +129,15 @@ export const metasClasses = useThemeCache(() => {
         textAlign: "left",
     });
 
+    const noUnderline = style("noUnderline", {
+        textDecoration: important("none"),
+    });
+
     return {
         root,
         meta,
         metaStyle,
         draftStatus,
+        noUnderline,
     };
 });

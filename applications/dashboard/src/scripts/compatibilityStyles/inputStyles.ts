@@ -249,6 +249,25 @@ export const inputCSS = () => {
         fontSize: globalVars.fonts.size.medium,
         color: colorOut(globalVars.mainColors.fg),
     });
+
+    cssOut(`.js-datetime-picker`, {
+        display: "flex",
+        flexWrap: "wrap",
+        width: calc(`100% + ${unit(globalVars.meta.spacing.default * 2)}`),
+        ...margins({
+            left: -globalVars.meta.spacing.default,
+            right: globalVars.meta.spacing.default,
+        }),
+    });
+
+    cssOut(`.InputBox.DatePicker`, {
+        flexGrow: 1,
+        minWidth: unit(200),
+        maxWidth: percent(100),
+        ...margins({
+            all: globalVars.meta.spacing.default,
+        }),
+    });
 };
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {

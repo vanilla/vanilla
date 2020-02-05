@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { allLinkStates, colorOut, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { percent } from "csx";
+import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();

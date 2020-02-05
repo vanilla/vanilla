@@ -31,8 +31,28 @@ import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+
+export const groupVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("groups");
+
+    const banner = makeThemeVars("banner", {
+        height: 200,
+    });
+
+    const logo = makeThemeVars("logo", {
+        height: 140,
+    });
+
+    return {
+        banner,
+        logo,
+    };
+});
 
 export const groupsCSS = () => {
+    const vars = groupVariables();
     const globalVars = globalVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
@@ -43,6 +63,10 @@ export const groupsCSS = () => {
     const primary = colorOut(mainColors.primary);
     const metaFg = colorOut(globalVars.meta.colors.fg);
     const mediaQueries = layoutVars.mediaQueries();
+
+    cssOut(`.Group-Banner`, {
+        height: unit(vars.banner.height),
+    });
 
     cssOut(`.groupToolbar`, {
         marginTop: unit(32),
@@ -69,6 +93,7 @@ export const groupsCSS = () => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
+        flexWrap: "wrap",
     });
 
     cssOut(`a.ChangePicture`, {
@@ -79,15 +104,24 @@ export const groupsCSS = () => {
         opacity: 0,
     });
 
-    cssOut(`.Group-Banner`, {
-        ...absolutePosition.fullSizeOfParent(),
+    // cssOut(`body.Section-Group .Group-Banner`, {
+    //     ...absolutePosition.fullSizeOfParent(),
+    // });
+
+    cssOut(`.DataTableContainer.Group-Box.ApplicantList .PageControls .H`, {
+        position: "relative",
+    });
+
+    cssOut(`body.Section-Event .Group-Banner`, {
+        flexGrow: 1,
+        width: percent(100),
     });
 
     cssOut(`.Photo.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
-        width: unit(140),
-        height: unit(140),
-        flexBasis: unit(140),
-        top: calc(`100% - 70px`),
+        width: unit(vars.logo.height),
+        height: unit(vars.logo.height),
+        flexBasis: unit(vars.logo.height),
+        top: unit(vars.banner.height - vars.logo.height / 2),
         background: "transparent",
         zIndex: 1,
         $nest: {
@@ -113,13 +147,13 @@ export const groupsCSS = () => {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
     });
 
-    cssOut(`.Groups .ChangePicture`, {
+    cssOut(`.PhotoWrap:hover a.ChangePicture`, {
         opacity: 0,
-        backgroundColor: importantColorOut(globalVars.mainColors.bg.fade(0.3)),
+        backgroundColor: importantColorOut(globalVars.mainColors.bg.fade(0.5)),
         color: colorOut(globalVars.mainColors.fg),
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {

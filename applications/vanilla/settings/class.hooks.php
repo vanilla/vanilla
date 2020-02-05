@@ -277,12 +277,12 @@ class VanillaHooks implements Gdn_IPlugin {
             $tags = TagModel::splitTags($tagsString);
             $tags = array_map('strtolower', $tags);
             // Create userTag array that doesn't include default tag ID's when validating, so that user can always add 5 tags.
-            $userTags = [];
-            foreach ($tags as $tag) {
-                if (!is_numeric($tag)) {
-                    $userTags[] = $tag;
-                };
-            }
+//            $userTags = [];
+//            foreach ($tags as $tag) {
+//                if (!is_numeric($tag)) {
+//                    $userTags[] = $tag;
+//                };
+//            }
             $reservedTags = array_map('strtolower', $reservedTags);
             $maxTags = c('Vanilla.Tagging.Max', 5);
 
@@ -294,7 +294,7 @@ class VanillaHooks implements Gdn_IPlugin {
             if (!TagModel::validateTags($tags)) {
                 $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             }
-            if (count($userTags) > $maxTags) {
+            if (count($tags) > $maxTags) {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
             }
         }

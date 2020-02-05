@@ -15,23 +15,6 @@ export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
     navItemGenerators.push(navItemGetter);
 }
 
-export function generateNavItems() {
-    const forumEnabled = getMeta("siteSection.apps.forum", true);
-    const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
-
-    if (forumEnabled) {
-        if (kbEnabled) {
-            registerDefaultNavItem(() => {
-                return {
-                    children: t("Help Menu", "Help"),
-                    permission: "kb.view",
-                    to: "/kb",
-                };
-            });
-        }
-    }
-}
-
 export const navigationVariables = useThemeCache(() => {
     const makeVars = variableFactory("navigation");
     const forumEnabled = getMeta("siteSection.apps.forum", true);

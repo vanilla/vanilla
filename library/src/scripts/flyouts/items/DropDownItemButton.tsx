@@ -20,6 +20,7 @@ export interface IDropDownItemButton {
     onClick: any;
     current?: boolean;
     lang?: string;
+    isActive?: boolean;
     buttonRef?: React.RefObject<HTMLButtonElement>;
 }
 
@@ -35,14 +36,18 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
     public render() {
         const { children, name } = this.props;
         const buttonContent = children ? children : name;
-        const classesDropDown = dropDownClasses();
+        const classes = dropDownClasses();
         return (
             <DropDownItem className={classNames(this.props.className)}>
                 <Button
                     buttonRef={this.props.buttonRef}
                     title={this.props.name}
                     onClick={this.props.onClick}
-                    className={classNames(this.props.buttonClassName, classesDropDown.action)}
+                    className={classNames(
+                        this.props.buttonClassName,
+                        classes.action,
+                        this.props.isActive && classes.actionActive,
+                    )}
                     baseClass={ButtonTypes.CUSTOM}
                     disabled={this.props.disabled}
                     aria-current={this.props.current ? "true" : "false"}

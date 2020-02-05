@@ -97,6 +97,11 @@ const titleBarNavClasses = useThemeCache(() => {
             : {},
     );
 
+    const navigationCentered = style("navigationCentered", {
+        ...absolutePosition.middleOfParent(true),
+        display: "inline-flex",
+    });
+
     const items = style(
         "items",
         {
@@ -121,6 +126,8 @@ const titleBarNavClasses = useThemeCache(() => {
         justifyContent: "center",
         minHeight: unit(vars.item.size),
         textDecoration: "none",
+        paddingLeft: unit(vars.navLinks.padding.left),
+        paddingRight: unit(vars.navLinks.padding.right),
         $nest: {
             "&.focus-visible": {
                 color: colorOut(titleBarVars.colors.fg),
@@ -154,10 +161,13 @@ const titleBarNavClasses = useThemeCache(() => {
     });
 
     const linkContent = style("linkContent", {
+        fontSize: unit(vars.navLinks.fontSize),
+        fontWeight: globalVars.fonts.weights.normal,
         position: "relative",
         display: "flex",
         alignItems: "center",
         minHeight: unit(vars.item.size),
+        lineHeight: unit(vars.item.size),
         height: 0, // IE11 Fix.
     });
 
@@ -171,16 +181,12 @@ const titleBarNavClasses = useThemeCache(() => {
     const navContiner = style("navContiner", {
         paddingBottom: unit(vars.navPadding.padding.bottom),
     });
-    const navLinks = style("navLink", {
-        fontSize: unit(vars.navLinks.fontSize),
-        fontWeight: globalVars.fonts.weights.normal,
-        paddingLeft: unit(vars.navLinks.padding.left),
-        paddingRight: unit(vars.navLinks.padding.right),
-    });
+    const navLinks = style("navLinks", {});
 
     return {
         root,
         navigation,
+        navigationCentered,
         items,
         link,
         linkActive,

@@ -48,18 +48,30 @@ export const absolutePosition = {
             left: unit(left),
         };
     },
-    middleOfParent: () => {
-        return {
-            position: "absolute" as PositionProperty,
-            display: "block",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            maxHeight: percent(100),
-            maxWidth: percent(100),
-            margin: "auto",
-        };
+    middleOfParent: (shrink: boolean = false) => {
+        if (shrink) {
+            return {
+                position: "absolute" as PositionProperty,
+                display: "inline-block",
+                top: percent(50),
+                left: percent(50),
+                right: "initial",
+                bottom: "initial",
+                transform: "translate(-50%, -50%)",
+            };
+        } else {
+            return {
+                position: "absolute" as PositionProperty,
+                display: "block",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                maxHeight: percent(100),
+                maxWidth: percent(100),
+                margin: "auto",
+            };
+        }
     },
     middleLeftOfParent: (left: LeftProperty<TLength> = px(0)) => {
         return {

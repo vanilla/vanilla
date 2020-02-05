@@ -6,21 +6,35 @@
 import { RefObject, useState, useLayoutEffect } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 
+// DOMRectReadOnly.fromRect()
+const EMPTY_RECT: DOMRect = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    toJSON: () => "",
+};
+
 /**
  * Utility hook for measuring a dom element.
  * Will return back measurements as a bounding rectangle for the element contained in a ref.
  */
 export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOffset: boolean = false) {
-    const [bounds, setContentRect] = useState<DOMRect>(
-        // DOMRectReadOnly.fromRect()
-        { x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0, toJSON: () => "" },
-    );
+    const [bounds, setContentRect] = useState<DOMRect>(EMPTY_RECT);
 
     useLayoutEffect(() => {
         let animationFrameId: number | null = null;
-        const measure: ResizeObserverCallback = ([entry]) => {
+
+        const measure = () => {
             animationFrameId = window.requestAnimationFrame(() => {
-                let rect = ref.current!.getBoundingClientRect();
+                if (!ref.current) {
+                    return;
+                }
+                let rect = ref.current.getBoundingClientRect();
 
                 if (adjustForScrollOffset) {
                     rect = {
@@ -39,6 +53,11 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
             });
         };
 
+        const resizeListener = () => {
+            measure();
+        };
+        window.addEventListener("resize", resizeListener);
+
         const ro = new ResizeObserver(measure);
         if (ref.current) {
             ro.observe(ref.current);
@@ -47,6 +66,7 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
         return () => {
             window.cancelAnimationFrame(animationFrameId!);
             ro.disconnect();
+            window.removeEventListener("resize", resizeListener);
         };
     }, [adjustForScrollOffset, ref]);
 

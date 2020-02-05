@@ -15,7 +15,7 @@ import { IMe } from "@library/@types/api/users";
 import getStore from "@library/redux/getStore";
 
 interface IProps extends IInjectableUserState {
-    permission: string | string[];
+    permission?: string | string[];
     children: React.ReactNode;
     fallback?: React.ReactNode;
     requestData: () => void;
@@ -28,6 +28,10 @@ interface IProps extends IInjectableUserState {
  */
 export class Permission extends React.Component<IProps> {
     public render(): React.ReactNode {
+        if (!this.props.permission) {
+            return this.props.children;
+        }
+
         return hasPermission(this.props.permission, this.props.currentUser)
             ? this.props.children
             : this.props.fallback || null;

@@ -94,7 +94,7 @@ export const emphasizeLightness = (
     const colorLightness = colorValue.lightness();
     let weightOffset = 1;
     if (colorLightness < 0.4) {
-        weightOffset = Math.abs(colorLightness - 0.5) * 20;
+        weightOffset = Math.abs(colorLightness - 0.4) * 20;
     }
 
     const weightCurved = weight * weightOffset;

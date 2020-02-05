@@ -19,7 +19,8 @@ export const navigationVariables = useThemeCache(() => {
     const makeVars = variableFactory("navigation");
 
     const navItems: {
-        [language: string]: ITitleBarNav[];
+        [language: string]: ITitleBarNav[] | undefined;
+        default: ITitleBarNav[];
     } = makeVars("navItems", {
         default: [
             {
@@ -32,13 +33,14 @@ export const navigationVariables = useThemeCache(() => {
             },
             ...navItemGenerators.map(generator => generator()),
         ],
+        [getCurrentLocale()]: undefined,
     });
 
     const currentLocale = getCurrentLocale();
 
     const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
         if (locale in navItems) {
-            return navItems[locale];
+            return navItems[locale] ?? navItems.default;
         } else {
             return navItems.default;
         }

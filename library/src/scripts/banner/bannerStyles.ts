@@ -60,7 +60,7 @@ export const bannerVariables = useThemeCache(() => {
         padding: {
             ...EMPTY_SPACING,
             top: topPadding as PaddingProperty<TLength>,
-            bottom: (topPadding * 0.8) as PaddingProperty<TLength>,
+            bottom: topPadding as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
         paddingMobile: {
@@ -147,7 +147,7 @@ export const bannerVariables = useThemeCache(() => {
         },
         margins: {
             ...EMPTY_SPACING,
-            top: 24,
+            top: 14,
             bottom: 12,
         },
         text: "How can we help you?",

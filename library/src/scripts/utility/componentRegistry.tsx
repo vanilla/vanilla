@@ -84,6 +84,7 @@ export function _mountComponents(parent: Element) {
             props = JSON.parse(props);
         }
         const children = node.innerHTML;
+        node.innerHTML = "";
 
         const registeredComponent = getComponent(name);
 

@@ -29,9 +29,7 @@ export const navigationVariables = useThemeCache(() => {
             { to: "/categories", children: t("Categories") },
         ];
     }
-    const navItems: {
-        [language: string]: ITitleBarNav[];
-    } = makeVars("navItems", {
+    const navItems: { [language: string]: ITitleBarNav[] | undefined; default: ITitleBarNav[] } = makeVars("navItems", {
         default: [...defaultForumLinks, ...navItemGenerators.map(generator => generator())],
         [getCurrentLocale()]: undefined,
     });

@@ -148,6 +148,10 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             this.setCloseFocusElement();
         }
 
+        if (prevState.wasDestroyed && !this.state.wasDestroyed) {
+            this.focusInitialElement();
+        }
+
         if (!prevProps.isVisible && this.props.isVisible) {
             this.focusInitialElement();
             this.setCloseFocusElement();

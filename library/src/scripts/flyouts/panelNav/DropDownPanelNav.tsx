@@ -9,11 +9,13 @@ import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import Heading from "@library/layout/Heading";
 import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Button from "@library/forms/Button";
 import { CloseTinyIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { TabHandler } from "@vanilla/dom-utils";
+import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps {
     title: string;
@@ -25,6 +27,9 @@ interface IProps {
 export function DropDownPanelNav(props: IProps) {
     const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([]);
     const [isPopping, setIsPopping] = useState(false);
+    const hasOpenItems = parentNavItems.length > 0;
+
+    const topLevelItemsRef = useRef<HTMLDivElement>();
 
     const classes = dropDownClasses();
 

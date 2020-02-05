@@ -31,12 +31,18 @@ export function PanelNavItems(props: IProps) {
     const { isActive } = props;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const { categoryRecordType } = useSiteNavContext();
+    const prevFocusedRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
         if (isActive) {
+            prevFocusedRef.current = document.activeElement as HTMLElement;
             setTimeout(() => {
                 buttonRef.current?.focus();
             }, 200);
+
+            return () => {
+                prevFocusedRef.current?.focus();
+            };
         }
     }, [isActive]);
 

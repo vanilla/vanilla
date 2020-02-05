@@ -71,6 +71,14 @@ interface SiteSectionInterface extends \JsonSerializable {
     public function applications(): array;
 
     /**
+     *  Check if application is enabled for site section.
+     *
+     * @param string $app
+     * @return bool
+     */
+    public function applicationEnabled(string $app): bool;
+
+    /**
      * Set application enabled or disabled.
      *
      * @param string $app

@@ -83,7 +83,7 @@ class VanillaController extends Gdn_Controller {
         if (count($apps) > 1) {
             $enabled = $siteSectionModel
                 ->getCurrentSiteSection()
-                ->applications()[\Vanilla\Contracts\Site\SiteSectionInterface::APP_FORUM];
+                ->applicationEnabled(\Vanilla\Contracts\Site\SiteSectionInterface::APP_FORUM);
         }
         return !$enabled;
     }

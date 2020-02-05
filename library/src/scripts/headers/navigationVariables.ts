@@ -20,19 +20,6 @@ export function generateNavItems() {
     const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
 
     if (forumEnabled) {
-        registerDefaultNavItem(() => {
-            return {
-                to: "/discussions",
-                children: t("Discussions"),
-            };
-        });
-        registerDefaultNavItem(() => {
-            return {
-                to: "/categories",
-                children: t("Categories"),
-            };
-        });
-
         if (kbEnabled) {
             registerDefaultNavItem(() => {
                 return {
@@ -47,11 +34,22 @@ export function generateNavItems() {
 
 export const navigationVariables = useThemeCache(() => {
     const makeVars = variableFactory("navigation");
+    const forumEnabled = getMeta("siteSection.apps.forum", true);
 
+    let defaultForumLinks: ITitleBarNav[] = [];
+    if (forumEnabled) {
+        defaultForumLinks = [
+            {
+                to: "/discussions",
+                children: t("Discussions"),
+            },
+            { to: "/categories", children: t("Categories") },
+        ];
+    }
     const navItems: {
         [language: string]: ITitleBarNav[];
     } = makeVars("navItems", {
-        default: [...navItemGenerators.map(generator => generator())],
+        default: [...defaultForumLinks, ...navItemGenerators.map(generator => generator())],
     });
 
     const currentLocale = getCurrentLocale();

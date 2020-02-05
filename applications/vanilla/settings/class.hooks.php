@@ -853,13 +853,29 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Detect if forum application is enabled for current site section
+     *
+     * @param $sender
+     * @return bool
+     */
+    private function linksEnabled($sender) {
+        $enabled = true;
+        if ($sender instanceof VanillaController) {
+            if ($sender->disabled()) {
+                $enabled = false;
+            }
+        }
+        return $enabled;
+    }
+
+    /**
      * @param NavModule $sender
      */
     public function siteNavModule_init_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
         $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
-        if (!(Gdn::config()->get('Vanilla.Forum.Disabled'))) {
+        if ($this->linksEnabled($sender)) {
             // Add the site discussion links.
             $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, ['icon' => 'th-list']);
             $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, ['icon' => 'discussion']);

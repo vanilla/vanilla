@@ -5,17 +5,12 @@
 
 import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAnimation";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import Heading from "@library/layout/Heading";
 import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import classNames from "classnames";
-import React, { useState, useRef, useEffect } from "react";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import Button from "@library/forms/Button";
-import { CloseTinyIcon } from "@library/icons/common";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { TabHandler } from "@vanilla/dom-utils";
-import { useLastValue } from "@vanilla/react-utils";
+import React, { useRef, useState } from "react";
 
 interface IProps {
     title: string;
@@ -26,16 +21,11 @@ interface IProps {
 
 export function DropDownPanelNav(props: IProps) {
     const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([]);
-    const [isPopping, setIsPopping] = useState(false);
-    const hasOpenItems = parentNavItems.length > 0;
-
-    const topLevelItemsRef = useRef<HTMLDivElement>();
 
     const classes = dropDownClasses();
 
     const popParentItem = () => {
         parentNavItems.pop();
-        setIsPopping(true);
         setParentNavItems(Array.from(parentNavItems));
     };
 
@@ -65,9 +55,6 @@ export function DropDownPanelNav(props: IProps) {
                 />
             </div>
             <EntranceAnimation
-                onDestroyed={() => {
-                    setIsPopping(false);
-                }}
                 isEntered={true}
                 fromDirection={FromDirection.RIGHT}
                 className={classes.panel}

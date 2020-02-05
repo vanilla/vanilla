@@ -66,7 +66,7 @@ export function PanelNavItems(props: IProps) {
                         onClick={props.popParentItem}
                         className={classes.backButton}
                     >
-                        <LeftChevronIcon className={classes.icon} />
+                        <LeftChevronIcon className={classes.arrow} />
                     </Button>
                 )}
                 <div className={classNames(classes.panelContent, { isNested: props.canGoBack })}>
@@ -83,7 +83,7 @@ export function PanelNavItems(props: IProps) {
                                         }}
                                     >
                                         <span className={classes.text}>{navItem.name}</span>
-                                        <RightChevronIcon className={classes.icon} />
+                                        <RightChevronIcon className={classes.arrow} />
                                     </DropDownItemButton>
                                 );
                             } else {

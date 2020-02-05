@@ -96,10 +96,15 @@ export const hamburgerClasses = useThemeCache(() => {
         });
     };
 
+    const container = style("container", {
+        paddingBottom: globalVars.gutter.half,
+    });
+
     return {
         root,
         content,
         spacer,
+        container,
         closeButton,
     };
 });

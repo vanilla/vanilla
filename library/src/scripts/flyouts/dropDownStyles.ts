@@ -301,12 +301,16 @@ export const dropDownClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const icon = style("icon", {
+    const arrow = style("arrow", {
         $nest: {
             "&&": {
                 padding: unit(globalVars.gutter.quarter),
             },
         },
+    });
+
+    const actionIcon = style("actionIcon", {
+        marginRight: globalVars.gutter.half,
     });
 
     const backButton = style(
@@ -400,12 +404,13 @@ export const dropDownClasses = useThemeCache(() => {
         section,
         toggleButtonIcon,
         action,
+        actionIcon,
         text,
         separator,
         sectionHeading,
         sectionContents,
         count,
-        icon,
+        arrow,
         verticalPadding,
         title,
         noVerticalPadding,
@@ -424,7 +429,7 @@ export const dropDownClasses = useThemeCache(() => {
 
 // Contents (button or link)
 // Replaces: .dropDownItem-button, .dropDownItem-link
-export const actionMixin = (classBasedStates?: IStateSelectors) => {
+export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProperties => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -476,5 +481,5 @@ export const actionMixin = (classBasedStates?: IStateSelectors) => {
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
         }),
-    } as NestedCSSProperties;
+    };
 };

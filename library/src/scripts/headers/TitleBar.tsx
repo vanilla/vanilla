@@ -32,6 +32,7 @@ import classNames from "classnames";
 import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { animated, useSpring } from "react-spring";
+import { useCollisionDetector } from "@vanilla/react-utils";
 
 interface IProps {
     container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
@@ -67,13 +68,14 @@ export default function TitleBar(_props: IProps) {
     };
 
     const { bgProps, bg2Props, logoProps } = useScrollTransition();
+    const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
 
     const { pages } = usePageContext();
     const device = useTitleBarDevice();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);
     const { hamburger } = props;
-    const isCompact = device === TitleBarDevices.COMPACT;
+    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
     const classesMeBox = meBoxClasses();
     const { currentUser } = useUsersState();
@@ -116,8 +118,11 @@ export default function TitleBar(_props: IProps) {
                                 />
                             </animated.div>
                         )}
+                        {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
+                                isCentered={vars.navAlignment.alignment === "center"}
+                                containerRef={collisionSourceRef}
                                 className={classes.nav}
                                 linkClassName={classes.topElement}
                                 linkContentClassName="titleBar-navLinkContent"
@@ -125,23 +130,24 @@ export default function TitleBar(_props: IProps) {
                         )}
                         {isCompact && (
                             <>
-                                <Hamburger
-                                    className={classes.hamburger}
-                                    extraBurgerNavigation={props.extraBurgerNavigation}
-                                />
+                                <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
                                 {!isSearchOpen && (
-                                    <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
-                                        <animated.span {...logoProps}>
-                                            <HeaderLogo
-                                                className={classes.logoContainer}
-                                                logoClassName="titleBar-logo"
-                                                logoType={LogoType.MOBILE}
-                                            />
-                                        </animated.span>
-                                    </div>
+                                    <>
+                                        {<FlexSpacer actualSpacer />}
+                                        <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
+                                            <animated.span {...logoProps}>
+                                                <HeaderLogo
+                                                    className={classes.logoContainer}
+                                                    logoClassName="titleBar-logo"
+                                                    logoType={LogoType.MOBILE}
+                                                />
+                                            </animated.span>
+                                        </div>
+                                    </>
                                 )}
                             </>
                         )}
+                        {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
                         <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
                             {!isSearchOpen && (
                                 <div className={classes.extraMeBoxIcons}>

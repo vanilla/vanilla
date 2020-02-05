@@ -97,6 +97,11 @@ const titleBarNavClasses = useThemeCache(() => {
             : {},
     );
 
+    const navigationCentered = style("navigationCentered", {
+        ...absolutePosition.middleOfParent(true),
+        display: "inline-flex",
+    });
+
     const items = style(
         "items",
         {
@@ -158,6 +163,7 @@ const titleBarNavClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         minHeight: unit(vars.item.size),
+        lineHeight: unit(vars.item.size),
         height: 0, // IE11 Fix.
     });
 
@@ -181,6 +187,7 @@ const titleBarNavClasses = useThemeCache(() => {
     return {
         root,
         navigation,
+        navigationCentered,
         items,
         link,
         linkActive,

@@ -215,7 +215,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const breakpoints = makeThemeVars("breakpoints", {
-        compact: 850,
+        compact: 800,
     });
 
     const mediaQueries = () => {
@@ -436,6 +436,11 @@ export const titleBarClasses = useThemeCache(() => {
             color: "inherit",
             flexGrow: 1,
             justifyContent: vars.navAlignment.alignment === "left" ? "flex-start" : "center",
+            $nest: {
+                "&.titleBar-guestNav": {
+                    flex: "initial",
+                },
+            },
         },
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
@@ -697,17 +702,11 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const leftFlexBasis = style(
-        "leftFlexBasis",
-        {
-            ...flex.middleLeft(),
-            flexBasis: vars.endElements.flexBasis,
-        },
-        mediaQueries.compact({
-            flexShrink: 1,
-            flexBasis: px(vars.endElements.mobile.flexBasis),
-        }),
-    );
+    const leftFlexBasis = style("leftFlexBasis", {
+        ...flex.middleLeft(),
+        flexShrink: 1,
+        flexBasis: px(vars.endElements.mobile.flexBasis),
+    });
 
     const signIn = style("signIn", {
         marginLeft: unit(vars.guest.spacer),
@@ -776,10 +775,10 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const logoCenterer = style("logoCenterer", {
-        display: "flex",
+        ...absolutePosition.middleOfParent(true),
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        flexGrow: 1,
     });
 
     const hamburger = style("hamburger", {

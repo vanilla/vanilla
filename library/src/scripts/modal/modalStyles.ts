@@ -133,6 +133,7 @@ export const modalClasses = useThemeCache(() => {
         transform: "none",
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
+        maxWidth: 400,
     };
 
     const root = style({

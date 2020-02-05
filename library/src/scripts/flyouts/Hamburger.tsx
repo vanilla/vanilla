@@ -28,7 +28,14 @@ import { Navigation } from "@knowledge/navigation/Navigation";
 
 interface IProps {
     className?: string;
-    extraBurgerNavigation?: React.ReactNode;
+    extraNavTop?: React.ReactNode;
+    extraNavBottom?: React.ReactNode;
+}
+
+const extraNavGroups: React.ComponentType[] = [];
+
+export function addHamburgerNavGroup(node: React.ComponentType) {
+    extraNavGroups.push(node);
 }
 
 /**
@@ -65,7 +72,7 @@ export default function Hamburger(props: IProps) {
                 >
                     <CloseTinyIcon />
                 </Button>
-                <div>
+                <div className={classes.container}>
                     <DropDownSection title={t("Site Navigation")}>
                         {navItems.map((item, i) => {
                             return (
@@ -75,7 +82,11 @@ export default function Hamburger(props: IProps) {
                             );
                         })}
                     </DropDownSection>
-                    {props.extraBurgerNavigation}
+                    {props.extraNavTop}
+                    {props.extraNavBottom}
+                    {extraNavGroups.map((GroupComponent, i) => (
+                        <GroupComponent key={i} />
+                    ))}
                 </div>
             </Modal>
         </>

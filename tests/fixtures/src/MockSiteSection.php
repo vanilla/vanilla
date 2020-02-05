@@ -32,6 +32,9 @@ class MockSiteSection implements SiteSectionInterface {
     /** @var array $defaultRoute */
     private $defaultRoute;
 
+    /** @var array $apps */
+    private $apps;
+
     /**
      * MockSiteSection constructor.
      *
@@ -55,7 +58,7 @@ class MockSiteSection implements SiteSectionInterface {
         $this->sectionID = $sectionID;
         $this->sectionGroup = $sectionGroup;
         $this->defaultRoute = $defaultRoute;
-        ['forum' => true];
+        $this->apps = ['forum' => true];
     }
     /**
      * @inheritdoc

@@ -21,6 +21,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -134,6 +135,11 @@ export const modalClasses = useThemeCache(() => {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         maxWidth: 400,
+        $nest: {
+            [`& .${dropDownClasses().action}`]: {
+                fontWeight: globalVars.fonts.weights.normal,
+            },
+        },
     };
 
     const root = style({

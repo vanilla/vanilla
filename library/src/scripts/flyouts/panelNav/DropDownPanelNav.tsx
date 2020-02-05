@@ -11,10 +11,12 @@ import Heading from "@library/layout/Heading";
 import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
+import { IActiveRecord } from "@library/navigation/SiteNavNode";
 
 interface IProps {
     title: string;
     navItems: INavigationTreeItem[];
+    activeRecord: IActiveRecord;
     afterNavSections?: React.ReactNode;
     isNestable: boolean;
 }
@@ -44,6 +46,7 @@ export function DropDownPanelNav(props: IProps) {
             />
             <div className={classNames(classes.panel, classes.panelFirst)} aria-hidden={parentNavItems.length > 0}>
                 <PanelNavItems
+                    activeRecord={props.activeRecord}
                     isActive={false}
                     navItems={props.navItems}
                     isNestable={props.isNestable}
@@ -70,6 +73,7 @@ export function DropDownPanelNav(props: IProps) {
 
                     return (
                         <PanelNavItems
+                            activeRecord={props.activeRecord}
                             isActive={i === parentNavItems.length - 1}
                             key={key}
                             navItems={currentItems}

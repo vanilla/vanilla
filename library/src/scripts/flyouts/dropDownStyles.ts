@@ -234,6 +234,15 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
+    const actionActive = style("actionActive", {
+        $nest: {
+            "&&": {
+                color: important(colorOut(globalVars.links.colors.active)!),
+                fontWeight: important(globalVars.fonts.weights.bold),
+            },
+        },
+    });
+
     const text = style("text", {
         display: "block",
         flex: 1,
@@ -405,6 +414,7 @@ export const dropDownClasses = useThemeCache(() => {
         toggleButtonIcon,
         action,
         actionIcon,
+        actionActive,
         text,
         separator,
         sectionHeading,

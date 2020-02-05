@@ -15,9 +15,11 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Heading from "@library/layout/Heading";
+import { IActiveRecord } from "@library/navigation/SiteNavNode";
 
 interface IProps {
     navItems: INavigationTreeItem[];
+    activeRecord: IActiveRecord;
     pushParentItem: (item: INavigationTreeItem) => void;
     popParentItem: () => void;
     isNestable: boolean;
@@ -73,10 +75,14 @@ export function PanelNavItems(props: IProps) {
                     <ul className={classes.sectionContents}>
                         {props.navItems.map((navItem, i) => {
                             const showChildren = categoryRecordType === navItem.recordType && props.isNestable;
+                            const isActive =
+                                navItem.recordType === props.activeRecord.recordType &&
+                                navItem.recordID === props.activeRecord.recordID;
 
                             if (showChildren) {
                                 return (
                                     <DropDownItemButton
+                                        isActive={isActive}
                                         key={i}
                                         onClick={() => {
                                             props.pushParentItem(navItem);
@@ -88,7 +94,7 @@ export function PanelNavItems(props: IProps) {
                                 );
                             } else {
                                 return (
-                                    <DropDownItemLink key={i} to={navItem.url}>
+                                    <DropDownItemLink isActive={isActive} key={i} to={navItem.url}>
                                         {navItem.name}
                                     </DropDownItemLink>
                                 );

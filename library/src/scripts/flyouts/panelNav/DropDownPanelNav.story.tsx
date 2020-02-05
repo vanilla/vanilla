@@ -31,6 +31,7 @@ function Story() {
         <SiteNavProvider categoryRecordType="knowledgeCategory">
             <Modal scrollable isVisible={true} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT}>
                 <DropDownPanelNav
+                    activeRecord={STORY_SITE_NAV_ACTIVE_RECORD}
                     isNestable={true}
                     title="Navigation First Root"
                     navItems={STORY_SITE_NAV_ITEMS}
@@ -43,6 +44,7 @@ function Story() {
                     }
                 />
                 <DropDownPanelNav
+                    activeRecord={STORY_SITE_NAV_ACTIVE_RECORD}
                     isNestable={true}
                     title="Navigation Second Root"
                     navItems={STORY_SITE_NAV_ITEMS}

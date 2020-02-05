@@ -255,7 +255,7 @@
 //
 // Styleguide 1.6.
 
-.subheading {
+.subheading.subheading {
   @include full-border(block, false, true);
   @include has-top-border;
   padding-top: $spacer;

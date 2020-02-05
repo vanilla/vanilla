@@ -1129,8 +1129,11 @@ class CommentModel extends Gdn_Model {
             if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
                 $fields = $this->Validation->schemaValidationFields();
                 unset($fields[$this->PrimaryKey]);
+                $comment = $this->getID($commentID, DATASET_TYPE_ARRAY);
+                $insertUserID = $comment['InsertUserID'] ?? null;
+                $dateInserted = $comment['DateInserted'] ?? null;
 
-                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID]) : $fields;
+                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) : $fields;
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', $commentData);
                 if ($spam) {

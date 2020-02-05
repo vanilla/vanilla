@@ -116,6 +116,13 @@ class MockSiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setApplication(string $app, bool $enable = true) {
         $this->apps[$app] = $enable;
     }

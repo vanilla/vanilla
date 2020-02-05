@@ -57,6 +57,25 @@ class DiscussionController extends VanillaController {
     }
 
     /**
+     * Get the most recent date inserted from an array of comments.
+     *
+     * @param iterable|null $comments The comments from a page.
+     * @return string|null $maxDateInserted.
+     * @throws Exception Some exception.
+     */
+    public function maxDateInserted(?iterable $comments): ?string {
+        if (is_null($comments)) {
+            return null;
+        }
+
+        $maxDate = null;
+        foreach ($comments as $comment) {
+            $maxDate = DiscussionModel::maxDate($maxDate, val('DateInserted', $comment));
+        }
+        return $maxDate;
+    }
+
+    /**
      * Default single discussion display.
      *
      * @since 2.0.0
@@ -154,19 +173,6 @@ class DiscussionController extends VanillaController {
             $this->Offset = 0;
         }
 
-
-        $LatestItem = $this->Discussion->CountCommentWatch;
-        if ($LatestItem === null) {
-            $LatestItem = 0;
-        } elseif ($LatestItem < $this->Discussion->CountComments) {
-            $LatestItem += 1;
-        } elseif ($LatestItem > $this->Discussion->CountComments) {
-            // If ever the CountCommentWatch is greater than the actual number of comments.
-            $LatestItem = $this->Discussion->CountComments;
-        }
-
-        $this->setData('_LatestItem', $LatestItem);
-
         // Set the canonical url to have the proper page title.
         $canonicalUrl = ($this->Discussion->Attributes['CanonicalUrl'] ?? '');
         if (empty($canonicalUrl)) {
@@ -187,6 +193,18 @@ class DiscussionController extends VanillaController {
 
         // Load the comments
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
+
+        $LatestItem = $this->Discussion->CountCommentWatch;
+        if ($LatestItem === null) {
+            $LatestItem = 0;
+        } elseif ($LatestItem < $this->Discussion->CountComments) {
+            $LatestItem += 1;
+        } elseif ($LatestItem > $this->Discussion->CountComments) {
+            // If ever the CountCommentWatch is greater than the actual number of comments.
+            $LatestItem = $this->Discussion->CountComments;
+        }
+
+        $this->setData('_LatestItem', $LatestItem);
 
         $PageNumber = pageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);
@@ -214,9 +232,12 @@ class DiscussionController extends VanillaController {
             }
         }
 
+        // Save the insert date of the last comment viewed to set in the user's discussion watch table.
+
         // Make sure to set the user's discussion watch records if this is not an API request.
         if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $this->CommentModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+            $maxDateInserted = $this->maxDateInserted($this->data('Comments'));
+            $this->DiscussionModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments, $maxDateInserted);
         }
 
         // Build a pager
@@ -340,7 +361,12 @@ class DiscussionController extends VanillaController {
             $lastComment = $comments[count($comments) - 1];
             // Mark the comment read.
             $this->setData('Offset', $this->Discussion->CountComments, true);
-            $this->CommentModel->setWatch($this->Discussion, $this->Discussion->CountComments, $this->Discussion->CountComments, $this->Discussion->CountComments);
+            $this->DiscussionModel->setWatch(
+                $this->Discussion,
+                $this->Discussion->CountComments,
+                $this->Discussion->CountComments,
+                $this->Discussion->CountComments
+            );
 
             $lastCommentID = $this->json('LastCommentID');
             if (is_null($lastCommentID) || $lastComment->CommentID > $lastCommentID) {

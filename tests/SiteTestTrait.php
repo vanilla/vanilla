@@ -10,6 +10,7 @@ namespace VanillaTests;
 use Garden\EventManager;
 use PHPUnit\Framework\AssertionFailedError;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Permissions;
 
 /**
  * Allow a class to test against
@@ -37,6 +38,9 @@ trait SiteTestTrait {
 
     /** @var array $enabledLocales */
     protected static $enabledLocales = [];
+
+    /** @var array */
+    private $sessionBak;
 
     /**
      * Get the names of addons to install.
@@ -172,5 +176,54 @@ TEMPLATE;
 
             $callback($path, $dest);
         }
+    }
+
+    /**
+     * Back up the container's session.
+     *
+     * This is a good method to call in your `setUp` method.
+     *
+     * @throws \Exception Throws an exception if the session has already been backed up.
+     */
+    protected function backupSession() {
+        if (!empty($this->sessionBak)) {
+            throw new \Exception("Cannot backup the session over a previous backup.", 500);
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+
+        $this->sessionBak = [
+            'userID' => $session->UserID,
+            'user' => $session->User,
+            'permissions' => clone $session->getPermissions(),
+        ];
+    }
+
+    /**
+     * Restore a backed up session.
+     *
+     * Call this method after a call to `backupSession()`.
+     *
+     * @throws \Exception Throws an exception if there isn't a session to restore.
+     */
+    protected function restoreSession() {
+        if (empty($this->sessionBak)) {
+            throw new \Exception("No session to restore.", 500);
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+
+        $session->UserID = $this->sessionBak['userID'];
+        $session->User = $this->sessionBak['user'];
+
+        // Hack to get past private property. Don't do outside of tests.
+        $fn = function (Permissions $perms) {
+            $this->permissions = $perms;
+        };
+        $fn->bindTo($session, \Gdn_Session::class);
+        $fn($this->sessionBak['permissions']);
+        $this->sessionBak = null;
     }
 }

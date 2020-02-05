@@ -20,6 +20,7 @@ export interface IDropDownItemLink {
     className?: string;
     lang?: string;
     isCurrent?: boolean;
+    isActive?: boolean;
 }
 
 /**
@@ -29,10 +30,15 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
     public render() {
         const { children, name, className, to } = this.props;
         const linkContents = children ? children : name;
-        const classesDropDown = dropDownClasses();
+        const classes = dropDownClasses();
         return (
-            <DropDownItem className={classNames(className, classesDropDown.item)}>
-                <SmartLink to={to} title={name} lang={this.props.lang} className={classesDropDown.action}>
+            <DropDownItem className={classNames(className, classes.item)}>
+                <SmartLink
+                    to={to}
+                    title={name}
+                    lang={this.props.lang}
+                    className={classNames(classes.action, this.props.isActive && classes.actionActive)}
+                >
                     {linkContents}
                 </SmartLink>
             </DropDownItem>

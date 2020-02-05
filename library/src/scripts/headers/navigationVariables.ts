@@ -33,13 +33,14 @@ export const navigationVariables = useThemeCache(() => {
         [language: string]: ITitleBarNav[];
     } = makeVars("navItems", {
         default: [...defaultForumLinks, ...navItemGenerators.map(generator => generator())],
+        [getCurrentLocale()]: undefined,
     });
 
     const currentLocale = getCurrentLocale();
 
     const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
         if (locale in navItems) {
-            return navItems[locale];
+            return navItems[locale] ?? navItems.default;
         } else {
             return navItems.default;
         }

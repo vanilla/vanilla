@@ -84,11 +84,11 @@ story.add(
                         <TitleBarDeviceProvider>
                             <StoryFullPage>
                                 <StoryHeading>Hamburger menu</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
                                 <StoryHeading>Big Logo</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
                                 <StoryHeading>Extra Navigation links</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} hamburger={true} />
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
                             </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </Provider>

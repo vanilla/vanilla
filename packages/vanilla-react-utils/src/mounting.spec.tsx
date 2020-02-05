@@ -26,12 +26,12 @@ describe("mountPortal", () => {
         expect(document.getElementById("world1-item")).toBeDefined();
     });
 
-    it("can override an existing container", async () => {
+    it("can push into an existing container", async () => {
         document.body.innerHTML = "<div></div>";
         await mountPortal(<HelloWorld id={"world1-item"} />, "world1-cont");
         await mountPortal(<HelloWorld id={"world1-item2"} />, "world1-cont");
         expect(document.getElementById("world1-cont")).toBeDefined();
-        expect(document.getElementById("world1-item")).toBeNull();
+        expect(document.getElementById("world1-item")).toBeDefined();
         expect(document.getElementById("world1-item2")).toBeDefined();
     });
 
@@ -40,7 +40,7 @@ describe("mountPortal", () => {
         await mountPortal(<HelloWorld id={"world1-item"} />, "world1-cont");
         await mountPortal(<PortalWorld id={"world1-portal"} contentID={"world1-item2"} />, "world1-cont");
         expect(document.getElementById("world1-cont")).toBeDefined();
-        expect(document.getElementById("world1-item")).toBeNull();
+        expect(document.getElementById("world1-item")).toBeDefined();
         expect(document.getElementById("world1-portal")).toBeDefined();
         expect(document.getElementById("world1-item2")).toBeDefined();
     });

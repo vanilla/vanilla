@@ -52,15 +52,20 @@ export const BackgroundsProvider = (props: { children: ReactNode }) => {
     );
 };
 
-export function fullBackgroundCompat(isHomePage = false) {
-    bodyCSS(); // set styles on body tag
+const COMPAT_BG_ID = "vanillaCompatBodyBg";
 
-    // Make a backwards compatible body background (absolute positioned).
-    const classes = fullBackgroundClasses(!!isHomePage);
-    const fullBodyBackground = document.createElement("div");
-    fullBodyBackground.classList.add(classes.root);
-    const frameBody = document.querySelector(".Frame-body");
-    if (frameBody) {
-        frameBody.prepend(fullBodyBackground);
+export function fullBackgroundCompat(isHomePage = false) {
+    if (!document.getElementById(COMPAT_BG_ID)) {
+        bodyCSS(); // set styles on body tag
+
+        // Make a backwards compatible body background (absolute positioned).
+        const classes = fullBackgroundClasses(!!isHomePage);
+        const fullBodyBackground = document.createElement("div");
+        fullBodyBackground.id = COMPAT_BG_ID;
+        fullBodyBackground.classList.add(classes.root);
+        const frameBody = document.querySelector(".Frame-body");
+        if (frameBody) {
+            frameBody.prepend(fullBodyBackground);
+        }
     }
 }

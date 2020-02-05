@@ -9674,7 +9674,7 @@ ul {
   color: #0291db;
 }
 
-.subheading {
+.subheading.subheading {
   display: block;
   margin-left: -18px;
   margin-right: -18px;

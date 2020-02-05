@@ -853,53 +853,35 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     * Detect if forum application is enabled for current site section
-     *
-     * @param mixed $sender
-     * @return bool
-     */
-    private function linksEnabled($sender): bool {
-        $enabled = true;
-        if ($sender instanceof VanillaController) {
-            if ($sender->disabled()) {
-                $enabled = false;
-            }
-        }
-        return $enabled;
-    }
-
-    /**
      * @param NavModule $sender
      */
     public function siteNavModule_init_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
         $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
-        if ($this->linksEnabled($sender)) {
-            // Add the site discussion links.
-            $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, ['icon' => 'th-list']);
-            $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, ['icon' => 'discussion']);
-            $sender->addGroup(t('Favorites'), 'favorites', '', 3);
+        // Add the site discussion links.
+        $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, ['icon' => 'th-list']);
+        $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, ['icon' => 'discussion']);
+        $sender->addGroup(t('Favorites'), 'favorites', '', 3);
 
-            if (Gdn::session()->isValid()) {
-                $sender->addLink(
-                    t('My Bookmarks'),
-                    '/discussions/bookmarked',
-                    'favorites.bookmarks',
-                    '',
-                    [],
-                    ['icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks]
-                );
-                $sender->addLink(
-                    t('My Discussions'),
-                    '/discussions/mine',
-                    'favorites.discussions',
-                    '',
-                    [],
-                    ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]
-                );
-                $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', [], ['icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts]);
-            }
+        if (Gdn::session()->isValid()) {
+            $sender->addLink(
+                t('My Bookmarks'),
+                '/discussions/bookmarked',
+                'favorites.bookmarks',
+                '',
+                [],
+                ['icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks]
+            );
+            $sender->addLink(
+                t('My Discussions'),
+                '/discussions/mine',
+                'favorites.discussions',
+                '',
+                [],
+                ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]
+            );
+            $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', [], ['icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts]);
         }
 
         $user = Gdn::controller()->data('Profile');

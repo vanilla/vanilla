@@ -18,4 +18,13 @@ Gdn::getContainer()
     ->addCall('registerFactory', [
         'embedFactory' => new Container\Reference(CommentEmbedFactory::class),
         'priority' => EmbedService::PRIORITY_NORMAL
-    ]);
+    ])
+    ->rule(\Vanilla\Site\SiteSectionModel::class)
+        ->addCall(
+            'registerApplication',
+            [
+                'forum',
+                ['name' => 'Forum']
+            ]
+        )
+    ;

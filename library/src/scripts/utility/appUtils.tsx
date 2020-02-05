@@ -89,6 +89,7 @@ interface ISiteSection {
     sectionGroup: string;
     sectionID: string;
     name: string;
+    apps: { [key: string]: boolean };
 }
 
 /**

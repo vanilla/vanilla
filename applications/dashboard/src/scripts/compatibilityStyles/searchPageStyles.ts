@@ -5,7 +5,6 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { inputVariables } from "@library/forms/inputStyles";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { margins, unit } from "@library/styles/styleHelpers";
@@ -14,14 +13,7 @@ import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasSt
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
     const layoutVars = forumLayoutVariables();
-
-    const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {
         top: unit(layoutVars.cell.paddings.vertical),

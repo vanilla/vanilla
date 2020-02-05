@@ -5,8 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
-import { allLinkStates, colorOut, negative, pointerEvents, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, negative, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";

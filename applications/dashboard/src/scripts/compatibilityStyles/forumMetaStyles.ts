@@ -6,22 +6,19 @@
  */
 
 import {
-    colorOut,
-    margins,
-    unit,
-    borders,
-    paddings,
     allLinkStates,
-    ISimpleBorderStyle,
+    borders,
+    colorOut,
     importantColorOut,
+    margins,
+    paddings,
+    unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
+import { important } from "csx";
+import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -29,13 +26,8 @@ export const mixinMetaContainer = (selector: string, overwrites = {}) => {
 
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
-    const formVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
     const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     mixinMetaLinkContainer(".DataList");
     mixinMetaLinkContainer(".DataList-Search");

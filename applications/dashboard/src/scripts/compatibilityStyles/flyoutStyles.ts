@@ -5,40 +5,16 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
-import {
-    borders,
-    buttonStates,
-    colorOut,
-    IActionStates,
-    importantUnit,
-    IStateSelectors,
-    negative,
-    paddings,
-    pointerEvents,
-    setAllLinkColors,
-    textInputSizingFromFixedHeight,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { colorOut, importantUnit, IStateSelectors, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important, percent } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { actionMixin, dropDownClasses, dropDownVariables } from "@library/flyouts/dropDownStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { actionMixin } from "@library/flyouts/dropDownStyles";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
-    const formVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     // Dropdown hover/focus colors:
     mixinFlyoutItem(".MenuItems .Item a");

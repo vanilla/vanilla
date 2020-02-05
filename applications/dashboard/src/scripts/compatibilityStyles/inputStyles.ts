@@ -5,7 +5,6 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
 import {
     borders,
     colorOut,
@@ -14,7 +13,6 @@ import {
     importantUnit,
     margins,
     negative,
-    pointerEvents,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
@@ -32,7 +30,6 @@ export const inputCSS = () => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     cssOut(
         `

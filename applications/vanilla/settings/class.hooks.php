@@ -878,7 +878,8 @@ class VanillaHooks implements Gdn_IPlugin {
                     t('My Discussions'),
                     '/discussions/mine',
                     'favorites.discussions',
-                    '', [],
+                    '',
+                    [],
                     ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]
                 );
                 $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', [], ['icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts]);

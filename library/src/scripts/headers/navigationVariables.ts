@@ -16,8 +16,8 @@ export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
 }
 
 export function generateNavItems() {
-    const forumEnabled = getMeta("siteSection.apps.forum");
-    const kbEnabled = getMeta("siteSection.apps.knowledgeBase");
+    const forumEnabled = getMeta("siteSection.apps.forum", true);
+    const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
 
     if (forumEnabled) {
         registerDefaultNavItem(() => {

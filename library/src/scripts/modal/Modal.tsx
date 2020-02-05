@@ -168,9 +168,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             this.onMountIn();
         }
 
-        if (!prevState.wasDestroyed && this.state.wasDestroyed) {
-        }
-
         if (!prevProps.isVisible && this.props.isVisible) {
             this.setState({ wasDestroyed: false });
         }

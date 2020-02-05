@@ -61,6 +61,7 @@ export const STORY_SITE_NAV_ITEMS: INavigationTreeItem[] = [
                 parentID: 26,
                 recordID: 97,
                 url: "#",
+                name: "Test Article",
                 children: [],
             },
             {

@@ -11,11 +11,10 @@ import classNames from "classnames";
 import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { forceRenderStyles } from "typestyle";
-import { IModalTransitioner, ModalTransition } from "@library/modal/ModalTransition";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
 
-interface IProps extends IModalTransitioner {
+interface IProps {
     onOverlayClick: React.MouseEventHandler;
     onModalClick: React.MouseEventHandler;
     onKeyDown: React.KeyboardEventHandler;

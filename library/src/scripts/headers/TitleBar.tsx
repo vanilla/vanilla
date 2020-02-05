@@ -41,7 +41,6 @@ interface IProps {
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
     isFixed?: boolean;
     useMobileBackButton?: boolean;
-    hamburger?: React.ReactNode; // Not to be used with mobileDropDownContent
     logoUrl?: string;
     hasSubNav?: boolean;
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
@@ -63,7 +62,6 @@ export default function TitleBar(_props: IProps) {
         mobileDropDownContent: null,
         isFixed: true,
         useMobileBackButton: true,
-        hamburger: false,
         ..._props,
     };
 
@@ -74,7 +72,6 @@ export default function TitleBar(_props: IProps) {
     const device = useTitleBarDevice();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);
-    const { hamburger } = props;
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
     const classesMeBox = meBoxClasses();
@@ -107,7 +104,7 @@ export default function TitleBar(_props: IProps) {
                             (props.useMobileBackButton ? (
                                 <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
                             ) : (
-                                hamburger && <FlexSpacer className="pageHeading-leftSpacer" />
+                                <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
                         {!isCompact && (
                             <animated.div className={classes.logoAnimationWrap} {...logoProps}>

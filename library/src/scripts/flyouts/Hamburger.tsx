@@ -4,27 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { t } from "@library/utility/appUtils";
-import Frame from "@library/layout/frame/Frame";
-import classNames from "classnames";
-import FrameBody from "@library/layout/frame/FrameBody";
-import { HamburgerIcon, CloseTinyIcon } from "@library/icons/common";
+import Permission from "@library/features/users/Permission";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
-import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { navigationVariables } from "@library/headers/navigationVariables";
+import { CloseTinyIcon, HamburgerIcon } from "@library/icons/common";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
-import { siteNavVariables } from "@library/navigation/siteNavStyles";
-import { navigationVariables } from "@library/headers/navigationVariables";
-import { getCurrentLocale } from "@vanilla/i18n";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import Permission from "@library/features/users/Permission";
-import { Navigation } from "@knowledge/navigation/Navigation";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React, { useState } from "react";
 
 interface IProps {
     className?: string;

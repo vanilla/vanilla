@@ -238,7 +238,7 @@ export const dropDownClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 color: important(colorOut(globalVars.links.colors.active)!),
-                fontWeight: important(globalVars.fonts.weights.bold),
+                fontWeight: important(globalVars.fonts.weights.bold) as any,
             },
         },
     });

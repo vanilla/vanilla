@@ -94,6 +94,7 @@ export default class Modal extends React.Component<IProps, IState> {
             </>,
             MODAL_CONTAINER_ID,
             true,
+            Modal.stack.length === 0,
         );
     }
 
@@ -120,7 +121,10 @@ A modal was mounted, but the page container could not be found.
 Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
             `);
         }
+    }
 
+    public onMountIn = () => {
+        const pageContainer = this.getPageContainer();
         this.setCloseFocusElement();
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
@@ -130,7 +134,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
-    }
+    };
 
     public handleDestroyed = () => {
         // Do some quick state updates to bump the modal to the top of the portal stack.
@@ -139,30 +143,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         // The second render will re-create the portal.
         this.setState({ wasDestroyed: true });
 
-        // We were destroyed so we should focus back to the last element.
-        this.closeFocusElement?.focus();
-    };
-
-    public componentDidUpdate(prevProps: IProps, prevState: IState) {
-        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
-            this.setCloseFocusElement();
-        }
-
-        if (prevState.wasDestroyed && !this.state.wasDestroyed) {
-            this.focusInitialElement();
-        }
-
-        if (!prevProps.isVisible && this.props.isVisible) {
-            this.focusInitialElement();
-            this.setCloseFocusElement();
-            this.setState({ wasDestroyed: false });
-        }
-    }
-
-    /**
-     * Tear down setup from componentDidMount
-     */
-    public componentWillUnmount() {
         const pageContainer = this.getPageContainer();
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
         Modal.stack.pop();
@@ -176,7 +156,25 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
 
+        // We were destroyed so we should focus back to the last element.
         this.closeFocusElement?.focus();
+    };
+
+    public componentDidUpdate(prevProps: IProps, prevState: IState) {
+        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
+            this.setCloseFocusElement();
+        }
+
+        if (prevState.wasDestroyed && !this.state.wasDestroyed) {
+            this.onMountIn();
+        }
+
+        if (!prevState.wasDestroyed && this.state.wasDestroyed) {
+        }
+
+        if (!prevProps.isVisible && this.props.isVisible) {
+            this.setState({ wasDestroyed: false });
+        }
     }
 
     private getPageContainer(): HTMLElement | null {
@@ -246,6 +244,7 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
                 return;
             } else {
                 if (topModal.props.exitHandler) {
+                    console.log("calling exit handler", topModal);
                     topModal.props.exitHandler(event as any);
                 }
             }

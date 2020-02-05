@@ -63,14 +63,19 @@ export function mountReact(
  * @param containerID The container to render the modal into. Defaults to modal container.
  * @param asPortal Whether or not we should render as a portal or a render.
  */
-export function mountPortal(element: ReactElement<any>, containerID: string, asPortal: boolean = false) {
+export function mountPortal(
+    element: ReactElement<any>,
+    containerID: string,
+    asPortal: boolean = false,
+    overwrite: boolean = true,
+) {
     // Ensure we have our modal container.
     let container = document.getElementById(containerID);
     if (!container) {
         container = document.createElement("div");
         container.id = containerID;
         document.body.appendChild(container);
-    } else {
+    } else if (overwrite) {
         ReactDOM.unmountComponentAtNode(container);
     }
 

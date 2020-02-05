@@ -11,6 +11,7 @@ import {
     colorOut,
     getHorizontalPaddingForTextInput,
     getVerticalPaddingForTextInput,
+    importantUnit,
     margins,
     negative,
     pointerEvents,
@@ -93,6 +94,7 @@ export const inputCSS = () => {
     // mixinInputStyles(".AdvancedSearch select");
     // mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
+    mixinInputStyles("ul.token-input-list, div.Popup .Body ul.token-input-list");
     mixinInputStyles(`
         .Container input[type= "text"],
         .Container textarea,
@@ -318,5 +320,24 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
             borderColor: isImportant ? important(primary as string) : primary,
         },
         ...extraFocus,
+    });
+
+    cssOut(`ul.token-input-list, div.Popup .Body ul.token-input-list`, {
+        paddingBottom: importantUnit(0),
+        paddingRight: importantUnit(0),
+        minHeight: unit(formVars.sizing.height),
+    });
+
+    cssOut(`.TextBoxWrapper li.token-input-token.token-input-token`, {
+        marginBottom: importantUnit(formVars.spacing.verticalPadding - formVars.border.width),
+        marginRight: importantUnit(formVars.spacing.horizontalPadding - 2 * formVars.border.width),
+    });
+
+    cssOut(`li.token-input-token span`, {
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`ul.token-input-list li input`, {
+        marginBottom: importantUnit(4),
     });
 };

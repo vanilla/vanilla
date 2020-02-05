@@ -211,9 +211,17 @@ export const groupsCSS = () => {
         }),
     );
 
+    cssOut(`.Group-Box.Group-MembersPreview .H`, {
+        position: "relative",
+    });
+
     cssOut(`.GroupWrap .DataTable .Buttons`, {
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "flex-end",
+    });
+
+    cssOut(`.groupsMemberFilter`, {
+        marginTop: unit(100),
     });
 };

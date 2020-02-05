@@ -35,8 +35,8 @@ export const tableCSS = () => {
 
     cssOut(
         `
-        .Groups .DataTable.DiscussionsTable.DiscussionsTable td.DiscussionName,
-        .DataTable.DiscussionsTable.DiscussionsTable td.DiscussionName
+        .DataTable.DiscussionsTable.DiscussionsTable thead td,
+        .DataTableWrap.GroupWrap thead td,
     `,
         {
             ...paddings({

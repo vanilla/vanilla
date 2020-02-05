@@ -46,6 +46,7 @@ export const forumMetaCSS = () => {
     mixinMetaLinkContainer(".DataTableWrap");
     mixinMetaLinkContainer(`.Container .Frame-contentWrap .ChildCategories`);
     mixinMetaLinkContainer(`.Item.Application .Meta`);
+    mixinMetaLinkContainer(`.Meta.Group-Meta.Group-Info`);
 
     cssOut(
         `

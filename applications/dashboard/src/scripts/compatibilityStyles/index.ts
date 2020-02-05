@@ -11,8 +11,17 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, negative, paddings, singleBorder, srOnly, unit } from "@library/styles/styleHelpers";
-import { ColorHelper, important } from "csx";
+import {
+    borders,
+    importantUnit,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    srOnly,
+    unit,
+} from "@library/styles/styleHelpers";
+import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
@@ -34,6 +43,8 @@ import { discussionCSS } from "./discussionStyles";
 import { searchPageCSS } from "./searchPageStyles";
 import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
+import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
+import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -328,6 +339,10 @@ export const compatibilityStyles = useThemeCache(() => {
         color: colorOut(vars.mainColors.fg),
     });
 
+    cssOut(`.Group-Box.Group-MembersPreview .PageControls .H`, {
+        position: "relative",
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -346,6 +361,8 @@ export const compatibilityStyles = useThemeCache(() => {
     searchPageCSS();
     groupsCSS();
     profilePageCSS();
+    photoGridCSS();
+    messagesCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

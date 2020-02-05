@@ -25,6 +25,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
+    const titleBarVars = titleBarVariables();
 
     const border = makeThemeVars("border", {
         verticalWidth: 3,
@@ -41,7 +42,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
-        bg: globalVars.mainColors.fg,
+        bg: titleBarVars.colors.fg,
         bottomSpace: 1,
     });
 

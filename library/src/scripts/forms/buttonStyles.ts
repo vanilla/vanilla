@@ -76,6 +76,7 @@ export const buttonVariables = useThemeCache(() => {
         name: ButtonTypes.STANDARD,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
+            fg: globalVars.mainColors.primaryContrast,
             bg: globalVars.mainColors.bg,
         },
         borders: {

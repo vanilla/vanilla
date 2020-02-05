@@ -581,7 +581,7 @@ class SettingsController extends DashboardController {
         $options = $siteSectionModel->getDefaultRoutes();
         if (count($options) > 0) {
             $items['Vanilla.Forum.Disabled'] = [
-                'LabelCode' => t('Disable forum controllers'),
+                'LabelCode' => t('Disable forum pages'),
                 'Control' => 'toggle',
                 'Description' => t("Remove discussion and categories links from menus.<br /> Set discussion and category related pages to return not found page 404."),
                 'Options' => [

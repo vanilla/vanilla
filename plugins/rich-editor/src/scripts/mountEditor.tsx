@@ -25,9 +25,14 @@ export default function mountEditor(containerSelector: string | Element) {
     const initialFormat = bodybox.getAttribute("format");
 
     if (initialFormat === "Rich" || initialFormat === "rich") {
-        mountReact(<ForumEditor legacyTextArea={bodybox as HTMLInputElement} />, container, () => {
-            container.classList.remove("isDisabled");
-        });
+        mountReact(
+            <ForumEditor legacyTextArea={bodybox as HTMLInputElement} />,
+            container,
+            () => {
+                container.classList.remove("isDisabled");
+            },
+            { clearContents: true },
+        );
     } else {
         throw new Error(`Unsupported initial editor format ${initialFormat}`);
     }

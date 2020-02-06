@@ -1184,7 +1184,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function calculateCommentReadData(
         int $discussionCommentCount,
-        string $discussionLastCommentDate,
+        ?string $discussionLastCommentDate,
         ?int $userReadComments,
         ?string $userLastReadDate
     ): array {
@@ -1216,7 +1216,9 @@ class DiscussionModel extends Gdn_Model {
         // If the discussion has no comments and read status is false or both user categories are null,
         // set unread comments to true unless the discussion is archived (in which case, we don't want it showing up as new).
         if (($discussionCommentCount === 0 && !$isRead) | ($userReadComments === null && $userLastReadDate === null)) {
-            $this->isArchived($discussionLastCommentDate->format(MYSQL_DATE_FORMAT)) ? $unreadCommentCount = 0 : $unreadCommentCount = true;
+            if (!is_null($discussionLastCommentDate)) {
+                $this->isArchived($discussionLastCommentDate->format(MYSQL_DATE_FORMAT)) ? $unreadCommentCount = 0 : $unreadCommentCount = true;
+            }
         }
 
         return [$isRead, $unreadCommentCount];

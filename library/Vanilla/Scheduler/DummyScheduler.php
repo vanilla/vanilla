@@ -268,7 +268,7 @@ class DummyScheduler implements SchedulerInterface {
      * @return void
      */
     protected function dispatchAll() {
-        foreach ($this->trackingSlips as $trackingSlip) {
+        foreach ($this->generateTrackingSlips() as $trackingSlip) {
             try {
                 $jobInterface = $trackingSlip->getJobInterface();
                 $driverSlip = $trackingSlip->getDriverSlip();
@@ -288,6 +288,23 @@ class DummyScheduler implements SchedulerInterface {
         if ($this->dispatchedEventName != null) {
             $this->eventManager->fire($this->dispatchedEventName, $this->trackingSlips);
         }
+    }
+
+    /**
+     * Tracking slip generator.
+     */
+    private function generateTrackingSlips() {
+        // Ensure we're starting at the start.
+        reset($this->trackingSlips);
+        while (($key = key($this->trackingSlips)) !== null) {
+            // Get the value. Advance the internal pointer.
+            $slip = $this->trackingSlips[$key];
+            next($this->trackingSlips);
+
+            yield $slip;
+        }
+        // Reset the internal pointer to hopefully avoid unexpected behavior.
+        reset($this->trackingSlips);
     }
 
     /**

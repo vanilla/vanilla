@@ -31,6 +31,9 @@ class SiteSectionModel {
     /** @var array $defaultRoutes */
     private $defaultRoutes = [];
 
+    /** @var array $apps */
+    private $apps = [];
+
     /**
      * SiteSectionModel constructor.
      *
@@ -165,5 +168,23 @@ class SiteSectionModel {
             }
         }
         return $this->currentSiteSection ?? $this->defaultSiteSection;
+    }
+
+    /**
+     * Register application available
+     *
+     * @param string $app
+     * @param array $settings
+     */
+    public function registerApplication(string $app, array $settings) {
+        $this->apps[$app] = $settings;
+    }
+
+    /**
+     * Get all available applications
+     *
+     */
+    public function applications(): array {
+        return $this->apps;
     }
 }

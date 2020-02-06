@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
 import { ReactElement } from "react";
@@ -10,6 +11,59 @@ import { ReactElement } from "react";
 export interface IComponentMountOptions {
     overwrite?: boolean;
 }
+
+interface IPortal {
+    target: HTMLElement;
+    component: React.ReactElement;
+}
+
+const portals: IPortal[] = [];
+
+const PORTAL_MANAGER_ID = "vanillaPortalManager";
+type PortalContextType = React.FC<{ children?: React.ReactNode }>;
+let PortalContext: PortalContextType = props => {
+    return <React.Fragment>{props.children}</React.Fragment>;
+};
+
+export function applySharedPortalContext(context: PortalContextType) {
+    PortalContext = context;
+    renderPortals();
+}
+
+/**
+ * Component for managing all mounted components from a single wrapped context.
+ *
+ * This allows a shared context provider to be applied to parts of the site.
+ */
+function PortalManager() {
+    return (
+        <div>
+            <PortalContext>
+                {portals.map((portal, i) => {
+                    return (
+                        <React.Fragment key={i}>
+                            {ReactDOM.createPortal(portal.component, portal.target)}
+                        </React.Fragment>
+                    );
+                })}
+            </PortalContext>
+        </div>
+    );
+}
+
+function renderPortals(callback?: () => void) {
+    // Ensure we have our modal container.
+    let container = document.getElementById(PORTAL_MANAGER_ID);
+    if (!container) {
+        container = document.createElement("div");
+        container.id = PORTAL_MANAGER_ID;
+        document.body.appendChild(container);
+    }
+
+    ReactDOM.render(<PortalManager />, container, callback);
+}
+
+// Make a mount root in base of the document.
 
 /**
  * Mount a root component of a React tree.
@@ -39,7 +93,9 @@ export function mountReact(
         target.parentElement!.insertBefore(container, target);
         mountPoint = container;
     }
-    ReactDOM.render(component, mountPoint, () => {
+    portals.push({ target: mountPoint, component });
+
+    renderPortals(() => {
         if (cleanupContainer) {
             target.remove();
             if (cleanupContainer.firstElementChild) {
@@ -61,24 +117,20 @@ export function mountReact(
  *
  * @param element The <Modal /> element to render.
  * @param containerID The container to render the modal into. Defaults to modal container.
- * @param asPortal Whether or not we should render as a portal or a render.
+ * @param asRealPortal Whether or not we should render this as a real portal, or one managed by the portal manager.
  */
-export function mountPortal(element: ReactElement<any>, containerID: string, asPortal: boolean = false) {
+export function mountPortal(element: ReactElement<any>, containerID: string, asRealPortal: boolean = false) {
     // Ensure we have our modal container.
     let container = document.getElementById(containerID);
     if (!container) {
         container = document.createElement("div");
         container.id = containerID;
         document.body.appendChild(container);
-    } else {
-        ReactDOM.unmountComponentAtNode(container);
     }
 
-    if (asPortal) {
+    if (asRealPortal) {
         return ReactDOM.createPortal(element, container);
     } else {
-        return new Promise(resolve => {
-            ReactDOM.render(element, container, () => resolve());
-        });
+        return new Promise(resolve => mountReact(element, container!, () => resolve()));
     }
 }

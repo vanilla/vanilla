@@ -170,6 +170,32 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Test dispatching with a single job in the queue that would create a children
+     */
+    public function testDispatchedWithOneJobOneChildren() {
+        /** @var $container \Garden\Container\Container */
+        $container = $this->getNewContainer();
+
+        /** @var $eventManager \Garden\EventManager */
+        $eventManager = $container->get(\Garden\EventManager::class);
+
+        /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
+        $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
+
+        $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\ParentJob::class);
+
+        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
+            /** @var $trackingSlips \Vanilla\Scheduler\TrackingSlip[] */
+            $this->assertTrue(count($trackingSlips) == 2);
+            $complete = \Vanilla\Scheduler\Job\JobExecutionStatus::complete();
+            $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
+            $this->assertTrue($trackingSlips[1]->getStatus()->is($complete));
+        });
+
+        $eventManager->fire(self::DISPATCH_EVENT);
+    }
+
+    /**
      * Test dispatching a single job, resulting in failure.
      */
     public function testDispatchedWithOneFailedJob() {

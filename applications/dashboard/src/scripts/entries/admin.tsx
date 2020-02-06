@@ -10,7 +10,7 @@ import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
-import { mountReact } from "@vanilla/react-utils/src";
+import { mountReact, applySharedPortalContext } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import "@library/theming/reset";
 
@@ -18,6 +18,14 @@ addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true })
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
+
+applySharedPortalContext(props => {
+    return (
+        <AppContext noTheme errorComponent={ErrorPage}>
+            {props.children}
+        </AppContext>
+    );
+});
 
 // Routing
 addComponent("App", () => (

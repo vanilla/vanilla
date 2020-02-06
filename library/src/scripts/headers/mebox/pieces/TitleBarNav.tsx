@@ -10,6 +10,7 @@ import classNames from "classnames";
 import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
 import { navigationVariables } from "@library/headers/navigationVariables";
+import FlexSpacer from "@library/layout/FlexSpacer";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -19,6 +20,8 @@ export interface ITitleBarNavProps {
     children?: React.ReactNode;
     wrapper?: JSX.Element;
     excludeExtraNavItems?: boolean;
+    containerRef?: React.RefObject<HTMLElement | null>;
+    isCentered?: boolean;
 }
 
 /**
@@ -75,17 +78,28 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
             : null;
 
         return (
-            <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
-                <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
-                    {this.props.children ? this.props.children : content}
-                    <>
-                        {this.props.excludeExtraNavItems ??
-                            TitleBarNav.extraNavItems.map((ComponentClass, i) => {
-                                return <ComponentClass key={i} />;
-                            })}
-                    </>
-                </ul>
-            </nav>
+            <>
+                {this.props.isCentered && <FlexSpacer actualSpacer />}
+                <nav
+                    ref={this.props.containerRef as any}
+                    className={classNames(
+                        "headerNavigation",
+                        this.props.className,
+                        classes.navigation,
+                        this.props.isCentered && classes.navigationCentered,
+                    )}
+                >
+                    <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
+                        {this.props.children ? this.props.children : content}
+                        <>
+                            {this.props.excludeExtraNavItems ??
+                                TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                                    return <ComponentClass key={i} />;
+                                })}
+                        </>
+                    </ul>
+                </nav>
+            </>
         );
     }
 }

@@ -5,6 +5,7 @@
 
 import React, { useMemo } from "react";
 import { animated, useTransition } from "react-spring";
+import classNames from "classnames";
 
 interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     // Whether or not the element has entered the screen and should be visible.
@@ -39,6 +40,10 @@ interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
 
     // Callback that is called when the animated element is removed from the DOM (transition out complete).
     onDestroyed?: () => void;
+
+    // Special class to apply when the first child has multiple
+    firstItemProps?: React.HtmlHTMLAttributes<HTMLDivElement>;
+    lastItemProps?: React.HtmlHTMLAttributes<HTMLDivElement>;
 }
 
 export enum FromDirection {
@@ -63,6 +68,8 @@ export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(functi
     ref,
 ) {
     const {
+        firstItemProps,
+        lastItemProps,
         isEntered,
         delay,
         fromDirection,
@@ -76,14 +83,30 @@ export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(functi
     } = _props;
     const config = useTransitionConfig(_props);
 
-    const transitions = useTransition(isEntered, null, config);
+    const transitions = useTransition(isEntered ? children : null, item => item?.key, config);
     const AnimatedComponent = asElement ? animated[asElement] : animated.div;
 
-    return transitions.map(({ item, key, props: style }) => {
+    return transitions.map(({ item, key, props: style }, i) => {
+        const isFirst = i === 0;
+        const isLast = i === transitions.length - 1;
+        const classes = classNames(
+            divProps.className,
+            isFirst && firstItemProps?.className,
+            isLast && lastItemProps?.className,
+        );
+
         return (
             item && (
-                <AnimatedComponent {...divProps} ref={ref} key={key} style={style}>
-                    {children}
+                <AnimatedComponent
+                    {...divProps}
+                    {...(isFirst ? firstItemProps ?? {} : {})}
+                    {...(isLast ? lastItemProps ?? {} : {})}
+                    className={classes}
+                    ref={ref}
+                    key={key}
+                    style={style}
+                >
+                    {item}
                 </AnimatedComponent>
             )
         );

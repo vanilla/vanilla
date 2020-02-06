@@ -215,7 +215,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const breakpoints = makeThemeVars("breakpoints", {
-        compact: 850,
+        compact: 800,
     });
 
     const mediaQueries = () => {
@@ -436,6 +436,11 @@ export const titleBarClasses = useThemeCache(() => {
             color: "inherit",
             flexGrow: 1,
             justifyContent: vars.navAlignment.alignment === "left" ? "flex-start" : "center",
+            $nest: {
+                "&.titleBar-guestNav": {
+                    flex: "initial",
+                },
+            },
         },
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
@@ -482,7 +487,7 @@ export const titleBarClasses = useThemeCache(() => {
             $nest: {
                 "&.isOpen": {
                     width: unit(vars.compactSearch.maxWidth),
-                    flexBasis: "auto",
+                    flex: 1,
                 },
             },
         },
@@ -680,14 +685,6 @@ export const titleBarClasses = useThemeCache(() => {
         color: vars.count.fg.toString(),
     });
 
-    const scroll = style("scroll", {
-        position: "relative",
-        top: 0,
-        left: 0,
-        height: percent(100),
-        ...(scrollWithNoScrollBar() as NestedCSSProperties),
-    });
-
     const rightFlexBasis = style(
         "rightFlexBasis",
         {
@@ -705,17 +702,11 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const leftFlexBasis = style(
-        "leftFlexBasis",
-        {
-            ...flex.middleLeft(),
-            flexBasis: vars.endElements.flexBasis,
-        },
-        mediaQueries.compact({
-            flexShrink: 1,
-            flexBasis: px(vars.endElements.mobile.flexBasis),
-        }),
-    );
+    const leftFlexBasis = style("leftFlexBasis", {
+        ...flex.middleLeft(),
+        flexShrink: 1,
+        flexBasis: px(vars.endElements.mobile.flexBasis),
+    });
 
     const signIn = style("signIn", {
         marginLeft: unit(vars.guest.spacer),
@@ -784,10 +775,10 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const logoCenterer = style("logoCenterer", {
-        display: "flex",
+        ...absolutePosition.middleOfParent(true),
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        flexGrow: 1,
     });
 
     const hamburger = style("hamburger", {
@@ -840,7 +831,6 @@ export const titleBarClasses = useThemeCache(() => {
         dropDownContents,
         count,
         extraMeBoxIcons,
-        scroll,
         rightFlexBasis,
         leftFlexBasis,
         signIn,
@@ -898,55 +888,6 @@ export const titleBarLogoClasses = useThemeCache(() => {
         isCenter,
     };
 });
-
-export const titleBarHomeClasses = useThemeCache(() => {
-    const vars = titleBarVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("titleBarHome");
-    const mediaQueries = layoutVariables().mediaQueries();
-
-    const root = style({
-        minHeight: vars.sizing.mobile.height * 2,
-    });
-
-    const left = style("left", {
-        height: px(1),
-        width: px(vars.button.size),
-        flexBasis: vars.button.size,
-    });
-
-    const bottom = style("bottom", {
-        position: "relative",
-        backgroundColor: colorOut(vars.bottomRow.bg),
-        width: percent(100),
-        height: px(vars.sizing.mobile.height),
-        $nest: {
-            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any),
-            [`.${titleBarClasses().linkButton}`]: {
-                backgroundColor: colorOut(globalVars.elementaryColors.transparent),
-            },
-        },
-    });
-
-    return {
-        root,
-        bottom,
-        left,
-    };
-});
-
-export const scrollWithNoScrollBar = (nestedStyles?: NestedCSSProperties) => {
-    return {
-        overflow: ["-moz-scrollbars-none", "auto"],
-        "-ms-overflow-style": "none",
-        $nest: {
-            "&::-webkit-scrollbar": {
-                display: "none",
-            },
-            ...nestedStyles,
-        },
-    };
-};
 
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
     const gradient = (direction: "right" | "left") => {

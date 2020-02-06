@@ -19,6 +19,8 @@ import classNames from "classnames";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
 import { props } from "bluebird";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -51,6 +53,7 @@ export interface IProps extends IOpenDirectionProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
+    mobileTitle?: string;
     flyoutType: FlyoutType;
     selfPadded?: boolean;
     isSmall?: boolean;
@@ -77,6 +80,7 @@ export default function DropDown(props: IProps) {
     const device = useDevice();
 
     const { title } = props;
+    const mobileTitle = props.mobileTitle ?? title;
     const classesDropDown = dropDownClasses();
     const classesFrameHeader = frameHeaderClasses();
     const classes = dropDownClasses();
@@ -126,39 +130,12 @@ export default function DropDown(props: IProps) {
                         }
                         horizontalOffset={props.horizontalOffset}
                     >
-                        {title ? (
-                            <header className={classNames("frameHeader", classesFrameHeader.root)}>
-                                {openAsModal && (
-                                    <FlexSpacer
-                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
-                                    />
-                                )}
-                                {openAsModal && (
-                                    <SmartAlign>
-                                        <Heading
-                                            title={title}
-                                            className={classNames(
-                                                "dropDown-title",
-                                                classesDropDown.title,
-                                                classes.title,
-                                            )}
-                                        />
-                                    </SmartAlign>
-                                )}
-
-                                {!openAsModal && (
-                                    <Heading
-                                        title={title}
-                                        className={classNames("dropDown-title", classesDropDown.title, classes.title)}
-                                    />
-                                )}
-
-                                <CloseButton
-                                    className={classNames(classesFrameHeader.action, classesFrameHeader.categoryIcon)}
-                                    onClick={params.closeMenuHandler}
-                                />
-                            </header>
-                        ) : null}
+                        {!openAsModal && title && <FrameHeader title={title} closeFrame={params.closeMenuHandler} />}
+                        {openAsModal && mobileTitle && (
+                            <FrameHeaderMinimal onClose={params.closeMenuHandler}>
+                                {mobileTitle ?? title}
+                            </FrameHeaderMinimal>
+                        )}
                         <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
                     </DropDownContents>
                 );

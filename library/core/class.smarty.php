@@ -33,10 +33,10 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         }
 
         // Get an ID for the body.
-        $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName.'_'.Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod)));
+        $methodStr = Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod));
+        $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName).'_'.$methodStr;
         $smarty->assign('BodyID', htmlspecialchars($bodyIdentifier));
         $smarty->assign('DataDrivenTitleBar', Gdn::config("Feature.DataDrivenTitleBar.Enabled", false));
-        //$Smarty->assign('Config', Gdn::config());
 
         // Assign some information about the user.
         $session = Gdn::session();
@@ -74,7 +74,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             }
         }
 
-        $bodyClass = val('CssClass', $controller->Data, '', true);
+        $bodyClass = val('CssClass', $controller->Data, '');
         $sections = Gdn_Theme::section(null, 'get');
         if (is_array($sections)) {
             foreach ($sections as $section) {
@@ -141,7 +141,6 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         );
 
         $smarty->enableSecurity($security);
-
     }
 
     /**
@@ -158,7 +157,20 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $compileID = CLIENT_NAME;
         }
 
-        $smarty->setTemplateDir(dirname($path));
+        if (strpos($path, ':') === false) {
+            $smarty->setTemplateDir(dirname($path));
+        } else {
+            list($type, $arg) = explode(':', $path, 2);
+            if ($type === 'file') {
+                $smarty->setTemplateDir(dirname($arg));
+            } elseif (!empty($controller->Theme)) {
+                $smarty->setTemplateDir([
+                    PATH_THEMES."/{$controller->Theme}/views",
+                    PATH_ADDONS_THEMES."/{$controller->Theme}/views",
+                ]);
+            }
+        }
+
         $smarty->display($path, null, $compileID);
     }
 

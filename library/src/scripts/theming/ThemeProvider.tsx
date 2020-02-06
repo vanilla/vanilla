@@ -25,6 +25,8 @@ interface IProps {
     disabled?: boolean;
 }
 
+let hasMounted = false;
+
 export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     const { themeKey, disabled, variablesOnly } = props;
     const { getAssets } = useReduxActions(ThemeActions);
@@ -47,7 +49,8 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
             return;
         }
 
-        if (assets.data) {
+        if (assets.data && !hasMounted) {
+            hasMounted = true;
             let themeHeader = document.getElementById("themeHeader");
             const themeFooter = document.getElementById("themeFooter");
 

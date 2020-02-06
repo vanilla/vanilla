@@ -21,7 +21,7 @@ export const buttonCSS = () => {
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
-    mixinButton(".js-poll-result-btn");
+
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button");
     mixinButton(".FormWrapper .Buttons .Button");
@@ -40,7 +40,6 @@ export const buttonCSS = () => {
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
-    // mixinButton(".ButtonGroup.Multi.Open .Button.Handle", ButtonTypes.PRIMARY);
 
     cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         width: unit(formElementVars.sizing.height),

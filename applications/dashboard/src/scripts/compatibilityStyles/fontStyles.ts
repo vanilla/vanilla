@@ -86,8 +86,8 @@ export const fontCSS = () => {
     // Categories, top level
     cssOut(
         `
-        .Panel .Box a,
-        .Panel .BoxFilter a,
+        .Panel .Box a:not(.Button),
+        .Panel .BoxFilter a:not(.Button),
         body.Section-EditProfile .Box .PanelCategories li.Heading,
         .BoxFilter:not(.BoxBestOfFilter) .PanelCategories li.Heading,
         .BoxCategories.BoxCategories .PanelCategories li.Heading

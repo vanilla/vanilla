@@ -74,6 +74,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             ...buttonTypeVars.fonts,
             color:
                 buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
+            weight: buttonGlobals.font.weight,
         }),
         ...defaultBorder,
         ...buttonSizing(
@@ -118,7 +119,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.hover.colors.bg
                                 : undefined,
                         ),
-                        // ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
                         ...hoverBorder,
                     },
                     "&:focus": {
@@ -133,8 +133,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.focus!.colors.bg
                                 : undefined,
                         ),
-
-                        // ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
                         ...focusBorder,
                     },
                     "&:active": {
@@ -149,9 +147,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.active!.colors.bg
                                 : undefined,
                         ),
-                        // ...fonts(
-                        //     buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
-                        // ),
                         ...activeBorder,
                     },
                     "&.focus-visible": {
@@ -166,11 +161,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.focusAccessible!.colors.bg
                                 : undefined,
                         ),
-                        // ...fonts(
-                        //     buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
-                        //         ? buttonTypeVars.focusAccessible.fonts
-                        //         : {},
-                        // ),
                         ...focusAccessibleBorder,
                     },
                 },

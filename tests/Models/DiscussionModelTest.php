@@ -464,6 +464,13 @@ class DiscussionModelTest extends TestCase {
      */
     public function provideTestCalculateCommentReadData() {
         $r = [
+            'discussionLastCommentDateIsNull' => [
+                10,
+                null,
+                null,
+                '2020-01-09 16:22:42',
+                [true, 0],
+            ],
             'userReadCommentIsNullWithReadDate' => [
                 10,
                 '2019-12-02 21:55:40',

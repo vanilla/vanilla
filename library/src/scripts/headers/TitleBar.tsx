@@ -82,6 +82,7 @@ export default function TitleBar(_props: IProps) {
     const logoClasses = titleBarLogoClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
+    const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
 
     const headerContent = (
         <HashOffsetReporter>
@@ -119,7 +120,7 @@ export default function TitleBar(_props: IProps) {
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
                                 isCentered={vars.navAlignment.alignment === "center"}
-                                containerRef={collisionSourceRef}
+                                containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
                                 className={classes.nav}
                                 linkClassName={classes.topElement}
                                 linkContentClassName="titleBar-navLinkContent"
@@ -130,8 +131,13 @@ export default function TitleBar(_props: IProps) {
                                 <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
                                 {!isSearchOpen && (
                                     <>
-                                        {<FlexSpacer actualSpacer />}
-                                        <div className={classNames(classes.logoCenterer, logoClasses.mobileLogo)}>
+                                        {isMobileLogoCentered && <FlexSpacer actualSpacer />}
+                                        <div
+                                            className={classNames(
+                                                isMobileLogoCentered && classes.logoCenterer,
+                                                logoClasses.mobileLogo,
+                                            )}
+                                        >
                                             <animated.span {...logoProps}>
                                                 <HeaderLogo
                                                     className={classes.logoContainer}

@@ -113,6 +113,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
             </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,
+            { bypassPortalManager: true },
         );
     });
 }

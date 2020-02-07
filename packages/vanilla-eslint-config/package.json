@@ -3,6 +3,7 @@
     "description": "The official Vanilla eslint configuration.",
     "version": "3.0.1",
     "main": "index.js",
+    "license": "gpl-2.0-only",
     "peerDependencies": {
         "eslint": "^6.6.0"
     },

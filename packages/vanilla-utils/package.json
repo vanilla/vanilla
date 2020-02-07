@@ -2,6 +2,7 @@
     "name": "@vanilla/utils",
     "main": "./index.ts",
     "module": "./index.ts",
+    "license": "gpl-2.0-only",
     "version": "3.0.1",
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

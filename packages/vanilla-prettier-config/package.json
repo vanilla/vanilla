@@ -2,6 +2,7 @@
     "name": "@vanilla/prettier-config",
     "version": "3.0.1",
     "main": "index.js",
+    "license": "gpl-2.0-only",
     "publishConfig": {
         "access": "public"
     }

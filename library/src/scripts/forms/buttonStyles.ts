@@ -386,6 +386,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         textAlign: "left",
         lineHeight: globalVars.lineHeights.base,
         fontWeight: globalVars.fonts.weights.semiBold,
+        whiteSpace: "nowrap",
     };
 
     const buttonAsText = style("asText", asTextStyles, {

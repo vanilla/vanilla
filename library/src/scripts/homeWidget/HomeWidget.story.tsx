@@ -15,6 +15,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { color } from "csx";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export default {
     title: "Home Widget",
@@ -78,7 +79,11 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
             <HomeWidget
                 itemData={STANDARD_5_ITEMS}
                 title="Solid Outer BG"
-                containerOptions={{ maxColumnCount: 3, outerBackground: { color: color("#EBF6FD") } }}
+                containerOptions={{
+                    maxColumnCount: 3,
+                    outerBackground: { color: color("#EBF6FD") },
+                    viewAll: { to: "#", position: "top" },
+                }}
             />
             <HomeWidget
                 itemData={STANDARD_5_ITEMS}
@@ -86,7 +91,11 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                 title="Outer BG w/ shadowed items"
                 containerOptions={{
                     maxColumnCount: 2,
-                    outerBackground: { color: color("#f4f4f4") },
+                    outerBackground: {
+                        image:
+                            "linear-gradient(0deg, rgba(181,219,255,1) 0%, rgba(223,246,255,1) 37%, rgba(255,255,255,1) 100%)",
+                    },
+                    viewAll: { to: "#", displayType: ButtonTypes.TRANSPARENT },
                 }}
                 itemOptions={{ borderType: BorderType.SHADOW }}
             />
@@ -98,13 +107,14 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                     maxColumnCount: 1,
                     outerBackground: { image: "linear-gradient(215.7deg, #FAFEFF 16.08%, #f6fdff 63.71%)" },
                     borderType: BorderType.SHADOW,
+                    viewAll: { to: "#", displayType: ButtonTypes.PRIMARY },
                 }}
             />
             <HomeWidget
                 itemData={STANDARD_5_ITEMS}
                 maxItemCount={4}
-                title="Solid Color"
-                containerOptions={{ maxColumnCount: 2 }}
+                title="Very Very Very Very Long Title with a top view all button, Very Very Very long"
+                containerOptions={{ maxColumnCount: 2, viewAll: { to: "#", position: "top" } }}
             />
         </div>
     );

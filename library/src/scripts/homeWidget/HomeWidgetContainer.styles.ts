@@ -21,14 +21,11 @@ import {
     borders,
 } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { percent } from "csx";
+import { percent, borderColor } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-
-export enum ViewAllDisplayType {
-    BUTTON_PRIMARY = "buttonPrimary",
-    LINK = "link",
-}
+import { cssRule } from "typestyle";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
@@ -42,7 +39,8 @@ export interface IHomeWidgetContainerOptions {
 interface IViewAll {
     position?: "top" | "bottom";
     to?: string;
-    displayType?: ViewAllDisplayType;
+    name?: string;
+    displayType?: ButtonTypes;
 }
 
 export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
@@ -62,8 +60,8 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
             borderType: BorderType.NONE,
             maxWidth: layoutVars.contentSizes.full,
             viewAll: {
-                position: "top",
-                displayType: ViewAllDisplayType.LINK,
+                position: "bottom" as "top" | "bottom",
+                displayType: ButtonTypes.TEXT_PRIMARY,
             },
             maxColumnCount: 3,
         },
@@ -182,12 +180,60 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         }),
     );
 
+    const viewAllContainer = style("viewAllContainer", {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    });
+
     const title = style("title", {
+        flex: 1,
         ...fonts(vars.title.font),
         ...paddings({
             horizontal: vars.spacing.gutter,
         }),
     });
 
-    return { root, content, borderedContent, title, grid, gridItem, gridItemContent, gridItemWidthConstraint };
+    const viewAll = style("viewAll", {
+        $nest: {
+            "&&": {
+                ...margins({
+                    horizontal: vars.spacing.gutter,
+                }),
+            },
+            "&:first-child": {
+                marginLeft: "auto",
+            },
+        },
+    });
+
+    const viewAllContent = style("viewAllContent", {
+        ...contentMixin,
+        paddingTop: 0,
+        marginTop: -vars.spacing.gutter,
+        $nest: {
+            [`.${borderedContent} + &`]: {
+                marginTop: 0,
+                $nest: {
+                    [`& .${viewAll}`]: {
+                        marginRight: 0,
+                    },
+                },
+            },
+        },
+    });
+
+    return {
+        root,
+        content,
+        borderedContent,
+        viewAllContent,
+        title,
+        viewAllContainer,
+        viewAll,
+        grid,
+        gridItem,
+        gridItemContent,
+        gridItemWidthConstraint,
+    };
 });

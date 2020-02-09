@@ -133,14 +133,17 @@ export function variableFactory(componentNames: string | string[]) {
             return merge(prev, curr);
         }, {});
 
-    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
+    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T, overrides?: any): T {
         const customVars = componentThemeVars?.[subElementName] ?? null;
-        if (customVars === null) {
-            return declaredVars;
+        let result = declaredVars;
+        if (customVars != null) {
+            result = normalizeVariables(customVars, result);
         }
 
-        const normalized = normalizeVariables(customVars, declaredVars);
-        return normalized;
+        if (overrides != null) {
+            result = normalizeVariables(overrides, result);
+        }
+        return result;
     };
 }
 

@@ -17,7 +17,7 @@ import { LocationDescriptor } from "history";
 import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 
-interface IProps {
+export interface IHomeWidgetItemProps {
     // Content
     to: LocationDescriptor;
     imageUrl?: string;
@@ -28,7 +28,7 @@ interface IProps {
     options?: IHomeWidgetItemOptions;
 }
 
-export function HomeWidgetItem(props: IProps) {
+export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const options = homeWidgetItemVariables(props.options).options;
     const classes = homeWidgetItemClasses(props.options);
 

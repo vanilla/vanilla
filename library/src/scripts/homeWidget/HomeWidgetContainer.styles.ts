@@ -16,9 +16,14 @@ import {
     EMPTY_FONTS,
     fonts,
     paddings,
+    IBorderStyles,
+    ISimpleBorderStyle,
+    borders,
 } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export enum ViewAllDisplayType {
     BUTTON_PRIMARY = "buttonPrimary",
@@ -69,7 +74,20 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         "options",
         {
             ...options,
+            borderType:
+                options.innerBackground.color || options.innerBackground.image ? BorderType.SHADOW : BorderType.NONE,
             maxWidth: options.maxColumnCount <= 2 ? layoutVars.contentSizes.narrow : layoutVars.contentSizes.full,
+        },
+        optionOverrides,
+    );
+
+    options = makeVars(
+        "options",
+        {
+            ...options,
+            innerBackground: {
+                color: options.borderType !== BorderType.NONE ? globalVars.mainColors.bg : undefined,
+            },
         },
         optionOverrides,
     );
@@ -89,27 +107,64 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
 
 export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
     const style = styleFactory("homeWidgetContainer");
+    const globalVars = globalVariables();
     const vars = homeWidgetContainerVariables(optionOverrides);
 
     const root = style({
         ...background(vars.options.outerBackground ?? {}),
     });
 
-    const content = style("content", {
+    const contentMixin: NestedCSSProperties = {
         maxWidth: unit(vars.options.maxWidth),
+        ...paddings({
+            vertical: vars.spacing.gutter,
+        }),
         ...margins({
             vertical: 0,
             horizontal: "auto",
         }),
+    };
+
+    const content = style("content", contentMixin);
+
+    const borderedContent = style("borderedContent", {
+        ...contentMixin,
+        maxWidth: unit(vars.options.maxWidth + vars.spacing.gutter * 2),
+        ...paddings({
+            top: 0,
+            horizontal: vars.spacing.gutter,
+        }),
     });
 
-    const grid = style("grid", {
-        display: "flex",
-        alignItems: "stretch",
-        justifyContent: "flex-start",
-        flexWrap: "wrap",
-        padding: unit(vars.spacing.gutter / 2),
-    });
+    const borderStyling: NestedCSSProperties = (() => {
+        switch (vars.options.borderType) {
+            case BorderType.NONE:
+                return {};
+            case BorderType.BORDER:
+                return {
+                    borderRadius: globalVars.border.radius,
+                    ...borders(),
+                };
+            case BorderType.SHADOW:
+                return {
+                    borderRadius: globalVars.border.radius,
+                    ...shadowHelper().embed(),
+                };
+        }
+    })();
+
+    const grid = style(
+        "grid",
+        {
+            ...background(vars.options.innerBackground),
+            display: "flex",
+            alignItems: "stretch",
+            justifyContent: "flex-start",
+            flexWrap: "wrap",
+            padding: unit(vars.spacing.gutter / 2),
+        },
+        borderStyling,
+    );
 
     const gridItem = style("gridItem", {
         flex: 1,
@@ -118,6 +173,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const gridItemContent = style("gridItemContent", {
         padding: unit(vars.spacing.gutter / 2),
+        height: percent(100),
     });
 
     const gridItemWidthConstraint = useThemeCache((maxWidth: number) =>
@@ -133,5 +189,5 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         }),
     });
 
-    return { root, content, title, grid, gridItem, gridItemContent, gridItemWidthConstraint };
+    return { root, content, borderedContent, title, grid, gridItem, gridItemContent, gridItemWidthConstraint };
 });

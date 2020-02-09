@@ -5,25 +5,30 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
+import { HomeWidgetItem, IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT, STORY_IMAGE } from "@library/storybook/storyData";
 import { HomeWidgetContainer, IHomeWidgetContainerProps } from "@library/homeWidget/HomeWidgetContainer";
 import { style } from "typestyle";
 import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
 import { BorderType } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { color } from "csx";
+import { storyWithConfig } from "@library/storybook/StoryContext";
+import { HomeWidget } from "@library/homeWidget/HomeWidget";
 
 export default {
     title: "Home Widget",
 };
 
+const STANDARD_5_ITEMS = [dummyItemProps(), dummyItemProps(), dummyItemProps(), dummyItemProps(), dummyItemProps()];
+
 export function ContainerTextOnly() {
     return (
         <div>
-            <ContainerWithOptions title="4 columns" options={{ maxColumnCount: 4 }} />
-            <ContainerWithOptions title="3 columns" options={{ maxColumnCount: 3 }} />
-            <ContainerWithOptions title="2 columns" options={{ maxColumnCount: 2 }} />
-            <ContainerWithOptions title="1 column" options={{ maxColumnCount: 1 }} />
+            <HomeWidget title="4 columns" itemData={STANDARD_5_ITEMS} containerOptions={{ maxColumnCount: 4 }} />
+            <HomeWidget title="3 columns" itemData={STANDARD_5_ITEMS} containerOptions={{ maxColumnCount: 3 }} />
+            <HomeWidget title="2 columns" itemData={STANDARD_5_ITEMS} containerOptions={{ maxColumnCount: 2 }} />
+            <HomeWidget title="1 column" itemData={STANDARD_5_ITEMS} containerOptions={{ maxColumnCount: 1 }} />
         </div>
     );
 }
@@ -39,6 +44,73 @@ export function ContainerWithImage() {
 }
 
 ContainerWithImage.story = {
+    parameters: {
+        chromatic: {
+            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+        },
+    },
+};
+
+export function ContainerItemEdgeCases() {
+    return (
+        <div>
+            <HomeWidgetContainer title="Text only, varying heights">
+                <DummyItem />
+                <DummyItem shortTitle />
+                <DummyItem shortBody />
+                <DummyItem shortTitle />
+                <DummyItem />
+            </HomeWidgetContainer>
+            <HomeWidgetContainer title="Missing image, varying heights">
+                <DummyItem image />
+                <DummyItem image imageMissing />
+                <DummyItem image shortBody />
+                <DummyItem image shortTitle />
+                <DummyItem image />
+            </HomeWidgetContainer>
+        </div>
+    );
+}
+
+export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false }, () => {
+    return (
+        <div>
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                title="Solid Outer BG"
+                containerOptions={{ maxColumnCount: 3, outerBackground: { color: color("#EBF6FD") } }}
+            />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                maxItemCount={4}
+                title="Outer BG w/ shadowed items"
+                containerOptions={{
+                    maxColumnCount: 2,
+                    outerBackground: { color: color("#f4f4f4") },
+                }}
+                itemOptions={{ borderType: BorderType.SHADOW }}
+            />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                maxItemCount={4}
+                title="Inner BG & shadow"
+                containerOptions={{
+                    maxColumnCount: 1,
+                    outerBackground: { image: "linear-gradient(215.7deg, #FAFEFF 16.08%, #f6fdff 63.71%)" },
+                    borderType: BorderType.SHADOW,
+                }}
+            />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                maxItemCount={4}
+                title="Solid Color"
+                containerOptions={{ maxColumnCount: 2 }}
+            />
+        </div>
+    );
+});
+
+(ContainerBackgroundVariants as any).story = {
     parameters: {
         chromatic: {
             viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
@@ -96,32 +168,29 @@ function ContainerWithOptionsAndImage(props: Omit<IHomeWidgetContainerProps, "ch
     );
 }
 
-function ContainerWithOptions(props: Omit<IHomeWidgetContainerProps, "children">) {
-    return (
-        <HomeWidgetContainer {...props}>
-            <DummyItem />
-            <DummyItem />
-            <DummyItem />
-            <DummyItem />
-            <DummyItem />
-        </HomeWidgetContainer>
-    );
+interface IDummyItemProps {
+    image?: boolean;
+    imageMissing?: boolean;
+    shortTitle?: boolean;
+    shortBody?: boolean;
 }
 
-function DummyItem(props: { image?: boolean }) {
-    return (
-        <HomeWidgetItem
-            options={{
-                contentType: props.image
-                    ? HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE
-                    : HomeWidgetItemContentType.TITLE_DESCRIPTION,
-            }}
-            imageUrl={STORY_IMAGE}
-            to="#"
-            name="Hello Longer longer longer longer longer even longer"
-            description={STORY_IPSUM_MEDIUM}
-        ></HomeWidgetItem>
-    );
+function dummyItemProps(props?: IDummyItemProps): IHomeWidgetItemProps {
+    return {
+        options: {
+            contentType: props?.image
+                ? HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE
+                : HomeWidgetItemContentType.TITLE_DESCRIPTION,
+        },
+        imageUrl: props?.imageMissing ? undefined : STORY_IMAGE,
+        to: "#",
+        name: props?.shortTitle ? "Short Title" : "Hello Longer longer longer longer longer even longer",
+        description: props?.shortBody ? STORY_IPSUM_SHORT : STORY_IPSUM_MEDIUM,
+    };
+}
+
+function DummyItem(props: IDummyItemProps) {
+    return <HomeWidgetItem {...dummyItemProps(props)}></HomeWidgetItem>;
 }
 
 function ItemIn4Variants(props: { children: React.ReactElement }) {
@@ -143,6 +212,8 @@ function ItemIn4Variants(props: { children: React.ReactElement }) {
     });
     const itemContainer = style({
         flex: 1,
+        display: "flex",
+        flexDirection: "column",
         marginRight: 24,
         $nest: {
             "&:last-child": {

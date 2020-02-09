@@ -66,6 +66,17 @@ export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWid
         optionOverrides,
     );
 
+    options = makeVars(
+        "options",
+        {
+            ...options,
+            background: {
+                color: options.borderType !== BorderType.NONE ? globalVars.mainColors.bg : undefined,
+            },
+        },
+        optionOverrides,
+    );
+
     const sizing = makeVars("sizing", {
         minWidth: 280,
     });
@@ -136,10 +147,12 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         color: colorOut(vars.options.fg),
         ...fonts(vars.name.font),
         ...linkStyleFallbacks,
+        marginBottom: unit(globalVars.gutter.half),
     });
 
     const root = style(
         {
+            height: percent(100),
             display: "block",
             ...background(vars.options.background),
             color: colorOut(vars.options.fg),

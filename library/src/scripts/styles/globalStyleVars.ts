@@ -125,6 +125,7 @@ export const globalVariables = useThemeCache(() => {
 
     const border = makeThemeVars("border", {
         color: mixBgAndFg(0.15),
+        colorHover: mixBgAndFg(0.2),
         width: 1,
         style: "solid",
         radius: 6,

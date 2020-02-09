@@ -24,6 +24,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",
@@ -41,6 +42,7 @@ export interface IHomeWidgetItemOptions {
 export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWidgetItemOptions) => {
     const makeVars = variableFactory("homeWidgetItem");
     const globalVars = globalVariables();
+    const layoutVars = layoutVariables();
 
     let options = makeVars(
         "options",
@@ -78,7 +80,7 @@ export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWid
     );
 
     const sizing = makeVars("sizing", {
-        minWidth: 280,
+        minWidth: layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5, // Min width allows 4 items to fit.
     });
 
     const name = makeVars("name", {

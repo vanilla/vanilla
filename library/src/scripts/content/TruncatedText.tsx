@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import { useMeasure } from "@vanilla/react-utils";
+import React, { useEffect, useRef } from "react";
 import shave from "shave";
-import throttle from "lodash/throttle";
+import { forceRenderStyles } from "typestyle";
 
 interface IProps {
     tag?: string;
@@ -17,46 +18,27 @@ interface IProps {
     expand?: boolean;
 }
 
-export default class TruncatedText extends React.PureComponent<IProps> {
-    private ref = React.createRef<HTMLDivElement>();
-
-    public static defaultProps: Partial<IProps> = {
+const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
+    const ref = useRef<HTMLDivElement | null>(null);
+    const props = {
         lines: 3,
         expand: false,
+        ..._props,
     };
 
-    public render() {
-        const Tag = (this.props.tag || "span") as "span";
+    const measure = useMeasure(ref);
 
-        return (
-            <Tag className={this.props.className} ref={this.ref}>
-                {this.props.children}
-            </Tag>
-        );
-    }
+    useEffect(() => {
+        truncate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [measure]);
 
-    public componentDidMount() {
-        this.truncate();
-        window.addEventListener("resize", this.resizeListener);
-    }
-
-    public componentWillUnmount() {
-        window.removeEventListener("resize", this.resizeListener);
-    }
-
-    public componentDidUpdate() {
-        this.truncate();
-    }
-
-    private resizeListener = throttle(() => {
-        this.truncate();
-    }, 250);
-
-    private truncate() {
-        if (this.props.useMaxHeight) {
-            this.truncateTextBasedOnMaxHeight();
+    function truncate() {
+        forceRenderStyles();
+        if (props.useMaxHeight) {
+            truncateTextBasedOnMaxHeight();
         } else {
-            this.truncateBasedOnLines();
+            truncateBasedOnLines();
         }
     }
 
@@ -65,11 +47,11 @@ export default class TruncatedText extends React.PureComponent<IProps> {
      *
      * @param excerpt - The excerpt to truncate.
      */
-    private truncateBasedOnLines() {
-        const lineHeight = this.calculateLineHeight();
+    function truncateBasedOnLines() {
+        const lineHeight = calculateLineHeight();
         if (lineHeight !== null) {
-            const maxHeight = this.props.lines! * lineHeight;
-            shave(this.ref.current!, maxHeight);
+            const maxHeight = props.lines! * lineHeight;
+            shave(ref.current!, maxHeight);
         }
     }
 
@@ -78,19 +60,29 @@ export default class TruncatedText extends React.PureComponent<IProps> {
      *
      * @param excerpt - The excerpt to truncate.
      */
-    private truncateTextBasedOnMaxHeight() {
-        const element = this.ref.current!;
+    function truncateTextBasedOnMaxHeight() {
+        const element = ref.current!;
         const maxHeight = parseInt(getComputedStyle(element)["max-height"], 10);
         if (maxHeight && maxHeight > 0) {
             shave(element, maxHeight);
         }
     }
 
-    private calculateLineHeight(): number | null {
-        if (this.ref.current) {
-            return parseInt(getComputedStyle(this.ref.current)["line-height"], 10);
+    function calculateLineHeight(): number | null {
+        if (ref.current) {
+            return parseInt(getComputedStyle(ref.current)["line-height"], 10);
         } else {
             return null;
         }
     }
-}
+
+    const Tag = (props.tag || "span") as "span";
+
+    return (
+        <Tag className={props.className} ref={ref}>
+            {props.children}
+        </Tag>
+    );
+});
+
+export default TruncatedText;

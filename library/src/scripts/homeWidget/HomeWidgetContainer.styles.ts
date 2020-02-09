@@ -164,9 +164,15 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         borderStyling,
     );
 
-    const gridItem = style("gridItem", {
+    const itemMixin: NestedCSSProperties = {
         flex: 1,
         flexBasis: percent(100 / vars.options.maxColumnCount),
+    };
+
+    const gridItem = style("gridItem", itemMixin);
+
+    const gridItemSpacer = style("gridItemSpacer", {
+        ...itemMixin,
     });
 
     const gridItemContent = style("gridItemContent", {
@@ -233,6 +239,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         viewAll,
         grid,
         gridItem,
+        gridItemSpacer,
         gridItemContent,
         gridItemWidthConstraint,
     };

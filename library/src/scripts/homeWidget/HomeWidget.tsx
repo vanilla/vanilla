@@ -4,10 +4,19 @@
  */
 
 import React from "react";
-import { IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import {
+    IHomeWidgetItemOptions,
+    HomeWidgetItemContentType,
+    homeWidgetItemVariables,
+} from "@library/homeWidget/HomeWidgetItem.styles";
+import {
+    IHomeWidgetContainerOptions,
+    homeWidgetContainerVariables,
+    homeWidgetContainerClasses,
+} from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 
 interface IProps {
     // Options
@@ -21,10 +30,31 @@ interface IProps {
 }
 
 export function HomeWidget(props: IProps) {
+    const itemOptions = homeWidgetItemVariables(props.itemOptions).options;
+    const containerOptions = homeWidgetContainerVariables(props.containerOptions).options;
+    const containerClasses = homeWidgetContainerClasses(props.containerOptions);
+
+    let items = props.itemData;
+
+    if (props.maxItemCount && items.length > props.maxItemCount) {
+        items = items.slice(0, props.maxItemCount);
+    }
+
+    let extraSpacerItemCount = 0;
+    if (
+        itemOptions.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE &&
+        props.itemData.length < containerOptions.maxColumnCount
+    ) {
+        extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;
+    }
+
     return (
         <HomeWidgetContainer options={props.containerOptions} title={props.title}>
-            {props.itemData.slice(0, props.maxItemCount ?? props.itemData.length - 1).map((item, i) => {
+            {items.map((item, i) => {
                 return <HomeWidgetItem key={i} {...item} options={props.itemOptions} />;
+            })}
+            {[...new Array(extraSpacerItemCount)].map((_, i) => {
+                return <div key={"spacer-" + i} className={containerClasses.gridItemSpacer}></div>;
             })}
         </HomeWidgetContainer>
     );

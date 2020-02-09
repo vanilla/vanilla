@@ -73,6 +73,70 @@ export function ContainerItemEdgeCases() {
     );
 }
 
+export function NotEnoughItems() {
+    return (
+        <div>
+            <HomeWidget
+                itemData={[dummyItemProps()]}
+                title="Want 4, only 1 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+            />
+            <HomeWidget
+                itemData={[dummyItemProps(), dummyItemProps()]}
+                title="Want 4, only 2 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+            />
+            <HomeWidget
+                itemData={[dummyItemProps(), dummyItemProps(), dummyItemProps()]}
+                title="Want 4, only 3 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+            />
+            <HomeWidget
+                itemData={[dummyItemProps()]}
+                title="Images - Want 4, only 1 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+                itemOptions={{
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+            <HomeWidget
+                itemData={[dummyItemProps(), dummyItemProps()]}
+                title="Images - Want 4, only 2 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+                itemOptions={{
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+            <HomeWidget
+                itemData={[dummyItemProps(), dummyItemProps(), dummyItemProps()]}
+                title="Images - Want 4, only 3 given"
+                containerOptions={{
+                    maxColumnCount: 4,
+                    viewAll: { to: "#", position: "top" },
+                }}
+                itemOptions={{
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+        </div>
+    );
+}
+
 export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false }, () => {
     return (
         <div>

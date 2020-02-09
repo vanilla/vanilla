@@ -48,7 +48,11 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                 {[
                     HomeWidgetItemContentType.TITLE_DESCRIPTION,
                     HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-                ].includes(options.contentType) && <TruncatedText tag={"div"}>{props.description}</TruncatedText>}
+                ].includes(options.contentType) && (
+                    <TruncatedText maxCharCount={160} tag={"div"}>
+                        {props.description}
+                    </TruncatedText>
+                )}
             </div>
         </SmartLink>
     );

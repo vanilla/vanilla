@@ -16,6 +16,7 @@ interface IProps {
     useMaxHeight?: boolean;
     lines?: number;
     expand?: boolean;
+    maxCharCount?: number;
 }
 
 const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
@@ -77,6 +78,17 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
     }
 
     const Tag = (props.tag || "span") as "span";
+
+    let { children } = props;
+    if (props.maxCharCount && typeof children === "string") {
+        const newChildren = children.slice(0, props.maxCharCount);
+
+        if (newChildren.length < children.length) {
+            children += "…";
+        }
+
+        children = newChildren;
+    }
 
     return (
         <Tag className={props.className} ref={ref}>

@@ -163,18 +163,24 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
      *
      * @param mixed $timestamp
      * @param mixed $expected
-     * @param bool $isWarning
+     * @param bool $isNotice
      *
      * @dataProvider timeStampDeprecatedProviders
      */
-    public function testDateTimeToTimestampDeprecated($timestamp, $expected, bool $isWarning = false) {
-        if ($isWarning) {
-            $this->expectException(\PHPUnit\Framework\Error\Warning::class);
+    public function testDateTimeToTimestampDeprecated($timestamp, $expected, bool $isNotice = false) {
+        if ($isNotice) {
+            $this->expectNotice();
         }
+        $now = time();
         $actual = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
-        $this->assertEquals($expected, $actual);
+        if ($expected === self::NOW) {
+            // This is a bit of a kludge because the test may take longer than a second.
+            $this->assertGreaterThanOrEqual($now, $actual);
+            $this->assertLessThanOrEqual($now + 10, $actual);
+        } else {
+            $this->assertEquals($expected, $actual);
+        }
     }
-
 
     /**
      * Test various alternate values for the timestamp.
@@ -183,11 +189,40 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
      */
     public function timeStampDeprecatedProviders(): array {
         return [
-            ['2015-12-24 12:12:12', 1450959132],
-            ['2015-12-24', 1450915200],
-            [null, self::NOW, true],
-            ['asdfasdf', self::NOW, true],
+            'date time' => ['2015-12-24 12:12:12', 1450959132],
+            'date' => ['2015-12-24', 1450915200],
+            'null' => [null, self::NOW],
+            'invalid' => ['asdfasdf', self::NOW, true],
         ];
+    }
+
+    /**
+     * Test some date to timestamp fallbacks.
+     *
+     * @param string|null $date
+     * @param mixed $fallback
+     * @param mixed $emptyFallback
+     * @param int|null $expected
+     * @dataProvider provideDateTimeToTimestampTests
+     */
+    public function testDateTimeToTimestampFallbacks(?string $date, $fallback, $emptyFallback, ?int $expected) {
+        $actual = @DateTimeFormatter::dateTimeToTimeStamp($date, $fallback, $emptyFallback);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide tests for `testDateTimeToTimestampFallbacks()`.
+     *
+     * @return array
+     */
+    public function provideDateTimeToTimestampTests(): array {
+        $r = [
+            'null' => [null, null, false, null],
+            'null empty null' => [null, 0, null, null],
+            'empty' => ['', null, false, null],
+            'invalid' => ['adwfsfdfs', 123, 345, 123],
+        ];
+        return $r;
     }
 
     /**

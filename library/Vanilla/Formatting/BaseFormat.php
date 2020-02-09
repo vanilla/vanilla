@@ -14,7 +14,7 @@ use Vanilla\Contracts\Formatting\FormatInterface;
  */
 abstract class BaseFormat implements FormatInterface {
     /** @var int */
-    const EXCERPT_MAX_LENGTH = 325;
+    const EXCERPT_MAX_LENGTH = 160;
 
     /**
      * Implement rendering of excerpts based on the plain-text version of format.

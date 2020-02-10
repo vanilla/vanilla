@@ -47,7 +47,7 @@ class SiteTotalsModule extends Gdn_Module {
         // check recalculate flag
         $recalculateFlag = Gdn::cache()->get(self::RECALCULATE_KEY);
 
-        if ($recalculateFlag === Gdn_Cache::CACHEOP_FAILURE) {  // expired
+        if ($recalculateFlag !== Gdn_Cache::CACHEOP_FAILURE) {  // expired
             $this->tryRegenerate();
         }
 
@@ -62,7 +62,7 @@ class SiteTotalsModule extends Gdn_Module {
      * cache key already exists, which would mean the lock is already in place.
      */
     private function tryRegenerate() {
-        $lockKey = mt_rand(0.9999999);
+        $lockKey = mt_rand(0, 9999999);
         $added = Gdn::cache()->add(self::RECALCULATE_KEY, $lockKey, [Gdn_Cache::FEATURE_EXPIRY => self::RECALCULATE_INTERVAL]);
         if ($added) {
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */

@@ -1,9 +1,0 @@
-{
-    "name": "@vanilla/addon-openapi-embed",
-    "version": "3.0.1",
-    "private": true,
-    "dependencies": {
-        "swagger-ui-react": "^3.25.0"
-    },
-    "devDependencies": {}
-}

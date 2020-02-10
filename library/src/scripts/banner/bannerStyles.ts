@@ -91,7 +91,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const contentContainer = makeThemeVars("contentContainer", {
-        minWidth: 600,
+        minWidth: 550,
         padding: spacing.padding,
     });
 
@@ -387,7 +387,11 @@ export const bannerClasses = useThemeCache(() => {
             minWidth: vars.contentContainer.minWidth,
         },
         media(
-            { maxWidth: 500 },
+            {
+                maxWidth: calc(
+                    `${unit(vars.contentContainer.minWidth)} + ${unit(vars.contentContainer.padding.horizontal)} * 4`,
+                ),
+            },
             {
                 minWidth: "initial",
             },

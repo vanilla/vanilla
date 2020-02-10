@@ -2,7 +2,7 @@
 /**
  * Site totals module.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -13,6 +13,10 @@
  */
 class SiteTotalsModule extends Gdn_Module {
 
+    const CACHE_TTL = 3600;
+
+    const CACHE_REFRESH_INTERVAL = 300;
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'dashboard';
@@ -22,16 +26,24 @@ class SiteTotalsModule extends Gdn_Module {
         return 'Panel';
     }
 
-    protected function _GetData() {
-        $px = Gdn::database()->DatabasePrefix;
-        $sql = "show table status where Name in ('{$px}User', '{$px}Discussion', '{$px}Comment')";
-
+    public function getAllCounts() {
         $result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
         foreach ($result as $name => $value) {
             $result[$name] = $this->getCount($name);
         }
         $this->setData('Totals', $result);
     }
+
+//    protected function _GetData() {
+//        $px = Gdn::database()->DatabasePrefix;
+//        $sql = "show table status where Name in ('{$px}User', '{$px}Discussion', '{$px}Comment')";
+//
+//        $result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
+//        foreach ($result as $name => $value) {
+//            $result[$name] = $this->getCount($name);
+//        }
+//        $this->setData('Totals', $result);
+//    }
 
     protected function getCount($table) {
         // Try and get the count from the cache.

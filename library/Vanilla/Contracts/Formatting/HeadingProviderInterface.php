@@ -7,6 +7,9 @@
 
 namespace Vanilla\Contracts\Formatting;
 
+/**
+ * Interface to provide headings.
+ */
 interface HeadingProviderInterface {
 
     /**

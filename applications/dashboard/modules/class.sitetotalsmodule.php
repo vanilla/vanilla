@@ -50,6 +50,14 @@ class SiteTotalsModule extends Gdn_Module {
         return $counts;
     }
 
+    public function gdn_statistics_analyticsTick_handler() {
+        $recalculateFlag = Gdn::cache()->get(self::CACHE_KEY.'.recalculate');
+
+        if ($recalculateFlag !== Gdn_Cache::CACHEOP_FAILURE) {  // expired
+            $this->getAllCounts();
+        }
+    }
+
 //    protected function _GetData() {
 //        $px = Gdn::database()->DatabasePrefix;
 //        $sql = "show table status where Name in ('{$px}User', '{$px}Discussion', '{$px}Comment')";
@@ -71,7 +79,8 @@ class SiteTotalsModule extends Gdn_Module {
     }
 
     public function toString() {
-        $this->_GetData();
+        $counts = $this->getAllCounts();
+        $this->setData('Totals', $counts);
         return parent::toString();
     }
 }

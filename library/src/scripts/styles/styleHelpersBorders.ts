@@ -14,6 +14,12 @@ import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
 import produce from "immer";
 
+export enum BorderType {
+    BORDER = "border",
+    NONE = "none",
+    SHADOW = "shadow",
+}
+
 export interface ISimpleBorderStyle {
     color?: ColorValues | ColorHelper;
     width?: BorderWidthProperty<TLength>;

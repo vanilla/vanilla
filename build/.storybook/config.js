@@ -8,14 +8,14 @@
 
 'use strict';
 
+import { forceRenderStyles } from "typestyle";
 import { configure, addDecorator, addParameters } from '@storybook/react';
-import {checkA11y, withA11y} from '@storybook/addon-a11y';
+import { checkA11y, withA11y } from '@storybook/addon-a11y';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
 import 'storybook-chromatic';
-
-require('../../library/src/scripts/storybookConfig');
+const { applyStoryContext } = require('../../library/src/scripts/storybookConfig');
 
 addParameters({
     chromatic: {
@@ -93,3 +93,9 @@ const storyFiles = require.context(
     /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
 configure(storyFiles, module);
 
+applyStoryContext();
+
+module.hot?.accept(() => {
+    forceRenderStyles();
+    applyStoryContext();
+})

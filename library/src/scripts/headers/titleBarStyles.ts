@@ -20,6 +20,7 @@ import {
     pointerEvents,
     singleBorder,
     sticky,
+    BorderType,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
@@ -32,12 +33,6 @@ import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
-
-enum TitleBarBorderType {
-    BORDER = "border",
-    NONE = "none",
-    SHADOW = "shadow",
-}
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -74,7 +69,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        type: TitleBarBorderType.NONE,
+        type: BorderType.NONE,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -279,15 +274,15 @@ export const titleBarClasses = useThemeCache(() => {
 
     const getBorderVars = (): NestedCSSProperties => {
         switch (vars.border.type) {
-            case TitleBarBorderType.BORDER:
+            case BorderType.BORDER:
                 return {
                     borderBottom: singleBorder(),
                 };
-            case TitleBarBorderType.SHADOW:
+            case BorderType.SHADOW:
                 return {
                     boxShadow: shadowHelper().makeShadow(),
                 };
-            case TitleBarBorderType.NONE:
+            case BorderType.NONE:
             default:
                 return {};
         }

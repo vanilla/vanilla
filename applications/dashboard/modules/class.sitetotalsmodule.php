@@ -15,60 +15,81 @@ class SiteTotalsModule extends Gdn_Module {
 
     const CACHE_TTL = 3600;
 
-    const CACHE_REFRESH_INTERVAL = 300;
+    const RECALCULATE_INTERVAL = 300;
 
     const CACHE_KEY = 'module.sitetotals';
 
+    const COUNTS_KEY = self::CACHE_KEY.'.counts';
+
+    const RECALCULATE_KEY = self::CACHE_KEY.'.recalculate';
+
+    /**
+     * SiteTotalsModule constructor.
+     */
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'dashboard';
     }
 
+    /**
+     * @return string
+     */
     public function assetTarget() {
         return 'Panel';
     }
 
-    public function getAllCounts() {
-        $countsCacheKey = self::CACHE_KEY.'.counts';
-        $counts = Gdn::cache()->get($countsCacheKey);
+    /**
+     * Get total counts
+     *
+     * @return mixed
+     */
+    public function getTotals() {
+        // check recalculate flag
+        $recalculateFlag = Gdn::cache()->get(self::RECALCULATE_KEY);
 
-        if ($counts !== Gdn_Cache::CACHEOP_FAILURE) {
-            return $counts;
+        if ($recalculateFlag === Gdn_Cache::CACHEOP_FAILURE) {  // expired
+            $this->tryRegenerate();
         }
 
+        // get totals from cache
+        $totals = Gdn::cache()->get(self::COUNTS_KEY);
+
+        return $totals;
+    }
+
+    /**
+     * Attempt to implement lock system. A failure likely means the
+     * cache key already exists, which would mean the lock is already in place.
+     */
+    private function tryRegenerate() {
+        $lockKey = mt_rand(0.9999999);
+        $added = Gdn::cache()->add(self::RECALCULATE_KEY, $lockKey, [Gdn_Cache::FEATURE_EXPIRY => self::RECALCULATE_INTERVAL]);
+        if ($added) {
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob($this->getAllCounts());
+        }
+    }
+
+    /**
+     * Fire counts request to the DB
+     */
+    private function getAllCounts() {
         $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
         foreach ($counts as $name => $value) {
             $counts[$name] = $this->getCount($name);
         }
 
         // cache counts
-        Gdn::cache()->store($countsCacheKey, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
-
-        // set recalculate flag
-        Gdn::cache()->store(self::CACHE_KEY.'.recalculate', true, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_REFRESH_INTERVAL]);
-
-        return $counts;
+        Gdn::cache()->store(self::COUNTS_KEY, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
     }
 
-    public function gdn_statistics_analyticsTick_handler() {
-        $recalculateFlag = Gdn::cache()->get(self::CACHE_KEY.'.recalculate');
-
-        if ($recalculateFlag !== Gdn_Cache::CACHEOP_FAILURE) {  // expired
-            $this->getAllCounts();
-        }
-    }
-
-//    protected function _GetData() {
-//        $px = Gdn::database()->DatabasePrefix;
-//        $sql = "show table status where Name in ('{$px}User', '{$px}Discussion', '{$px}Comment')";
-//
-//        $result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
-//        foreach ($result as $name => $value) {
-//            $result[$name] = $this->getCount($name);
-//        }
-//        $this->setData('Totals', $result);
-//    }
-
+    /**
+     * Query the DB for count
+     *
+     * @param string $table
+     * @return mixed
+     */
     protected function getCount($table) {
         $count = Gdn::sql()
             ->select($table.'ID', 'count', 'CountRows')
@@ -78,9 +99,17 @@ class SiteTotalsModule extends Gdn_Module {
         return $count;
     }
 
+    /**
+     * @return string
+     */
     public function toString() {
-        $counts = $this->getAllCounts();
-        $this->setData('Totals', $counts);
+        $totals = $this->getTotals();
+
+        if (empty($totals)) {
+            return '';   //don't render the module
+        }
+
+        $this->setData('Totals', $totals);
         return parent::toString();
     }
 }

@@ -9,18 +9,23 @@
  */
 
 /**
- * Site-wide stats.
+ * Class SiteTotalsModule
  */
 class SiteTotalsModule extends Gdn_Module {
 
+    /** @var int */
     const CACHE_TTL = 3600;
 
+    /** @var int */
     const RECALCULATE_INTERVAL = 300;
 
+    /** @var string */
     const CACHE_KEY = 'module.sitetotals';
 
+    /** @var string */
     const COUNTS_KEY = self::CACHE_KEY.'.counts';
 
+    /** @var string */
     const RECALCULATE_KEY = self::CACHE_KEY.'.recalculate';
 
     /**
@@ -48,7 +53,7 @@ class SiteTotalsModule extends Gdn_Module {
         $recalculateFlag = Gdn::cache()->get(self::RECALCULATE_KEY);
 
         if ($recalculateFlag !== Gdn_Cache::CACHEOP_FAILURE) {  // expired
-            $this->tryRegenerate();
+            $this->tryRecalculate();
         }
 
         // get totals from cache
@@ -61,9 +66,10 @@ class SiteTotalsModule extends Gdn_Module {
      * Attempt to implement lock system. A failure likely means the
      * cache key already exists, which would mean the lock is already in place.
      */
-    private function tryRegenerate() {
+    private function tryRecalculate() {
         $lockKey = mt_rand(0, 9999999);
         $added = Gdn::cache()->add(self::RECALCULATE_KEY, $lockKey, [Gdn_Cache::FEATURE_EXPIRY => self::RECALCULATE_INTERVAL]);
+
         if ($added) {
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
             $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
@@ -76,6 +82,7 @@ class SiteTotalsModule extends Gdn_Module {
      */
     private function getAllCounts() {
         $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
+
         foreach ($counts as $name => $value) {
             $counts[$name] = $this->getCount($name);
         }

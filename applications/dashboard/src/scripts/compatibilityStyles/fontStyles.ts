@@ -13,6 +13,7 @@ import { ColorHelper, important } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { allLinkStates, paddings, unit } from "@library/styles/styleHelpers";
 import { siteNavVariables } from "@library/navigation/siteNavStyles";
+import { panelListVariables } from "@library/layout/panelListStyles";
 
 export const forumFontsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");
@@ -75,8 +76,11 @@ export const fontCSS = () => {
 
     // Panel Headings
     cssOut(`.Panel h4`, {
-        padding: 0,
-        marginBottom: unit(globalVars.gutter.size),
+        ...paddings({
+            vertical: 0,
+            horizontal: vars.panelLink.padding.all,
+        }),
+        marginBottom: unit(panelListVariables().offset.default),
         ...fonts({
             size: vars.fonts.sizes.sectionHeading,
             weight: globalVars.fonts.weights.bold,
@@ -95,7 +99,7 @@ export const fontCSS = () => {
         {
             ...fonts({
                 size: vars.fonts.sizes.title,
-                weight: globalVars.fonts.weights.bold,
+                weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
             ...paddings(vars.panelLink.padding),

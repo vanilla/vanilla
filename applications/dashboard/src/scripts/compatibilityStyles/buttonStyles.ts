@@ -20,10 +20,8 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent } from "csx";
-import { forumGlobalVariables } from "@dashboard/compatibilityStyles/forumVariables";
 
 export const buttonCSS = () => {
-    const vars = forumGlobalVariables();
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const mainColors = globalVars.mainColors;

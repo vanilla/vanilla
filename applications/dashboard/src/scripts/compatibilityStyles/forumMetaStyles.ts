@@ -139,13 +139,12 @@ export const forumMetaCSS = () => {
             ...margins({
                 all: globalVars.meta.spacing.default,
             }),
+            ...borders(),
         },
     );
 
     cssOut(`.Content .MessageList .RoleTracker > .Tag`, {
         color: colorOut(globalVars.mainColors.fg),
-        // border: important(0),
-        // padding: important(0),
     });
 
     cssOut(".MItem a.Tag", {
@@ -210,7 +209,10 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-        .MItem.RoleTracker
+        .MItem.RoleTracker,
+        .MItem.Rank,
+        .AuthorInfo .MItem.RoleTitle,
+        .MessageList .ItemComment .MItem.RoleTitle
         `,
         {
             ...borders(),

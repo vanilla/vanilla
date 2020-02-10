@@ -33,6 +33,7 @@ import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -155,6 +156,8 @@ export const titleBarVariables = useThemeCache(() => {
 
     const compactSearch = makeThemeVars("compactSearch", {
         maxWidth: 672,
+        bg: emphasizeLightness(colors.bg, 0.1),
+        fg: colors.fg,
         mobile: {
             width: button.mobile.width,
         },
@@ -321,6 +324,12 @@ export const titleBarClasses = useThemeCache(() => {
                         color: colorOut(vars.colors.fg),
                     },
                 },
+            },
+            [`& .${searchBarClasses().valueContainer}`]: {
+                backgroundColor: colorOut(vars.compactSearch.bg),
+            },
+            [`& .${searchBarClasses().valueContainer} .searchBar__input`]: {
+                color: colorOut(vars.compactSearch.fg),
             },
         },
         ...mediaQueries.compact({

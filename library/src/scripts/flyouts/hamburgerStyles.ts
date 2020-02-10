@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { negative, paddings, unit } from "@library/styles/styleHelpers";
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent } from "csx";
+import { calc, important, percent } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const hamburgerVariables = useThemeCache(() => {
@@ -65,6 +65,8 @@ export const hamburgerClasses = useThemeCache(() => {
                         width: unit(formElVars.sizing.height),
                         height: unit(formElVars.sizing.height),
                         marginLeft: unit(negative(formElVars.sizing.height)),
+                        borderTopLeftRadius: important(0),
+                        borderBottomLeftRadius: important(0),
                     },
                     "& .Dropdown.MenuItems": {
                         position: "relative",

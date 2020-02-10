@@ -128,9 +128,37 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     // Panel
-    cssOut(".Panel a, .About a", {
-        ...siteNavNodeClasses().linkMixin,
+    cssOut(
+        `
+        .Panel.Panel-main .PanelCategories a,
+        .About a,
+        .Panel.Panel-main .FilterMenu a,
+        .Panel.Panel-main .BoxFilter a
+        `,
+        {
+            ...siteNavNodeClasses().linkMixin,
+            display: "flex",
+            color: "inherit",
+        },
+    );
+
+    cssOut(".Panel .ClearFix::after", {
+        display: important("none"),
     });
+
+    cssOut(
+        `
+        #Panel.Panel-main .FilterMenu .Aside,
+        .Panel.Panel-main .PanelInfo .Aside,
+        .Item .Aside
+        `,
+        {
+            ...margins({
+                all: 0,
+                left: "auto",
+            }),
+        },
+    );
 
     cssOut(
         `

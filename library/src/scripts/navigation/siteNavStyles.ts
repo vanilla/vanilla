@@ -116,19 +116,25 @@ export const siteNavNodeClasses = useThemeCache(() => {
     const linkMixin: NestedCSSProperties = {
         display: "block",
         flexGrow: 1,
-        color: "inherit",
         lineHeight: vars.node.lineHeight,
         minHeight: px(30),
         outline: 0,
         padding: 0,
         width: percent(100),
+        color: colorOut(globalVars.links.colors.default),
         ...allLinkStates({
             hover: {
-                color: globalVars.links.colors.hover,
+                color: colorOut(globalVars.links.colors.hover),
             },
-            focus: { color: globalVars.links.colors.focus },
-            accessibleFocus: { color: globalVars.links.colors.accessibleFocus },
-            active: { color: globalVars.links.colors.active },
+            focus: {
+                color: colorOut(globalVars.links.colors.focus),
+            },
+            accessibleFocus: {
+                color: colorOut(globalVars.links.colors.accessibleFocus),
+            },
+            active: {
+                color: colorOut(globalVars.links.colors.active),
+            },
         }),
         $nest: {
             "&:not(.focus-visible):active, &:focus": {
@@ -139,11 +145,10 @@ export const siteNavNodeClasses = useThemeCache(() => {
             // },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
-                color: "inherit",
                 $nest: {
                     "&.isFirstLevel": {
                         fontSize: unit(globalVars.fonts.size.large),
-                        fontWeight: globalVars.fonts.weights.bold,
+                        fontWeight: globalVars.fonts.weights.normal,
                     },
                 },
             },

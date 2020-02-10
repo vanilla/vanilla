@@ -65,6 +65,9 @@ export const buttonCSS = () => {
         width: unit(formElementVars.sizing.height),
         ...borders({
             color: "transparent",
+            radius: {
+                left: important(0),
+            },
         }),
         $nest: {},
     });
@@ -98,6 +101,8 @@ export const buttonCSS = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 border: important(0),
+                borderTopLeftRadius: important(0),
+                borderBottomLeftRadius: important(0),
             },
             "& .Button.Handle .SpDropdownHandle::before": {
                 padding: important(0),

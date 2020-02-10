@@ -519,7 +519,7 @@ export const bannerClasses = useThemeCache(() => {
         calc(
             `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
                 vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
-            )} - ${unit(padding * 2)}`,
+            )} - ${unit(padding)}`,
         );
 
     const imageElementContainer = style(
@@ -566,7 +566,7 @@ export const bannerClasses = useThemeCache(() => {
                 maxWidth: calc(
                     `${unit(vars.imageElement.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
                         vars.imageElement.padding.horizontal ?? vars.imageElement.padding.all,
-                    )}`,
+                    )} * 2`,
                 ),
             },
             { right: "initial", objectPosition: "0% 50%" },

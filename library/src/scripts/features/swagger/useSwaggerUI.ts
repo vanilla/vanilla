@@ -26,14 +26,13 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 
 export function useSwaggerUI(_options: { url?: string; spec?: object; [key: string]: any }) {
     const { url, spec } = _options;
-    const { topOffset } = useScrollOffset();
     const [headings, setHeadings] = useState<ISwaggerHeading[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const swaggerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         importSwagger().then(SwaggerUIConstructor => {
-            replaceDeepLinkScrolling(SwaggerUIConstructor, topOffset);
+            replaceDeepLinkScrolling(SwaggerUIConstructor);
             if (swaggerRef.current) {
                 setIsLoading(false);
                 SwaggerUIConstructor({

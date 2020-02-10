@@ -64,6 +64,8 @@ interface IState {
     isWatchingEnabled: boolean;
 }
 
+window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = 0;
+
 /**
  * Provider for handling a global scroll offset.
  * This wraps `ScrollOffset.Provider` with some good default behaviour.
@@ -191,6 +193,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
      * Set the value items will be translated by.
      */
     private setScrollOffset: ScollOffsetSetter = offset => {
+        window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = offset;
         this.setState({ scrollOffset: offset });
     };
 

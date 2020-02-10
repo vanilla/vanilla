@@ -31,7 +31,7 @@ applySharedPortalContext(props => {
     }, [setNavHeight]);
     return (
         <AppContext noTheme errorComponent={ErrorPage}>
-            <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, topOffset: navHeight }}>
+            <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
                 {props.children}
             </ScrollOffsetContext.Provider>
         </AppContext>

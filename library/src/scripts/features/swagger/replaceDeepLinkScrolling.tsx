@@ -11,9 +11,9 @@ import { scrollToElement } from "@library/content/hashScrolling";
  * Swagger currently uses a really weird way to scroll (scrolling done in JS).
  * Stub it out and use our own scrolling method that accounts for header offset.
  */
-export function replaceDeepLinkScrolling(swagger: any, offset?: number) {
+export function replaceDeepLinkScrolling(swagger: any) {
     swagger.plugins.DeepLinkingLayout.statePlugins.layout.actions.scrollToElement = (elementToScroll, container) => {
-        scrollToElement(elementToScroll, offset);
+        scrollToElement(elementToScroll, window.__VANILLA_GLOBAL_SCROLL_OFFSET__);
         return () => {};
     };
 }

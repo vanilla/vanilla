@@ -90,6 +90,16 @@
         font-size: 18px;
         margin-top: 0;
         margin-bottom: 12px;
+        padding-left: 0;
+        padding-right: 0;
+
+        &:hover {
+            background: none;
+
+            a {
+                text-decoration: underline !important;
+            }
+        }
     }
 
     .opblock-tag + div {

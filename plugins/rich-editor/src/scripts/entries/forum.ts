@@ -17,13 +17,15 @@ const MOUNTED_CLASS = "js-isMounted";
  * Set up the new discussion form if it exists.
  */
 async function setupEditor() {
+    // There can be an edge case where an old comment is set to another format, but if this plugin is enabled, we still want the rich editor styles applied.
+    const body = document.getElementsByTagName("body");
+    if (body) {
+        body[0].classList.add("hasRichEditor");
+    }
+
     const editorMountPoints = document.querySelectorAll(".richEditor");
     if (editorMountPoints.length > 0) {
         const mountEditor = await import(/* webpackChunkName: "mountEditor" */ "@rich-editor/mountEditor");
-        const body = document.getElementsByTagName("body");
-        if (body) {
-            body[0].classList.add("hasRichEditor");
-        }
 
         editorMountPoints.forEach(mountPoint => {
             if (!mountPoint.classList.contains(MOUNTED_CLASS)) {

@@ -155,7 +155,6 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        maxWidth: 672,
         bg: emphasizeLightness(colors.bg, 0.1),
         fg: colors.fg,
         mobile: {

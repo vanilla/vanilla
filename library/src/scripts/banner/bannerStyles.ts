@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url, rgba } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -102,6 +102,7 @@ export const bannerVariables = useThemeCache(() => {
         padding: {
             ...EMPTY_SPACING,
             all: globalVars.gutter.size,
+            right: 0,
         },
     });
 
@@ -511,9 +512,11 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const makeImageMinWidth = (rootUnit, padding) =>
-        `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
-            vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
-        )} - ${unit(padding)}`;
+        calc(
+            `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
+                vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
+            )} - ${unit(padding * 2)}`,
+        );
 
     const imageElementContainer = style(
         "imageElementContainer",
@@ -522,6 +525,7 @@ export const bannerClasses = useThemeCache(() => {
             minWidth: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
             flexGrow: 1,
             position: "relative",
+            overflow: "hidden",
         },
         media(
             { maxWidth: globalVars.content.width },
@@ -529,6 +533,11 @@ export const bannerClasses = useThemeCache(() => {
                 minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding.horizontal),
             },
         ),
+        layoutVariables()
+            .mediaQueries()
+            .oneColumnDown({
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingMobile.horizontal),
+            }),
         media(
             { maxWidth: 500 },
             {
@@ -540,12 +549,24 @@ export const bannerClasses = useThemeCache(() => {
     const imageElement = style(
         "imageElement",
         {
-            ...absolutePosition.fullSizeOfParent(),
-            objectFit: "contain",
+            ...absolutePosition.middleRightOfParent(),
+            minWidth: unit(vars.imageElement.minWidth),
             ...paddings(vars.imageElement.padding),
             objectPosition: "100% 50%",
+            objectFit: "contain",
+            marginLeft: "auto",
+            right: 0,
         },
-        mediaQueries.oneColumnDown({ objectPosition: "0% 100%" }),
+        media(
+            {
+                maxWidth: calc(
+                    `${unit(vars.imageElement.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
+                        vars.imageElement.padding.horizontal ?? vars.imageElement.padding.all,
+                    )}`,
+                ),
+            },
+            { right: "initial", objectPosition: "0% 50%" },
+        ),
     );
 
     return {

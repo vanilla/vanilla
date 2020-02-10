@@ -240,7 +240,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
                 return;
             } else {
                 if (topModal.props.exitHandler) {
-                    console.log("calling exit handler", topModal);
                     topModal.props.exitHandler(event as any);
                 }
             }

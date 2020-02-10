@@ -39,6 +39,11 @@ module.exports = {
         "getter-return": "off",
         "no-dupe-class-members": "off",
 
+        // General JS restrictions
+        "no-console": ["error", { allow: ["warn", "error"] }],
+        "no-debugger": ["error"],
+        "no-alert": ["error"],
+
         // Typescript specific rules
         "@typescript-eslint/ban-types": [
             "error",

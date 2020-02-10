@@ -17,7 +17,7 @@ class SiteTotalsModule extends Gdn_Module {
 
     const CACHE_REFRESH_INTERVAL = 300;
 
-    const CACHE_KEY = 'module.sitetotals.counts';
+    const CACHE_KEY = 'module.sitetotals';
 
     public function __construct() {
         parent::__construct();
@@ -29,7 +29,8 @@ class SiteTotalsModule extends Gdn_Module {
     }
 
     public function getAllCounts() {
-        $counts = Gdn::cache()->get(self::CACHE_KEY);
+        $countsCacheKey = self::CACHE_KEY.'.counts';
+        $counts = Gdn::cache()->get($countsCacheKey);
 
         if ($counts !== Gdn_Cache::CACHEOP_FAILURE) {
             return $counts;
@@ -41,7 +42,11 @@ class SiteTotalsModule extends Gdn_Module {
         }
 
         // cache counts
-        Gdn::cache()->store(self::CACHE_KEY, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
+        Gdn::cache()->store($countsCacheKey, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
+
+        // set recalculate flag
+        Gdn::cache()->store(self::CACHE_KEY.'.recalculate', true, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_REFRESH_INTERVAL]);
+
         return $counts;
     }
 

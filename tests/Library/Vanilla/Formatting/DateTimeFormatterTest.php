@@ -171,10 +171,10 @@ class DateTimeFormatterTest extends MinimalContainerTestCase {
         if ($isNotice) {
             $this->expectNotice();
         }
-        $now = time();
         $actual = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
         if ($expected === self::NOW) {
             // This is a bit of a kludge because the test may take longer than a second.
+            $now = time();
             $this->assertGreaterThanOrEqual($now, $actual);
             $this->assertLessThanOrEqual($now + 10, $actual);
         } else {

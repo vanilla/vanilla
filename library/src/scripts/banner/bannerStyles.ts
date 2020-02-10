@@ -33,6 +33,7 @@ import { compactSearchVariables, SearchBarButtonType } from "@library/headers/me
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
+import { containerVariables } from "@library/layout/components/containerStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -87,6 +88,11 @@ export const bannerVariables = useThemeCache(() => {
 
     const backgrounds = makeThemeVars("backgrounds", {
         ...compactSearchVars.backgrounds,
+    });
+
+    const contentContainer = makeThemeVars("contentContainer", {
+        minWidth: 500,
+        padding: spacing.padding,
     });
 
     const imageElement = makeThemeVars("imageElement", {
@@ -299,6 +305,7 @@ export const bannerVariables = useThemeCache(() => {
         backgrounds,
         spacing,
         innerBackground,
+        contentContainer,
         text,
         title,
         description,
@@ -340,7 +347,6 @@ export const bannerClasses = useThemeCache(() => {
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
-        overflow: "hidden",
     });
 
     const outerBackground = (url?: string) => {
@@ -375,9 +381,9 @@ export const bannerClasses = useThemeCache(() => {
     const contentContainer = style(
         "contentContainer",
         {
-            ...paddings(vars.spacing.padding),
+            ...paddings(vars.contentContainer.padding),
             backgroundColor: vars.innerBackground.bg,
-            minWidth: 500,
+            minWidth: vars.contentContainer.minWidth,
         },
         media(
             { maxWidth: 500 },
@@ -504,14 +510,25 @@ export const bannerClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
+    const makeImageMinWidth = (rootUnit, padding) =>
+        `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
+            vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
+        )} - ${unit(padding)}`;
+
     const imageElementContainer = style(
         "imageElementContainer",
         {
             alignSelf: "stretch",
-            minWidth: unit(vars.imageElement.minWidth),
+            minWidth: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
             flexGrow: 1,
             position: "relative",
         },
+        media(
+            { maxWidth: globalVars.content.width },
+            {
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding.horizontal),
+            },
+        ),
         media(
             { maxWidth: 500 },
             {

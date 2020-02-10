@@ -488,13 +488,9 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const content = style("content", {
-        $nest: {
-            "&&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(vars.colors.contrast),
-                boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
-                zIndex: 1,
-            },
-        },
+        borderColor: colorOut(vars.colors.contrast),
+        boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        zIndex: 1,
     });
 
     const imagePositioner = style("imagePositioner", {

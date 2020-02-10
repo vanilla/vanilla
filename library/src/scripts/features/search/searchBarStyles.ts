@@ -192,7 +192,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 $nest: {
                     "&:hover, &:focus, &.isFocused": {
                         color: "inherit",
-                        backgroundColor: globalVars.states.hover.color.toString(),
+                        backgroundColor: globalVars.states.hover.highlight.toString(),
                     },
                 },
             },

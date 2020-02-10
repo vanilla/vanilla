@@ -115,7 +115,7 @@ export const atMentionCSS = useThemeCache(() => {
                 marginBottom: 0,
             },
             "&.isActive .atMentionList-suggestion": {
-                backgroundColor: colorOut(globalVars.states.focus.color),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
             },
         },
     });

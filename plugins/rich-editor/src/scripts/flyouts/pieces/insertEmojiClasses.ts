@@ -44,7 +44,7 @@ export const insertEmojiClasses = useThemeCache(() => {
                         opacity: 1,
                     },
                     accessibleFocus: {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
+                        backgroundColor: colorOut(globalVars.states.hover.highlight),
                     },
                 },
                 {

@@ -20,6 +20,7 @@ import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
 import main from "@storybook/api/dist/initial-state";
+import { elementType } from "prop-types";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -34,38 +35,21 @@ export const globalVariables = useThemeCache(() => {
     const constants = makeThemeVars("constants", {
         linkStateColorEmphasis: 0.15,
         fullGutter: 48,
-        stateEmphasis: 0.06,
         states: {
             hover: {
-                stateEmphasis: null as number | null,
+                stateEmphasis: 0.08,
             },
             selected: {
-                stateEmphasis: null as number | null,
+                stateEmphasis: 0.5,
             },
             active: {
-                stateEmphasis: null as number | null,
+                stateEmphasis: 0.2,
             },
             focus: {
-                stateEmphasis: null as number | null,
+                stateEmphasis: 0.15,
             },
         },
     });
-
-    if (!constants.states.hover.stateEmphasis) {
-        constants.states.hover.stateEmphasis = constants.stateEmphasis;
-    }
-
-    if (!constants.states.selected.stateEmphasis) {
-        constants.states.selected.stateEmphasis = constants.stateEmphasis;
-    }
-
-    if (!constants.states.active.stateEmphasis) {
-        constants.states.active.stateEmphasis = constants.stateEmphasis;
-    }
-
-    if (!constants.states.focus.stateEmphasis) {
-        constants.states.focus.stateEmphasis = constants.stateEmphasis;
-    }
 
     const elementaryColors = {
         black: color("#000"),
@@ -303,19 +287,23 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: emphasizeLightness(mainColors.primary, constants.states.hover.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.hover.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         selected: {
-            color: emphasizeLightness(mainColors.primary, constants.states.selected.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.selected.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         active: {
-            color: emphasizeLightness(mainColors.primary, constants.states.active.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.active.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         focus: {
-            color: emphasizeLightness(mainColors.primary, constants.states.focus.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.focus.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
     });

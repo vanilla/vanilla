@@ -65,13 +65,13 @@ export const meBoxMessageClasses = useThemeCache(() => {
                 textShadow: "none",
             },
             hover: {
-                backgroundColor: colorOut(globalVars.states.hover.color),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
             },
             focus: {
-                backgroundColor: colorOut(globalVars.states.focus.color),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
             },
             active: {
-                backgroundColor: colorOut(globalVars.states.active.color),
+                backgroundColor: colorOut(globalVars.states.active.highlight),
             },
         }),
     });

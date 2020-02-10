@@ -177,11 +177,7 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
-            },
-            ".hasFocus .searchBar-valueContainer": {
-                backgroundColor: colorOut(vars.colors.active.bg),
             },
             ".searchBar__placeholder": {
                 color: colorOut(vars.colors.placeholder),

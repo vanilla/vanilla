@@ -4,6 +4,7 @@ body {
     height: 100%;
 }
 .storybookDashboardStyles {
+    $staticVariables: true;
     @import "../../../scss/admin.scss";
 
     // Re-apply these because we're nested inside the body.

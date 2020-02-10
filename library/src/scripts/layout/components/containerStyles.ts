@@ -20,6 +20,9 @@ export const containerVariables = useThemeCache(() => {
         padding: {
             horizontal: vars.gutter.size,
         },
+        paddingMobile: {
+            horizontal: 8,
+        },
     });
 
     const sizing = makeThemeVars("sizes", {
@@ -57,12 +60,11 @@ export const containerMainStyles = () => {
 export const containerClasses = useThemeCache(() => {
     const style = styleFactory("container");
     const mediaQueries = layoutVariables().mediaQueries();
+    const vars = containerVariables();
     const root = style(
         containerMainStyles() as NestedCSSProperties,
         mediaQueries.oneColumnDown({
-            ...paddings({
-                horizontal: 8,
-            }),
+            ...paddings(vars.spacing.paddingMobile),
         }),
     );
     return { root };

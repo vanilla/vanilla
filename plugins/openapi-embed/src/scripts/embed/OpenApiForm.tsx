@@ -24,6 +24,7 @@ import { LoadStatus, IApiError } from "@vanilla/library/src/scripts/@types/api/c
 import ButtonLoader from "@vanilla/library/src/scripts/loaders/ButtonLoader";
 
 interface IProps {
+    isVisible: boolean;
     data: Partial<IOpenApiEmbedData>;
     onDismiss: () => void;
     onSave: (data: IOpenApiEmbedData) => void;
@@ -39,18 +40,30 @@ export function OpenApiForm(props: IProps) {
 
     const spec = useRemoteSpec(url);
 
+    const clearForm = () => {
+        setShowPreview(false);
+        setHeadings([]);
+        setUrl("");
+    };
+
     const handleSubmit = () => {
         if (spec.status !== LoadStatus.SUCCESS || !url) {
             return;
         }
-
+        clearForm();
+        props.onDismiss();
         props.onSave({ url, embedType: "openapi", headings, specJson: JSON.stringify(spec.data) });
     };
 
+    const onDimiss = () => {
+        clearForm();
+        props.onDismiss();
+    };
+
     return (
-        <Modal size={ModalSizes.MEDIUM} titleID={titleID}>
+        <Modal isVisible={props.isVisible} size={ModalSizes.MEDIUM} titleID={titleID} exitHandler={onDimiss}>
             <Frame
-                header={<FrameHeader titleID={titleID} closeFrame={props.onDismiss} title={"Configure OpenApi Spec"} />}
+                header={<FrameHeader titleID={titleID} closeFrame={onDimiss} title={"Configure OpenApi Spec"} />}
                 body={
                     <FrameBody hasVerticalPadding>
                         <InputTextBlock
@@ -81,16 +94,15 @@ export function OpenApiForm(props: IProps) {
                     </FrameFooter>
                 }
             />
-            {showPreview && spec.data && (
-                <OpenApiPreview
-                    onLoadHeadings={setHeadings}
-                    spec={spec.data}
-                    onConfirm={handleSubmit}
-                    onDismiss={() => {
-                        setShowPreview(false);
-                    }}
-                />
-            )}
+            <OpenApiPreview
+                isVisible={showPreview}
+                onLoadHeadings={setHeadings}
+                spec={spec.data}
+                onConfirm={handleSubmit}
+                onDismiss={() => {
+                    setShowPreview(false);
+                }}
+            />
         </Modal>
     );
 }
@@ -115,6 +127,11 @@ function useRemoteSpec(specUrl: string) {
             } catch (e) {
                 setData(undefined);
                 setStatus(LoadStatus.ERROR);
+
+                if (e.request && !e.response) {
+                    e.message =
+                        "A network error occurred. This could be a CORS issue or a dropped internet connection.";
+                }
                 setError(e);
             }
         },

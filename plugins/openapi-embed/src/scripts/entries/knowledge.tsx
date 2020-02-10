@@ -14,6 +14,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
 import { SwaggerIcon } from "@openapi-embed/embed/swagger/SwaggerIcon";
 import classNames from "classnames";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 registerEmbed("openapi", OpenApiEmbed);
 
@@ -21,6 +22,7 @@ function InsertOpenApiEmbedButton() {
     const { quill } = useEditor();
     const [showForm, setShowForm] = useState(false);
     const embedInserter = quill && (quill.getModule("embed/insertion") as EmbedInsertionModule);
+    const classes = richEditorClasses(false);
 
     const insertEmbed = (data: IOpenApiEmbedData) => {
         if (!embedInserter) {
@@ -41,23 +43,27 @@ function InsertOpenApiEmbedButton() {
         <>
             <EditorEmbedBar.Item>
                 <Button
-                    baseClass={ButtonTypes.ICON}
+                    className={classNames(classes.button, "richEditor-button richEditor-embedButton")}
+                    baseClass={ButtonTypes.CUSTOM}
                     onClick={() => {
                         setShowForm(true);
                     }}
                 >
-                    <SwaggerIcon title={"Add OpenApi Embed"} />
+                    <span className={classes.iconWrap}></span>
+                    <SwaggerIcon
+                        className={classNames(classes.icon, "richEditorButton-icon")}
+                        title={"Add OpenApi Embed"}
+                    />
                 </Button>
             </EditorEmbedBar.Item>
-            {showForm && (
-                <OpenApiForm
-                    data={{}}
-                    onSave={insertEmbed}
-                    onDismiss={() => {
-                        setShowForm(false);
-                    }}
-                />
-            )}
+            <OpenApiForm
+                isVisible={showForm}
+                data={{}}
+                onSave={insertEmbed}
+                onDismiss={() => {
+                    setShowForm(false);
+                }}
+            />
         </>
     );
 }

@@ -46,18 +46,17 @@ export function OpenApiEmbed(props: IProps) {
                 >
                     <OpenApiEmbedPlaceholder data={props} />
                 </EmbedContent>
-                {showEditModal && (
-                    <OpenApiForm
-                        data={props}
-                        onSave={data => {
-                            props.syncBackEmbedValue?.(data);
-                            setShowEditModal(false);
-                        }}
-                        onDismiss={() => {
-                            setShowEditModal(false);
-                        }}
-                    />
-                )}
+                <OpenApiForm
+                    isVisible={showEditModal}
+                    data={props}
+                    onSave={data => {
+                        props.syncBackEmbedValue?.(data);
+                        setShowEditModal(false);
+                    }}
+                    onDismiss={() => {
+                        setShowEditModal(false);
+                    }}
+                />
             </EmbedContainer>
         );
     } else {

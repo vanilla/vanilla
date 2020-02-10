@@ -18,6 +18,7 @@ import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { t } from "@vanilla/i18n";
 
 interface IProps {
+    isVisible: boolean;
     spec?: object;
     url?: string;
     onDismiss: () => void;
@@ -37,7 +38,7 @@ export function OpenApiPreview(props: IProps) {
     }, [headings, isLoading, onLoadHeadings]);
 
     return (
-        <Modal size={ModalSizes.LARGE} titleID="">
+        <Modal isVisible={props.isVisible} size={ModalSizes.LARGE} titleID="">
             <Frame
                 header={
                     <FrameHeader onBackClick={props.onDismiss} closeFrame={props.onDismiss} title={"API Preview"} />

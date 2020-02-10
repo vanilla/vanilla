@@ -137,6 +137,14 @@ export function NotEnoughItems() {
     );
 }
 
+(NotEnoughItems as any).story = {
+    parameters: {
+        chromatic: {
+            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+        },
+    },
+};
+
 export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false }, () => {
     return (
         <div>

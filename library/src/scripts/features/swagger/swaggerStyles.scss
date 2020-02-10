@@ -1,0 +1,98 @@
+@import "~swagger-ui-react/swagger-ui.css";
+
+.swagger-ui.swagger-ui {
+    text-align: left;
+    font-family: inherit !important;
+    .wrapper {
+        padding: 0;
+        margin: 0;
+    }
+
+    // Widen the min-width on the first table column.
+    table tbody tr td:first-of-type {
+        min-width: 12em;
+    }
+
+    // Hide this unwanted tag.
+    .response-col_links {
+        display: none;
+    }
+
+    .opblock {
+        line-height: 1;
+    }
+
+    .opblock-summary {
+        flex-direction: column;
+        align-items: center;
+        min-height: 42px;
+        padding-left: 105px;
+        position: relative;
+        align-items: flex-start;
+    }
+
+    .authorization__btn {
+        display: none;
+    }
+
+    .opblock-summary-method {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        bottom: 5px;
+        width: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .opblock-summary-description {
+        padding: 0 10px;
+        padding-top: 5px;
+    }
+
+    table.model {
+        margin-top: 24px;
+    }
+
+    .try-out {
+        display: none;
+    }
+
+    .model-example .tab {
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .tabitem::before {
+        display: none;
+    }
+
+    .parameters-col_description {
+        input, select {
+            display: none;
+        }
+    }
+
+    // Fix wrapping and alignmenet of "required" markers.
+    .opblock-title {
+        display: flex;
+        align-items: center;
+
+        &:after {
+            // This is some pseudo-text.
+            white-space: nowrap;
+        }
+    }
+
+    .opblock-tag {
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 12px;
+    }
+
+    .opblock-tag + div {
+        display: flex;
+        flex-direction: column;
+    }
+}

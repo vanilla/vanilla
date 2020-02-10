@@ -21,7 +21,7 @@ interface IContextParams {
     setTopOffset(pixels: number): void;
 }
 
-export const ScrollOffsetContext = React.createContext<IContextParams>({
+export const SCROLL_OFFSET_DEFAULTS: IContextParams = {
     setScrollOffset: () => {
         logWarning("Set scroll offset called, but a proper provider was not configured.");
     },
@@ -41,6 +41,10 @@ export const ScrollOffsetContext = React.createContext<IContextParams>({
         current: null,
     },
     offsetClass: "",
+};
+
+export const ScrollOffsetContext = React.createContext<IContextParams>({
+    ...SCROLL_OFFSET_DEFAULTS,
 });
 
 export interface IWithScrollOffset {

@@ -58,6 +58,7 @@
         "reselect": "4.0.0",
         "shave": "2.5.3",
         "sprintf-js": "1.1.1",
+        "swagger-ui-react": "^3.25.0",
         "tabbable": "3.1.1",
         "tar": ">=4.4.2",
         "tsc-watch": "^4.0.0",

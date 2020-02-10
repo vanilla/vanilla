@@ -4,7 +4,6 @@
     "private": true,
     "license": "GPL-2.0",
     "dependencies": {
-        "@vanilla/library": "^3.0.1",
-        "swagger-ui-dist": "^3.24.0"
+        "@vanilla/library": "^3.0.1"
     }
 }

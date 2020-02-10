@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url, rgba } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -33,6 +33,7 @@ import { compactSearchVariables, SearchBarButtonType } from "@library/headers/me
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
+import { containerVariables } from "@library/layout/components/containerStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -89,13 +90,19 @@ export const bannerVariables = useThemeCache(() => {
         ...compactSearchVars.backgrounds,
     });
 
+    const contentContainer = makeThemeVars("contentContainer", {
+        minWidth: 550,
+        padding: spacing.padding,
+    });
+
     const imageElement = makeThemeVars("imageElement", {
         image: undefined as string | undefined,
-        minWidth: 600,
+        minWidth: 500,
         disappearingWidth: 500,
         padding: {
             ...EMPTY_SPACING,
             all: globalVars.gutter.size,
+            right: 0,
         },
     });
 
@@ -299,6 +306,7 @@ export const bannerVariables = useThemeCache(() => {
         backgrounds,
         spacing,
         innerBackground,
+        contentContainer,
         text,
         title,
         description,
@@ -340,7 +348,6 @@ export const bannerClasses = useThemeCache(() => {
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),
-        overflow: "hidden",
     });
 
     const outerBackground = (url?: string) => {
@@ -375,12 +382,16 @@ export const bannerClasses = useThemeCache(() => {
     const contentContainer = style(
         "contentContainer",
         {
-            ...paddings(vars.spacing.padding),
+            ...paddings(vars.contentContainer.padding),
             backgroundColor: vars.innerBackground.bg,
-            minWidth: 500,
+            minWidth: vars.contentContainer.minWidth,
         },
         media(
-            { maxWidth: 500 },
+            {
+                maxWidth: calc(
+                    `${unit(vars.contentContainer.minWidth)} + ${unit(vars.contentContainer.padding.horizontal)} * 4`,
+                ),
+            },
             {
                 minWidth: "initial",
             },
@@ -504,14 +515,33 @@ export const bannerClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
+    const makeImageMinWidth = (rootUnit, padding) =>
+        calc(
+            `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
+                vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
+            )} - ${unit(padding)}`,
+        );
+
     const imageElementContainer = style(
         "imageElementContainer",
         {
             alignSelf: "stretch",
-            minWidth: unit(vars.imageElement.minWidth),
+            minWidth: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
             flexGrow: 1,
             position: "relative",
+            overflow: "hidden",
         },
+        media(
+            { maxWidth: globalVars.content.width },
+            {
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding.horizontal),
+            },
+        ),
+        layoutVariables()
+            .mediaQueries()
+            .oneColumnDown({
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingMobile.horizontal),
+            }),
         media(
             { maxWidth: 500 },
             {
@@ -523,12 +553,24 @@ export const bannerClasses = useThemeCache(() => {
     const imageElement = style(
         "imageElement",
         {
-            ...absolutePosition.fullSizeOfParent(),
-            objectFit: "contain",
+            ...absolutePosition.middleRightOfParent(),
+            minWidth: unit(vars.imageElement.minWidth),
             ...paddings(vars.imageElement.padding),
             objectPosition: "100% 50%",
+            objectFit: "contain",
+            marginLeft: "auto",
+            right: 0,
         },
-        mediaQueries.oneColumnDown({ objectPosition: "0% 100%" }),
+        media(
+            {
+                maxWidth: calc(
+                    `${unit(vars.imageElement.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
+                        vars.imageElement.padding.horizontal ?? vars.imageElement.padding.all,
+                    )} * 2`,
+                ),
+            },
+            { right: "initial", objectPosition: "0% 50%" },
+        ),
     );
 
     return {

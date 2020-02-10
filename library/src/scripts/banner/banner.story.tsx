@@ -15,6 +15,8 @@ import Banner from "@library/banner/Banner";
 import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment } from "@library/banner/bannerStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export default {
     title: "Banner",
@@ -200,3 +202,72 @@ export const ImageAsElement = storyWithConfig(
     },
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
 );
+
+(ImageAsElement as any).story = {
+    parameters: {
+        chromatic: {
+            viewports: [1400, globalVariables().content.width, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+        },
+    },
+};
+
+export const ImageAsElementWide = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+                content: {
+                    width: 1350,
+                },
+            },
+            banner: {
+                options: {
+                    alignment: BannerAlignment.LEFT,
+                },
+                colors: {
+                    bg: "#fff",
+                    contrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+);
+
+(ImageAsElementWide as any).story = {
+    parameters: {
+        chromatic: {
+            viewports: [1450, 1350, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+        },
+    },
+};

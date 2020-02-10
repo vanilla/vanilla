@@ -17,7 +17,6 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
@@ -209,13 +208,40 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-        .MItem.RoleTracker,
-        .MItem.Rank,
-        .AuthorInfo .MItem.RoleTitle,
-        .MessageList .ItemComment .MItem.RoleTitle
+        .Container .MItem.RoleTracker,
+        .Container .MItem.Rank,
+        .Container .AuthorInfo .MItem.RoleTitle,
+        .Container .MessageList .ItemComment .MItem.RoleTitle,
+        .Container .ItemComment .MItem.Rank,
+        .Container .DataTableWrap .Meta .Tag
         `,
         {
+            color: colorOut(globalVars.mainColors.fg),
             ...borders(),
+            opacity: 1,
+        },
+    );
+
+    cssOut(
+        `
+        .DataList .MItem > a:hover,
+        .DataList .MItem > a:focus,
+        .DataList .MItem > a:active,
+        .DataList .MItem > a.focus-visible
+        `,
+        {
+            textDecoration: "none",
+        },
+    );
+
+    cssOut(
+        `
+            .DataTable .MItem a,
+            .MItem > .Tag
+        `,
+        {
+            border: important(0),
+            padding: important(0),
         },
     );
 };
@@ -223,12 +249,6 @@ export const forumMetaCSS = () => {
 function mixinMetaLinkContainer(selector: string) {
     selector = trimTrailingCommas(selector);
     const vars = globalVariables();
-    const formVars = formElementsVariables();
-    const mainColors = vars.mainColors;
-
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
     const metaFg = colorOut(vars.meta.colors.fg);
 
     cssOut(selector, {

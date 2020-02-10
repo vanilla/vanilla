@@ -8,12 +8,22 @@
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { absolutePosition, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    borders,
+    colorOut,
+    unit,
+    paddings,
+    importantUnit,
+    emphasizeLightness,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent } from "csx";
+import { forumGlobalVariables } from "@dashboard/compatibilityStyles/forumVariables";
 
 export const buttonCSS = () => {
+    const vars = forumGlobalVariables();
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
@@ -41,13 +51,22 @@ export const buttonCSS = () => {
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
 
-    cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
+    cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         width: unit(formElementVars.sizing.height),
         background: important("none"),
         backgroundColor: important("none"),
         ...borders({
             color: "transparent",
         }),
+    });
+
+    cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
+        backgroundColor: colorOut(emphasizeLightness(globalVars.mainColors.primary, 0.2)),
+        width: unit(formElementVars.sizing.height),
+        ...borders({
+            color: "transparent",
+        }),
+        $nest: {},
     });
 
     cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
@@ -85,18 +104,6 @@ export const buttonCSS = () => {
             },
         },
     });
-
-    // cssOut(`.Button.Primary:not([disabled]):hover`, {
-    //     color: colorOut(globalVars.mainColors.primaryContrast),
-    // });
-
-    // cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
-    //     borderColor: primary,
-    //     borderStyle: globalVars.border.style,
-    //     borderWidth: unit(globalVars.border.width),
-    //     color: colorOut(button),
-    //     backgroundColor: colorOut(globalVars.mainColors.primary),
-    // });
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);

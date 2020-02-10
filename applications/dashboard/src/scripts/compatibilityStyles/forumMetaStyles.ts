@@ -41,7 +41,6 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-        .DataList .Meta .Tag-Announcement,
         .DataList .NewCommentCount,
         .DataList .HasNew.HasNew,
         .MessageList .Tag-Announcement,
@@ -55,8 +54,8 @@ export const forumMetaCSS = () => {
         a.Tag
         `,
         {
-            color: importantColorOut(fg),
             ...borders(),
+            color: importantColorOut(fg),
             textDecoration: "none",
             ...allLinkStates({
                 allStates: {

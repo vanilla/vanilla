@@ -44,11 +44,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        font-family: inherit;
     }
 
     .opblock-summary-description {
         padding: 0 10px;
         padding-top: 5px;
+        font-family: inherit;
     }
 
     table.model {
@@ -92,6 +94,7 @@
         margin-bottom: 12px;
         padding-left: 0;
         padding-right: 0;
+        font-family: inherit;
 
         &:hover {
             background: none;

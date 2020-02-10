@@ -27,7 +27,7 @@ export const dayPickerVariables = useThemeCache(() => {
     const colors = {
         today: globalVars.mainColors.primary,
         selected: {
-            color: globalVars.states.selected.color,
+            color: globalVars.states.selected.highlight,
         },
         hover: {
             bg: globalVars.states.hover.highlight,

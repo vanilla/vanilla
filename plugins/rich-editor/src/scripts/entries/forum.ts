@@ -20,9 +20,15 @@ async function setupEditor() {
     const editorMountPoints = document.querySelectorAll(".richEditor");
     if (editorMountPoints.length > 0) {
         const mountEditor = await import(/* webpackChunkName: "mountEditor" */ "@rich-editor/mountEditor");
+        const body = document.getElementsByTagName("body");
+        if (body) {
+            body[0].classList.add("hasRichEditor");
+        }
+
         editorMountPoints.forEach(mountPoint => {
             if (!mountPoint.classList.contains(MOUNTED_CLASS)) {
                 mountPoint.classList.add(MOUNTED_CLASS);
+
                 const popup = mountPoint.closest(".Popup");
                 if (popup) {
                     popup.classList.add("hasRichEditor");

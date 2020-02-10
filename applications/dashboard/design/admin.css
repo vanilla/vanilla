@@ -12027,7 +12027,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .Message img .embedImage-img,
 .embedImage-img {
-  display: block;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   position: relative;
   margin-left: auto;
   margin-right: auto;
@@ -12037,10 +12039,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .bbcode_left .embedImage-img {
   margin-left: 0;
+  display: inline-block;
 }
 
 .bbcode_right .embedImage-img {
   margin-right: 0;
+  display: inline-block;
 }
 
 .embedImage-link {

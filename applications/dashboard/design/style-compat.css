@@ -955,7 +955,6 @@ body {
 .userContent p {
   word-break: break-word;
   text-overflow: ellipsis;
-  border-radius: 0;
 }
 .userContent .CommentHeader {
   margin-bottom: 14px;
@@ -1273,7 +1272,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .richEditor-close.richEditor-close {
-  display: flex;
+  display: block;
 }
 
 @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
@@ -1567,7 +1566,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .Message img .embedImage-img,
 .embedImage-img {
-  display: block;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   position: relative;
   margin-left: auto;
   margin-right: auto;
@@ -1577,10 +1578,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .bbcode_left .embedImage-img {
   margin-left: 0;
+  display: inline-block;
 }
 
 .bbcode_right .embedImage-img {
   margin-right: 0;
+  display: inline-block;
 }
 
 .embedImage-link {
@@ -1610,7 +1613,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   overflow: hidden;
   text-align: left;
   pointer-events: initial !important;
-  overflow: hidden;
 }
 
 .embedText-main {

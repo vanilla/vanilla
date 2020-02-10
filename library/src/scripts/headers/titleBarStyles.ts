@@ -489,7 +489,6 @@ export const titleBarClasses = useThemeCache(() => {
             height: unit(vars.sizing.height),
             $nest: {
                 "&.isOpen": {
-                    width: unit(vars.compactSearch.maxWidth),
                     flex: 1,
                 },
             },
@@ -500,7 +499,6 @@ export const titleBarClasses = useThemeCache(() => {
     const compactSearchResults = style("compactSearchResults", {
         position: "absolute",
         top: unit(formElementVars.sizing.height),
-        maxWidth: px(vars.compactSearch.maxWidth),
         width: percent(100),
         $nest: {
             "&:empty": {

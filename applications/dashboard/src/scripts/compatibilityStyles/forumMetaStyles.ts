@@ -53,7 +53,6 @@ export const forumMetaCSS = () => {
         .DataTableWrap .HasNew.HasNew,
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
-        .Item .Author a,
         a.Tag
         `,
         {
@@ -145,12 +144,14 @@ export const forumMetaCSS = () => {
 
     cssOut(`.Content .MessageList .RoleTracker > .Tag`, {
         color: colorOut(globalVars.mainColors.fg),
-        border: important(0),
-        padding: important(0),
+        // border: important(0),
+        // padding: important(0),
     });
 
-    cssOut(".MItem .Tag", {
+    cssOut(".MItem a.Tag", {
         ...margins({ all: important(0) }),
+        border: important(0),
+        padding: important(0),
     });
 
     cssOut(
@@ -194,6 +195,25 @@ export const forumMetaCSS = () => {
         .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a`,
         {
             opacity: important(1),
+        },
+    );
+
+    cssOut(
+        `
+        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a
+        `,
+        {
+            textDecoration: "none",
+        },
+    );
+
+    cssOut(
+        `
+        .MItem.RoleTracker
+        `,
+        {
+            ...borders(),
         },
     );
 };

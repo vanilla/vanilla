@@ -10,6 +10,8 @@
 @import "../../../library/src/scss/social/socialMediaVariables";
 @import "../../../library/src/scss/mixins/mixins";
 
+$staticVariables: true;
+
 // Compatibility
 @import "compatibility/mixins";
 @import "compatibility/scaffolding";

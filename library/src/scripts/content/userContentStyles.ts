@@ -337,19 +337,6 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const legacy: NestedCSSSelectors = {
-        "& .bbcode_left": {
-            $nest: {
-                ".embedImage-img": {
-                    marginRight: "auto",
-                },
-            },
-        },
-        "& .bbcode_right .embedImage-img": {
-            marginLeft: "auto",
-        },
-    };
-
     const blockQuoteVars = blockQuoteVariables();
 
     const blockquotes: NestedCSSSelectors = {
@@ -378,7 +365,6 @@ export const userContentClasses = useThemeCache(() => {
             ...codeStyles,
             ...spoilersAndQuotes,
             ...blockquotes,
-            ...legacy,
         },
     });
 

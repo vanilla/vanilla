@@ -213,16 +213,6 @@ export const compatibilityStyles = useThemeCache(() => {
         paddingRight: 0,
     });
 
-    cssOut(
-        `
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a
-        `,
-        {
-            textDecoration: "none",
-        },
-    );
-
     cssOut(`.Herobanner-bgImage`, {
         "-webkit-filter": "none",
         filter: "none",

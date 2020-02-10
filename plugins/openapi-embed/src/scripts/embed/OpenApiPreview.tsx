@@ -41,7 +41,7 @@ export function OpenApiPreview(props: IProps) {
         <Modal isVisible={props.isVisible} size={ModalSizes.LARGE} titleID="">
             <Frame
                 header={
-                    <FrameHeader onBackClick={props.onDismiss} closeFrame={props.onDismiss} title={"API Preview"} />
+                    <FrameHeader onBackClick={props.onDismiss} closeFrame={props.onDismiss} title={t("API Preview")} />
                 }
                 body={
                     <FrameBody hasVerticalPadding>

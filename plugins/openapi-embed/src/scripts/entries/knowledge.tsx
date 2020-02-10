@@ -15,6 +15,7 @@ import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
 import { SwaggerIcon } from "@openapi-embed/embed/swagger/SwaggerIcon";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { t } from "@vanilla/i18n";
 
 registerEmbed("openapi", OpenApiEmbed);
 
@@ -52,7 +53,7 @@ function InsertOpenApiEmbedButton() {
                     <span className={classes.iconWrap}></span>
                     <SwaggerIcon
                         className={classNames(classes.icon, "richEditorButton-icon")}
-                        title={"Add OpenApi Embed"}
+                        title={t("Add OpenApi Embed")}
                     />
                 </Button>
             </EditorEmbedBar.Item>

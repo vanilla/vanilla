@@ -10,6 +10,8 @@ import { ReactElement } from "react";
 
 export interface IComponentMountOptions {
     overwrite?: boolean;
+    clearContents?: boolean;
+    bypassPortalManager?: boolean;
 }
 
 interface IPortal {
@@ -85,8 +87,17 @@ export function mountReact(
     callback?: () => void,
     options?: IComponentMountOptions,
 ) {
+    if (options?.bypassPortalManager) {
+        ReactDOM.render(<PortalContext>{component}</PortalContext>, target, callback);
+        return;
+    }
+
     let mountPoint = target;
     let cleanupContainer: HTMLElement | undefined;
+    if (options?.clearContents) {
+        target.innerHTML = "";
+    }
+
     if (options && options.overwrite) {
         const container = document.createElement("span");
         cleanupContainer = container;

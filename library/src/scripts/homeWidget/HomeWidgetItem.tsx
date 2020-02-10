@@ -32,8 +32,6 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const options = homeWidgetItemVariables(props.options).options;
     const classes = homeWidgetItemClasses(props.options);
 
-    console.log("options", { options, propOptions: props.options });
-
     return (
         <SmartLink to={props.to} className={classes.root}>
             {HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE === options.contentType && (

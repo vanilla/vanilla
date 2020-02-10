@@ -21,6 +21,7 @@ export function testStoreState(state: DeepPartial<ICoreStoreState>) {
 
 export function resetStoreState(state: DeepPartial<ICoreStoreState>) {
     const store = getStore();
+    // eslint-disable-next-line no-console
     console.log("resetting redux state", state);
     store.dispatch(resetActionAC(testStoreState(state)));
 }

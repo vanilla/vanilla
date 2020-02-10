@@ -26,6 +26,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { cssRule } from "typestyle";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
@@ -127,7 +128,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const borderedContent = style("borderedContent", {
         ...contentMixin,
-        maxWidth: unit(vars.options.maxWidth + vars.spacing.gutter * 2),
         ...paddings({
             top: 0,
             horizontal: vars.spacing.gutter,
@@ -173,6 +173,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const gridItemSpacer = style("gridItemSpacer", {
         ...itemMixin,
+        minWidth: unit(homeWidgetItemVariables().sizing.minWidth),
     });
 
     const gridItemContent = style("gridItemContent", {
@@ -220,11 +221,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         $nest: {
             [`.${borderedContent} + &`]: {
                 marginTop: 0,
-                $nest: {
-                    [`& .${viewAll}`]: {
-                        marginRight: 0,
-                    },
-                },
             },
         },
     });

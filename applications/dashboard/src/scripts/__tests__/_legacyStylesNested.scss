@@ -1,4 +1,6 @@
+
 .storybookLegacyStyles {
+    @import "../../../scss/isStaticVariables.scss";
     @import "../../../scss/style.scss";
     @import "../../../scss/style-compat.scss";
 }

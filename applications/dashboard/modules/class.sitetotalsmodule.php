@@ -105,7 +105,11 @@ class SiteTotalsModule extends Gdn_Module {
         $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
 
         foreach ($counts as $name => $value) {
-            $counts[$name] = $this->getCount($name);
+            if ($name === "User") {
+                $counts[$name] = $this->getCount($name);
+            } else {
+                //TODO: get date from countAllDiscussions and countAllComments and sum
+            }
         }
 
         // cache counts

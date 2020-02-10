@@ -17,6 +17,8 @@ class SiteTotalsModule extends Gdn_Module {
 
     const CACHE_REFRESH_INTERVAL = 300;
 
+    const CACHE_KEY = 'module.sitetotals.counts';
+
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'dashboard';
@@ -27,11 +29,20 @@ class SiteTotalsModule extends Gdn_Module {
     }
 
     public function getAllCounts() {
-        $result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
-        foreach ($result as $name => $value) {
-            $result[$name] = $this->getCount($name);
+        $counts = Gdn::cache()->get(self::CACHE_KEY);
+
+        if ($counts !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $counts;
         }
-        $this->setData('Totals', $result);
+
+        $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
+        foreach ($counts as $name => $value) {
+            $counts[$name] = $this->getCount($name);
+        }
+
+        // cache counts
+        Gdn::cache()->store(self::CACHE_KEY, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
+        return $counts;
     }
 
 //    protected function _GetData() {
@@ -46,21 +57,11 @@ class SiteTotalsModule extends Gdn_Module {
 //    }
 
     protected function getCount($table) {
-        // Try and get the count from the cache.
-        $key = "$table.CountRows";
-        $count = Gdn::cache()->get($key);
-        if ($count !== Gdn_Cache::CACHEOP_FAILURE) {
-            return $count;
-        }
-
-        // The count wasn't in the cache so grab it from the table.
         $count = Gdn::sql()
             ->select($table.'ID', 'count', 'CountRows')
             ->from($table)
             ->get()->value('CountRows');
 
-        // Save the value to the cache.
-        Gdn::cache()->store($key, $count, [Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)]);
         return $count;
     }
 

@@ -7,4 +7,6 @@ import { StoryContextProvider } from "@library/storybook/StoryContext";
 import { addDecorator } from "@storybook/react";
 import React from "react";
 
-addDecorator(storyFn => <StoryContextProvider>{storyFn()}</StoryContextProvider>);
+export function applyStoryContext() {
+    addDecorator(storyFn => <StoryContextProvider>{storyFn()}</StoryContextProvider>);
+}

@@ -24,7 +24,6 @@ import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary"
 import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { visibility } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { mountModal } from "@library/modal/Modal";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
@@ -114,6 +113,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
             </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,
+            { bypassPortalManager: true },
         );
     });
 }

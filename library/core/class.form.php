@@ -72,6 +72,9 @@ class Gdn_Form extends Gdn_Pluggable {
     /** @var array Associative array of hidden inputs with their "Name" attribute as the key. */
     public $HiddenInputs;
 
+    /** @var string Autocomplete. */
+    public $AutoComplete = 'off';
+
     /**
      * @var string All form-related elements (form, input, select, textarea, [etc] will have
      *    this value prefixed on their ID attribute. Default is "Form_". If the
@@ -2022,6 +2025,8 @@ PASSWORDMETER;
             $return .= $this->_idAttribute('', $attributes);
         }
 
+
+
         // Method
         $methodFromAttributes = arrayValueI('method', $attributes);
         $this->Method = $methodFromAttributes === false ? $this->Method : $methodFromAttributes;
@@ -2033,6 +2038,11 @@ PASSWORDMETER;
         }
 
         $this->Action = $actionFromAttributes === false ? $this->Action : $actionFromAttributes;
+
+        // Autocomplete
+        $autoCompleteFromAttributes = arrayValueI('autocomplete', $attributes);
+        $this->AutoComplete = $autoCompleteFromAttributes === false ? $this->AutoComplete : $autoCompleteFromAttributes;
+
 
         if (strcasecmp($this->Method, 'get') == 0) {
             // The path is not getting passed on get forms so put them in hidden fields.
@@ -2055,6 +2065,7 @@ PASSWORDMETER;
 
         $return .= ' method="'.$this->Method.'"'
             .' action="'.$this->Action.'"'
+            .' autocomplete="'.$this->AutoComplete.'" '
             .$this->_attributesToString($attributes)
             .">\n<div>\n";
 

@@ -11,6 +11,8 @@ import { t } from "@vanilla/i18n";
 import { uploadFile } from "@library/apiv2";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import ButtonLoader from "@vanilla/library/src/scripts/loaders/ButtonLoader";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 interface IProps {
     value: string | null; // The image url
@@ -26,6 +28,7 @@ interface IProps {
 export function DashboardImageUpload(props: IProps) {
     const { inputID, labelType } = useFormGroup();
     const imageUploader = props.imageUploader || uploadFile;
+    const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<Error | null>(null);
 
@@ -57,6 +60,7 @@ export function DashboardImageUpload(props: IProps) {
                             return;
                         }
 
+                        setIsLoading(true);
                         setName(file.name);
                         const tempUrl = URL.createObjectURL(file);
                         props.onImagePreview && props.onImagePreview(tempUrl);
@@ -67,13 +71,17 @@ export function DashboardImageUpload(props: IProps) {
                             const uploaded = await imageUploader(file);
                             valueRef.current = uploaded.url;
                             props.onChange(uploaded.url);
+                            setIsLoading(false);
                         } catch (e) {
                             setUploadError(e);
+                            setIsLoading(false);
                         }
                     }}
                 />
                 <span className="file-upload-choose">{name || fallbackName || props.placeholder || t("Choose")}</span>
-                <span className="file-upload-browse">{t("Browse")}</span>
+                <span className="file-upload-browse">
+                    {isLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Browse")}
+                </span>
             </label>
             {props.errors && <ErrorMessages errors={props.errors} />}
             {uploadError && (

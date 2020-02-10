@@ -37,7 +37,7 @@ export default function CurrentThemeInfo(props: IProps) {
                     {Object.entries(info).map(([key, value], i) => (
                         <div key={i} className={classes.description}>
                             <p>
-                                <strong>{key}</strong>:{" "}
+                                <strong>{key === "Description" ? "" : `${key}:`}</strong>{" "}
                                 {value.type === "date" ? <DateTime timestamp={value.info} /> : value.info}
                             </p>
                         </div>

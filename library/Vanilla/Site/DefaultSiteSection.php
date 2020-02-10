@@ -28,14 +28,23 @@ class DefaultSiteSection implements SiteSectionInterface {
     /** @var string */
     private $configLocaleKey;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
+    /** @var array $apps */
+    private $apps;
+
     /**
      * DI.
      *
      * @param ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config, \Gdn_Router $router) {
         $this->configSiteName = $config->get('Garden.Title', 'Vanilla');
         $this->configLocaleKey = $config->get('Garden.Locale', 'en');
+        $configDefaultController = $config->get('Routes.DefaultController');
+        $this->defaultRoute = $router->parseRoute($configDefaultController);
+        $this->apps = ['forum' => !(bool)$config->get('Vanilla.Forum.Disabled')];
     }
 
     /**
@@ -78,5 +87,33 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function jsonSerialize() {
         return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
     }
 }

@@ -123,11 +123,18 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentName: string) {
+export function variableFactory(componentNames: string | string[]) {
     const themeVars = getThemeVariables();
+    componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
+
+    const componentThemeVars = componentNames
+        .map(name => themeVars?.[name] ?? {})
+        .reduce((prev, curr) => {
+            return merge(prev, curr);
+        }, {});
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
-        const customVars = themeVars?.[componentName]?.[subElementName] ?? null;
+        const customVars = componentThemeVars?.[subElementName] ?? null;
         if (customVars === null) {
             return declaredVars;
         }

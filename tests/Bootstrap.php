@@ -28,6 +28,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
@@ -512,6 +513,9 @@ class Bootstrap {
         if (class_exists(\CategoryModel::class)) {
             \CategoryModel::$Categories = null;
         }
+
+        SchemaFactory::setContainer(null);
+        SchemaFactory::setEventManager(null);
 
         unset($GLOBALS['dic']);
         Gdn::setContainer(new NullContainer());

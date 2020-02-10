@@ -476,8 +476,7 @@ class SettingsController extends DashboardController {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->setHighlightRoute('dashboard/settings/branding');
         $this->title(t('Branding & SEO'));
-        $configurationModule = new ConfigurationModule($this);
-        $configurationModule->initialize([
+        $items = [
             'Garden.HomepageTitle' => [
                 'LabelCode' => t('Homepage Title'),
                 'Control' => 'textbox',
@@ -576,7 +575,22 @@ class SettingsController extends DashboardController {
                     'UseRealBoolean' => true
                 ]
             ]
-        ]);
+        ];
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $options = $siteSectionModel->getDefaultRoutes();
+        if (count($options) > 0) {
+            $items['Vanilla.Forum.Disabled'] = [
+                'LabelCode' => t('Disable forum pages'),
+                'Control' => 'toggle',
+                'Description' => t("Remove discussion and categories links from menus.<br /> Set discussion and category related pages to return not found page 404."),
+                'Options' => [
+                    'ForumDisabled' => true,
+                ]
+            ];
+        }
+        $configurationModule = new ConfigurationModule($this);
+        $configurationModule->initialize($items);
         $this->setData('ConfigurationModule', $configurationModule);
         $this->render();
     }
@@ -690,6 +704,10 @@ class SettingsController extends DashboardController {
 
             $this->informMessage(t("Your changes were saved successfully."));
         }
+
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $this->setData('defaultRouteOptions', $siteSectionModel->getDefaultRoutes());
 
         // Add warnings for layouts that have been specified by the theme.
         $themeManager = Gdn::themeManager();

@@ -66,15 +66,20 @@
     display: none;
 }
 
-.Panel {
-    width: $panel_width;
-    background: $panel_bg;
-    padding: $panel_padding;
-    border: $panel_border;
-    border-radius: $panel_borderRadius;
 
-    @if($panel_toLeft != true) {
-        margin-left: auto;
+.Panel {
+
+    @if($staticVariables) {
+
+        width: $panel_width;
+        background: $panel_bg;
+        padding: $panel_padding;
+        border: $panel_border;
+        border-radius: $panel_borderRadius;
+
+        @if($panel_toLeft != true) {
+            margin-left: auto;
+        }
     }
 
     @include maxWidth($theme-breakpoint_tablet) {

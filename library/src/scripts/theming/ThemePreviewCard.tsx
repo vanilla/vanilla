@@ -336,9 +336,9 @@ export default function ThemePreviewCard(props: IProps) {
                                                 </span>
                                                 <span className={classNames("sc-only")}>
                                                     <ToolTip
-                                                        label={
-                                                            "This theme cannot be deleted because it is the currently applied theme"
-                                                        }
+                                                        label={t(
+                                                            "This theme cannot be deleted because it is the currently applied theme.",
+                                                        )}
                                                     >
                                                         <ToolTipIcon>
                                                             <span>

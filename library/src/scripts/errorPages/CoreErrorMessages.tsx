@@ -107,6 +107,8 @@ export function getErrorCode(errorMessageProps: IErrorMessageProps) {
         return errorMessageProps.apiError.response.status;
     } else if (errorMessageProps.error && errorMessageProps.error.status) {
         return errorMessageProps.error.status;
+    } else if (errorMessageProps.defaultError) {
+        return errorMessageProps.defaultError;
     } else {
         return errorMessageProps.defaultError;
     }

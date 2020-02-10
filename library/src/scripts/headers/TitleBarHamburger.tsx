@@ -14,11 +14,9 @@ interface IProps {
 }
 
 export function TitleBarHamburger(props: IProps) {
-    const { contents } = props;
-    const classes = hamburgerClasses();
     return (
         <MemoryRouter>
-            <TitleBar useMobileBackButton={false} hamburger={contents} />
+            <TitleBar useMobileBackButton={false} />
         </MemoryRouter>
     );
 }

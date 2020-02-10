@@ -865,8 +865,22 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->addGroup(t('Favorites'), 'favorites', '', 3);
 
         if (Gdn::session()->isValid()) {
-            $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', [], ['icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks]);
-            $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', [], ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]);
+            $sender->addLink(
+                t('My Bookmarks'),
+                '/discussions/bookmarked',
+                'favorites.bookmarks',
+                '',
+                [],
+                ['icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks]
+            );
+            $sender->addLink(
+                t('My Discussions'),
+                '/discussions/mine',
+                'favorites.discussions',
+                '',
+                [],
+                ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]
+            );
             $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', [], ['icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts]);
         }
 

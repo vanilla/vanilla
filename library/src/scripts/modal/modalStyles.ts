@@ -21,6 +21,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -101,7 +102,7 @@ export const modalClasses = useThemeCache(() => {
         // When nesting our modals on top we need to be higher.
     });
 
-    const overlay = style("overlay", {
+    const overlayMixin: NestedCSSProperties = {
         position: "fixed",
         // Viewport units are useful here because
         // we're actually fine this being taller than the initially visible viewport.
@@ -111,9 +112,35 @@ export const modalClasses = useThemeCache(() => {
         left: 0,
         right: 0,
         bottom: 0,
-        background: colorOut(vars.colors.overlayBg),
         zIndex: 10,
+    };
+
+    const overlayScrim = style("overlayScrim", {
+        ...overlayMixin,
+        background: colorOut(vars.colors.overlayBg),
     });
+
+    const overlayContent = style("overlayContent", {
+        ...overlayMixin,
+    });
+
+    const sidePanelMixin: NestedCSSProperties = {
+        left: unit(vars.dropDown.padding),
+        width: calc(`100% - ${unit(vars.dropDown.padding)}`),
+        display: "flex",
+        flexDirection: "column",
+        top: 0,
+        bottom: 0,
+        transform: "none",
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+        maxWidth: 400,
+        $nest: {
+            [`& .${dropDownClasses().action}`]: {
+                fontWeight: globalVars.fonts.weights.normal,
+            },
+        },
+    };
 
     const root = style({
         display: "flex",
@@ -165,27 +192,24 @@ export const modalClasses = useThemeCache(() => {
                 width: unit(vars.sizing.small),
                 maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
-            "&&&.isSidePanel": {
-                left: unit(vars.dropDown.padding),
-                width: calc(`100% - ${unit(vars.dropDown.padding)}`),
-                display: "flex",
-                flexDirection: "column",
-                top: 0,
-                bottom: 0,
+            "&&&.isSidePanelRight": {
+                ...sidePanelMixin,
                 right: 0,
-                transform: "none",
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                left: "initial",
+            },
+            "&&&.isSidePanelLeft": {
+                ...sidePanelMixin,
+                left: 0,
+                right: "initial",
             },
             "&&.isDropDown": {
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: globalVars.gutter.size,
                 width: percent(100),
                 marginBottom: "auto",
                 transform: "none",
-                maxHeight: percent(100),
+                maxHeight: calc(`100% - ${unit(globalVars.gutter.size)}`),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
                 border: "none",
@@ -251,7 +275,8 @@ export const modalClasses = useThemeCache(() => {
         scroll,
         content,
         pageHeader,
-        overlay,
+        overlayScrim,
+        overlayContent,
         frameWrapper,
     };
 });

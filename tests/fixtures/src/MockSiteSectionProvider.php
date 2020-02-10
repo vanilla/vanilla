@@ -135,7 +135,11 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
                 $locale,
                 '/'.$locale,
                 "mockSiteSection-".$locale,
-                "mockSiteSectionGroup-1"
+                "mockSiteSectionGroup-1",
+                [
+                    'Destination' => 'discussions',
+                    'Type' => 'Internal'
+                ]
             );
 
             $siteSections[] = new MockSiteSection(
@@ -143,7 +147,11 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
                 $locale,
                 '/ssg2-'.$locale,
                 "ssg2-mockSiteSection-".$locale,
-                "mockSiteSectionGroup-2"
+                "mockSiteSectionGroup-2",
+                [
+                    'Destination' => 'discussions',
+                    'Type' => 'Internal'
+                ]
             );
         }
 

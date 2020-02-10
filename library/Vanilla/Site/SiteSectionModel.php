@@ -28,13 +28,19 @@ class SiteSectionModel {
     /** @var SiteSectionInterface $currentSiteSection */
     private $defaultSiteSection;
 
+    /** @var array $defaultRoutes */
+    private $defaultRoutes = [];
+
+    /** @var array $apps */
+    private $apps = [];
+
     /**
      * SiteSectionModel constructor.
      *
      * @param ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config) {
-        $this->defaultSiteSection = new DefaultSiteSection($config);
+    public function __construct(ConfigurationInterface $config, \Gdn_Router $router) {
+        $this->defaultSiteSection = new DefaultSiteSection($config, $router);
     }
 
     /**
@@ -49,6 +55,41 @@ class SiteSectionModel {
         }
     }
 
+    /**
+     * Register optional default route
+     *
+     * @param string $name
+     * @param array $route Array should contain Destination and Type.
+     *          eg: ['Destination' => 'discussions', 'Type' => 'Internal', 'ImageUrl' => 'layout.png']
+     */
+    public function addDefaultRoute(string $name, array $route) {
+        $this->defaultRoutes[$name] = $route;
+    }
+
+    /**
+     * Get default route options
+     *
+     * @return array
+     */
+    public function getDefaultRoutes(): array {
+        return $this->defaultRoutes;
+    }
+
+    /**
+     * Get layout options
+     *
+     * @return array
+     */
+    public function getLayoutOptions(): array {
+        $layouts = [
+            'discussions' => 'Discussions',
+            'categories' => 'Categories'
+        ];
+        foreach ($this->defaultRoutes as $name => $route) {
+            $layouts[$route['Destination']] = $name;
+        }
+        return $layouts;
+    }
     /**
      * Get all site sections that match a particular site section group.
      *
@@ -127,5 +168,23 @@ class SiteSectionModel {
             }
         }
         return $this->currentSiteSection ?? $this->defaultSiteSection;
+    }
+
+    /**
+     * Register application available
+     *
+     * @param string $app
+     * @param array $settings
+     */
+    public function registerApplication(string $app, array $settings) {
+        $this->apps[$app] = $settings;
+    }
+
+    /**
+     * Get all available applications
+     *
+     */
+    public function applications(): array {
+        return $this->apps;
     }
 }

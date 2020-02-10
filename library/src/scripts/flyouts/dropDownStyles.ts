@@ -15,10 +15,11 @@ import {
     unit,
     userSelect,
     negative,
-    importantUnit,
+    IStateSelectors,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -227,60 +228,24 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    // Contents (button or link)
-    // Replaces: .dropDownItem-button, .dropDownItem-link
-    const actionMixin: NestedCSSProperties = {
-        ...buttonResetMixin(),
-        cursor: "pointer",
-        appearance: "none",
-        display: "flex",
-        alignItems: "center",
-        width: percent(100),
-        textAlign: "left",
-        minHeight: unit(vars.item.minHeight),
-        lineHeight: unit(globalVars.lineHeights.condensed),
-        ...paddings({
-            vertical: 4,
-            horizontal: vars.item.padding.horizontal,
-        }),
-        ...borders({
-            color: "transparent",
-            radius: 0,
-        }),
-        color: colorOut(vars.item.colors.fg, true),
-        ...userSelect("none"),
-        ...buttonStates({
-            allStates: {
-                textShadow: "none",
-                outline: 0,
-            },
-            hover: {
-                backgroundColor: colorOut(globalVars.states.hover.color, true),
-            },
-            focus: {
-                backgroundColor: colorOut(globalVars.states.focus.color, true),
-            },
-            active: {
-                backgroundColor: colorOut(globalVars.states.active.color, true),
-            },
-            accessibleFocus: {
-                borderColor: colorOut(globalVars.mainColors.primary, true),
-            },
-        }),
-        ...mediaQueries.oneColumnDown({
-            fontSize: unit(vars.item.mobile.fontSize),
-            fontWeight: globalVars.fonts.weights.semiBold,
-            minHeight: unit(vars.item.mobile.minHeight),
-        }),
-    };
     const action = style("action", {
         $nest: {
-            "&&": actionMixin,
+            "&&": actionMixin(),
+        },
+    });
+
+    const actionActive = style("actionActive", {
+        $nest: {
+            "&&": {
+                color: important(colorOut(globalVars.links.colors.active)!),
+                fontWeight: important(globalVars.fonts.weights.bold) as any,
+            },
         },
     });
 
     const text = style("text", {
         display: "block",
+        flex: 1,
     });
 
     const separator = style("separator", {
@@ -288,6 +253,47 @@ export const dropDownClasses = useThemeCache(() => {
         height: unit(globalVars.separator.size),
         backgroundColor: colorOut(globalVars.separator.color),
         ...margins(vars.spacer.margin),
+
+        $nest: {
+            "&:first-child": {
+                height: 0,
+                ...margins({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
+            },
+        },
+    });
+
+    const panelNavItems = style("panelNavItems", {
+        display: "flex",
+        alignItems: "flex-start",
+    });
+
+    const panel = style("panel", {
+        backgroundColor: colorOut(vars.contents.bg),
+        ...absolutePosition.fullSizeOfParent(),
+        zIndex: 2,
+    });
+
+    const panelFirst = style("panelFirst", {
+        $nest: {
+            "&&": {
+                position: "relative",
+                height: "initial",
+                zIndex: 0,
+            },
+        },
+    });
+
+    const panelLast = style("panelLast", {
+        $nest: {
+            "&&": {},
+        },
+    });
+
+    const panelContent = style("panelContent", {
+        flex: 1,
+        $nest: {
+            "&.isNested": {},
+        },
     });
 
     const sectionHeading = style("sectionHeading", {
@@ -301,7 +307,40 @@ export const dropDownClasses = useThemeCache(() => {
 
     const sectionContents = style("sectionContents", {
         display: "block",
+        position: "relative",
     });
+
+    const arrow = style("arrow", {
+        $nest: {
+            "&&": {
+                padding: unit(globalVars.gutter.quarter),
+            },
+        },
+    });
+
+    const actionIcon = style("actionIcon", {
+        marginRight: globalVars.gutter.half,
+    });
+
+    const backButton = style(
+        "backButton",
+        {
+            $nest: {
+                "&&": {
+                    zIndex: 2,
+                    minHeight: unit(vars.item.minHeight),
+                    transform: "translateX(12px)",
+                },
+            },
+        },
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&&": {
+                    minHeight: unit(vars.item.mobile.minHeight),
+                },
+            },
+        }),
+    );
 
     const count = style("count", {
         fontSize: unit(globalVars.fonts.size.small),
@@ -374,18 +413,83 @@ export const dropDownClasses = useThemeCache(() => {
         section,
         toggleButtonIcon,
         action,
-        actionMixin,
+        actionIcon,
+        actionActive,
         text,
         separator,
         sectionHeading,
         sectionContents,
         count,
+        arrow,
         verticalPadding,
         title,
         noVerticalPadding,
         paddedFrame,
+        panelFirst,
+        panelLast,
+        panelNavItems,
+        panel,
+        panelContent,
+        backButton,
         check,
         contentOffsetLeft,
         contentOffsetRight,
     };
 });
+
+// Contents (button or link)
+// Replaces: .dropDownItem-button, .dropDownItem-link
+export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProperties => {
+    const vars = dropDownVariables();
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+
+    return {
+        ...buttonResetMixin(),
+        cursor: "pointer",
+        appearance: "none",
+        display: "flex",
+        alignItems: "center",
+        width: percent(100),
+        textAlign: "left",
+        minHeight: unit(vars.item.minHeight),
+        lineHeight: unit(globalVars.lineHeights.condensed),
+        ...paddings({
+            vertical: 4,
+            horizontal: vars.item.padding.horizontal,
+        }),
+        ...borders({
+            color: "transparent",
+            radius: 0,
+        }),
+        color: colorOut(vars.item.colors.fg, true),
+        ...userSelect("none"),
+        ...buttonStates(
+            {
+                allStates: {
+                    textShadow: "none",
+                    outline: 0,
+                },
+                hover: {
+                    backgroundColor: colorOut(globalVars.states.hover.color, true),
+                },
+                focus: {
+                    backgroundColor: colorOut(globalVars.states.focus.color, true),
+                },
+                active: {
+                    backgroundColor: colorOut(globalVars.states.active.color, true),
+                },
+                accessibleFocus: {
+                    borderColor: colorOut(globalVars.mainColors.primary, true),
+                },
+            },
+            undefined,
+            classBasedStates,
+        ),
+        ...mediaQueries.oneColumnDown({
+            fontSize: unit(vars.item.mobile.fontSize),
+            fontWeight: globalVars.fonts.weights.semiBold,
+            minHeight: unit(vars.item.mobile.minHeight),
+        }),
+    };
+};

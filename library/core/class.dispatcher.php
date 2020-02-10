@@ -279,7 +279,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Try and dispatch with the new dispatcher.
         // This is temporary. We will eventually just have the new dispatcher.
         $response = $this->dispatcher->dispatch($request);
-
         if ($response->getMeta('noMatch')) { // don't go using noMatch in other code!
             // Analyze the request AFTER checking for update mode.
             $routeArgs = $this->analyzeRequest($request);
@@ -360,17 +359,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             'query' => array_change_key_case($request->get()),
             'post' => $request->post()
         ];
-
-        // Here is the basic format of a request:
-        // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
-
-        // Here are some examples of what this method could/would receive:
-        // /application/controller/method/argn
-        // /controller/method/argn
-        // /application/controller/argn
-        // /controller/argn
-        // /controller
-
         $parts = explode('/', str_replace('\\', '/', $request->path()));
         // Decode path parts at the dispatcher level.
         array_walk($parts, function(&$value) {
@@ -751,7 +739,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         } elseif (in_array($request->path(), ['', '/'])) {
             $this->isHomepage = true;
-            $defaultController = Gdn::router()->getRoute('DefaultController');
+            $defaultController = Gdn::router()->getDefaultRoute();
             $originalGet = $request->get();
             $request->pathAndQuery($defaultController['Destination']);
             if (is_array($originalGet) && count($originalGet) > 0) {
@@ -823,6 +811,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controllerName = $routeArgs['controller'];
         $controller = $this->createController($controllerName, $request, $routeArgs);
 
+        if ($controller instanceof VanillaController) {
+            if ($controller->disabled()) {
+                $routeArgs['controllerMethod'] = 'disabled';
+                $routeArgs['controller'] = $controllerName = 'VanillaController';
+                $controller = $this->createController($controllerName, $request, $routeArgs);
+                safeHeader("HTTP/1.1 404 Not Found");
+            }
+        }
         // Find the method to call.
         list($controllerMethod, $pathArgs) = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
         if (!$controllerMethod) {
@@ -868,7 +864,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         try {
             $this->fireEvent('BeforeControllerMethod');
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, 'before');
-
             call_user_func_array($callback, $args);
         } catch (\Throwable $ex) {
             if ($this->dispatchException === null) {

@@ -29,6 +29,12 @@ class MockSiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
+    /** @var array $apps */
+    private $apps;
+
     /**
      * MockSiteSection constructor.
      *
@@ -43,13 +49,16 @@ class MockSiteSection implements SiteSectionInterface {
         string $locale,
         string $basePath,
         string $sectionID,
-        string $sectionGroup
+        string $sectionGroup,
+        array $defaultRoute
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
         $this->siteSectionPath = $basePath;
         $this->sectionID = $sectionID;
         $this->sectionGroup = $sectionGroup;
+        $this->defaultRoute = $defaultRoute;
+        $this->apps = ['forum' => true];
     }
     /**
      * @inheritdoc
@@ -91,5 +100,33 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function jsonSerialize() {
         return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
     }
 }

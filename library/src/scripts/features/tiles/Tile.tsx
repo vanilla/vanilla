@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import { tileClasses } from "@library/features/tiles/titleStyles";
+import { tileClasses } from "@library/features/tiles/tileStyles";
 
 interface IProps {
     icon: string;
@@ -35,9 +35,9 @@ export default class Tile extends React.Component<IProps> {
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
         const classes = tileClasses();
         return (
-            <div className={classNames(className, classes.root(columns))}>
+            <div className={classNames(className, classes.root)}>
                 <SmartLink className={classNames(classes.link(columns))} to={url}>
-                    <div className={classNames(classes.frame(columns))}>
+                    <div className={classNames(classes.frame)}>
                         {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} />}
                         {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>

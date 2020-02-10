@@ -98,8 +98,8 @@ export default function BackLink(props: IProps) {
         );
     } else {
         content = (
-            <a
-                href={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
+            <SmartLink
+                to={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -111,7 +111,7 @@ export default function BackLink(props: IProps) {
                 }}
             >
                 {content}
-            </a>
+            </SmartLink>
         );
     }
 

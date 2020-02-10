@@ -10,14 +10,22 @@ import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
-import { mountReact } from "@vanilla/react-utils/src";
+import { mountReact, applySharedPortalContext } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import "@library/theming/reset";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
+
+applySharedPortalContext(props => {
+    return (
+        <AppContext noTheme errorComponent={ErrorPage}>
+            {props.children}
+        </AppContext>
+    );
+});
 
 // Routing
 addComponent("App", () => (
@@ -33,7 +41,7 @@ const render = () => {
         mountReact(
             // Error component is set as null until we can refactor a non-kb specific Error page.
             <AppContext errorComponent={<ErrorPage /> || null}>
-                <Router sectionRoot="/theme" />
+                <Router disableDynamicRouting />
             </AppContext>,
             app,
         );

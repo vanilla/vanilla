@@ -15,6 +15,7 @@ import {
     spinnerLoader,
     unit,
     userSelect,
+    spinnerLoaderAnimationProperties,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -23,6 +24,7 @@ import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     // Fetch external global variables
@@ -33,6 +35,8 @@ export const buttonGlobalVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        primary: globalVars.mainColors.primary,
+        primaryTextColor: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
@@ -66,6 +70,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
 export const buttonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("button");
+    const vars = buttonGlobalVariables();
 
     const standard: IButtonType = makeThemeVars("basic", {
         name: ButtonTypes.STANDARD,
@@ -129,10 +134,10 @@ export const buttonVariables = useThemeCache(() => {
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
-            bg: globalVars.mainColors.primary,
+            bg: vars.colors.primary,
         },
         fonts: {
-            color: globalVars.mainColors.bg,
+            color: vars.colors.primaryTextColor,
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
@@ -141,7 +146,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         hover: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -149,7 +154,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         active: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -157,7 +162,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focus: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -165,7 +170,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focusAccessible: {
             fonts: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primaryContrast,
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -323,6 +328,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const pushLeft = style("pushLeft", {
         marginRight: important("auto"),
@@ -362,7 +368,13 @@ export const buttonUtilityClasses = useThemeCache(() => {
         }),
     });
 
-    const buttonIcon = style("icon", iconMixin(formElementVars.sizing.height));
+    const buttonIcon = style(
+        "icon",
+        iconMixin(formElementVars.sizing.height),
+        mediaQueries.oneColumnDown({
+            height: vars.sizing.compactHeight,
+        }),
+    );
 
     const buttonIconCompact = style("iconCompact", iconMixin(vars.sizing.compactHeight));
 
@@ -426,7 +438,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
+export const buttonLoaderClasses = useThemeCache((buttonType?: ButtonTypes) => {
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
@@ -445,22 +457,23 @@ export const buttonLoaderClasses = (buttonType?: ButtonTypes) => {
             break;
     }
 
-    const root = (alignment: "left" | "center" = "center") =>
+    const root = useThemeCache((alignment: "left" | "center" = "center") =>
         style({
             ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
             padding: unit(4),
             height: percent(100),
             width: percent(100),
-            $nest: {
-                "&:after": spinnerLoader({
-                    color: spinnerColor,
-                    dimensions: 20,
-                }),
-                "&:hover:after": spinnerLoader({
-                    color: stateSpinnerColor,
-                    dimensions: 20,
-                }),
+        }),
+    );
+
+    const reducedPadding = style("reducedPadding", {
+        $nest: {
+            "&&": {
+                padding: unit(3),
             },
-        });
-    return { root };
-};
+        },
+    });
+
+    const svg = style("svg", spinnerLoaderAnimationProperties());
+    return { root, svg, reducedPadding };
+});

@@ -7647,11 +7647,6 @@ label[id^=iCheck] {
   height: 160px;
   border: 1px solid #e7e8e9;
 }
-.media .media-body {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-}
 
 .media-list {
   padding-left: 0;

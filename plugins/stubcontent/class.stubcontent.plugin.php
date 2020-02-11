@@ -243,7 +243,7 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                        Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
                             'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
@@ -255,7 +255,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing role: {$roleTag}";
                     }
 
-                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                    Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
                         'content' => $contentID,
                         'error' => print_r($errors, true)
@@ -306,7 +306,7 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                        Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
                             'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
@@ -321,7 +321,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing category: {$categoryTag}";
                     }
 
-                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                    Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
                         'content' => $contentID,
                         'error' => print_r($errors, true)
@@ -369,7 +369,7 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                        Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
                             'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
@@ -384,7 +384,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing parent: {$parentTag}";
                     }
 
-                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                    Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
                         'content' => $contentID,
                         'error' => print_r($errors, true)
@@ -407,7 +407,7 @@ class StubContentPlugin extends Gdn_Plugin {
                 if ($rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
                 } else {
-                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
+                    Logger::event("stubcontent-insertfailed", Logger::WARNING, "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
                         'content' => $contentID,
                         'error' => print_r($model->validationResults(), true)

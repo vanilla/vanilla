@@ -150,7 +150,6 @@ export const bannerVariables = useThemeCache(() => {
         fontMobile: {
             ...textMixin,
             size: globalVars.fonts.size.title,
-            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
         margins: {
             ...EMPTY_SPACING,
@@ -164,7 +163,6 @@ export const bannerVariables = useThemeCache(() => {
         text: undefined as string | undefined,
         font: {
             ...textMixin,
-            color: colors.contrast,
             size: globalVars.fonts.size.large,
         },
         maxWidth: 400,

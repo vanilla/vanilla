@@ -51,7 +51,7 @@ class BannerImageModel {
         ];
         $props = array_merge($defaultProps, $props);
         $html = "";
-        $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE));
+        $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
         if (inSection(c("Theme.Banner.VisibleSections"))) {
             $html = "<div data-react='community-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
         }

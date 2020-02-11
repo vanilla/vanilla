@@ -28,6 +28,8 @@ use Vanilla\Theme\TwigAsset;
  */
 class FsThemeProvider implements ThemeProviderInterface {
 
+    const FALLBACK_THEME_KEY = "theme-foundation";
+
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
 
@@ -94,10 +96,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @throws NotFoundException Throws an exception when themeName not found.
      */
     public function getThemeByName($themeKey): Addon {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
+        $theme = $this->getThemeAddon($themeKey);
         return $theme;
     }
 
@@ -105,10 +104,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getThemeViewPath($themeKey): string {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
+        $theme = $this->getThemeAddon($themeKey);
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
     }
@@ -117,22 +113,36 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getMasterThemeKey($themeKey): string {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
-        return $themeKey;
+        $theme = $this->getThemeAddon($themeKey);
+        return $theme->getKey();
     }
 
     /**
      * @inheritdoc
      */
     public function getName($themeKey): string {
+        $theme = $this->getThemeAddon($themeKey);
+        return $theme->getInfoValue('name');
+    }
+
+    /**
+     * Get the current theme, or fallback to the default one.
+     *
+     * @param int|string $themeKey
+     *
+     * @return Addon
+     */
+    public function getThemeAddon($themeKey): Addon {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
+            $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
+            if (!($theme instanceof Addon)) {
+                // Uh-oh, even the default theme doesn't exist.
+                throw new NotFoundException("Theme");
+            }
         }
-        return $theme->getInfoValue('name');
+
+        return $theme;
     }
 
     /**

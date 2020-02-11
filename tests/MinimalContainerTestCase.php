@@ -20,6 +20,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
@@ -69,6 +70,8 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
             ->setClass(SingleSiteSectionProvider::class)
             ->setShared(true)
+
+            ->setInstance(BannerImageModel::class, null)
 
             // Mocks of interfaces.
             // Addons

@@ -81,6 +81,7 @@ export const globalVariables = useThemeCache(() => {
     const generatedMainColors = makeThemeVars("mainColors", {
         secondary: emphasizeLightness(colorPrimary, 0.06, !goodContrast),
         primaryContrast: initialMainColors.bg,
+        secondaryContrast: initialMainColors.bg,
     });
 
     const mainColors = {

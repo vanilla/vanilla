@@ -27,7 +27,9 @@ class BannerImageModel {
      *
      * @param SiteMeta $siteMeta
      */
-    public function __construct(SiteMeta $siteMeta) { $this->siteMeta = $siteMeta; }
+    public function __construct(SiteMeta $siteMeta) {
+        $this->siteMeta = $siteMeta;
+    }
 
     /**
      * Render the Banner.

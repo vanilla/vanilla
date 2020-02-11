@@ -74,7 +74,7 @@ class TwigEnhancer {
         ConfigurationInterface $config,
         LocaleInterface $locale,
         Gdn_Request $request,
-        BannerImageModel $bannerImageModel
+        BannerImageModel $bannerImageModel = null
     ) {
         $this->addonProvider = $addonProvider;
         $this->eventManager = $eventManager;
@@ -256,6 +256,13 @@ class TwigEnhancer {
     }
 
     /**
+     * @return string
+     */
+    public function renderNoop(): string {
+        return '';
+    }
+
+    /**
      * Return a mapping of twig function name -> callable.
      */
     private function getFunctionMappings(): array {
@@ -275,7 +282,7 @@ class TwigEnhancer {
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
             'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
-            'renderBanner' => [$this->bannerImageModel, 'renderBanner'],
+            'renderBanner' => $this->bannerImageModel ? [$this->bannerImageModel, 'renderBanner'] : [$this, 'renderNoop'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',

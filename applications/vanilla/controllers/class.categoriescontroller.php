@@ -8,6 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionModel;
+
 /**
  * Handles displaying categories via /categoris endpoint.
  */
@@ -260,6 +263,12 @@ class CategoriesController extends VanillaController {
      * @param int $offset Number of discussions to skip.
      */
     public function index($categoryIdentifier = '', $page = '0') {
+        if (!$categoryIdentifier) {
+            /** @var SiteSectionInterface $siteSection */
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['CategoryID'] ?? '';
+        }
+
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
 

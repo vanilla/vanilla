@@ -131,6 +131,19 @@ if ($SystemUserID) {
         $SystemUserID = false;
         removeFromConfig('Garden.SystemUserID');
     }
+
+    // Make sure our profile image respects SSL settings.
+    $profileUrl = $SysUser->Photo ?? '';
+    $ownSiteHttp = 'http://'.\Gdn::request()->getHostAndPort();
+    if ($profileUrl && strpos($profileUrl, $ownSiteHttp) === 0) {
+        \Gdn::sql()->update(
+            'User',
+            [
+                'Photo' => preg_replace("/^http/", "https", $profileUrl),
+            ],
+            [ 'UserID' => $SystemUserID]
+        )->put();
+    }
 }
 
 if (!$SystemUserID) {

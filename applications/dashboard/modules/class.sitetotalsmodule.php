@@ -108,7 +108,7 @@ class SiteTotalsModule extends Gdn_Module {
             if ($name === "User") {
                 $counts[$name] = $this->getCount($name);
             } else {
-                //TODO: get date from countAllDiscussions and countAllComments and sum
+                //TODO: get data from countAllDiscussions and countAllComments and sum
             }
         }
 

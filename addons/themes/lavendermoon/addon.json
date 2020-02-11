@@ -7,6 +7,7 @@
     "license": "GPL-2.0-only",
     "sites": [],
     "isResponsive": true,
+    "hidden": true,
     "Features": {
         "ProfileHeader": true,
         "SharedMasterView": true,

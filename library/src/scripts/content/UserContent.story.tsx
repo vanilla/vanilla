@@ -85,9 +85,9 @@ storiesOf("User Content", module).add("Content", () => {
 
        <div class="embedExternal embedImage">
           <div class="embedExternal-content">
-             <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/207/3HWDW6ZRRH0Q.png" rel="nofollow noreferrer noopener ugc" target="_blank">
-                <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/207/3HWDW6ZRRH0Q.png" alt="Untitled Image">
-             </a>
+              <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+                 <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" alt="image.png">
+              </a>
           </div>
        </div>
 

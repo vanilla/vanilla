@@ -201,7 +201,7 @@ class StubContentPlugin extends Gdn_Plugin {
     public function insertContent($content) {
 
         // Don't affect installed forums
-        if (!empty(c('Garden.Installed', false))) {
+        if (c('Garden.Installed', false) == true) {
             return;
         }
 

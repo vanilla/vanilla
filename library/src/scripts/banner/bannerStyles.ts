@@ -393,6 +393,7 @@ export const bannerClasses = useThemeCache(() => {
                 ),
             },
             {
+                width: percent(100),
                 minWidth: "initial",
             },
         ),

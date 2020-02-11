@@ -8,7 +8,6 @@
  * @since 2.0
  */
 
-use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\SchedulerInterface;
 
 /**
@@ -23,7 +22,7 @@ class SiteTotalsModule extends Gdn_Module {
     const RECALCULATE_INTERVAL = 900;
 
     /** @var int */
-    const LOCK_INTERVAL = 30;
+    const LOCK_INTERVAL = 60;
 
     /** @var string */
     const CACHE_KEY = 'module.sitetotals';
@@ -78,7 +77,7 @@ class SiteTotalsModule extends Gdn_Module {
     private function tryRecalculate() {
         $lock = Gdn::cache()->get(self::LOCK_KEY);
 
-        if ($lock !== Gdn_Cache::CACHEOP_FAILURE) { //already locked
+        if ($lock === Gdn_Cache::CACHEOP_SUCCESS) { //already locked
             return false;
         } else {
             $added = Gdn::cache()->add(self::LOCK_KEY, mt_rand(0, 999999), [Gdn_Cache::FEATURE_EXPIRY => self::LOCK_INTERVAL]);
@@ -105,18 +104,14 @@ class SiteTotalsModule extends Gdn_Module {
         $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
 
         foreach ($counts as $name => $value) {
-            if ($name === "User") {
-                $counts[$name] = $this->getCount($name);
-            } else {
-                //TODO: get data from countAllDiscussions and countAllComments and sum
-            }
+            $counts[$name] = $this->getCount($name);
         }
 
         // cache counts
         Gdn::cache()->store(self::COUNTS_KEY, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
 
         //cache recalculate key
-        Gdn::cache()->store(self::RECALCULATE_KEY, 'recalculated', [Gdn_Cache::FEATURE_EXPIRY => self::RECALCULATE_INTERVAL]);
+        Gdn::cache()->store(self::RECALCULATE_KEY, time(), [Gdn_Cache::FEATURE_EXPIRY => self::RECALCULATE_INTERVAL]);
     }
 
     /**

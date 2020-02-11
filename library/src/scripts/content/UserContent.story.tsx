@@ -77,7 +77,7 @@ storiesOf("User Content", module).add("Content", () => {
 
        <div class="embedExternal embedImage">
           <div class="embedExternal-content">
-              <a class="embedImage-link" href="https://dev.vanilla.localhost/uploads/864/S1ABM9A39GGP.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+              <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" rel="nofollow noreferrer noopener ugc" target="_blank">
                  <img class="embedImage-img" src="https://dev.vanilla.localhost/uploads/864/S1ABM9A39GGP.png" alt="image.png">
               </a>
           </div>

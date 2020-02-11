@@ -76,7 +76,7 @@ export const buttonVariables = useThemeCache(() => {
         name: ButtonTypes.STANDARD,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
-            fg: globalVars.mainColors.primaryContrast, // Defaults to bg, but if you need it, you may change it.
+            fg: globalVars.mainColors.fg,
             bg: globalVars.mainColors.bg,
         },
         borders: {
@@ -89,7 +89,7 @@ export const buttonVariables = useThemeCache(() => {
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.bg,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         active: {
@@ -98,7 +98,7 @@ export const buttonVariables = useThemeCache(() => {
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.bg,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         focus: {
@@ -107,7 +107,7 @@ export const buttonVariables = useThemeCache(() => {
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.bg,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         focusAccessible: {
@@ -116,7 +116,7 @@ export const buttonVariables = useThemeCache(() => {
             },
             colors: {
                 bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.bg,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
     });

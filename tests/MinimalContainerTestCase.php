@@ -21,6 +21,7 @@ use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Web\TwigEnhancer;
 use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
@@ -71,7 +72,8 @@ class MinimalContainerTestCase extends TestCase {
             ->setClass(SingleSiteSectionProvider::class)
             ->setShared(true)
 
-            ->setInstance(BannerImageModel::class, null)
+            ->rule(TwigEnhancer::class)
+            ->setConstructorArgs(['bannerImageModel' => null])
 
             // Mocks of interfaces.
             // Addons

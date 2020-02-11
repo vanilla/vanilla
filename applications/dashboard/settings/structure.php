@@ -135,7 +135,7 @@ if ($SystemUserID) {
     // Make sure our profile image respects SSL settings.
     $profileUrl = $SysUser->Photo ?? '';
     $ownSiteHttp = 'http://'.\Gdn::request()->getHostAndPort();
-    if ($profileUrl && strpos($profileUrl, $ownSiteHttp) === 0) {
+    if ($profileUrl && strpos($profileUrl, $ownSiteHttp) === 0 && \Gdn::config('Garden.AllowSSL')) {
         \Gdn::sql()->update(
             'User',
             [

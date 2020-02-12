@@ -112,7 +112,7 @@ export const emphasizeLightness = (
             return colorLighter;
         }
     } else {
-        if (colorLightness - weightCurved > 0 && flipIfMax) {
+        if (colorLightness - weightCurved > 0 && !flipIfMax) {
             return colorDarker;
         } else {
             return colorLighter;

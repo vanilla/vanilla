@@ -13,19 +13,11 @@
         }
     },
     "banner": {
-        "title": {
-            "font": {
-                "color": "#424242"
-            }
-        },
         "backgrounds": {
             "useOverlay": false
         },
         "outerBackground": {
             "backgroundPosition": "0% 50%"
-        },
-        "searchButtonOptions": {
-            "type": "solid"
         },
         "inputAndButton": "36px"
     },

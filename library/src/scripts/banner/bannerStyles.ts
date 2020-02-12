@@ -12,7 +12,6 @@ import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc
 import {
     centeredBackgroundProps,
     fonts,
-    getBackgroundImage,
     IFont,
     unit,
     colorOut,
@@ -22,12 +21,11 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     borders,
-    IButtonStates,
     EMPTY_BACKGROUND,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
@@ -501,6 +499,14 @@ export const bannerClasses = useThemeCache(() => {
     const content = style("content", {
         borderColor: colorOut(vars.colors.contrast),
         boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        borderRadius:
+            vars.searchButton.borders &&
+            vars.searchButton.borders.right &&
+            vars.searchButton.borders.right.radius &&
+            (typeof vars.searchButton.borders.right.radius === "number" ||
+                typeof vars.searchButton.borders.right.radius === "string")
+                ? unit(vars.searchButton.borders.right.radius)
+                : 0,
         zIndex: 1,
     });
 

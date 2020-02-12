@@ -41,27 +41,14 @@ export const forumMetaCSS = () => {
     mixinMetaLinkContainer(`.Item.Application .Meta`);
     mixinMetaLinkContainer(`.Meta.Group-Meta.Group-Info`);
 
-    // .Container .DataList .NewCommentCount,
-    // .Container .DataList .HasNew.HasNew,
-    // .Container .MessageList .Tag-Announcement,
-    // .Container .MessageList .NewCommentCount,
-    // .Container .MessageList .HasNew.HasNew,
-    // .Container .DataTableWrap .Tag-Announcement,
-    // .Container .DataTableWrap .NewCommentCount,
-    // .Container .DataTableWrap .HasNew.HasNew,
-    // .Container .MessageList .ItemComment .Username,
-    // .Container .MessageList .ItemDiscussion .Username,
-    // .Container .MessageList .ItemDiscussion .MItem.Rank,
-    // .Container a.Tag
-
     cssOut(
         `
-
-        `,
+        .ItemDiscussion .Meta,
+        .DataList .Meta
+    `,
         {
-            opacity: important(1),
-            color: importantColorOut(fg),
-            textDecoration: "none",
+            color: colorOut(globalVars.meta.colors.fg),
+            fontSize: unit(globalVars.meta.text.fontSize),
         },
     );
 

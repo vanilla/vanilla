@@ -36,7 +36,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         primary: globalVars.mainColors.primary,
-        primaryTextColor: globalVars.mainColors.primaryContrast,
+        primaryContrast: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
@@ -124,7 +124,7 @@ export const buttonVariables = useThemeCache(() => {
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
-            fg: vars.colors.primaryTextColor, // Defaults to bg, but may need to be changed for proper contrast
+            fg: vars.colors.primaryContrast, // Defaults to bg, but may need to be changed for proper contrast
             bg: vars.colors.primary,
         },
         spinnerColor: globalVars.mainColors.bg,

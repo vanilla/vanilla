@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { importantColorOut, unit } from "@library/styles/styleHelpers";
+import { importantColorOut, unit, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 
@@ -14,9 +14,12 @@ export const discussionCSS = () => {
 
     cssOut(
         `
-        .userContent
+        .userContent,
+        .UserContent,
+        .MessageList.Discussion
         `,
         {
+            color: colorOut(globalVars.mainColors.fg),
             fontSize: unit(globalVars.fonts.size.medium),
         },
     );

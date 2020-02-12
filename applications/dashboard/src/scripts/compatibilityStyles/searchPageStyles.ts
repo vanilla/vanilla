@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { margins, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, fonts, margins, unit } from "@library/styles/styleHelpers";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 
@@ -22,18 +22,52 @@ export const searchPageCSS = () => {
 
     cssOut(
         `
-        .DataList a,
-        .DataList-Search a,
-        .Breadcrumbs a,
-        .MessageList a,
-        .DataList-Search .MItem-Author a,
-        .DataTableWrap a,
-        .Container .Frame-contentWrap .ChildCategories a,
-        .DataList.DataList-Search .Item.Item-Search h3 a
+         #search-results .Breadcrumbs a,
+         #search-results .MessageList a,
+         #search-results .DataTableWrap a,
+         #search-results .Container .Frame-contentWrap .ChildCategories a,
+        .DataList#search-results a,
+        .DataList-Search#search-results .MItem-Author,
+        .DataList-Search#search-results .MItem-Author a,
+        .DataList-Search#search-results a,
+        .DataList-Search .MItem-Author a
         `,
         {
             textDecoration: "none",
             color: colorOut(globalVars.mainColors.fg),
+            fontSize: unit(globalVars.meta.text.fontSize),
+        },
+    );
+
+    cssOut(
+        `
+          .DataList.DataList-Search#search-results .Item.Item-Search h3 a,
+      `,
+        {
+            textDecoration: "none",
+            ...fonts({
+                color: globalVars.mainColors.fg,
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.semiBold,
+                lineHeight: globalVars.lineHeights.condensed,
+            }),
+            ...allLinkStates({
+                hover: {
+                    color: colorOut(globalVars.links.colors.hover),
+                },
+                accessibleFocus: {
+                    color: colorOut(globalVars.links.colors.accessibleFocus),
+                },
+                focus: {
+                    color: colorOut(globalVars.links.colors.focus),
+                },
+                active: {
+                    color: colorOut(globalVars.links.colors.active),
+                },
+                visited: {
+                    color: colorOut(globalVars.links.colors.visited),
+                },
+            }),
         },
     );
 
@@ -45,16 +79,15 @@ export const searchPageCSS = () => {
         marginBottom: unit(globalVars.gutter.size),
     });
 
-    cssOut(`.DataList.DataList-Search .Item.Item-Search .Media-Body .Meta`, {
+    cssOut(`#search-results .DataList.DataList-Search .Item.Item-Search .Media-Body .Meta`, {
         ...metaContainerStyles(),
         $nest: {
             "& .Bullet": {
                 display: "none",
             },
-            // "& > *": {},
         },
     });
-    cssOut(`.DataList.DataList-Search .Item.Item-Search .Media-Body .Summary`, {
+    cssOut(`#search-results .DataList.DataList-Search .Item.Item-Search .Media-Body .Summary`, {
         $nest: {
             "& .Bullet": {
                 display: "none",
@@ -62,15 +95,15 @@ export const searchPageCSS = () => {
         },
     });
 
-    cssOut(`.DataList.DataList-Search .Breadcrumbs`, {
+    cssOut(`#search-results .DataList.DataList-Search .Breadcrumbs`, {
         overflow: "visible",
     });
 
-    cssOut(`.DataList.DataList-Search .Item-Body.Media`, {
+    cssOut(`#search-results .DataList.DataList-Search .Item-Body.Media`, {
         margin: 0,
     });
 
-    cssOut(`.DataList.DataList-Search + .PageControls.Bottom`, {
+    cssOut(`#search-results .DataList.DataList-Search + .PageControls.Bottom`, {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -88,16 +121,10 @@ export const searchPageCSS = () => {
         },
     });
 
-    cssOut(`.DataList.DataList-Search .Crumb`, {
+    cssOut(`#search-results .DataList.DataList-Search .Crumb`, {
         ...margins({
             right: -6,
             left: -6,
         }),
-    });
-
-    cssOut(`#Panel .FilterMenu .Aside, .PanelInfo .Aside, .Item .Aside`, {
-        float: "none",
-        display: "block",
-        margin: `0 0 14px`,
     });
 };

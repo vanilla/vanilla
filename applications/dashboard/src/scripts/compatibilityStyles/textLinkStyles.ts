@@ -5,8 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import { setAllLinkColors } from "@library/styles/styleHelpers";
+import { colorOut, setAllLinkColors } from "@library/styles/styleHelpers";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { throwError } from "rxjs";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const textLinkCSS = () => {
     // Various links
@@ -38,34 +40,47 @@ export const textLinkCSS = () => {
         .DataTableWrap .MItem.RoleTracker
         `,
     );
-    // Links that have FG color by default but regular state colors.
-    mixinTextLink(".ItemContent a", true);
-    mixinTextLink(".DataList .Item h3 a", true);
-    mixinTextLink(".DataList .Item a.Title", true);
-    mixinTextLink(".DataList .Item .Title a", true);
-    mixinTextLink("a.Tag", true);
-    mixinTextLink(".MenuItems a", true);
+    mixinTextLink(`
+        .Container .userContent a,
+        .Container .UserContent a
+    `);
 
-    mixinTextLink(".DataTable h2 a", true);
-    mixinTextLink(".DataTable h3 a", true);
-    mixinTextLink(".DataTable .Title.Title a", true);
-    mixinTextLink(".Timebased.EndTime a", true);
-    mixinTextLink(".FilterMenu a", true);
-    mixinTextLink(".Breadcrumbs a", true, {
-        textDecoration: "none",
-    });
+    // Links that have FG color by default but regular state colors.
+    mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
+    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
+    mixinTextLinkNoDefaultLinkAppearance("a.Tag");
+    mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable .Title.Title a");
+    mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
+    mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
+    mixinTextLinkNoDefaultLinkAppearance(".Breadcrumbs a");
 };
 
 // Mixins replacement
-export const mixinTextLink = (selector: string, skipDefaultColor = false, overwrite?: {}) => {
-    const linkColors = setAllLinkColors();
+export const mixinTextLink = (selector: string, overwrite?: {}) => {
     selector = trimTrailingCommas(selector);
-
-    if (!skipDefaultColor) {
+    const selectors = selector.split(",");
+    const linkColors = setAllLinkColors(overwrite);
+    if (!selectors) {
         cssOut(selector, {
-            color: linkColors.color,
-            ...overwrite,
+            color: colorOut(linkColors.color),
+        });
+        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
+    } else {
+        selectors.map(s => {
+            cssOut(selector, {
+                color: colorOut(linkColors.color),
+            });
+            nestedWorkaround(trimTrailingCommas(s), linkColors.nested);
         });
     }
-    nestedWorkaround(selector, linkColors.nested);
+};
+
+export const mixinTextLinkNoDefaultLinkAppearance = selector => {
+    const globalVars = globalVariables();
+    mixinTextLink(selector, { default: globalVars.links.colors.default, textDecoration: "none" });
 };

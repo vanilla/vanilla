@@ -62,6 +62,7 @@ export const metaContainerStyles = (overwrites?: any) => {
         width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
         overflow: "hidden",
         textAlign: "left",
+        fontSize: unit(globalVars.meta.text.fontSize),
         ...margins({
             left: -vars.spacing.default,
             right: vars.spacing.default,

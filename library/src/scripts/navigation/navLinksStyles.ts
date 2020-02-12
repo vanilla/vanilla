@@ -5,10 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, paddings, setAllLinkColors, unit, fonts } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { media } from "typestyle";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
@@ -174,11 +175,14 @@ export const navLinksClasses = useThemeCache(() => {
 
     const link = style("link", {
         display: "block",
-        fontSize: unit(vars.link.fontSize),
-        lineHeight: vars.link.lineHeight,
-        color: linkColors.color,
-        $nest: linkColors.nested,
-    });
+        ...fonts({
+            size: vars.link.fontSize,
+            lineHeight: vars.link.lineHeight,
+            // @ts-ignore
+            color: linkColors.color,
+        }),
+        $nest: linkColors.nested as NestedCSSProperties,
+    } as NestedCSSProperties);
 
     const viewAllItem = style(
         "viewAllItem",
@@ -199,9 +203,12 @@ export const navLinksClasses = useThemeCache(() => {
 
     const viewAll = style("viewAll", {
         display: "block",
-        fontWeight: vars.viewAll.fontWeight,
-        fontSize: vars.viewAll.fontSize,
-        color: viewAllLinkColors.color,
+        ...fonts({
+            weight: vars.viewAll.fontWeight,
+            size: vars.viewAll.fontSize,
+            // @ts-ignore
+            color: vars.viewAll.color,
+        }),
         $nest: viewAllLinkColors.nested,
     });
 

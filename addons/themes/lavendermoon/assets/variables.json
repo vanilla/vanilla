@@ -3,7 +3,8 @@
         "mainColors": {
             "primary": "#9966b2",
             "fg": "#fff",
-            "bg": "#323639"
+            "bg": "#323639",
+            "primaryContrast": "#fff"
         },
         "fonts": {
             "families": {

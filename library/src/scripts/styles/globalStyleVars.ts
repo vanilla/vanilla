@@ -19,8 +19,6 @@ import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import main from "@storybook/api/dist/initial-state";
-import { elementType } from "prop-types";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -118,16 +116,18 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(colorPrimary, constants.linkStateColorEmphasis, true);
+    const linkDerivedColors = makeThemeVars("linkDerivedColors", {
+        default: mainColors.secondary,
+        state: emphasizeLightness(colorPrimary, constants.linkStateColorEmphasis, true),
+    });
 
     const links = makeThemeVars("links", {
         colors: {
-            default: linkColorDefault,
-            hover: linkColorState,
-            focus: linkColorState,
-            accessibleFocus: linkColorState,
-            active: linkColorState,
+            default: linkDerivedColors.default,
+            hover: linkDerivedColors.state,
+            focus: linkDerivedColors.state,
+            accessibleFocus: linkDerivedColors.state,
+            active: linkDerivedColors.state,
             visited: undefined,
         },
     });

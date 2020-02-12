@@ -243,12 +243,6 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkStyles: NestedCSSSelectors = {
-        a: linkStyle,
-        "p a": linkStyle,
-        "li a": linkStyle,
-    };
-
     const codeStyles: NestedCSSSelectors = {
         "& .code": {
             position: "relative",
@@ -361,7 +355,6 @@ export const userContentClasses = useThemeCache(() => {
             ...headings,
             ...lists,
             ...paragraphSpacing,
-            ...linkStyles,
             ...codeStyles,
             ...spoilersAndQuotes,
             ...blockquotes,

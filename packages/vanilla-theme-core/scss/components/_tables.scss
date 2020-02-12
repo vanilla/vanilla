@@ -604,12 +604,14 @@ body.Section-Group {
 
     .Invitation {
 
-        .MItem {
-            color: $component-meta_color;
-
-            &:focus,
-            &:hover {
+        @if ($staticVariables) {
+            .MItem {
                 color: $component-meta_color;
+
+                &:focus,
+                &:hover {
+                    color: $component-meta_color;
+                }
             }
         }
 

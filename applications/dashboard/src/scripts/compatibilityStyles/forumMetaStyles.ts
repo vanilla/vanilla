@@ -9,6 +9,7 @@ import {
     allLinkStates,
     borders,
     colorOut,
+    fonts,
     importantColorOut,
     margins,
     paddings,
@@ -18,6 +19,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
+import trim from "validator/lib/trim";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -39,57 +41,90 @@ export const forumMetaCSS = () => {
     mixinMetaLinkContainer(`.Item.Application .Meta`);
     mixinMetaLinkContainer(`.Meta.Group-Meta.Group-Info`);
 
-    cssOut(
-        `
-        .DataList .NewCommentCount,
-        .DataList .HasNew.HasNew,
-        .MessageList .Tag-Announcement,
-        .MessageList .NewCommentCount,
-        .MessageList .HasNew.HasNew,
-        .DataTableWrap .Tag-Announcement,
-        .DataTableWrap .NewCommentCount,
-        .DataTableWrap .HasNew.HasNew,
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        a.Tag
-        `,
-        {
-            ...borders(),
-            color: importantColorOut(fg),
-            textDecoration: "none",
-            ...allLinkStates({
-                allStates: {
-                    borderColor: colorOut(globalVars.mainColors.fg),
-                },
-            }),
-        },
-    );
+    // .Container .DataList .NewCommentCount,
+    // .Container .DataList .HasNew.HasNew,
+    // .Container .MessageList .Tag-Announcement,
+    // .Container .MessageList .NewCommentCount,
+    // .Container .MessageList .HasNew.HasNew,
+    // .Container .DataTableWrap .Tag-Announcement,
+    // .Container .DataTableWrap .NewCommentCount,
+    // .Container .DataTableWrap .HasNew.HasNew,
+    // .Container .MessageList .ItemComment .Username,
+    // .Container .MessageList .ItemDiscussion .Username,
+    // .Container .MessageList .ItemDiscussion .MItem.Rank,
+    // .Container a.Tag
 
     cssOut(
         `
-        .MessageList .ItemDiscussion a.Username,
-        .MessageList .ItemDiscussion .Username,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a,
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MessageList .ItemComment a.Username,
-        .MessageList .ItemComment .Username,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment a.Username,
-        .MainContent.Content .MessageList.Discussion .Item.ItemDiscussion a.Username,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
+
         `,
         {
-            color: colorOut(globalVars.mainColors.fg),
             opacity: important(1),
-            ...allLinkStates({
-                hover: {
-                    color: colorOut(globalVars.links.colors.hover),
-                },
-                focus: {
-                    color: colorOut(globalVars.links.colors.focus),
-                },
-                active: {
-                    color: colorOut(globalVars.links.colors.active),
-                },
+            color: importantColorOut(fg),
+            textDecoration: "none",
+        },
+    );
+
+    const linkSelectors = `
+        .MessageList .ItemDiscussion .MItem.RoleTracker a,
+        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
+        .MainContent.Content .MItem.RoleTracker a,
+        .MessageList .ItemComment .Username,
+        .MessageList .ItemDiscussion .Username,
+        .AuthorInfo .MItem.RoleTracker,
+        .MItem > a,
+        `;
+
+    // Links
+    cssOut(linkSelectors, {
+        display: "inline-flex",
+        alignItems: "center",
+        opacity: important(1),
+    });
+
+    // Split because it seems there's a bug with TypeStyles and it's unable to handle the deep nesting.
+    trimTrailingCommas(linkSelectors)
+        .split(",")
+        .map(s => {
+            cssOut(trim(s), {
+                ...allLinkStates({
+                    noState: {
+                        color: colorOut(globalVars.mainColors.fg),
+                    },
+                    hover: {
+                        color: colorOut(globalVars.links.colors.hover),
+                        textDecoration: "underline",
+                    },
+                    focus: {
+                        color: colorOut(globalVars.links.colors.focus),
+                        textDecoration: "underline",
+                    },
+                    accessibleFocus: {
+                        color: colorOut(globalVars.links.colors.accessibleFocus),
+                        textDecoration: "underline",
+                    },
+                    active: {
+                        color: colorOut(globalVars.links.colors.active),
+                        textDecoration: "underline",
+                    },
+                }),
+            });
+        });
+
+    cssOut(
+        `
+        .MessageList .ItemDiscussion .MItem.RoleTracker a,
+        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
+        .MainContent.Content .MItem.RoleTracker a,
+    `,
+        {
+            ...paddings({
+                horizontal: 0,
+            }),
+            ...margins({
+                all: 0,
             }),
         },
     );
@@ -107,48 +142,8 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(
-        `
-        .Meta-Discussion .Tag,
-        .DataList .Author .Username,
-        .DataList .MItem,
-        .DataList .MItem.Category,
-        .DataList .ChildCategories,
-        .MessageList .Author .Username,
-        .MessageList .MItem,
-        .MessageList .MItem.Category,
-        .MessageList .ChildCategories
-        .Container .Frame-contentWrap .ChildCategories > b,
-        .Container .Frame-contentWrap .ChildCategories a,
-        .Groups .DataTable .MItem a,
-        .DataTable .MItem a,
-        .Container .DataTable .MItem.Category,
-        .DiscussionHeader .AuthorWrap .Username,
-        .Content .MessageList .Tag,
-        .DataList.DataList-Search .CrumbLabel,
-        .Item.Application .MItem
-        `,
-        {
-            textDecoration: important("none"),
-            color: colorOut(globalVars.mainColors.fg),
-            ...paddings({
-                horizontal: 3,
-            }),
-            ...margins({
-                all: globalVars.meta.spacing.default,
-            }),
-            ...borders(),
-        },
-    );
-
     cssOut(`.Content .MessageList .RoleTracker > .Tag`, {
         color: colorOut(globalVars.mainColors.fg),
-    });
-
-    cssOut(".MItem a.Tag", {
-        ...margins({ all: important(0) }),
-        border: important(0),
-        padding: important(0),
     });
 
     cssOut(
@@ -181,45 +176,54 @@ export const forumMetaCSS = () => {
         },
     );
 
-    mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
-        overflow: "visible",
+    cssOut(`.Tag`, {
+        background: "none",
     });
 
     cssOut(
         `
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment a.Username,
-        .MainContent.Content .MessageList.Discussion .Item.ItemDiscussion a.Username,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a`,
+    .AuthorWrap a.Username,
+    .AuthorInfo .MItem,
+    .DiscussionMeta .MItem
+    `,
         {
-            opacity: important(1),
+            ...paddings({
+                all: 0,
+            }),
+            ...margins({
+                horizontal: unit(globalVars.meta.spacing.default),
+            }),
         },
     );
 
-    cssOut(
-        `
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a
-        `,
-        {
-            textDecoration: "none",
-        },
-    );
+    mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
+        overflow: "visible",
+    });
 
-    cssOut(
-        `
-        .Container .MItem.RoleTracker,
-        .Container .MItem.Rank,
-        .Container .AuthorInfo .MItem.RoleTitle,
-        .Container .MessageList .ItemComment .MItem.RoleTitle,
-        .Container .ItemComment .MItem.Rank,
-        .Container .DataTableWrap .Meta .Tag
-        `,
-        {
-            color: colorOut(globalVars.mainColors.fg),
-            ...borders(),
-            opacity: 1,
-        },
-    );
+    // // Color
+    // cssOut(
+    //     `
+    //     .Container .MItem.RoleTracker,
+    //     .Container .MItem.Rank,
+    //     .Container .AuthorInfo .MItem.RoleTitle,
+    //     .Container .MessageList .ItemComment .MItem.RoleTitle,
+    //     .Container .ItemComment .MItem.Rank,
+    //     .Container .DataTableWrap .Meta .Tag,
+    //
+    //     `,
+    //     {
+    //         color: colorOut(globalVars.mainColors.fg),
+    //     },
+    // );
+
+    cssOut(`.Container .AuthorInfo .MItem`, {
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
+    cssOut(`.Container .AuthorInfo .MItem img`, {
+        paddingLeft: unit(12),
+    });
 
     cssOut(
         `
@@ -233,16 +237,24 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(
-        `
-            .DataTable .MItem a,
-            .MItem > .Tag
-        `,
-        {
-            border: important(0),
-            padding: important(0),
-        },
-    );
+    // cssOut(
+    //     `
+    //         .DataTable .MItem a,
+    //         .MItem > .Tag
+    //     `,
+    //     {
+    //         border: important(0),
+    //         padding: important(0),
+    //     },
+    // );
+
+    cssOut(`.MItem img`, {
+        width: "auto",
+        height: unit(12),
+        ...paddings({
+            left: 12,
+        }),
+    });
 };
 
 function mixinMetaLinkContainer(selector: string) {

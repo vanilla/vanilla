@@ -63,19 +63,21 @@ $code-block_padding:                    $userContent_fontSize !default;
         margin-right: auto;
     }
 
-    p,
-    li {
-        a {
-            color: $link-default_color;
+    @if ($staticVariables) {
+        p,
+        li {
+            a {
+                color: $link-default_color;
 
-            &:focus,
-            &:hover {
-                color: $link-default-hover_color;
-                text-decoration: underline;
-            }
+                &:focus,
+                &:hover {
+                    color: $link-default-hover_color;
+                    text-decoration: underline;
+                }
 
-            &:visited {
-                color: $link-default_visited_color;
+                &:visited {
+                    color: $link-default_visited_color;
+                }
             }
         }
     }

@@ -45,6 +45,7 @@ import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
+import { signaturesCSS } from "./signaturesSyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -285,53 +286,6 @@ export const compatibilityStyles = useThemeCache(() => {
         fontWeight: vars.fonts.weights.bold,
     });
 
-    cssOut(
-        `
-        .Tag,
-        .DataList .Meta .Tag-Announcement,
-        .DataList .NewCommentCount,
-        .DataList .HasNew.HasNew,
-        .MessageList .Tag-Announcement,
-        .MessageList .NewCommentCount,
-        .MessageList .HasNew.HasNew,
-        .DataTableWrap .Tag-Announcement,
-        .DataTableWrap .NewCommentCount,
-        .DataTableWrap .HasNew.HasNew,
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        .Content .DataList .Tag,
-        .Content .DataList .Tag-Poll,
-        .Content .DataList .RoleTracker,
-        .Content .MessageList .Tag,
-        .Content .MessageList .Tag-Poll,
-        .Content .MessageList .RoleTracker,
-        .Content .MessageList .IdeationTag,
-        .Content .DataTableWrap .Tag,
-        .Content .DataTableWrap .Tag-Poll,
-        .Content .DataTableWrap .RoleTracker,
-        .Content .DataTableWrap .IdeationTag
-        `,
-        {
-            ...borders(),
-            background: "none",
-            backgroundColor: "transparent",
-            ...fonts({
-                color: vars.meta.text.color,
-                size: vars.meta.text.fontSize,
-            }),
-            textDecoration: "none",
-        },
-    );
-
-    cssOut(`a.Tag`, {
-        $nest: {
-            "&:hover, &:focus, &:active": {
-                textDecoration: important("none"),
-                borderColor: colorOut(vars.mainColors.fg),
-            },
-        },
-    });
-
     cssOut(`.DataList.Discussions .Item .Title a`, {
         textDecoration: important("none"),
     });
@@ -362,6 +316,12 @@ export const compatibilityStyles = useThemeCache(() => {
         position: "relative",
     });
 
+    cssOut(`#Panel .FilterMenu .Aside, .PanelInfo .Aside, .Item .Aside`, {
+        float: "none",
+        display: "block",
+        margin: `0 0 14px`,
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -382,6 +342,7 @@ export const compatibilityStyles = useThemeCache(() => {
     profilePageCSS();
     photoGridCSS();
     messagesCSS();
+    signaturesCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

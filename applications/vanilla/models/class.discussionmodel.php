@@ -2080,16 +2080,22 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
                 $this->Validation->applyRule('Body', 'Length');
             }
 
-            // Add min length if body is required.
-            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
-                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+            if ($minCommentLength && is_numeric($minCommentLength)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
                 $this->Validation->applyRule('Body', 'MinTextLength');
+            } else {
+                // Add min length if body is required.
+                if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                    $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                    $this->Validation->applyRule('Body', 'MinTextLength');
+                }
             }
         }
 

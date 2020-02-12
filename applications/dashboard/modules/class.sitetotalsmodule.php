@@ -73,8 +73,10 @@ class SiteTotalsModule extends Gdn_Module {
     /**
      * Attempt to implement lock system. A failure likely means the
      * cache key already exists, which would mean the lock is already in place.
+     *
+     * @return bool
      */
-    private function tryRecalculate() {
+    private function tryRecalculate():bool {
         $lock = Gdn::cache()->get(self::LOCK_KEY);
 
         if ($lock === Gdn_Cache::CACHEOP_SUCCESS) { //already locked
@@ -93,18 +95,28 @@ class SiteTotalsModule extends Gdn_Module {
                         }
                     ]
                 );
+
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
-     * Fire counts request to the DB
+     * Triggers getCount to request the DB
      */
     private function getAllCounts() {
         $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
 
         foreach ($counts as $name => $value) {
-            $counts[$name] = $this->getCount($name);
+            $count = $this->getCount($name);
+            $counts[$name] = $count;
+        }
+
+        if (in_array(null, $counts)) {
+            Logger::log('sitetotalsmodule_request_error', 'DB request returning unexpected values', $counts);
+            return false;    //bail without overriding the cache
         }
 
         // cache counts
@@ -118,13 +130,13 @@ class SiteTotalsModule extends Gdn_Module {
      * Query the DB for count
      *
      * @param string $table
-     * @return mixed
+     * @return int
      */
-    protected function getCount($table) {
+    protected function getCount($table): ?int {
         $count = Gdn::sql()
             ->select($table.'ID', 'count', 'CountRows')
             ->from($table)
-            ->get()->value('CountRows');
+            ->get()->value('CountRows', null);
 
         return $count;
     }

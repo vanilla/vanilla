@@ -16,6 +16,7 @@ import { BorderType } from "@library/styles/styleHelpers";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n";
+import Container from "@library/layout/components/Container";
 
 export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
@@ -66,19 +67,21 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 
     return (
         <div className={classes.root}>
-            <div className={classes.content}>
-                <div className={classes.viewAllContainer}>
-                    {props.title && <Heading className={classes.title}>{props.title}</Heading>}
-                    {options.viewAll.position === "top" && viewAllButton}
+            <Container>
+                <div className={classes.content}>
+                    <div className={classes.viewAllContainer}>
+                        {props.title && <Heading className={classes.title}>{props.title}</Heading>}
+                        {options.viewAll.position === "top" && viewAllButton}
+                    </div>
+                    {!gridHasBorder && grid}
                 </div>
-                {!gridHasBorder && grid}
-            </div>
-            {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
-            {viewAllButton && options.viewAll.position === "bottom" && (
-                <div className={classes.viewAllContent}>
-                    <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
-                </div>
-            )}
+                {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
+                {viewAllButton && options.viewAll.position === "bottom" && (
+                    <div className={classes.viewAllContent}>
+                        <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
+                    </div>
+                )}
+            </Container>
         </div>
     );
 }

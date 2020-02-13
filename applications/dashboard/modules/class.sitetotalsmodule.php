@@ -79,10 +79,8 @@ class SiteTotalsModule extends Gdn_Module {
     private function tryRecalculate():bool {
         $lock = Gdn::cache()->get(self::LOCK_KEY);
 
-        if ($lock === Gdn_Cache::CACHEOP_SUCCESS) { //already locked
-            return false;
-        } else {
-            $added = Gdn::cache()->add(self::LOCK_KEY, mt_rand(0, 999999), [Gdn_Cache::FEATURE_EXPIRY => self::LOCK_INTERVAL]);
+        if ($lock === Gdn_Cache::CACHEOP_FAILURE) { //already locked
+            $added = Gdn::cache()->add(self::LOCK_KEY, mt_rand(1, 999999), [Gdn_Cache::FEATURE_EXPIRY => self::LOCK_INTERVAL]);
 
             if ($added) {
                 /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */

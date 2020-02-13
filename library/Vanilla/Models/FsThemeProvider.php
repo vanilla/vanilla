@@ -192,8 +192,27 @@ class FsThemeProvider implements ThemeProviderInterface {
             if ($logo = $this->config->get($logoConfig)) {
                 $logoUrl = Gdn_Upload::url($logo);
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
-            }
-        }
+            } else {
+                // Check theme for default.
+                if ($themeVars = $res['assets']['variables'] ?? false) {
+                    $logo = $themeVars->
+//                    $logo = valr("titleBar.logo", $themeVars);
+                }
+            };
+            $break = "here";
+//                if (isset($logo)) {
+//                    $desktopLogo = valr("desktop.url", $themeLogoVars);
+//                    $mobileLogo = valr("mobile.url", $themeLogoVars);
+//                    if ($desktopLogo) {
+//                        $res["assets"]["logo"] = new ImageAsset($desktopLogo);
+//                    }
+//                    if ($mobileLogo) {
+//                        $res["assets"]["mobileLogo"] = new ImageAsset($mobileLogo);
+//                    }
+//                }
+
+
+
 
         $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;

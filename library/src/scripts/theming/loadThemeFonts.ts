@@ -5,6 +5,7 @@
 
 import getStore from "@library/redux/getStore";
 import WebFont from "webfontloader";
+import { getMeta, assetUrl, siteUrl } from "@library/utility/appUtils";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
@@ -27,7 +28,11 @@ export function loadThemeFonts() {
         const webFontConfig: WebFont.Config = {
             custom: {
                 families: fonts.data.map(font => font.name),
-                urls: fonts.data.map(font => font.url),
+                urls: fonts.data.map(font => {
+                    const url = new URL(siteUrl(assetUrl(font.url)));
+                    url.searchParams.append("v", getMeta("context.cacheBuster"));
+                    return url.href;
+                }),
             },
         };
 

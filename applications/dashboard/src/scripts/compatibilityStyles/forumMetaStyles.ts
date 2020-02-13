@@ -129,7 +129,7 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(`.Content .MessageList .RoleTracker > .Tag`, {
+    cssOut(`.Content .MessageList .RoleTracker > .Tag, .Tag`, {
         color: colorOut(globalVars.mainColors.fg),
     });
 

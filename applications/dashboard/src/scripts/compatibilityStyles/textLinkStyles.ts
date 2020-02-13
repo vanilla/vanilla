@@ -82,5 +82,5 @@ export const mixinTextLink = (selector: string, overwrite?: {}) => {
 
 export const mixinTextLinkNoDefaultLinkAppearance = selector => {
     const globalVars = globalVariables();
-    mixinTextLink(selector, { default: globalVars.links.colors.default, textDecoration: "none" });
+    mixinTextLink(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
 };

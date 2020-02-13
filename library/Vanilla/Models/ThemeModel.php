@@ -210,10 +210,10 @@ class ThemeModel {
     /**
      * Get master theme key
      *
-     * @param $themeKey
+     * @param int|string $themeKey
      * @return string
      */
-    public function getMasterThemeKey($themeKey) {
+    public function getMasterThemeKey($themeKey): string {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->getMasterThemeKey($themeKey);
     }

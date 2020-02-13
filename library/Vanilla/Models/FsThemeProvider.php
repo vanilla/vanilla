@@ -15,7 +15,7 @@ use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\AddonManager;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -31,7 +31,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
 
-    /** @var AddonManager */
+    /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper */
@@ -49,13 +49,13 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * FsThemeProvider constructor.
      *
-     * @param AddonManager $addonManager
+     * @param AddonProviderInterface $addonManager
      * @param Gdn_Request $request
      * @param ConfigurationInterface $config
      * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
-        AddonManager $addonManager,
+        AddonProviderInterface $addonManager,
         Gdn_Request $request,
         ConfigurationInterface $config,
         ThemeModelHelper $themeHelper

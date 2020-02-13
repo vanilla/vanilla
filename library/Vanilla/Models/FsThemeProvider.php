@@ -192,14 +192,27 @@ class FsThemeProvider implements ThemeProviderInterface {
             if ($logo = $this->config->get($logoConfig)) {
                 $logoUrl = Gdn_Upload::url($logo);
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
-            } else {
-                // Check theme for default.
-                if ($themeVars = $res['assets']['variables'] ?? false) {
-                    $logo = $themeVars->
-//                    $logo = valr("titleBar.logo", $themeVars);
+            }
+        }
+
+
+        // Check theme for default.
+        if (!$logo) {
+            if (valr("assets.variables",$res)) {
+                $themeVars = json_decode($res['assets']['variables']->getData(), true);
+                $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
+                $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
+                if (!empty($desktopLogo)) {
+                    $res["assets"]["logo"] = new ImageAsset($themeVars);
                 }
-            };
-            $break = "here";
+                if (!empty($mobileLogo)) {
+                    $res["assets"]["mobileLogo"] = new ImageAsset($themeVars);
+                }
+            }
+        }
+
+        $break = "here";
+
 //                if (isset($logo)) {
 //                    $desktopLogo = valr("desktop.url", $themeLogoVars);
 //                    $mobileLogo = valr("mobile.url", $themeLogoVars);
@@ -213,8 +226,7 @@ class FsThemeProvider implements ThemeProviderInterface {
 
 
 
-
-        $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
+$themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
         $res['preview']['info']['Description'] = ['type'=>'string', 'info' => $theme->getInfoValue('description', '')];
 

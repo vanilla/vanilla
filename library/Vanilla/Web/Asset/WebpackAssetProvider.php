@@ -8,8 +8,10 @@
 namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Addon;
 use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -23,6 +25,12 @@ class WebpackAssetProvider {
 
     /** @var Contracts\AddonProviderInterface */
     private $addonProvider;
+
+    /** @var \Gdn_Session */
+    private $session;
+
+    /** @var ConfigurationInterface */
+    private $config;
 
     /** @var string */
     private $cacheBustingKey = '';
@@ -44,13 +52,18 @@ class WebpackAssetProvider {
      *
      * @param RequestInterface $request
      * @param Contracts\AddonProviderInterface $addonProvider
+     * @param \Gdn_Session $session
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\AddonProviderInterface $addonProvider
+        Contracts\AddonProviderInterface $addonProvider,
+        \Gdn_Session $session,
+        ConfigurationInterface $config
     ) {
         $this->request = $request;
         $this->addonProvider = $addonProvider;
+        $this->session = $session;
+        $this->config = $config;
     }
 
     /**
@@ -137,6 +150,7 @@ class WebpackAssetProvider {
 
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+            $addon = $this->checkReplacePreview($addon);
             // See if we have a common bundle
             $commonAsset = new WebpackAddonAsset(
                 $this->request,
@@ -173,6 +187,24 @@ class WebpackAssetProvider {
     }
 
     /**
+     * Check if current theme need to be replaced by some preview theme
+     *
+     * @param Addon $addon
+     * @return Addon
+     */
+    private function checkReplacePreview(Addon $addon): Addon {
+        $currentThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+            if ($addon->getKey() === $currentThemeKey) {
+                if ($previewTheme = $this->addonProvider->lookupTheme($previewThemeKey)) {
+                    $addon = $previewTheme;
+                }
+            }
+        }
+        return $addon;
+    }
+
+    /**
      * Get all stylesheets for a particular site section.
      *
      * @param string $section
@@ -184,10 +216,10 @@ class WebpackAssetProvider {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
-
         $styles = [];
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+            $addon = $this->checkReplacePreview($addon);
             $asset = new WebpackAddonAsset(
                 $this->request,
                 WebpackAsset::STYLE_EXTENSION,

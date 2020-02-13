@@ -128,23 +128,27 @@ export const compatibilityStyles = useThemeCache(() => {
         marginRight: unit(layoutVars.cell.paddings.horizontal),
     });
 
-    // Panel
-    cssOut(
-        `
-        .Panel.Panel-main .PanelCategories a,
+    const panelSelectors = `
         .About a,
         .Panel.Panel-main .FilterMenu a,
-        .Panel.Panel-main .BoxFilter a
-        `,
-        {
-            ...siteNavNodeClasses().linkMixin,
-            display: "flex",
-            color: "inherit",
-        },
-    );
+        .Panel.Panel-main .BoxFilter a,
+        .Panel.Panel-main .PanelInfo a.ItemLink,
+        .Panel.Panel-main .FilterMenu a,
+        `;
+
+    // Panel
+    cssOut(panelSelectors, {
+        ...siteNavNodeClasses().linkMixin(true, panelSelectors),
+        display: "flex",
+        opacity: 1,
+    });
 
     cssOut(".Panel .ClearFix::after", {
         display: important("none"),
+    });
+
+    cssOut("a", {
+        cursor: "pointer",
     });
 
     cssOut(
@@ -157,6 +161,10 @@ export const compatibilityStyles = useThemeCache(() => {
             ...margins({
                 all: 0,
                 left: "auto",
+            }),
+            ...paddings({
+                all: 0,
+                left: unit(12),
             }),
         },
     );
@@ -383,19 +391,21 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
     let rawStyles = `\n`;
     Object.keys(nestedObject).forEach(key => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
-        const targetStyles = nestedObject[key];
-        const keys = Object.keys(targetStyles);
-        if (keys.length > 0) {
-            rawStyles += `${finalSelector} { `;
-            keys.forEach(property => {
-                const style = targetStyles[property];
-                if (style) {
-                    rawStyles += `\n    ${camelCaseToDash(property)}: ${
-                        style instanceof ColorHelper ? colorOut(style) : style
-                    };`;
-                }
-            });
-            rawStyles += `\n}\n\n`;
+        if (selector !== "") {
+            const targetStyles = nestedObject[key];
+            const keys = Object.keys(targetStyles);
+            if (keys.length > 0) {
+                rawStyles += `${finalSelector} { `;
+                keys.forEach(property => {
+                    const style = targetStyles[property];
+                    if (style) {
+                        rawStyles += `\n    ${camelCaseToDash(property)}: ${
+                            style instanceof ColorHelper ? colorOut(style) : style
+                        };`;
+                    }
+                });
+                rawStyles += `\n}\n\n`;
+            }
         }
     });
 

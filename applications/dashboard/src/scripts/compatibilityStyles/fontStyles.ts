@@ -78,7 +78,7 @@ export const fontCSS = () => {
     cssOut(`.Panel h4`, {
         ...paddings({
             vertical: 0,
-            horizontal: vars.panelLink.padding.all,
+            horizontal: 0,
         }),
         marginBottom: unit(panelListVariables().offset.default),
         ...fonts({
@@ -144,6 +144,7 @@ export const fontCSS = () => {
 
     for (let i = 2; i <= 12; i++) {
         const offset = unit(i * vars.panelLink.spacer.default);
+        // Links
         cssOut(
             `
             body.Section-EditProfile .Box .PanelCategories li.Depth${i} a.ItemLink,
@@ -152,6 +153,19 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading[aria-level='${i}'],
         `,
             {
+                fontSize: unit(i === 2 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
+                paddingLeft: offset,
+                color: colorOut(globalVars.mainColors.fg),
+            },
+        );
+
+        // Headings
+        cssOut(
+            `
+            .Panel.Panel-main .Box .Heading[aria-level='${i}'],
+        `,
+            {
+                fontSize: unit(globalVars.fonts.size.large),
                 paddingLeft: offset,
             },
         );

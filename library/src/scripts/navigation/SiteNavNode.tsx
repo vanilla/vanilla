@@ -16,6 +16,7 @@ import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
 import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
+import { colorOut } from "@library/styles/styleHelpersColors";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -44,7 +45,6 @@ export default class SiteNavNode extends React.Component<IProps> {
         const depthClass = `hasDepth-${this.props.depth + 1}`;
         const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
         const classes = siteNavNodeClasses();
-
         const { activeRecord } = this.props;
 
         let linkContents;

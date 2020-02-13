@@ -234,12 +234,24 @@ export const userContentClasses = useThemeCache(() => {
 
     const linkColors = setAllLinkColors();
     const linkStyle = {
-        color: linkColors.color,
-        $nest: {
-            ...linkColors.nested,
-            "&:hover, &:focus": {
-                textDecoration: "underline",
-            },
+        "& a": {
+            color: colorOut(linkColors.color),
+        },
+        "& a:hover": {
+            color: colorOut(globalVars.links.colors.hover),
+            textDecoration: "underline",
+        },
+        "& a:focus": {
+            color: colorOut(globalVars.links.colors.focus),
+            textDecoration: "underline",
+        },
+        "& a.focus-visible": {
+            color: colorOut(globalVars.links.colors.accessibleFocus),
+            textDecoration: "underline",
+        },
+        "& a:active": {
+            color: colorOut(globalVars.links.colors.active),
+            textDecoration: "underline",
         },
     };
 
@@ -358,6 +370,7 @@ export const userContentClasses = useThemeCache(() => {
             ...codeStyles,
             ...spoilersAndQuotes,
             ...blockquotes,
+            ...linkStyle,
         },
     });
 

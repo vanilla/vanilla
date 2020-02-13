@@ -10,6 +10,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { negative, unit, colorOut, allLinkStates } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -113,30 +114,25 @@ export const siteNavNodeClasses = useThemeCache(() => {
         },
     });
 
-    const linkMixin: NestedCSSProperties = {
-        display: "block",
-        flexGrow: 1,
-        lineHeight: vars.node.lineHeight,
-        minHeight: px(30),
-        outline: 0,
-        padding: 0,
-        width: percent(100),
-        color: colorOut(globalVars.links.colors.default),
-        ...allLinkStates({
-            hover: {
-                color: colorOut(globalVars.links.colors.hover),
-            },
-            focus: {
-                color: colorOut(globalVars.links.colors.focus),
-            },
-            accessibleFocus: {
-                color: colorOut(globalVars.links.colors.accessibleFocus),
-            },
-            active: {
-                color: colorOut(globalVars.links.colors.active),
-            },
-        }),
-        $nest: {
+    const linkMixin = (useTextColor?: boolean, selector?: string): NestedCSSProperties => {
+        const $nest = {
+            ...allLinkStates({
+                noState: {
+                    color: colorOut(!useTextColor ? globalVars.links.colors.default : globalVars.mainColors.fg),
+                },
+                hover: {
+                    color: colorOut(globalVars.links.colors.hover),
+                },
+                focus: {
+                    color: colorOut(globalVars.links.colors.focus),
+                },
+                accessibleFocus: {
+                    color: colorOut(globalVars.links.colors.accessibleFocus),
+                },
+                active: {
+                    color: colorOut(globalVars.links.colors.active),
+                },
+            }).$nest,
             "&:not(.focus-visible):active, &:focus": {
                 outline: 0,
             },
@@ -152,15 +148,38 @@ export const siteNavNodeClasses = useThemeCache(() => {
                     },
                 },
             },
-        },
+        };
+
+        if (selector) {
+            const selectors = selector.split(",");
+            if (selectors.length && selectors.length > 0) {
+                selectors.map(s => {
+                    nestedWorkaround(trimTrailingCommas(s), $nest);
+                });
+            } else {
+                nestedWorkaround(trimTrailingCommas(selector), $nest);
+            }
+        }
+
+        return {
+            display: "block",
+            flexGrow: 1,
+            lineHeight: vars.node.lineHeight,
+            minHeight: px(30),
+            outline: 0,
+            padding: 0,
+            width: percent(100),
+        };
     };
-    const link = style("link", linkMixin);
+
+    const link = style("link", linkMixin());
 
     const label = style(
         "label",
         {
             position: "relative",
             display: "block",
+            color: colorOut(globalVars.mainColors.fg),
             width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
             marginLeft: unit(-vars.nodeToggle.width),
             textAlign: "left",
@@ -204,5 +223,15 @@ export const siteNavNodeClasses = useThemeCache(() => {
         transform: `translateY(-50%)`,
     });
 
-    return { root, children, contents, link, linkMixin, label, spacer, toggle, buttonOffset };
+    return {
+        root,
+        children,
+        contents,
+        link,
+        linkMixin,
+        label,
+        spacer,
+        toggle,
+        buttonOffset,
+    };
 });

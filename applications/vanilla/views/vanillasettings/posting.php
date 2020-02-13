@@ -168,8 +168,8 @@ specify the same one as above. If users report issues with mobile editing, this 
     </div>
     <div class="form-group">
         <div class="label-wrap">
-        <?php echo $form->label('Max Comment Length', 'Vanilla.Comment.MaxLength'); ?>
-        <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
+        <?php echo $form->label('Max Post Length', 'Vanilla.Comment.MaxLength'); ?>
+        <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a post down to a reasonable size."); ?></div>
         </div>
         <div class="input-wrap">
         <?php echo $form->textBox('Vanilla.Comment.MaxLength', ['class' => 'InputBox SmallInput']); ?>
@@ -177,8 +177,8 @@ specify the same one as above. If users report issues with mobile editing, this 
     </div>
     <div class="form-group">
         <div class="label-wrap">
-        <?php echo $form->label('Min Comment Length', 'Vanilla.Comment.MinLength'); ?>
-        <div class="info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
+        <?php echo $form->label('Min Post Length', 'Vanilla.Comment.MinLength'); ?>
+        <div class="info"><?php echo t("You can specify a minimum post length to discourage short posts."); ?></div>
         </div>
         <div class="input-wrap">
         <?php echo $form->textBox('Vanilla.Comment.MinLength', ['class' => 'InputBox SmallInput']); ?>

@@ -199,7 +199,7 @@ class WebpackAssetProvider {
      * @param Addon $addon
      * @return Addon
      */
-    private function checkReplacePreview(Addon $addon): AddonInterface {
+    private function checkReplacePreview(AddonInterface $addon): AddonInterface {
         $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
         $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {

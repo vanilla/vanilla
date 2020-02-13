@@ -78,7 +78,7 @@ export const fontCSS = () => {
     cssOut(`.Panel h4`, {
         ...paddings({
             vertical: 0,
-            horizontal: 0,
+            horizontal: vars.panelLink.padding.all,
         }),
         marginBottom: unit(panelListVariables().offset.default),
         ...fonts({
@@ -142,8 +142,8 @@ export const fontCSS = () => {
         },
     );
 
-    for (let i = 2; i <= 12; i++) {
-        const offset = unit(i * vars.panelLink.spacer.default);
+    for (let i = 1; i <= 12; i++) {
+        const offset = unit((i - 1) * vars.panelLink.spacer.default + vars.panelLink.padding.all);
         // Links
         cssOut(
             `
@@ -170,6 +170,11 @@ export const fontCSS = () => {
             },
         );
     }
+
+    // First link to all categories
+    cssOut(`.Panel.Panel-main .PanelInfo a.ItemLink.ItemLinkAllCategories`, {
+        paddingLeft: unit(vars.panelLink.padding.all),
+    });
 };
 
 export const forumTitleMixin = () => {

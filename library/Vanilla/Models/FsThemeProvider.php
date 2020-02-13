@@ -119,7 +119,8 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
+            //throw new NotFoundException("Theme");
+            return 'default';
         }
         return $themeKey;
     }

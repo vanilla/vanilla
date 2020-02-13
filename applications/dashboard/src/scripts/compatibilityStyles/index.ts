@@ -330,6 +330,11 @@ export const compatibilityStyles = useThemeCache(() => {
         margin: `0 0 14px`,
     });
 
+    cssOut(`.HasNew`, {
+        backgroundColor: colorOut(vars.mainColors.primary),
+        color: colorOut(vars.mainColors.primaryContrast),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

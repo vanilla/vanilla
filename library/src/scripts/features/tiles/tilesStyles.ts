@@ -36,14 +36,10 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
         },
     });
 
-    const options = themeVars(
-        "options",
-        {
-            columns: 2,
-            alignment: TileAlignment.CENTER,
-        },
-        optionOverrides,
-    );
+    const options = themeVars("options", {
+        columns: 2,
+        alignment: TileAlignment.CENTER,
+    });
 
     const { columns } = options;
 

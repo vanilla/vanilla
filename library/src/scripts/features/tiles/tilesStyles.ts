@@ -32,7 +32,6 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
     const containerSpacing = themeVars("containerSpacing", {
         padding: {
             ...EMPTY_SPACING,
-            horizontal: 8,
             vertical: 24,
         },
     });

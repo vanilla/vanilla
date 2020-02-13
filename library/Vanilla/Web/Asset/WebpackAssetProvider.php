@@ -12,6 +12,7 @@ use Vanilla\Addon;
 use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ThemeModel;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -31,6 +32,9 @@ class WebpackAssetProvider {
 
     /** @var ConfigurationInterface */
     private $config;
+
+    /** @var ThemeModel */
+    private $themeModel;
 
     /** @var string */
     private $cacheBustingKey = '';
@@ -58,12 +62,14 @@ class WebpackAssetProvider {
         RequestInterface $request,
         Contracts\AddonProviderInterface $addonProvider,
         \Gdn_Session $session,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        ThemeModel $themeModel
     ) {
         $this->request = $request;
         $this->addonProvider = $addonProvider;
         $this->session = $session;
         $this->config = $config;
+        $this->themeModel = $themeModel;
     }
 
     /**
@@ -193,10 +199,12 @@ class WebpackAssetProvider {
      * @return Addon
      */
     private function checkReplacePreview(Addon $addon): Addon {
-        $currentThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
             if ($addon->getKey() === $currentThemeKey) {
-                if ($previewTheme = $this->addonProvider->lookupTheme($previewThemeKey)) {
+                $addonKey = $this->themeModel->getMasterThemeKey($previewThemeKey);
+                if ($previewTheme = $this->addonProvider->lookupTheme($addonKey)) {
                     $addon = $previewTheme;
                 }
             }

@@ -208,6 +208,17 @@ class ThemeModel {
     }
 
     /**
+     * Get master theme key
+     *
+     * @param $themeKey
+     * @return string
+     */
+    public function getMasterThemeKey($themeKey) {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->getMasterThemeKey($themeKey);
+    }
+
+    /**
      * Set current theme.
      *
      * @param int $themeID Theme ID to set current.

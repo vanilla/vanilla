@@ -404,7 +404,9 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         if ($hidden && !in_array($themeInfo['key'], $alwaysVisibleThemes)) {
-            return [];
+            if ($themeInfo['key'] !== $this->getConfigThemeKey()) {
+                return [];
+            }
         }
 
         return $themeInfo;

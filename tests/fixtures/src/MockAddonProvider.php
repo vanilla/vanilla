@@ -8,6 +8,7 @@
 namespace VanillaTests\Fixtures;
 
 use Vanilla\Contracts;
+use Vanilla\Contracts\AddonInterface;
 
 /**
  * Mock addon provider. All addons given to it are "enabled".
@@ -45,5 +46,12 @@ class MockAddonProvider implements Contracts\AddonProviderInterface {
      */
     public function getEnabled(): array {
         return $this->addons;
+    }
+
+    /**
+     * @return AddonInterface|null Get theme addon.
+     */
+    public function lookupTheme($themeKey) {
+        return $this->addons[$themeKey] ?? null;
     }
 }

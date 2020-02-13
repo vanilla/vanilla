@@ -198,7 +198,7 @@ class FsThemeProvider implements ThemeProviderInterface {
 
         // Check theme for default.
         if (!$logo) {
-            if (valr("assets.variables",$res)) {
+            if (valr("assets.variables", $res)) {
                 $themeVars = json_decode($res['assets']['variables']->getData(), true);
                 $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
                 $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
@@ -210,10 +210,10 @@ class FsThemeProvider implements ThemeProviderInterface {
                 }
                 if (!$noMobileLogo || !$noDesktopLogo) {
                     if (!$noMobileLogo) {
-                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($mobileLogo,  true, true));
+                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($mobileLogo, true, true));
                     } else {
                         // Use same logo if mobile is not set.
-                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($desktopLogo,  true, true));
+                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($desktopLogo, true, true));
                     }
                 }
             }

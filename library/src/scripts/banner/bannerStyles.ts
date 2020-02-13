@@ -92,7 +92,11 @@ export const bannerVariables = useThemeCache(() => {
 
     const contentContainer = makeThemeVars("contentContainer", {
         minWidth: 550,
-        padding: spacing.padding,
+        padding: {
+            ...spacing.padding,
+            left: 0,
+            right: 0,
+        },
     });
 
     const imageElement = makeThemeVars("imageElement", {

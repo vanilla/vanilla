@@ -67,20 +67,22 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 
     return (
         <div className={classes.root}>
-            <Container>
-                <div className={classes.content}>
-                    <div className={classes.viewAllContainer}>
-                        {props.title && <Heading className={classes.title}>{props.title}</Heading>}
-                        {options.viewAll.position === "top" && viewAllButton}
+            <Container fullGutter>
+                <div className={classes.container}>
+                    <div className={classes.content}>
+                        <div className={classes.viewAllContainer}>
+                            {props.title && <Heading className={classes.title}>{props.title}</Heading>}
+                            {options.viewAll.position === "top" && viewAllButton}
+                        </div>
+                        {!gridHasBorder && grid}
                     </div>
-                    {!gridHasBorder && grid}
+                    {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
+                    {viewAllButton && options.viewAll.position === "bottom" && (
+                        <div className={classes.viewAllContent}>
+                            <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
+                        </div>
+                    )}
                 </div>
-                {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
-                {viewAllButton && options.viewAll.position === "bottom" && (
-                    <div className={classes.viewAllContent}>
-                        <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
-                    </div>
-                )}
             </Container>
         </div>
     );

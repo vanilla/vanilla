@@ -202,31 +202,25 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $themeVars = json_decode($res['assets']['variables']->getData(), true);
                 $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
                 $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
-                if (!empty($desktopLogo)) {
-                    $res["assets"]["logo"] = new ImageAsset($themeVars);
+                $noDesktopLogo = empty($desktopLogo);
+                $noMobileLogo = empty($mobileLogo);
+
+                if (!$noDesktopLogo) {
+                    $res["assets"]["logo"] = new ImageAsset(asset($desktopLogo, true, true));
                 }
-                if (!empty($mobileLogo)) {
-                    $res["assets"]["mobileLogo"] = new ImageAsset($themeVars);
+                if (!$noMobileLogo || !$noDesktopLogo) {
+                    if (!$noMobileLogo) {
+                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($mobileLogo,  true, true));
+                    } else {
+                        // Use same logo if mobile is not set.
+                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($desktopLogo,  true, true));
+                    }
                 }
             }
         }
 
-        $break = "here";
 
-//                if (isset($logo)) {
-//                    $desktopLogo = valr("desktop.url", $themeLogoVars);
-//                    $mobileLogo = valr("mobile.url", $themeLogoVars);
-//                    if ($desktopLogo) {
-//                        $res["assets"]["logo"] = new ImageAsset($desktopLogo);
-//                    }
-//                    if ($mobileLogo) {
-//                        $res["assets"]["mobileLogo"] = new ImageAsset($mobileLogo);
-//                    }
-//                }
-
-
-
-$themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
+        $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;
         $res['preview']['info']['Description'] = ['type'=>'string', 'info' => $theme->getInfoValue('description', '')];
 

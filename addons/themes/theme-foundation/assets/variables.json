@@ -1,12 +1,1 @@
-{
-    "titleBar": {
-        "logo": {
-            "desktop": {
-                "url": "~/assets/testLogo.png"
-            },
-            "mobile": {
-                "url": ""
-            }
-        }
-    }
-}
+{}

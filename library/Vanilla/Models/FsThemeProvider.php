@@ -19,7 +19,7 @@ use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Gdn_Request;
+use Garden\Web\RequestInterface;
 use Gdn_Upload;
 use Vanilla\Theme\TwigAsset;
 
@@ -37,7 +37,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /** @var ThemeModelHelper */
     private $themeHelper;
 
-    /** @var Gdn_Request */
+    /** @var RequestInterface $request */
     private $request;
 
     /** @var ConfigurationInterface */
@@ -50,13 +50,13 @@ class FsThemeProvider implements ThemeProviderInterface {
      * FsThemeProvider constructor.
      *
      * @param AddonProviderInterface $addonManager
-     * @param Gdn_Request $request
+     * @param RequestInterface $request
      * @param ConfigurationInterface $config
      * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
         AddonProviderInterface $addonManager,
-        Gdn_Request $request,
+        RequestInterface $request,
         ConfigurationInterface $config,
         ThemeModelHelper $themeHelper
     ) {

@@ -49,6 +49,7 @@ class MockAddonProvider implements Contracts\AddonProviderInterface {
     }
 
     /**
+     * @param int|string $themeKey Theme key or ID
      * @return AddonInterface|null Get theme addon.
      */
     public function lookupTheme($themeKey) {

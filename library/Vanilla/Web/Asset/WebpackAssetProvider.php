@@ -13,6 +13,7 @@ use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\ThemeModel;
+use Vanilla\Contracts\AddonInterface;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -198,7 +199,7 @@ class WebpackAssetProvider {
      * @param Addon $addon
      * @return Addon
      */
-    private function checkReplacePreview(Addon $addon): Addon {
+    private function checkReplacePreview(Addon $addon): AddonInterface {
         $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
         $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {

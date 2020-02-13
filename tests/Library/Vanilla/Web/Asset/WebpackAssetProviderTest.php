@@ -31,6 +31,12 @@ class WebpackAssetProviderTest extends TestCase {
         vfsStream::setup();
     }
 
+    /**
+     * Get simple WebpackAssetProvider instance
+     *
+     * @param array $addons
+     * @return WebpackAssetProvider
+     */
     private function getWebpackAssetProvider(array $addons = []) {
         $session = new \Gdn_Session();
         $addonManager = new MockAddonProvider($addons);

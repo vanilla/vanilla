@@ -8,14 +8,13 @@ namespace Vanilla\Models;
 
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
-use Vanilla\AddonManager;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
 use Garden\Schema\ValidationField;
-use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
@@ -85,7 +84,7 @@ class ThemeModel {
     /** @var ConfigurationInterface $config */
     private $config;
 
-    /** @var AddonManager $addonManager */
+    /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper $themeHelper */
@@ -99,13 +98,13 @@ class ThemeModel {
      *
      * @param ConfigurationInterface $config
      * @param \Gdn_Session $session
-     * @param AddonManager $addonManager
+     * @param AddonProviderInterface $addonManager
      * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
-        AddonManager $addonManager,
+        AddonProviderInterface $addonManager,
         ThemeModelHelper $themeHelper
     ) {
         $this->config = $config;

@@ -121,6 +121,7 @@ export const buttonCSS = () => {
     mixinButton("body.Section-Profile .ProfileOptions .MemberButtons", ButtonTypes.STANDARD);
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
+    mixinButton(".viewPollResults", ButtonTypes.STANDARD);
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",

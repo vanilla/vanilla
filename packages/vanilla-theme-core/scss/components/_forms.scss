@@ -106,8 +106,10 @@ select::-ms-expand {
     }
 }
 
-.js-poll-result-btn {
-    @include Button;
+@if ($staticVariables) {
+    .js-poll-result-btn {
+        @include Button;
+    }
 }
 
 .FormTitleWrapper,

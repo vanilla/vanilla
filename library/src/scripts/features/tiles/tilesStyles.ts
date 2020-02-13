@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit, EMPTY_SPACING, paddings } from "@library/styles/styleHelpers";
+import { unit, EMPTY_SPACING, paddings, extendItemContainer } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -32,6 +32,7 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
     const containerSpacing = themeVars("containerSpacing", {
         padding: {
             ...EMPTY_SPACING,
+            horizontal: 8,
             vertical: 24,
         },
     });
@@ -91,24 +92,11 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
     );
 
     const isCentered = vars.options.alignment === TileAlignment.CENTER;
-    const items = style(
-        "items",
-        {
-            position: "relative",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "stretch",
-            justifyContent: isCentered ? "center" : "flex-start",
-        },
-        mediaQueries.oneColumnDown({
-            display: "block",
-        }),
-    );
 
     let columnCount = vars.options.columns;
     let width: CSSPercentage = "50%";
     let additionnalMediaQueries = [] as NestedCSSProperties[];
-    let padding = vars.itemSpacing.paddingTwoColumns;
+    let itemPadding = vars.itemSpacing.paddingTwoColumns;
     switch (columnCount) {
         case 3:
             width = globalVars.utility["percentage.third"];
@@ -117,7 +105,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
                     width: percent(50),
                 }),
             );
-            padding = vars.itemSpacing.paddingThreeColumns;
+            itemPadding = vars.itemSpacing.paddingThreeColumns;
             break;
         case 4:
             width = "25%";
@@ -126,9 +114,25 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
                     width: percent(50),
                 }),
             );
-            padding = vars.itemSpacing.paddingFourColumns;
+            itemPadding = vars.itemSpacing.paddingFourColumns;
             break;
     }
+
+    const items = style(
+        "items",
+        {
+            position: "relative",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "stretch",
+            justifyContent: isCentered ? "center" : "flex-start",
+            ...extendItemContainer(itemPadding),
+        },
+        mediaQueries.oneColumnDown({
+            display: "block",
+            ...extendItemContainer(vars.itemSpacing.paddingOneColumn),
+        }),
+    );
 
     const item = style(
         "item",
@@ -138,7 +142,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
             alignItems: "center",
             justifyContent: "stretch",
             width,
-            padding: unit(padding),
+            padding: unit(itemPadding),
         },
         ...additionnalMediaQueries,
         mediaQueries.oneColumnDown({

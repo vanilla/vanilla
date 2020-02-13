@@ -12,6 +12,8 @@ export interface IContainer {
     className?: string;
     children?: React.ReactNode;
     tag?: keyof JSX.IntrinsicElements;
+    fullGutter?: boolean; // Use when a component wants a full mobile/desktop gutter.
+    // Useful for components that don't provide their own padding.
 }
 
 /*
@@ -26,7 +28,17 @@ export default class Container extends React.Component<IContainer> {
         if (this.props.children) {
             const classes = containerClasses();
             const Tag = this.props.tag || "div";
-            return <Tag className={className(classes.root, this.props.className)}>{this.props.children}</Tag>;
+            return (
+                <Tag
+                    className={className(
+                        classes.root,
+                        this.props.className,
+                        this.props.fullGutter && classes.fullGutter,
+                    )}
+                >
+                    {this.props.children}
+                </Tag>
+            );
         } else {
             return null;
         }

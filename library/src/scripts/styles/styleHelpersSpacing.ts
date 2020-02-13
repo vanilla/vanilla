@@ -6,6 +6,7 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { unit } from "@library/styles/styleHelpers";
+import { calc } from "csx";
 
 export interface ISpacing {
     top?: string | number;
@@ -81,4 +82,17 @@ export function paddings(spacing: ISpacing) {
 
 export function margins(spacing: ISpacing) {
     return spacings("margin", spacing);
+}
+
+/**
+ * Extend an item container outward to compensate for item paddings.
+ * Usually used in a grid.
+ *
+ * @param itemPaddingX A single unit of padding of a horizontal side of the item.
+ */
+export function extendItemContainer(itemPaddingX: number): NestedCSSProperties {
+    return {
+        width: calc(`100% + ${unit(itemPaddingX * 2)}`),
+        marginLeft: unit(-itemPaddingX),
+    };
 }

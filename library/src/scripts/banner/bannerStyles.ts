@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc, translateY } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -356,9 +356,14 @@ export const bannerClasses = useThemeCache(() => {
         };
 
         return style("outerBackground", {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: percent(100),
+            height: calc(`100% + 2px`),
+            transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
             ...centeredBackgroundProps(),
             display: "block",
-            ...absolutePosition.fullSizeOfParent(),
             ...background(finalVars),
         });
     };

@@ -71,8 +71,8 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(
         `
-        .Content .DataList .Item:not(.ItemDiscussion),
-        .Content .MessageList .Item.Item:not(.ItemDiscussion)
+        .Content .DataList .Item:not(.ItemDiscussion):not(.ItemComment),
+        .Content .MessageList .Item.Item:not(.ItemDiscussion):not(.ItemComment)
         `,
         {
             background: "none",

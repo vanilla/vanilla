@@ -147,20 +147,20 @@
             font-weight: $component-meta_fontWeight;
             color: $component-meta_color;
         }
-    }
 
-    .Meta,
-    .AuthorWrap {
-        margin-left: -$utility-baseUnit;
-        margin-right: -$utility-baseUnit;
+        .Meta,
+        .AuthorWrap {
+            margin-left: -$utility-baseUnit;
+            margin-right: -$utility-baseUnit;
 
-        @include maxWidth {
-            margin-top: $utility-baseUnitDouble;
-            line-height: $component-meta_lineHeight;
+            @include maxWidth {
+                margin-top: $utility-baseUnitDouble;
+                line-height: $component-meta_lineHeight;
+            }
         }
-    }
 
-    @if ($staticVariables) {
+
+
         .Author .Username,
         .MItem,
         .MItem.Category,

@@ -105,46 +105,16 @@ export const offsetLightness = (
     const colorDarker = colorValue.darken(weightCurved) as ColorHelper;
     const colorLighter = colorValue.lighten(weightCurved) as ColorHelper;
 
-    //const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.8;
-
-    if (debug) {
-        window.console.log("white lightness: ", color("#fff").lightness());
-        window.console.log("black lightness: ", color("#000").lightness());
-        window.console.log("colorLightness: ", colorLightness);
-        window.console.log("colorValue: ", colorValue.toHexString());
-        window.console.log("isLightColor(colorValue): ", isLightColor(colorValue));
-        window.console.log("weight: ", weight);
-        window.console.log("weightOffset: ", weightOffset);
-        window.console.log("weightCurved: ", weightCurved);
-        window.console.log("colorDarker: ", colorDarker);
-        window.console.log("colorLighter: ", colorLighter);
-        window.console.log("isLightColor(colorValue): ", isLightColor(colorValue));
-        // window.console.log("darken: ", darken);
-        window.console.log("flipIfMax: ", flipIfMax);
-        window.console.log(
-            "colorLightness + weightCurved > 1 && flipIfMax: ",
-            colorLightness + weightCurved > 1 && flipIfMax,
-        );
-        window.console.log(
-            "colorLightness - weightCurved > 0 && !flipIfMax: ",
-            colorLightness - weightCurved > 0 && !flipIfMax,
-        );
-    }
-
     if (isLightColor(colorValue)) {
         if (colorLightness + weightCurved > 1 && flipIfMax) {
-            window.console.log("case 1: lighter");
             return colorLighter;
         } else {
-            window.console.log("case 2: darker");
             return colorDarker;
         }
     } else {
         if (colorLightness - weightCurved > 0 && !flipIfMax) {
-            window.console.log("case 3: lighter");
             return colorLighter;
         } else {
-            window.console.log("case 4: darker");
             return colorDarker;
         }
     }

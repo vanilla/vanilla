@@ -63,6 +63,22 @@ export const flyoutCSS = () => {
         right: unit(13),
         color: colorOut(globalVars.mainColors.primaryContrast),
     });
+
+    cssOut(
+        `
+        .MenuItems hr,
+        .MenuItems .menu-separator,
+        .MenuItems .dd-separator,
+        .MenuItems .editor-action-separator,
+        .Flyout.Flyout hr,
+        .Flyout.Flyout .menu-separator,
+        .Flyout.Flyout .dd-separator,
+        .Flyout.Flyout .editor-action-separator
+        `,
+        {
+            borderBottomColor: colorOut(globalVars.separator.color),
+        },
+    );
 };
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {

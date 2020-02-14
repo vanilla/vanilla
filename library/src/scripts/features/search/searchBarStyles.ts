@@ -266,10 +266,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
-        // ...borderRadii({
-        //     left: important(0),
-        //     right: important(unit(splashVars.inputAndButton.borderRadius) as string),
-        // }),
     });
 
     const label = style("label", {

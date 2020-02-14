@@ -12,10 +12,10 @@ import {
     absolutePosition,
     borders,
     colorOut,
-    unit,
-    paddings,
     importantUnit,
     offsetLightness,
+    paddings,
+    unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -31,8 +31,8 @@ export const buttonCSS = () => {
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
 
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
-    mixinButton(".FormTitleWrapper .Buttons .Button");
-    mixinButton(".FormWrapper .Buttons .Button");
+    mixinButton(".FormTitleWrapper .Buttons .Button", ButtonTypes.PRIMARY);
+    mixinButton(".FormWrapper .Buttons .Button", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Button-Controls .Button.Primary", ButtonTypes.PRIMARY);

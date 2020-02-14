@@ -93,6 +93,10 @@ export const titleBarVariables = useThemeCache(() => {
         alignment: "left" as "left" | "center",
     });
 
+    const generatedColors = makeThemeVars("generatedColors", {
+        state: offsetLightness(colors.bg, 0.04), // Default state color change
+    });
+
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
@@ -114,22 +118,22 @@ export const titleBarVariables = useThemeCache(() => {
         },
         hover: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focus: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focusAccessible: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         active: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
     };
@@ -155,7 +159,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        bg: offsetLightness(colors.bg, 0.1),
+        bg: globalVars.mainColors.secondary,
         fg: colors.fg,
         mobile: {
             width: button.mobile.width,

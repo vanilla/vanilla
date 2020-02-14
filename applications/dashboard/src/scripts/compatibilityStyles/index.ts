@@ -69,11 +69,17 @@ export const compatibilityStyles = useThemeCache(() => {
         overflow: "auto",
     });
 
-    cssOut(`.Content .DataList .Item, .Content .MessageList .Item`, {
-        background: "none",
-        borderColor: colorOut(vars.border.color),
-        ...paddings(layoutVars.cell.paddings),
-    });
+    cssOut(
+        `
+        .Content .DataList .Item:not(.ItemDiscussion),
+        .Content .MessageList .Item.Item:not(.ItemDiscussion)
+        `,
+        {
+            background: "none",
+            borderColor: colorOut(vars.border.color),
+            ...paddings(layoutVars.cell.paddings),
+        },
+    );
 
     // @mixin font-style-base()
     cssOut("html, body, .DismissMessage", {
@@ -333,6 +339,10 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(`.HasNew`, {
         backgroundColor: colorOut(vars.mainColors.primary),
         color: colorOut(vars.mainColors.primaryContrast),
+    });
+
+    cssOut(`.Item.Read`, {
+        background: "none",
     });
 
     buttonCSS();

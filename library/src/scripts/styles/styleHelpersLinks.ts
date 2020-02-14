@@ -90,7 +90,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
             cursor: "pointer",
         },
         visited: {
-            color: colorOut(mergedColors.visited),
+            color: mergedColors.visited ? colorOut(mergedColors.visited) : undefined,
         },
     };
 
@@ -101,7 +101,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
             "&&:focus": styles.focus,
             "&&.focus-visible": styles.accessibleFocus,
             "&&:active": styles.active,
-            "&:visited": styles.visited,
+            "&:visited": styles.visited ?? undefined,
         },
     };
 

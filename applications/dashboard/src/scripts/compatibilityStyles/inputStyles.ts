@@ -104,6 +104,7 @@ export const inputCSS = () => {
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
     mixinInputStyles(".AdvancedSearch .InputBox", false, false);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
+    cssOut(`.richEditor-frame.InputBox.InputBox.InputBox `, { padding: 0 });
     // cssOut(".token-input-list", inputClasses().inputMixin);
     cssOut("select", {
         $nest: {

@@ -41,9 +41,8 @@ export const discussionCSS = () => {
         .Item .Poll .PollOptions .PollColor.PollColor10,
     `,
         {
-            backgroundColor: importantColorOut(
-                globalVars.mixPrimaryAndBg(globalVars.getRatioBasedOnBackgroundDarkness(0.85)),
-            ),
+            color: colorOut(globalVars.mainColors.primaryContrast),
+            backgroundColor: importantColorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis)),
             opacity: 1,
         },
     );
@@ -67,6 +66,7 @@ export const discussionCSS = () => {
         `,
         {
             top: unit(4),
+            left: unit(6),
         },
     );
 };

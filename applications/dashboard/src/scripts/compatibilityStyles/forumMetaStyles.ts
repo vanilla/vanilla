@@ -68,6 +68,7 @@ export const forumMetaCSS = () => {
         display: "inline-flex",
         alignItems: "center",
         opacity: important(1),
+        textDecoration: "none",
     });
 
     // Split because it seems there's a bug with TypeStyles and it's unable to handle the deep nesting.

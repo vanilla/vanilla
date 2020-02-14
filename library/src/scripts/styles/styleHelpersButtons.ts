@@ -41,7 +41,7 @@ export interface IButtonStates {
 export const allLinkStates = (styles: ILinkStates, nested?: object) => {
     const output = allButtonStates(styles, nested, true);
     const visited = styles.visited !== undefined ? styles.visited : styles.noState || {};
-    output.$nest["&:visited"] = { ...styles.allStates, ...visited };
+    output.$nest["&:visited"] = { ...visited };
     return output;
 };
 

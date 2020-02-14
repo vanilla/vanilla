@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, importantUnit, IStateSelectors, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut, fonts, importantUnit, IStateSelectors, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { actionMixin } from "@library/flyouts/dropDownStyles";
@@ -33,8 +33,10 @@ export const flyoutCSS = () => {
         .MenuItems
         `,
         {
-            color: fg,
             background: bg,
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+            }),
         },
     );
 

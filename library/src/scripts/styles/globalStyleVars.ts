@@ -75,9 +75,9 @@ export const globalVariables = useThemeCache(() => {
 
     const generatedMainColors = makeThemeVars("mainColors", {
         primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
-        secondary: offsetLightness(colorPrimary, 0.15),
+        secondary: offsetLightness(colorPrimary, 0.1),
         secondaryContrast: initialMainColors.bg,
-        state: offsetLightness(colorPrimary, 0.25), // Default state color change, applies to all states by default
+        state: offsetLightness(colorPrimary, 0.15), // Default state color change, applies to all states by default
     });
 
     const mainColors = {

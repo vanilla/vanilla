@@ -12,6 +12,7 @@ import {
     fonts,
     importantColorOut,
     margins,
+    negative,
     paddings,
     unit,
 } from "@library/styles/styleHelpers";
@@ -225,6 +226,10 @@ export const forumMetaCSS = () => {
         ...paddings({
             left: 12,
         }),
+    });
+
+    cssOut(`.DataList.Discussions .ItemContent.Discussion .Meta.Meta-Discussion`, {
+        marginLeft: unit(negative(globalVars.meta.text.margin)),
     });
 };
 

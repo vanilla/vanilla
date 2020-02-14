@@ -323,24 +323,22 @@ export const buttonUtilityClasses = useThemeCache(() => {
         justifyContent: "center",
         border: "none",
         padding: 0,
+        background: "transparent",
         ...allButtonStates({
+            allStates: {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
             hover: {
                 color: colorOut(globalVars.mainColors.primary),
             },
             focusNotKeyboard: {
                 outline: 0,
-                color: colorOut(globalVars.mainColors.secondary),
-            },
-            focus: {
-                color: colorOut(globalVars.mainColors.secondary),
             },
             accessibleFocus: {
-                color: colorOut(globalVars.mainColors.secondary),
-            },
-            active: {
-                color: colorOut(globalVars.mainColors.secondary),
+                outline: "initial",
             },
         }),
+        color: "inherit",
     });
 
     const buttonIcon = style(

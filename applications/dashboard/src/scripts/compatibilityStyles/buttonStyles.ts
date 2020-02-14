@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { cssOut, trimTrailingCommas, mixinCloseButton } from "@dashboard/compatibilityStyles/index";
 import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import {
@@ -29,6 +29,8 @@ export const buttonCSS = () => {
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
+    mixinButton(".DataList a.Delete.Delete.Delete", ButtonTypes.ICON_COMPACT);
+    mixinButton(".MessageList a.Delete.Delete.Delete", ButtonTypes.ICON_COMPACT);
 
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button", ButtonTypes.PRIMARY);

@@ -85,7 +85,7 @@ export const titleBarVariables = useThemeCache(() => {
             width: buttonSize,
         },
         state: {
-            bg: offsetLightness(colors.bg, 0.04),
+            bg: globalVars.mainColors.statePrimary,
         },
     });
 

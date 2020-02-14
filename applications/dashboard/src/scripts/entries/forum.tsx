@@ -59,7 +59,6 @@ addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    fullBackgroundCompat();
     compatibilityStyles();
     applyCompatibilityIcons();
 }

@@ -23,6 +23,8 @@ import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const inputCSS = () => {
+    wrapSelects();
+
     const globalVars = globalVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
@@ -260,6 +262,17 @@ export const inputCSS = () => {
         }),
     });
 };
+
+function wrapSelects() {
+    const selects = document.querySelectorAll("select");
+    selects.forEach((selectElement: HTMLElement) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("SelectWrapper");
+        selectElement.parentElement?.insertBefore(wrapper, selectElement);
+        wrapper.appendChild(selectElement);
+    });
+    $("select").wrap('<div class="SelectWrapper"></div>');
+}
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
     const globalVars = globalVariables();

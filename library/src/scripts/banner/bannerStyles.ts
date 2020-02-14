@@ -503,7 +503,7 @@ export const bannerClasses = useThemeCache(() => {
 
     const content = style("content", {
         borderColor: colorOut(vars.colors.contrast),
-        boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        // boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
         borderRadius:
             vars.searchButton.borders &&
             vars.searchButton.borders.right &&
@@ -513,6 +513,11 @@ export const bannerClasses = useThemeCache(() => {
                 ? unit(vars.searchButton.borders.right.radius)
                 : 0,
         zIndex: 1,
+        $nest: {
+            "&.hasFocus .searchBar-valueContainer": {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+            },
+        },
     });
 
     const imagePositioner = style("imagePositioner", {

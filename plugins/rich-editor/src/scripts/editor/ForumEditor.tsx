@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import getStore from "@library/redux/getStore";
 import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
@@ -29,6 +29,7 @@ interface IProps {
 export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
+    const [hasFocus, setHasFocus] = useState(false);
 
     const embedOptionsID = useUniqueID("embedOptions");
 
@@ -40,8 +41,17 @@ export function ForumEditor(props: IProps) {
                     legacyMode={true}
                     allowUpload={hasPermission("uploads.add")}
                     isLoading={false}
+                    onFocus={setHasFocus}
                 >
-                    <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
+                    <div
+                        className={classNames(
+                            "richEditor-frame",
+                            "InputBox",
+                            classes.legacyFrame,
+                            classes.root,
+                            hasFocus && "focus-visible",
+                        )}
+                    >
                         <EditorContent legacyTextArea={props.legacyTextArea} />
                         <EditorParagraphMenu />
                         <EditorInlineMenus />

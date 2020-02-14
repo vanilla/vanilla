@@ -33,7 +33,7 @@ import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { forumMetaCSS } from "@dashboard/compatibilityStyles/forumMetaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
-import { fontCSS } from "./fontStyles";
+import { fontCSS, forumFontsVariables } from "./fontStyles";
 import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
@@ -146,6 +146,7 @@ export const compatibilityStyles = useThemeCache(() => {
     // Panel
     cssOut(panelSelectors, {
         ...siteNavNodeClasses().linkMixin(true, panelSelectors),
+        minHeight: 0,
         display: "flex",
         opacity: 1,
     });
@@ -331,7 +332,15 @@ export const compatibilityStyles = useThemeCache(() => {
     );
 
     cssOut(".Panel > * + *", {
-        marginTop: unit(vars.gutter.size * 2),
+        marginTop: unit(vars.gutter.size),
+    });
+
+    cssOut(".Panel li a", {
+        minHeight: 0,
+    });
+
+    cssOut(".Panel.Panel li + li", {
+        paddingTop: forumFontsVariables().panelLink.spacer.default,
     });
 
     cssOut(`#ConversationForm label`, {

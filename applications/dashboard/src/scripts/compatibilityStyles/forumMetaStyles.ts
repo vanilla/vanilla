@@ -228,7 +228,7 @@ export const forumMetaCSS = () => {
         }),
     });
 
-    cssOut(`.DataList.Discussions .ItemContent.Discussion .Meta.Meta-Discussion`, {
+    cssOut(`.DataList.Discussions .ItemContent .Meta`, {
         marginLeft: unit(negative(globalVars.meta.text.margin)),
     });
 };

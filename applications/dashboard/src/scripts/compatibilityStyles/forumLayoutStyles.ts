@@ -154,6 +154,10 @@ export const forumLayoutCSS = () => {
                 all: globalVars.gutter.half,
             }),
             $nest: {
+                "& .PhotoWrapLarge img": {
+                    left: globalVars.gutter.half,
+                    right: globalVars.gutter.half,
+                },
                 "& > *": {
                     ...paddings({
                         horizontal: globalVars.gutter.half,

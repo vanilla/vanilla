@@ -11,7 +11,7 @@ import { fonts } from "@library/styles/styleHelpersTypography";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { ColorHelper, important } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { allLinkStates, paddings, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, paddings, unit, EMPTY_SPACING } from "@library/styles/styleHelpers";
 import { siteNavVariables } from "@library/navigation/siteNavStyles";
 import { panelListVariables } from "@library/layout/panelListStyles";
 
@@ -20,7 +20,6 @@ export const forumFontsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const fonts = makeThemeVars("fonts", {
         sizes: {
-            sectionHeading: globalVars.fonts.size.large + 2,
             title: globalVars.fonts.size.large,
             base: globalVars.fonts.size.medium,
 
@@ -39,11 +38,18 @@ export const forumFontsVariables = useThemeCache(() => {
             all: navVars.node.padding + navVars.node.borderWidth,
         },
         spacer: {
-            default: navVars.spacer.default,
+            default: panelListVariables().offset.default,
         },
     });
 
-    return { fonts, panelLink };
+    const panelTitle = makeThemeVars("panelTitle", {
+        margins: {
+            ...EMPTY_SPACING,
+            bottom: navVars.spacer.default,
+        },
+    });
+
+    return { fonts, panelLink, panelTitle };
 });
 
 export const fontCSS = () => {
@@ -75,14 +81,13 @@ export const fontCSS = () => {
     );
 
     // Panel Headings
-    cssOut(`.Panel h4`, {
+    cssOut(`.Panel h4, .Panel h3, .Panel h2`, {
         ...paddings({
             vertical: 0,
-            horizontal: vars.panelLink.padding.all,
         }),
         marginBottom: unit(panelListVariables().offset.default),
         ...fonts({
-            size: vars.fonts.sizes.sectionHeading,
+            size: vars.fonts.sizes.title,
             weight: globalVars.fonts.weights.bold,
         }),
     });
@@ -90,8 +95,6 @@ export const fontCSS = () => {
     // Categories, top level
     cssOut(
         `
-        .Panel .Box a:not(.Button),
-        .Panel .BoxFilter a:not(.Button),
         body.Section-EditProfile .Box .PanelCategories li.Heading,
         .BoxFilter:not(.BoxBestOfFilter) .PanelCategories li.Heading,
         .BoxCategories.BoxCategories .PanelCategories li.Heading
@@ -102,7 +105,6 @@ export const fontCSS = () => {
                 weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
-            ...paddings(vars.panelLink.padding),
         },
     );
 
@@ -123,6 +125,8 @@ export const fontCSS = () => {
 
     cssOut(
         `
+        .Panel .Box a:not(.Button),
+        .Panel .BoxFilter a:not(.Button),
         body.Section-EditProfile .Box .PanelCategories li.Depth3 a,
         body.Section-EditProfile .Box .PanelCategories li.Depth4 a,
         body.Section-EditProfile .Box .PanelCategories li.Depth5 a,
@@ -143,7 +147,7 @@ export const fontCSS = () => {
     );
 
     for (let i = 1; i <= 12; i++) {
-        const offset = unit((i - 1) * vars.panelLink.spacer.default + vars.panelLink.padding.all);
+        const offset = unit((i - 1) * vars.panelLink.spacer.default);
         // Links
         cssOut(
             `
@@ -153,7 +157,7 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading[aria-level='${i}'],
         `,
             {
-                fontSize: unit(i === 2 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
+                fontSize: unit(i === 1 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
                 paddingLeft: offset,
                 color: colorOut(globalVars.mainColors.fg),
             },
@@ -170,11 +174,6 @@ export const fontCSS = () => {
             },
         );
     }
-
-    // First link to all categories
-    cssOut(`.Panel.Panel-main .PanelInfo a.ItemLink.ItemLinkAllCategories`, {
-        paddingLeft: unit(vars.panelLink.padding.all),
-    });
 };
 
 export const forumTitleMixin = () => {

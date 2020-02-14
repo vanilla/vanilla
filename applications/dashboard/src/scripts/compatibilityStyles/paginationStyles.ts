@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, unit, margins } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 
@@ -13,17 +13,26 @@ export const paginationCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
     const primary = colorOut(mainColors.primary);
-
     cssOut(
         `
-        .Pager span,
+        .Pager > span,
         .Pager > a`,
         {
-            ...borders(),
+            ...borders({ radius: 0 }),
             backgroundColor: colorOut(globalVars.mainColors.bg),
             color: colorOut(globalVars.mainColors.fg),
         },
     );
+
+    cssOut(`.Pager .Next`, {
+        borderTopRightRadius: globalVars.border.radius,
+        borderBottomRightRadius: globalVars.border.radius,
+    });
+
+    cssOut(`.Pager .Prev`, {
+        borderBottomLeftRadius: globalVars.border.radius,
+        borderTopLeftRadius: globalVars.border.radius,
+    });
 
     cssOut(`.Pager span`, {
         $nest: {
@@ -41,10 +50,6 @@ export const paginationCSS = () => {
         marginBottom: unit(16),
     });
 
-    cssOut(`.ToggleFlyout.selectBox`, {
-        marginRight: "auto",
-    });
-
     cssOut(`.MorePager`, {
         textAlign: "right",
         $nest: {
@@ -52,5 +57,15 @@ export const paginationCSS = () => {
                 color: colorOut(globalVars.mainColors.primary),
             },
         },
+    });
+
+    cssOut(`.PageControls-filters`, {
+        flex: 1,
+        display: "inline-flex",
+        alignItems: "baseline",
+    });
+
+    cssOut(`.PageControls.PageControls .selectBox`, {
+        height: "auto",
     });
 };

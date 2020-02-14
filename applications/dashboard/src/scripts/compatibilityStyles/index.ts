@@ -46,6 +46,7 @@ import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles"
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { signaturesCSS } from "./signaturesSyles";
+import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -218,6 +219,24 @@ export const compatibilityStyles = useThemeCache(() => {
         color: fg,
     });
 
+    // Items
+    const resultVars = searchResultsVariables();
+    const horizontalPadding = resultVars.spacing.padding.left + resultVars.spacing.padding.right;
+    cssOut(`.DataList, .Item-Header`, {
+        marginLeft: unit(-resultVars.spacing.padding.left),
+        width: calc(`100% + ${unit(horizontalPadding)}`),
+    });
+
+    cssOut(`.DataList .Item`, {
+        borderTop: singleBorder(),
+        borderBottom: singleBorder(),
+        ...paddings(resultVars.spacing.padding),
+    });
+
+    cssOut(`.DataList .Item + .Item`, {
+        borderTop: "none",
+    });
+
     cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
         marginTop: unit(vars.gutter.size * 2.5),
         border: "none",
@@ -281,15 +300,8 @@ export const compatibilityStyles = useThemeCache(() => {
         marginTop: unit(vars.gutter.size * 2),
     });
 
-    cssOut(`.PageControls.PageControls .selectBox`, {
-        height: "auto",
-    });
-
     cssOut(`.Content .PageControls`, {
         marginBottom: unit(24),
-        ...paddings({
-            horizontal: layoutVars.cell.paddings.horizontal,
-        }),
     });
 
     cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {

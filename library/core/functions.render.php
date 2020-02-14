@@ -844,7 +844,6 @@ if (!function_exists('filtersDropDown')) {
             $default = t('All');
         }
         $output = '';
-
         if (c('Vanilla.EnableCategoryFollowing')) {
             $links = [];
             $active = null;
@@ -889,7 +888,15 @@ if (!function_exists('filtersDropDown')) {
             ]);
 
             // Generate the markup for the drop down menu.
-            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+            $output .= linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+        }
+
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            if (Gdn_Theme::inSection('DiscussionList')) {
+                include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+                $output .= adminCheck();
+            }
+            $output = "<div class='PageControls-filters'>$output</div>";
         }
 
         return $output;

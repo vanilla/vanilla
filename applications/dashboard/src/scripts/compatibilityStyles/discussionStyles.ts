@@ -65,8 +65,8 @@ export const discussionCSS = () => {
         .MessageList .ItemDiscussion .Item-Header .PhotoWrap
         `,
         {
-            top: unit(4),
-            left: unit(6),
+            top: 2,
+            left: 2,
         },
     );
 };

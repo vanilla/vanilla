@@ -15,7 +15,7 @@ import {
     unit,
     paddings,
     importantUnit,
-    emphasizeLightness,
+    offsetLightness,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -59,7 +59,7 @@ export const buttonCSS = () => {
     });
 
     cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
-        backgroundColor: colorOut(emphasizeLightness(globalVars.mainColors.primary, 0.2)),
+        backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
         width: unit(formElementVars.sizing.height),
         ...borders({
             color: "transparent",

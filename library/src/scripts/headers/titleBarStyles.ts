@@ -11,7 +11,7 @@ import {
     allButtonStates,
     borders,
     colorOut,
-    emphasizeLightness,
+    offsetLightness,
     flexHelper,
     modifyColorBasedOnLightness,
     unit,
@@ -85,7 +85,7 @@ export const titleBarVariables = useThemeCache(() => {
             width: buttonSize,
         },
         state: {
-            bg: emphasizeLightness(colors.bg, 0.04),
+            bg: offsetLightness(colors.bg, 0.04),
         },
     });
 
@@ -155,7 +155,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        bg: emphasizeLightness(colors.bg, 0.1),
+        bg: offsetLightness(colors.bg, 0.1),
         fg: colors.fg,
         mobile: {
             width: button.mobile.width,

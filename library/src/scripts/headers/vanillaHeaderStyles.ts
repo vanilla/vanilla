@@ -11,7 +11,7 @@ import {
     allButtonStates,
     borders,
     colorOut,
-    emphasizeLightness,
+    offsetLightness,
     flexHelper,
     modifyColorBasedOnLightness,
     unit,
@@ -59,7 +59,7 @@ export const titleBarVariables = useThemeCache(() => {
             width: buttonSize,
         },
         state: {
-            bg: emphasizeLightness(colors.bg, 0.04),
+            bg: globalVars.mainColors.secondary,
         },
     });
 

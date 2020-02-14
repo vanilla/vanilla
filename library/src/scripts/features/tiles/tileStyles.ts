@@ -9,7 +9,7 @@ import {
     borders,
     colorOut,
     defaultTransition,
-    emphasizeLightness,
+    offsetLightness,
     isLightColor,
     paddings,
     unit,
@@ -164,12 +164,7 @@ export const tileClasses = useThemeCache(() => {
                     ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
                         borders({
-                            color: emphasizeLightness(
-                                globalVars.border.color,
-                                0.05,
-                                isLightColor(globalVars.border.color),
-                                true,
-                            ),
+                            color: offsetLightness(globalVars.border.color, 0.05, true),
                             radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                         }),
                         shadow.embedHover(),

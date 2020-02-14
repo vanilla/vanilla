@@ -30,7 +30,7 @@ export const importantColorOut = (colorValue: ColorValues | string) => {
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.45;
+    return color.lightness() >= 0.4;
 };
 
 /*
@@ -85,11 +85,11 @@ export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, 
  * @param weight - The amount you want to mix the two colors (value from 0 to 1)
  * @param flipIfMax - Modify in the opposite direction if we're darker than black or whiter than white.
  */
-export const emphasizeLightness = (
+export const offsetLightness = (
     colorValue: ColorHelper | "transparent",
     weight: number,
-    darken: boolean = false,
     flipIfMax: boolean = true,
+    debug: boolean = false,
 ) => {
     if (colorValue === "transparent") {
         return colorValue;
@@ -97,25 +97,55 @@ export const emphasizeLightness = (
 
     const colorLightness = colorValue.lightness();
     let weightOffset = 1;
-    if (colorLightness < 0.4) {
-        weightOffset = Math.abs(colorLightness - 0.4) * 20;
+    if (!isLightColor(colorValue)) {
+        weightOffset = Math.abs(colorLightness - 0.45) * 20; // Seems darker colors need more contrast than light colors to get the same impact
     }
 
     const weightCurved = weight * weightOffset;
     const colorDarker = colorValue.darken(weightCurved) as ColorHelper;
     const colorLighter = colorValue.lighten(weightCurved) as ColorHelper;
 
-    if (isLightColor(colorValue) && !darken) {
+    //const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.8;
+
+    if (debug) {
+        window.console.log("white lightness: ", color("#fff").lightness());
+        window.console.log("black lightness: ", color("#000").lightness());
+        window.console.log("colorLightness: ", colorLightness);
+        window.console.log("colorValue: ", colorValue.toHexString());
+        window.console.log("isLightColor(colorValue): ", isLightColor(colorValue));
+        window.console.log("weight: ", weight);
+        window.console.log("weightOffset: ", weightOffset);
+        window.console.log("weightCurved: ", weightCurved);
+        window.console.log("colorDarker: ", colorDarker);
+        window.console.log("colorLighter: ", colorLighter);
+        window.console.log("isLightColor(colorValue): ", isLightColor(colorValue));
+        // window.console.log("darken: ", darken);
+        window.console.log("flipIfMax: ", flipIfMax);
+        window.console.log(
+            "colorLightness + weightCurved > 1 && flipIfMax: ",
+            colorLightness + weightCurved > 1 && flipIfMax,
+        );
+        window.console.log(
+            "colorLightness - weightCurved > 0 && !flipIfMax: ",
+            colorLightness - weightCurved > 0 && !flipIfMax,
+        );
+    }
+
+    if (isLightColor(colorValue)) {
         if (colorLightness + weightCurved > 1 && flipIfMax) {
-            return colorDarker;
-        } else {
+            window.console.log("case 1: lighter");
             return colorLighter;
+        } else {
+            window.console.log("case 2: darker");
+            return colorDarker;
         }
     } else {
         if (colorLightness - weightCurved > 0 && !flipIfMax) {
-            return colorDarker;
-        } else {
+            window.console.log("case 3: lighter");
             return colorLighter;
+        } else {
+            window.console.log("case 4: darker");
+            return colorDarker;
         }
     }
 };

@@ -118,7 +118,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         const $nest = {
             ...allLinkStates({
                 noState: {
-                    color: colorOut(!useTextColor ? globalVars.links.colors.default : globalVars.mainColors.fg),
+                    color: colorOut(useTextColor ? globalVars.mainColors.fg : globalVars.links.colors.default),
                 },
                 hover: {
                     color: colorOut(globalVars.links.colors.hover),
@@ -136,9 +136,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
             "&:not(.focus-visible):active, &:focus": {
                 outline: 0,
             },
-            // "&:hover": {
-            //     color: colorOut(globalVars.links.colors.default.toString()),
-            // },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
                 $nest: {
@@ -161,7 +158,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
             }
         }
 
-        return {
+        const baseStyles = {
             display: "block",
             flexGrow: 1,
             lineHeight: vars.node.lineHeight,
@@ -170,16 +167,27 @@ export const siteNavNodeClasses = useThemeCache(() => {
             padding: 0,
             width: percent(100),
         };
+
+        if (selector) {
+            if (useTextColor) {
+                baseStyles["color"] = colorOut(globalVars.mainColors.fg);
+            }
+            return baseStyles;
+        } else {
+            return {
+                ...baseStyles,
+                $nest: $nest,
+            };
+        }
     };
 
-    const link = style("link", linkMixin());
+    const link = style("link", linkMixin(true));
 
     const label = style(
         "label",
         {
             position: "relative",
             display: "block",
-            color: colorOut(globalVars.mainColors.fg),
             width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
             marginLeft: unit(-vars.nodeToggle.width),
             textAlign: "left",

@@ -6,7 +6,7 @@
 import {
     colorOut,
     ColorValues,
-    emphasizeLightness,
+    offsetLightness,
     IBackground,
     IBorderRadiusOutput,
     modifyColorBasedOnLightness,
@@ -19,6 +19,7 @@ import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
+import main from "@storybook/api/dist/initial-state";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -31,7 +32,7 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const constants = makeThemeVars("constants", {
-        linkStateColorEmphasis: 0.15,
+        stateColorEmphasis: 0.15,
         fullGutter: 48,
         states: {
             hover: {
@@ -64,10 +65,6 @@ export const globalVariables = useThemeCache(() => {
 
     colorPrimary = initialMainColors.primary;
 
-    const primaryDarkness = colorPrimary.lightness();
-    const backgroundDarkness = initialMainColors.bg.lightness();
-    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.8;
-
     // Shorthand checking bg color for darkness
     const getRatioBasedOnBackgroundDarkness = (
         weight: number,
@@ -77,9 +74,10 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.06, !goodContrast),
-        primaryContrast: initialMainColors.bg,
+        primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        secondary: offsetLightness(colorPrimary, 0.15),
         secondaryContrast: initialMainColors.bg,
+        state: offsetLightness(colorPrimary, 0.25), // Default state color change, applies to all states by default
     });
 
     const mainColors = {
@@ -118,7 +116,7 @@ export const globalVariables = useThemeCache(() => {
 
     const linkDerivedColors = makeThemeVars("linkDerivedColors", {
         default: mainColors.secondary,
-        state: emphasizeLightness(colorPrimary, constants.linkStateColorEmphasis, true),
+        state: mainColors.state,
     });
 
     const links = makeThemeVars("links", {

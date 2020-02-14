@@ -10,7 +10,7 @@ import {
     defaultTransition,
     flexHelper,
     colorOut,
-    emphasizeLightness,
+    offsetLightness,
     absolutePosition,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -46,7 +46,7 @@ export const themeCardVariables = useThemeCache(() => {
 
     const actionDropdown = makeThemeVars("actionDropdown", {
         state: {
-            bg: emphasizeLightness(colors.overlayBg, 0.04),
+            bg: offsetLightness(colors.overlayBg, 0.04),
         },
     });
 

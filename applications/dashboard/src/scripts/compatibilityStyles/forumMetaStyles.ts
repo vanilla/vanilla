@@ -187,22 +187,6 @@ export const forumMetaCSS = () => {
         overflow: "visible",
     });
 
-    // // Color
-    // cssOut(
-    //     `
-    //     .Container .MItem.RoleTracker,
-    //     .Container .MItem.Rank,
-    //     .Container .AuthorInfo .MItem.RoleTitle,
-    //     .Container .MessageList .ItemComment .MItem.RoleTitle,
-    //     .Container .ItemComment .MItem.Rank,
-    //     .Container .DataTableWrap .Meta .Tag,
-    //
-    //     `,
-    //     {
-    //         color: colorOut(globalVars.mainColors.fg),
-    //     },
-    // );
-
     cssOut(`.Container .AuthorInfo .MItem`, {
         display: "inline-flex",
         alignItems: "center",
@@ -224,16 +208,15 @@ export const forumMetaCSS = () => {
         },
     );
 
-    // cssOut(
-    //     `
-    //         .DataTable .MItem a,
-    //         .MItem > .Tag
-    //     `,
-    //     {
-    //         border: important(0),
-    //         padding: important(0),
-    //     },
-    // );
+    cssOut(
+        `
+    .Content .Meta-Discussion > .Tag,
+    .Content  .idea-counter-module
+    `,
+        {
+            padding: 0,
+        },
+    );
 
     cssOut(`.MItem img`, {
         width: "auto",

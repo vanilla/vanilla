@@ -43,7 +43,7 @@ export const flyoutCSS = () => {
     cssOut(`.selectBox-item .dropdown-menu-link.selectBox-link`, {
         ...paddings({
             left: importantUnit(26),
-            right: importantUnit(30),
+            right: importantUnit(38),
         }),
     });
 
@@ -60,7 +60,8 @@ export const flyoutCSS = () => {
 
     cssOut(".selectBox-selectedIcon", {
         left: "auto",
-        right: unit(5),
+        right: unit(13),
+        color: colorOut(globalVars.mainColors.primary),
     });
 };
 

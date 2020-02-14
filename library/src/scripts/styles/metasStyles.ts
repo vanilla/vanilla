@@ -54,7 +54,6 @@ export const metaContainerStyles = (overwrites?: any) => {
     const vars = metasVariables();
     const globalVars = globalVariables();
     const flexed = { display: "flex", flexWrap: "wrap", justifyContent: "flex-start", alignItems: "center" };
-    const flexContents = overwrites && overwrites.flexContents ? flexed : {};
     return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
@@ -90,7 +89,6 @@ export const metaContainerStyles = (overwrites?: any) => {
             "&.isFlexed": flexed,
         },
         ...overwrites,
-        ...flexContents,
     } as NestedCSSProperties;
 };
 

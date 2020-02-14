@@ -144,6 +144,20 @@ export function variableFactory(componentNames: string | string[]) {
     };
 }
 
+function stripUndefinedKeys(obj: any) {
+    if (typeof obj === "object") {
+        const newObj = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                newObj[key] = value;
+            }
+        }
+        return newObj;
+    }
+
+    return obj;
+}
+
 const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
 const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
 

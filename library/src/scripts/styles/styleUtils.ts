@@ -141,10 +141,24 @@ export function variableFactory(componentNames: string | string[]) {
         }
 
         if (overrides != null) {
-            result = normalizeVariables(overrides, result);
+            result = normalizeVariables(stripUndefinedKeys(overrides), result);
         }
         return result;
     };
+}
+
+function stripUndefinedKeys(obj: any) {
+    if (typeof obj === "object") {
+        const newObj = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                newObj[key] = value;
+            }
+        }
+        return newObj;
+    }
+
+    return obj;
 }
 
 const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;

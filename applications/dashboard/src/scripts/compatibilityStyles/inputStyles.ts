@@ -121,7 +121,7 @@ export const inputCSS = () => {
     });
 
     cssOut("form .SelectWrapper, .AdvancedSearch .Handle.Handle ", {
-        color: colorOut(globalVars.border.color),
+        color: colorOut(inputVars.colors.fg),
     });
 
     cssOut("form .SelectWrapper", {
@@ -271,7 +271,6 @@ function wrapSelects() {
         selectElement.parentElement?.insertBefore(wrapper, selectElement);
         wrapper.appendChild(selectElement);
     });
-    $("select").wrap('<div class="SelectWrapper"></div>');
 }
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {

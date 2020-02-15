@@ -75,10 +75,6 @@ export const searchPageCSS = () => {
         display: "none",
     });
 
-    cssOut(`#Form_within`, {
-        marginBottom: unit(globalVars.gutter.size),
-    });
-
     cssOut(`#search-results .DataList.DataList-Search .Item.Item-Search .Media-Body .Meta`, {
         ...metaContainerStyles(),
         $nest: {

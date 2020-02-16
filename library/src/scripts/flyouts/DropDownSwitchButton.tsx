@@ -12,7 +12,7 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 export interface IButtonSwitch {
     status: boolean;
     isLoading?: boolean;
-    onClick: (event: any) => void;
+    onClick?: (event: any) => void;
     label: string;
 }
 /**

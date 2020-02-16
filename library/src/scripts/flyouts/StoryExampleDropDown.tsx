@@ -21,6 +21,7 @@ import { t } from "@library/utility/appUtils";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {
     flyoutType: FlyoutType;
@@ -29,6 +30,11 @@ interface IProps extends Omit<IStoryTileAndTextProps, "children"> {
 
 export function StoryExampleDropDown(props: IProps) {
     const [isVisible, setVisible] = useState(!!props.defaultsOpen);
+    const [status, setStatus] = useState(false);
+
+    const handleSwitch = () => {
+        setStatus(!status);
+    };
 
     return (
         <DropDown
@@ -83,6 +89,18 @@ export function StoryExampleDropDown(props: IProps) {
                         },
                     ]}
                 />
+            </DropDownSection>
+            <DropDownSection title={"Switch Buttons"}>
+                <DropDownSwitchButton
+                    status={status}
+                    onClick={handleSwitch}
+                    label={"Featured Article"}
+                    isLoading={false}
+                />
+                <DropDownItemSeparator />
+                <DropDownSwitchButton status={true} label={"Featured Article"} isLoading={false} />
+                <DropDownItemSeparator />
+                <DropDownSwitchButton status={false} label={"Featured Article"} isLoading={true} />
             </DropDownSection>
         </DropDown>
     );

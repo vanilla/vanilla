@@ -330,7 +330,7 @@ export function CategoryIcon(props: { className?: string }) {
     );
 }
 
-export function CheckCompactIcon(props: { className?: string }) {
+export function CheckCompactIcon(props: { className?: string; "aria-hidden"?: true }) {
     const title = `✓`;
     const classes = iconClasses();
     return (

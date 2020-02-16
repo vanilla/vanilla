@@ -1,11 +1,8 @@
 import * as React from "react";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { CheckCompactIcon } from "@library/icons/common";
-import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 import { dropdownSwitchButtonClasses } from "@library/flyouts/dropDownSwitchButtonStyles";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 

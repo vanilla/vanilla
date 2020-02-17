@@ -422,6 +422,11 @@ class DiscussionsApiController extends AbstractApiController {
                     'field' => 'd.CategoryID'
                 ],
             ],
+            'sort:s?' => [
+                'default' => array_keys($this->discussionModel::getAllowedSorts())[0],
+                'description' => 'Order discussions.',
+                'enum' => array_keys($this->discussionModel::getAllowedSorts()),
+            ],
             'dateInserted?' => new DateFilterSchema([
                 'description' => 'When the discussion was created.',
                 'x-filter' => [
@@ -494,6 +499,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Allow addons to update the where clause.
         $where = $this->getEventManager()->fireFilter('discussionsApiController_indexFilters', $where, $this, $in, $query);
+
+        if ($query['sort']) {
+            $this->discussionModel->setSort($query['sort']);
+        }
 
         if ($query['followed']) {
             $where['Followed'] = true;

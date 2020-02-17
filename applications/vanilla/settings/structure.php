@@ -156,7 +156,7 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('DateLastComment', 'datetime', null, ['index', 'index.CategoryPages'])
     ->column('LastCommentUserID', 'int', true)
-    ->column('Score', 'float', null)
+    ->column('Score', 'float', null, 'index')
     ->column('Attributes', 'text', true)
     ->column('RegardingID', 'int(11)', true, 'index');
 //->column('Source', 'varchar(20)', true)

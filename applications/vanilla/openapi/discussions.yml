@@ -11,6 +11,16 @@ paths:
           type: integer
         x-filter:
           field: d.CategoryID
+      - description: Sort discussions.
+        in: query
+        name: sort
+        schema:
+          type: string
+          default: hot
+          enum:
+          - hot
+          - top
+          - new
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'

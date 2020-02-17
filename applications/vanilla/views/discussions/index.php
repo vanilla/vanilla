@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+$isDataDrivenTheme = Gdn::themeFeatures()->useDataDrivenTheme();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
+$checkMark = !$isDataDrivenTheme ? adminCheck(NULL, ['', ' ']) : '';
 echo '<h1 class="H HomepageTitle">'.
-    adminCheck(NULL, ['', ' ']).
+    $checkMark.
     $this->data('Title').
     followButton($this->data('Category.CategoryID')).
     '</h1>';

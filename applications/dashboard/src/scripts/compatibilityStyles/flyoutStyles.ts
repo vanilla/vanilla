@@ -5,39 +5,16 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
-import {
-    borders,
-    buttonStates,
-    colorOut,
-    IActionStates,
-    IStateSelectors,
-    negative,
-    paddings,
-    pointerEvents,
-    setAllLinkColors,
-    textInputSizingFromFixedHeight,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { colorOut, fonts, importantUnit, IStateSelectors, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important, percent } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { actionMixin, dropDownClasses, dropDownVariables } from "@library/flyouts/dropDownStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { actionMixin } from "@library/flyouts/dropDownStyles";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
-    const formVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     // Dropdown hover/focus colors:
     mixinFlyoutItem(".MenuItems .Item a");
@@ -56,8 +33,50 @@ export const flyoutCSS = () => {
         .MenuItems
         `,
         {
-            color: fg,
             background: bg,
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+            }),
+        },
+    );
+
+    // Flip Checkbox in dropdown for consistency with KB
+
+    cssOut(`.selectBox-item .dropdown-menu-link.selectBox-link`, {
+        ...paddings({
+            left: importantUnit(26),
+            right: importantUnit(38),
+        }),
+    });
+
+    cssOut(`.selectBox-item.isActive .dropdown-menu-link.selectBox-link`, {
+        backgroundColor: colorOut(globalVars.states.active.highlight, true),
+        $nest: {
+            "& .dropdown-menu-link.selectBox-link": {
+                cursor: "pointer",
+            },
+        },
+    });
+
+    cssOut(".selectBox-selectedIcon", {
+        left: "auto",
+        right: unit(13),
+        color: colorOut(globalVars.mainColors.primaryContrast),
+    });
+
+    cssOut(
+        `
+        .MenuItems hr,
+        .MenuItems .menu-separator,
+        .MenuItems .dd-separator,
+        .MenuItems .editor-action-separator,
+        .Flyout.Flyout hr,
+        .Flyout.Flyout .menu-separator,
+        .Flyout.Flyout .dd-separator,
+        .Flyout.Flyout .editor-action-separator
+        `,
+        {
+            borderBottomColor: colorOut(globalVars.separator.color),
         },
     );
 };

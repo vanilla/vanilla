@@ -8,11 +8,10 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc } from "csx";
+import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc, translateY } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
-    getBackgroundImage,
     IFont,
     unit,
     colorOut,
@@ -22,12 +21,11 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     borders,
-    IButtonStates,
     EMPTY_BACKGROUND,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import generateButtonClass, { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
@@ -61,7 +59,7 @@ export const bannerVariables = useThemeCache(() => {
         padding: {
             ...EMPTY_SPACING,
             top: topPadding as PaddingProperty<TLength>,
-            bottom: (topPadding * 0.8) as PaddingProperty<TLength>,
+            bottom: topPadding as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
         paddingMobile: {
@@ -157,7 +155,7 @@ export const bannerVariables = useThemeCache(() => {
         },
         margins: {
             ...EMPTY_SPACING,
-            top: 24,
+            top: 14,
             bottom: 12,
         },
         text: "How can we help you?",
@@ -360,9 +358,14 @@ export const bannerClasses = useThemeCache(() => {
         };
 
         return style("outerBackground", {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: percent(100),
+            height: calc(`100% + 2px`),
+            transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
             ...centeredBackgroundProps(),
             display: "block",
-            ...absolutePosition.fullSizeOfParent(),
             ...background(finalVars),
         });
     };
@@ -502,11 +505,20 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const content = style("content", {
+        borderColor: colorOut(vars.colors.contrast),
+        // boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        borderRadius:
+            vars.searchButton.borders &&
+            vars.searchButton.borders.right &&
+            vars.searchButton.borders.right.radius &&
+            (typeof vars.searchButton.borders.right.radius === "number" ||
+                typeof vars.searchButton.borders.right.radius === "string")
+                ? unit(vars.searchButton.borders.right.radius)
+                : 0,
+        zIndex: 1,
         $nest: {
-            "&&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(vars.colors.contrast),
-                boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
-                zIndex: 1,
+            "&.hasFocus .searchBar-valueContainer": {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
             },
         },
     });

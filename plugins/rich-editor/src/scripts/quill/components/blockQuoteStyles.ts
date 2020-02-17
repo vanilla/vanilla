@@ -11,6 +11,7 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { paddings, unit, userSelect } from "@library/styles/styleHelpers";
 import { percent } from "csx";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const blockQuoteVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -53,5 +54,8 @@ export const blockQuoteCSS = useThemeCache(() => {
                 marginBottom: unit(0),
             },
         },
+    });
+    cssOut(`.embedLink-excerpt`, {
+        color: colorOut(globalVars.mainColors.fg),
     });
 });

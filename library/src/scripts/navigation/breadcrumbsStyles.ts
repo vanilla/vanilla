@@ -8,7 +8,15 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { px, em } from "csx";
-import { colorOut, margins, paddings, singleLineEllipsis, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    margins,
+    paddings,
+    setAllLinkColors,
+    singleLineEllipsis,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
     const makeVariables = variableFactory("breadcrumbs");
@@ -24,14 +32,15 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = breadcrumbsVariables();
     const style = styleFactory("breadcrumbs");
-
+    const linkColors = setAllLinkColors();
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
         fontSize: unit(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
-        color: colorOut(globalVars.links.colors.default),
         textTransform: "uppercase",
+        color: colorOut(linkColors.color),
+        $nest: linkColors.nested,
     });
 
     const root = style({

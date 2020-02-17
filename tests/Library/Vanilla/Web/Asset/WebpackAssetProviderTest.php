@@ -152,6 +152,7 @@ class WebpackAssetProviderTest extends TestCase {
             new MockAddon('everything'),
             new MockAddon('js-only'),
             new MockAddon('css-only'),
+            new MockAddon('default'), // Theme
             // Note there is no disabled
         ];
 

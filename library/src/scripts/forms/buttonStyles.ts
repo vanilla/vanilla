@@ -36,12 +36,12 @@ export const buttonGlobalVariables = useThemeCache(() => {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         primary: globalVars.mainColors.primary,
-        primaryTextColor: globalVars.mainColors.primaryContrast,
+        primaryContrast: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
-        color: globalVars.mainColors.fg,
         size: globalVars.fonts.size.medium,
+        weight: globalVars.fonts.weights.normal,
     });
 
     const padding = makeThemeVars("padding", {
@@ -76,24 +76,20 @@ export const buttonVariables = useThemeCache(() => {
         name: ButtonTypes.STANDARD,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
+            fg: globalVars.mainColors.fg,
             bg: globalVars.mainColors.bg,
         },
         borders: {
             color: globalVars.mixBgAndFg(0.24),
             radius: globalVars.border.radius,
         },
-        fonts: {
-            color: globalVars.mainColors.fg,
-        },
         hover: {
             borders: {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
-            },
-            fonts: {
-                color: globalVars.mainColors.bg,
+                bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         active: {
@@ -101,10 +97,8 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
-            },
-            fonts: {
-                color: globalVars.mainColors.bg,
+                bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         focus: {
@@ -112,10 +106,8 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
-            },
-            fonts: {
-                color: globalVars.mainColors.bg,
+                bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
         focusAccessible: {
@@ -123,10 +115,8 @@ export const buttonVariables = useThemeCache(() => {
                 color: globalVars.mainColors.primary,
             },
             colors: {
-                bg: globalVars.mainColors.primary,
-            },
-            fonts: {
-                color: globalVars.mainColors.bg,
+                bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.secondaryContrast,
             },
         },
     });
@@ -134,10 +124,8 @@ export const buttonVariables = useThemeCache(() => {
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         colors: {
+            fg: vars.colors.primaryContrast, // Defaults to bg, but may need to be changed for proper contrast
             bg: vars.colors.primary,
-        },
-        fonts: {
-            color: vars.colors.primaryTextColor,
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
@@ -145,35 +133,27 @@ export const buttonVariables = useThemeCache(() => {
             radius: globalVars.border.radius,
         },
         hover: {
-            fonts: {
-                color: globalVars.mainColors.primaryContrast,
-            },
             colors: {
                 bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.primaryContrast,
             },
         },
         active: {
-            fonts: {
-                color: globalVars.mainColors.primaryContrast,
-            },
             colors: {
                 bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.primaryContrast,
             },
         },
         focus: {
-            fonts: {
-                color: globalVars.mainColors.primaryContrast,
-            },
             colors: {
                 bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.primaryContrast,
             },
         },
         focusAccessible: {
-            fonts: {
-                color: globalVars.mainColors.primaryContrast,
-            },
             colors: {
                 bg: globalVars.mainColors.secondary,
+                fg: globalVars.mainColors.primaryContrast,
             },
         },
     });
@@ -183,9 +163,6 @@ export const buttonVariables = useThemeCache(() => {
         colors: {
             fg: globalVars.mainColors.bg,
             bg: globalVars.mainColors.fg.fade(0.1),
-        },
-        fonts: {
-            color: globalVars.mainColors.bg,
         },
         borders: {
             color: globalVars.mainColors.bg,
@@ -217,9 +194,7 @@ export const buttonVariables = useThemeCache(() => {
         name: ButtonTypes.TRANSLUCID,
         colors: {
             bg: globalVars.mainColors.bg,
-        },
-        fonts: {
-            color: globalVars.mainColors.primary,
+            fg: globalVars.mainColors.primary,
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
@@ -348,24 +323,22 @@ export const buttonUtilityClasses = useThemeCache(() => {
         justifyContent: "center",
         border: "none",
         padding: 0,
+        background: "transparent",
         ...allButtonStates({
+            allStates: {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
             hover: {
                 color: colorOut(globalVars.mainColors.primary),
             },
             focusNotKeyboard: {
                 outline: 0,
-                color: colorOut(globalVars.mainColors.secondary),
-            },
-            focus: {
-                color: colorOut(globalVars.mainColors.secondary),
             },
             accessibleFocus: {
-                color: colorOut(globalVars.mainColors.secondary),
-            },
-            active: {
-                color: colorOut(globalVars.mainColors.secondary),
+                outline: "initial",
             },
         }),
+        color: "inherit",
     });
 
     const buttonIcon = style(

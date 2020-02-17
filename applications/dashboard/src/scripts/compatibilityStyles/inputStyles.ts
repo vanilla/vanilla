@@ -5,15 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
 import {
     borders,
     colorOut,
     getHorizontalPaddingForTextInput,
     getVerticalPaddingForTextInput,
+    importantUnit,
     margins,
     negative,
-    pointerEvents,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
@@ -24,6 +23,8 @@ import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const inputCSS = () => {
+    wrapSelects();
+
     const globalVars = globalVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
@@ -31,7 +32,6 @@ export const inputCSS = () => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     cssOut(
         `
@@ -93,6 +93,7 @@ export const inputCSS = () => {
     // mixinInputStyles(".AdvancedSearch select");
     // mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
+    mixinInputStyles("ul.token-input-list, div.Popup .Body ul.token-input-list");
     mixinInputStyles(`
         .Container input[type= "text"],
         .Container textarea,
@@ -105,6 +106,7 @@ export const inputCSS = () => {
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
     mixinInputStyles(".AdvancedSearch .InputBox", false, false);
     cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
+    cssOut(`.richEditor-frame.InputBox.InputBox.InputBox `, { padding: 0 });
     // cssOut(".token-input-list", inputClasses().inputMixin);
     cssOut("select", {
         $nest: {
@@ -119,7 +121,7 @@ export const inputCSS = () => {
     });
 
     cssOut("form .SelectWrapper, .AdvancedSearch .Handle.Handle ", {
-        color: colorOut(globalVars.border.color),
+        color: colorOut(inputVars.colors.fg),
     });
 
     cssOut("form .SelectWrapper", {
@@ -232,19 +234,44 @@ export const inputCSS = () => {
         },
     });
 
-    cssOut("input[type='checkbox']", {
-        cursor: "pointer",
-        $nest: {
-            "&:hover, &:focus, &.focus-visible, &:active": {
-                outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-            },
-        },
-    });
-
     cssOut("#Form_date", {
         marginRight: unit(globalVars.gutter.half),
     });
+
+    cssOut(`.FormWrapper label`, {
+        fontSize: globalVars.fonts.size.medium,
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`.js-datetime-picker`, {
+        display: "flex",
+        flexWrap: "wrap",
+        width: calc(`100% + ${unit(globalVars.meta.spacing.default * 2)}`),
+        ...margins({
+            left: -globalVars.meta.spacing.default,
+            right: globalVars.meta.spacing.default,
+        }),
+    });
+
+    cssOut(`.InputBox.DatePicker`, {
+        flexGrow: 1,
+        minWidth: unit(200),
+        maxWidth: percent(100),
+        ...margins({
+            all: globalVars.meta.spacing.default,
+        }),
+    });
 };
+
+function wrapSelects() {
+    const selects = document.querySelectorAll("select");
+    selects.forEach((selectElement: HTMLElement) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("SelectWrapper");
+        selectElement.parentElement?.insertBefore(wrapper, selectElement);
+        wrapper.appendChild(selectElement);
+    });
+}
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
     const globalVars = globalVariables();
@@ -294,5 +321,24 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
             borderColor: isImportant ? important(primary as string) : primary,
         },
         ...extraFocus,
+    });
+
+    cssOut(`ul.token-input-list, div.Popup .Body ul.token-input-list`, {
+        paddingBottom: importantUnit(0),
+        paddingRight: importantUnit(0),
+        minHeight: unit(formVars.sizing.height),
+    });
+
+    cssOut(`.TextBoxWrapper li.token-input-token.token-input-token`, {
+        marginBottom: importantUnit(formVars.spacing.verticalPadding - formVars.border.width),
+        marginRight: importantUnit(formVars.spacing.horizontalPadding - 2 * formVars.border.width),
+    });
+
+    cssOut(`li.token-input-token span`, {
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`ul.token-input-list li input`, {
+        marginBottom: importantUnit(4),
     });
 };

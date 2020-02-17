@@ -235,16 +235,18 @@ a.MoreWrap,
         border-bottom-right-radius: $pager_borderRadius;
     }
 
-    .QuickSearchWrap .Button,
-    .QuickSearchButton {
-        @include Button(
-            $quickSearch_bg,
-            $quickSearch_fg,
-            $quickSearch_borderColor,
-            $quickSearch-hover_bg,
-            $quickSearch-hover_fg,
-            $quickSearch-hover_borderColor
-        );
+    @if($staticVariables) {
+        .QuickSearchWrap .Button,
+        .QuickSearchButton {
+            @include Button(
+                $quickSearch_bg,
+                $quickSearch_fg,
+                $quickSearch_borderColor,
+                $quickSearch-hover_bg,
+                $quickSearch-hover_fg,
+                $quickSearch-hover_borderColor
+            );
+        }
     }
 
     .QuickSearchButton {

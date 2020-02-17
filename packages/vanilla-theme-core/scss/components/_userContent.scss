@@ -47,19 +47,37 @@ $code-block_padding:                    $userContent_fontSize !default;
         display: block;
     }
 
-    p,
-    li {
-        a {
-            color: $link-default_color;
+    .bbcode_right,
+    .bbcode_center,
+    .bbcode_left {
+        .embedImage-img {
+            display: inline-block;
+        }
+    }
 
-            &:focus,
-            &:hover {
-                color: $link-default-hover_color;
-                text-decoration: underline;
-            }
+    .bbcode_right .embedImage-img {
+        margin-left: auto;
+    }
 
-            &:visited {
-                color: $link-default_visited_color;
+    .bbcode_left .embedImage-img {
+        margin-right: auto;
+    }
+
+    @if ($staticVariables) {
+        p,
+        li {
+            a {
+                color: $link-default_color;
+
+                &:focus,
+                &:hover {
+                    color: $link-default-hover_color;
+                    text-decoration: underline;
+                }
+
+                &:visited {
+                    color: $link-default_visited_color;
+                }
             }
         }
     }

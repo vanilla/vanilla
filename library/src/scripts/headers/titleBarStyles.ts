@@ -10,7 +10,7 @@ import {
     allButtonStates,
     borders,
     colorOut,
-    emphasizeLightness,
+    offsetLightness,
     flexHelper,
     modifyColorBasedOnLightness,
     unit,
@@ -32,6 +32,7 @@ import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -83,12 +84,16 @@ export const titleBarVariables = useThemeCache(() => {
             width: buttonSize,
         },
         state: {
-            bg: emphasizeLightness(colors.bg, 0.04),
+            bg: globalVars.mainColors.statePrimary,
         },
     });
 
     const navAlignment = makeThemeVars("navAlignment", {
         alignment: "left" as "left" | "center",
+    });
+
+    const generatedColors = makeThemeVars("generatedColors", {
+        state: offsetLightness(colors.bg, 0.04), // Default state color change
     });
 
     const linkButtonDefaults: IButtonType = {
@@ -112,22 +117,22 @@ export const titleBarVariables = useThemeCache(() => {
         },
         hover: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focus: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focusAccessible: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         active: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
     };
@@ -153,7 +158,8 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        maxWidth: 672,
+        bg: globalVars.mainColors.secondary,
+        fg: colors.fg,
         mobile: {
             width: button.mobile.width,
         },
@@ -324,6 +330,12 @@ export const titleBarClasses = useThemeCache(() => {
                     },
                 },
             },
+            [`& .${searchBarClasses().valueContainer}`]: {
+                backgroundColor: colorOut(vars.compactSearch.bg),
+            },
+            [`& .${searchBarClasses().valueContainer} .searchBar__input`]: {
+                color: colorOut(vars.compactSearch.fg),
+            },
         },
         ...mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
@@ -483,7 +495,6 @@ export const titleBarClasses = useThemeCache(() => {
             height: unit(vars.sizing.height),
             $nest: {
                 "&.isOpen": {
-                    width: unit(vars.compactSearch.maxWidth),
                     flex: 1,
                 },
             },
@@ -494,7 +505,6 @@ export const titleBarClasses = useThemeCache(() => {
     const compactSearchResults = style("compactSearchResults", {
         position: "absolute",
         top: unit(formElementVars.sizing.height),
-        maxWidth: px(vars.compactSearch.maxWidth),
         width: percent(100),
         $nest: {
             "&:empty": {

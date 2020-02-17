@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+use Vanilla\Utility\HtmlUtils;
+
+if (!defined('APPLICATION')) exit();
 
 $Controller = Gdn::controller();
 $Session = Gdn::session();
@@ -30,9 +34,14 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
     $MyDiscussions .= filterCountString($CountDiscussions);
     $MyDrafts .= filterCountString($CountDrafts);
 }
+$titleClasses = HtmlUtils::classNames(
+    !Gdn::themeFeatures()->useDataDrivenTheme() && "sr-only",
+    "BoxFilter-HeadingWrap"
+);
+
 ?>
 <div class="BoxFilter BoxDiscussionFilter">
-    <span class="sr-only BoxFilter-HeadingWrap">
+    <span class="<?php echo $titleClasses ?>">
         <h2 class="BoxFilter-Heading">
             <?php echo t('Quick Links'); ?>
         </h2>

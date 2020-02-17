@@ -5,23 +5,36 @@
  * @license GPL-2.0-only
  */
 
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { cssOut, trimTrailingCommas, mixinCloseButton } from "@dashboard/compatibilityStyles/index";
 import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    borders,
+    colorOut,
+    importantUnit,
+    offsetLightness,
+    paddings,
+    unit,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { important, percent } from "csx";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
     const primary = colorOut(mainColors.primary);
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
-    mixinButton(".js-poll-result-btn");
+    mixinButton(".DataList a.Delete.Delete.Delete", ButtonTypes.ICON_COMPACT);
+    mixinButton(".MessageList a.Delete.Delete.Delete", ButtonTypes.ICON_COMPACT);
+
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
-    mixinButton(".FormTitleWrapper .Buttons .Button");
-    mixinButton(".FormWrapper .Buttons .Button");
+    mixinButton(".FormTitleWrapper .Buttons .Button", ButtonTypes.PRIMARY);
+    mixinButton(".FormWrapper .Buttons .Button", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Button-Controls .Button.Primary", ButtonTypes.PRIMARY);
@@ -35,6 +48,67 @@ export const buttonCSS = () => {
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
+    mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
+    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+
+    cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
+        width: unit(formElementVars.sizing.height),
+        background: important("none"),
+        backgroundColor: important("none"),
+        ...borders({
+            color: "transparent",
+        }),
+    });
+
+    cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
+        backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
+        width: unit(formElementVars.sizing.height),
+        ...borders({
+            color: "transparent",
+            radius: {
+                left: important(0),
+            },
+        }),
+        $nest: {},
+    });
+
+    cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
+        position: "relative",
+        maxWidth: percent(100),
+        $nest: {
+            "& .Button.Primary": {
+                maxWidth: percent(100),
+                width: percent(100),
+                ...paddings({
+                    horizontal: formElementVars.sizing.height,
+                }),
+            },
+            "& .Sprite.SpDropdownHandle": {
+                ...absolutePosition.fullSizeOfParent(),
+                minWidth: importantUnit(formElementVars.sizing.height),
+                padding: important(0),
+                border: important(0),
+                borderRadius: important(0),
+            },
+            "& .Button.Handle": {
+                ...absolutePosition.middleRightOfParent(),
+                width: unit(formElementVars.sizing.height),
+                maxWidth: unit(formElementVars.sizing.height),
+                minWidth: unit(formElementVars.sizing.height),
+                height: unit(formElementVars.sizing.height),
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: important(0),
+                borderTopLeftRadius: important(0),
+                borderBottomLeftRadius: important(0),
+            },
+            "& .Button.Handle .SpDropdownHandle::before": {
+                padding: important(0),
+            },
+        },
+    });
 
     // Standard
     mixinButton(".Button", ButtonTypes.STANDARD);
@@ -49,21 +123,10 @@ export const buttonCSS = () => {
     mixinButton("body.Section-Profile .ProfileOptions .MemberButtons", ButtonTypes.STANDARD);
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
+    mixinButton(".viewPollResults", ButtonTypes.STANDARD);
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",
-    });
-
-    cssOut(`.ButtonGroup.Multi .Button.Handle, .ButtonGroup.Multi.Open .Button.Handle`, {
-        borderColor: primary,
-        borderStyle: globalVars.border.style,
-        borderWidth: unit(globalVars.border.width),
-        color: colorOut(globalVars.mainColors.primaryContrast),
-        backgroundColor: colorOut(globalVars.mainColors.primary),
-    });
-
-    cssOut(`.Button.Primary:not([disabled]):hover`, {
-        color: colorOut(globalVars.mainColors.primaryContrast),
     });
 };
 

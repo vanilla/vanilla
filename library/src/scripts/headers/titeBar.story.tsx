@@ -20,7 +20,6 @@ import Button from "@library/forms/Button";
 import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
-import Container from "@library/layout/components/Container";
 import { StoryFullPage } from "@library/storybook/StoryFullPage";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");

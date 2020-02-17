@@ -9,10 +9,14 @@ namespace VanillaTests\Library\Vanilla\Web\Asset;
 
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
+use Vanilla\Models\FsThemeProvider;
+use Vanilla\Models\ThemeModel;
+use Vanilla\Models\ThemeModelHelper;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\Request;
 
 /**
@@ -28,10 +32,49 @@ class WebpackAssetProviderTest extends TestCase {
     }
 
     /**
+     * Get simple WebpackAssetProvider instance
+     *
+     * @param array $addons
+     * @return WebpackAssetProvider
+     */
+    private function getWebpackAssetProvider(array $addons = []) {
+        $session = new \Gdn_Session();
+        $addonManager = new MockAddonProvider($addons);
+        $config = new MockConfig(['Garden.CurrentTheme'=>'default']);
+        $themeHelper = new ThemeModelHelper(
+            $addonManager,
+            $session,
+            $config
+        );
+        $themeModel = new ThemeModel(
+            $config,
+            $session,
+            $addonManager,
+            $themeHelper
+        );
+        $request = new Request();
+        $fsThemeProvider = new FsThemeProvider(
+            $addonManager,
+            $request,
+            $config,
+            $themeHelper
+        );
+        $themeModel->addThemeProvider($fsThemeProvider);
+        $provider = new WebpackAssetProvider(
+            $request,
+            $addonManager,
+            $session,
+            $config,
+            $themeModel
+        );
+        return $provider;
+    }
+
+    /**
      * Test the hot reload functionality.
      */
     public function testHotReload() {
-        $provider = new WebpackAssetProvider(new Request(), new MockAddonProvider([]));
+        $provider = $this->getWebpackAssetProvider();
         $provider->setHotReloadEnabled(true, '');
         $sectionKey = 'forum';
 
@@ -57,7 +100,7 @@ class WebpackAssetProviderTest extends TestCase {
      * Test that the locale asset is always first when requested.
      */
     public function testLocaleAsset() {
-        $provider = new WebpackAssetProvider(new Request(), new MockAddonProvider([]));
+        $provider = $this->getWebpackAssetProvider();
         $scripts = $provider->getScripts('someSection');
         $this->assertNotInstanceOf(
             LocaleAsset::class,
@@ -109,11 +152,12 @@ class WebpackAssetProviderTest extends TestCase {
             new MockAddon('everything'),
             new MockAddon('js-only'),
             new MockAddon('css-only'),
+            new MockAddon('default'), // Theme
             // Note there is no disabled
         ];
 
         $fileSystem = vfsStream::create($structure);
-        $provider = new WebpackAssetProvider(new Request(), new MockAddonProvider($mockAddons));
+        $provider = $this->getWebpackAssetProvider($mockAddons);
         $provider->setFsRoot($fileSystem->url());
         $buster = 'buster12345';
         $provider->setCacheBusterKey($buster);

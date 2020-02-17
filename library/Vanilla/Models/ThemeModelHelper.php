@@ -6,9 +6,8 @@
 
 namespace Vanilla\Models;
 
-use Vanilla\AddonManager;
-use Gdn_Session as SessionInterface;
 use Vanilla\Contracts\AddonProviderInterface;
+use Gdn_Session as SessionInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\ThemeProviderInterface;
 
@@ -19,7 +18,7 @@ class ThemeModelHelper {
     /** @var SessionInterface $session */
     private $session;
 
-    /** @var AddonManager $addonManager */
+    /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ConfigurationInterface $config */
@@ -28,7 +27,7 @@ class ThemeModelHelper {
     /**
      * ThemeModelHelper constructor.
      *
-     * @param AddonManager $addonManager
+     * @param AddonProviderInterface $addonManager
      * @param SessionInterface $session
      * @param ConfigurationInterface $config
      */

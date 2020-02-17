@@ -22,6 +22,7 @@ export interface IDropDownItemButton {
     lang?: string;
     isActive?: boolean;
     buttonRef?: React.RefObject<HTMLButtonElement>;
+    role?: string;
 }
 
 /**
@@ -52,6 +53,7 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
                     disabled={this.props.disabled}
                     aria-current={this.props.current ? "true" : "false"}
                     lang={this.props.lang}
+                    role={this.props.role}
                 >
                     {buttonContent}
                 </Button>

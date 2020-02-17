@@ -294,6 +294,10 @@ export const dropDownClasses = useThemeCache(() => {
             "&.isNested": {},
         },
     });
+    const sectionContents = style("sectionContents", {
+        display: "block",
+        position: "relative",
+    });
 
     const sectionHeading = style("sectionHeading", {
         color: colorOut(globalVars.meta.text.color),
@@ -302,11 +306,9 @@ export const dropDownClasses = useThemeCache(() => {
         textAlign: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
         ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
-    });
-
-    const sectionContents = style("sectionContents", {
-        display: "block",
-        position: "relative",
+        $nest: {
+            [`& + .${sectionContents} li:first-child`]: { paddingTop: unit(vars.spacer.margin.vertical) },
+        },
     });
 
     const arrow = style("arrow", {

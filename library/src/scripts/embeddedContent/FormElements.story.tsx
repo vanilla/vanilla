@@ -121,6 +121,7 @@ story.add("Inputs", () => {
                     },
                 ]}
             />
+            <StoryHeading>Dropdown with search</StoryHeading>
             <StoryExampleDropDownSearch />
             <StoryHeading>Date Range</StoryHeading>
             <StorySmallContent>

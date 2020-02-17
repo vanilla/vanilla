@@ -14,7 +14,7 @@ import classNames from "classnames";
 /**
  * Form component for searching/selecting a category.
  */
-export default class StoryExampleDropDownSearch extends React.Component<ISelectOneProps> {
+export default class StoryExampleDropDownSearch extends React.Component {
     public render() {
         return (
             <div className={"input-wrap"}>
@@ -24,7 +24,7 @@ export default class StoryExampleDropDownSearch extends React.Component<ISelectO
                         return;
                     }}
                     value={undefined}
-                    label={"DropDown with search"}
+                    label={"Subcommunity"}
                     options={[
                         {
                             label: "Development",

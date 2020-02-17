@@ -42,7 +42,7 @@ export const inputVariables = useThemeCache(() => {
 
     const border: IBordersWithRadius = makeThemeVars("borders", {
         ...EMPTY_BORDER,
-        ...globalVars.borderCategories.formElements.default,
+        ...globalVars.borderType.formElements.default,
     });
 
     return {

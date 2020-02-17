@@ -28,10 +28,10 @@ export const formElementsVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        width: vars.borderCategories.formElements.default.width ?? vars.border.width,
-        color: vars.borderCategories.formElements.default.color ?? vars.border.color,
-        style: vars.borderCategories.formElements.default.radius ?? vars.border.style,
-        radius: vars.borderCategories.formElements.default.radius,
+        width: vars.borderType.formElements.default.width ?? vars.border.width,
+        color: vars.borderType.formElements.default.color ?? vars.border.color,
+        style: vars.borderType.formElements.default.radius ?? vars.border.style,
+        radius: vars.borderType.formElements.default.radius ?? vars.border.radius,
     });
 
     const giantInput = makeThemeVars("giantInput", {

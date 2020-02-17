@@ -56,6 +56,7 @@ export const buttonCSS = () => {
         background: important("none"),
         backgroundColor: important("none"),
         ...borders({
+            ...globalVars.borderType.formElements.buttons,
             color: "transparent",
         }),
     });
@@ -64,6 +65,7 @@ export const buttonCSS = () => {
         backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
         width: unit(formElementVars.sizing.height),
         ...borders({
+            ...globalVars.borderType.formElements.buttons,
             color: "transparent",
             radius: {
                 left: important(0),

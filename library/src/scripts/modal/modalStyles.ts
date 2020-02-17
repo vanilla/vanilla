@@ -45,7 +45,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        radius: globalVars.borderCategories.modals.radius,
+        radius: globalVars.borderType.modals.radius,
     });
 
     const dropDown = makeThemeVars("dropDown", {
@@ -209,7 +209,7 @@ export const modalClasses = useThemeCache(() => {
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
-                ...borders(),
+                ...borders(globalVars.borderType.modals),
             },
             "& .form-group": {
                 marginLeft: unit(-16),

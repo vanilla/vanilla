@@ -55,7 +55,7 @@ export const inputCSS = () => {
         {
             color: fg,
             backgroundColor: bg,
-            ...borders(),
+            ...borders(globalVars.borderType.formElements.default),
         },
     );
 
@@ -75,7 +75,7 @@ export const inputCSS = () => {
 
     cssOut(`div.token-input-dropdown`, {
         // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-        ...borders(),
+        ...borders(globalVars.borderType.dropDowns),
         transform: translateY(unit(globalVars.border.width) as string),
     });
 
@@ -191,6 +191,7 @@ export const inputCSS = () => {
         lineHeight: unit(globalVars.meta.lineHeights.default),
         minHeight: unit(spaceWithoutPaddingInInput),
         ...borders({
+            ...globalVars.borderType.formElements.default,
             color: globalVars.meta.colors.fg,
         }),
         display: "inline-flex",

@@ -87,7 +87,7 @@ export const dropDownVariables = useThemeCache(() => {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         border: {
-            radius: globalVars.borderCategories.dropDowns.content,
+            radius: globalVars.borderType.dropDowns.content,
             color: globalVars.border.color,
         },
         padding: {

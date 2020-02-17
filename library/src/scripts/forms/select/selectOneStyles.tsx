@@ -5,7 +5,7 @@
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc } from "csx";
 
 export const selectOneVariables = useThemeCache(() => {
@@ -21,11 +21,15 @@ export const selectOneVariables = useThemeCache(() => {
 export const selectOneClasses = useThemeCache(() => {
     const style = styleFactory("selectOne");
     const vars = selectOneVariables();
+    const globalVars = globalVariables();
 
     const inputWrap = style("inputWrap", {
         $nest: {
             "&.hasFocus .inputBlock-inputText": {
-                borderColor: colorOut(globalVariables().mainColors.primary),
+                ...borders({
+                    ...globalVars.borderType.formElements.default,
+                    color: globalVars.mainColors.primary,
+                }),
             },
             ".inputBlock-inputText": {
                 paddingRight: unit(vars.padding.right),

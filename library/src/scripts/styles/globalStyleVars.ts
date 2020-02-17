@@ -151,7 +151,7 @@ export const globalVariables = useThemeCache(() => {
         radius: 6, // Global default
     });
 
-    const borderCategories = makeThemeVars("borderRadiiGroups", {
+    const borderType = makeThemeVars("borderType", {
         formElements: {
             default: {
                 ...EMPTY_BORDER,
@@ -428,7 +428,7 @@ export const globalVariables = useThemeCache(() => {
         mainColors,
         messageColors,
         body,
-        borderCategories,
+        borderType,
         border,
         meta,
         gutter,

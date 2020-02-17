@@ -596,6 +596,7 @@ export const titleBarClasses = useThemeCache(() => {
                         {
                             "& .meBox-buttonContent": {
                                 ...borders({
+                                    radius: 0,
                                     width: 1,
                                     color: "transparent",
                                 }),

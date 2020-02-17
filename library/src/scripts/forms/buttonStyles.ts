@@ -8,17 +8,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     allButtonStates,
     colorOut,
-    ColorValues,
     flexHelper,
-    IFont,
-    modifyColorBasedOnLightness,
-    spinnerLoader,
     unit,
     userSelect,
     spinnerLoaderAnimationProperties,
+    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import merge from "lodash/merge";
@@ -80,11 +77,12 @@ export const buttonVariables = useThemeCache(() => {
             bg: globalVars.mainColors.bg,
         },
         borders: {
+            ...globalVars.borderType.formElements.buttons,
             color: globalVars.mixBgAndFg(0.24),
-            radius: globalVars.border.radius,
         },
         hover: {
             borders: {
+                ...globalVars.borderType.formElements.buttons,
                 color: globalVars.mainColors.primary,
             },
             colors: {
@@ -94,6 +92,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         active: {
             borders: {
+                ...globalVars.borderType.formElements.buttons,
                 color: globalVars.mainColors.primary,
             },
             colors: {
@@ -103,6 +102,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focus: {
             borders: {
+                ...globalVars.borderType.formElements.buttons,
                 color: globalVars.mainColors.primary,
             },
             colors: {
@@ -112,6 +112,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         focusAccessible: {
             borders: {
+                ...globalVars.borderType.formElements.buttons,
                 color: globalVars.mainColors.primary,
             },
             colors: {
@@ -129,8 +130,8 @@ export const buttonVariables = useThemeCache(() => {
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
+            ...globalVars.borderType.formElements.buttons,
             color: globalVars.mainColors.primary,
-            radius: globalVars.border.radius,
         },
         hover: {
             colors: {
@@ -165,8 +166,8 @@ export const buttonVariables = useThemeCache(() => {
             bg: globalVars.mainColors.fg.fade(0.1),
         },
         borders: {
+            ...globalVars.borderType.formElements.buttons,
             color: globalVars.mainColors.bg,
-            radius: globalVars.border.radius,
         },
         hover: {
             colors: {
@@ -198,8 +199,8 @@ export const buttonVariables = useThemeCache(() => {
         },
         spinnerColor: globalVars.mainColors.bg,
         borders: {
+            ...globalVars.borderType.formElements.buttons,
             color: globalVars.mainColors.bg,
-            radius: globalVars.border.radius,
         },
         hover: {
             colors: {

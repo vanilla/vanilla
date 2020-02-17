@@ -215,7 +215,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`div.Popup .Body`, {
         // borderRadius: unit(vars.border.radius),
-        ...borders(),
+        ...borders(vars.borderType.modals),
         backgroundColor: bg,
         color: fg,
     });
@@ -283,7 +283,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.QuickSearchButton`, {
         color: fg,
-        ...borders(),
+        ...borders(vars.borderType.formElements.buttons),
     });
 
     cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
@@ -294,7 +294,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(),
+        ...borders(vars.borderType.dropDowns),
     });
 
     cssOut(`.Frame-content`, {

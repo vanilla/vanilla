@@ -1264,10 +1264,10 @@ class CommentModel extends Gdn_Model {
         // discussion author.
         $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
-        // Mark the user as participated.
+        // Mark the user as participated and update DateLastViewed.
         $this->SQL->replace(
             'UserDiscussion',
-            ['Participated' => 1],
+            ['Participated' => 1, 'DateLastViewed' => $Fields['DateInserted']],
             ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 

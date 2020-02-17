@@ -19,6 +19,7 @@ import {
     IBorderStyles,
     ISimpleBorderStyle,
     borders,
+    extendItemContainer,
 } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, borderColor } from "csx";
@@ -59,7 +60,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
                 ...EMPTY_BACKGROUND,
             },
             borderType: BorderType.NONE,
-            maxWidth: layoutVars.contentSizes.full,
+            maxWidth: globalVars.content.width,
             viewAll: {
                 position: "bottom" as "top" | "bottom",
                 displayType: ButtonTypes.TEXT_PRIMARY,
@@ -75,7 +76,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
             ...options,
             borderType:
                 options.innerBackground.color || options.innerBackground.image ? BorderType.SHADOW : BorderType.NONE,
-            maxWidth: options.maxColumnCount <= 2 ? layoutVars.contentSizes.narrow : layoutVars.contentSizes.full,
+            maxWidth: options.maxColumnCount <= 2 ? layoutVars.contentSizes.narrow : options.maxWidth,
         },
         optionOverrides,
     );
@@ -114,15 +115,20 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     });
 
     const contentMixin: NestedCSSProperties = {
-        maxWidth: unit(vars.options.maxWidth),
         ...paddings({
             vertical: vars.spacing.gutter,
         }),
-        ...margins({
-            vertical: 0,
-            horizontal: "auto",
-        }),
+        ...extendItemContainer(vars.spacing.gutter),
     };
+
+    const container = style("container", {
+        $nest: {
+            "&&": {
+                maxWidth: unit(vars.options.maxWidth),
+                margin: "0 auto",
+            },
+        },
+    });
 
     const content = style("content", contentMixin);
 
@@ -148,6 +154,8 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
                     borderRadius: globalVars.border.radius,
                     ...shadowHelper().embed(),
                 };
+            default:
+                return {};
         }
     })();
 
@@ -227,6 +235,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     return {
         root,
+        container,
         content,
         borderedContent,
         viewAllContent,

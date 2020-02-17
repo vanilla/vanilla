@@ -42,18 +42,19 @@ Router.addRoutes([
 
 applySharedPortalContext(props => {
     return (
-        <AppContext variablesOnly={!getMeta("themeFeatures.DataDrivenTheme", false)} errorComponent={ErrorPage}>
+        <AppContext
+            variablesOnly={
+                !getMeta("themeFeatures.DataDrivenTheme", false) && !getMeta("themeFeatures.SharedMasterView", false)
+            }
+            errorComponent={ErrorPage}
+        >
             {props.children}
         </AppContext>
     );
 });
 
 // Routing
-addComponent("App", () => (
-    <AppContext variablesOnly>
-        <Router disableDynamicRouting />
-    </AppContext>
-));
+addComponent("App", () => <Router disableDynamicRouting />);
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);

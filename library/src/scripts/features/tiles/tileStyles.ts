@@ -14,6 +14,8 @@ import {
     paddings,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    fonts,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
@@ -55,8 +57,11 @@ export const tileVariables = useThemeCache(() => {
     });
 
     const title = themeVars("title", {
-        fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
-        lineHeight: globalVars.lineHeights.condensed,
+        font: {
+            ...EMPTY_FONTS,
+            size: globalVars.fonts.size.large as FontSizeProperty<TLength>,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
         marginBottom: 6,
     });
 
@@ -206,8 +211,7 @@ export const tileClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        fontSize: unit(vars.title.fontSize),
-        lineHeight: vars.title.lineHeight,
+        ...fonts(vars.title.font),
         textAlign: vars.options.alignment,
         marginBottom: unit(vars.title.marginBottom),
     });

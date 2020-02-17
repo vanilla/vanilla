@@ -15,11 +15,11 @@ use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\AddonManager;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Gdn_Request;
+use Garden\Web\RequestInterface;
 use Gdn_Upload;
 use Vanilla\Theme\TwigAsset;
 
@@ -33,13 +33,13 @@ class FsThemeProvider implements ThemeProviderInterface {
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
 
-    /** @var AddonManager */
+    /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper */
     private $themeHelper;
 
-    /** @var Gdn_Request */
+    /** @var RequestInterface $request */
     private $request;
 
     /** @var ConfigurationInterface */
@@ -51,14 +51,14 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * FsThemeProvider constructor.
      *
-     * @param AddonManager $addonManager
-     * @param Gdn_Request $request
+     * @param AddonProviderInterface $addonManager
+     * @param RequestInterface $request
      * @param ConfigurationInterface $config
      * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
-        AddonManager $addonManager,
-        Gdn_Request $request,
+        AddonProviderInterface $addonManager,
+        RequestInterface $request,
         ConfigurationInterface $config,
         ThemeModelHelper $themeHelper
     ) {
@@ -414,7 +414,9 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         if ($hidden && !in_array($themeInfo['key'], $alwaysVisibleThemes)) {
-            return [];
+            if ($themeInfo['key'] !== $this->getConfigThemeKey()) {
+                return [];
+            }
         }
 
         return $themeInfo;

@@ -37,37 +37,37 @@ export enum TileAlignment {
 /**
  * Renders list of tiles
  */
-export default class Tiles extends React.Component<IProps> {
-    public render() {
-        const vars = tilesVariables();
-        const { className, items, alignment = vars.options.alignment, columns = vars.options.columns } = this.props;
-        const classes = tilesClasses();
+export default function Tiles(props: IProps) {
+    const optionOverrides = { columns: props.columns, alignment: props.alignment };
+    const options = tilesVariables(optionOverrides).options;
+    const { className, items } = props;
+    const { columns } = options;
+    const classes = tilesClasses(optionOverrides);
 
-        if (items.length === 0) {
-            return (
-                <div className={classNames(className, "isEmpty", classes.root(columns))}>
-                    <Paragraph>{this.props.emptyMessage}</Paragraph>
-                </div>
-            );
-        } else {
-            return (
-                <div className={classNames(className, classes.root(columns))}>
-                    <ul className={classNames(classes.items(alignment))}>
-                        {items.map((tile, i) => (
-                            <li key={i} className={classNames(classes.item(columns))}>
-                                <Tile
-                                    icon={tile.icon}
-                                    fallbackIcon={this.props.fallbackIcon}
-                                    title={tile.name}
-                                    description={tile.description}
-                                    url={tile.url}
-                                    columns={columns}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            );
-        }
+    if (items.length === 0) {
+        return (
+            <div className={classNames(className, "isEmpty", classes.root)}>
+                <Paragraph>{props.emptyMessage}</Paragraph>
+            </div>
+        );
+    } else {
+        return (
+            <div className={classNames(className, classes.root)}>
+                <ul className={classNames(classes.items)}>
+                    {items.map((tile, i) => (
+                        <li key={i} className={classNames(classes.item)}>
+                            <Tile
+                                icon={tile.icon}
+                                fallbackIcon={props.fallbackIcon}
+                                title={tile.name}
+                                description={tile.description}
+                                url={tile.url}
+                                columns={columns}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
     }
 }

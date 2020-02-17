@@ -264,6 +264,112 @@ export const ImageAsElementWide = storyWithConfig(
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
 );
 
+export const BorderedSearchWithSolidButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+                content: {
+                    width: 1350,
+                },
+            },
+            banner: {
+                options: {
+                    alignment: BannerAlignment.LEFT,
+                },
+                colors: {
+                    bg: "#fff",
+                    contrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.SOLID,
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Bordered with button solid" />,
+);
+
+export const BorderedSearchWithTransparentButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+                content: {
+                    width: 1350,
+                },
+            },
+            banner: {
+                options: {
+                    alignment: BannerAlignment.LEFT,
+                },
+                colors: {
+                    bg: "#fff",
+                    contrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.TRANSPARENT,
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Bordered with button transparent" />,
+);
+
 (ImageAsElementWide as any).story = {
     parameters: {
         chromatic: {

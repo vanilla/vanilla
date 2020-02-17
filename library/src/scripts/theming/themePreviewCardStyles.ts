@@ -10,7 +10,7 @@ import {
     defaultTransition,
     flexHelper,
     colorOut,
-    emphasizeLightness,
+    offsetLightness,
     absolutePosition,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -46,7 +46,7 @@ export const themeCardVariables = useThemeCache(() => {
 
     const actionDropdown = makeThemeVars("actionDropdown", {
         state: {
-            bg: emphasizeLightness(colors.overlayBg, 0.04),
+            bg: offsetLightness(colors.overlayBg, 0.04),
         },
     });
 
@@ -222,13 +222,13 @@ export const themeCardClasses = useThemeCache(() => {
         color: vars.colors.btnTextColor.toString(),
         $nest: {
             "&:hover": {
-                backgroundColor: colorOut(globalVars.states.hover.color, true),
+                backgroundColor: colorOut(globalVars.states.hover.highlight, true),
             },
             "&:focus": {
-                backgroundColor: colorOut(globalVars.states.focus.color, true),
+                backgroundColor: colorOut(globalVars.states.hover.highlight, true),
             },
             "&:active": {
-                backgroundColor: colorOut(globalVars.states.active.color, true),
+                backgroundColor: colorOut(globalVars.states.active.highlight, true),
             },
         },
     });

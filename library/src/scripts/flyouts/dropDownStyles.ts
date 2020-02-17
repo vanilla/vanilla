@@ -471,16 +471,28 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.color, true),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.hover.contrast, true)
+                        : undefined,
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.color, true),
+                    backgroundColor: colorOut(globalVars.states.focus.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.focus.contrast, true)
+                        : undefined,
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.active.color, true),
+                    backgroundColor: colorOut(globalVars.states.active.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.active.contrast, true)
+                        : undefined,
                 },
                 accessibleFocus: {
-                    borderColor: colorOut(globalVars.mainColors.primary, true),
+                    borderColor: colorOut(globalVars.states.focus.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.focus.contrast, true)
+                        : undefined,
                 },
             },
             undefined,

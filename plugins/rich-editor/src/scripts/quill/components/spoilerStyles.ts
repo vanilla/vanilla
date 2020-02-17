@@ -12,7 +12,7 @@ import { cssRule } from "typestyle";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { borders } from "@library/styles/styleHelpersBorders";
 import { absolutePosition, margins, paddings, unit, userSelect, fonts } from "@library/styles/styleHelpers";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
 
 export const spoilerVariables = useThemeCache(() => {
@@ -69,8 +69,8 @@ export const spoilerCSS = useThemeCache(() => {
         color: colorOut(userContentVars.blocks.fg),
     });
     cssRule(".spoiler", {
-        backgroundColor: colorOut(userContentVars.blocks.bg),
-        color: colorOut(userContentVars.blocks.fg),
+        backgroundColor: important(colorOut(userContentVars.blocks.bg) as string),
+        color: important(colorOut(userContentVars.blocks.fg) as string),
         border: 0,
         $nest: {
             "& .spoiler-content": {

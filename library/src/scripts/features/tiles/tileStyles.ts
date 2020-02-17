@@ -8,8 +8,9 @@ import {
     absolutePosition,
     borders,
     colorOut,
-    debugHelper,
     defaultTransition,
+    offsetLightness,
+    isLightColor,
     paddings,
     unit,
     userSelect,
@@ -77,7 +78,7 @@ export const tileVariables = useThemeCache(() => {
             left: 24,
             right: 24,
         },
-        borderRadius: 2,
+        borderRadius: globalVars.border.radius,
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         bgHover: globalVars.mainColors.bg,
@@ -153,7 +154,7 @@ export const tileClasses = useThemeCache(() => {
             ...shadowOrBorderBasedOnLightness(
                 globalVars.body.backgroundImage.color,
                 borders({
-                    color: vars.link.fg.fade(0.3),
+                    radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                 }),
                 shadow.embed(),
             ),
@@ -168,7 +169,8 @@ export const tileClasses = useThemeCache(() => {
                     ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
                         borders({
-                            color: vars.link.fg.fade(0.5),
+                            color: offsetLightness(globalVars.border.color, 0.05),
+                            radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                         }),
                         shadow.embedHover(),
                     ),

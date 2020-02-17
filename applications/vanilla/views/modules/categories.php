@@ -11,9 +11,11 @@ if ($this->Data !== FALSE) {
         <?php echo panelHeading(t('Categories')); ?>
         <ul class="PanelInfo PanelCategories">
             <?php
-            echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
-                anchor('<span class="Aside"><span class="Count">'.bigPlural($CountDiscussions, '%s discussion').'</span></span> '.t('All Categories'), '/categories', 'ItemLink')
-                .'</li>';
+            if (!Gdn::themeFeatures()->useDataDrivenTheme()) {
+                echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
+                    anchor('<span class="Aside"><span class="Count">'.bigPlural($CountDiscussions, '%s discussion').'</span></span> '.t('All Categories'), '/categories', 'ItemLink ItemLinkAllCategories')
+                    .'</li>';
+            }
 
             $MaxDepth = c('Vanilla.Categories.MaxDisplayDepth');
 

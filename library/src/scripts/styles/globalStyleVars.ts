@@ -6,7 +6,7 @@
 import {
     colorOut,
     ColorValues,
-    emphasizeLightness,
+    offsetLightness,
     IBackground,
     IBorderRadiusOutput,
     modifyColorBasedOnLightness,
@@ -15,10 +15,11 @@ import {
     getRatioBasedOnDarkness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
+import main from "@storybook/api/dist/initial-state";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -31,8 +32,22 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const constants = makeThemeVars("constants", {
-        linkStateColorEmphasis: 0.15,
+        stateColorEmphasis: 0.15,
         fullGutter: 48,
+        states: {
+            hover: {
+                stateEmphasis: 0.08,
+            },
+            selected: {
+                stateEmphasis: 0.5,
+            },
+            active: {
+                stateEmphasis: 0.2,
+            },
+            focus: {
+                stateEmphasis: 0.15,
+            },
+        },
     });
 
     const elementaryColors = {
@@ -45,19 +60,26 @@ export const globalVariables = useThemeCache(() => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
         secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
     colorPrimary = initialMainColors.primary;
 
-    const primaryDarkness = colorPrimary.lightness();
-    const backgroundDarkness = initialMainColors.bg.lightness();
-    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+    // Shorthand checking bg color for darkness
+    const getRatioBasedOnBackgroundDarkness = (
+        weight: number,
+        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+    ) => {
+        return getRatioBasedOnDarkness(weight, bgColor);
+    };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.06, !goodContrast),
+        primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
+        secondary: offsetLightness(colorPrimary, 0.05),
+        stateSecondary: offsetLightness(colorPrimary, 0.2), // Default state color change
+        secondaryContrast: initialMainColors.bg,
     });
 
     const mainColors = {
@@ -65,13 +87,8 @@ export const globalVariables = useThemeCache(() => {
         ...generatedMainColors,
     };
 
-    // Shorthand checking bg color for darkness
-    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
-    };
-
     const mixBgAndFg = (weight: number) => {
-        return mainColors.fg.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
     const mixPrimaryAndFg = (weight: number) => {
@@ -99,16 +116,18 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(linkColorDefault, constants.linkStateColorEmphasis, true);
+    const linkDerivedColors = makeThemeVars("linkDerivedColors", {
+        default: mainColors.secondary,
+        state: mainColors.stateSecondary,
+    });
 
     const links = makeThemeVars("links", {
         colors: {
-            default: linkColorDefault,
-            hover: linkColorState,
-            focus: linkColorState,
-            accessibleFocus: linkColorState,
-            active: linkColorState,
+            default: linkDerivedColors.default,
+            hover: linkDerivedColors.state,
+            focus: linkDerivedColors.state,
+            accessibleFocus: linkDerivedColors.state,
+            active: linkDerivedColors.state,
             visited: undefined,
         },
     });
@@ -270,19 +289,23 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.08),
+            highlight: mixPrimaryAndBg(constants.states.hover.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         selected: {
-            color: mixPrimaryAndBg(0.5),
+            highlight: mixPrimaryAndBg(constants.states.selected.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.2),
+            highlight: mixPrimaryAndBg(constants.states.active.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.15),
+            highlight: mixPrimaryAndBg(constants.states.focus.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
     });

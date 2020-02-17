@@ -168,13 +168,17 @@ if (!function_exists('writeListItem')):
                 Gdn::controller()->EventArguments['ChildCategories'] = &$children;
                 Gdn::controller()->EventArguments['Category'] = &$category;
                 Gdn::controller()->fireEvent('BeforeCategoryItem');
+                $headingClass = "CategoryNameHeading";
+                if (empty($row['Description'])) {
+                    $headingClass .= " isEmptyDescription";
+                }
                 ?>
                 <div class="ItemContent Category">
                     <div class="Options">
                         <?php echo getOptions($category) ?>
                     </div>
                     <?php echo categoryPhoto($category); ?>
-                    <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap">
+                    <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap <?php echo $headingClass?>">
                         <?php echo anchor(Gdn_Format::text(val('Name', $category)), categoryUrl($category), 'Title');
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
@@ -269,7 +273,12 @@ if (!function_exists('WriteTableRow')):
 
                     echo categoryPhoto($row);
 
-                    echo "<{$h} aria-level='".$level."'>";
+                    $headingClass = "CategoryNameHeading";
+                    if (empty($row['Description'])) {
+                        $headingClass .= " isEmptyDescription";
+                    }
+
+                    echo "<{$h} aria-level='".$level."' class='".$headingClass."'>";
                     $safeName = htmlspecialchars($row['Name']);
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
@@ -470,7 +479,7 @@ if (!function_exists('followButton')) :
 
             $icon = <<<EOT
                 <svg xmlns="http://www.w3.org/2000/svg" class="followButton-icon" viewBox="0 0 16 16" aria-hidden="true">
-                    <title>{$iconTitle}</title>  
+                    <title>{$iconTitle}</title>
                     <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
                 </svg>
 EOT;

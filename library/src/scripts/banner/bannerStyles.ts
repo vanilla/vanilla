@@ -8,25 +8,32 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import { important, percent, px, quote, translateX, calc, translateY } from "csx";
+import {
+    centeredBackgroundProps,
+    fonts,
+    IFont,
+    unit,
+    colorOut,
+    backgroundHelper,
+    absolutePosition,
+    modifyColorBasedOnLightness,
+    EMPTY_FONTS,
+    EMPTY_SPACING,
+    borders,
+    EMPTY_BACKGROUND,
+    paddings,
+    margins,
+} from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
-import {EMPTY_SPACING, margins, paddings} from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import {
-    backgroundHelper,
-    centeredBackgroundProps,
-    EMPTY_BACKGROUND
-} from "@library/styles/styleHelpersBackgroundStyling";
-import {EMPTY_FONTS, fonts, IFont} from "@library/styles/styleHelpersTypography";
-import {colorOut, modifyColorBasedOnLightness} from "@library/styles/styleHelpersColors";
 import merge from "lodash/merge";
-import {unit, borders, absolutePosition} from "@library/styles/styleHelpers";
-import {calc, important, percent, px, quote, translateX} from "csx";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -54,7 +61,7 @@ export const bannerVariables = useThemeCache(() => {
         padding: {
             ...EMPTY_SPACING,
             top: topPadding as PaddingProperty<TLength>,
-            bottom: (topPadding * 0.8) as PaddingProperty<TLength>,
+            bottom: topPadding as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
         paddingMobile: {
@@ -92,7 +99,7 @@ export const bannerVariables = useThemeCache(() => {
             fonts: {
                 color: initialColors.secondaryContrast,
             },
-        }
+        },
     });
 
     const colors = merge(initialColors, derivedColors);
@@ -168,7 +175,7 @@ export const bannerVariables = useThemeCache(() => {
         },
         margins: {
             ...EMPTY_SPACING,
-            top: 24,
+            top: 14,
             bottom: 12,
         },
         text: "How can we help you?",
@@ -225,19 +232,21 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const shadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.05),
-        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.3))}`,
-        background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.1) as BackgroundColorProperty,
+        color: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.05),
+        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.3))}`,
+        background: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(
+            0.1,
+        ) as BackgroundColorProperty,
     });
 
     // const bgColor = isTransparentButton ? "transparent" : colors.bg;
-    // const fgColor = isTransparentButton ? colors.contrast : colors.fg;
+    // const fgColor = isTransparentButton ? colors.primaryContrast : colors.fg;
     // const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
-    // const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
+    // const activeBorderColor = isTransparentButton ? colors.primaryContrast : colors.bg;
 
     const searchButton: IButtonType = makeThemeVars("bannerSearchButton", {
         name: "bannerSearchButton",
-        spinnerColor: colors.contrast,
+        spinnerColor: colors.primaryContrast,
         colors: colors,
         borders: {
             color: colors.bg,
@@ -258,31 +267,31 @@ export const bannerVariables = useThemeCache(() => {
         },
         hover: {
             colors: {
-                fg: colors.contrast,
+                fg: colors.primaryContrast,
                 bg: colors.state.colors.bg,
             },
             borders: {
                 color: colors.bg,
             },
             fonts: {
-                color: colors.contrast,
+                color: colors.primaryContrast,
             },
         },
         active: {
             colors: {
-                fg: colors.contrast,
+                fg: colors.primaryContrast,
                 bg: colors.state.colors.bg,
             },
             borders: {
                 color: colors.bg,
             },
             fonts: {
-                color: colors.contrast,
+                color: colors.primaryContrast,
             },
         },
         focus: {
             colors: {
-                fg: colors.contrast,
+                fg: colors.primaryContrast,
                 bg: colors.state.colors.bg,
                 // bg: bgColorActive,
             },
@@ -291,19 +300,19 @@ export const bannerVariables = useThemeCache(() => {
                 bg: colors.state.colors.bg,
             },
             fonts: {
-                color: colors.contrast,
+                color: colors.primaryContrast,
             },
         },
         focusAccessible: {
             colors: {
-                fg: colors.contrast,
+                fg: colors.primaryContrast,
                 bg: colors.state.colors.bg,
             },
             borders: {
                 color: colors.state.colors.fg,
             },
             fonts: {
-                color: colors.contrast,
+                color: colors.primaryContrast,
             },
         },
     });
@@ -344,144 +353,144 @@ export const bannerClasses = useThemeCache(() => {
     if (vars.searchButtonOptions.type === SearchBarButtonType.SOLID) {
         // SOLID
         const solidButtonVars = merge(vars.searchButton, {
-            "colors": {
+            colors: {
                 fg: vars.colors.bg,
                 bg: vars.colors.fg,
             },
-            "fonts": {
-                "color": vars.colors.bg,
+            fonts: {
+                color: vars.colors.bg,
             },
-            "hover": {
+            hover: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: vars.colors.secondary,
-                    fg: vars.colors.seondaryContrast.
-                }
+                    fg: vars.colors.secondaryContrast,
+                },
             },
-            "active": {
+            active: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: vars.backgrounds.overlayColor.fade(0.15),
-                }
+                },
             },
-            "focus": {
+            focus: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: vars.backgrounds.overlayColor.fade(0.15),
-                }
+                },
             },
-            "focusAccessible": {
+            focusAccessible: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: vars.backgrounds.overlayColor.fade(0.15),
-                }
-            }
+                },
+            },
         });
         searchButton = style("searchButton-solid", generateButtonStyleProperties(solidButtonVars), {
-            left: -1
+            left: -1,
         });
     } else if (vars.searchButtonOptions.type === SearchBarButtonType.TRANSPARENT) {
         // TRANSPARENT
 
         const transparentVariables = merge(vars.searchButton, {
-            "colors": {
+            colors: {
                 fg: vars.title.font.color,
                 bg: "transparent",
             },
-            "borders": {
+            borders: {
                 color: vars.title.font.color,
                 width: 1,
                 leftColor: vars.title.font.color,
             },
-            "hover": {
+            hover: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "active": {
+            active: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "focus": {
+            focus: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "focusAccessible": {
+            focusAccessible: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
-            }
+                },
+            },
         });
         searchButton = style("searchButton-transparent", generateButtonStyleProperties(transparentVariables), {
             left: -1,
         });
     } else {
         const defaultButtonVars = merge(vars.searchButton, {
-            "colors": {
+            colors: {
                 fg: vars.colors.primaryContrast,
                 bg: vars.colors.primary,
             },
-            "borders": {
+            borders: {
                 width: 1,
                 color: vars.colors.secondary,
                 leftColor: vars.colors.secondary,
             },
-            "hover": {
+            hover: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "active": {
+            active: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "focus": {
+            focus: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
+                },
             },
-            "focusAccessible": {
+            focusAccessible: {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
-                "colors": {
+                colors: {
                     bg: overlayColor,
-                }
-            }
+                },
+            },
         });
-        searchButton = style("searchButton", generateButtonStyleProperties(vars.defaultButtonVars), { left: -1 });
+        searchButton = style("searchButton", generateButtonStyleProperties(defaultButtonVars), { left: -1 });
     }
 
     const valueContainer = style("valueContainer", {
@@ -511,9 +520,14 @@ export const bannerClasses = useThemeCache(() => {
         };
 
         return style("outerBackground", {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: percent(100),
+            height: calc(`100% + 2px`),
+            transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
             ...centeredBackgroundProps(),
             display: "block",
-            ...absolutePosition.fullSizeOfParent(),
             ...backgroundHelper(finalVars),
         });
     };
@@ -556,7 +570,7 @@ export const bannerClasses = useThemeCache(() => {
     );
 
     const text = style("text", {
-        color: colorOut(vars.colors.contrast),
+        color: colorOut(vars.colors.primaryContrast),
     });
 
     const searchContainer = style(
@@ -653,11 +667,20 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const content = style("content", {
+        borderColor: colorOut(vars.colors.primaryContrast),
+        // boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        borderRadius:
+            vars.searchButton.borders &&
+            vars.searchButton.borders.right &&
+            vars.searchButton.borders.right.radius &&
+            (typeof vars.searchButton.borders.right.radius === "number" ||
+                typeof vars.searchButton.borders.right.radius === "string")
+                ? unit(vars.searchButton.borders.right.radius)
+                : 0,
+        zIndex: 1,
         $nest: {
-            "&&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(vars.colors.contrast),
-                boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
-                zIndex: 1,
+            "&.hasFocus .searchBar-valueContainer": {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
             },
         },
     });

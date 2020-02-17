@@ -11,7 +11,6 @@ use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -206,14 +205,14 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $noMobileLogo = empty($mobileLogo);
 
                 if (!$noDesktopLogo) {
-                    $res["assets"]["logo"] = new ImageAsset(asset($desktopLogo, true, true));
+                    $res["assets"]["logo"] = new ImageAsset($desktopLogo);
                 }
                 if (!$noMobileLogo || !$noDesktopLogo) {
                     if (!$noMobileLogo) {
-                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($mobileLogo, true, true));
+                        $res["assets"]["mobileLogo"] = new ImageAsset($mobileLogo);
                     } else {
                         // Use same logo if mobile is not set.
-                        $res["assets"]["mobileLogo"] = new ImageAsset(asset($desktopLogo, true, true));
+                        $res["assets"]["mobileLogo"] = new ImageAsset($desktopLogo);
                     }
                 }
             }

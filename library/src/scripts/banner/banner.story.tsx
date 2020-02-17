@@ -370,6 +370,36 @@ export const BorderedSearchWithTransparentButton = storyWithConfig(
     () => <StoryBanner title="Bordered with button transparent" />,
 );
 
+export const SearchStyleNoBorder = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {},
+        },
+    },
+    () => <StoryBanner title="Button Styles - No Border" />,
+);
+
+export const ButtonStyleFullBorder = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {},
+        },
+    },
+    () => <StoryBanner title="Button Styles - Full Border" />,
+);
+
+export const ButtonStyleShadowed = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {},
+        },
+    },
+    () => <StoryBanner title="Button Styles - Shadowed" />,
+);
+
 (ImageAsElementWide as any).story = {
     parameters: {
         chromatic: {

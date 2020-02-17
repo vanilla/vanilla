@@ -61,7 +61,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                     className={linkContentClasses}
                     onClick={this.handleClick as any}
                 >
-                    <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
+                    <span className={classNames(classes.label)}>{this.props.name}</span>
                 </Button>
             );
         } else {
@@ -78,7 +78,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                             tabIndex={0}
                             to={this.props.url}
                         >
-                            <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
+                            <span className={classes.label}>{this.props.name}</span>
                         </SmartLink>
                     )}
                 </Hoverable>

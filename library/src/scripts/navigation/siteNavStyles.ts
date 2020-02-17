@@ -85,6 +85,25 @@ export const siteNavNodeClasses = useThemeCache(() => {
 
     const style = styleFactory("siteNavNode");
 
+    const label = style(
+        "label",
+        {
+            position: "relative",
+            display: "block",
+            width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
+            marginLeft: unit(-vars.nodeToggle.width),
+            textAlign: "left",
+            border: `solid transparent ${unit(vars.node.borderWidth)}`,
+            paddingTop: unit(vars.node.padding + vars.node.borderWidth),
+            paddingRight: unit(vars.node.padding),
+            paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
+            paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
+        },
+        mediaQueries.oneColumnDown({
+            fontSize: unit(globalVars.fonts.size.large),
+        }),
+    );
+
     const root = style({
         position: "relative",
         display: "flex",
@@ -94,7 +113,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         fontSize: unit(vars.node.fontSize),
         color: vars.node.fg.toString(),
         $nest: {
-            "&.isCurrent": {
+            [`&.isCurrent .${label}`]: {
                 color: vars.node.active.fg.toString(),
             },
         },
@@ -137,8 +156,10 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 outline: 0,
             },
             "&.hasChildren": {
-                fontWeight: globalVars.fonts.weights.semiBold,
                 $nest: {
+                    [`& .${label}`]: {
+                        fontWeight: globalVars.fonts.weights.bold,
+                    },
                     "&.isFirstLevel": {
                         fontSize: unit(globalVars.fonts.size.large),
                         fontWeight: globalVars.fonts.weights.normal,
@@ -182,25 +203,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
     };
 
     const link = style("link", linkMixin(true));
-
-    const label = style(
-        "label",
-        {
-            position: "relative",
-            display: "block",
-            width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
-            marginLeft: unit(-vars.nodeToggle.width),
-            textAlign: "left",
-            border: `solid transparent ${unit(vars.node.borderWidth)}`,
-            paddingTop: unit(vars.node.padding + vars.node.borderWidth),
-            paddingRight: unit(vars.node.padding),
-            paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
-            paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
-        },
-        mediaQueries.oneColumnDown({
-            fontSize: unit(globalVars.fonts.size.large),
-        }),
-    );
 
     const spacer = style("spacer", {
         display: "block",

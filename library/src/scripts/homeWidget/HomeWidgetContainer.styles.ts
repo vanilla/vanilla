@@ -5,27 +5,23 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { CsxBackgroundOptions } from "csx/lib/types";
 import {
     BorderType,
     EMPTY_BACKGROUND,
     IBackground,
     unit,
-    background,
+    backgroundHelper,
     margins,
     EMPTY_FONTS,
     fonts,
     paddings,
-    IBorderStyles,
-    ISimpleBorderStyle,
     borders,
     extendItemContainer,
 } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { percent, borderColor } from "csx";
+import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { cssRule } from "typestyle";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 
@@ -111,7 +107,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const vars = homeWidgetContainerVariables(optionOverrides);
 
     const root = style({
-        ...background(vars.options.outerBackground ?? {}),
+        ...backgroundHelper(vars.options.outerBackground ?? {}),
     });
 
     const contentMixin: NestedCSSProperties = {
@@ -162,7 +158,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const grid = style(
         "grid",
         {
-            ...background(vars.options.innerBackground),
+            ...backgroundHelper(vars.options.innerBackground),
             display: "flex",
             alignItems: "stretch",
             justifyContent: "flex-start",

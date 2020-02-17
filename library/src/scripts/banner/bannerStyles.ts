@@ -72,9 +72,9 @@ export const bannerVariables = useThemeCache(() => {
     // Main colors
     const initialColors = makeThemeVars("initialColors", {
         primary: globalVars.mainColors.primary,
+        primaryContrast: globalVars.mainColors.primaryContrast,
         secondary: globalVars.mainColors.secondary,
-        secondaryContrast: globalVars.mainColors.secondaryCon,
-        contrast: globalVars.elementaryColors.white,
+        secondaryContrast: globalVars.mainColors.secondaryContrast,
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         borderColor: globalVars.mainColors.fg.fade(0.4),
@@ -83,14 +83,14 @@ export const bannerVariables = useThemeCache(() => {
     const derivedColors = makeThemeVars("derivedColors", {
         state: {
             colors: {
-                fg: initialColors.contrast,
+                fg: initialColors.secondaryContrast,
                 bg: initialColors.secondary,
             },
             borders: {
                 color: initialColors.bg,
             },
             fonts: {
-                color: initialColors.contrast,
+                color: initialColors.secondaryContrast,
             },
         }
     });
@@ -146,12 +146,12 @@ export const bannerVariables = useThemeCache(() => {
 
     const textMixin = {
         ...EMPTY_FONTS,
-        color: colors.contrast,
+        color: colors.primaryContrast,
         align: options.alignment,
         shadow: `0 1px 1px ${colorOut(
-            modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity),
+            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.innerShadowOpacity),
         )}, 0 1px 25px ${colorOut(
-            modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.outerShadowOpacity),
+            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.outerShadowOpacity),
         )}` as TextShadowProperty,
     };
 
@@ -337,6 +337,7 @@ export const bannerClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
 
     const isCentered = vars.options.alignment === "center";
+    const overlayColor = vars.backgrounds.overlayColor.fade(0.15);
 
     let searchButton;
 
@@ -389,22 +390,23 @@ export const bannerClasses = useThemeCache(() => {
         });
     } else if (vars.searchButtonOptions.type === SearchBarButtonType.TRANSPARENT) {
         // TRANSPARENT
+
         const transparentVariables = merge(vars.searchButton, {
             "colors": {
-                fg: vars.colors.contrast,
+                fg: vars.title.font.color,
                 bg: "transparent",
             },
             "borders": {
-                color: vars.colors.contrast,
+                color: vars.title.font.color,
                 width: 1,
-                leftColor: vars.colors.contrast,
+                leftColor: vars.title.font.color,
             },
             "hover": {
                 borders: {
                     bg: vars.colors.state.borders.color,
                 },
                 "colors": {
-                    bg: vars.backgrounds.overlayColor.fade(0.15),
+                    bg: overlayColor,
                 }
             },
             "active": {
@@ -412,7 +414,7 @@ export const bannerClasses = useThemeCache(() => {
                     bg: vars.colors.state.borders.color,
                 },
                 "colors": {
-                    bg: vars.backgrounds.overlayColor.fade(0.15),
+                    bg: overlayColor,
                 }
             },
             "focus": {
@@ -420,7 +422,7 @@ export const bannerClasses = useThemeCache(() => {
                     bg: vars.colors.state.borders.color,
                 },
                 "colors": {
-                    bg: vars.backgrounds.overlayColor.fade(0.15),
+                    bg: overlayColor,
                 }
             },
             "focusAccessible": {
@@ -428,7 +430,7 @@ export const bannerClasses = useThemeCache(() => {
                     bg: vars.colors.state.borders.color,
                 },
                 "colors": {
-                    bg: vars.backgrounds.overlayColor.fade(0.15),
+                    bg: overlayColor,
                 }
             }
         });
@@ -438,9 +440,46 @@ export const bannerClasses = useThemeCache(() => {
     } else {
         const defaultButtonVars = merge(vars.searchButton, {
             "colors": {
-                fg: vars.colors.contrast,
-                bg: "transparent",
+                fg: vars.colors.primaryContrast,
+                bg: vars.colors.primary,
             },
+            "borders": {
+                width: 1,
+                color: vars.colors.secondary,
+                leftColor: vars.colors.secondary,
+            },
+            "hover": {
+                borders: {
+                    bg: vars.colors.state.borders.color,
+                },
+                "colors": {
+                    bg: overlayColor,
+                }
+            },
+            "active": {
+                borders: {
+                    bg: vars.colors.state.borders.color,
+                },
+                "colors": {
+                    bg: overlayColor,
+                }
+            },
+            "focus": {
+                borders: {
+                    bg: vars.colors.state.borders.color,
+                },
+                "colors": {
+                    bg: overlayColor,
+                }
+            },
+            "focusAccessible": {
+                borders: {
+                    bg: vars.colors.state.borders.color,
+                },
+                "colors": {
+                    bg: overlayColor,
+                }
+            }
         });
         searchButton = style("searchButton", generateButtonStyleProperties(vars.defaultButtonVars), { left: -1 });
     }

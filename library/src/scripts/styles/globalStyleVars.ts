@@ -47,6 +47,7 @@ export const globalVariables = useThemeCache(() => {
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
+        secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
     colorPrimary = initialMainColors.primary;

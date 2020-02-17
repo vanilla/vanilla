@@ -2084,7 +2084,7 @@ class DiscussionModel extends Gdn_Model {
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->applyRule('Body', 'RawLength');
             }
 
             if ($minCommentLength && is_numeric($minCommentLength)) {

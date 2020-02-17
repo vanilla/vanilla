@@ -528,6 +528,29 @@ if (!function_exists('validateLength')) {
     }
 }
 
+if (!function_exists('validateRawLength')) {
+    /**
+     * Validate that a string is not too long.
+     *
+     * @param mixed $value The value to validate.
+     * @param object $field The field information that contains the maximum length for the {@link $value}.
+     * @return bool|string
+     */
+    function validateRawLength($value, $field) {
+        if (function_exists('mb_strlen')) {
+            $diff = mb_strlen($value, 'UTF-8') - $field->Length;
+        } else {
+            $diff = strlen($value) - $field->Length;
+        }
+
+        if ($diff <= 0) {
+            return true;
+        } else {
+            return sprintf(t('ValidateLength'), t($field->Name), $diff);
+        }
+    }
+}
+
 if (!function_exists('validateEnum')) {
     /**
      * Validate that a value is one of the values allowed in an enum.

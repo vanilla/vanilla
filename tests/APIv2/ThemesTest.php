@@ -16,6 +16,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Models\ThemeModel;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -142,12 +143,13 @@ class ThemesTest extends AbstractAPIv2Test {
      * @depends testGetByName
      */
     public function testLogo() {
+        $cacheBuster = self::container()->get(DeploymentCacheBuster::class)->value();
         $logo = "logo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.Logo", $logo);
 
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo));
+        $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo) . "?v=$cacheBuster");
     }
 
     /**
@@ -156,12 +158,13 @@ class ThemesTest extends AbstractAPIv2Test {
      * @depends testGetByName
      */
     public function testMobileLogo() {
+        $cacheBuster = self::container()->get(DeploymentCacheBuster::class)->value();
         $mobileLogo = "mobileLogo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.MobileLogo", $mobileLogo);
 
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo));
+        $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo) . "?v=$cacheBuster");
     }
 
     /**

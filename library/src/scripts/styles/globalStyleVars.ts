@@ -20,6 +20,7 @@ import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -371,6 +372,13 @@ export const globalVariables = useThemeCache(() => {
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
+    // Sets global "style" for buttons. Use "ButtonPresets" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
+    // the style of them.
+    const buttonPreset = makeThemeVars("buttonPreset", {
+        style: undefined,
+    });
+
     const separator = makeThemeVars("separator", {
         color: border.color,
         size: 1,
@@ -453,6 +461,7 @@ export const globalVariables = useThemeCache(() => {
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,
+        buttonPreset,
     };
 });
 

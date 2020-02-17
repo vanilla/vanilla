@@ -4,7 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, buttonResetMixin, buttonSizing, ButtonTypes } from "@library/forms/buttonStyles";
+import {
+    buttonGlobalVariables,
+    ButtonPresets,
+    buttonResetMixin,
+    buttonSizing,
+    ButtonTypes,
+} from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { borders } from "@library/styles/styleHelpersBorders";
@@ -29,6 +35,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
+            preset: ButtonPresets.ADVANCED,
             colors: {},
             hover: state,
             focus: state,

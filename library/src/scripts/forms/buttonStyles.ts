@@ -22,6 +22,12 @@ import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+export enum ButtonPresets {
+    SOLID = "solid",
+    OUTLINE = "outline",
+    ADVANCED = "advanced",
+}
+
 export const buttonGlobalVariables = useThemeCache(() => {
     // Fetch external global variables
     const globalVars = globalVariables();
@@ -68,8 +74,9 @@ export const buttonVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("button");
     const vars = buttonGlobalVariables();
 
-    const standard: IButtonType = makeThemeVars("basic", {
+    const standard: IButtonType = makeThemeVars("standard", {
         name: ButtonTypes.STANDARD,
+        preset: ButtonPresets.OUTLINE,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
             fg: globalVars.mainColors.fg,
@@ -123,6 +130,7 @@ export const buttonVariables = useThemeCache(() => {
 
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
+        preset: ButtonPresets.SOLID,
         colors: {
             fg: vars.colors.primaryContrast, // Defaults to bg, but may need to be changed for proper contrast
             bg: vars.colors.primary,
@@ -160,6 +168,7 @@ export const buttonVariables = useThemeCache(() => {
 
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
+        preset: ButtonPresets.ADVANCED,
         colors: {
             fg: globalVars.mainColors.bg,
             bg: globalVars.mainColors.fg.fade(0.1),
@@ -192,6 +201,7 @@ export const buttonVariables = useThemeCache(() => {
 
     const translucid: IButtonType = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
+        preset: ButtonPresets.ADVANCED,
         colors: {
             bg: globalVars.mainColors.bg,
             fg: globalVars.mainColors.primary,

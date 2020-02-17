@@ -7,6 +7,7 @@
 namespace Vanilla\Models;
 
 use Vanilla\Addon;
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -132,11 +133,11 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @return Addon
      */
-    public function getThemeAddon($themeKey): Addon {
+    public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
+        if (!($theme instanceof AddonInterface)) {
             $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
-            if (!($theme instanceof Addon)) {
+            if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
             }
@@ -157,7 +158,6 @@ class FsThemeProvider implements ThemeProviderInterface {
             "assets" => $assets,
             'name' => $theme->getInfoValue('name'),
             'themeID' => $theme->getInfoValue('key'),
-            'name' => $theme->getInfoValue('name'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
             'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme')),

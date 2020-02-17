@@ -17,6 +17,7 @@ import {
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { percent } from "csx";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -70,6 +71,9 @@ export const inputClasses = useThemeCache(() => {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),
+            "&. .SelectOne__input": {
+                width: percent(100),
+            },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
                     color: vars.colors.state.fg,
@@ -85,6 +89,7 @@ export const inputClasses = useThemeCache(() => {
     const applyInputCSSRules = () => cssRule(" .inputText", inputMixin);
 
     const inputText = style("inputText", {
+        ...inputMixin,
         marginBottom: 0,
         $nest: {
             "&&": {

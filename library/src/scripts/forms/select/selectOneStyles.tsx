@@ -6,7 +6,7 @@
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, unit } from "@library/styles/styleHelpers";
-import { calc } from "csx";
+import { calc, percent } from "csx";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
@@ -47,6 +47,9 @@ export const selectOneClasses = useThemeCache(() => {
             "& .SelectOne__single-value": {
                 textOverflow: "ellipsis",
                 maxWidth: calc(`100% - ${unit(vars.padding.right + 26)}`),
+            },
+            "& .SelectOne__value-container > *": {
+                width: percent(100),
             },
         },
     });

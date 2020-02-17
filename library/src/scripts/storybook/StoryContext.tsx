@@ -22,6 +22,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { tileVariables } from "@library/features/tiles/tileStyles";
 import { tilesVariables } from "@library/features/tiles/tilesStyles";
 import { bannerVariables } from "@library/banner/bannerStyles";
+import { inputClasses } from "@library/forms/inputStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -114,6 +115,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
 
     const classes = storyBookClasses();
     blotCSS();
+    inputClasses().applyInputCSSRules();
 
     return (
         <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>

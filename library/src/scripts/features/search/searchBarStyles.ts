@@ -99,6 +99,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                         [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
                         },
+                        "& > *": {
+                            width: percent(100),
+                        },
                     },
                 },
                 "& .searchBar-submitButton": {

@@ -12,7 +12,6 @@ import {
     unit,
     userSelect,
     spinnerLoaderAnimationProperties,
-    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";

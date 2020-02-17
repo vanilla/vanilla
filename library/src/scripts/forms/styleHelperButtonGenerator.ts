@@ -24,15 +24,17 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
+    const state = buttonTypeVars.state ?? {};
+
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
             colors: {},
-            hover: {},
-            focus: {},
-            active: {},
-            borders: {},
-            focusAccessible: {},
+            hover: state,
+            focus: state,
+            active: state,
+            borders: state,
+            focusAccessible: state,
         },
         buttonTypeVars,
     );

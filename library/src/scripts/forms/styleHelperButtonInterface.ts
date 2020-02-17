@@ -10,7 +10,7 @@ import { ColorValues } from "@library/styles/styleHelpersColors";
 import { TLength } from "typestyle/lib/types";
 
 export interface IButtonType {
-    name: string;
+    preset: string;
     spinnerColor?: ColorValues;
     colors?: {
         bg?: ColorValues;
@@ -27,6 +27,14 @@ export interface IButtonType {
         side?: TLength;
     };
     fonts?: IFont;
+    state?: {
+        colors?: {
+            fg?: ColorValues;
+            bg?: ColorValues;
+        };
+        borders?: IBorderStyles;
+        fonts?: IFont;
+    };
     hover?: {
         colors?: {
             fg?: ColorValues;

@@ -8,15 +8,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import {
-    borders,
-    colorOut,
-    fullSizeOfParent,
-    margins,
-    sticky,
-    unit,
-    absolutePosition,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, sticky, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -53,7 +45,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        radius: globalVars.border.radius,
+        radius: globalVars.borderCategories.modals.radius,
     });
 
     const dropDown = makeThemeVars("dropDown", {

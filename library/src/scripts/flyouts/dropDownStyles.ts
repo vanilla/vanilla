@@ -87,7 +87,7 @@ export const dropDownVariables = useThemeCache(() => {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         border: {
-            radius: globalVars.border.radius,
+            radius: globalVars.borderCategories.dropDowns.content,
             color: globalVars.border.color,
         },
         padding: {
@@ -125,8 +125,7 @@ export const dropDownClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "auto",
-        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
-        ...borders(vars.contents.border),
+        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
         $nest: {
             "&&": {
                 zIndex: 3,
@@ -172,7 +171,7 @@ export const dropDownClasses = useThemeCache(() => {
     const likeDropDownContent = style("likeDropDownContent", {
         ...shadows.dropDown(),
         backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...borders(),
+        ...borders(vars.contents.border),
     } as NestedCSSProperties);
 
     const items = style("items", {

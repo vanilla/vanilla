@@ -85,6 +85,13 @@ const setAllRadii = (radius: BorderRadiusProperty<TLength>) => {
     };
 };
 
+export const EMPTY_BORDER = {
+    color: undefined,
+    style: undefined,
+    radius: undefined,
+    width: undefined,
+};
+
 /**
  * Main utility function for generation proper border radiuses. Supports numerous shorthand properties.
  *

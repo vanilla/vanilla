@@ -13,13 +13,13 @@ import {
     radiusValue,
     EMPTY_BACKGROUND,
     getRatioBasedOnDarkness,
+    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import main from "@storybook/api/dist/initial-state";
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -148,7 +148,30 @@ export const globalVariables = useThemeCache(() => {
         colorHover: mixBgAndFg(0.2),
         width: 1,
         style: "solid",
-        radius: 6,
+        radius: 6, // Global default
+    });
+
+    const borderCategories = makeThemeVars("borderRadiiGroups", {
+        formElements: {
+            default: {
+                ...EMPTY_BORDER,
+                radius: border.radius,
+            },
+            buttons: {
+                ...EMPTY_BORDER,
+                radius: border.radius,
+            },
+        },
+        modals: {
+            ...EMPTY_BORDER,
+            radius: border.radius,
+        },
+        dropDowns: {
+            content: {
+                ...EMPTY_BORDER,
+                radius: border.radius,
+            },
+        },
     });
 
     const gutterSize = 16;
@@ -405,6 +428,7 @@ export const globalVariables = useThemeCache(() => {
         mainColors,
         messageColors,
         body,
+        borderCategories,
         border,
         meta,
         gutter,

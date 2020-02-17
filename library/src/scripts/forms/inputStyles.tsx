@@ -8,6 +8,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     borders,
     colorOut,
+    EMPTY_BORDER,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
@@ -39,7 +40,10 @@ export const inputVariables = useThemeCache(() => {
         size: globalVars.fonts.size.large,
     });
 
-    const border: IBordersWithRadius = makeThemeVars("borders", globalVars.border);
+    const border: IBordersWithRadius = makeThemeVars("borders", {
+        ...EMPTY_BORDER,
+        ...globalVars.borderCategories.formElements.default,
+    });
 
     return {
         colors,
@@ -56,7 +60,7 @@ export const inputClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const inputMixin: NestedCSSProperties = {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.width * 2),
         backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),

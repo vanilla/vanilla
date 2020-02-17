@@ -10,7 +10,6 @@ import {
     absolutePosition,
     colorOut,
     flexHelper,
-    margins,
     negative,
     paddings,
     unit,
@@ -19,7 +18,6 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");

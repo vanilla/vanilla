@@ -5,7 +5,6 @@
  */
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     allButtonStates,
@@ -197,12 +196,15 @@ export const titleBarVariables = useThemeCache(() => {
         bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
     });
 
+    // Note that the logo defined here is the last fallback. If set through the dashboard, it will overwrite these values.
     const logo = makeThemeVars("logo", {
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
+        desktop: {}, // add "url" if you want to set in theme
+        mobile: {}, // add "url" if you want to set in theme
     });
 
     const mobileLogo = makeThemeVars("mobileLogo", {

@@ -11,7 +11,6 @@ use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -195,6 +194,31 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
             }
         }
+
+
+        // Check theme for default.
+        if (!$logo) {
+            if (valr("assets.variables", $res)) {
+                $themeVars = json_decode($res['assets']['variables']->getData(), true);
+                $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
+                $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
+                $noDesktopLogo = empty($desktopLogo);
+                $noMobileLogo = empty($mobileLogo);
+
+                if (!$noDesktopLogo) {
+                    $res["assets"]["logo"] = new ImageAsset($desktopLogo);
+                }
+                if (!$noMobileLogo || !$noDesktopLogo) {
+                    if (!$noMobileLogo) {
+                        $res["assets"]["mobileLogo"] = new ImageAsset($mobileLogo);
+                    } else {
+                        // Use same logo if mobile is not set.
+                        $res["assets"]["mobileLogo"] = new ImageAsset($desktopLogo);
+                    }
+                }
+            }
+        }
+
 
         $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;

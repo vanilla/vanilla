@@ -259,7 +259,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const animation = makeThemeVars("animation", {
-        defaultTiming: ".15s",
+        defaultTiming: ".1s",
         defaultEasing: "ease-out",
     });
 

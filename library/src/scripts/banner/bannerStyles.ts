@@ -44,7 +44,7 @@ export enum BannerAlignment {
 export enum SearchBarPresets {
     NO_BORDER = "no border",
     BORDER = "border",
-    SHADOW = "shadow",
+    UNIFIED_BORDER = "unified border",
 }
 
 export const bannerVariables = useThemeCache(() => {
@@ -213,6 +213,7 @@ export const bannerVariables = useThemeCache(() => {
 
     const searchBar = makeThemeVars("searchBar", {
         preset: SearchBarPresets.NO_BORDER,
+        showShadow: false,
         sizing: {
             maxWidth: 705,
         },
@@ -246,11 +247,9 @@ export const bannerVariables = useThemeCache(() => {
         modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.outerShadowOpacity),
     )}` as TextShadowProperty;
 
-    if (!searchBar.shadow && searchBar.preset === SearchBarPresets.SHADOW) {
+    if (!searchBar.shadow && searchBar.showShadow) {
         searchBar.shadow = defaultSearchShadow;
     }
-
-    window.console.log("DONE? ", searchBar);
 
     const buttonShadow = makeThemeVars("shadow", {
         color: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.05),
@@ -371,6 +370,8 @@ export const bannerClasses = useThemeCache(() => {
     const isCentered = vars.options.alignment === "center";
     const overlayColor = vars.backgrounds.overlayColor.fade(0.15);
 
+    const unifiedBorderOverwrite = vars.searchBar.preset === SearchBarPresets.UNIFIED_BORDER ? {} : {};
+
     let searchButton;
 
     if (vars.searchButtonOptions.type === SearchBarButtonType.SOLID) {
@@ -417,9 +418,11 @@ export const bannerClasses = useThemeCache(() => {
                 },
             },
         });
+
         searchButton = style("searchButton-solid", generateButtonStyleProperties(solidButtonVars), {
             left: -1,
             borderLeftWidth: important(0),
+            ...unifiedBorderOverwrite,
         });
     } else if (vars.searchButtonOptions.type === SearchBarButtonType.TRANSPARENT) {
         // TRANSPARENT
@@ -470,6 +473,7 @@ export const bannerClasses = useThemeCache(() => {
         searchButton = style("searchButton-transparent", generateButtonStyleProperties(transparentVariables), {
             left: -1,
             borderLeftWidth: important(0),
+            ...unifiedBorderOverwrite,
         });
     } else {
         const defaultButtonVars = merge(vars.searchButton, {
@@ -515,9 +519,13 @@ export const bannerClasses = useThemeCache(() => {
                 },
             },
         });
-        searchButton = style("searchButton", generateButtonStyleProperties(defaultButtonVars), { left: -1 });
+        searchButton = style("searchButton", generateButtonStyleProperties(defaultButtonVars), {
+            left: -1,
+            ...unifiedBorderOverwrite,
+        });
     }
 
+    // Suspect
     const valueContainer = style("valueContainer", {
         $nest: {
             "&&": {
@@ -693,25 +701,39 @@ export const bannerClasses = useThemeCache(() => {
 
     let nest = {};
 
-    if (vars.searchBar.preset === SearchBarPresets.NO_BORDER) {
+    // Suspect
+    if (vars.searchBar.preset === SearchBarPresets.BORDER) {
         nest = {
             "&.hasFocus .searchBar-valueContainer": {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+                ...borders({
+                    color: globalVars.mainColors.primary,
+                    width: globalVars.border.width * 2,
+                }),
+            },
+        };
+    } else if (vars.searchBar.preset === SearchBarPresets.UNIFIED_BORDER) {
+        nest = {
+            "&.hasFocus .searchBar-valueContainer": {
+                ...borders({
+                    top: {
+                        color: globalVars.mainColors.primary,
+                        width: globalVars.border.width * 2,
+                    },
+                    bottom: {
+                        color: globalVars.mainColors.primary,
+                        width: globalVars.border.width * 2,
+                    },
+                    left: { color: globalVars.mainColors.primary, width: globalVars.border.width * 2 },
+                }),
             },
         };
     }
 
-    window.console.log("vars.searchBar.shadow: ", vars.searchBar.shadow);
-
     const content = style("content", {
         borderColor: colorOut(vars.colors.primaryContrast),
         borderRadius:
-            vars.searchButton.borders &&
-            vars.searchButton.borders.right &&
-            vars.searchButton.borders.right.radius &&
-            (typeof vars.searchButton.borders.right.radius === "number" ||
-                typeof vars.searchButton.borders.right.radius === "string")
-                ? unit(vars.searchButton.borders.right.radius)
+            vars.searchButton.borders && vars.searchButton.borders.right && vars.searchButton.borders.right.radius
+                ? unit(vars.searchButton.borders.right.radius as string | number | undefined)
                 : 0,
         zIndex: 1,
         boxShadow: vars.searchBar.shadow,

@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
-import { calc, important, percent, px } from "csx";
+import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -237,6 +237,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
         cursor: "text",
+        transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
         ...borderRadii({
             right: 0,
             left: vars.border.radius,
@@ -284,6 +285,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.height),
         color: colorOut(globalVars.mixBgAndFg(0.78)),
+        transform: translateX(`${unit(8)}`),
         $nest: {
             "&, &.buttonIcon": {
                 border: "none",

@@ -81,10 +81,10 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
 
     let { children } = props;
     if (props.maxCharCount && typeof children === "string") {
-        const newChildren = children.slice(0, props.maxCharCount);
+        let newChildren = children.slice(0, props.maxCharCount);
 
         if (newChildren.length < children.length) {
-            children += "…";
+            newChildren += "…";
         }
 
         children = newChildren;
@@ -92,7 +92,7 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
 
     return (
         <Tag className={props.className} ref={ref}>
-            {props.children}
+            {children}
         </Tag>
     );
 });

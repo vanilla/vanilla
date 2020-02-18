@@ -64,7 +64,8 @@ export const globalVariables = useThemeCache(() => {
     const initialMainColors = makeThemeVars("mainColors", {
         fg: color("#555a62"),
         bg: color("#fff"),
-        primary: colorPrimary,
+        // primary: colorPrimary,
+        primary: color("#ff6749"),
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
         secondaryContrast: elementaryColors.white, // for good contrast with text.

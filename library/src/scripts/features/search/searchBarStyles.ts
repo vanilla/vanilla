@@ -330,7 +330,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         position: "absolute",
         top: 0,
         bottom: 0,
-        left: unit(globalVars.border.width * 2),
+        left: unit(vars.border.width),
         height: unit(formElementVars.sizing.height),
         display: "flex",
         alignItems: "center",

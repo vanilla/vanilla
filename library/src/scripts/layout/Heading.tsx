@@ -13,44 +13,45 @@ export interface ICommonHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
-    title: React.ReactNode;
+    title?: React.ReactNode;
 }
 
-export interface IHeadingProps extends ICommonHeadingProps {
+export interface IHeadingProps extends ICommonHeadingProps, Omit<React.HTMLAttributes<HTMLHeadingElement>, "title"> {
+    isLarge?: boolean;
     children?: React.ReactNode;
-    titleRef: React.RefObject<HTMLHeadingElement>;
 }
 
 /**
  * A component representing a element.
  */
-export default class Heading extends React.Component<IHeadingProps> {
-    public static defaultProps: Partial<IHeadingProps> = {
-        depth: 2,
-    };
+const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Heading(props: IHeadingProps, ref) {
+    const { children, title, depth, renderAsDepth, className, isLarge, ...restProps } = props;
+    const finalDepth = depth ?? 2;
+    const finalRenderDepth = renderAsDepth ?? finalDepth;
 
-    private get renderAsDepth(): number {
-        return this.props.renderAsDepth ? this.props.renderAsDepth : this.props.depth!;
-    }
+    const Tag = `h${finalDepth}` as "h1";
+    const classes = typographyClasses();
 
-    public render() {
-        const { children, title } = this.props;
-        const Tag = `h${this.props.depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-        const classesTypography = typographyClasses();
+    return (
+        <Tag
+            {...restProps}
+            ref={ref}
+            className={classNames(
+                "heading",
+                `heading-${finalRenderDepth}`,
+                {
+                    [classes.pageTitle]: finalRenderDepth === 1,
+                    [classes.largeTitle]: isLarge,
+                    [classes.subTitle]: finalRenderDepth === 2,
+                    [classes.componentSubTitle]: finalRenderDepth >= 3,
+                },
 
-        return (
-            <Tag
-                id={this.props.id}
-                ref={this.props.titleRef}
-                className={classNames(
-                    "heading",
-                    `heading-${this.renderAsDepth}`,
-                    { [`${classesTypography.pageTitle}`]: this.renderAsDepth === 1 },
-                    this.props.className,
-                )}
-            >
-                {children ? children : title}
-            </Tag>
-        );
-    }
-}
+                className,
+            )}
+        >
+            {children ?? title}
+        </Tag>
+    );
+});
+
+export default Heading;

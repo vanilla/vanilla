@@ -81,7 +81,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
 
-    const independantRoot = style("independantRoot", {
+    const independentRoot = style("independentRoot", {
         position: "relative",
     });
 
@@ -261,8 +261,8 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const compoundValueContainer = style("compoundValueContainer", {
         $nest: {
             "&&": {
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                borderTopRightRadius: important(0),
+                borderBottomRightRadius: important(0),
             },
         },
     });
@@ -391,7 +391,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     return {
         root,
-        independantRoot,
+        independentRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

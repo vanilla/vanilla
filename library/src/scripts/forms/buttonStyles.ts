@@ -163,8 +163,6 @@ export const buttonVariables = useThemeCache(() => {
         spinnerColor: globalVars.mainColors.bg,
     });
 
-    window.console.log("primary: ", primary);
-
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
         preset: ButtonPresets.ADVANCED,

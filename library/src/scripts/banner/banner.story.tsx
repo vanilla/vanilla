@@ -14,7 +14,7 @@ import { color } from "csx";
 import Banner from "@library/banner/Banner";
 import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { BannerAlignment } from "@library/banner/bannerStyles";
+import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
@@ -377,7 +377,21 @@ export const SearchStyleNoBorder = storyWithConfig(
             banner: {},
         },
     },
-    () => <StoryBanner title="Button Styles - No Border" />,
+    () => <StoryBanner title="Search Styles - No Border (default) with search" />,
+);
+
+export const SearchStyleNoBorderNoButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search Styles - No Border no button" />,
 );
 
 export const ButtonStyleFullBorder = storyWithConfig(
@@ -385,19 +399,59 @@ export const ButtonStyleFullBorder = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {},
+            titleBar: {
+                border: {
+                    type: "border",
+                },
+            },
         },
     },
-    () => <StoryBanner title="Button Styles - Full Border" />,
+    () => <StoryBanner title="Search Styles - Full Border" />,
+);
+
+export const ButtonStyleFullBorderNoButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search Styles - Full Border no button" />,
 );
 
 export const ButtonStyleShadowed = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            banner: {},
+            banner: {
+                searchBar: {
+                    preset: SearchBarPresets.SHADOW,
+                },
+            },
         },
     },
-    () => <StoryBanner title="Button Styles - Shadowed" />,
+    () => <StoryBanner title="Search Styles - Shadowed" />,
+);
+
+export const ButtonStyleShadowedNoButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                searchBar: {
+                    preset: SearchBarPresets.SHADOW,
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search Styles - Shadowed no button" />,
 );
 
 (ImageAsElementWide as any).story = {

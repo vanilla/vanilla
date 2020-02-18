@@ -61,7 +61,7 @@ class NotFoundFormat implements FormatInterface {
      * @inheritdoc
      */
     public function getVisibleTextLength(string $content): string {
-        return $this->getErrorMessage();
+        return 0;
     }
 
     /**

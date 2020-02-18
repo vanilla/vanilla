@@ -284,7 +284,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         $nest: {
             "&&": {
                 ...margins({
-                    horizontal: vars.options.borderType === "navLinks" ? 0 : vars.itemSpacing.horizontal,
+                    horizontal: vars.options.borderType === "navLinks" ? 0 : vars.gridItem.padding.horizontal,
                 }),
             },
             "&:first-child": {

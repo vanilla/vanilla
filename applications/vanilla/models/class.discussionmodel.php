@@ -860,7 +860,8 @@ class DiscussionModel extends Gdn_Model {
         $finalQuery = str_replace(
             '`'.$this->Database->DatabasePrefix.'_TBL_`',
             '('.$subQuery.')',
-            $outerQuery);
+            $outerQuery
+        );
 
         $data = $sql->query($finalQuery);
 

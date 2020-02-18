@@ -259,11 +259,6 @@ export const bannerVariables = useThemeCache(() => {
         ) as BackgroundColorProperty,
     });
 
-    // const bgColor = isTransparentButton ? "transparent" : colors.bg;
-    // const fgColor = isTransparentButton ? colors.primaryContrast : colors.fg;
-    // const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
-    // const activeBorderColor = isTransparentButton ? colors.primaryContrast : colors.bg;
-
     const searchButton: IButtonType = makeThemeVars("bannerSearchButton", {
         name: "bannerSearchButton",
         spinnerColor: colors.primaryContrast,
@@ -370,7 +365,16 @@ export const bannerClasses = useThemeCache(() => {
     const isCentered = vars.options.alignment === "center";
     const overlayColor = vars.backgrounds.overlayColor.fade(0.15);
 
-    const unifiedBorderOverwrite = vars.searchBar.preset === SearchBarPresets.UNIFIED_BORDER ? {} : {};
+    const unifiedBorderOverwrite =
+        vars.searchBar.preset === SearchBarPresets.UNIFIED_BORDER
+            ? {
+                  ...borders({
+                      color: globalVars.mainColors.primary,
+                      width: globalVars.border.width * 2,
+                  }),
+                  borderRightColor: vars.colors.bg,
+              }
+            : {};
 
     let searchButton;
 
@@ -701,7 +705,6 @@ export const bannerClasses = useThemeCache(() => {
 
     let nest = {};
 
-    // Suspect
     if (vars.searchBar.preset === SearchBarPresets.BORDER) {
         nest = {
             "&.hasFocus .searchBar-valueContainer": {
@@ -724,6 +727,15 @@ export const bannerClasses = useThemeCache(() => {
                         width: globalVars.border.width * 2,
                     },
                     left: { color: globalVars.mainColors.primary, width: globalVars.border.width * 2 },
+                }),
+            },
+        };
+    } else if (vars.searchBar.preset === SearchBarPresets.NO_BORDER) {
+        nest = {
+            "&.hasFocus .searchBar-valueContainer": {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+                ...borders({
+                    color: vars.colors.bg,
                 }),
             },
         };

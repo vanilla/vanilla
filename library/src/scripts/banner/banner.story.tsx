@@ -45,13 +45,6 @@ function StoryBanner(props: { title: string }) {
 export const SearchStyleDefault = storyWithConfig(
     {
         useWrappers: false,
-        themeVars: {
-            banner: {
-                searchBar: {
-                    preset: SearchBarPresets.NO_BORDER,
-                },
-            },
-        },
     },
     () => <StoryBanner title="Search Styles - No Border (default) with search" />,
 );
@@ -171,65 +164,63 @@ export const BorderedSearchWithTransparentButton = storyWithConfig(
     () => <StoryBanner title="Bordered with button transparent" />,
 );
 
-// export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryBanner title="Standard" />);
-//
-// export const NoDescription = storyWithConfig(
-//     {
-//         useWrappers: false,
-//         themeVars: {
-//             banner: {
-//                 options: {
-//                     hideDesciption: true,
-//                 },
-//                 colors: {
-//                     primary: color("#9279a8"),
-//                 },
-//             },
-//         },
-//     },
-//     () => <StoryBanner title="No Description" />,
-// );
-//
-// export const NoSearch = storyWithConfig(
-//     {
-//         useWrappers: false,
-//         themeVars: {
-//             banner: {
-//                 options: {
-//                     hideSearch: true,
-//                 },
-//             },
-//         },
-//     },
-//     () => <StoryBanner title="No Search" />,
-// );
-//
-// export const NoBackground = storyWithConfig(
-//     {
-//         useWrappers: false,
-//         themeVars: {
-//             banner: {
-//                 colors: {
-//                     primaryContrast: color("rgb(42,42,42)"),
-//                     primary: color("#9279a8"),
-//                     bg: color("#699dff"),
-//                     fg: color("rgb(255,254,250)"),
-//                 },
-//                 backgrounds: {
-//                     useOverlay: false,
-//                 },
-//                 searchButtonOptions: {
-//                     type: SearchBarButtonType.SOLID,
-//                 },
-//                 outerBackground: {
-//                     image: "none",
-//                 },
-//             },
-//         },
-//     },
-//     () => <StoryBanner title="No Background" />,
-// );
-//
+export const NoDescription = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    hideDesciption: true,
+                },
+                colors: {
+                    primary: color("#9279a8"),
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Description" />,
+);
+
+export const NoSearch = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    hideSearch: true,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Search" />,
+);
+
+export const NoBackgroundSolidButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                colors: {
+                    primary: color("#9279a8"),
+                    primaryContrast: color("#fff"),
+                    bg: color("#699dff"),
+                    fg: color("rgb(255,254,250)"),
+                },
+                backgrounds: {
+                    useOverlay: false,
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.SOLID,
+                },
+                outerBackground: {
+                    image: "none",
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="No Background - Solid button" />,
+);
+
 // export const LeftAligned = storyWithConfig(
 //     {
 //         useWrappers: false,

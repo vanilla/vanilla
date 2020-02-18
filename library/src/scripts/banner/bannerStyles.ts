@@ -351,56 +351,26 @@ export const bannerClasses = useThemeCache(() => {
     let searchButton;
 
     if (vars.searchButtonOptions.type === SearchBarButtonType.SOLID) {
-        // SOLID
         const solidButtonVars = merge(vars.searchButton, {
             colors: {
-                fg: vars.colors.bg,
-                bg: vars.colors.fg,
+                fg: vars.colors.primary,
+                bg: vars.colors.primaryContrast,
             },
             fonts: {
                 color: vars.colors.bg,
             },
             borders: {
-                color: vars.colors.fg,
+                fg: vars.colors.primary,
             },
             state: {
+                colors: {
+                    fg: vars.colors.secondary,
+                    bg: vars.colors.secondaryContrast,
+                },
                 borders: {
-                    color: vars.colors.fg,
+                    color: vars.colors.secondaryContrast,
                 },
             },
-            // hover: {
-            //     borders: {
-            //         bg: vars.state.borders.color,
-            //     },
-            //     colors: {
-            //         bg: vars.colors.secondary,
-            //         fg: vars.colors.secondaryContrast,
-            //     },
-            // },
-            // active: {
-            //     borders: {
-            //         bg: vars.colors.state.borders.color,
-            //     },
-            //     colors: {
-            //         bg: vars.backgrounds.overlayColor.fade(0.15),
-            //     },
-            // },
-            // focus: {
-            //     borders: {
-            //         bg: vars.colors.state.borders.color,
-            //     },
-            //     colors: {
-            //         bg: vars.backgrounds.overlayColor.fade(0.15),
-            //     },
-            // },
-            // focusAccessible: {
-            //     borders: {
-            //         bg: vars.colors.state.borders.color,
-            //     },
-            //     colors: {
-            //         bg: vars.backgrounds.overlayColor.fade(0.15),
-            //     },
-            // },
         });
 
         searchButton = style("searchButton-solid", generateButtonStyleProperties(solidButtonVars), {
@@ -492,7 +462,9 @@ export const bannerClasses = useThemeCache(() => {
 
     const valueContainer = style("valueContainer", {
         $nest: {
-            "&&": noBorderInputStyles ?? unifiedBorderStyles ?? borderInputStyles ?? {},
+            "&&": merge(noBorderInputStyles ?? unifiedBorderStyles ?? borderInputStyles ?? {}, {
+                backgroundColor: colorOut(vars.colors.bg),
+            }),
             ".inputText": {
                 borderColor: colorOut(vars.searchBar.border.color),
             },
@@ -501,6 +473,8 @@ export const bannerClasses = useThemeCache(() => {
             },
         },
     } as NestedCSSProperties);
+
+    console.log("jasfjasdjf: ", vars);
 
     const root = style({
         position: "relative",
@@ -733,6 +707,7 @@ export const bannerClasses = useThemeCache(() => {
                 : 0,
         zIndex: 1,
         boxShadow: vars.searchBar.shadow,
+        backgroundColor: colorOut(vars.colors.bg),
         $nest: nest,
     });
 

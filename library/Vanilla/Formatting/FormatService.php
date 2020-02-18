@@ -86,7 +86,7 @@ class FormatService {
      * @param string $content The content to render.
      * @param string|null $format The format of the content.
      *
-     * @return string
+     * @return int The number of visible characters in $content.
      */
     public function getVisibleTextLength(string $content, ?string $format): int {
         return $this

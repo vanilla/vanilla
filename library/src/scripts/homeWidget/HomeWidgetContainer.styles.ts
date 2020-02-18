@@ -99,7 +99,16 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
     const navPaddings = navLinksVariables().item.padding;
     const mobileNavPaddings = navLinksVariables().item.paddingMobile;
 
+    const bottomMultiplier = options.viewAll.position === "bottom" ? 1.5 : 2;
     const spacing = makeVars("spacing", {
+        padding: {
+            ...EMPTY_SPACING,
+            top: globalVars.gutter.size * 2,
+            bottom: globalVars.gutter.size * bottomMultiplier,
+        },
+    });
+
+    const itemSpacing = makeVars("itemSpacing", {
         ...EMPTY_SPACING,
         horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
         vertical: globalVars.gutter.size,
@@ -109,14 +118,14 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         },
     });
 
-    const horizontalSpacing = spacing.horizontal / 2; // Cut in half to account for grid item spacing.
-    const horizontalSpacingMobile = spacing.mobile.horizontal / 2; // Cut in half to account for grid item spacing.
+    const horizontalSpacing = itemSpacing.horizontal / 2; // Cut in half to account for grid item spacing.
+    const horizontalSpacingMobile = itemSpacing.mobile.horizontal / 2; // Cut in half to account for grid item spacing.
 
     const grid = makeVars("grid", {
         padding: {
             ...EMPTY_SPACING,
             horizontal: horizontalSpacing,
-            vertical: spacing.vertical,
+            vertical: itemSpacing.vertical,
         },
         paddingMobile: {
             horizontal: horizontalSpacingMobile,
@@ -127,7 +136,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         padding: {
             ...EMPTY_SPACING,
             horizontal: horizontalSpacing,
-            vertical: spacing.vertical,
+            vertical: itemSpacing.vertical,
         },
         paddingMobile: {
             ...EMPTY_SPACING,
@@ -135,9 +144,9 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         },
     });
 
-    const mobileMediaQuery = layoutVariables().mediaQueries().oneColumn;
+    const mobileMediaQuery = layoutVariables().mediaQueries().oneColumnDown;
 
-    return { options, spacing, title, grid, gridItem, mobileMediaQuery };
+    return { options, spacing, itemSpacing, title, grid, gridItem, mobileMediaQuery };
 });
 
 export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
@@ -147,18 +156,17 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const root = style({
         ...background(vars.options.outerBackground ?? {}),
+        ...paddings(vars.spacing.padding),
     });
 
     // For navLinks style only.
-    const separator = style("separator", {
-        marginBottom: vars.spacing.vertical * 2,
-    });
+    const separator = style("separator", {});
 
     const contentMixin: NestedCSSProperties = {
         ...paddings({
-            vertical: vars.spacing.vertical,
+            vertical: vars.itemSpacing.vertical,
         }),
-        ...(vars.options.borderType === "navLinks" ? {} : extendItemContainer(vars.spacing.horizontal)),
+        ...(vars.options.borderType === "navLinks" ? {} : extendItemContainer(vars.itemSpacing.horizontal)),
     };
 
     const container = style("container", {
@@ -176,7 +184,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...contentMixin,
         ...paddings({
             top: 0,
-            horizontal: vars.spacing.horizontal,
+            horizontal: vars.itemSpacing.horizontal,
         }),
     });
 
@@ -273,7 +281,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         $nest: {
             "&&": {
                 ...margins({
-                    horizontal: vars.spacing.horizontal,
+                    horizontal: vars.itemSpacing.horizontal,
                 }),
             },
             "&:first-child": {
@@ -285,7 +293,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const viewAllContent = style("viewAllContent", {
         ...contentMixin,
         paddingTop: 0,
-        marginTop: -vars.spacing.vertical,
+        marginTop: -vars.itemSpacing.vertical,
         $nest: {
             [`.${borderedContent} + &`]: {
                 marginTop: 0,

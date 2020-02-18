@@ -62,7 +62,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             });
 
             return (
-                <Container fullGutter>
+                <Container fullGutter narrow>
                     <nav
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
                     >

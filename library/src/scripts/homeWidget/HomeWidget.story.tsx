@@ -16,6 +16,7 @@ import { color } from "csx";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { StandardNavLinksStory } from "@library/navigation/navLinksWithHeadings.story";
 
 export default {
     title: "Home Widget",
@@ -237,6 +238,54 @@ export function Items() {
         </div>
     );
 }
+
+export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
+    return (
+        <div>
+            <StandardNavLinksStory />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                title="As Navigation Links"
+                maxItemCount={4}
+                containerOptions={{
+                    borderType: "navLinks",
+                    maxColumnCount: 2,
+                    viewAll: { to: "#", position: "bottom" },
+                }}
+            />
+        </div>
+    );
+});
+
+export const AsNavLinksFullBg = storyWithConfig({ useWrappers: false }, () => {
+    return (
+        <div>
+            <StandardNavLinksStory />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                title="As Navigation Links"
+                maxItemCount={3}
+                itemOptions={{
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+                containerOptions={{
+                    viewAll: { to: "#" },
+                    outerBackground: {
+                        color: color("#F8F8F8"),
+                    },
+                }}
+            />
+        </div>
+    );
+});
+
+AsNavLinks.story = {
+    parameters: {
+        chromatic: {
+            viewports: [500, 1200],
+        },
+    },
+};
 
 function ContainerWithOptionsAndImage(props: Omit<IHomeWidgetContainerProps, "children">) {
     return (

@@ -29,12 +29,7 @@ export const navLinksVariables = useThemeCache(() => {
 
     const linksWithHeadings = makeThemeVars("linksWithHeadings", {
         paddings: {
-            // all: 20,
-        },
-        mobile: {
-            paddings: {
-                all: 0,
-            },
+            vertical: globalVars.gutter.size * 1.5,
         },
     });
 
@@ -89,12 +84,7 @@ export const navLinksVariables = useThemeCache(() => {
             top: "auto",
         },
         paddings: {
-            top: 20,
-        },
-        mobile: {
-            paddings: {
-                top: 8,
-            },
+            top: globalVars.gutter.size,
         },
         $nest: viewAllLinkColors.nested,
     });
@@ -170,16 +160,17 @@ export const navLinksClasses = useThemeCache(() => {
         marginBottom: unit(vars.spacing.margin),
     });
 
-    const title = style(
-        "title",
-        {
-            display: "block",
-            ...fonts(vars.title.font),
-            maxWidth: percent(100),
-            ...margins(vars.title.margins),
+    const title = style("title", {
+        $nest: {
+            "&&": {
+                display: "block",
+                ...fonts(vars.title.font),
+                maxWidth: percent(100),
+                ...margins(vars.title.margins),
+                ...mediaQueries.oneColumn(fonts(vars.title.mobile.font)),
+            },
         },
-        mediaQueries.oneColumn(fonts(vars.title.mobile.font)),
-    );
+    });
 
     const linkColors = setAllLinkColors({
         default: globalVars.mainColors.fg,
@@ -196,18 +187,12 @@ export const navLinksClasses = useThemeCache(() => {
         $nest: linkColors.nested as NestedCSSProperties,
     } as NestedCSSProperties);
 
-    const viewAllItem = style(
-        "viewAllItem",
-        {
-            display: "block",
-            fontSize: unit(vars.item.fontSize),
-            ...margins(vars.viewAll.margins),
-            ...paddings(vars.viewAll.paddings),
-        },
-        mediaQueries.oneColumn({
-            ...paddings(vars.viewAll.mobile.paddings),
-        }),
-    );
+    const viewAllItem = style("viewAllItem", {
+        display: "block",
+        fontSize: unit(vars.item.fontSize),
+        ...margins(vars.viewAll.margins),
+        ...paddings(vars.viewAll.paddings),
+    });
 
     const viewAllLinkColors = setAllLinkColors({
         default: globalVars.mainColors.primary,
@@ -235,7 +220,6 @@ export const navLinksClasses = useThemeCache(() => {
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            ...paddings(vars.linksWithHeadings.mobile.paddings),
             ...extendItemContainer(vars.item.paddingMobile.horizontal),
         }),
     );
@@ -245,10 +229,9 @@ export const navLinksClasses = useThemeCache(() => {
         {
             display: "block",
             width: percent(100),
-            height: unit(vars.separator.height),
 
             // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
-            borderBottom: singleBorder({ color: vars.separator.bg }),
+            borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
         },
         mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
     );
@@ -256,7 +239,6 @@ export const navLinksClasses = useThemeCache(() => {
     const separatorOdd = style(
         "separatorOdd",
         {
-            $unique: true,
             display: "none",
         },
         mediaQueries.oneColumn({

@@ -301,13 +301,15 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const sectionHeading = style("sectionHeading", {
-        color: colorOut(globalVars.meta.text.color),
-        fontSize: unit(globalVars.fonts.size.small),
-        textTransform: "uppercase",
-        textAlign: "center",
-        fontWeight: globalVars.fonts.weights.semiBold,
-        ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
         $nest: {
+            "&&": {
+                color: colorOut(globalVars.meta.text.color),
+                fontSize: unit(globalVars.fonts.size.small),
+                textTransform: "uppercase",
+                textAlign: "center",
+                fontWeight: globalVars.fonts.weights.semiBold,
+                ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
+            },
             [`& + .${sectionContents} li:first-child`]: { paddingTop: unit(vars.spacer.margin.vertical) },
         },
     });

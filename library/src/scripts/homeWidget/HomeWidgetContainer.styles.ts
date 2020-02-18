@@ -100,11 +100,13 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
     const mobileNavPaddings = navLinksVariables().item.paddingMobile;
 
     const bottomMultiplier = options.viewAll.position === "bottom" ? 1.5 : 2;
+    const needsSpacing =
+        options.outerBackground.color || options.outerBackground.image || options.borderType === "navLinks";
     const spacing = makeVars("spacing", {
         padding: {
             ...EMPTY_SPACING,
-            top: globalVars.gutter.size * 2,
-            bottom: globalVars.gutter.size * bottomMultiplier,
+            top: needsSpacing ? globalVars.gutter.size * 2 : 0,
+            bottom: needsSpacing ? globalVars.gutter.size * bottomMultiplier : 0,
         },
     });
 

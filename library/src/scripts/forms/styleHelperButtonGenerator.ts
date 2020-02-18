@@ -4,39 +4,38 @@
  * @license GPL-2.0-only
  */
 
-import {
-    buttonGlobalVariables,
-    ButtonPresets,
-    buttonResetMixin,
-    buttonSizing,
-    ButtonTypes,
-} from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonPresets, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { borders } from "@library/styles/styleHelpersBorders";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { styleFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import { ColorHelper, percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
-import { Color } from "csstype";
 
 export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+    const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
     const state = buttonTypeVars.state ?? {};
+    const colors = buttonTypeVars.colors ?? {
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+    };
 
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
             preset: ButtonPresets.ADVANCED,
-            colors: {},
+            colors,
+            state,
             hover: state,
             focus: state,
             active: state,
@@ -45,6 +44,33 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         },
         buttonTypeVars,
     );
+
+    // Check for preset, defaults to "advanced" where everything is explicit.
+    if (buttonTypeVars.preset === ButtonPresets.OUTLINE) {
+        buttonTypeVars = merge(
+            {
+                borders: {
+                    ...globalVars.borderType.formElements.buttons,
+                    color: (colors.fg as ColorHelper).mix(colors.bg as ColorHelper, 0.24),
+                },
+            },
+            buttonTypeVars,
+        );
+
+        window.console.log("ButtonPresets.OUTLINE: ", buttonTypeVars);
+    } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
+        buttonTypeVars = merge(
+            {
+                borders: {
+                    ...globalVars.borderType.formElements.buttons,
+                    color: colors.bg,
+                },
+            },
+            buttonTypeVars,
+        );
+
+        window.console.log("ButtonPresets.SOLID: ", buttonTypeVars);
+    }
 
     // Remove debug and fallback
     const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);

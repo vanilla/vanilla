@@ -81,7 +81,7 @@ export const NoBackground = storyWithConfig(
         themeVars: {
             banner: {
                 colors: {
-                    contrast: color("rgb(42,42,42)"),
+                    primaryContrast: color("rgb(42,42,42)"),
                     primary: color("#9279a8"),
                     bg: color("#699dff"),
                     fg: color("rgb(255,254,250)"),
@@ -173,7 +173,7 @@ export const ImageAsElement = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
@@ -234,7 +234,7 @@ export const ImageAsElementWide = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
@@ -287,7 +287,7 @@ export const BorderedSearchWithSolidButton = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
@@ -340,7 +340,7 @@ export const BorderedSearchWithTransparentButton = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",

@@ -20,7 +20,11 @@ import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
 import { color, ColorHelper, percent } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonPresets } from "@library/forms/buttonStyles";
+import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+
+export interface IButtonPresets {
+    style: undefined | ButtonTypes;
+}
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -61,6 +65,7 @@ export const globalVariables = useThemeCache(() => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
+        primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
         secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
@@ -152,26 +157,21 @@ export const globalVariables = useThemeCache(() => {
         radius: 6, // Global default
     });
 
+    const standardBorder = {
+        radius: border.radius,
+        width: border.width,
+        color: border.color,
+        style: border.style,
+    };
+
     const borderType = makeThemeVars("borderType", {
         formElements: {
-            default: {
-                ...EMPTY_BORDER,
-                radius: border.radius,
-            },
-            buttons: {
-                ...EMPTY_BORDER,
-                radius: border.radius,
-            },
+            default: standardBorder,
+            buttons: standardBorder,
         },
-        modals: {
-            ...EMPTY_BORDER,
-            radius: border.radius,
-        },
+        modals: standardBorder,
         dropDowns: {
-            content: {
-                ...EMPTY_BORDER,
-                radius: border.radius,
-            },
+            content: standardBorder,
         },
     });
 
@@ -377,7 +377,7 @@ export const globalVariables = useThemeCache(() => {
     // the style of them.
     const buttonPreset = makeThemeVars("buttonPreset", {
         style: undefined,
-    });
+    } as IButtonPresets);
 
     const separator = makeThemeVars("separator", {
         color: border.color,

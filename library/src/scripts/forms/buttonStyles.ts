@@ -76,16 +76,13 @@ export const buttonVariables = useThemeCache(() => {
 
     const standard: IButtonType = makeThemeVars("standard", {
         name: ButtonTypes.STANDARD,
-        preset: ButtonPresets.OUTLINE,
+        preset: globalVars.buttonPreset.style ?? ButtonPresets.OUTLINE,
         spinnerColor: globalVars.mainColors.fg,
         colors: {
             fg: globalVars.mainColors.fg,
             bg: globalVars.mainColors.bg,
         },
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mixBgAndFg(0.24),
-        },
+        // Borders are from preset
         hover: {
             borders: {
                 ...globalVars.borderType.formElements.buttons,
@@ -130,16 +127,15 @@ export const buttonVariables = useThemeCache(() => {
 
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
-        preset: ButtonPresets.SOLID,
+        preset: globalVars.buttonPreset.style ?? ButtonPresets.SOLID,
         colors: {
             fg: vars.colors.primaryContrast, // Defaults to bg, but may need to be changed for proper contrast
             bg: vars.colors.primary,
         },
-        spinnerColor: globalVars.mainColors.bg,
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mainColors.primary,
-        },
+        // borders: {
+        //     ...globalVars.borderType.formElements.buttons,
+        //     color: globalVars.mainColors.primary,
+        // },
         hover: {
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -164,7 +160,10 @@ export const buttonVariables = useThemeCache(() => {
                 fg: globalVars.mainColors.primaryContrast,
             },
         },
+        spinnerColor: globalVars.mainColors.bg,
     });
+
+    window.console.log("primary: ", primary);
 
     const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,

@@ -59,7 +59,7 @@ export function useStoryConfig(value: Partial<IContext>) {
     return context.refreshKey;
 }
 
-export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType) {
+export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType): any {
     const HookWrapper = () => {
         const refreshKey = useStoryConfig(config);
         return <Component key={refreshKey} />;

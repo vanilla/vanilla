@@ -53,6 +53,13 @@ class TextFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
+    public function getVisibleTextLength(string $content): int {
+        return strlen($this->renderPlainText($content));
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function filter(string $content): string {
         return $content;
     }

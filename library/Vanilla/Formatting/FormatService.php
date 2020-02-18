@@ -81,6 +81,20 @@ class FormatService {
     }
 
     /**
+     * Get the length of content with all formatting removed.
+     *
+     * @param string $content The content to render.
+     * @param string|null $format The format of the content.
+     *
+     * @return string
+     */
+    public function getVisibleTextLength(string $content, ?string $format): int {
+        return $this
+            ->getFormatter($format)
+            ->getVisibleTextLength($content);
+    }
+
+    /**
      * Render a version of the content suitable to be quoted in other content.
      *
      * @param string $content The raw content to render.

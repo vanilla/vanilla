@@ -530,24 +530,17 @@ if (!function_exists('validateLength')) {
 
 if (!function_exists('validateRawLength')) {
     /**
-     * Validate that a string is not too long.
+     * Validate that a string is not too long when most of the formatting and meta data is removed.
      *
      * @param mixed $value The value to validate.
      * @param object $field The field information that contains the maximum length for the {@link $value}.
+     * @param array $post The Post array from the form.
      * @return bool|string
      */
-    function validateRawLength($value, $field) {
-        if (function_exists('mb_strlen')) {
-            $diff = mb_strlen($value, 'UTF-8') - $field->Length;
-        } else {
-            $diff = strlen($value) - $field->Length;
-        }
-
-        if ($diff <= 0) {
-            return true;
-        } else {
-            return sprintf(t('ValidateLength'), t($field->Name), $diff);
-        }
+    function validateRawLength($value, $field, $post) {
+        $format = $post['Format'] ?? '';
+        $value = Gdn::FormatService()->getVisibleTextLength($value, $format);
+        return validateLength($value, $field);
     }
 }
 

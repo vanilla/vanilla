@@ -3,36 +3,34 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { CsxBackgroundOptions } from "csx/lib/types";
-import {
-    BorderType,
-    EMPTY_BACKGROUND,
-    IBackground,
-    unit,
-    background,
-    margins,
-    EMPTY_FONTS,
-    fonts,
-    paddings,
-    IBorderStyles,
-    ISimpleBorderStyle,
-    borders,
-    extendItemContainer,
-} from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { percent, borderColor } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { cssRule } from "typestyle";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { navLinksVariables } from "@library/navigation/navLinksStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import {
+    background,
+    borders,
+    BorderType,
+    EMPTY_BACKGROUND,
+    EMPTY_FONTS,
+    EMPTY_SPACING,
+    extendItemContainer,
+    fonts,
+    IBackground,
+    margins,
+    paddings,
+    unit,
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
     innerBackground?: IBackground;
-    borderType?: BorderType;
+    borderType?: BorderType | "navLinks";
     maxWidth?: number | string;
     viewAll?: IViewAll;
     maxColumnCount?: number;
@@ -59,7 +57,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
             innerBackground: {
                 ...EMPTY_BACKGROUND,
             },
-            borderType: BorderType.NONE,
+            borderType: BorderType.NONE as BorderType | "navLinks",
             maxWidth: globalVars.content.width,
             viewAll: {
                 position: "bottom" as "top" | "bottom",
@@ -98,11 +96,48 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         },
     });
 
+    const navPaddings = navLinksVariables().item.padding;
+    const mobileNavPaddings = navLinksVariables().item.paddingMobile;
+
     const spacing = makeVars("spacing", {
-        gutter: globalVars.gutter.size,
+        ...EMPTY_SPACING,
+        horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
+        vertical: globalVars.gutter.size,
+        mobile: {
+            ...EMPTY_SPACING,
+            horizontal: options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
+        },
     });
 
-    return { options, spacing, title };
+    const horizontalSpacing = spacing.horizontal / 2; // Cut in half to account for grid item spacing.
+    const horizontalSpacingMobile = spacing.mobile.horizontal / 2; // Cut in half to account for grid item spacing.
+
+    const grid = makeVars("grid", {
+        padding: {
+            ...EMPTY_SPACING,
+            horizontal: horizontalSpacing,
+            vertical: spacing.vertical,
+        },
+        paddingMobile: {
+            horizontal: horizontalSpacingMobile,
+        },
+    });
+
+    const gridItem = makeVars("gridItem", {
+        padding: {
+            ...EMPTY_SPACING,
+            horizontal: horizontalSpacing,
+            vertical: spacing.vertical,
+        },
+        paddingMobile: {
+            ...EMPTY_SPACING,
+            horizontal: horizontalSpacingMobile,
+        },
+    });
+
+    const mobileMediaQuery = layoutVariables().mediaQueries().oneColumn;
+
+    return { options, spacing, title, grid, gridItem, mobileMediaQuery };
 });
 
 export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
@@ -114,11 +149,16 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...background(vars.options.outerBackground ?? {}),
     });
 
+    // For navLinks style only.
+    const separator = style("separator", {
+        marginBottom: vars.spacing.vertical * 2,
+    });
+
     const contentMixin: NestedCSSProperties = {
         ...paddings({
-            vertical: vars.spacing.gutter,
+            vertical: vars.spacing.vertical,
         }),
-        ...extendItemContainer(vars.spacing.gutter),
+        ...(vars.options.borderType === "navLinks" ? {} : extendItemContainer(vars.spacing.horizontal)),
     };
 
     const container = style("container", {
@@ -136,7 +176,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...contentMixin,
         ...paddings({
             top: 0,
-            horizontal: vars.spacing.gutter,
+            horizontal: vars.spacing.horizontal,
         }),
     });
 
@@ -167,9 +207,10 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
             alignItems: "stretch",
             justifyContent: "flex-start",
             flexWrap: "wrap",
-            padding: unit(vars.spacing.gutter / 2),
+            ...paddings(vars.grid.padding),
         },
         borderStyling,
+        vars.mobileMediaQuery(paddings(vars.grid.paddingMobile)),
     );
 
     const itemMixin: NestedCSSProperties = {
@@ -184,10 +225,14 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         minWidth: unit(homeWidgetItemVariables().sizing.minWidth),
     });
 
-    const gridItemContent = style("gridItemContent", {
-        padding: unit(vars.spacing.gutter / 2),
-        height: percent(100),
-    });
+    const gridItemContent = style(
+        "gridItemContent",
+        {
+            ...paddings(vars.gridItem.padding),
+            height: percent(100),
+        },
+        vars.mobileMediaQuery(paddings(vars.gridItem.paddingMobile)),
+    );
 
     const gridItemWidthConstraint = useThemeCache((maxWidth: number) =>
         style("gridItemWidthConstraint", {
@@ -195,25 +240,40 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         }),
     );
 
-    const viewAllContainer = style("viewAllContainer", {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-    });
+    const viewAllContainer = style(
+        "viewAllContainer",
+        {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            ...paddings({
+                horizontal: vars.grid.padding.horizontal,
+            }),
+        },
+        vars.mobileMediaQuery(paddings(vars.grid.paddingMobile)),
+    );
 
-    const title = style("title", {
-        flex: 1,
-        ...fonts(vars.title.font),
-        ...paddings({
-            horizontal: vars.spacing.gutter,
-        }),
-    });
+    const title = style(
+        "title",
+        {
+            flex: 1,
+            ...fonts(vars.title.font),
+            ...paddings({
+                horizontal: vars.gridItem.padding.horizontal,
+            }),
+        },
+        vars.mobileMediaQuery(
+            paddings({
+                horizontal: vars.gridItem.paddingMobile.horizontal,
+            }),
+        ),
+    );
 
     const viewAll = style("viewAll", {
         $nest: {
             "&&": {
                 ...margins({
-                    horizontal: vars.spacing.gutter,
+                    horizontal: vars.spacing.horizontal,
                 }),
             },
             "&:first-child": {
@@ -225,7 +285,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const viewAllContent = style("viewAllContent", {
         ...contentMixin,
         paddingTop: 0,
-        marginTop: -vars.spacing.gutter,
+        marginTop: -vars.spacing.vertical,
         $nest: {
             [`.${borderedContent} + &`]: {
                 marginTop: 0,
@@ -235,6 +295,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     return {
         root,
+        separator,
         container,
         content,
         borderedContent,

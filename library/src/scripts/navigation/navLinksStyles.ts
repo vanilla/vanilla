@@ -27,22 +27,22 @@ export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
     const globalVars = globalVariables();
 
-    const linksWithHeadings = makeThemeVars("linksWithHeadings", {
-        paddings: {
-            vertical: globalVars.gutter.size * 1.5,
-        },
-    });
-
     const item = makeThemeVars("item", {
         fontSize: globalVars.fonts.size.large,
         padding: {
             ...EMPTY_SPACING,
-            vertical: 24,
+            vertical: globalVars.spacer.size * 2,
             horizontal: containerVariables().spacing.paddingFull.horizontal,
         },
         paddingMobile: {
             ...EMPTY_SPACING,
             horizontal: 0,
+        },
+    });
+
+    const linksWithHeadings = makeThemeVars("linksWithHeadings", {
+        paddings: {
+            horizontal: item.padding.horizontal / 2,
         },
     });
 
@@ -135,7 +135,10 @@ export const navLinksClasses = useThemeCache(() => {
 
     const root = style(
         {
-            ...paddings(vars.item.padding),
+            ...paddings({
+                ...vars.item.padding,
+                horizontal: vars.item.padding.horizontal / 2,
+            }),
             display: "flex",
             flexDirection: "column",
             maxWidth: percent(100),
@@ -143,7 +146,10 @@ export const navLinksClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({
             width: percent(100),
-            ...paddings(vars.item.paddingMobile),
+            ...paddings({
+                ...vars.item.paddingMobile,
+                horizontal: vars.item.paddingMobile.horizontal / 2,
+            }),
         }),
     );
 

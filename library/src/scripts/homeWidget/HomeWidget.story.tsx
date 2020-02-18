@@ -249,6 +249,16 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                 maxItemCount={4}
                 containerOptions={{
                     borderType: "navLinks",
+                    maxColumnCount: 1,
+                    viewAll: { to: "#", position: "bottom" },
+                }}
+            />
+            <HomeWidget
+                itemData={STANDARD_5_ITEMS}
+                title="As Navigation Links"
+                maxItemCount={4}
+                containerOptions={{
+                    borderType: "navLinks",
                     maxColumnCount: 2,
                     viewAll: { to: "#", position: "bottom" },
                 }}

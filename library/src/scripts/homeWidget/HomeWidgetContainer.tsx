@@ -73,23 +73,25 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     {options.borderType === "navLinks" && (
                         <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>
                     )}
-                    <div className={classes.content}>
-                        <div className={classes.viewAllContainer}>
-                            {props.title && (
-                                <Heading className={classes.title} renderAsDepth={1}>
-                                    {props.title}
-                                </Heading>
-                            )}
-                            {options.viewAll.position === "top" && viewAllButton}
+                    <div className={classes.verticalContainer}>
+                        <div className={classes.content}>
+                            <div className={classes.viewAllContainer}>
+                                {props.title && (
+                                    <Heading className={classes.title} renderAsDepth={1}>
+                                        {props.title}
+                                    </Heading>
+                                )}
+                                {options.viewAll.position === "top" && viewAllButton}
+                            </div>
+                            {!gridHasBorder && grid}
                         </div>
-                        {!gridHasBorder && grid}
+                        {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
+                        {viewAllButton && options.viewAll.position === "bottom" && (
+                            <div className={classes.viewAllContent}>
+                                <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
+                            </div>
+                        )}
                     </div>
-                    {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
-                    {viewAllButton && options.viewAll.position === "bottom" && (
-                        <div className={classes.viewAllContent}>
-                            <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
-                        </div>
-                    )}
                 </div>
             </Container>
         </div>

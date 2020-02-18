@@ -156,7 +156,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const root = style({
         ...background(vars.options.outerBackground ?? {}),
-        ...paddings(vars.spacing.padding),
     });
 
     // For navLinks style only.
@@ -168,6 +167,10 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         }),
         ...(vars.options.borderType === "navLinks" ? {} : extendItemContainer(vars.itemSpacing.horizontal)),
     };
+
+    const verticalContainer = style("verticalContainer", {
+        ...paddings(vars.spacing.padding),
+    });
 
     const container = style("container", {
         $nest: {
@@ -281,7 +284,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         $nest: {
             "&&": {
                 ...margins({
-                    horizontal: vars.itemSpacing.horizontal,
+                    horizontal: vars.options.borderType === "navLinks" ? 0 : vars.itemSpacing.horizontal,
                 }),
             },
             "&:first-child": {
@@ -304,6 +307,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     return {
         root,
         separator,
+        verticalContainer,
         container,
         content,
         borderedContent,

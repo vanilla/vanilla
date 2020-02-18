@@ -66,12 +66,21 @@ export const addThemeClasses = useThemeCache(() => {
         },
     });
 
+    const noBoxshadow = style("noBoxshadow", {
+        $nest: {
+            "&&": {
+                boxShadow: "unset",
+            },
+        },
+    });
+
     const addThemeLink = style("addThemeLink", {});
 
     return {
         addTheme,
         button,
         addThemeLink,
+        noBoxshadow,
     };
 });
 

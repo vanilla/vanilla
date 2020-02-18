@@ -10,6 +10,8 @@ import React from "react";
 import addThemeClasses from "./addThemeStyles";
 import { t } from "@vanilla/i18n";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
+import themeCardClasses from "./themePreviewCardStyles";
 
 interface IProps {
     onAdd?: React.ReactNode;
@@ -18,13 +20,23 @@ interface IProps {
 
 export function AddTheme(props: IProps) {
     const classes = addThemeClasses();
+    const classesThemeCard = themeCardClasses();
+    const classesthemeItem = themeItemClasses();
     return (
-        <Button
-            baseClass={ButtonTypes.ICON}
-            className={classNames(classes.button, props.className)}
-            title={t("Add Theme")}
-        >
-            <div className={classes.addTheme}>{props.onAdd}</div>
-        </Button>
+        <div className={classNames(classesthemeItem.item, props.className)}>
+            <div className={(classesThemeCard.constraintContainer, classes.noBoxshadow)}>
+                <div className={classesThemeCard.ratioContainer}>
+                    <div className={classesThemeCard.container}>
+                        <Button
+                            baseClass={ButtonTypes.ICON}
+                            className={classNames(classes.button)}
+                            title={t("Add Theme")}
+                        >
+                            <div className={classes.addTheme}>{props.onAdd}</div>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

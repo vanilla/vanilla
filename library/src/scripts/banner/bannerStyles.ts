@@ -474,8 +474,6 @@ export const bannerClasses = useThemeCache(() => {
         },
     } as NestedCSSProperties);
 
-    console.log("jasfjasdjf: ", vars);
-
     const root = style({
         position: "relative",
         backgroundColor: colorOut(vars.outerBackground.color),

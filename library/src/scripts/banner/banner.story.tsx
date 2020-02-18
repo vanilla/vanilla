@@ -195,11 +195,14 @@ export const NoSearch = storyWithConfig(
     () => <StoryBanner title="No Search" />,
 );
 
-export const NoBackgroundSolidButton = storyWithConfig(
+export const SolidButtonUnifiedBorder = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
             banner: {
+                searchBar: {
+                    preset: SearchBarPresets.UNIFIED_BORDER,
+                },
                 colors: {
                     primary: color("#9279a8"),
                     primaryContrast: color("#fff"),

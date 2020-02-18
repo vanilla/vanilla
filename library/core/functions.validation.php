@@ -539,8 +539,13 @@ if (!function_exists('validateRawLength')) {
      */
     function validateRawLength($value, $field, $post) {
         $format = $post['Format'] ?? '';
-        $value = Gdn::FormatService()->getVisibleTextLength($value, $format);
-        return validateLength($value, $field);
+        $stringLength = Gdn::FormatService()->getVisibleTextLength($value, $format);
+        $diff = $stringLength - $field->Length;
+        if ($diff <= 0) {
+            return true;
+        } else {
+            return sprintf(t('ValidateLength'), t($field->Name), $diff);
+        }
     }
 }
 

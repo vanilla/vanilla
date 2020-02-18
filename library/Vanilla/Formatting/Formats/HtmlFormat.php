@@ -96,7 +96,7 @@ class HtmlFormat extends BaseFormat {
      * @inheritdoc
      */
     public function getVisibleTextLength(string $content): int {
-        return strlen($this->renderPlainText($content));
+        return mb_strlen($this->renderPlainText($content), 'UTF-8');
     }
 
     /**

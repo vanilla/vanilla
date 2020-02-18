@@ -188,13 +188,13 @@ $Construct->table('UserDiscussion');
 $ParticipatedExists = $Construct->columnExists('Participated');
 
 $Construct->column('UserID', 'int', false, 'primary')
-    ->column('DiscussionID', 'int', false, ['primary', 'key', 'index.bookmarked', 'index.participated'])
+    ->column('DiscussionID', 'int', false, ['primary', 'key'])
     ->column('Score', 'float', null)
     ->column('CountComments', 'int', '0')
     ->column('DateLastViewed', 'datetime', null)// null signals never
     ->column('Dismissed', 'tinyint(1)', '0')// relates to dismissed announcements
-    ->column('Bookmarked', 'tinyint(1)', '0', 'index.bookmarked')
-    ->column('Participated', 'tinyint(1)', '0', 'index.participated')// whether or not the user has participated in the discussion.
+    ->column('Bookmarked', 'tinyint(1)', '0')
+    ->column('Participated', 'tinyint(1)', '0')// whether or not the user has participated in the discussion.
     ->set($Explicit, $Drop);
 
 $Construct->table('Comment');

@@ -56,8 +56,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             },
             buttonTypeVars,
         );
-
-        window.console.log("ButtonPresets.OUTLINE: ", buttonTypeVars);
     } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
         buttonTypeVars = merge(
             {
@@ -68,8 +66,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             },
             buttonTypeVars,
         );
-
-        window.console.log("ButtonPresets.SOLID: ", buttonTypeVars);
     }
 
     // Remove debug and fallback

@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
+import { calc, color, ColorHelper, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
     backgroundHelper,
@@ -220,7 +220,7 @@ export const bannerVariables = useThemeCache(() => {
     const isSolidButton = searchButtonOptions.preset === ButtonPresets.SOLID;
     const isTransparentButton = searchButtonOptions.preset === ButtonPresets.TRANSPARENT;
 
-    const hasNoBorder =
+    const inputHasNoBorder =
         // @ts-ignore
         searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER ||
         searchInputOptions.preset === SearchBarPresets.NO_BORDER;
@@ -255,7 +255,7 @@ export const bannerVariables = useThemeCache(() => {
             )}` as TextShadowProperty,
         },
         border: {
-            color: hasNoBorder ? colors.bg : colors.primaryContrast,
+            color: inputHasNoBorder ? colors.bg : colors.primaryContrast,
             leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
             radius: {
                 left: globalVars.border.radius,
@@ -400,11 +400,6 @@ export const bannerClasses = useThemeCache(() => {
             },
         },
     } as NestedCSSProperties);
-
-    const root = style({
-        position: "relative",
-        backgroundColor: colorOut(vars.outerBackground.color),
-    });
 
     const outerBackground = (url?: string) => {
         const finalUrl = url ?? vars.outerBackground.image ?? undefined;
@@ -649,6 +644,24 @@ export const bannerClasses = useThemeCache(() => {
             { right: "initial", objectPosition: "0% 50%" },
         ),
     );
+
+    const rootConditionalStyles =
+        vars.searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER
+            ? borders({
+                  color: vars.colors.primary,
+                  width: vars.border.width * 2,
+              })
+            : {};
+
+    console.log("vars.searchInputOptions.preset", vars.searchInputOptions.preset);
+
+    const root = style({
+        position: "relative",
+        backgroundColor: colorOut(vars.outerBackground.color),
+        $nest: {
+            [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
+        },
+    });
 
     return {
         root,

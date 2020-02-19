@@ -20,6 +20,7 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     fonts,
+    IBordersWithRadius,
     IFont,
     modifyColorBasedOnLightness,
     unit,
@@ -109,6 +110,7 @@ export const bannerVariables = useThemeCache(() => {
 
     const border = {
         width: globalVars.border.width,
+        radius: globalVars.borderType.formElements.default.radius,
     };
 
     const backgrounds = makeThemeVars("backgrounds", {
@@ -213,7 +215,6 @@ export const bannerVariables = useThemeCache(() => {
     const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPresets.TRANSPARENT });
 
     if (searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER) {
-        searchInputOptions.preset = SearchBarPresets.NO_BORDER; // Unified border currently only supports no border style.
         searchButtonOptions.preset = ButtonPresets.SOLID; // Unified border currently only supports solid buttons.
     }
 
@@ -258,7 +259,7 @@ export const bannerVariables = useThemeCache(() => {
             color: inputHasNoBorder ? colors.bg : colors.primaryContrast,
             leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
             radius: {
-                left: globalVars.border.radius,
+                left: border.radius,
                 right: 0,
             },
             width: globalVars.border.width,
@@ -279,7 +280,7 @@ export const bannerVariables = useThemeCache(() => {
             width: searchBar.border.width,
         },
         right: {
-            radius: globalVars.border.radius,
+            radius: border.radius,
         },
     };
 
@@ -330,18 +331,19 @@ export const bannerVariables = useThemeCache(() => {
         }
     }
 
-    // Overwrite search bar and seardch button styles if UNIFIED_BORDER is set, since we don't support the other combinations.
-    // if (searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER) {
-    //     searchBar.preset = SearchBarPresets.NO_BORDER;
-    //     searchButton.preset = ButtonPresets.SOLID;
-    // }
-
     const buttonShadow = makeThemeVars("shadow", {
         color: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.05),
         full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.3))}`,
         background: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(
             0.1,
         ) as BackgroundColorProperty,
+    });
+
+    const unifiedBannerOptions = makeThemeVars("unifiedBannerOptions", {
+        border: {
+            width: 2,
+            color: colors.secondary,
+        },
     });
 
     return {
@@ -365,6 +367,7 @@ export const bannerVariables = useThemeCache(() => {
         isTransparentButton,
         searchInputOptions,
         searchButtonOptions,
+        unifiedBannerOptions,
     };
 });
 
@@ -645,15 +648,36 @@ export const bannerClasses = useThemeCache(() => {
         ),
     );
 
+    let rightRadius = vars.border.radius as number | string;
+    let leftRadius = vars.border.radius as number | string;
+
+    if (
+        vars.searchButton &&
+        vars.searchButton.borders &&
+        vars.searchButton.borders.right &&
+        vars.searchButton.borders.right.radius
+    ) {
+        const radius = vars.searchButton.borders.right.radius as string | number;
+        rightRadius = unit(radius) as any;
+    }
+
+    if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
+        leftRadius = unit(vars.searchBar.border.radius.left) as any;
+    }
+
     const rootConditionalStyles =
         vars.searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER
-            ? borders({
-                  color: vars.colors.primary,
-                  width: vars.border.width * 2,
-              })
+            ? {
+                  borderTopLeftRadius: unit(leftRadius),
+                  borderBottomLeftRadius: unit(leftRadius),
+                  borderTopRightRadius: unit(rightRadius),
+                  borderBottomRightRadius: unit(rightRadius),
+                  backgroundColor: colorOut(vars.unifiedBannerOptions.border.color),
+                  boxShadow: `0 0 0 ${unit(vars.unifiedBannerOptions.border.width)} ${
+                      vars.unifiedBannerOptions.border.color
+                  }`,
+              }
             : {};
-
-    console.log("vars.searchInputOptions.preset", vars.searchInputOptions.preset);
 
     const root = style({
         position: "relative",

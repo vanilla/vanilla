@@ -334,6 +334,10 @@ export const unifiedBorder = storyWithConfig(
                 searchInputOptions: {
                     preset: SearchBarPresets.UNIFIED_BORDER,
                 },
+                outerBackground: {
+                    color: "#980013",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
             },
         },
     },

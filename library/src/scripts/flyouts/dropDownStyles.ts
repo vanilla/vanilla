@@ -86,10 +86,7 @@ export const dropDownVariables = useThemeCache(() => {
     const contents = makeThemeVars("contents", {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
-        border: {
-            radius: globalVars.borderType.dropDowns.content,
-            color: globalVars.border.color,
-        },
+        border: globalVars.borderType.dropDowns.content,
         padding: {
             vertical: 9,
             horizontal: 16,
@@ -125,6 +122,7 @@ export const dropDownClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "auto",
+        ...borders(vars.contents.border),
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
         $nest: {
             "&&": {

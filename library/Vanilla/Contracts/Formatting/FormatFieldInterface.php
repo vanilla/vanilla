@@ -7,6 +7,11 @@
 
 namespace Vanilla\Contracts\Formatting;
 
+/**
+ * Interface FormatFieldInterface
+ *
+ * @package Vanilla\Contracts\Formatting
+ */
 interface FormatFieldInterface {
 
     /**

@@ -197,16 +197,18 @@ class FsThemeProvider implements ThemeProviderInterface {
             "logo" => "Garden.Logo",
             "mobileLogo" => "Garden.MobileLogo",
         ];
+        $foundLogo = false;
         foreach ($logos as $logoName => $logoConfig) {
             if ($logo = $this->config->get($logoConfig)) {
                 $logoUrl = Gdn_Upload::url($logo);
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
+                $foundLogo = true;
             }
         }
 
 
         // Check theme for default.
-        if (!$logo) {
+        if (!$foundLogo) {
             if (valr("assets.variables", $res)) {
                 $themeVars = json_decode($res['assets']['variables']->getData(), true);
                 $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);

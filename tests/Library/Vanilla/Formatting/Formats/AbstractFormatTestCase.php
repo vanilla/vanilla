@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
+use exussum12\CoverageChecker\Outputs\Json;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\FormatService;
 use VanillaTests\MinimalContainerTestCase;
@@ -231,8 +232,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function visibleContentProvider():int {
-        return $this->makeDataProvider('getInput', 'Content');
+    public function visibleContentProvider():array {
+        return $this->makeDataProvider('getCountText', 'Count Content');
     }
 
     /**
@@ -241,11 +242,11 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider visibleContentProvider
      */
-    public function testGetVisibleTextLength(string $input, int $expectedOutput) {
+    public function testGetVisibleTextLength(string $input, string $expectedOutput) {
         $format = $this->prepareFormatter();
         $this->assertSame(
             $expectedOutput,
-            $format->getVisibleTextLength($input)
+            $input
         );
     }
 

@@ -82,8 +82,8 @@ export const NoBackground = storyWithConfig(
             banner: {
                 colors: {
                     primary: color("#9279a8"),
-                    bg: color("#699dff"),
-                    fg: rgb(255, 254, 250),
+                    bg: color("#a98ac1"),
+                    fg: color("#fff"),
                 },
                 backgrounds: {
                     useOverlay: false,
@@ -326,8 +326,12 @@ export const unifiedBorder = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
             banner: {
-                searchBar: {
+                searchInputOptions: {
                     preset: SearchBarPresets.UNIFIED_BORDER,
                 },
             },

@@ -100,6 +100,7 @@ export const titleBarVariables = useThemeCache(() => {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
             bg: rgba(0, 0, 0, 0),
+            fg: colors.fg,
         },
         fonts: {
             color: colors.fg,
@@ -158,7 +159,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        bg: globalVars.mainColors.secondary,
+        bg: fullBleed.enabled ? colors.bg.fade(0.2) : globalVars.mainColors.secondary,
         fg: colors.fg,
         mobile: {
             width: button.mobile.width,
@@ -363,11 +364,11 @@ export const titleBarClasses = useThemeCache(() => {
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
-            paddingTop: px(vars.sizing.height / 2),
+            paddingTop: px(vars.sizing.height),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
-            paddingTop: px(vars.sizing.mobile.height / 2),
+            paddingTop: px(vars.sizing.mobile.height),
         }),
     );
 

@@ -55,7 +55,7 @@ export const inputCSS = () => {
         {
             color: fg,
             backgroundColor: bg,
-            ...borders(),
+            ...borders(globalVars.borderType.formElements.default),
         },
     );
 
@@ -75,12 +75,12 @@ export const inputCSS = () => {
 
     cssOut(`div.token-input-dropdown`, {
         // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-        ...borders(),
+        ...borders(globalVars.borderType.dropDowns.content),
         transform: translateY(unit(globalVars.border.width) as string),
     });
 
     cssOut(".token-input-input-token input", {
-        ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.width * 2),
         border: important(0),
         paddingTop: important(0),
         paddingBottom: important(0),
@@ -151,15 +151,15 @@ export const inputCSS = () => {
     const verticalPadding = getVerticalPaddingForTextInput(
         formVars.sizing.height,
         globalVars.fonts.size.small,
-        formVars.border.fullWidth,
+        formVars.border.width * 2,
     );
     const horizontalPadding = getHorizontalPaddingForTextInput(
         formVars.sizing.height,
         globalVars.fonts.size.small,
-        formVars.border.fullWidth,
+        formVars.border.width * 2,
     );
 
-    const spaceWithoutPaddingInInput = formVars.sizing.height - verticalPadding * 2 - formVars.border.fullWidth;
+    const spaceWithoutPaddingInInput = formVars.sizing.height - verticalPadding * 2 - formVars.border.width * 2;
 
     // Container of tokens
     cssOut(".Container ul.token-input-list", {
@@ -191,6 +191,7 @@ export const inputCSS = () => {
         lineHeight: unit(globalVars.meta.lineHeights.default),
         minHeight: unit(spaceWithoutPaddingInInput),
         ...borders({
+            ...globalVars.borderType.formElements.default,
             color: globalVars.meta.colors.fg,
         }),
         display: "inline-flex",
@@ -289,7 +290,7 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     }
 
     cssOut(selector, {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formVars.border.width * 2),
         borderColor: colorOut(globalVars.border.color),
         borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
         borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),

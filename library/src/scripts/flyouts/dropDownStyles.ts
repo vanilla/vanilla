@@ -21,7 +21,7 @@ import {
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
+import { important, percent, rgba } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 
@@ -87,7 +87,7 @@ export const dropDownVariables = useThemeCache(() => {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         border: {
-            radius: globalVars.border.radius,
+            radius: globalVars.borderType.dropDowns.content,
             color: globalVars.border.color,
         },
         padding: {
@@ -125,8 +125,7 @@ export const dropDownClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "auto",
-        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
-        ...borders(vars.contents.border),
+        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
         $nest: {
             "&&": {
                 zIndex: 3,
@@ -172,7 +171,7 @@ export const dropDownClasses = useThemeCache(() => {
     const likeDropDownContent = style("likeDropDownContent", {
         ...shadows.dropDown(),
         backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...borders(),
+        ...borders(vars.contents.border),
     } as NestedCSSProperties);
 
     const items = style("items", {
@@ -463,7 +462,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
             horizontal: vars.item.padding.horizontal,
         }),
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
         color: colorOut(vars.item.colors.fg, true),

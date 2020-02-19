@@ -8,9 +8,11 @@ import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 import { IFont } from "@library/styles/styleHelpersTypography";
 import { ColorValues } from "@library/styles/styleHelpersColors";
 import { TLength } from "typestyle/lib/types";
+import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IButtonType {
-    name: string;
+    name: ButtonTypes | string;
+    preset?: ButtonPresets;
     spinnerColor?: ColorValues;
     colors?: {
         bg?: ColorValues;
@@ -27,6 +29,14 @@ export interface IButtonType {
         side?: TLength;
     };
     fonts?: IFont;
+    state?: {
+        colors?: {
+            fg?: ColorValues;
+            bg?: ColorValues;
+        };
+        borders?: IBorderStyles;
+        fonts?: IFont;
+    };
     hover?: {
         colors?: {
             fg?: ColorValues;

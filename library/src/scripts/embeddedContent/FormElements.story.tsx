@@ -121,8 +121,8 @@ story.add("Inputs", () => {
                     },
                 ]}
             />
-            <StoryHeading>DropDown with search</StoryHeading>
-            <StoryExampleDropDownSearch onChange={doNothing} />
+            <StoryHeading>Dropdown with search</StoryHeading>
+            <StoryExampleDropDownSearch />
             <StoryHeading>Date Range</StoryHeading>
             <StorySmallContent>
                 <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />

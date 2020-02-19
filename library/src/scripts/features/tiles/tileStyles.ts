@@ -16,6 +16,7 @@ import {
     userSelect,
     EMPTY_FONTS,
     fonts,
+    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";

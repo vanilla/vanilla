@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import {
     absolutePosition,
-    background,
+    backgroundHelper,
     borders,
     BorderType,
     colorOut,
@@ -156,7 +156,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         {
             height: percent(100),
             display: "block",
-            ...background(vars.options.background),
+            ...backgroundHelper(vars.options.background),
             color: colorOut(vars.options.fg),
             overflow: "hidden",
             minWidth: unit(vars.sizing.minWidth),

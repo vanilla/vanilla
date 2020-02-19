@@ -10,7 +10,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { color } from "csx";
+import { color, rgb } from "csx";
 import Banner from "@library/banner/Banner";
 import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
@@ -81,10 +81,10 @@ export const NoBackground = storyWithConfig(
         themeVars: {
             banner: {
                 colors: {
-                    contrast: color("rgb(42,42,42)"),
+                    primaryContrast: rgb(42, 42, 42),
                     primary: color("#9279a8"),
                     bg: color("#699dff"),
-                    fg: color("rgb(255,254,250)"),
+                    fg: rgb(255, 254, 250),
                 },
                 backgrounds: {
                     useOverlay: false,
@@ -173,7 +173,7 @@ export const ImageAsElement = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
@@ -234,7 +234,7 @@ export const ImageAsElementWide = storyWithConfig(
                 },
                 colors: {
                     bg: "#fff",
-                    contrast: "#111111",
+                    primaryContrast: "#111111",
                 },
                 outerBackground: {
                     color: "#FFF6F5",
@@ -244,6 +244,64 @@ export const ImageAsElementWide = storyWithConfig(
                     font: {
                         color: "#323232",
                     },
+                },
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                searchButtonOptions: {
+                    type: SearchBarButtonType.NONE,
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+);
+
+export const Shadowed = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                searchBar: {
+                    shadow: {
+                        show: true,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search with shadow" />,
+);
+
+export const SearchShadowNoSearchButton = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#4fb33f"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                searchBar: {
+                    shadow: {
+                        show: true,
+                    },
+                },
+                options: {
+                    alignment: BannerAlignment.LEFT,
                 },
                 imageElement: {
                     image:

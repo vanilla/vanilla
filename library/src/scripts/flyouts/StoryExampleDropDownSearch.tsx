@@ -4,12 +4,7 @@
  */
 import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";
 import React from "react";
-import { StoryHeading } from "@library/storybook/StoryHeading";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import classNames from "classnames";
 
 /**
  * Form component for searching/selecting a category.

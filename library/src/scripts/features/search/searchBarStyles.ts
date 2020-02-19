@@ -8,12 +8,13 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
-import { calc, important, percent, px, translateX } from "csx";
+import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -157,7 +158,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
@@ -330,7 +331,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         position: "absolute",
         top: 0,
         bottom: 0,
-        left: unit(vars.border.width),
+        left: unit(globalVars.border.width * 2),
         height: unit(formElementVars.sizing.height),
         display: "flex",
         alignItems: "center",

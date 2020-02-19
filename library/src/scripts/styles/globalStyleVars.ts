@@ -13,14 +13,13 @@ import {
     radiusValue,
     EMPTY_BACKGROUND,
     getRatioBasedOnDarkness,
-    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
-import { color, ColorHelper, percent } from "csx";
+import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IButtonPresets {
     style: undefined | ButtonTypes;
@@ -58,14 +57,13 @@ export const globalVariables = useThemeCache(() => {
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: "transparent" as ColorValues,
+        transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
         fg: color("#555a62"),
         bg: color("#fff"),
-        // primary: colorPrimary,
-        primary: color("#ff6749"),
+        primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
         secondaryContrast: elementaryColors.white, // for good contrast with text.

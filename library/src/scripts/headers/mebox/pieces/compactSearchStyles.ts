@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit, modifyColorBasedOnLightness, IButtonStates } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, important, percent, px } from "csx";
+import { ColorHelper, important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -53,7 +53,7 @@ export const compactSearchVariables = useThemeCache(() => {
             : globalVars.elementaryColors.white.fade(0.3),
     });
 
-    const bgColor = isTransparentButton ? "transparent" : colors.primary;
+    const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.primary;
     const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
     const fgColor = isTransparentButton ? colors.contrast : colors.fg;
     const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;

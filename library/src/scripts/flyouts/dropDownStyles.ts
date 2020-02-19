@@ -21,7 +21,7 @@ import {
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
+import { important, percent, rgba } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 
@@ -462,7 +462,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
             horizontal: vars.item.padding.horizontal,
         }),
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
         color: colorOut(vars.item.colors.fg, true),

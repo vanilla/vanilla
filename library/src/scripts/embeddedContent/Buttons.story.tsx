@@ -44,7 +44,7 @@ function StoryButton() {
                 .
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact text={"Standard"}>
+                <StoryTileAndTextCompact type="titleBar" text={"Standard"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
 
@@ -155,6 +155,14 @@ export const PresetsOutline = storyWithConfig(
                 buttonPreset: ({
                     style: ButtonPresets.OUTLINE,
                 } as unknown) as IButtonPresets,
+            },
+            button: {
+                primary: {
+                    colors: {
+                        fg: globalVariables().mainColors.primary,
+                        bg: "#fff",
+                    },
+                },
             },
         },
     },

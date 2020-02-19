@@ -20,7 +20,7 @@ import {
     pointerEvents,
 } from "@library/styles/styleHelpers";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
+import { calc, ColorHelper, percent, px, quote, rgba, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
@@ -370,7 +370,7 @@ export const titleBarClasses = useThemeCache(() => {
                         ...borders({
                             radius: 0,
                             width: 1,
-                            color: "transparent",
+                            color: rgba(0, 0, 0, 0),
                         }),
                     },
                     "&.isOpen": {

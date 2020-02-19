@@ -16,7 +16,7 @@ import {
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { important, percent, px } from "csx";
+import { important, percent, px, rgba } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -32,7 +32,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
     // Fetch external global variables
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
-    const makeThemeVars = variableFactory("button");
+    const makeThemeVars = variableFactory("buttonGlobals");
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.fg,
@@ -60,12 +60,17 @@ export const buttonGlobalVariables = useThemeCache(() => {
 
     const border = makeThemeVars("border", globalVars.border);
 
+    const constants = makeThemeVars("constants", {
+        borderMixRatio: 0.24,
+    });
+
     return {
         padding,
         sizing,
         border,
         font,
         colors,
+        constants,
     };
 });
 
@@ -74,7 +79,7 @@ export const buttonVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("button");
     const vars = buttonGlobalVariables();
 
-    const standard: IButtonType = makeThemeVars("standard", {
+    const standard = makeThemeVars("standard", {
         name: ButtonTypes.STANDARD,
         preset: globalVars.buttonPreset.style ?? ButtonPresets.OUTLINE,
         spinnerColor: globalVars.mainColors.fg,
@@ -82,7 +87,10 @@ export const buttonVariables = useThemeCache(() => {
             fg: globalVars.mainColors.fg,
             bg: globalVars.mainColors.bg,
         },
-        // Borders are from preset
+        borders: {
+            color: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+            radius: globalVars.border.radius,
+        },
         hover: {
             borders: {
                 ...globalVars.borderType.formElements.buttons,
@@ -123,19 +131,20 @@ export const buttonVariables = useThemeCache(() => {
                 fg: globalVars.mainColors.secondaryContrast,
             },
         },
-    });
+    } as IButtonType);
 
-    const primary: IButtonType = makeThemeVars("primary", {
+    const primary = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         preset: globalVars.buttonPreset.style ?? ButtonPresets.SOLID,
         colors: {
-            fg: vars.colors.primaryContrast, // Defaults to bg, but may need to be changed for proper contrast
+            fg: vars.colors.primaryContrast,
             bg: vars.colors.primary,
         },
-        // borders: {
-        //     ...globalVars.borderType.formElements.buttons,
-        //     color: globalVars.mainColors.primary,
-        // },
+        spinnerColor: globalVars.mainColors.bg,
+        borders: {
+            color: globalVars.mainColors.primary,
+            radius: globalVars.border.radius,
+        },
         hover: {
             colors: {
                 bg: globalVars.mainColors.secondary,
@@ -160,10 +169,9 @@ export const buttonVariables = useThemeCache(() => {
                 fg: globalVars.mainColors.primaryContrast,
             },
         },
-        spinnerColor: globalVars.mainColors.bg,
-    });
+    } as IButtonType);
 
-    const transparent: IButtonType = makeThemeVars("transparent", {
+    const transparent = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
         preset: ButtonPresets.ADVANCED,
         colors: {
@@ -194,9 +202,9 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
-    });
+    } as IButtonType);
 
-    const translucid: IButtonType = makeThemeVars("translucid", {
+    const translucid = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
         preset: ButtonPresets.ADVANCED,
         colors: {
@@ -228,7 +236,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
-    });
+    } as IButtonType);
 
     return {
         standard,

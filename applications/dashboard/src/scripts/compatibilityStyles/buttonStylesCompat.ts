@@ -19,7 +19,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { important, percent } from "csx";
+import { important, percent, rgba } from "csx";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
@@ -57,7 +57,7 @@ export const buttonCSS = () => {
         backgroundColor: important("none"),
         ...borders({
             ...globalVars.borderType.formElements.buttons,
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         }),
     });
 
@@ -66,7 +66,7 @@ export const buttonCSS = () => {
         width: unit(formElementVars.sizing.height),
         ...borders({
             ...globalVars.borderType.formElements.buttons,
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
             radius: {
                 left: important(0),
             },

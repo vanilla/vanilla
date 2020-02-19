@@ -22,7 +22,7 @@ import {
     BorderType,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url, translate, rgba } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -99,7 +99,7 @@ export const titleBarVariables = useThemeCache(() => {
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
-            bg: "transparent",
+            bg: rgba(0, 0, 0, 0),
         },
         fonts: {
             color: colors.fg,
@@ -113,7 +113,7 @@ export const titleBarVariables = useThemeCache(() => {
         },
         borders: {
             style: "none",
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         },
         hover: {
             colors: {
@@ -600,7 +600,7 @@ export const titleBarClasses = useThemeCache(() => {
                                 ...borders({
                                     radius: 0,
                                     width: 1,
-                                    color: "transparent",
+                                    color: rgba(0, 0, 0, 0),
                                 }),
                             },
                             "&.isOpen": {

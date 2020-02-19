@@ -12,7 +12,7 @@ import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IButtonType {
     name: ButtonTypes | string;
-    preset?: ButtonPresets | undefined;
+    preset?: ButtonPresets;
     spinnerColor?: ColorValues;
     colors?: {
         bg?: ColorValues;

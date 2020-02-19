@@ -4,14 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, ButtonPresets, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import {
+    buttonGlobalVariables,
+    ButtonPresets,
+    buttonResetMixin,
+    buttonSizing,
+    ButtonTypes,
+    buttonVariables,
+} from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders } from "@library/styles/styleHelpersBorders";
+import { borders, EMPTY_BORDER } from "@library/styles/styleHelpersBorders";
 import { colorOut } from "@library/styles/styleHelpersColors";
-import { fonts } from "@library/styles/styleHelpersTypography";
+import { EMPTY_FONTS, fonts } from "@library/styles/styleHelpersTypography";
 import { styleFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent } from "csx";
+import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -21,6 +28,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
+    const buttonVars = buttonVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
@@ -45,51 +53,68 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         buttonTypeVars,
     );
 
-    // Check for preset, defaults to "advanced" where everything is explicit.
-    if (buttonTypeVars.preset === ButtonPresets.OUTLINE) {
-        buttonTypeVars = merge(
-            {
-                borders: {
-                    ...globalVars.borderType.formElements.buttons,
-                    color: (colors.fg as ColorHelper).mix(colors.bg as ColorHelper, 0.24),
-                },
-            },
-            buttonTypeVars,
-        );
-    } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
-        buttonTypeVars = merge(
-            {
-                borders: {
-                    ...globalVars.borderType.formElements.buttons,
-                    color: colors.bg,
-                },
-            },
-            buttonTypeVars,
-        );
+    let backgroundColor =
+        buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg;
+
+    let fontColor =
+        buttonTypeVars.fonts && buttonTypeVars.fonts.color
+            ? buttonTypeVars.fonts.color
+            : buttonTypeVars.colors && buttonTypeVars.colors.fg
+            ? buttonTypeVars.colors.fg
+            : undefined;
+
+    if (!buttonTypeVars.borders) {
+        buttonTypeVars.borders = {};
     }
 
+    if (!buttonTypeVars.borders.color) {
+        buttonTypeVars.borders = EMPTY_BORDER;
+    }
+
+    if (buttonTypeVars.colors && buttonTypeVars.colors.fg && buttonTypeVars.colors.bg) {
+        const fg = buttonTypeVars.colors.fg;
+        const bg = buttonTypeVars.colors.bg;
+        if (buttonTypeVars.preset === ButtonPresets.OUTLINE) {
+            buttonTypeVars.borders.color = bg.mix(fg, buttonGlobals.constants.borderMixRatio);
+            if (buttonTypeVars.state && buttonTypeVars.state.borders && !buttonTypeVars.state.borders.color) {
+                buttonTypeVars.state.borders.color = globalVars.mainColors.primary;
+            }
+        } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
+            buttonTypeVars.borders.color = bg;
+        }
+    }
+
+    let defaultBorder = borders({
+        ...EMPTY_BORDER,
+        ...buttonTypeVars.borders,
+    });
+
     // Remove debug and fallback
-    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.hover.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.hover.borders }))
             : {};
 
     const activeBorder =
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.active.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.active.borders }))
             : {};
 
     const focusBorder =
         buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
+            ? merge(
+                  cloneDeep(defaultBorder),
+                  borders({ ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) }),
+              )
             : defaultBorder;
 
     const focusAccessibleBorder =
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }))
             : {};
+
+    const fontVars = { ...EMPTY_FONTS, ...buttonTypeVars.fonts };
 
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
@@ -97,15 +122,12 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),
-        backgroundColor: colorOut(
-            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
-        ),
+        backgroundColor: colorOut(backgroundColor),
         ...fonts({
+            ...fontVars,
             size: buttonGlobals.font.size,
-            ...buttonTypeVars.fonts,
-            color:
-                buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
-            weight: buttonGlobals.font.weight,
+            color: fontColor,
+            weight: fontVars.weight ?? undefined,
         }),
         ...defaultBorder,
         ...buttonSizing(

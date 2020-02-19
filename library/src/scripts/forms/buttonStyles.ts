@@ -25,7 +25,9 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 export enum ButtonPresets {
     SOLID = "solid",
     OUTLINE = "outline",
+    TRANSPARENT = "transparent",
     ADVANCED = "advanced",
+    HIDE = "hide",
 }
 
 export const buttonGlobalVariables = useThemeCache(() => {

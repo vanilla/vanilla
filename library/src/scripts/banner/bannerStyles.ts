@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { important, percent, px, quote, translateX, ColorHelper, url, rgba, calc, translateY } from "csx";
+import { important, percent, px, quote, translateX, rgba, calc, translateY } from "csx";
 import {
     centeredBackgroundProps,
     fonts,
@@ -28,15 +28,22 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { compactSearchVariables, SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
+import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
     CENTER = "center",
+}
+
+export enum SearchBarPresets {
+    NO_BORDER = "no border",
+    BORDER = "border",
+    UNIFIED_BORDER = "unified border", // wraps button, and will set button to "solid"
 }
 
 export const bannerVariables = useThemeCache(() => {
@@ -202,10 +209,10 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const searchButtonOptions = makeThemeVars("searchButtonOptions", {
-        type: SearchBarButtonType.TRANSPARENT,
+        preset: ButtonPresets.TRANSPARENT,
     });
 
-    const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
+    const isTransparentButton = searchButtonOptions.preset === ButtonPresets.TRANSPARENT;
 
     const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.bg;
     const fgColor = isTransparentButton ? colors.primaryContrast : colors.fg;
@@ -213,6 +220,7 @@ export const bannerVariables = useThemeCache(() => {
     const activeBorderColor = isTransparentButton ? colors.primaryContrast : colors.bg;
 
     const searchBar = makeThemeVars("searchBar", {
+        preset: SearchBarPresets.NO_BORDER,
         sizing: {
             maxWidth: 705,
         },
@@ -247,8 +255,9 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const searchButton: IButtonType = makeThemeVars("bannerSearchButton", {
-        name: "bannerSearchButton",
+    const searchButton = makeThemeVars("searchButton", {
+        name: "searchButton",
+        preset: ButtonPresets.TRANSPARENT,
         spinnerColor: colors.primaryContrast,
         colors: {
             bg: bgColor,

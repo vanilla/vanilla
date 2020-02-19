@@ -12,11 +12,11 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, rgb } from "csx";
 import Banner from "@library/banner/Banner";
-import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { BannerAlignment } from "@library/banner/bannerStyles";
+import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
 
 export default {
     title: "Banner",
@@ -89,7 +89,7 @@ export const NoBackground = storyWithConfig(
                     useOverlay: false,
                 },
                 searchButtonOptions: {
-                    type: SearchBarButtonType.SOLID,
+                    preset: ButtonPresets.SOLID,
                 },
                 outerBackground: {
                     image: "none",
@@ -126,7 +126,7 @@ export const BackgroundImage = storyWithConfig(
                     useOverlay: true,
                 },
                 searchButtonOptions: {
-                    type: SearchBarButtonType.TRANSPARENT,
+                    preset: ButtonPresets.TRANSPARENT,
                 },
             },
         },
@@ -188,7 +188,7 @@ export const ImageAsElement = storyWithConfig(
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 searchButtonOptions: {
-                    type: SearchBarButtonType.NONE,
+                    preset: ButtonPresets.HIDE,
                 },
                 spacing: {
                     padding: {
@@ -249,7 +249,7 @@ export const ImageAsElementWide = storyWithConfig(
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 searchButtonOptions: {
-                    type: SearchBarButtonType.NONE,
+                    preset: ButtonPresets.HIDE,
                 },
                 spacing: {
                     padding: {
@@ -285,7 +285,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
         themeVars: {
             global: {
                 mainColors: {
-                    primary: color("#4fb33f"),
+                    // primary: color("#4fb33f"),
                 },
                 body: {
                     backgroundImage: {
@@ -307,7 +307,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 searchButtonOptions: {
-                    type: SearchBarButtonType.NONE,
+                    preset: ButtonPresets.HIDE,
                 },
                 spacing: {
                     padding: {
@@ -319,6 +319,21 @@ export const SearchShadowNoSearchButton = storyWithConfig(
         },
     },
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+);
+
+// Only works with button
+export const unifiedBorder = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                searchBar: {
+                    preset: SearchBarPresets.UNIFIED_BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search with shadow" />,
 );
 
 (ImageAsElementWide as any).story = {

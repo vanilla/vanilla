@@ -12,20 +12,21 @@ import { ColorHelper, important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-
-export enum SearchBarButtonType {
-    TRANSPARENT = "transparent",
-    SOLID = "solid",
-    NONE = "none",
-}
+import { SearchBarPresets } from "@library/banner/bannerStyles";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("compactSearch");
     const titleBarVars = titleBarVariables();
     const formElVars = formElementsVariables();
-    const searchButtonOptions = makeThemeVars("searchButtonOptions", { type: SearchBarButtonType.SOLID });
-    const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
+    const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPresets.TRANSPARENT });
+    const searchInputOptions = makeThemeVars("searchInputOptions", { preset: SearchBarPresets.NO_BORDER });
+
+    const isUnifiedBorder = searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER;
+    const isTransparentButton = searchButtonOptions.preset === ButtonPresets.TRANSPARENT;
+    const isSolidButton = searchButtonOptions.preset === ButtonPresets.SOLID || isUnifiedBorder; // force solid button when using unified border
+
     let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
@@ -45,7 +46,7 @@ export const compactSearchVariables = useThemeCache(() => {
         },
     });
 
-    const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
+    const isContrastLight = colors.contrast.lightness() >= 0.5;
     const backgrounds = makeThemeVars("backgrounds", {
         useOverlay: false,
         overlayColor: isContrastLight

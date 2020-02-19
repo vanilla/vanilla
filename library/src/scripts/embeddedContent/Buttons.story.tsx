@@ -174,7 +174,7 @@ export const PresetsSolid = storyWithConfig(
         themeVars: {
             global: {
                 buttonPreset: ({
-                    style: ButtonPresets.SOLID,
+                    preset: ButtonPresets.SOLID,
                 } as unknown) as IButtonPresets,
             },
         },

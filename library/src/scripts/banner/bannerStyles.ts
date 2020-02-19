@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { calc, color, ColorHelper, important, percent, px, quote, rgba, translateX, translateY } from "csx";
+import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
     backgroundHelper,
@@ -20,7 +20,6 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     fonts,
-    IBordersWithRadius,
     IFont,
     modifyColorBasedOnLightness,
     unit,
@@ -48,11 +47,23 @@ export enum SearchBarPresets {
     UNIFIED_BORDER = "unified border", // wraps button, and will set button to "solid"
 }
 
+export const presetsBanner = useThemeCache(() => {
+    const makeThemeVars = variableFactory(["presetsBanner"]);
+    const button = makeThemeVars("button", { preset: ButtonPresets.TRANSPARENT });
+    const input = makeThemeVars("input", { preset: SearchBarPresets.NO_BORDER });
+
+    return {
+        button,
+        input,
+    };
+});
+
 export const bannerVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory(["banner", "splash"]);
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
+    const presets = presetsBanner();
 
     const options = makeThemeVars("options", {
         alignment: BannerAlignment.CENTER,
@@ -211,23 +222,18 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const searchInputOptions = makeThemeVars("searchInputOptions", { preset: SearchBarPresets.NO_BORDER });
-    const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPresets.TRANSPARENT });
-
-    if (searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER) {
-        searchButtonOptions.preset = ButtonPresets.SOLID; // Unified border currently only supports solid buttons.
+    if (presets.input.preset === SearchBarPresets.UNIFIED_BORDER) {
+        presets.button.preset = ButtonPresets.SOLID; // Unified border currently only supports solid buttons.
     }
 
-    const isSolidButton = searchButtonOptions.preset === ButtonPresets.SOLID;
-    const isTransparentButton = searchButtonOptions.preset === ButtonPresets.TRANSPARENT;
+    const isSolidButton = presets.button.preset === ButtonPresets.SOLID;
+    const isTransparentButton = presets.button.preset === ButtonPresets.TRANSPARENT;
 
     const inputHasNoBorder =
-        // @ts-ignore
-        searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER ||
-        searchInputOptions.preset === SearchBarPresets.NO_BORDER;
+        presets.input.preset === SearchBarPresets.UNIFIED_BORDER || presets.input.preset === SearchBarPresets.NO_BORDER;
 
     const searchBar = makeThemeVars("searchBar", {
-        preset: searchButtonOptions,
+        preset: presets.button.preset,
         colors: {
             fg: colors.fg,
             bg: colors.bg,
@@ -256,7 +262,7 @@ export const bannerVariables = useThemeCache(() => {
             )}` as TextShadowProperty,
         },
         border: {
-            color: inputHasNoBorder ? colors.bg : colors.primaryContrast,
+            color: inputHasNoBorder ? colors.bg : colors.primary,
             leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
             radius: {
                 left: border.radius,
@@ -272,7 +278,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     let buttonBorderStyles = {
-        color: colors.primaryContrast,
+        color: colors.borderColor,
         width: 0,
         left: {
             ...EMPTY_BORDER,
@@ -309,7 +315,7 @@ export const bannerVariables = useThemeCache(() => {
 
     const searchButton = makeThemeVars("searchButton", {
         name: "searchButton",
-        preset: searchButtonOptions.preset,
+        preset: presets.button.preset,
         spinnerColor: colors.primaryContrast,
         colors: {
             bg: searchButtonBg,
@@ -365,8 +371,6 @@ export const bannerVariables = useThemeCache(() => {
         imageElement,
         border,
         isTransparentButton,
-        searchInputOptions,
-        searchButtonOptions,
         unifiedBannerOptions,
     };
 });
@@ -377,6 +381,7 @@ export const bannerClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
+    const presets = presetsBanner();
 
     const isCentered = vars.options.alignment === "center";
     const searchButton = style("searchButton", generateButtonStyleProperties(vars.searchButton), { left: -1 });
@@ -385,7 +390,9 @@ export const bannerClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 backgroundColor: colorOut(vars.searchBar.colors.bg),
-                ...borders(vars.searchBar.border),
+                ...borders({
+                    color: vars.searchBar.border.color,
+                }),
                 $nest: {
                     "&:active, &:hover, &:focus, &.focus-visible": {
                         ...borders(vars.searchBar.border),
@@ -558,21 +565,40 @@ export const bannerClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
+    let rightRadius = vars.border.radius as number | string;
+    let leftRadius = vars.border.radius as number | string;
+
+    if (
+        vars.searchButton &&
+        vars.searchButton.borders &&
+        vars.searchButton.borders.right &&
+        vars.searchButton.borders.right.radius
+    ) {
+        const radius = vars.searchButton.borders.right.radius as string | number;
+        rightRadius = unit(radius) as any;
+    }
+
+    if (presets.button.preset === ButtonPresets.HIDE) {
+        leftRadius = rightRadius;
+    } else {
+        if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
+            leftRadius = unit(vars.searchBar.border.radius.left) as any;
+        }
+    }
+
     const content = style("content", {
-        borderColor: colorOut(vars.colors.primaryContrast),
-        borderRadius:
-            vars.searchButton.borders &&
-            vars.searchButton.borders.right &&
-            vars.searchButton.borders.right.radius &&
-            (typeof vars.searchButton.borders.right.radius === "number" ||
-                typeof vars.searchButton.borders.right.radius === "string")
-                ? unit(vars.searchButton.borders.right.radius)
-                : 0,
+        boxSizing: "border-box",
         zIndex: 1,
         boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
+
+        borderTopLeftRadius: unit(leftRadius),
+        borderBottomLeftRadius: unit(leftRadius),
+        borderTopRightRadius: unit(rightRadius),
+        borderBottomRightRadius: unit(rightRadius),
+
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+                boxShadow: `0 0 0 1px ${colorOut(vars.colors.primary)} inset`,
             },
             "& .searchBar-valueContainer icon-clear": {
                 color: colorOut(vars.searchBar.font.color),
@@ -648,25 +674,8 @@ export const bannerClasses = useThemeCache(() => {
         ),
     );
 
-    let rightRadius = vars.border.radius as number | string;
-    let leftRadius = vars.border.radius as number | string;
-
-    if (
-        vars.searchButton &&
-        vars.searchButton.borders &&
-        vars.searchButton.borders.right &&
-        vars.searchButton.borders.right.radius
-    ) {
-        const radius = vars.searchButton.borders.right.radius as string | number;
-        rightRadius = unit(radius) as any;
-    }
-
-    if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
-        leftRadius = unit(vars.searchBar.border.radius.left) as any;
-    }
-
     const rootConditionalStyles =
-        vars.searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER
+        presets.input.preset === SearchBarPresets.UNIFIED_BORDER
             ? {
                   borderTopLeftRadius: unit(leftRadius),
                   borderBottomLeftRadius: unit(leftRadius),

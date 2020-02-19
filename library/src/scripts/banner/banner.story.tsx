@@ -88,11 +88,13 @@ export const NoBackground = storyWithConfig(
                 backgrounds: {
                     useOverlay: false,
                 },
-                searchButtonOptions: {
-                    preset: ButtonPresets.SOLID,
-                },
                 outerBackground: {
                     image: "none",
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.SOLID,
                 },
             },
         },
@@ -125,6 +127,8 @@ export const BackgroundImage = storyWithConfig(
                 backgrounds: {
                     useOverlay: true,
                 },
+            },
+            presetsBanner: {
                 searchButtonOptions: {
                     preset: ButtonPresets.TRANSPARENT,
                 },
@@ -159,6 +163,7 @@ export const ImageAsElement = storyWithConfig(
             global: {
                 mainColors: {
                     primary: color("#111111"),
+                    primaryContrast: color("#fff"),
                 },
                 body: {
                     backgroundImage: {
@@ -187,14 +192,20 @@ export const ImageAsElement = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                searchButtonOptions: {
-                    preset: ButtonPresets.HIDE,
-                },
+
                 spacing: {
                     padding: {
                         top: 87,
                         bottom: 87,
                     },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -248,14 +259,19 @@ export const ImageAsElementWide = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                searchButtonOptions: {
-                    preset: ButtonPresets.HIDE,
-                },
                 spacing: {
                     padding: {
                         top: 87,
                         bottom: 87,
                     },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -306,14 +322,20 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                searchButtonOptions: {
-                    preset: ButtonPresets.HIDE,
-                },
+
                 spacing: {
                     padding: {
                         top: 87,
                         bottom: 87,
                     },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -331,12 +353,14 @@ export const unifiedBorder = storyWithConfig(
                 primaryContrast: "#e3e3e3",
             },
             banner: {
-                searchInputOptions: {
-                    preset: SearchBarPresets.UNIFIED_BORDER,
-                },
                 outerBackground: {
                     color: "#980013",
                     image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.UNIFIED_BORDER,
                 },
             },
         },

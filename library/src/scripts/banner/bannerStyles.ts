@@ -22,6 +22,7 @@ import {
     EMPTY_SPACING,
     borders,
     EMPTY_BACKGROUND,
+    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -77,12 +78,30 @@ export const bannerVariables = useThemeCache(() => {
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
+        primaryContrast: globalVars.mainColors.primaryContrast,
         secondary: globalVars.mainColors.secondary,
-        contrast: globalVars.elementaryColors.white,
+        secondaryContrast: globalVars.mainColors.secondaryContrast,
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
-        borderColor: globalVars.mainColors.fg.fade(0.4),
+        borderColor: globalVars.mixPrimaryAndFg(0.4),
     });
+
+    const state = makeThemeVars("state", {
+        colors: {
+            fg: colors.secondaryContrast,
+            bg: colors.secondary,
+        },
+        borders: {
+            color: colors.bg,
+        },
+        fonts: {
+            color: colors.secondaryContrast,
+        },
+    });
+
+    const border = {
+        width: globalVars.border.width,
+    };
 
     const backgrounds = makeThemeVars("backgrounds", {
         ...compactSearchVars.backgrounds,
@@ -133,12 +152,12 @@ export const bannerVariables = useThemeCache(() => {
 
     const textMixin = {
         ...EMPTY_FONTS,
-        color: colors.contrast,
+        color: colors.primaryContrast,
         align: options.alignment,
         shadow: `0 1px 1px ${colorOut(
-            modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity),
+            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.innerShadowOpacity),
         )}, 0 1px 25px ${colorOut(
-            modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.outerShadowOpacity),
+            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.outerShadowOpacity),
         )}` as TextShadowProperty,
     };
 
@@ -182,8 +201,16 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const searchButtonOptions = makeThemeVars("searchButtonOptions", { type: SearchBarButtonType.TRANSPARENT });
+    const searchButtonOptions = makeThemeVars("searchButtonOptions", {
+        type: SearchBarButtonType.TRANSPARENT,
+    });
+
     const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
+
+    const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.bg;
+    const fgColor = isTransparentButton ? colors.primaryContrast : colors.fg;
+    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
+    const activeBorderColor = isTransparentButton ? colors.primaryContrast : colors.bg;
 
     const searchBar = makeThemeVars("searchBar", {
         sizing: {
@@ -201,10 +228,18 @@ export const bannerVariables = useThemeCache(() => {
             ...EMPTY_SPACING,
             top: 16,
         },
+        shadow: {
+            show: false,
+            style: `0 1px 1px ${colorOut(
+                modifyColorBasedOnLightness(colors.fg, text.shadowMix, true).fade(text.innerShadowOpacity),
+            )}, 0 1px 25px ${colorOut(
+                modifyColorBasedOnLightness(colors.fg, text.shadowMix, true).fade(text.outerShadowOpacity),
+            )}` as TextShadowProperty,
+        },
         border: {
-            color: colors.contrast,
-            leftColor: isTransparentButton ? colors.contrast : colors.borderColor,
-            width: globalVars.border.width,
+            ...EMPTY_BORDER,
+            color: colors.primaryContrast,
+            leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
             radius: {
                 left: globalVars.border.radius,
                 right: 0,
@@ -212,32 +247,22 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const shadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.05),
-        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.3))}`,
-        background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.1) as BackgroundColorProperty,
-    });
-
-    const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.bg;
-    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
-    const fgColor = isTransparentButton ? colors.contrast : colors.fg;
-    const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
-    const searchButton = makeThemeVars("splashSearchButton", {
-        name: "splashSearchButton",
-        spinnerColor: colors.contrast,
+    const searchButton: IButtonType = makeThemeVars("bannerSearchButton", {
+        name: "bannerSearchButton",
+        spinnerColor: colors.primaryContrast,
         colors: {
-            fg: fgColor,
             bg: bgColor,
+            fg: fgColor,
         },
         borders: {
             ...(isTransparentButton
                 ? {
-                      color: colors.contrast,
+                      color: colors.primaryContrast,
                       width: 1,
                   }
                 : { color: colors.bg, width: 0 }),
             left: {
-                color: searchBar.border.leftColor,
+                color: searchBar.border.color,
                 width: searchBar.border.width,
             },
             right: {
@@ -250,55 +275,27 @@ export const bannerVariables = useThemeCache(() => {
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
         },
-        hover: {
+        state: {
             colors: {
-                fg: colors.contrast,
+                fg: colors.primaryContrast,
                 bg: bgColorActive,
             },
             borders: {
                 color: activeBorderColor,
             },
             fonts: {
-                color: colors.contrast,
-            },
-        },
-        active: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-        focus: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
+                color: colors.primaryContrast,
             },
         },
     } as IButtonType);
+
+    const buttonShadow = makeThemeVars("shadow", {
+        color: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.05),
+        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.3))}`,
+        background: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(
+            0.1,
+        ) as BackgroundColorProperty,
+    });
 
     return {
         options,
@@ -312,12 +309,14 @@ export const bannerVariables = useThemeCache(() => {
         description,
         paragraph,
         searchBar,
-        shadow,
+        buttonShadow,
         searchButton,
         searchButtonOptions,
         colors,
         inputAndButton,
         imageElement,
+        border,
+        isTransparentButton,
     };
 });
 
@@ -335,6 +334,11 @@ export const bannerClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 ...borders(vars.searchBar.border),
+                $nest: {
+                    "&:active, &:hover, &:focus, &.focus-visible": {
+                        ...borders(vars.searchBar.border),
+                    },
+                },
             },
             ".inputText": {
                 borderColor: colorOut(vars.searchBar.border.color),
@@ -408,7 +412,7 @@ export const bannerClasses = useThemeCache(() => {
     );
 
     const text = style("text", {
-        color: colorOut(vars.colors.contrast),
+        color: colorOut(vars.colors.primaryContrast),
     });
 
     const searchContainer = style(
@@ -420,7 +424,7 @@ export const bannerClasses = useThemeCache(() => {
             margin: isCentered ? "auto" : undefined,
             ...margins(vars.searchBar.margin),
             $nest: {
-                ".search-results": {
+                "& .search-results": {
                     width: percent(100),
                     maxWidth: unit(vars.searchBar.sizing.maxWidth),
                     margin: "auto",
@@ -479,8 +483,8 @@ export const bannerClasses = useThemeCache(() => {
                 ...absolutePosition.middleOfParent(),
                 width: px(20),
                 height: px(20),
-                backgroundColor: colorOut(vars.shadow.background),
-                boxShadow: vars.shadow.full,
+                backgroundColor: colorOut(vars.buttonShadow.background),
+                boxShadow: vars.buttonShadow.full,
             },
             ".searchBar-actionButton": {
                 color: important("inherit"),
@@ -505,8 +509,7 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const content = style("content", {
-        borderColor: colorOut(vars.colors.contrast),
-        // boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+        borderColor: colorOut(vars.colors.primaryContrast),
         borderRadius:
             vars.searchButton.borders &&
             vars.searchButton.borders.right &&
@@ -516,6 +519,7 @@ export const bannerClasses = useThemeCache(() => {
                 ? unit(vars.searchButton.borders.right.radius)
                 : 0,
         zIndex: 1,
+        boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {
                 boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,

@@ -81,7 +81,6 @@ export const NoBackground = storyWithConfig(
         themeVars: {
             banner: {
                 colors: {
-                    primaryContrast: rgb(42, 42, 42),
                     primary: color("#9279a8"),
                     bg: color("#699dff"),
                     fg: rgb(255, 254, 250),

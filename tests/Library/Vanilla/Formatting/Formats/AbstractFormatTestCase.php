@@ -238,7 +238,7 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
 
     /**
      * Test getting the length of formatted text with most of the formatting removed.
-     *  
+     *
      * @param string $input
      * @param int $expectedOutput
      *

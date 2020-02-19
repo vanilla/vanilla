@@ -1,0 +1,14 @@
+[
+    { "attributes": { "bold": true }, "insert": "bold" },
+    { "insert": "normal" },
+    { "attributes": { "italic": true }, "insert": "italic" },
+    { "attributes": { "italic": true, "bold": true }, "insert": "bold-italic " },
+    { "attributes": { "italic": true, "bold": true, "link": "https://google.com" }, "insert": "go" },
+    { "attributes": { "link": "https://google.com" }, "insert": "ogl" },
+    { "attributes": { "italic": true, "bold": true, "link": "https://google.com" }, "insert": "elink" },
+    { "insert": "\n\nText after line breaks." },
+    { "attributes": { "strike": true }, "insert": "strike" },
+    { "insert": "\n\n\n\n" },
+    { "attributes": { "strike": true }, "insert": "Mutliple more breaks." },
+    { "insert": "\n" }
+]

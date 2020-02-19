@@ -78,7 +78,7 @@ class FormatFixture {
      * @return string|null
      */
     public function getCountText(): ?string {
-        return $this->getFixtureContentsWithFileName('count-text.txt');
+        return $this->getFixtureContentsWithFileName('output-count.txt');
     }
 
     /**

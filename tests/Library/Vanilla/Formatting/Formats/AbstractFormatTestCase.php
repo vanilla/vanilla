@@ -245,8 +245,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
     public function testGetVisibleTextLength(string $input, string $expectedOutput) {
         $format = $this->prepareFormatter();
         $this->assertSame(
-            $expectedOutput,
-            $input
+            (int) $expectedOutput,
+            $format->getVisibleTextLength($input),
+            'paragraph/output-count.txt expects '.$expectedOutput.', '.$format->getVisibleTextLength($input).' found.'
         );
     }
 

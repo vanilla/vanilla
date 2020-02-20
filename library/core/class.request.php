@@ -1673,7 +1673,7 @@ class Gdn_Request implements RequestInterface {
      * @return string
      */
     public function getSimpleUrl(string $uri = ''): string {
-        if(is_null($this->urlPrefix)) {
+        if (is_null($this->urlPrefix)) {
             $scheme = $this->getScheme();
             $hostAndPort = $this->getHostAndPort();
             $assetRoot = $this->getAssetRoot();

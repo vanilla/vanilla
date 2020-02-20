@@ -11,6 +11,7 @@
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Contracts\LocaleInterface;
 
 /**
  * Manages discussion comments data.
@@ -48,6 +49,11 @@ class CommentModel extends Gdn_Model {
     private $formatterService;
 
     /**
+     * @var \Vanilla\Contracts\LocaleInterface Object for translation.
+     */
+    protected $locale;
+
+    /**
      * @var CommentModel $instance;
      */
     private static $instance;
@@ -62,6 +68,7 @@ class CommentModel extends Gdn_Model {
 
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
+        $this->locale = Gdn::getContainer()->get(Vanilla\Contracts\LocaleInterface::class);
 
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
@@ -1091,9 +1098,22 @@ class CommentModel extends Gdn_Model {
         $this->Validation->applyRule('Body', 'Required');
         $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
         $this->Validation->applyRule('Body', 'MeAction');
-        $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+        $maxCommentLength = 20; //Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
             $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
+            $this->Validation->addRule('Length', function($value, $field, $post){
+                $format = $post['Format'] ?? '';
+                $formatService = Gdn::getContainer()->get(\Vanilla\Formatting\FormatService::class);
+                $stringLength = $formatService->getVisibleTextLength($value, $format);
+                $diff = $stringLength - $field->Length;
+                if ($diff <= 0) {
+                    return true;
+                } else {
+                    $validationMessage = 'Raw: '.$this->locale->translate('ValidateLength' ?? '');
+                    $fieldName = $this->locale->translate($field->Name ?? '');
+                    return sprintf($validationMessage, $fieldName, $diff);
+                }
+            });
             $this->Validation->applyRule('Body', 'RawLength');
         }
         $minCommentLength = c('Vanilla.Comment.MinLength');
@@ -1117,6 +1137,8 @@ class CommentModel extends Gdn_Model {
         $this->EventArguments['CommentID'] = $commentID;
         $this->fireEvent('BeforeSaveComment');
 
+
+//        $this->Validation->unapplyRule('Body', 'Length');
         // Validate the form posted values
         if ($this->validate($formPostValues, $insert)) {
             // Backward compatible check for flood control

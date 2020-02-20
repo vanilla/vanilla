@@ -86,6 +86,8 @@ class Gdn_Request implements RequestInterface {
     /** @var array Request data/parameters, either from superglobals or from a custom array of key/value pairs. */
     protected $_RequestArguments;
 
+    protected $urlPrefix;
+
     /**
      * Instantiate a new instance of the {@link Gdn_Request} class.
      */
@@ -1671,10 +1673,13 @@ class Gdn_Request implements RequestInterface {
      * @return string
      */
     public function getSimpleUrl(string $uri = ''): string {
-        $scheme = $this->getScheme();
-        $hostAndPort = $this->getHostAndPort();
-        $assetRoot = $this->getAssetRoot();
-        return "{$scheme}://{$hostAndPort}{$assetRoot}{$uri}";
+        if(is_null($this->urlPrefix)) {
+            $scheme = $this->getScheme();
+            $hostAndPort = $this->getHostAndPort();
+            $assetRoot = $this->getAssetRoot();
+            $this->urlPrefix = "{$scheme}://{$hostAndPort}{$assetRoot}";
+        }
+        return "{$this->urlPrefix}{$uri}";
     }
 
     /**

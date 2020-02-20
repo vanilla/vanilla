@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -24,7 +25,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
     use StaticInitializer;
 

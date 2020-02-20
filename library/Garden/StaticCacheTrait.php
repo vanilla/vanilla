@@ -30,7 +30,7 @@ trait StaticCacheTrait {
      *
      * @return mixed
      */
-    public static function sc(string $key, $default = null) {
+    public static function sc(string $key, $default = false) {
         if (empty($key)) {
             throw new \Exception('Static cache key can not be empty!');
         } else {
@@ -38,10 +38,10 @@ trait StaticCacheTrait {
                 self::$sCache = self::scInit();
                 self::$scInit = true;
             }
-            if (!key_exists($key, self::$sCache) && !is_null($default)) {
+            if (!key_exists($key, self::$sCache)) {
                 self::$sCache[$key] = self::f($key, $default);
             }
-            return self::$sCache[$key] ?? null;
+            return self::$sCache[$key];
         }
     }
 

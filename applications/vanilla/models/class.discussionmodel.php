@@ -792,9 +792,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $sql = $this->SQL;
 
         // Build up the base query. Self-join for optimization.
-        $sql->select('d2.*')
+        $sql->select('d.DiscussionID')
             ->from('Discussion d')
-            ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($limit, $offset);
 
         foreach ($orderBy as $field => $direction) {
@@ -841,6 +840,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $safeWheres[$this->addFieldPrefix($key)] = $value;
         }
         $sql->where($safeWheres);
+        $subQuery = $sql->getSelect(true);
+
+        $sql->reset();
+        $sql->select('d2.*')
+            ->from('Discussion d2')
+            ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
 
         // Add the UserDiscussion query.
         if (($userID = Gdn::session()->UserID) > 0) {
@@ -852,7 +857,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 ->select('w.Participated');
         }
 
-        $data = $sql->get();
+        $outerQuery = $sql->getSelect();
+        $finalQuery = str_replace(
+            '`'.$this->Database->DatabasePrefix.'_TBL_`',
+            '('.$subQuery.')',
+            $outerQuery
+        );
+
+        $data = $sql->query($finalQuery);
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);

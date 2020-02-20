@@ -112,13 +112,14 @@ export const forumLayoutCSS = () => {
 
     cssOut(
         `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
-        containerMainStyles() as NestedCSSProperties,
         mediaQueries.xs({
             ...paddings({
                 horizontal: globalVars.gutter.half,
             }),
         }),
     );
+
+    cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles() as NestedCSSProperties);
 
     cssOut(
         `.Frame-row`,

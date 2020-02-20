@@ -65,7 +65,11 @@ export default function Banner(props: IProps) {
                     <div className={classes.contentContainer}>
                         <div className={classes.titleWrap}>
                             <FlexSpacer className={classes.titleFlexSpacer} />
-                            {title && <Heading title={title} className={classes.title} />}
+                            {title && (
+                                <Heading className={classes.title} depth={1} isLarge>
+                                    {title}
+                                </Heading>
+                            )}
                             <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
                         </div>
                         {!options.hideDesciption && description && (

@@ -14,6 +14,7 @@ export interface IContainer {
     tag?: keyof JSX.IntrinsicElements;
     fullGutter?: boolean; // Use when a component wants a full mobile/desktop gutter.
     // Useful for components that don't provide their own padding.
+    narrow?: boolean;
 }
 
 /*
@@ -34,6 +35,7 @@ export default class Container extends React.Component<IContainer> {
                         classes.root,
                         this.props.className,
                         this.props.fullGutter && classes.fullGutter,
+                        this.props.narrow && "isNarrow",
                     )}
                 >
                     {this.props.children}

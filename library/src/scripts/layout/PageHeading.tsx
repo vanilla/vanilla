@@ -30,10 +30,6 @@ interface IPageHeading {
 
 export function PageHeading(props: IPageHeading) {
     const { includeBackLink = true, actions, children, headingClassName, title, className } = props;
-
-    // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
-    // public titleRef: React.RefObject<HTMLHeadingElement>;
-    const ref = useRef<HTMLHeadingElement>(null);
     const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
@@ -44,7 +40,7 @@ export function PageHeading(props: IPageHeading) {
             <div className={classes.main}>
                 {includeBackLink && <BackLink className={linkClasses.inHeading(fontSize)} />}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                    <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
+                    <Heading depth={1} title={title} className={headingClassName}>
                         {children}
                     </Heading>
                 </ConditionalWrap>

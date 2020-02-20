@@ -27,6 +27,7 @@ export const insertEmojiClasses = useThemeCache(() => {
         opacity: globalVars.states.text.opacity,
         cursor: "pointer",
         borderRadius: unit(3),
+        background: "transparent",
         $nest: {
             ...buttonStates(
                 {
@@ -43,7 +44,7 @@ export const insertEmojiClasses = useThemeCache(() => {
                         opacity: 1,
                     },
                     accessibleFocus: {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
+                        backgroundColor: colorOut(globalVars.states.hover.highlight),
                     },
                 },
                 {

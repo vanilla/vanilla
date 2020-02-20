@@ -1,14 +1,15 @@
 version: 2.1
 orbs:
     core: vanilla/core@2
-    chromatic: wave/chromatic@1.0.1
     codecov: codecov/codecov@1.0.5
 aliases:
     - &run_yarn
         run:
             name: Install Yarn Packages
             command: |
-                cd ~/workspace/repo
+                if [ -d ~/workspace/repo ]; then
+                    cd ~/workspace/repo
+                fi
                 yarn install --pure-lockfile
                 yarn install-all
     - &attach_workspace
@@ -229,8 +230,28 @@ jobs:
                     fi
                 name: "Conditionally perform Chromatic test"
             - checkout
-            - chromatic/load-node-modules
-            - chromatic/test-exit-cleanly-on-changes
+            - *run_yarn
+            - run:
+                command: yarn chromatic test --exit-zero-on-changes
+                name: Chromatic - accept all changes
+    chromatic_run_accept_all:
+        executor: core/node
+        steps:
+            - run:
+                command: |
+                    if [ -z "$CHROMATIC_APP_CODE" ]; then
+                        echo "No Chromatic app code detected. Exiting."
+                        circleci-agent step halt
+                    else
+                        echo "Chromatic app code detected. Proceeding..."
+                    fi
+                name: "Conditionally perform Chromatic test"
+            - checkout
+            - *run_yarn
+            - run:
+                command: yarn chromatic test --auto-accept-changes
+                name: Chromatic - accept all changes
+
 
 workflows:
     version: 2
@@ -240,7 +261,7 @@ workflows:
                 filters:
                     branches:
                         ignore: master
-            - chromatic/run-and-accept-all:
+            - chromatic_run_accept_all:
                 filters:
                     branches:
                         only: master

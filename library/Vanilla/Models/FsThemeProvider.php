@@ -7,11 +7,11 @@
 namespace Vanilla\Models;
 
 use Vanilla\Addon;
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -27,6 +27,8 @@ use Vanilla\Theme\TwigAsset;
  * Handle custom themes.
  */
 class FsThemeProvider implements ThemeProviderInterface {
+
+    const FALLBACK_THEME_KEY = "theme-foundation";
 
     use FsThemeMissingTrait;
     use ThemeVariablesTrait;
@@ -94,10 +96,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @throws NotFoundException Throws an exception when themeName not found.
      */
     public function getThemeByName($themeKey): Addon {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
+        $theme = $this->getThemeAddon($themeKey);
         return $theme;
     }
 
@@ -105,10 +104,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getThemeViewPath($themeKey): string {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
+        $theme = $this->getThemeAddon($themeKey);
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
     }
@@ -117,23 +113,36 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getMasterThemeKey($themeKey): string {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            //throw new NotFoundException("Theme");
-            return 'default';
-        }
-        return $themeKey;
+        $theme = $this->getThemeAddon($themeKey);
+        return $theme->getKey();
     }
 
     /**
      * @inheritdoc
      */
     public function getName($themeKey): string {
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
+        $theme = $this->getThemeAddon($themeKey);
         return $theme->getInfoValue('name');
+    }
+
+    /**
+     * Get the current theme, or fallback to the default one.
+     *
+     * @param int|string $themeKey
+     *
+     * @return Addon
+     */
+    public function getThemeAddon($themeKey): AddonInterface {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof AddonInterface)) {
+            $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
+            if (!($theme instanceof AddonInterface)) {
+                // Uh-oh, even the default theme doesn't exist.
+                throw new NotFoundException("Theme");
+            }
+        }
+
+        return $theme;
     }
 
     /**
@@ -148,7 +157,6 @@ class FsThemeProvider implements ThemeProviderInterface {
             "assets" => $assets,
             'name' => $theme->getInfoValue('name'),
             'themeID' => $theme->getInfoValue('key'),
-            'name' => $theme->getInfoValue('name'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
             'current' => $theme->getInfoValue('key') === $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme')),
@@ -195,6 +203,31 @@ class FsThemeProvider implements ThemeProviderInterface {
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
             }
         }
+
+
+        // Check theme for default.
+        if (!$logo) {
+            if (valr("assets.variables", $res)) {
+                $themeVars = json_decode($res['assets']['variables']->getData(), true);
+                $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
+                $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
+                $noDesktopLogo = empty($desktopLogo);
+                $noMobileLogo = empty($mobileLogo);
+
+                if (!$noDesktopLogo) {
+                    $res["assets"]["logo"] = new ImageAsset($desktopLogo);
+                }
+                if (!$noMobileLogo || !$noDesktopLogo) {
+                    if (!$noMobileLogo) {
+                        $res["assets"]["mobileLogo"] = new ImageAsset($mobileLogo);
+                    } else {
+                        // Use same logo if mobile is not set.
+                        $res["assets"]["mobileLogo"] = new ImageAsset($desktopLogo);
+                    }
+                }
+            }
+        }
+
 
         $themeInfo = \Gdn::themeManager()->getThemeInfo($theme->getInfoValue('key'));
         $res['preview']['previewImage'] = $themeInfo['IconUrl'] ?? null;

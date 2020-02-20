@@ -12,7 +12,7 @@
 
 .Message img .embedImage-img, // Compatibility
 .embedImage-img {
-    display: block;
+    display: inline-flex;
     position: relative;
     margin: {
         left: auto;
@@ -24,12 +24,14 @@
 
 .bbcode_left {
     .embedImage-img {
-        margin-left: 0,
+        margin-left: 0;
+        display: inline-block;
     }
 }
 .bbcode_right {
     .embedImage-img {
-        margin-right: 0,
+        margin-right: 0;
+        display: inline-block;
     }
 }
 

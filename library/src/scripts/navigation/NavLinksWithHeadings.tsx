@@ -13,6 +13,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
 import NavLinks from "@library/navigation/NavLinks";
+import Container from "@library/layout/components/Container";
 
 interface IProps {
     title: string; // For accessibility, title of group
@@ -61,13 +62,17 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             });
 
             return (
-                <nav className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}>
-                    <ScreenReaderContent>
-                        <Heading title={this.props.title} depth={this.props.depth} />
-                    </ScreenReaderContent>
-                    {groupedContent}
-                    {ungroupedContent}
-                </nav>
+                <Container fullGutter narrow>
+                    <nav
+                        className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
+                    >
+                        <ScreenReaderContent>
+                            <Heading title={this.props.title} depth={this.props.depth} />
+                        </ScreenReaderContent>
+                        {groupedContent}
+                        {ungroupedContent}
+                    </nav>
+                </Container>
             );
         } else {
             return null;

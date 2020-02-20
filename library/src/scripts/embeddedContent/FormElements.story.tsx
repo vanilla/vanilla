@@ -18,7 +18,7 @@ import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import DateRange from "@library/forms/DateRange";
 import Checkbox from "@library/forms/Checkbox";
-import StoryExampleDropDownSearch from "@library/embeddedContent/StoryExampleDropDownSearch";
+import StoryExampleDropDownSearch from "@library/flyouts/StoryExampleDropDownSearch";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import RadioButton from "@library/forms/RadioButton";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";

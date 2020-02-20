@@ -25,6 +25,7 @@ import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatib
 import { fullBackgroundCompat } from "@vanilla/library/src/scripts/layout/Backgrounds";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import CommunityBanner from "@vanilla/library/src/scripts/banner/CommunityBanner";
 
 initAllUserContent();
 onContent(convertAllUserContent);
@@ -56,9 +57,9 @@ applySharedPortalContext(props => {
 addComponent("App", () => <Router disableDynamicRouting />);
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
+addComponent("community-banner", CommunityBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    fullBackgroundCompat();
     compatibilityStyles();
     applyCompatibilityIcons();
 }

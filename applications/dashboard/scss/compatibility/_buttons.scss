@@ -26,10 +26,11 @@ button.Close {
     width: 36px;
     min-width: 36px;
     padding: 0;
-    color: $icon_color;
-
-    &:visited {
+    @if ($staticVariables) {
         color: $icon_color;
+        &:visited {
+            color: $icon_color;
+        }
     }
 
     .icon {
@@ -40,9 +41,11 @@ button.Close {
         color: $global-color_primary;
     }
 
-    &:focus,
-    &:hover {
-        color: $global-color_primary;
+    @if ($staticVariables) {
+        &:focus,
+        &:hover {
+            color: $global-color_primary;
+        }
     }
 }
 

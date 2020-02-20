@@ -63,7 +63,7 @@ export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWid
         "options",
         {
             ...options,
-            borderType: hasImage ? BorderType.SHADOW : BorderType.NONE,
+            borderType: hasImage ? BorderType.SHADOW : options.borderType,
         },
         optionOverrides,
     );
@@ -187,5 +187,9 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         objectPosition: "center center",
     });
 
-    return { root, name, content, imageContainer, image };
+    const description = style("description", {
+        lineHeight: globalVars.lineHeights.base,
+    });
+
+    return { root, name, content, imageContainer, image, description };
 });

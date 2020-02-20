@@ -67,6 +67,12 @@ export const containerMainStyles = (): NestedCSSProperties => {
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),
+
+        $nest: {
+            "&.isNarrow": {
+                maxWidth: vars.sizing.narrowContentSize,
+            },
+        },
     };
 };
 

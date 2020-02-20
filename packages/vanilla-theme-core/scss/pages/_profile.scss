@@ -151,25 +151,29 @@ body.Section-Profile {
             }
         }
 
-        .Button-EditProfile {
-            @include Button(
-                    $button-primary_bg,
-                    $button-primary_fg,
-                    $button-primary_border,
-                    $button-primary-hover_bg,
-                    $button-primary-hover_fg,
-                    $button-primary-hover_border
-            );
+        @if ($staticVariables) {
+            .Button-EditProfile {
+                @include Button(
+                        $button-primary_bg,
+                        $button-primary_fg,
+                        $button-primary_border,
+                        $button-primary-hover_bg,
+                        $button-primary-hover_fg,
+                        $button-primary-hover_border
+                );
+            }
         }
 
-        .ButtonGroup.Open .NavButton.Handle {
-            background-color: darken($formButton_bg, 8%);
-            border-color: darken($formButton_bg, 8%);
-            color: $formButton_color;
-        }
+        @if ($staticVariables) {
+            .ButtonGroup.Open .NavButton.Handle {
+                background-color: darken($formButton_bg, 8%);
+                border-color: darken($formButton_bg, 8%);
+                color: $formButton_color;
+            }
 
-        .ProfileButtons-BackToProfile {
-            @include Button;
+            .ProfileButtons-BackToProfile {
+                @include Button;
+            }
         }
 
         @include maxWidth($theme-breakpoint_tablet) {

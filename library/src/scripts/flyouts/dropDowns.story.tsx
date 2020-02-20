@@ -11,10 +11,10 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { StoryExampleDropDown } from "./StoryExampleDropDown";
+import { StoryExampleDropDown } from "@library/flyouts/StoryExampleDropDown";
 import { FlyoutType } from "@library/flyouts/DropDown";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import StoryExampleMessagesDropDown from "@library/embeddedContent/StoryExampleDropDownMessages";
+import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownMessages";
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 

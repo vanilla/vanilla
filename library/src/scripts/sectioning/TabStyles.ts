@@ -5,11 +5,22 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    fonts,
+    paddings,
+    borders,
+    negative,
+    srOnly,
+    IFont,
+    sticky,
+    extendItemContainer,
+} from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, viewHeight } from "csx";
+import { percent, viewHeight, calc } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -71,16 +82,22 @@ export const tabClasses = useThemeCache(() => {
 
     const tabList = style("tabList", {
         display: "flex",
-        width: percent(100),
+        // Offset for the outer borders.
+        ...extendItemContainer(globalVariables().border.width),
         justifyContent: "space-between",
         alignItems: "stretch",
+        background: colorOut(vars.colors.bg),
+        ...sticky(),
+        top: 0,
+        zIndex: 1,
     });
+
     const tab = style(
         "tab",
         {
             ...userSelect(),
             position: "relative",
-            width: percent(25),
+            flex: 1,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             border: "1px solid #bfcbd8",

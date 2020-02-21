@@ -228,32 +228,6 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
     }
 
     /**
-     * PHPUnit data provider for testing character counts in different formats.
-     *
-     * @return array
-     */
-    public function visibleContentProvider():array {
-        return $this->makeDataProvider('getCountText', 'Count Content');
-    }
-
-    /**
-     * Test getting the length of formatted text with most of the formatting removed.
-     *
-     * @param string $input
-     * @param int $expectedOutput
-     *
-     * @dataProvider visibleContentProvider
-     */
-    public function testGetVisibleTextLength(string $input, string $expectedOutput) {
-        $format = $this->prepareFormatter();
-        $this->assertSame(
-            (int) $expectedOutput,
-            $format->getVisibleTextLength($input),
-            'paragraph/output-count.txt expects '.$expectedOutput.', '.$format->getVisibleTextLength($input).' found.'
-        );
-    }
-
-    /**
      * Generate a PHPUnit data provider.
      *
      * @param string $methodToCall The name of the method to call on the fixture for getting the expected output.

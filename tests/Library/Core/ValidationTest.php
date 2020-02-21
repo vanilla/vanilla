@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
+use Garden\Schema\Validation;
 use Gdn_Validation;
 use Vanilla\Invalid;
 use VanillaTests\MinimalContainerTestCase;
@@ -52,6 +53,22 @@ class ValidationTest extends MinimalContainerTestCase {
         ];
     }
 
+    /**
+     * @param array $post
+     * @param int $expectedLength
+     *
+     * @dataProvider providePostContent
+     */
+    public function testRawContentLength(array $post, bool $isValid) :void {
+        $maxLength = 10;
+        $validation = new Gdn_Validation([
+            'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string', 'RawLength' => $maxLength],
+            'Format' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
+        ], true);
+        $validation->applyRule('Body', 'visibleTextLength');
+        $result = $validation->validate($post);
+        $this->assertEquals($isValid, $result);
+    }
     /**
      * Test some basic valid types.
      *
@@ -180,5 +197,23 @@ class ValidationTest extends MinimalContainerTestCase {
         ];
 
         return array_column($r, null, 0);
+    }
+
+    public function providePostContent() {
+        $output = [
+              [
+                  ['Body' => '**Bold**', 'Format' => 'Markdown'],
+                  true
+              ],
+            [
+                ['Body' => '**Bold** Text', 'Format' => 'Markdown'],
+                true
+            ],
+            [
+                ['Body' => '**Bold** Text *italic*', 'Format' => 'Markdown'],
+                false
+            ],
+        ];
+        return $output;
     }
 }

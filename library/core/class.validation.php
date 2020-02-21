@@ -11,8 +11,6 @@
  */
 
 use Vanilla\Invalid;
-use Vanilla\Formatting\FormatService;
-use Vanilla\Contracts\LocaleInterface;
 
 /**
  * Manages data integrity validation rules.
@@ -67,12 +65,6 @@ class Gdn_Validation {
     /** @var array An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule. */
     private $customErrors = [];
 
-    /** @var LocaleInterface */
-    private $locale;
-
-    /** @var FormatService */
-    private $formatService;
-
     /**
      * Class constructor. Optionally takes a schema definition to generate validation rules for.
      *
@@ -84,8 +76,6 @@ class Gdn_Validation {
             $this->setSchema($schema);
         }
         $this->setResetOnValidate($resetOnValidate);
-        $this->locale = Gdn::getContainer()->get(Vanilla\Contracts\LocaleInterface::class);
-        $this->formatService = Gdn::getContainer()->get(FormatService::class);
 
         // Define the default validation functions.
         $this->addRule('Required', 'function:ValidateRequired');
@@ -103,7 +93,6 @@ class Gdn_Validation {
         $this->addRule('Time', 'function:ValidateTime', true);
         $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
-        $this->addRule('RawLength', [$this, 'validateRawLength']);
         $this->addRule('MinTextLength', 'function:validateMinTextLength');
         $this->addRule('Enum', 'function:ValidateEnum');
         $this->addRule('MinimumAge', 'function:ValidateMinimumAge');
@@ -878,26 +867,5 @@ class Gdn_Validation {
             return $invalid;
         }
         return $default;
-    }
-
-    /**
-     * Validate content length by stripping most meta-data and formatting.
-     *
-     * @param $value
-     * @param $field
-     * @param $post
-     * @return Invalid
-     */
-    private function validateRawLength($value, $field, $post){
-        $format = $post['Format'] ?? '';
-        $stringLength = $this->formatService->getVisibleTextLength($value, $format);
-        $diff = $stringLength - $field->RawLength;
-        if ($diff <= 0) {
-            return $value;
-        } else {
-            $validationMessage = $this->locale->translate('ValidateLength' ?? '');
-            $fieldName = $this->locale->translate($field->Name ?? '');
-            return new Invalid(sprintf($validationMessage, $fieldName, $diff));
-        }
     }
 }

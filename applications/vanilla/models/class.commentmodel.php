@@ -1093,8 +1093,8 @@ class CommentModel extends Gdn_Model {
         $this->Validation->applyRule('Body', 'MeAction');
         $maxCommentLength = 20; //Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-            $this->Validation->setSchemaProperty('Body', 'RawLength', $maxCommentLength);
-            $this->Validation->applyRule('Body', 'RawLength');
+            $this->Validation->setSchemaProperty('Body', 'visibleTextLength', $maxCommentLength);
+            $this->Validation->applyRule('Body', 'visibleTextLength');
         }
         $minCommentLength = c('Vanilla.Comment.MinLength');
         if ($minCommentLength && is_numeric($minCommentLength)) {

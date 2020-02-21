@@ -22,7 +22,7 @@ import {
     BorderType,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url, translate, rgba } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -99,7 +99,8 @@ export const titleBarVariables = useThemeCache(() => {
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
-            bg: "transparent",
+            bg: rgba(0, 0, 0, 0),
+            fg: colors.fg,
         },
         fonts: {
             color: colors.fg,
@@ -113,7 +114,7 @@ export const titleBarVariables = useThemeCache(() => {
         },
         borders: {
             style: "none",
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         },
         hover: {
             colors: {
@@ -158,7 +159,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        bg: globalVars.mainColors.secondary,
+        bg: fullBleed.enabled ? colors.bg.fade(0.2) : globalVars.mainColors.secondary,
         fg: colors.fg,
         mobile: {
             width: button.mobile.width,
@@ -363,11 +364,11 @@ export const titleBarClasses = useThemeCache(() => {
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
-            paddingTop: px(vars.sizing.height / 2),
+            paddingTop: px(vars.sizing.height),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
-            paddingTop: px(vars.sizing.mobile.height / 2),
+            paddingTop: px(vars.sizing.mobile.height),
         }),
     );
 
@@ -598,8 +599,9 @@ export const titleBarClasses = useThemeCache(() => {
                         {
                             "& .meBox-buttonContent": {
                                 ...borders({
+                                    radius: 0,
                                     width: 1,
-                                    color: "transparent",
+                                    color: rgba(0, 0, 0, 0),
                                 }),
                             },
                             "&.isOpen": {

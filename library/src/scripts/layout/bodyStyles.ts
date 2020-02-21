@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule, style } from "typestyle";
-import { colorOut, background, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { colorOut, backgroundHelper, margins, paddings, fonts } from "@library/styles/styleHelpers";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -113,7 +113,7 @@ export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        background(source.backgroundImage),
+        backgroundHelper(source.backgroundImage),
     );
 
     return { root };

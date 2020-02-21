@@ -11,23 +11,14 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import {
-    borders,
-    importantUnit,
-    margins,
-    negative,
-    paddings,
-    singleBorder,
-    srOnly,
-    unit,
-} from "@library/styles/styleHelpers";
+import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
 import * as types from "typestyle/lib/types";
-import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStyles";
+import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
 import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
@@ -215,7 +206,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`div.Popup .Body`, {
         // borderRadius: unit(vars.border.radius),
-        ...borders(),
+        ...borders(vars.borderType.modals),
         backgroundColor: bg,
         color: fg,
     });
@@ -283,7 +274,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.QuickSearchButton`, {
         color: fg,
-        ...borders(),
+        ...borders(vars.borderType.formElements.buttons),
     });
 
     cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
@@ -294,7 +285,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(),
+        ...borders(vars.borderType.dropDowns.content),
     });
 
     cssOut(`.Frame-content`, {

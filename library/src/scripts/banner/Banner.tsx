@@ -5,21 +5,18 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
-import { ColorValues } from "@library/styles/styleHelpersColors";
+import { bannerClasses, bannerVariables, SearchBarPresets, presetsBanner } from "@library/banner/bannerStyles";
 import { t, assetUrl } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
-import { getBackgroundImage } from "@library/styles/styleHelpers";
-import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 
 interface IProps {
     action?: React.ReactNode;
@@ -90,7 +87,7 @@ export default function Banner(props: IProps) {
                                     hideSearchButton={
                                         device === Devices.MOBILE ||
                                         device === Devices.XS ||
-                                        vars.searchButtonOptions.type === SearchBarButtonType.NONE
+                                        presetsBanner().button.preset === ButtonPresets.HIDE
                                     }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}

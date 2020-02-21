@@ -267,7 +267,7 @@ export const storyBookClasses = useThemeCache(() => {
                 fg = globalVars.mainColors.bg;
                 break;
             case "titleBar":
-                bg = titleBarVars.colors.bg;
+                bg = titleBarVars.colors.bg.mix(titleBarVars.colors.fg, 0.5);
                 fg = titleBarVars.colors.fg;
                 break;
         }

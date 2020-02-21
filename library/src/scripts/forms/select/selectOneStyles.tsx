@@ -5,8 +5,8 @@
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { calc } from "csx";
+import { borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { calc, percent } from "csx";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
@@ -21,11 +21,15 @@ export const selectOneVariables = useThemeCache(() => {
 export const selectOneClasses = useThemeCache(() => {
     const style = styleFactory("selectOne");
     const vars = selectOneVariables();
+    const globalVars = globalVariables();
 
     const inputWrap = style("inputWrap", {
         $nest: {
             "&.hasFocus .inputBlock-inputText": {
-                borderColor: colorOut(globalVariables().mainColors.primary),
+                ...borders({
+                    ...globalVars.borderType.formElements.default,
+                    color: globalVars.mainColors.primary,
+                }),
             },
             ".inputBlock-inputText": {
                 paddingRight: unit(vars.padding.right),
@@ -43,6 +47,9 @@ export const selectOneClasses = useThemeCache(() => {
             "& .SelectOne__single-value": {
                 textOverflow: "ellipsis",
                 maxWidth: calc(`100% - ${unit(vars.padding.right + 26)}`),
+            },
+            "& .SelectOne__value-container > *": {
+                width: percent(100),
             },
         },
     });

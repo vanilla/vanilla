@@ -12,7 +12,6 @@ import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyl
 import merge from "lodash/merge";
 import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
-import produce from "immer";
 
 export enum BorderType {
     BORDER = "border",

@@ -15,11 +15,15 @@ import {
     getRatioBasedOnDarkness,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderStyleProperty, BorderWidthProperty, Color } from "csstype";
-import { color, ColorHelper, percent } from "csx";
+import { BorderStyleProperty, BorderWidthProperty } from "csstype";
+import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import main from "@storybook/api/dist/initial-state";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+
+export interface IButtonPresets {
+    style: undefined | ButtonTypes;
+}
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -53,14 +57,16 @@ export const globalVariables = useThemeCache(() => {
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: "transparent" as ColorValues,
+        transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
+        primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
+        secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
     colorPrimary = initialMainColors.primary;
@@ -147,7 +153,25 @@ export const globalVariables = useThemeCache(() => {
         colorHover: mixBgAndFg(0.2),
         width: 1,
         style: "solid",
-        radius: 6,
+        radius: 6, // Global default
+    });
+
+    const standardBorder = {
+        radius: border.radius,
+        width: border.width,
+        color: border.color,
+        style: border.style,
+    };
+
+    const borderType = makeThemeVars("borderType", {
+        formElements: {
+            default: standardBorder,
+            buttons: standardBorder,
+        },
+        modals: standardBorder,
+        dropDowns: {
+            content: standardBorder,
+        },
     });
 
     const gutterSize = 16;
@@ -234,7 +258,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const animation = makeThemeVars("animation", {
-        defaultTiming: ".15s",
+        defaultTiming: ".1s",
         defaultEasing: "ease-out",
     });
 
@@ -347,6 +371,13 @@ export const globalVariables = useThemeCache(() => {
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
+    // Sets global "style" for buttons. Use "ButtonPresets" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
+    // the style of them.
+    const buttonPreset = makeThemeVars("buttonPreset", {
+        style: undefined,
+    } as IButtonPresets);
+
     const separator = makeThemeVars("separator", {
         color: border.color,
         size: 1,
@@ -404,6 +435,7 @@ export const globalVariables = useThemeCache(() => {
         mainColors,
         messageColors,
         body,
+        borderType,
         border,
         meta,
         gutter,
@@ -428,6 +460,7 @@ export const globalVariables = useThemeCache(() => {
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,
+        buttonPreset,
     };
 });
 

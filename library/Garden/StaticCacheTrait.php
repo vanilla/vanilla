@@ -38,10 +38,16 @@ trait StaticCacheTrait {
                 self::$sCache = self::scInit();
                 self::$scInit = true;
             }
-            if (!key_exists($key, self::$sCache) && $update) {
-                self::$sCache[$key] = self::f($key, $default);
+            if (!key_exists($key, self::$sCache)) {
+                if ($update) {
+                    self::$sCache[$key] = $res = self::f($key, $default);
+                } else {
+                    $res = $default;
+                }
+            } else {
+                $res = self::$sCache[$key];
             }
-            return self::$sCache[$key];
+            return $res;
         }
     }
 

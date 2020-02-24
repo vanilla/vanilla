@@ -55,9 +55,12 @@ class ValidationTest extends MinimalContainerTestCase {
     }
 
     /**
-     * @param array $post
-     * @param int $expectedLength
+     * Test the length of text with formatting stripped out.
      *
+     * @param array $post
+     * @param bool $isValid
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      * @dataProvider providePostContent
      */
     public function testVisibleTextLength(array $post, bool $isValid) :void {
@@ -200,6 +203,11 @@ class ValidationTest extends MinimalContainerTestCase {
         return array_column($r, null, 0);
     }
 
+    /**
+     * Provide Markdown text to test counting text length with formatting stripped out.
+     *
+     * @return array
+     */
     public function providePostContent() {
         $output = [
             'Short Formatted' => [

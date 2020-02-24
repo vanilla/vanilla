@@ -11,10 +11,10 @@ class VisibleTextLengthValidator {
     /**
      * Validate content length by stripping most meta-data and formatting.
      *
-     * @param $value
-     * @param $field
-     * @param $post
-     * @return Invalid
+     * @param string $value User input content.
+     * @param string $field Field name where content is found.
+     * @param array $post POST array.
+     * @return \Vanilla\Invalid
      */
     private function validate($value, $field, $post){
         $format = $post['Format'] ?? '';
@@ -31,6 +31,14 @@ class VisibleTextLengthValidator {
         }
     }
 
+    /**
+     * Execute validate function for visible text validator.
+     *
+     * @param string $value User input content.
+     * @param string $field Field name where content is found.
+     * @param array $post POST array.
+     * @return \Vanilla\Invalid
+     */
     public function __invoke($value, $field, $row = []) {
         return $this->validate($value, $field, $row);
     }

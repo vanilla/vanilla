@@ -14,7 +14,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for signInUrl()
  */
-class SignInUrlTest extends TestCase{
+class SignInUrlTest extends TestCase {
 
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;

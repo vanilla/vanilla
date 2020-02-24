@@ -66,6 +66,8 @@ export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
     right?: ISimpleBorderStyle & IRadiusFlex;
 }
 
+export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
+
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
     if (variable != null) {
         const type = typeof variable;
@@ -318,7 +320,7 @@ const singleBorderStyle = (
 };
 
 export const borders = (
-    detailedStyles?: IBorderStyles | ISimpleBorderStyle | undefined,
+    detailedStyles?: IBorderStyles | ISimpleBorderStyle | IMixedBorderStyles | undefined,
     fallbackBorderVariables: IGlobalBorderStyles = globalVariables().border,
     debug = false,
 ): NestedCSSProperties => {

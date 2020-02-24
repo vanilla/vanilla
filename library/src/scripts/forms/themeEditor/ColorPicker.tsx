@@ -11,6 +11,7 @@ import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles
 import { color, ColorHelper } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { useField } from "formik";
+const Collit = require("collit");
 
 export interface IColorPicker {
     inputProps?: React.HTMLAttributes<Omit<Omit<Omit<HTMLInputElement, "type">, "id">, "tabIndex">>;
@@ -29,6 +30,7 @@ export default function ColorPicker(props: IColorPicker) {
     const initialColor = props.initialColor ? props.initialColor : color("#000");
 
     const [lastValidColor, setLastValidColor] = useState(initialColor);
+    const [inputTextValue, setInputTextValue] = useState(initialColor);
 
     const [selectedColor, selectedColorMeta, selectedColorHelpers] = useField({
         name: props.variableID,
@@ -37,6 +39,18 @@ export default function ColorPicker(props: IColorPicker) {
         value: colorOut(initialColor),
     });
 
+    const isValidColorString = (color: string) => {
+        const Validator = Collit.Validator;
+        return (
+            typeof color === "string" &&
+            (Validator.isHex(color) ||
+                Validator.isRgb(color) ||
+                Validator.isRgba(color) ||
+                Validator.isHsl(color) ||
+                Validator.isHsla(color))
+        );
+    };
+
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
             colorInput.current.click();
@@ -44,12 +58,12 @@ export default function ColorPicker(props: IColorPicker) {
     };
 
     const onTextInputChange = e => {
-        const newColor = color(e.target.value);
-        console.log("e.target.value: ", e.target.value);
-        console.log("New Color: ", newColor);
-        if (newColor) {
+        console.log("isValidColorString(e.target.value): ", isValidColorString(e.target.value));
+        if (isValidColorString(e.target.value)) {
+            const newColor = color(e.target.value);
             selectedColorHelpers.setValue(newColor);
             setLastValidColor(newColor);
+            setInputTextValue(newColor);
         }
 
         return e.target.value;
@@ -57,10 +71,9 @@ export default function ColorPicker(props: IColorPicker) {
 
     const onColorInputChange = e => {
         const newColor = color(e.target.value);
-        if (newColor) {
-            selectedColorHelpers.setValue(newColor);
-            setLastValidColor(newColor);
-        }
+        selectedColorHelpers.setValue(newColor);
+        setLastValidColor(newColor);
+        setInputTextValue(newColor);
     };
 
     const formattedColor = colorOut(lastValidColor);
@@ -76,7 +89,7 @@ export default function ColorPicker(props: IColorPicker) {
                     aria-describedby={props.labelID}
                     className={classes.textInput}
                     placeholder={"#0291DB"}
-                    value={selectedColorMeta.value}
+                    value={colorOut(inputTextValue)}
                     onChange={onTextInputChange}
                 />
                 {/*"Real" color input*/}

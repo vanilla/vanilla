@@ -13,7 +13,7 @@ export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
     return {
         outline: {
-            color: "#0291db",
+            color: color("#0291db"),
         },
         width: 160,
         fonts: {
@@ -22,7 +22,7 @@ export const themeBuilderVariables = () => {
             size: 13,
         },
         border: {
-            color: "#bfcbd8",
+            color: color("#bfcbd8"),
             width: 1,
             style: "solid",
         },

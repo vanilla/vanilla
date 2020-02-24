@@ -4,13 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
 import { percent } from "csx";
-import { borders, singleBorder, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
-import { single } from "rxjs/operators";
+import { borders, colorOut, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
+import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -43,11 +42,15 @@ export const colorPickerClasses = useThemeCache(() => {
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
-        ...borders({
-            top: builderVariables.border,
-            bottom: builderVariables.border,
-            left: builderVariables.border,
-        }),
+        ...borders(
+            {
+                all: builderVariables.border,
+                right: {
+                    radius: builderVariables.wrap.borderRadius,
+                },
+            },
+            builderVariables.border as IGlobalBorderStyles,
+        ),
     });
 
     const swatch = style("swatch", {
@@ -61,7 +64,7 @@ export const colorPickerClasses = useThemeCache(() => {
                     radius: builderVariables.wrap.borderRadius,
                 },
             },
-            builderVariables.border,
+            builderVariables.border as IGlobalBorderStyles,
         ),
     });
 
@@ -69,7 +72,7 @@ export const colorPickerClasses = useThemeCache(() => {
         position: "absolute",
         $nest: {
             [`&:focus + .${swatch}`]: {
-                borderLeftColor: builderVariables.outline.color,
+                borderLeftColor: colorOut(builderVariables.outline.color),
             },
         },
     });

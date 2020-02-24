@@ -1734,6 +1734,10 @@ if (!function_exists('signInUrl')) {
             }
         }
 
+        if ($target = '/entry/autosignedout') {
+            $target = '/';
+        }
+
         return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
     }
 }

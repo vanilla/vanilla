@@ -3041,11 +3041,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $this->setUserBookmarkCount($user->UserID);
         }
 
-        $dataObject = (object)$data;
-        $this->calculate($dataObject);
-        $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
-        $this->getEventManager()->dispatch($discussionEvent);
-
+        if ($data) {
+            $dataObject = (object)$data;
+            $this->calculate($dataObject);
+            $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($discussionEvent);
+        }
         return true;
     }
 

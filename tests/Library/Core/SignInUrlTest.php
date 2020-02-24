@@ -8,18 +8,21 @@
 namespace VanillaTests\Library\Core;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for signInUrl()
  */
 class SignInUrlTest extends TestCase {
 
+    use SiteTestTrait;
+
     /**
      * Test target parameter.
      *
      * @param string $target
      * @param string $expected
-     * @dataProvider provideSignInUrls
+     * @dataProvider provideSignInUrlTargets
      */
     public function testSignInUrlTarget(string $target, string $expected): void {
         $actual = signInUrl($target);

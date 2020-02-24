@@ -20,18 +20,18 @@ class VisibleTextLengthValidator {
         $format = $post['Format'] ?? '';
         $formatServices = \Gdn::formatService();
         $stringLength = $formatServices->getVisibleTextLength($value, $format);
-        $diff = $stringLength - $field->visibleTextLength;
+        $diff = $stringLength - $field->maxTextLength;
         if ($diff <= 0) {
             return $value;
         } else {
             $locale = \Gdn::locale();
             $validationMessage = $locale->translate('ValidateLength' ?? '');
             $fieldName = $locale->translate($field->Name ?? '');
-            return new Invalid(sprintf($validationMessage, $fieldName, $diff));
+            return new Invalid(sprintf($validationMessage, $fieldName, abs($diff)));
         }
     }
 
     public function __invoke($value, $field, $row = []) {
-        $this->validate($value, $field, $row);
+        return $this->validate($value, $field, $row);
     }
 }

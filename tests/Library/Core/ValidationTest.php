@@ -11,6 +11,7 @@ use Garden\Schema\Validation;
 use Gdn_Validation;
 use Vanilla\Invalid;
 use VanillaTests\MinimalContainerTestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the **Gdn_Validation** object.
@@ -59,12 +60,12 @@ class ValidationTest extends MinimalContainerTestCase {
      *
      * @dataProvider providePostContent
      */
-    public function testRawContentLength(array $post, bool $isValid) :void {
+    public function testVisibleTextLength(array $post, bool $isValid) :void {
         $maxLength = 10;
         $validation = new Gdn_Validation([
-            'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string', 'RawLength' => $maxLength],
-            'Format' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
-        ], true);
+            'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string', 'maxTextLength' => $maxLength]
+        ]);
+        $validation->addRule('visibleTextLength', \Gdn::getContainer()->get(\Vanilla\VisibleTextLengthValidator::class));
         $validation->applyRule('Body', 'visibleTextLength');
         $result = $validation->validate($post);
         $this->assertEquals($isValid, $result);
@@ -201,15 +202,15 @@ class ValidationTest extends MinimalContainerTestCase {
 
     public function providePostContent() {
         $output = [
-              [
-                  ['Body' => '**Bold**', 'Format' => 'Markdown'],
-                  true
-              ],
-            [
+            'Short Formatted' => [
+                ['Body' => '**Bold**', 'Format' => 'Markdown'],
+                true
+            ],
+            'Short Mixed' => [
                 ['Body' => '**Bold** Text', 'Format' => 'Markdown'],
                 true
             ],
-            [
+            'Long Mixed' => [
                 ['Body' => '**Bold** Text *italic*', 'Format' => 'Markdown'],
                 false
             ],

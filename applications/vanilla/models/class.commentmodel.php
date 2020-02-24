@@ -8,9 +8,17 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Attributes;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Community\Events\CommentEvent;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussion comments data.
@@ -20,6 +28,8 @@ class CommentModel extends Gdn_Model {
     use \Vanilla\FloodControlTrait;
 
     use UpdateMediaTrait;
+
+    use FormatFieldTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -851,6 +861,24 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
+     * @return mixed
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'commentID:i' => 'The ID of the comment.',
+            'discussionID:i' => 'The ID of the discussion.',
+            'body:s' => 'The body of the comment.',
+            'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
+            'insertUserID:i' => 'The user that created the comment.',
+            'score:i|n' => 'Total points associated with this post.',
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'url:s?' => 'The full URL to the comment.'
+        ]);
+        return $result;
+    }
+
+    /**
      * Count total comments in a discussion specified by ID.
      *
      * Events: BeforeGetCount
@@ -1207,10 +1235,50 @@ class CommentModel extends Gdn_Model {
                 $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
             }
         }
-
+        $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY): false;
+        if ($comment) {
+            $commentEvent = $this->eventFromRow(
+                (array)$comment,
+                $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE
+            );
+            $this->getEventManager()->dispatch($commentEvent);
+        }
         return $commentID;
     }
 
+    /**
+     * Generate a comment event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return CommentEvent
+     */
+    private function eventFromRow(array $row, string $action): CommentEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $userModel->expandUsers($row, ["InsertUserID"]);
+        $comment = $this->normalizeRow($row, true);
+        $comment = $this->schema()->validate($comment);
+        $result = new CommentEvent(
+            $action,
+            ["comment" => $comment]
+        );
+        return $result;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        $this->formatField($row, "Body", $row["Format"]);
+        $scheme = new CamelCaseScheme;
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
     /**
      * Update the attachment status of attachemnts in particular comment.
      *
@@ -1563,6 +1631,13 @@ class CommentModel extends Gdn_Model {
 
         // Clear the page cache.
         $this->removePageCache($comment['DiscussionID']);
+        
+        if ($comment) {
+            $dataObject = (object)$comment;
+            $this->calculate($dataObject);
+            $commentEvent = $this->eventFromRow((array)$dataObject, CommentEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($commentEvent);
+        }
         return true;
     }
 

@@ -8,9 +8,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\SchemaFactory;
 
 /**
  * API Controller for the `/comments` resource.
@@ -142,17 +144,12 @@ class CommentsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return Schema::parse([
-            'commentID:i' => 'The ID of the comment.',
-            'discussionID:i' => 'The ID of the discussion.',
-            'body:s' => 'The body of the comment.',
-            'dateInserted:dt' => 'When the comment was created.',
-            'dateUpdated:dt|n' => 'When the comment was last updated.',
-            'insertUserID:i' => 'The user that created the comment.',
-            'score:i|n' => 'Total points associated with this post.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'url:s?' => 'The full URL to the comment.'
-        ]);
+        $result = $this->commentModel
+            ->schema()
+            ->merge(Schema::parse([
+                'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
+            ]));
+        return $result;
     }
 
     /**

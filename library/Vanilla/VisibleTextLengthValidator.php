@@ -24,7 +24,7 @@ class VisibleTextLengthValidator {
      * @param array $post POST array.
      * @return \Vanilla\Invalid
      */
-    private function validate($value, $field, $post){
+    private function validate($value, $field, $post) {
         $format = $post['Format'] ?? '';
         $formatServices = \Gdn::formatService();
         $stringLength = $formatServices->getVisibleTextLength($value, $format);

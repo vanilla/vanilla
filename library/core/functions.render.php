@@ -1734,7 +1734,7 @@ if (!function_exists('signInUrl')) {
             }
         }
 
-        if ($target = '/entry/autosignedout') {
+        if (strpos($target, 'entry') === 0) {
             $target = '';
         }
 

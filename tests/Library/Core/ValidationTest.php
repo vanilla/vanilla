@@ -11,7 +11,6 @@ use Garden\Schema\Validation;
 use Gdn_Validation;
 use Vanilla\Invalid;
 use VanillaTests\MinimalContainerTestCase;
-use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the **Gdn_Validation** object.

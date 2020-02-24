@@ -7,17 +7,14 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { storyWithConfig } from "@library/storybook/StoryContext";
-import ThemeEditorInputBlock from "@library/forms/themeEditor/ThemeEditorInputBlock";
-import ColorPicker from "@library/forms/themeEditor/ColorPicker";
 import { percent } from "csx";
 import { storiesOf } from "@storybook/react";
-import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import { Form, FormikProvider, useFormik } from "formik";
+import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 
 const story = storiesOf("Theme", module);
 
-story.add("Theme Editor", () => {
+story.add("Theme Builder", () => {
     const form = useFormik({
         initialValues: {},
         onSubmit: values => {
@@ -28,9 +25,18 @@ story.add("Theme Editor", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Theme Editor</StoryHeading>
-            <div style={{ width: percent(100), maxWidth: "500px", margin: "auto" }}>
+            <div
+                style={{
+                    width: percent(100),
+                    maxWidth: "376px",
+                    margin: "auto",
+                    backgroundColor: "#f5f6f7",
+                    padding: "16px",
+                }}
+            >
                 <FormikProvider value={form}>
-                    <Form>
+                    {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
+                    <Form translate="yes">
                         <ColorPickerBlock
                             colorPicker={{ variableID: "global.something.or.other.color" }}
                             inputBlock={{ label: "testma" }}

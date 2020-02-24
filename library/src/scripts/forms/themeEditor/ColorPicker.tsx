@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
-import { ColorHelper } from "csx";
+import { color, ColorHelper } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { useField } from "formik";
 
@@ -23,41 +23,84 @@ export interface IColorPicker {
 
 export default function ColorPicker(props: IColorPicker) {
     const classes = colorPickerClasses();
-    const inputRef = useRef<HTMLInputElement>(null);
+    const colorInput = useRef<HTMLInputElement>(null);
+    const textInput = useRef<HTMLInputElement>(null);
+
+    const initialColor = props.initialColor ? props.initialColor : color("#000");
+
+    const [lastValidColor, setLastValidColor] = useState(initialColor);
+
     const [selectedColor, selectedColorMeta, selectedColorHelpers] = useField({
         name: props.variableID,
         onBlur: props.inputProps ? props.inputProps.onBlur : undefined,
         onChange: props.inputProps ? props.inputProps.onChange : undefined,
-        value: props.initialColor ? colorOut(props.initialColor) : "#000",
+        value: colorOut(initialColor),
     });
+
     const clickReadInput = () => {
-        if (inputRef && inputRef.current) {
-            inputRef.current.click();
+        if (colorInput && colorInput.current) {
+            colorInput.current.click();
         }
     };
 
-    const formattedColor = colorOut(selectedColorMeta.value);
+    const onTextInputChange = e => {
+        const newColor = color(e.target.value);
+        console.log("e.target.value: ", e.target.value);
+        console.log("New Color: ", newColor);
+        if (newColor) {
+            selectedColorHelpers.setValue(newColor);
+            setLastValidColor(newColor);
+        }
+
+        return e.target.value;
+    };
+
+    const onColorInputChange = e => {
+        const newColor = color(e.target.value);
+        if (newColor) {
+            selectedColorHelpers.setValue(newColor);
+            setLastValidColor(newColor);
+        }
+    };
+
+    const formattedColor = colorOut(lastValidColor);
 
     return (
-        <span className={classes.root}>
-            <input
-                {...props.inputProps}
-                ref={inputRef}
-                type="color"
-                id={props.inputID}
-                aria-describedby={props.labelID}
-                className={classNames(visibility().visuallyHidden, props.inputClass)}
-            />
-            <span
-                onClick={clickReadInput}
-                style={{ backgroundColor: formattedColor }}
-                title={formattedColor}
-                aria-hidden={true}
-                className={classes.swatch}
-                tabIndex={-1}
-            >
-                {formattedColor}
+        <>
+            <span className={classes.root}>
+                {/*Text Input*/}
+                <input
+                    ref={textInput}
+                    type="text"
+                    id={props.inputID}
+                    aria-describedby={props.labelID}
+                    className={classes.textInput}
+                    placeholder={"#0291DB"}
+                    value={selectedColorMeta.value}
+                    onChange={onTextInputChange}
+                />
+                {/*"Real" color input*/}
+                <input
+                    {...props.inputProps}
+                    ref={colorInput}
+                    type="color"
+                    id={props.inputID}
+                    aria-describedby={props.labelID}
+                    className={classNames(classes.realInput, visibility().visuallyHidden)}
+                    onChange={onColorInputChange}
+                />
+                {/*Swatch*/}
+                <span
+                    onClick={clickReadInput}
+                    style={{ backgroundColor: formattedColor }}
+                    title={formattedColor}
+                    aria-hidden={true}
+                    className={classes.swatch}
+                    tabIndex={-1}
+                >
+                    <span className={visibility().visuallyHidden}>{formattedColor}</span>
+                </span>
             </span>
-        </span>
+        </>
     );
 }

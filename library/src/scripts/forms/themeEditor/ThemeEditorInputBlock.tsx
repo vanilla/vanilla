@@ -5,8 +5,7 @@
  */
 
 import React, { useMemo } from "react";
-
-import { themeEditorClasses } from "@library/forms/themeEditor/themeEditorStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
 export interface IThemeEditorInputBlock {
     label: string;
@@ -16,9 +15,9 @@ export interface IThemeEditorInputBlock {
 }
 
 export default function ThemeEditorInputBlock(props: IThemeEditorInputBlock) {
-    const classes = themeEditorClasses();
+    const classes = themeBuilderClasses();
     return (
-        <div className={classes.root}>
+        <div className={classes.inputBlock}>
             <label htmlFor={props.labelID} className={classes.label}>
                 {props.label}
             </label>

@@ -8,11 +8,13 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const titlebarVars = titleBarVariables();
     const makeVars = variableFactory("onlineTabs");
 
     const colors = makeVars("colors", {
@@ -31,7 +33,7 @@ export const tabsVariables = useThemeCache(() => {
     });
 
     const navHeight = makeVars("navHeight", {
-        height: 48
+        height: titlebarVars.sizing.height
     })
 
     const border = makeVars("border", {

@@ -33,8 +33,8 @@ export const tabsVariables = useThemeCache(() => {
     });
 
     const navHeight = makeVars("navHeight", {
-        height: titlebarVars.sizing.height
-    })
+        height: titlebarVars.sizing.height,
+    });
 
     const border = makeVars("border", {
         width: globalVars.border.width,
@@ -49,7 +49,7 @@ export const tabsVariables = useThemeCache(() => {
     return {
         colors,
         border,
-        navHeight
+        navHeight,
     };
 });
 
@@ -64,9 +64,7 @@ export const tabClasses = useThemeCache(() => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "stretch",
-        height: calc(
-            `${percent(100)} - ${unit(vars.navHeight.height)}`,
-        ),
+        height: calc(`${percent(100)} - ${unit(vars.navHeight.height)}`),
     });
 
     const tabsHandles = style("tabsHandles", {
@@ -129,7 +127,7 @@ export const tabClasses = useThemeCache(() => {
         flexGrow: 1,
         height: percent(100),
         flexDirection: "column",
-        position: "relative"
+        position: "relative",
     });
 
     const panel = style("panel", {

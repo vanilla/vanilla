@@ -59,8 +59,8 @@ class ValidationTest extends MinimalContainerTestCase {
      *
      * @param array $post
      * @param bool $isValid
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Container\ContainerException Container error.
+     * @throws \Garden\Container\NotFoundException Container not found error.
      * @dataProvider providePostContent
      */
     public function testVisibleTextLength(array $post, bool $isValid) :void {

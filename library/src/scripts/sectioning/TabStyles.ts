@@ -19,11 +19,13 @@ import {
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const titlebarVars = titleBarVariables();
     const makeVars = variableFactory("onlineTabs");
 
     const colors = makeVars("colors", {
@@ -41,6 +43,10 @@ export const tabsVariables = useThemeCache(() => {
         },
     });
 
+    const navHeight = makeVars("navHeight", {
+        height: titlebarVars.sizing.height,
+    });
+
     const border = makeVars("border", {
         width: globalVars.border.width,
         color: globalVars.border.color,
@@ -54,6 +60,7 @@ export const tabsVariables = useThemeCache(() => {
     return {
         colors,
         border,
+        navHeight,
     };
 });
 
@@ -68,7 +75,7 @@ export const tabClasses = useThemeCache(() => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "stretch",
-        height: viewHeight(90),
+        height: calc(`${percent(100)} - ${unit(vars.navHeight.height)}`),
     });
 
     const tabsHandles = style("tabsHandles", {
@@ -137,6 +144,7 @@ export const tabClasses = useThemeCache(() => {
         flexGrow: 1,
         height: percent(100),
         flexDirection: "column",
+        position: "relative",
     });
 
     const panel = style("panel", {

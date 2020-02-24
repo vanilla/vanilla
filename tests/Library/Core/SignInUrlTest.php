@@ -7,44 +7,36 @@
 
 namespace VanillaTests\Library\Core;
 
-use Gdn_Configuration;
 use PHPUnit\Framework\TestCase;
-use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for signInUrl()
  */
 class SignInUrlTest extends TestCase {
 
-    use SiteTestTrait {
-        SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
-    }
-
     /**
-     * @inheritdoc
+     * Test target parameter.
+     *
+     * @param string $target
+     * @param string $expected
+     * @dataProvider provideSignInUrls
      */
-    public static function setUpBeforeClass(): void {
-        self::siteSetUpBeforeClass();
-
-        /** @var Gdn_Configuration $config */
-        $config = self::container()->get(Gdn_Configuration::class);
-    }
-
-    /**
-     * Test where target starts with 'entry'.
-     */
-    public function testSignInUrlWithEntryTarget() {
-        $expected = '/entry/signin';
-        $actual = signInUrl('entry/autosignedout');
+    public function testSignInUrlTarget(string $target, string $expected): void {
+        $actual = signInUrl($target);
         $this->assertSame($expected, $actual);
     }
 
     /**
-     * Test where target doesn't contain 'entry'.
+     * Provide targets for verifying signInUrl handling.
+     *
+     * @return array
      */
-    public function testSignInUrlWithNoEntry() {
-        $expected = '/entry/signin?Target=foo';
-        $actual = signInUrl('foo');
-        $this->assertSame($expected, $actual);
+    public function provideSignInUrlTargets(): array {
+        $result = [
+            ["foo", "/entry/signin?Target=foo"],
+            ["entry/register", "/entry/signin"],
+            ["discussion/1/the-word-entry-is-in-this-discussion-name", "/entry/signin?Target=discussion%2F1%2Fthe-word-entry-is-in-this-discussion-name"],
+        ];
+        return $result;
     }
 }

@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-use Garden\Schema\Validation;
 use Gdn_Validation;
 use Vanilla\Invalid;
 use VanillaTests\MinimalContainerTestCase;

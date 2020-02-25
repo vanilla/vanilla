@@ -13,8 +13,17 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
     if (!colorValue) {
         return undefined;
     } else {
-        const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
-        return makeImportant ? important(output.toString()) : output.toString();
+        if (
+            colorValue
+                .toString()
+                .trim()
+                .startsWith("linear-gradient(")
+        ) {
+            return colorValue.toString();
+        } else {
+            const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
+            return makeImportant ? important(output.toString()) : output.toString();
+        }
     }
 };
 

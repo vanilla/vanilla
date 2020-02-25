@@ -11,6 +11,9 @@ import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles
 import { color, ColorHelper } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { useField } from "formik";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+
 const Collit = require("collit");
 
 export interface IColorPicker {
@@ -29,8 +32,8 @@ export default function ColorPicker(props: IColorPicker) {
 
     const initialColor = props.initialColor ? props.initialColor : color("#000");
 
-    const [lastValidColor, setLastValidColor] = useState(initialColor);
-    const [inputTextValue, setInputTextValue] = useState(initialColor);
+    const [lastValidColor, setLastValidColor] = useState(initialColor); // Always "Color" object
+    const [inputTextValue, setInputTextValue] = useState(initialColor.toString()); // Always string
 
     const [selectedColor, selectedColorMeta, selectedColorHelpers] = useField({
         name: props.variableID,
@@ -58,22 +61,20 @@ export default function ColorPicker(props: IColorPicker) {
     };
 
     const onTextInputChange = e => {
-        console.log("isValidColorString(e.target.value): ", isValidColorString(e.target.value));
-        if (isValidColorString(e.target.value)) {
-            const newColor = color(e.target.value);
+        const colorString = e.target.value;
+        if (isValidColorString(colorString)) {
+            const newColor = color(colorString);
             selectedColorHelpers.setValue(newColor);
             setLastValidColor(newColor);
-            setInputTextValue(newColor);
         }
-
-        return e.target.value;
+        setInputTextValue(e.target.value);
     };
 
     const onColorInputChange = e => {
         const newColor = color(e.target.value);
         selectedColorHelpers.setValue(newColor);
         setLastValidColor(newColor);
-        setInputTextValue(newColor);
+        setInputTextValue(newColor.toString());
     };
 
     const formattedColor = colorOut(lastValidColor);
@@ -81,17 +82,6 @@ export default function ColorPicker(props: IColorPicker) {
     return (
         <>
             <span className={classes.root}>
-                {/*Text Input*/}
-                <input
-                    ref={textInput}
-                    type="text"
-                    id={props.inputID}
-                    aria-describedby={props.labelID}
-                    className={classes.textInput}
-                    placeholder={"#0291DB"}
-                    value={colorOut(inputTextValue)}
-                    onChange={onTextInputChange}
-                />
                 {/*"Real" color input*/}
                 <input
                     {...props.inputProps}
@@ -102,17 +92,31 @@ export default function ColorPicker(props: IColorPicker) {
                     className={classNames(classes.realInput, visibility().visuallyHidden)}
                     onChange={onColorInputChange}
                 />
+                {/*Text Input*/}
+                <input
+                    ref={textInput}
+                    type="text"
+                    aria-describedby={props.labelID}
+                    aria-hidden={true}
+                    className={classNames(classes.textInput, {
+                        [classes.invalidColor]: !isValidColorString(inputTextValue),
+                    })}
+                    placeholder={"#0291DB"}
+                    value={inputTextValue}
+                    onChange={onTextInputChange}
+                />
                 {/*Swatch*/}
-                <span
+                <Button
                     onClick={clickReadInput}
                     style={{ backgroundColor: formattedColor }}
                     title={formattedColor}
                     aria-hidden={true}
                     className={classes.swatch}
                     tabIndex={-1}
+                    baseClass={ButtonTypes.CUSTOM}
                 >
                     <span className={visibility().visuallyHidden}>{formattedColor}</span>
-                </span>
+                </Button>
             </span>
         </>
     );

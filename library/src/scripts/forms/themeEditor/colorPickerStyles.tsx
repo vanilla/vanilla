@@ -35,22 +35,21 @@ export const colorPickerClasses = useThemeCache(() => {
         alignItems: "stretch",
     });
 
-    const textInput = style("classes", {
+    const invalidColor = style("invalidColor", {});
+    const textInput = style("textInput", {
         ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.fonts.size, 0, vars.sizing.height),
-        border: 0,
         width: unit(inputWidth),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
-        ...borders(
-            {
-                all: builderVariables.border,
-                right: {
-                    radius: builderVariables.wrap.borderRadius,
-                },
+        ...borders({}, builderVariables.border as IGlobalBorderStyles),
+        borderRightColor: "transparent",
+        $nest: {
+            [`&.${invalidColor}`]: {
+                borderRightColor: colorOut(builderVariables.outline.warning),
+                boxShadow: `inset 0 0 0 1px ${colorOut(builderVariables.outline.warning)}`,
             },
-            builderVariables.border as IGlobalBorderStyles,
-        ),
+        },
     });
 
     const swatch = style("swatch", {
@@ -58,20 +57,16 @@ export const colorPickerClasses = useThemeCache(() => {
         width: unit(vars.swatch.width),
         flexBasis: unit(vars.swatch.width),
         height: percent(100),
-        ...borders(
-            {
-                right: {
-                    radius: builderVariables.wrap.borderRadius,
-                },
-            },
-            builderVariables.border as IGlobalBorderStyles,
-        ),
+        border: 0,
+        borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
+        borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
     });
 
     const realInput = style("realInput", {
         position: "absolute",
+        outline: 0,
         $nest: {
-            [`&:focus + .${swatch}`]: {
+            [`&:focus + .${textInput}`]: {
                 borderLeftColor: colorOut(builderVariables.outline.color),
             },
         },
@@ -82,5 +77,6 @@ export const colorPickerClasses = useThemeCache(() => {
         textInput,
         swatch,
         realInput,
+        invalidColor,
     };
 });

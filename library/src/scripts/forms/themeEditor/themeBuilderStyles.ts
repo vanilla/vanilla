@@ -14,6 +14,7 @@ export const themeBuilderVariables = () => {
     return {
         outline: {
             color: color("#0291db"),
+            warning: color("#d0021b"),
         },
         width: 160,
         fonts: {
@@ -59,7 +60,6 @@ export const themeBuilderClasses = useThemeCache(() => {
     const inputWrap = style("inputWrap", {
         display: "flex",
         flexWrap: "nowrap",
-        overflow: "hidden",
         alignItems: "stretch",
         width: unit(vars.width),
         flexBasis: unit(vars.width),

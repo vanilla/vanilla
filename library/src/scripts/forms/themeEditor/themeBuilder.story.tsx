@@ -12,6 +12,9 @@ import { storiesOf } from "@storybook/react";
 import { Form, FormikProvider, useFormik } from "formik";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
+import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
+import { t } from "@vanilla/i18n/src";
+import ThemeBuilderSectionSubGroup from "@library/forms/themeEditor/ThemeBuilderSectionSubGroup";
 
 const story = storiesOf("Theme", module);
 
@@ -41,8 +44,42 @@ story.add("Theme Builder", () => {
                         <ThemeBuilderTitle />
                         <ColorPickerBlock
                             colorPicker={{ variableID: "global.something.or.other.color" }}
-                            inputBlock={{ label: "testma" }}
+                            inputBlock={{ label: "Test 1" }}
                         />
+                        <ColorPickerBlock
+                            colorPicker={{ variableID: "global.something.or.other.color" }}
+                            inputBlock={{ label: "Test 2" }}
+                        />
+                        <ThemeBuilderSection label={"Section 1"}>
+                            <ColorPickerBlock
+                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                inputBlock={{ label: "Test 3" }}
+                            />
+                            <ColorPickerBlock
+                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                inputBlock={{ label: "Test 4" }}
+                            />
+                        </ThemeBuilderSection>
+                        <ThemeBuilderSection label={"Section 31"}>
+                            <ColorPickerBlock
+                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                inputBlock={{ label: "Test 5" }}
+                            />
+                            <ColorPickerBlock
+                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                inputBlock={{ label: "Test 6" }}
+                            />
+                            <ThemeBuilderSectionSubGroup label={"Section Sub Group"}>
+                                <ColorPickerBlock
+                                    colorPicker={{ variableID: "global.something.or.other.color" }}
+                                    inputBlock={{ label: "Test 7" }}
+                                />
+                                <ColorPickerBlock
+                                    colorPicker={{ variableID: "global.something.or.other.color" }}
+                                    inputBlock={{ label: "Test 8" }}
+                                />
+                            </ThemeBuilderSectionSubGroup>
+                        </ThemeBuilderSection>
                     </Form>
                 </FormikProvider>
             </aside>

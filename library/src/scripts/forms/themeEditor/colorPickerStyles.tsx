@@ -5,11 +5,10 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
-import { borders, colorOut, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
+import { percent, translateX } from "csx";
+import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
 import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -46,8 +45,9 @@ export const colorPickerClasses = useThemeCache(() => {
         borderRightColor: "transparent",
         $nest: {
             [`&.${invalidColor}`]: {
-                borderRightColor: colorOut(builderVariables.outline.warning),
-                boxShadow: `inset 0 0 0 1px ${colorOut(builderVariables.outline.warning)}`,
+                // borderRightColor: colorOut(builderVariables.outline.warning),
+                // boxShadow: `inset 0 0 0 1px ${colorOut(builderVariables.outline.warning)}`,
+                backgroundColor: colorOut(builderVariables.outline.warning),
             },
         },
     });
@@ -65,9 +65,10 @@ export const colorPickerClasses = useThemeCache(() => {
     const realInput = style("realInput", {
         position: "absolute",
         outline: 0,
+        transform: translateX(negativeUnit(10)),
         $nest: {
             [`&:focus + .${textInput}`]: {
-                borderLeftColor: colorOut(builderVariables.outline.color),
+                borderColor: colorOut(builderVariables.outline.color),
             },
         },
     });

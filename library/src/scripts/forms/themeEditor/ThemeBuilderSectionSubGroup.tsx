@@ -9,10 +9,10 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyl
 
 export interface IThemeBuilderSubGroupSection {
     label: string;
-    children: React.ReactChild;
+    children: React.ReactNode;
 }
 
-export default function ThemeBuilderSubGroupSection(props: IThemeBuilderSubGroupSection) {
+export default function ThemeBuilderSectionSubGroup(props: IThemeBuilderSubGroupSection) {
     const classes = themeBuilderClasses();
     return (
         <div className={classes.subGroupSection}>

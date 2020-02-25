@@ -6,8 +6,8 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color } from "csx";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, unit } from "@library/styles/styleHelpers";
+import { fonts, IFont } from "@library/styles/styleHelpersTypography";
+import { borders, margins, unit } from "@library/styles/styleHelpers";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -16,19 +16,33 @@ export const themeBuilderVariables = () => {
     return {
         outline: {
             color: color("#0291db"),
-            warning: color("#d0021b"),
+            warning: color("#ffebed"),
         },
         width: 160,
+        label: {
+            family: fontFamily,
+            color: textColor,
+            size: 13,
+        },
         title: {
             family: fontFamily,
             color: textColor,
             size: 16,
             weight: 700,
-        },
-        label: {
+            transform: "uppercase",
+        } as IFont,
+        sectionTitle: {
             family: fontFamily,
-            color: textColor,
-            size: 13,
+            color: color("#757e8c"),
+            size: 12,
+            transform: "uppercase",
+            weight: 600,
+        } as IFont,
+        sectionGroupTitle: {
+            family: fontFamily,
+            color: color("#2d343f"),
+            size: 14,
+            weight: 700,
         },
         border: {
             color: color("#bfcbd8"),
@@ -49,12 +63,14 @@ export const themeBuilderClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        marginBottom: unit(8),
     });
 
     const label = style("label", {
         width: unit(vars.width),
         flexBasis: unit(vars.width),
         flexGrow: 1,
+        fontWeight: 600,
         ...fonts(vars.label),
     });
 
@@ -76,16 +92,37 @@ export const themeBuilderClasses = useThemeCache(() => {
     const title = style("title", {
         ...fonts(vars.title),
         textAlign: "center",
-        textTransform: "uppercase",
         marginBottom: unit(16),
     });
 
-    const section = style("section", {});
-    const sectionTitle = style("sectionTitle", {});
-    const subSection = style("subSection", {});
-    const subSectionTitle = style("subSectionTitle", {});
+    const section = style("section", {
+        borderTop: `solid #c1cbd7 1px`,
+        marginTop: unit(32),
+    });
+
+    const sectionTitle = style("sectionTitle", {
+        ...fonts(vars.sectionTitle),
+        textAlign: "center",
+        ...margins({
+            top: 6,
+            bottom: 14,
+        }),
+    });
+
+    // const subSection = style("subSection", {});
+    //
+    // const subSectionTitle = style("subSectionTitle", {
+    //
+    // });
+
     const subGroupSection = style("subGroupSection", {});
-    const subGroupSectionTitle = style("subGroupSectionTitle", {});
+    const subGroupSectionTitle = style("subGroupSectionTitle", {
+        ...fonts(vars.sectionGroupTitle),
+        ...margins({
+            top: 20,
+            bottom: 12,
+        }),
+    });
 
     return {
         inputBlock,
@@ -95,8 +132,8 @@ export const themeBuilderClasses = useThemeCache(() => {
         title,
         section,
         sectionTitle,
-        subSection,
-        subSectionTitle,
+        // subSection,
+        // subSectionTitle,
         subGroupSection,
         subGroupSectionTitle,
     };

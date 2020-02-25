@@ -9,7 +9,7 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyl
 
 export interface IThemeBuilderSection {
     label: string;
-    children: React.ReactChild;
+    children: React.ReactNode;
 }
 
 export default function ThemeBuilderSection(props: IThemeBuilderSection) {

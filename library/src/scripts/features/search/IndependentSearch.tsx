@@ -30,6 +30,7 @@ interface IProps extends IWithSearchProps, RouteComponentProps<{}> {
     hideSearchButton?: boolean;
     isLarge?: boolean;
     buttonBaseClass?: ButtonTypes;
+    disablePointerEvent?: boolean;
 }
 
 interface IState {
@@ -80,6 +81,8 @@ export function IndependentSearch(props: IProps) {
                 hideSearchButton={props.hideSearchButton}
                 contentClass={props.contentClass}
                 valueContainerClasses={props.valueContainerClasses}
+                disableAutocomplete={props.disablePointerEvent ? true : false}
+                disablePointerEvent={props.disablePointerEvent}
             />
             <div
                 ref={resultsRef}

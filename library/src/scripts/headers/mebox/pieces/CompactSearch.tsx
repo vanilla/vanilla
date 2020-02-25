@@ -36,6 +36,7 @@ export interface ICompactSearchProps {
     buttonContentClassName?: string;
     cancelContentClassName?: string;
     clearButtonClass?: string;
+    disablePointerEvent?: boolean;
 }
 
 /**
@@ -139,6 +140,8 @@ export function CompactSearch(props: ICompactSearchProps) {
                             onCloseSuggestions={props.onCloseSuggestions}
                             className={"compactSearch-searchBar"}
                             clearButtonClass={props.clearButtonClass}
+                            disableAutocomplete={props.disablePointerEvent ? true : false}
+                            disablePointerEvent={props.disablePointerEvent}
                         />
 
                         <div

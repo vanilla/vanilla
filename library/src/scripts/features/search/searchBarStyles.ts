@@ -52,6 +52,9 @@ export const searchBarVariables = useThemeCache(() => {
         height: 13,
         width: 14,
         fg: input.fg.fade(0.7),
+        padding: {
+            right: 5
+        }
     });
 
     const results = themeVars("results", {
@@ -250,6 +253,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 alignItems: "center",
                 justifyContent: "flex-start",
                 paddingLeft: unit(vars.searchIcon.gap),
+                paddingRight: unit(vars.searchIcon.padding.right)
             },
             "&.noSearchButton": {
                 ...borderRadii({

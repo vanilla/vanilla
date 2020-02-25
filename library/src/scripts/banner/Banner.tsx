@@ -25,6 +25,7 @@ interface IProps {
     className?: string;
     backgroundImage?: string;
     contentImage?: string;
+    disablePointerEvent?: boolean;
 }
 
 /**
@@ -91,6 +92,7 @@ export default function Banner(props: IProps) {
                                     }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}
+                                    disablePointerEvent={props.disablePointerEvent}
                                 />
                             </div>
                         )}

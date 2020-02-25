@@ -62,6 +62,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     contentClass?: string;
     buttonBaseClass?: ButtonTypes;
     valueContainerClasses?: string;
+    disablePointerEvent?: boolean;
 }
 
 interface IState {
@@ -340,8 +341,13 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Handle the form submission.
      */
     private onFormSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        this.props.onSearch();
+        if (this.props.disablePointerEvent) {
+            event.preventDefault();
+            return false;
+        } else {
+            event.preventDefault();
+            this.props.onSearch();
+        }
     };
 
     /**

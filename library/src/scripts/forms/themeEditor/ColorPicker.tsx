@@ -9,14 +9,13 @@ import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
 import { color, ColorHelper } from "csx";
-import { colorOut } from "@library/styles/styleHelpersColors";
 import { useField } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { isValidColor, stringIsHexColor, stringIsRgbColor } from "@library/styles/styleUtils";
+import { isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
@@ -65,7 +64,7 @@ export default function ColorPicker(props: IColorPicker) {
     const onTextChange = e => {
         const colorString = e.target.value;
         helpers.setTouched(true);
-        if (stringIsHexColor(colorString) || stringIsRgbColor(colorString)) {
+        if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
         }
         helpers.setValue(colorString); // Text is unchanged

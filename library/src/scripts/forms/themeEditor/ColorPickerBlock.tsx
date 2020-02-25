@@ -10,10 +10,11 @@ import ColorPicker, { IColorPicker } from "@library/forms/themeEditor/ColorPicke
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
 
-interface IPresetColorPicker extends Omit<Omit<IColorPicker, "inputID">, "labelID"> {
+export interface IPresetColorPicker extends Omit<Omit<IColorPicker, "inputID">, "labelID"> {
     defaultValue?: ColorHelper;
 }
-interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}
+
+export interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}
 
 export interface IColorPickerBlock {
     colorPicker: IPresetColorPicker;

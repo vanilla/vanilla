@@ -27,7 +27,6 @@
         "@vanilla/monaco-editor": "^3.0.2",
         "axios": "0.18.1",
         "classnames": "2.2.6",
-        "collit": "^1.0.1",
         "csx": "9.0.0",
         "emojibase-data": "3.2.1",
         "formik": "^2.1.4",

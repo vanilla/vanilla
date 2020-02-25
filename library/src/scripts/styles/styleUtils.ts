@@ -163,6 +163,7 @@ function stripUndefinedKeys(obj: any) {
 
 const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
 const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
+const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -204,14 +205,57 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
 }
 
 /**
+ * Check if string is valid color in hex format
+ * @param colorString
+ */
+export function stringIsHexColor(color: string) {
+    return color && color.match(rgbRegex);
+}
+
+/**
+ * Check if string is valid color in rgb or rgba format
+ * @param colorString
+ */
+export function stringIsRgbColor(color: string) {
+    return color && color.match(rgbRegex);
+}
+
+/**
+ * Check if string is valid color in hsl or hsla format
+ * @param colorString
+ */
+export function stringIsHslColor(color: string) {
+    return color && color.match(hslRegex);
+}
+
+/**
+ * Check if string is supported color format
+ * @param colorString
+ */
+export function stringIsValidColor(colorValue: string) {
+    return (
+        typeof colorValue === "string" &&
+        (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
+    );
+}
+
+/**
+ * Check if string or ColorHelper is valid
+ * @param colorString
+ */
+export const isValidColor = (colorValue: string | undefined | ColorHelper) => {
+    return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
+};
+
+/**
  * Convert a color string into an instance.
  * @param colorString
  */
 export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
-    if (colorString.startsWith("#")) {
+    if (stringIsHexColor(colorString)) {
         // It's a colour.
         return color(colorString);
-    } else if (colorString.match(rgbRegex)) {
+    } else if (stringIsRgbColor(colorString)) {
         const result = rgbRegex.exec(colorString)!;
 
         const r = parseInt(result[1], 10);
@@ -224,7 +268,7 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         } else {
             return rgb(r, g, b);
         }
-    } else if (colorString.match(hslRegex)) {
+    } else if (stringIsHslColor(colorString)) {
         const result = hslRegex.exec(colorString)!;
 
         const h = parseInt(result[1], 10);

@@ -13,7 +13,6 @@ import { Form, FormikProvider, useFormik } from "formik";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
-import { t } from "@vanilla/i18n/src";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 
 const story = storiesOf("Theme", module);

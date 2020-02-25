@@ -16,13 +16,12 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-
-const Collit = require("collit");
+import { isValidColor } from "@library/styles/styleUtils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
 export interface IColorPicker {
-    inputProps?: React.HTMLAttributes<Omit<Omit<Omit<HTMLInputElement, "type">, "id">, "tabIndex">>;
+    inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex">;
     inputID: string;
     variableID: string;
     labelID: string;
@@ -35,6 +34,10 @@ export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMess
     return typeof error === "string" ? error : defaultMessage;
 };
 
+export const ensureColorHelper = (colorValue: string | ColorHelper) => {
+    return typeof colorValue === "string" ? color(colorValue) : colorValue;
+};
+
 export default function ColorPicker(props: IColorPicker) {
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -45,31 +48,17 @@ export default function ColorPicker(props: IColorPicker) {
         return uniqueIDFromPrefix("colorPickerError");
     }, []);
 
-    const initialColor = props.defaultValue ? props.defaultValue : color("#fff");
+    const initialColor = props.defaultValue;
+    const initialValidColor = isValidColor(initialColor) ? ensureColorHelper(initialColor as any) : color("#000");
 
-    const [lastValidColor, setLastValidColor] = useState(initialColor); // Always "Color" object
-    const [inputTextValue, setInputTextValue] = useState(initialColor.toString()); // Always string
-
-    const [selectedColor, selectedColorMeta, selectedColorHelpers] = useField({
+    const [selectedColor, selectedColorMeta, helpers] = useField({
         name: props.variableID,
         onBlur: props.inputProps ? props.inputProps.onBlur : undefined,
         onChange: props.inputProps ? props.inputProps.onChange : undefined,
         value: colorOut(initialColor),
     });
 
-    const isValidColorString = (color: string | undefined) => {
-        if (color) {
-            const Validator = Collit.Validator;
-            return (
-                typeof color === "string" &&
-                (Validator.isHex(color) ||
-                    Validator.isRgb(color) ||
-                    Validator.isRgba(color) ||
-                    Validator.isHsl(color) ||
-                    Validator.isHsla(color))
-            );
-        }
-    };
+    const [validColor, setValidColor] = useState(initialValidColor);
 
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
@@ -79,23 +68,21 @@ export default function ColorPicker(props: IColorPicker) {
 
     const onTextInputChange = e => {
         const colorString = e.target.value;
-        if (isValidColorString(colorString)) {
-            const newColor = color(colorString);
-            selectedColorHelpers.setValue(newColor);
-            setLastValidColor(newColor);
+        if (isValidColor(colorString)) {
+            setValidColor(color(colorString)); // Only set valid color if passes validation
         }
-        setInputTextValue(e.target.value);
+        helpers.setValue(e.target.value); // Text is unchanged
     };
 
     const onColorInputChange = e => {
+        // Will always be valid color, since it's a real picker
         const newColor = color(e.target.value);
-        selectedColorHelpers.setValue(newColor);
-        setLastValidColor(newColor);
-        setInputTextValue(newColor.toString());
+        setValidColor(newColor);
+        helpers.setValue(newColor);
     };
 
-    const formattedColor = colorOut(lastValidColor);
-    const hasError = props.errors && props.errors.length > 0;
+    const hasError = !isValidColor(selectedColor as any);
+    const validColorString = colorOut(validColor);
 
     return (
         <>
@@ -110,7 +97,7 @@ export default function ColorPicker(props: IColorPicker) {
                     className={classNames(classes.realInput, visibility().visuallyHidden)}
                     onChange={onColorInputChange}
                     aria-errormessage={hasError ? errorID : undefined}
-                    defaultValue={initialColor.toString()}
+                    value={validColorString}
                 />
                 {/*Text Input*/}
                 <input
@@ -119,34 +106,30 @@ export default function ColorPicker(props: IColorPicker) {
                     aria-describedby={props.labelID}
                     aria-hidden={true}
                     className={classNames(classes.textInput, {
-                        [classes.invalidColor]: !isValidColorString(inputTextValue),
+                        [classes.invalidColor]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={inputTextValue}
+                    value={selectedColor.toString()}
                     onChange={onTextInputChange}
                 />
                 {/*Swatch*/}
                 <Button
                     onClick={clickReadInput}
-                    style={{ backgroundColor: isValidColorString(formattedColor) ? formattedColor : "#000" }}
-                    title={formattedColor}
+                    style={{ backgroundColor: validColorString }}
+                    title={validColorString}
                     aria-hidden={true}
                     className={classes.swatch}
                     tabIndex={-1}
                     baseClass={ButtonTypes.CUSTOM}
                 >
-                    <span className={visibility().visuallyHidden}>{formattedColor}</span>
+                    <span className={visibility().visuallyHidden}>{validColorString}</span>
                 </Button>
             </span>
-            {props.errors && props.errors.length > 0 && (
+            {selectedColorMeta.error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    {props.errors.map((error, i) => {
-                        return (
-                            <li className={builderClasses.error} key={i}>
-                                {error && getDefaultOrCustomErrorMessage(error, t("Invalid color"))}
-                            </li>
-                        );
-                    })}
+                    <li className={builderClasses.error}>
+                        {getDefaultOrCustomErrorMessage(builderClasses.error, t("Invalid color"))}
+                    </li>
                 </ul>
             )}
         </>

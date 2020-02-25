@@ -14,7 +14,7 @@ export interface IThemeEditorInputBlock {
     children: React.ReactChild;
 }
 
-export default function ThemeEditorInputBlock(props: IThemeEditorInputBlock) {
+export default function ThemeBuilderInputBlock(props: IThemeEditorInputBlock) {
     const classes = themeBuilderClasses();
     return (
         <div className={classes.inputBlock}>

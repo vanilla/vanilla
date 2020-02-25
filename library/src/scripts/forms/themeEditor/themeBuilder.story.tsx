@@ -22,7 +22,7 @@ story.add("Theme Builder", () => {
     const form = useFormik({
         initialValues: {},
         onSubmit: values => {
-            console.log(values);
+            // console.log(values);
         },
     });
 

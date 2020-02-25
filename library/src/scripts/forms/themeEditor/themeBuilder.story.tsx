@@ -90,7 +90,6 @@ story.add("Theme Builder", () => {
                                 <ColorPickerBlock
                                     colorPicker={{
                                         variableID: "global.something.or.other.color",
-                                        errors: [true],
                                         defaultValue: "cat" as any, // Intentionally bypassing typescript for error
                                     }}
                                     inputBlock={{ label: "With Error" }}
@@ -98,11 +97,6 @@ story.add("Theme Builder", () => {
                                 <ColorPickerBlock
                                     colorPicker={{
                                         variableID: "global.something.or.other.color",
-                                        errors: [
-                                            "Custom Error Messages",
-                                            "Custom Error Messages",
-                                            "Custom Error Messages",
-                                        ],
                                         defaultValue: "chinchilla" as any, // Intentionally bypassing typescript for error
                                     }}
                                     inputBlock={{ label: "With Error" }}

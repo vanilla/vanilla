@@ -66,7 +66,7 @@ export default function ColorPicker(props: IColorPicker) {
         }
     };
 
-    const onTextInputChange = e => {
+    const onTextChange = e => {
         const colorString = e.target.value;
         if (isValidColor(colorString)) {
             setValidColor(color(colorString)); // Only set valid color if passes validation
@@ -109,8 +109,8 @@ export default function ColorPicker(props: IColorPicker) {
                         [classes.invalidColor]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={selectedColor.toString()}
-                    onChange={onTextInputChange}
+                    value={typeof selectedColor === "string" ? selectedColor : colorOut(selectedColor as any)}
+                    onChange={onTextChange}
                 />
                 {/*Swatch*/}
                 <Button

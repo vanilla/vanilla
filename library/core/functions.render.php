@@ -1734,6 +1734,10 @@ if (!function_exists('signInUrl')) {
             }
         }
 
+        if (strpos($target, 'entry/') === 0) {
+            $target = '';
+        }
+
         return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
     }
 }

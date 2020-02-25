@@ -375,6 +375,10 @@ class ModerationController extends VanillaController {
         $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);
+            if ($Category['Type'] === 'Reporting' && !array_key_exists('DiscussionType', $this->Data)) {
+                $this->setData('DiscussionType', 'Report');
+                $this->setData('CategoryID', $Category['CategoryID']);
+            }
             if ($Category && $Category['PermsDiscussionsEdit']) {
                 $AllowedDiscussions[] = $DiscussionID;
             }

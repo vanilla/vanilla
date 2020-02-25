@@ -16,7 +16,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { isValidColor } from "@library/styles/styleUtils";
+import { isValidColor, stringIsHexColor, stringIsRgbColor } from "@library/styles/styleUtils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
@@ -25,7 +25,7 @@ export interface IColorPicker {
     inputID: string;
     variableID: string;
     labelID: string;
-    defaultValue?: ColorHelper;
+    defaultValue?: string;
     inputClass?: string;
     errors?: IErrorWithDefault[]; // Uses default message if true
 }
@@ -48,16 +48,12 @@ export default function ColorPicker(props: IColorPicker) {
         return uniqueIDFromPrefix("colorPickerError");
     }, []);
 
-    const initialColor = props.defaultValue;
-    const initialValidColor = isValidColor(initialColor) ? ensureColorHelper(initialColor as any) : color("#000");
+    // String
+    const initialValidColor =
+        props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : "#000";
 
-    const [selectedColor, selectedColorMeta, helpers] = useField({
-        name: props.variableID,
-        onBlur: props.inputProps ? props.inputProps.onBlur : undefined,
-        onChange: props.inputProps ? props.inputProps.onChange : undefined,
-        value: colorOut(initialColor),
-    });
-
+    // console.log("initialValidColor: ", initialValidColor);
+    const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
     const [validColor, setValidColor] = useState(initialValidColor);
 
     const clickReadInput = () => {
@@ -68,21 +64,29 @@ export default function ColorPicker(props: IColorPicker) {
 
     const onTextChange = e => {
         const colorString = e.target.value;
-        if (isValidColor(colorString)) {
-            setValidColor(color(colorString)); // Only set valid color if passes validation
+        helpers.setTouched(true);
+        if (stringIsHexColor(colorString) || stringIsRgbColor(colorString)) {
+            setValidColor(colorString); // Only set valid color if passes validation
         }
-        helpers.setValue(e.target.value); // Text is unchanged
+        helpers.setValue(colorString); // Text is unchanged
     };
 
-    const onColorInputChange = e => {
+    const onPickerChange = e => {
         // Will always be valid color, since it's a real picker
-        const newColor = color(e.target.value);
-        setValidColor(newColor);
-        helpers.setValue(newColor);
+        const newColor: string = e.target.value;
+        if (newColor) {
+            helpers.setTouched(true);
+            helpers.setValue(newColor);
+            setValidColor(
+                color(newColor)
+                    .toRGB()
+                    .toString(),
+            );
+        }
     };
 
-    const hasError = !isValidColor(selectedColor as any);
-    const validColorString = colorOut(validColor);
+    const textValue = selectedColor.value !== undefined ? selectedColor.value : props.defaultValue || "";
+    const hasError = !isValidColor(textValue);
 
     return (
         <>
@@ -95,9 +99,10 @@ export default function ColorPicker(props: IColorPicker) {
                     id={props.inputID}
                     aria-describedby={props.labelID}
                     className={classNames(classes.realInput, visibility().visuallyHidden)}
-                    onChange={onColorInputChange}
+                    onChange={onPickerChange}
+                    onBlur={onPickerChange}
                     aria-errormessage={hasError ? errorID : undefined}
-                    value={validColorString}
+                    defaultValue={initialValidColor}
                 />
                 {/*Text Input*/}
                 <input
@@ -109,20 +114,21 @@ export default function ColorPicker(props: IColorPicker) {
                         [classes.invalidColor]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={typeof selectedColor === "string" ? selectedColor : colorOut(selectedColor as any)}
+                    value={textValue}
                     onChange={onTextChange}
+                    auto-correct="false"
                 />
                 {/*Swatch*/}
                 <Button
                     onClick={clickReadInput}
-                    style={{ backgroundColor: validColorString }}
-                    title={validColorString}
+                    style={{ backgroundColor: color(validColor).toString() }}
+                    title={validColor}
                     aria-hidden={true}
                     className={classes.swatch}
                     tabIndex={-1}
                     baseClass={ButtonTypes.CUSTOM}
                 >
-                    <span className={visibility().visuallyHidden}>{validColorString}</span>
+                    <span className={visibility().visuallyHidden}>{color(validColor).toString()}</span>
                 </Button>
             </span>
             {selectedColorMeta.error && (

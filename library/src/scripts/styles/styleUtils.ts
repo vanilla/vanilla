@@ -209,7 +209,7 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
  * @param colorString
  */
 export function stringIsHexColor(color: string) {
-    return color && color.match(rgbRegex);
+    return color && color.match(hexRegex);
 }
 
 /**

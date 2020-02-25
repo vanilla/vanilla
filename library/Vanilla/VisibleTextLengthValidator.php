@@ -25,6 +25,13 @@ class VisibleTextLengthValidator {
     /** @var int */
     private $maxTextLength = 8000;
 
+    /**
+     * VisibleTextLengthValidator constructor.
+     *
+     * @param int $maxTextLength Maximum length of text.
+     * @param FormatService $formatService Service to apply a formatter.
+     * @param LocaleInterface $locale For translating error messages.
+     */
     public function __construct(int $maxTextLength, \Vanilla\Formatting\FormatService $formatService, \Vanilla\Contracts\LocaleInterface $locale) {
         $this->locale = $locale;
         $this->formatService = $formatService;

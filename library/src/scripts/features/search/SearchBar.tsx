@@ -153,7 +153,10 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Otherwise falls back to what is determined by react-select.
      */
     private get isMenuVisible(): boolean | undefined {
-        return this.state.forceMenuClosed || this.props.value.length === 0 || this.props.disableAutocomplete
+        return this.state.forceMenuClosed ||
+            this.props.value.length === 0 ||
+            this.props.disableAutocomplete ||
+            this.props.disablePointerEvent
             ? false
             : undefined;
     }

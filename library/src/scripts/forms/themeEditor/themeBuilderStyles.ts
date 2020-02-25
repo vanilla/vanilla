@@ -65,7 +65,7 @@ export const themeBuilderVariables = () => {
 };
 
 export const themeBuilderClasses = useThemeCache(() => {
-    const style = styleFactory("themeEditor");
+    const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
 
     const inputBlock = style("inputBlock", {
@@ -101,7 +101,7 @@ export const themeBuilderClasses = useThemeCache(() => {
     const title = style("title", {
         ...fonts(vars.title),
         textAlign: "center",
-        marginBottom: unit(16),
+        marginBottom: unit(20),
     });
 
     const section = style("section", {

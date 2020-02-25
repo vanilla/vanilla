@@ -110,7 +110,7 @@ export default function ColorPicker(props: IColorPicker) {
                     className={classNames(classes.realInput, visibility().visuallyHidden)}
                     onChange={onColorInputChange}
                     aria-errormessage={hasError ? errorID : undefined}
-                    defaultValue={initialColor ? colorOut(initialColor) : undefined}
+                    defaultValue={initialColor.toString()}
                 />
                 {/*Text Input*/}
                 <input

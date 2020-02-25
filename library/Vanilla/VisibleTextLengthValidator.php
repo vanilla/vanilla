@@ -16,25 +16,38 @@ use Vanilla\Contracts\LocaleInterface;
  */
 class VisibleTextLengthValidator {
 
+    /** @var \Vanilla\Contracts\LocaleInterface */
+    private $locale;
+
+    /** @var \Vanilla\Formatting\FormatService */
+    private $formatService;
+
+    /** @var int */
+    private $maxTextLength = 8000;
+
+    public function __construct(int $maxTextLength, \Vanilla\Formatting\FormatService $formatService, \Vanilla\Contracts\LocaleInterface $locale) {
+        $this->locale = $locale;
+        $this->formatService = $formatService;
+        $this->maxTextLength = $maxTextLength;
+    }
+
     /**
      * Validate content length by stripping most meta-data and formatting.
      *
      * @param string $value User input content.
      * @param string $field Field name where content is found.
      * @param array $post POST array.
-     * @return \Vanilla\Invalid
+     * @return mixed Either an Invalid Object or the value.
      */
     private function validate($value, $field, $post) {
         $format = $post['Format'] ?? '';
-        $formatServices = \Gdn::formatService();
-        $stringLength = $formatServices->getVisibleTextLength($value, $format);
-        $diff = $stringLength - $field->maxTextLength;
+        $stringLength = $this->formatService->getVisibleTextLength($value, $format);
+        $diff = $stringLength - ($field->maxTextLength ?? $this->maxTextLength);
         if ($diff <= 0) {
             return $value;
         } else {
-            $locale = \Gdn::locale();
-            $validationMessage = $locale->translate('ValidateLength' ?? '');
-            $fieldName = $locale->translate($field->Name ?? '');
+            $validationMessage = $this->locale->translate('ValidateLength' ?? '');
+            $fieldName = $this->locale->translate($field->Name ?? '');
             return new Invalid(sprintf($validationMessage, $fieldName, abs($diff)));
         }
     }
@@ -45,7 +58,7 @@ class VisibleTextLengthValidator {
      * @param string $value User input content.
      * @param string $field Field name where content is found.
      * @param array $row POST array.
-     * @return \Vanilla\Invalid
+     * @return mixed Either an Invalid Object or the value.
      */
     public function __invoke($value, $field, $row = []) {
         return $this->validate($value, $field, $row);

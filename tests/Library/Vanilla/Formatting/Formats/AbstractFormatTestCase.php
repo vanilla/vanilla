@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
-use exussum12\CoverageChecker\Outputs\Json;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\FormatService;
 use VanillaTests\MinimalContainerTestCase;

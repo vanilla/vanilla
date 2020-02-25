@@ -42,4 +42,11 @@ abstract class BaseFormat implements FormatInterface {
     public function renderQuote(string $content): string {
         return $this->renderHTML($content);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getVisibleTextLength(string $content): int {
+        return mb_strlen($this->renderPlainText($content), 'UTF-8');
+    }
 }

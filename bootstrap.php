@@ -295,6 +295,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['visibleTextLength', new Reference(\Vanilla\VisibleTextLengthValidator::class)])
 
+    ->rule(\Vanilla\VisibleTextLengthValidator::class)
+    ->setConstructorArgs(['maxTextLength' => ContainerUtils::config('Vanilla.Comment.MaxLength')])
+
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])

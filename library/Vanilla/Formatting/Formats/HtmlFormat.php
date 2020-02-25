@@ -95,13 +95,6 @@ class HtmlFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function getVisibleTextLength(string $content): int {
-        return mb_strlen($this->renderPlainText($content), 'UTF-8');
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function renderQuote(string $content): string {
         $result = $this->htmlSanitizer->filter($content);
 

@@ -10,11 +10,10 @@ import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
 import { color, ColorHelper } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
-import { useField, FieldMetaProps } from "formik";
+import { useField } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
-import { FieldInputProps } from "formik/dist/types";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
@@ -141,9 +140,9 @@ export default function ColorPicker(props: IColorPicker) {
             </span>
             {props.errors && props.errors.length > 0 && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    {props.errors.map(error => {
+                    {props.errors.map((error, i) => {
                         return (
-                            <li className={builderClasses.error}>
+                            <li className={builderClasses.error} key={i}>
                                 {error && getDefaultOrCustomErrorMessage(error, t("Invalid color"))}
                             </li>
                         );

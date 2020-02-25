@@ -12,7 +12,7 @@ export interface IThemeBuilderSubGroupSection {
     children: React.ReactNode;
 }
 
-export default function ThemeBuilderSectionSubGroup(props: IThemeBuilderSubGroupSection) {
+export default function ThemeBuilderSectionGroup(props: IThemeBuilderSubGroupSection) {
     const classes = themeBuilderClasses();
     return (
         <div className={classes.subGroupSection}>

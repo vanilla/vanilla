@@ -14,7 +14,7 @@ import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import { t } from "@vanilla/i18n/src";
-import ThemeBuilderSectionSubGroup from "@library/forms/themeEditor/ThemeBuilderSectionSubGroup";
+import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 
 const story = storiesOf("Theme", module);
 
@@ -87,7 +87,7 @@ story.add("Theme Builder", () => {
                                 }}
                                 inputBlock={{ label: "Test 6" }}
                             />
-                            <ThemeBuilderSectionSubGroup label={"Section Sub Group"}>
+                            <ThemeBuilderSectionGroup label={"Section Sub Group"}>
                                 <ColorPickerBlock
                                     colorPicker={{
                                         variableID: "global.something.or.other.color",
@@ -114,7 +114,7 @@ story.add("Theme Builder", () => {
                                     }}
                                     inputBlock={{ label: "Test 8 - No default value" }}
                                 />
-                            </ThemeBuilderSectionSubGroup>
+                            </ThemeBuilderSectionGroup>
                         </ThemeBuilderSection>
                     </Form>
                 </FormikProvider>

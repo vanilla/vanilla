@@ -37,7 +37,7 @@ export const colorPickerClasses = useThemeCache(() => {
 
     const invalidColor = style("invalidColor", {});
     const textInput = style("textInput", {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.fonts.size, 0, vars.sizing.height),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 0, vars.sizing.height),
         width: unit(inputWidth),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),

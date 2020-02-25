@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from "react";
-import ThemeBuilderInputBlock, { IThemeEditorInputBlock } from "@library/forms/themeEditor/ThemeBuilderInputBlock";
+import ThemeBuilderBlock, { IThemeEditorInputBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import ColorPicker, { IColorPicker } from "@library/forms/themeEditor/ColorPicker";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
@@ -27,7 +27,7 @@ export default function ColorPickerBlock(props: IColorPickerBlock) {
     }, []);
 
     return (
-        <ThemeBuilderInputBlock
+        <ThemeBuilderBlock
             {...{
                 ...props.inputBlock,
                 inputID,
@@ -41,6 +41,6 @@ export default function ColorPickerBlock(props: IColorPickerBlock) {
                     labelID,
                 }}
             />
-        </ThemeBuilderInputBlock>
+        </ThemeBuilderBlock>
     );
 }

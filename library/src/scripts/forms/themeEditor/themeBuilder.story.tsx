@@ -11,6 +11,7 @@ import { percent } from "csx";
 import { storiesOf } from "@storybook/react";
 import { Form, FormikProvider, useFormik } from "formik";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
+import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 
 const story = storiesOf("Theme", module);
 
@@ -25,7 +26,7 @@ story.add("Theme Builder", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Theme Editor</StoryHeading>
-            <div
+            <aside
                 style={{
                     width: percent(100),
                     maxWidth: "376px",
@@ -37,13 +38,14 @@ story.add("Theme Builder", () => {
                 <FormikProvider value={form}>
                     {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
                     <Form translate="yes">
+                        <ThemeBuilderTitle />
                         <ColorPickerBlock
                             colorPicker={{ variableID: "global.something.or.other.color" }}
                             inputBlock={{ label: "testma" }}
                         />
                     </Form>
                 </FormikProvider>
-            </div>
+            </aside>
         </StoryContent>
     );
 });

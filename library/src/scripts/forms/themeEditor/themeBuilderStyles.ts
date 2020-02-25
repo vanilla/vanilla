@@ -11,15 +11,23 @@ import { borders, unit } from "@library/styles/styleHelpers";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
+    const fontFamily = ["Open Sans"];
+    const textColor = color("#48576a");
     return {
         outline: {
             color: color("#0291db"),
             warning: color("#d0021b"),
         },
         width: 160,
-        fonts: {
-            family: ["Open Sans"],
-            color: color("#48576a"),
+        title: {
+            family: fontFamily,
+            color: textColor,
+            size: 16,
+            weight: 700,
+        },
+        label: {
+            family: fontFamily,
+            color: textColor,
             size: 13,
         },
         border: {
@@ -47,7 +55,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         width: unit(vars.width),
         flexBasis: unit(vars.width),
         flexGrow: 1,
-        ...fonts(vars.fonts),
+        ...fonts(vars.label),
     });
 
     const undoWrap = style("undoWrap", {
@@ -65,10 +73,31 @@ export const themeBuilderClasses = useThemeCache(() => {
         flexBasis: unit(vars.width),
     });
 
+    const title = style("title", {
+        ...fonts(vars.title),
+        textAlign: "center",
+        textTransform: "uppercase",
+        marginBottom: unit(16),
+    });
+
+    const section = style("section", {});
+    const sectionTitle = style("sectionTitle", {});
+    const subSection = style("subSection", {});
+    const subSectionTitle = style("subSectionTitle", {});
+    const subGroupSection = style("subGroupSection", {});
+    const subGroupSectionTitle = style("subGroupSectionTitle", {});
+
     return {
         inputBlock,
         label,
         undoWrap,
         inputWrap,
+        title,
+        section,
+        sectionTitle,
+        subSection,
+        subSectionTitle,
+        subGroupSection,
+        subGroupSectionTitle,
     };
 });

@@ -7,14 +7,14 @@
 import React, { useMemo } from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
-export interface IThemeEditorInputBlock {
+export interface IThemeBuilderBlock {
     label: string;
     labelID: string;
     undo?: boolean;
     children: React.ReactChild;
 }
 
-export default function ThemeBuilderInputBlock(props: IThemeEditorInputBlock) {
+export default function ThemeBuilderBlock(props: IThemeBuilderBlock) {
     const classes = themeBuilderClasses();
     return (
         <div className={classes.inputBlock}>

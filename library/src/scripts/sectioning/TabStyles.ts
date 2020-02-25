@@ -5,14 +5,27 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    fonts,
+    paddings,
+    borders,
+    negative,
+    srOnly,
+    IFont,
+    sticky,
+    extendItemContainer,
+} from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const titlebarVars = titleBarVariables();
     const makeVars = variableFactory("onlineTabs");
 
     const colors = makeVars("colors", {
@@ -31,8 +44,8 @@ export const tabsVariables = useThemeCache(() => {
     });
 
     const navHeight = makeVars("navHeight", {
-        height: 48
-    })
+        height: titlebarVars.sizing.height,
+    });
 
     const border = makeVars("border", {
         width: globalVars.border.width,
@@ -47,7 +60,7 @@ export const tabsVariables = useThemeCache(() => {
     return {
         colors,
         border,
-        navHeight
+        navHeight,
     };
 });
 
@@ -62,9 +75,7 @@ export const tabClasses = useThemeCache(() => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "stretch",
-        height: calc(
-            `${percent(100)} - ${unit(vars.navHeight.height)}`,
-        ),
+        height: calc(`${percent(100)} - ${unit(vars.navHeight.height)}`),
     });
 
     const tabsHandles = style("tabsHandles", {
@@ -78,16 +89,22 @@ export const tabClasses = useThemeCache(() => {
 
     const tabList = style("tabList", {
         display: "flex",
-        width: percent(100),
+        // Offset for the outer borders.
+        ...extendItemContainer(globalVariables().border.width),
         justifyContent: "space-between",
         alignItems: "stretch",
+        background: colorOut(vars.colors.bg),
+        ...sticky(),
+        top: 0,
+        zIndex: 1,
     });
+
     const tab = style(
         "tab",
         {
             ...userSelect(),
             position: "relative",
-            width: percent(25),
+            flex: 1,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             border: "1px solid #bfcbd8",
@@ -127,7 +144,7 @@ export const tabClasses = useThemeCache(() => {
         flexGrow: 1,
         height: percent(100),
         flexDirection: "column",
-        position: "relative"
+        position: "relative",
     });
 
     const panel = style("panel", {

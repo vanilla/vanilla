@@ -789,7 +789,7 @@ abstract class Gdn_SQLDriver {
      * object. This method should not be called directly; it is called by
      * $this->get() and $this->getWhere().
      */
-    public function getSelect() {
+    public function getSelect(bool $prepared = false) {
         // Close off any open query elements.
         $this->_endQuery();
 
@@ -875,6 +875,10 @@ abstract class Gdn_SQLDriver {
             $sql = $this->getLimit($sql, $this->_Limit, $this->_Offset);
         }
 
+        if ($prepared) {
+            $parameters = $this->calculateParameters($this->_NamedParameters);
+            $sql = $this->applyParameters($sql, $parameters);
+        }
         return $sql;
     }
 

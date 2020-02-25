@@ -19,7 +19,7 @@ use VanillaTests\MinimalContainerTestCase;
  */
 class VisibleTextLengthValidatorTest extends MinimalContainerTestCase {
 
-    /** @var int Number of characters to test for */
+    /** @var int Number of characters to test for. */
     const TEST_MAX_COMMENT_LENGTH = 10;
 
     /**

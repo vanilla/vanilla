@@ -208,31 +208,31 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
  * Check if string is valid color in hex format
  * @param colorString
  */
-export function stringIsHexColor(color: string) {
-    return color && color.match(hexRegex);
+export function stringIsHexColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hexRegex);
 }
 
 /**
  * Check if string is valid color in rgb or rgba format
  * @param colorString
  */
-export function stringIsRgbColor(color: string) {
-    return color && color.match(rgbRegex);
+export function stringIsRgbColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbRegex);
 }
 
 /**
  * Check if string is valid color in hsl or hsla format
  * @param colorString
  */
-export function stringIsHslColor(color: string) {
-    return color && color.match(hslRegex);
+export function stringIsHslColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslRegex);
 }
 
 /**
  * Check if string is supported color format
  * @param colorString
  */
-export function stringIsValidColor(colorValue: string) {
+export function stringIsValidColor(colorValue) {
     return (
         typeof colorValue === "string" &&
         (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
@@ -243,7 +243,7 @@ export function stringIsValidColor(colorValue: string) {
  * Check if string or ColorHelper is valid
  * @param colorString
  */
-export const isValidColor = (colorValue: string | undefined | ColorHelper) => {
+export const isValidColor = colorValue => {
     return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
 };
 

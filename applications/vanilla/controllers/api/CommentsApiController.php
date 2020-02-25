@@ -145,10 +145,7 @@ class CommentsApiController extends AbstractApiController {
      */
     protected function fullSchema() {
         $result = $this->commentModel
-            ->schema()
-            ->merge(Schema::parse([
-                'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
-            ]));
+            ->schema();
         return $result;
     }
 

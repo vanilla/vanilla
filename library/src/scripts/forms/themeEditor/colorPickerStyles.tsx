@@ -8,7 +8,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { percent, translateX } from "csx";
 import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
 import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
-import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -36,30 +36,44 @@ export const colorPickerClasses = useThemeCache(() => {
 
     const invalidColor = style("invalidColor", {});
     const textInput = style("textInput", {
+        position: "relative",
         ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 0, vars.sizing.height),
         width: unit(inputWidth),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
-        borderRightColor: "transparent",
+        zIndex: 1,
+        transition: `color .2s ease-out, background .2s ease-out`,
         $nest: {
             [`&.${invalidColor}`]: {
-                // borderRightColor: colorOut(builderVariables.outline.warning),
-                // boxShadow: `inset 0 0 0 1px ${colorOut(builderVariables.outline.warning)}`,
-                backgroundColor: colorOut(builderVariables.outline.warning),
+                color: colorOut(builderVariables.error.color),
+                background: colorOut(builderVariables.error.backgroundColor),
             },
         },
     });
 
     const swatch = style("swatch", {
         display: "block",
+        position: "relative",
         width: unit(vars.swatch.width),
         flexBasis: unit(vars.swatch.width),
         height: percent(100),
-        border: 0,
+        ...borders(
+            {
+                top: builderVariables.border as IGlobalBorderStyles,
+                right: builderVariables.border as IGlobalBorderStyles,
+                bottom: builderVariables.border as IGlobalBorderStyles,
+            },
+            {} as IGlobalBorderStyles,
+        ),
         borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
+        $nest: {
+            "&:focus, &:active": {
+                zIndex: 2,
+            },
+        },
     });
 
     const realInput = style("realInput", {

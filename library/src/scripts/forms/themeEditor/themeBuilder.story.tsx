@@ -7,7 +7,7 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { percent } from "csx";
+import { color, ColorHelper, percent } from "csx";
 import { storiesOf } from "@storybook/react";
 import { Form, FormikProvider, useFormik } from "formik";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
@@ -43,40 +43,76 @@ story.add("Theme Builder", () => {
                     <Form translate="yes">
                         <ThemeBuilderTitle />
                         <ColorPickerBlock
-                            colorPicker={{ variableID: "global.something.or.other.color" }}
+                            colorPicker={{
+                                variableID: "global.something.or.other.color",
+                                defaultValue: color("#ca0000"),
+                            }}
                             inputBlock={{ label: "Test 1" }}
                         />
                         <ColorPickerBlock
-                            colorPicker={{ variableID: "global.something.or.other.color" }}
+                            colorPicker={{
+                                variableID: "global.something.or.other.color",
+                                defaultValue: color("#00ca25"),
+                            }}
                             inputBlock={{ label: "Test 2" }}
                         />
                         <ThemeBuilderSection label={"Section 1"}>
                             <ColorPickerBlock
-                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                colorPicker={{
+                                    variableID: "global.something.or.other.color",
+                                    defaultValue: color("#3139ca"),
+                                }}
                                 inputBlock={{ label: "Test 3" }}
                             />
                             <ColorPickerBlock
-                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                colorPicker={{
+                                    variableID: "global.something.or.other.color",
+                                    defaultValue: color("#c627ca"),
+                                }}
                                 inputBlock={{ label: "Test 4" }}
                             />
                         </ThemeBuilderSection>
                         <ThemeBuilderSection label={"Section 31"}>
                             <ColorPickerBlock
-                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                colorPicker={{
+                                    variableID: "global.something.or.other.color",
+                                    defaultValue: color("#c7cac4"),
+                                }}
                                 inputBlock={{ label: "Test 5" }}
                             />
                             <ColorPickerBlock
-                                colorPicker={{ variableID: "global.something.or.other.color" }}
+                                colorPicker={{
+                                    variableID: "global.something.or.other.color",
+                                    defaultValue: color("#15206f"),
+                                }}
                                 inputBlock={{ label: "Test 6" }}
                             />
                             <ThemeBuilderSectionSubGroup label={"Section Sub Group"}>
                                 <ColorPickerBlock
-                                    colorPicker={{ variableID: "global.something.or.other.color" }}
-                                    inputBlock={{ label: "Test 7" }}
+                                    colorPicker={{
+                                        variableID: "global.something.or.other.color",
+                                        errors: [true],
+                                        defaultValue: "cat" as any, // Intentionally bypassing typescript for error
+                                    }}
+                                    inputBlock={{ label: "With Error" }}
                                 />
                                 <ColorPickerBlock
-                                    colorPicker={{ variableID: "global.something.or.other.color" }}
-                                    inputBlock={{ label: "Test 8" }}
+                                    colorPicker={{
+                                        variableID: "global.something.or.other.color",
+                                        errors: [
+                                            "Custom Error Messages",
+                                            "Custom Error Messages",
+                                            "Custom Error Messages",
+                                        ],
+                                        defaultValue: "chinchilla" as any, // Intentionally bypassing typescript for error
+                                    }}
+                                    inputBlock={{ label: "With Error" }}
+                                />
+                                <ColorPickerBlock
+                                    colorPicker={{
+                                        variableID: "global.something.or.other.color",
+                                    }}
+                                    inputBlock={{ label: "Test 8 - No default value" }}
                                 />
                             </ThemeBuilderSectionSubGroup>
                         </ThemeBuilderSection>

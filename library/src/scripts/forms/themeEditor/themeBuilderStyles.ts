@@ -5,9 +5,9 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color } from "csx";
+import { color, percent } from "csx";
 import { fonts, IFont } from "@library/styles/styleHelpersTypography";
-import { borders, margins, unit } from "@library/styles/styleHelpers";
+import { margins, negativeUnit, unit } from "@library/styles/styleHelpers";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -16,7 +16,6 @@ export const themeBuilderVariables = () => {
     return {
         outline: {
             color: color("#0291db"),
-            warning: color("#ffebed"),
         },
         width: 160,
         label: {
@@ -44,6 +43,12 @@ export const themeBuilderVariables = () => {
             size: 14,
             weight: 700,
         },
+        errorMessage: {
+            family: fontFamily,
+            color: color("#d0021b"),
+            size: 12,
+            weight: 600,
+        },
         border: {
             color: color("#bfcbd8"),
             width: 1,
@@ -51,6 +56,10 @@ export const themeBuilderVariables = () => {
         },
         wrap: {
             borderRadius: 3,
+        },
+        error: {
+            color: color("#d0021b"),
+            backgroundColor: color("#FFF3D4"),
         },
     };
 };
@@ -83,7 +92,7 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const inputWrap = style("inputWrap", {
         display: "flex",
-        flexWrap: "nowrap",
+        flexWrap: "wrap",
         alignItems: "stretch",
         width: unit(vars.width),
         flexBasis: unit(vars.width),
@@ -109,18 +118,28 @@ export const themeBuilderClasses = useThemeCache(() => {
         }),
     });
 
-    // const subSection = style("subSection", {});
-    //
-    // const subSectionTitle = style("subSectionTitle", {
-    //
-    // });
-
     const subGroupSection = style("subGroupSection", {});
     const subGroupSectionTitle = style("subGroupSectionTitle", {
         ...fonts(vars.sectionGroupTitle),
         ...margins({
             top: 20,
             bottom: 12,
+        }),
+    });
+
+    const errorContainer = style("errorContainer", {
+        flexGrow: 1,
+        width: percent(100),
+        display: "block",
+        marginTop: negativeUnit(2),
+    });
+
+    const error = style("error", {
+        width: percent(100),
+        display: "block",
+        ...fonts(vars.errorMessage),
+        ...margins({
+            vertical: 4,
         }),
     });
 
@@ -132,8 +151,8 @@ export const themeBuilderClasses = useThemeCache(() => {
         title,
         section,
         sectionTitle,
-        // subSection,
-        // subSectionTitle,
+        error,
+        errorContainer,
         subGroupSection,
         subGroupSectionTitle,
     };

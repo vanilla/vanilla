@@ -54,25 +54,6 @@ class ValidationTest extends MinimalContainerTestCase {
     }
 
     /**
-     * Test the length of text with formatting stripped out.
-     *
-     * @param array $post
-     * @param bool $isValid
-     * @throws \Garden\Container\ContainerException Container error.
-     * @throws \Garden\Container\NotFoundException Container not found error.
-     * @dataProvider providePostContent
-     */
-    public function testVisibleTextLength(array $post, bool $isValid) :void {
-        $maxLength = 10;
-        $validation = new Gdn_Validation([
-            'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string', 'maxTextLength' => $maxLength]
-        ]);
-        $validation->addRule('visibleTextLength', \Gdn::getContainer()->get(\Vanilla\VisibleTextLengthValidator::class));
-        $validation->applyRule('Body', 'visibleTextLength');
-        $result = $validation->validate($post);
-        $this->assertEquals($isValid, $result);
-    }
-    /**
      * Test some basic valid types.
      *
      * @param string $type The dbtype to validate.

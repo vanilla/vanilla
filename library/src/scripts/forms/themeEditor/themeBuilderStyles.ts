@@ -61,6 +61,9 @@ export const themeBuilderVariables = () => {
             color: color("#d0021b"),
             backgroundColor: color("#FFF3D4"),
         },
+        input: {
+            height: 28,
+        },
     };
 };
 
@@ -70,23 +73,28 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const inputBlock = style("inputBlock", {
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "space-between",
         marginBottom: unit(8),
     });
 
     const label = style("label", {
         width: unit(vars.width),
+        display: "flex",
+        alignItems: "center",
         flexBasis: unit(vars.width),
         flexGrow: 1,
         fontWeight: 600,
+        height: unit(vars.input.height),
         ...fonts(vars.label),
     });
 
     const undoWrap = style("undoWrap", {
-        display: "block",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         width: unit(24),
-        height: unit(24),
+        height: unit(vars.input.height),
         flexBasis: unit(24),
     });
 

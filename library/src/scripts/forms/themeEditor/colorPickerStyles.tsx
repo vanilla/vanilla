@@ -14,7 +14,7 @@ export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
     return {
         sizing: {
-            height: 28,
+            height: themeBuilderVariables().input.height,
         },
         swatch: {
             width: 39,
@@ -37,7 +37,7 @@ export const colorPickerClasses = useThemeCache(() => {
     const invalidColor = style("invalidColor", {});
     const textInput = style("textInput", {
         position: "relative",
-        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 0, vars.sizing.height),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 2, vars.sizing.height),
         width: unit(inputWidth),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),

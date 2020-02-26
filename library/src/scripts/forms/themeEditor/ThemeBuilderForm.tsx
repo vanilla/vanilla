@@ -79,7 +79,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         />
                         <ColorPickerBlock
                             colorPicker={{
-                                variableID: "buttonGlobals.colors.primary",
+                                variableID: "buttonGlobals.colors.primaryContrast",
                                 defaultValue: colorOut(buttonGlobals.colors.primaryContrast),
                             }}
                             inputBlock={{ label: t("Text") }}

@@ -60,6 +60,15 @@ export const importantUnit = (val: string | number | undefined, unitFunction = p
     return withUnit ? important(withUnit.toString()) : withUnit;
 };
 
+export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
+    const withUnit = unit(val);
+    return withUnit ? important(negative(withUnit).toString()) : withUnit;
+};
+
+export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
+    return negative(unit(val));
+};
+
 export const negative = val => {
     if (typeof val === "string") {
         val = val.trim();

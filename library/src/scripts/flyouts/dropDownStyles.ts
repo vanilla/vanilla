@@ -14,9 +14,9 @@ import {
     buttonStates,
     unit,
     userSelect,
-    negative,
     IStateSelectors,
     absolutePosition,
+    negativeUnit,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -399,7 +399,7 @@ export const dropDownClasses = useThemeCache(() => {
         transform: `translateX(${unit(flyoutOffset)})`,
     });
     const contentOffsetRight = style("contentOffsetRight", {
-        transform: `translateX(${negative(unit(flyoutOffset))})`,
+        transform: `translateX(${negativeUnit(flyoutOffset)})`,
     });
 
     return {

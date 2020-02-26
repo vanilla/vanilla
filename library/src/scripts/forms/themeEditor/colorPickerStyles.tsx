@@ -39,6 +39,7 @@ export const colorPickerClasses = useThemeCache(() => {
         position: "relative",
         ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 2, vars.sizing.height),
         width: unit(inputWidth),
+        color: colorOut(builderVariables.font.color),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),

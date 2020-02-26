@@ -13,12 +13,15 @@ import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection"
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpersColors";
+import { t } from "@vanilla/i18n/src";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
 export interface IThemeBuilderForm {}
 
 export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const classes = themeBuilderClasses();
-    const vars = globalVariables();
+    const global = globalVariables();
+    const buttonGlobals = buttonGlobalVariables();
     const form = useFormik({
         initialValues: {},
         onSubmit: values => {
@@ -30,71 +33,73 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <Form translate={true} className={classes.root}>
                 <ThemeBuilderTitle />
+
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: colorOut(vars.mainColors.primary),
+                        defaultValue: colorOut(global.mainColors.primary),
                     }}
-                    inputBlock={{ label: "Test 1" }}
+                    inputBlock={{ label: t("Brand Color") }}
                 />
-                <ColorPickerBlock
-                    colorPicker={{
-                        variableID: "global.something.or.other.color.2",
-                        defaultValue: "#00ca25",
-                    }}
-                    inputBlock={{ label: "Test 2" }}
-                />
-                <ThemeBuilderSection label={"Section 1"}>
+
+                <ThemeBuilderSection label={"Body"}>
                     <ColorPickerBlock
                         colorPicker={{
-                            variableID: "global.something.or.other.color.3",
-                            defaultValue: "#3139ca",
+                            variableID: "global.body.backgroundImage.color",
+                            defaultValue: colorOut(global.body.backgroundImage.color),
                         }}
-                        inputBlock={{ label: "Test 3" }}
+                        inputBlock={{ label: t("Background Color") }}
                     />
+
                     <ColorPickerBlock
                         colorPicker={{
-                            variableID: "global.something.or.other.color.4",
-                            defaultValue: "#c627ca",
+                            variableID: "global.mainColors.fg",
+                            defaultValue: colorOut(global.mainColors.fg),
                         }}
-                        inputBlock={{ label: "Test 4" }}
+                        inputBlock={{ label: t("Text") }}
+                    />
+
+                    <ColorPickerBlock
+                        colorPicker={{
+                            variableID: "global.links.colors.default",
+                            defaultValue: colorOut(global.links.colors.default),
+                        }}
+                        inputBlock={{ label: t("Links") }}
                     />
                 </ThemeBuilderSection>
-                <ThemeBuilderSection label={"Section 31"}>
-                    <ColorPickerBlock
-                        colorPicker={{
-                            variableID: "global.something.or.other.color.5",
-                            defaultValue: "#c7cac4",
-                        }}
-                        inputBlock={{ label: "Test 5" }}
-                    />
-                    <ColorPickerBlock
-                        colorPicker={{
-                            variableID: "global.something.or.other.color.6",
-                            defaultValue: "#15206f",
-                        }}
-                        inputBlock={{ label: "Test 6" }}
-                    />
-                    <ThemeBuilderSectionGroup label={"Section Sub Group"}>
+
+                <ThemeBuilderSection label={t("Buttons & Inputs")}>
+                    <ThemeBuilderSectionGroup label={t("Primary Buttons")}>
                         <ColorPickerBlock
                             colorPicker={{
-                                variableID: "global.something.or.other.color.7",
-                                defaultValue: "cat" as any, // Intentionally bypassing typescript for error
+                                variableID: "buttonGlobals.colors.primary",
+                                defaultValue: colorOut(buttonGlobals.colors.primary),
                             }}
-                            inputBlock={{ label: "With Error" }}
+                            inputBlock={{ label: t("Background") }}
                         />
                         <ColorPickerBlock
                             colorPicker={{
-                                variableID: "global.something.or.other.color.8",
-                                defaultValue: "chinchilla" as any, // Intentionally bypassing typescript for error
+                                variableID: "buttonGlobals.colors.primary",
+                                defaultValue: colorOut(buttonGlobals.colors.primaryContrast),
                             }}
-                            inputBlock={{ label: "With Error" }}
+                            inputBlock={{ label: t("Text") }}
+                        />
+                    </ThemeBuilderSectionGroup>
+
+                    <ThemeBuilderSectionGroup label={t("Secondary Buttons")}>
+                        <ColorPickerBlock
+                            colorPicker={{
+                                variableID: "buttonGlobals.colors.bg",
+                                defaultValue: colorOut(buttonGlobals.colors.bg),
+                            }}
+                            inputBlock={{ label: t("Background") }}
                         />
                         <ColorPickerBlock
                             colorPicker={{
-                                variableID: "global.something.or.other.color.9",
+                                variableID: "buttonGlobals.colors.fg",
+                                defaultValue: colorOut(buttonGlobals.colors.fg),
                             }}
-                            inputBlock={{ label: "Test 8 - No default value" }}
+                            inputBlock={{ label: t("Text") }}
                         />
                     </ThemeBuilderSectionGroup>
                 </ThemeBuilderSection>

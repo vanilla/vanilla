@@ -382,7 +382,7 @@ class CommentsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
-        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, []);
+        $normalizedRow = $this->commentModel->normalizeRow($dbRecord, []);
         // Allow addons to hook into the normalization process.
         $options = [];
         $result = $this->getEventManager()->fireFilter(

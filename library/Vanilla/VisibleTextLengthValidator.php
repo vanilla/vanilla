@@ -68,7 +68,7 @@ class VisibleTextLengthValidator {
      *
      * @return int
      */
-    public function getMaxTextLength() : int {
+    public function getMaxTextLength(): int {
         if (!$this->maxTextLength) {
             $config = \Gdn::getContainer()->get(ConfigurationInterface::class);
             $this->maxTextLength = $config->get('Vanilla.Comment.MaxLength');
@@ -82,7 +82,7 @@ class VisibleTextLengthValidator {
      * @param int $maxTextLength
      * @return void
      */
-    public function setMaxTextLength(int $maxTextLength) :void {
+    public function setMaxTextLength(int $maxTextLength): void {
         $this->maxTextLength = $maxTextLength;
     }
 

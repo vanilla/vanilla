@@ -112,7 +112,6 @@ class CommentModelTest extends SharedBootstrapTestCase {
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $commentID = $this->commentModel->save([
-            "Name" => __FUNCTION__,
             "DiscussionID" => $discussionID,
             "Body" => "Hello world.",
             "Format" => "markdown",
@@ -139,7 +138,6 @@ class CommentModelTest extends SharedBootstrapTestCase {
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $this->commentModel->save([
-            "Name" => __FUNCTION__,
             "DiscussionID" => $discussionID,
             "Body" => "Hello world.",
             "Format" => "markdown",
@@ -163,7 +161,6 @@ class CommentModelTest extends SharedBootstrapTestCase {
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $commentID = $this->commentModel->save([
-            "Name" => __FUNCTION__,
             "DiscussionID" => $discussionID,
             "Body" => "Hello world.",
             "Format" => "markdown",

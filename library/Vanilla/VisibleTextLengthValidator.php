@@ -16,9 +16,6 @@ use Vanilla\Contracts\LocaleInterface;
  */
 class VisibleTextLengthValidator {
 
-    /** @var int Fallback if no MaxTextLength is provided. */
-    const DEFAULT_MAX_COMMENT_LENGTH = 8000;
-
     /** @var LocaleInterface */
     private $locale;
 
@@ -71,7 +68,7 @@ class VisibleTextLengthValidator {
      *
      * @return int
      */
-    private function getMaxTextLength() : int {
+    public function getMaxTextLength() : int {
         return $this->maxTextLength;
     }
 
@@ -81,8 +78,8 @@ class VisibleTextLengthValidator {
      * @param int $maxTextLength
      * @return void
      */
-    private function setMaxTextLength(int $maxTextLength = 0) :void {
-        $this->maxTextLength = ($maxTextLength > 0) ? $maxTextLength : self::DEFAULT_MAX_COMMENT_LENGTH;
+    public function setMaxTextLength(int $maxTextLength) :void {
+        $this->maxTextLength = $maxTextLength;
     }
 
     /**

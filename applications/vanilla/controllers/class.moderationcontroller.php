@@ -370,7 +370,9 @@ class ModerationController extends VanillaController {
 
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
-        $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, Type, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
+        $DiscussionData = $DiscussionModel->SQL
+            ->select('DiscussionID, Name, Type, DateLastComment, CategoryID, CountComments')
+            ->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
 
         $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {

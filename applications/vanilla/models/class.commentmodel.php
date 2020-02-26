@@ -861,7 +861,9 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
-     * @return mixed
+     * Get a schema instance comprised of standard comment fields.
+     *
+     * @return Schema
      */
     public function schema(): Schema {
         $result = Schema::parse([

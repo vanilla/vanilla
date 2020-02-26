@@ -29,7 +29,6 @@ class VisibleTextLengthValidator {
     /**
      * VisibleTextLengthValidator constructor.
      *
-     * @param int $maxTextLength Maximum length of text.
      * @param FormatService $formatService Service to apply a formatter.
      * @param LocaleInterface $locale For translating error messages.
      */

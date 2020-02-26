@@ -8,11 +8,9 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\SchemaFactory;
 
 /**
  * API Controller for the `/comments` resource.

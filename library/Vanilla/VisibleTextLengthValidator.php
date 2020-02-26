@@ -16,6 +16,9 @@ use Vanilla\Contracts\LocaleInterface;
  */
 class VisibleTextLengthValidator {
 
+    /** @var int Fallback if no MaxTextLength is provided. */
+    const DEFAULT_MAX_COMMENT_LENGTH = 8000;
+
     /** @var LocaleInterface */
     private $locale;
 
@@ -23,7 +26,7 @@ class VisibleTextLengthValidator {
     private $formatService;
 
     /** @var int */
-    private $maxTextLength = 8000;
+    private $maxTextLength;
 
     /**
      * VisibleTextLengthValidator constructor.
@@ -35,7 +38,7 @@ class VisibleTextLengthValidator {
     public function __construct(int $maxTextLength, FormatService $formatService, LocaleInterface $locale) {
         $this->locale = $locale;
         $this->formatService = $formatService;
-        $this->maxTextLength = $maxTextLength;
+        $this->setMaxTextLength($maxTextLength);
     }
 
     /**
@@ -53,7 +56,7 @@ class VisibleTextLengthValidator {
             return new Invalid(sprintf($noFormatError, 'Format'));
         }
         $stringLength = $this->formatService->getVisibleTextLength($value, $format);
-        $diff = $stringLength - ($field->maxTextLength ?? $this->maxTextLength);
+        $diff = $stringLength - ($field->maxTextLength ?? $this->getMaxTextLength());
         if ($diff <= 0) {
             return $value;
         } else {
@@ -61,6 +64,25 @@ class VisibleTextLengthValidator {
             $fieldName = $this->locale->translate($field->Name ?? '');
             return new Invalid(sprintf($validationMessage, $fieldName, abs($diff)));
         }
+    }
+
+    /**
+     * Get the Maximum Text Length.
+     *
+     * @return int
+     */
+    private function getMaxTextLength() : int {
+        return $this->maxTextLength;
+    }
+
+    /**
+     * Set the Maximum Text Length.
+     *
+     * @param int $maxTextLength
+     * @return void
+     */
+    private function setMaxTextLength(int $maxTextLength = 0) :void {
+        $this->maxTextLength = ($maxTextLength > 0) ? $maxTextLength : self::DEFAULT_MAX_COMMENT_LENGTH;
     }
 
     /**

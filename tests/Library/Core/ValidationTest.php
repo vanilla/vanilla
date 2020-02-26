@@ -181,27 +181,4 @@ class ValidationTest extends MinimalContainerTestCase {
 
         return array_column($r, null, 0);
     }
-
-    /**
-     * Provide Markdown text to test counting text length with formatting stripped out.
-     *
-     * @return array
-     */
-    public function providePostContent() {
-        $output = [
-            'Short Formatted' => [
-                ['Body' => '**Bold**', 'Format' => 'Markdown'],
-                true
-            ],
-            'Short Mixed' => [
-                ['Body' => '**Bold** Text', 'Format' => 'Markdown'],
-                true
-            ],
-            'Long Mixed' => [
-                ['Body' => '**Bold** Text *italic*', 'Format' => 'Markdown'],
-                false
-            ],
-        ];
-        return $output;
-    }
 }

@@ -72,14 +72,19 @@ export const getHorizontalPaddingForTextInput = (height: number, fontSize: numbe
     return getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth) * 2;
 };
 
-export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
+export const textInputSizingFromFixedHeight = (
+    height: number,
+    fontSize: number,
+    fullBorderWidth: number,
+    minHeight = formElementsVariables().sizing.height,
+) => {
     const paddingVertical = getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth);
     const paddingHorizontal = getHorizontalPaddingForTextInput(height, fontSize, fullBorderWidth);
     return {
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
-        minHeight: unit(formElementsVariables().sizing.height),
+        minHeight: unit(minHeight),
         ...paddings({
             vertical: unit(paddingVertical),
             horizontal: unit(paddingHorizontal),

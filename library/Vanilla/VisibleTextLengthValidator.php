@@ -10,6 +10,7 @@ namespace Vanilla;
 use Vanilla\Invalid;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /*
  * Validates the Body field length by stripping any formatting code.
@@ -32,10 +33,9 @@ class VisibleTextLengthValidator {
      * @param FormatService $formatService Service to apply a formatter.
      * @param LocaleInterface $locale For translating error messages.
      */
-    public function __construct(int $maxTextLength, FormatService $formatService, LocaleInterface $locale) {
+    public function __construct(FormatService $formatService, LocaleInterface $locale) {
         $this->locale = $locale;
         $this->formatService = $formatService;
-        $this->setMaxTextLength($maxTextLength);
     }
 
     /**
@@ -69,6 +69,10 @@ class VisibleTextLengthValidator {
      * @return int
      */
     public function getMaxTextLength() : int {
+        if (!$this->maxTextLength) {
+            $config = \Gdn::getContainer()->get(ConfigurationInterface::class);
+            $this->maxTextLength = $config->get('Vanilla.Comment.MaxLength');
+        }
         return $this->maxTextLength;
     }
 

@@ -33,7 +33,7 @@ class VisibleTextLengthValidatorTest extends MinimalContainerTestCase {
     public function testVisibleTextLengthValidator(array $post, bool $isValid) {
         $formatService = \Gdn::formatService();
         $locale = \Gdn::locale();
-        $validator = new VisibleTextLengthValidator(self::TEST_MAX_COMMENT_LENGTH, $formatService, $locale);
+        $validator = new VisibleTextLengthValidator($formatService, $locale);
         $field = (object) array('Name' => 'Body', 'maxTextLength' => self::TEST_MAX_COMMENT_LENGTH);
         $result = $validator($post['Body'] ?? '', $field, $post);
         $actual = !($result instanceof Invalid);

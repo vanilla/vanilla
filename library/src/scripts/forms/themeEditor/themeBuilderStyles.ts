@@ -7,7 +7,8 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts, IFont } from "@library/styles/styleHelpersTypography";
-import { margins, negativeUnit, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, negativeUnit, unit } from "@library/styles/styleHelpers";
+import { themeEditorVariables } from "@themingapi/theme/themeEditorStyles";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -64,12 +65,22 @@ export const themeBuilderVariables = () => {
         input: {
             height: 28,
         },
+        panel: {
+            bg: color("#f5f6f7"),
+        },
     };
 };
 
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
+    // const editorVariables = themeEditorVariables();
+
+    const root = style({
+        padding: unit(16),
+        backgroundColor: colorOut(vars.panel.bg),
+        minHeight: percent(100),
+    });
 
     const inputBlock = style("inputBlock", {
         display: "flex",
@@ -152,6 +163,7 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     return {
+        root,
         inputBlock,
         label,
         undoWrap,

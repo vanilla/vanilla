@@ -70,13 +70,19 @@ export const tabClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
+    const titleBarVars = titleBarVariables();
 
-    const root = style({
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "stretch",
-        height: calc(`${percent(100)} - ${unit(vars.navHeight.height)}`),
-    });
+    const root = style(
+        {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "stretch",
+            height: calc(`100% - ${unit(vars.navHeight.height)}`),
+        },
+        mediaQueries.oneColumnDown({
+            height: calc(`100% - ${unit(titleBarVars.sizing.mobile.height)}`),
+        }),
+    );
 
     const tabsHandles = style("tabsHandles", {
         display: "flex",
@@ -130,7 +136,6 @@ export const tabClasses = useThemeCache(() => {
         },
 
         mediaQueries.oneColumnDown({
-            flexGrow: 0,
             $nest: {
                 label: {
                     minHeight: unit(formElementVariables.sizing.height),

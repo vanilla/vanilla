@@ -28,42 +28,60 @@ class VisibleTextLengthValidatorTest extends MinimalContainerTestCase {
      * @param array $post Testable POST array.
      * @param bool $isValid Expected result of the validator.
      *
-     * @dataProvider providePostContent()
+     * @dataProvider providePostContent
      */
     public function testVisibleTextLengthValidator(array $post, bool $isValid) {
         $formatService = \Gdn::formatService();
         $locale = \Gdn::locale();
         $validator = new VisibleTextLengthValidator(self::TEST_MAX_COMMENT_LENGTH, $formatService, $locale);
-        $result = $validator($post['Body'] ?? '', 'Body', $post);
-        $resultType = true;
-        if ($result instanceof Invalid) {
-            $resultType = false;
-        }
-        $this->assertEquals($isValid, $resultType);
+        $field = (object) array('Name' => 'Body', 'maxTextLength' => self::TEST_MAX_COMMENT_LENGTH);
+        $result = $validator($post['Body'] ?? '', $field, $post);
+        $actual = !($result instanceof Invalid);
+        $this->assertEquals($isValid, $actual);
     }
 
     /**
-     * Provide Markdown text to test counting text length with formatting stripped out.
+     * Provide formatted text to test counting text length with formatting stripped out.
      *
-     * @return array
+     * @return array Formatted posts with expected validation results (true or false).
      */
     public static function providePostContent() {
         return [
-            'Short Formatted' => [
-                ['Body' => '**Bold**', 'Format' => 'Markdown'],
+            'Empty Body' => [
+                ['Body' => '', 'Format' => 'markdown'],
                 true
             ],
-            'Short Mixed' => [
-                ['Body' => '**Bold** Text', 'Format' => 'Markdown'],
-                true
-            ],
-            'Long Mixed' => [
-                ['Body' => '**Bold** Text *italic*', 'Format' => 'Markdown'],
+            'Empty Format' => [
+                ['Body' => 'Word up!', 'Format' => ''],
                 false
             ],
-            'Empty Body' => [
-                ['Body' => '', 'Format' => 'Markdown'],
+            'Short Plain' => [
+                ['Body' => 'Word Up', 'Format' => 'markdown'],
                 true
+            ],
+            'Short Formatted' => [
+                ['Body' => '**Word** *Up*', 'Format' => 'markdown'],
+                true
+            ],
+            'Long Markdown' => [
+                ['Body' => '**Many** Words *Up*', 'Format' => 'markdown'],
+                false
+            ],
+            'Short Rich' => [
+                ['Body' => '[{"insert":"Word "},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"},{"insert":"\n"}]', 'Format' => 'rich'],
+                true
+            ],
+            'Long Rich' => [
+                ['Body' => '[{"insert":"Many words"},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"}]', 'Format' => 'rich'],
+                false
+            ],
+            'Short WYSYWIG' => [
+                ['Body' => '<p>Word<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>', 'Format' => 'wysiwyg'],
+                true
+            ],
+            'Long WYSYWIG' => [
+                ['Body' => '<p>Many words<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>', 'Format' => 'wysiwyg'],
+                false
             ],
         ];
     }

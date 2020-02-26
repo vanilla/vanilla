@@ -16,10 +16,10 @@ use Vanilla\Contracts\LocaleInterface;
  */
 class VisibleTextLengthValidator {
 
-    /** @var \Vanilla\Contracts\LocaleInterface */
+    /** @var LocaleInterface */
     private $locale;
 
-    /** @var \Vanilla\Formatting\FormatService */
+    /** @var FormatService */
     private $formatService;
 
     /** @var int */
@@ -32,7 +32,7 @@ class VisibleTextLengthValidator {
      * @param FormatService $formatService Service to apply a formatter.
      * @param LocaleInterface $locale For translating error messages.
      */
-    public function __construct(int $maxTextLength, \Vanilla\Formatting\FormatService $formatService, \Vanilla\Contracts\LocaleInterface $locale) {
+    public function __construct(int $maxTextLength, FormatService $formatService, LocaleInterface $locale) {
         $this->locale = $locale;
         $this->formatService = $formatService;
         $this->maxTextLength = $maxTextLength;
@@ -42,12 +42,16 @@ class VisibleTextLengthValidator {
      * Validate content length by stripping most meta-data and formatting.
      *
      * @param string $value User input content.
-     * @param string $field Field name where content is found.
+     * @param object $field Properties of field where content is found.
      * @param array $post POST array.
      * @return mixed Either an Invalid Object or the value.
      */
     private function validate($value, $field, $post) {
         $format = $post['Format'] ?? '';
+        if (!$format) {
+            $noFormatError = $this->locale->translate('%s Not Found');
+            return new Invalid(sprintf($noFormatError, 'Format'));
+        }
         $stringLength = $this->formatService->getVisibleTextLength($value, $format);
         $diff = $stringLength - ($field->maxTextLength ?? $this->maxTextLength);
         if ($diff <= 0) {
@@ -63,7 +67,7 @@ class VisibleTextLengthValidator {
      * Execute validate function for visible text validator.
      *
      * @param string $value User input content.
-     * @param string $field Field name where content is found.
+     * @param object $field Properties of field where content is found.
      * @param array $row POST array.
      * @return mixed Either an Invalid Object or the value.
      */

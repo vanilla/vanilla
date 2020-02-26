@@ -1275,6 +1275,8 @@ class CommentModel extends Gdn_Model {
      */
     public function normalizeRow(array $row, $expand = []): array {
         $this->formatField($row, "Body", $row["Format"]);
+        $row['Url'] = commentUrl($row);
+        $row['Attributes'] = new Attributes($row['Attributes']);
         $scheme = new CamelCaseScheme;
         $result = $scheme->convertArrayKeys($row);
         return $result;
@@ -1631,7 +1633,7 @@ class CommentModel extends Gdn_Model {
 
         // Clear the page cache.
         $this->removePageCache($comment['DiscussionID']);
-        
+
         if ($comment) {
             $dataObject = (object)$comment;
             $this->calculate($dataObject);

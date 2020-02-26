@@ -8,7 +8,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { color, percent } from "csx";
 import { fonts, IFont } from "@library/styles/styleHelpersTypography";
 import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
-import { themeEditorVariables } from "@themingapi/theme/themeEditorStyles";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.

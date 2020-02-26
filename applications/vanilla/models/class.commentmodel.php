@@ -1238,7 +1238,7 @@ class CommentModel extends Gdn_Model {
         $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
         if ($comment) {
             $commentEvent = $this->eventFromRow(
-                (array)$comment,
+                $comment,
                 $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE
             );
             $this->getEventManager()->dispatch($commentEvent);

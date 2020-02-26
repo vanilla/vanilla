@@ -1235,7 +1235,7 @@ class CommentModel extends Gdn_Model {
                 $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
             }
         }
-        $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY): false;
+        $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
         if ($comment) {
             $commentEvent = $this->eventFromRow(
                 (array)$comment,

@@ -45,7 +45,6 @@ interface IProps {
     hasSubNav?: boolean;
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
     extraBurgerNavigation?: React.ReactNode;
-    disablePointerEvent?: boolean;
 }
 
 export enum LogoAlignment {
@@ -184,7 +183,6 @@ export default function TitleBar(_props: IProps) {
                             onCloseSuggestions={() => setIsShowingSuggestions(false)}
                             buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
                             clearButtonClass={classes.clearButtonClass}
-                            disablePointerEvent={props.disablePointerEvent}
                         />
                         {meBox}
                     </ConditionalWrap>

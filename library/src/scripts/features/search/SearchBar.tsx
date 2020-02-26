@@ -62,7 +62,6 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     contentClass?: string;
     buttonBaseClass?: ButtonTypes;
     valueContainerClasses?: string;
-    disablePointerEvent?: boolean;
 }
 
 interface IState {
@@ -153,10 +152,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Otherwise falls back to what is determined by react-select.
      */
     private get isMenuVisible(): boolean | undefined {
-        return this.state.forceMenuClosed ||
-            this.props.value.length === 0 ||
-            this.props.disableAutocomplete ||
-            this.props.disablePointerEvent
+        return this.state.forceMenuClosed || this.props.value.length === 0 || this.props.disableAutocomplete
             ? false
             : undefined;
     }
@@ -344,13 +340,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Handle the form submission.
      */
     private onFormSubmit = (event: React.FormEvent) => {
-        if (this.props.disablePointerEvent) {
-            event.preventDefault();
-            return false;
-        } else {
-            event.preventDefault();
-            this.props.onSearch();
-        }
+        event.preventDefault();
+        this.props.onSearch();
     };
 
     /**

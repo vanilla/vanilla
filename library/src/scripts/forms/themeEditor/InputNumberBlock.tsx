@@ -7,37 +7,38 @@
 import React, { useMemo } from "react";
 import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { ColorHelper } from "csx";
-import { IInputNumber } from "@library/forms/themeEditor/NumberInput";
+import { IInputNumber } from "@library/forms/themeEditor/InputNumber";
+import InputNumber from "@library/forms/themeEditor/InputNumber";
 
-export interface IPresetNumberInput extends Omit<Omit<IInputNumber, "inputID">, "labelID"> {
-    defaultValue?: ColorHelper;
+export interface IPresetInputNumber extends Omit<IInputNumber, "inputID" | "labelID"> {
+    defaultValue?: number;
 }
 
-export interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}
+export interface IPresetThemeEditorInputBlock extends Omit<IThemeBuilderBlock, "children" | "labelID" | "inputID"> {}
 
 export interface INumberInputBlock {
-    inputNumber: IInputNumber;
+    inputNumber: IPresetInputNumber;
     inputBlock: IPresetThemeEditorInputBlock;
 }
 
-export default function NumberInputBlock(props: INumberInputBlock) {
+export default function InputNumberBlock(props: INumberInputBlock) {
     const inputID = useMemo(() => {
-        return uniqueIDFromPrefix("themeBuilderNumberPickerInput");
+        return uniqueIDFromPrefix("numberPickerInput");
     }, []);
     const labelID = useMemo(() => {
-        return uniqueIDFromPrefix("themeBuilderNumberPickerLabel");
+        return uniqueIDFromPrefix("numberPickerLabel");
     }, []);
 
     return (
         <ThemeBuilderBlock
+            undo={true}
             {...{
                 ...props.inputBlock,
                 inputID,
                 labelID,
             }}
         >
-            <NumberInputBlock
+            <InputNumber
                 {...{
                     ...props.inputNumber,
                     inputID,

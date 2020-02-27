@@ -1279,7 +1279,7 @@ class CommentModel extends Gdn_Model {
         $this->formatField($row, "Body", $row["Format"]);
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes']);
-        $scheme = new CamelCaseScheme;
+        $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;
     }

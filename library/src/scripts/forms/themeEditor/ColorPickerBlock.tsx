@@ -11,7 +11,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
 
 export interface IPresetColorPicker extends Omit<Omit<IColorPicker, "inputID">, "labelID"> {
-    defaultValue?: string;
+    defaultValue?: ColorHelper;
 }
 
 export interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}

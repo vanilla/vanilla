@@ -24,9 +24,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const buttonGlobals = buttonGlobalVariables();
     const form = useFormik({
         initialValues: {},
-        onSubmit: values => {
-            // co<form action="#" class="themeBuilder-root_femt1sx">nsole.log(values);
-        },
+        onSubmit: values => {},
     });
     return (
         <FormikProvider value={form}>

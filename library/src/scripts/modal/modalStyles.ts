@@ -171,6 +171,7 @@ export const modalClasses = useThemeCache(() => {
             },
             "&.isXL": {
                 width: unit(vars.sizing.xl),
+                height: percent(100),
                 maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isLarge": {

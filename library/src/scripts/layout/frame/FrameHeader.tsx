@@ -22,6 +22,7 @@ export interface IFrameHeaderProps extends ICommonHeadingProps {
     srOnlyTitle?: boolean;
     titleID?: string;
     children?: React.ReactNode;
+    borderless?: boolean;
 }
 
 /**
@@ -62,7 +63,14 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         }
 
         return (
-            <header className={classNames("frameHeader", this.props.className, classes.root)}>
+            <header
+                className={classNames(
+                    "frameHeader",
+                    this.props.className,
+                    classes.root,
+                    this.props.borderless && classes.rootBorderLess,
+                )}
+            >
                 <Heading
                     id={this.props.titleID}
                     title={this.props.title}

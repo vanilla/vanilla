@@ -1015,7 +1015,7 @@ class Gdn_Format {
 
             // Unquoted mention.
             if (!$mention && !empty($str)) {
-                $parts2 = preg_split('`([\s.,;?!:\'])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $parts2 = preg_split('`&nbsp;|([\s.,;?!:\'])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
                 $suffix = val(1, $parts2, '') . val(2, $parts2, '');
             }

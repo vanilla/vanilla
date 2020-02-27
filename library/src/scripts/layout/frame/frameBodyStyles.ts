@@ -44,6 +44,13 @@ export const frameBodyClasses = useThemeCache(() => {
         },
     });
 
+    const framePaddings = style("framePaddings", {
+        ...paddings({
+            left: vars.spacing.padding,
+            right: vars.spacing.padding,
+        }),
+    });
+
     const noContentMessage = style("noContentMessage", {
         ...paddings({
             top: vars.header.spacing * 2,
@@ -65,6 +72,7 @@ export const frameBodyClasses = useThemeCache(() => {
     });
     return {
         root,
+        framePaddings,
         noContentMessage,
         contents,
     };

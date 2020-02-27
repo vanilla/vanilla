@@ -5,14 +5,28 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, unit, fonts, paddings, borders, negative, srOnly, IFont } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    fonts,
+    paddings,
+    borders,
+    negative,
+    srOnly,
+    IFont,
+    sticky,
+    extendItemContainer,
+    flexHelper,
+} from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, viewHeight } from "csx";
+import { percent, viewHeight, calc } from "csx";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const titlebarVars = titleBarVariables();
     const makeVars = variableFactory("onlineTabs");
 
     const colors = makeVars("colors", {
@@ -30,6 +44,10 @@ export const tabsVariables = useThemeCache(() => {
         },
     });
 
+    const navHeight = makeVars("navHeight", {
+        height: titlebarVars.sizing.height,
+    });
+
     const border = makeVars("border", {
         width: globalVars.border.width,
         color: globalVars.border.color,
@@ -43,6 +61,7 @@ export const tabsVariables = useThemeCache(() => {
     return {
         colors,
         border,
+        navHeight,
     };
 });
 
@@ -52,13 +71,19 @@ export const tabClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
+    const titleBarVars = titleBarVariables();
 
-    const root = style({
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "stretch",
-        height: viewHeight(90),
-    });
+    const root = style(
+        {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "stretch",
+            height: calc(`100% - ${unit(vars.navHeight.height)}`),
+        },
+        mediaQueries.oneColumnDown({
+            height: calc(`100% - ${unit(titleBarVars.sizing.mobile.height)}`),
+        }),
+    );
 
     const tabsHandles = style("tabsHandles", {
         display: "flex",
@@ -71,16 +96,22 @@ export const tabClasses = useThemeCache(() => {
 
     const tabList = style("tabList", {
         display: "flex",
-        width: percent(100),
+        // Offset for the outer borders.
+        ...extendItemContainer(globalVariables().border.width),
         justifyContent: "space-between",
         alignItems: "stretch",
+        background: colorOut(vars.colors.bg),
+        ...sticky(),
+        top: 0,
+        zIndex: 1,
     });
+
     const tab = style(
         "tab",
         {
             ...userSelect(),
             position: "relative",
-            width: percent(25),
+            flex: 1,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             border: "1px solid #bfcbd8",
@@ -90,7 +121,11 @@ export const tabClasses = useThemeCache(() => {
             minHeight: unit(28),
             fontSize: unit(13),
             transition: "color 0.3s ease",
+            ...flexHelper().middle(),
             $nest: {
+                "& > *": {
+                    ...paddings({ horizontal: globalVars.gutter.half }),
+                },
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
                 },
@@ -106,7 +141,6 @@ export const tabClasses = useThemeCache(() => {
         },
 
         mediaQueries.oneColumnDown({
-            flexGrow: 0,
             $nest: {
                 label: {
                     minHeight: unit(formElementVariables.sizing.height),
@@ -120,6 +154,7 @@ export const tabClasses = useThemeCache(() => {
         flexGrow: 1,
         height: percent(100),
         flexDirection: "column",
+        position: "relative",
     });
 
     const panel = style("panel", {

@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 
 export const STORY_IMAGE =
@@ -23,4 +24,15 @@ export const STORY_USER: IUserFragment = {
     dateLastActive: "2016-07-25 17:51:15",
     photoUrl: "https://user-images.githubusercontent.com/1770056/74098133-6f625100-4ae2-11ea-8a9d-908d70030647.png",
     label: "User Label",
+};
+
+export const StoryTextContent = (props: { firstTitle?: string }) => {
+    return (
+        <div style={{ padding: 16 }}>
+            <h2>{props.firstTitle ?? STORY_IPSUM_SHORT}</h2>
+            <p>{STORY_IPSUM_LONG}</p>
+            <h2>{STORY_IPSUM_SHORT}</h2>
+            <p>{STORY_IPSUM_LONG}</p>
+        </div>
+    );
 };

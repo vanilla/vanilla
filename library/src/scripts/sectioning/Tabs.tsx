@@ -2,11 +2,16 @@ import React, { ReactElement, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabClasses } from "@library/sectioning/TabStyles";
 import classNames from "classnames";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { ErrorIcon, WarningIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IData {
     label: string;
     panelData: string;
     contents: React.ReactNode;
+    error?: IError;
 }
 interface IProps {
     data: IData[];
@@ -30,6 +35,13 @@ export function Tabs(props: IProps) {
                     return (
                         <Tab key={index} className={classNames(classes.tab, { [classes.isActive]: isActive })}>
                             <div>{tab.label}</div>
+                            {tab.error && (
+                                <ToolTip label={tab.error.message}>
+                                    <ToolTipIcon>
+                                        <WarningIcon className={iconClasses().errorFgColor} />
+                                    </ToolTipIcon>
+                                </ToolTip>
+                            )}
                         </Tab>
                     );
                 })}

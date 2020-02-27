@@ -49,7 +49,7 @@ interface FormatInterface {
      * @param string $content
      * @return int
      */
-    public function getVisibleTextLength(string $content): int;
+    public function getPlainTextLength(string $content): int;
 
     /**
      * Render a version of the content   suitable to be quoted in other content.

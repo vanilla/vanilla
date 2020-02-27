@@ -88,10 +88,10 @@ class FormatService {
      *
      * @return int The number of visible characters in $content.
      */
-    public function getVisibleTextLength(string $content, ?string $format): int {
+    public function getPlainTextLength(string $content, ?string $format): int {
         return $this
             ->getFormatter($format)
-            ->getVisibleTextLength($content);
+            ->getPlainTextLength($content);
     }
 
     /**

@@ -10,12 +10,11 @@ namespace Vanilla;
 use Vanilla\Invalid;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Contracts\ConfigurationInterface;
 
 /*
  * Validates the Body field length by stripping any formatting code.
  */
-class VisibleTextLengthValidator {
+class PlainTextLengthValidator {
 
     /** @var LocaleInterface */
     private $locale;
@@ -23,11 +22,8 @@ class VisibleTextLengthValidator {
     /** @var FormatService */
     private $formatService;
 
-    /** @var int */
-    private $maxTextLength;
-
     /**
-     * VisibleTextLengthValidator constructor.
+     * PlainTextLengthValidator constructor.
      *
      * @param FormatService $formatService Service to apply a formatter.
      * @param LocaleInterface $locale For translating error messages.
@@ -51,38 +47,21 @@ class VisibleTextLengthValidator {
             $noFormatError = $this->locale->translate('%s Not Found');
             return new Invalid(sprintf($noFormatError, 'Format'));
         }
-        $stringLength = $this->formatService->getVisibleTextLength($value, $format);
-        $diff = $stringLength - ($field->maxTextLength ?? $this->getMaxTextLength());
-        if ($diff <= 0) {
+
+        $maxPlainTextLength = $field->maxPlainTextLength ?? null;
+        if (!is_numeric($maxPlainTextLength)) {
+            throw new \InvalidArgumentException("Invalid max plain-text length specified in field schema.");
+        }
+
+        $plainTextLength = $this->formatService->getPlainTextLength($value, $format);
+        if ($plainTextLength <= $maxPlainTextLength) {
             return $value;
         } else {
             $validationMessage = $this->locale->translate('ValidateLength' ?? '');
             $fieldName = $this->locale->translate($field->Name ?? '');
+            $diff = $plainTextLength - $maxPlainTextLength;
             return new Invalid(sprintf($validationMessage, $fieldName, abs($diff)));
         }
-    }
-
-    /**
-     * Get the Maximum Text Length.
-     *
-     * @return int
-     */
-    public function getMaxTextLength(): int {
-        if (!$this->maxTextLength) {
-            $config = \Gdn::getContainer()->get(ConfigurationInterface::class);
-            $this->maxTextLength = $config->get('Vanilla.Comment.MaxLength');
-        }
-        return $this->maxTextLength;
-    }
-
-    /**
-     * Set the Maximum Text Length.
-     *
-     * @param int $maxTextLength
-     * @return void
-     */
-    public function setMaxTextLength(int $maxTextLength): void {
-        $this->maxTextLength = $maxTextLength;
     }
 
     /**

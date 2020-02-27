@@ -60,7 +60,7 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function getVisibleTextLength(string $content): int {
+    public function getPlainTextLength(string $content): int {
         return 0;
     }
 

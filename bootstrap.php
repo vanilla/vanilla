@@ -293,10 +293,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
 
     ->rule(Gdn_Validation::class)
-    ->addCall('addRule', ['visibleTextLength', new Reference(\Vanilla\VisibleTextLengthValidator::class)])
-
-    ->rule(\Vanilla\VisibleTextLengthValidator::class)
-    ->setConstructorArgs(['maxTextLength' => ContainerUtils::config('Vanilla.Comment.MaxLength')])
+    ->addCall('addRule', ['plainTextLength', new Reference(\Vanilla\PlainTextLengthValidator::class)])
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)

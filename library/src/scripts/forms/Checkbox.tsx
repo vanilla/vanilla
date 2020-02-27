@@ -18,7 +18,7 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    label: string;
+    label: React.ReactNode;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
@@ -54,7 +54,6 @@ export default function CheckBox(props: IProps) {
                 defaultChecked={props.defaultChecked}
                 disabled={props.disabled}
                 tabIndex={0}
-                title={props.tooltipLabel ? props.label : undefined}
             />
             {props.tooltipLabel && props.label ? <ToolTip label={props.label}>{icon}</ToolTip> : icon}
             {props.label && (

@@ -9,6 +9,7 @@ import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utili
 import { checkRadioClasses } from "./checkRadioStyles";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
+import { srOnly, visibility } from "@library/styles/styleHelpers";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -20,6 +21,7 @@ interface IProps extends IOptionalComponentID {
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
+    srOnlyLabel?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
@@ -50,7 +52,10 @@ export default function CheckBox(props: IProps) {
                 </svg>
             </span>
             {props.label && (
-                <span id={labelID} className={classes.label}>
+                <span
+                    id={labelID}
+                    className={classNames(classes.label, props.srOnlyLabel && visibility().visuallyHidden)}
+                >
                     {props.label}
                 </span>
             )}

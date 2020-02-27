@@ -17,13 +17,14 @@ use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
 use Vanilla\Community\Events\CommentEvent;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends Gdn_Model {
+class CommentModel extends Gdn_Model implements FormatFieldInterface {
 
     use \Vanilla\FloodControlTrait;
 

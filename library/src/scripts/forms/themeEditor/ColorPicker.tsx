@@ -24,7 +24,7 @@ export interface IColorPicker {
     inputID: string;
     variableID: string;
     labelID: string;
-    defaultValue?: string;
+    defaultValue?: ColorHelper;
     inputClass?: string;
     errors?: IErrorWithDefault[]; // Uses default message if true
 }
@@ -51,7 +51,6 @@ export default function ColorPicker(props: IColorPicker) {
     const initialValidColor =
         props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : "#000";
 
-    // console.log("initialValidColor: ", initialValidColor);
     const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
     const [validColor, setValidColor] = useState(initialValidColor);
 
@@ -84,7 +83,7 @@ export default function ColorPicker(props: IColorPicker) {
         }
     };
 
-    const textValue = selectedColor.value !== undefined ? selectedColor.value : props.defaultValue || "";
+    const textValue = selectedColor.value !== undefined ? selectedColor.value : props.defaultValue?.toHexString() || "";
     const hasError = !isValidColor(textValue);
 
     return (
@@ -127,7 +126,7 @@ export default function ColorPicker(props: IColorPicker) {
                     tabIndex={-1}
                     baseClass={ButtonTypes.CUSTOM}
                 >
-                    <span className={visibility().visuallyHidden}>{color(validColor).toString()}</span>
+                    <span className={visibility().visuallyHidden}>{color(validColor).toHexString()}</span>
                 </Button>
             </span>
             {selectedColorMeta.error && (

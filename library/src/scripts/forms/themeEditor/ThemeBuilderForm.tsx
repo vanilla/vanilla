@@ -12,7 +12,6 @@ import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
 import { t } from "@vanilla/i18n/src";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
@@ -35,7 +34,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: colorOut(global.mainColors.primary),
+                        defaultValue: global.mainColors.primary,
                     }}
                     inputBlock={{ label: t("Brand Color") }}
                 />
@@ -44,7 +43,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.body.backgroundImage.color",
-                            defaultValue: colorOut(global.body.backgroundImage.color),
+                            defaultValue: global.body.backgroundImage.color,
                         }}
                         inputBlock={{ label: t("Background Color") }}
                     />
@@ -52,7 +51,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
-                            defaultValue: colorOut(global.mainColors.fg),
+                            defaultValue: global.mainColors.fg,
                         }}
                         inputBlock={{ label: t("Text") }}
                     />
@@ -60,7 +59,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.links.colors.default",
-                            defaultValue: colorOut(global.links.colors.default),
+                            defaultValue: global.links.colors.default,
                         }}
                         inputBlock={{ label: t("Links") }}
                     />
@@ -71,14 +70,14 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
-                                defaultValue: colorOut(buttonGlobals.colors.primary),
+                                defaultValue: buttonGlobals.colors.primary,
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
-                                defaultValue: colorOut(buttonGlobals.colors.primaryContrast),
+                                defaultValue: buttonGlobals.colors.primaryContrast,
                             }}
                             inputBlock={{ label: t("Text") }}
                         />
@@ -88,14 +87,14 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
-                                defaultValue: colorOut(buttonGlobals.colors.bg),
+                                defaultValue: buttonGlobals.colors.bg,
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
-                                defaultValue: colorOut(buttonGlobals.colors.fg),
+                                defaultValue: buttonGlobals.colors.fg,
                             }}
                             inputBlock={{ label: t("Text") }}
                         />

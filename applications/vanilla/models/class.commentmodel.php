@@ -1272,10 +1272,9 @@ class CommentModel extends Gdn_Model {
      * Given a database row, massage the data into a more externally-useful format.
      *
      * @param array $row
-     * @param array $expand
      * @return array
      */
-    public function normalizeRow(array $row, $expand = []): array {
+    public function normalizeRow(array $row): array {
         $this->formatField($row, "Body", $row["Format"]);
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes']);

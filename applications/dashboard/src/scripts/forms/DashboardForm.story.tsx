@@ -96,16 +96,6 @@ function SimpleInputItems() {
         </>
     );
 }
-export function FormGroup() {
-    return (
-        <StoryContent>
-            <StoryHeading depth={1}>Basic Form Inputs & Groups</StoryHeading>
-            <form>
-                <DashboardFormList></DashboardFormList>
-            </form>
-        </StoryContent>
-    );
-}
 
 const longDescription =
     "Here's some info text for this field. I'm giving a little description of what this field does and how it affects the user.";

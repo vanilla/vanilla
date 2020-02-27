@@ -9,7 +9,7 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { percent } from "csx";
 import { storiesOf } from "@storybook/react";
-import ThemeBuilderForm from "@library/forms/themeEditor/ThemeBuilderForm";
+import ThemeBuilderForm from "@themingapi/theme/ThemeBuilderForm";
 
 const story = storiesOf("Theme", module);
 

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts, IFont } from "@library/styles/styleHelpersTypography";
 import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";

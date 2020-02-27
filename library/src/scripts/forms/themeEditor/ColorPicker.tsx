@@ -16,6 +16,7 @@ import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
+import { string } from "prop-types";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
@@ -83,7 +84,12 @@ export default function ColorPicker(props: IColorPicker) {
         }
     };
 
-    const textValue = selectedColor.value !== undefined ? selectedColor.value : props.defaultValue?.toHexString() || "";
+    const textValue =
+        selectedColor.value !== undefined
+            ? selectedColor.value
+            : props.defaultValue && isValidColor(props.defaultValue)
+            ? props.defaultValue.toHexString()
+            : "";
     const hasError = !isValidColor(textValue);
 
     return (

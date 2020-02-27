@@ -16,6 +16,7 @@ import {
     IFont,
     sticky,
     extendItemContainer,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -120,7 +121,11 @@ export const tabClasses = useThemeCache(() => {
             minHeight: unit(28),
             fontSize: unit(13),
             transition: "color 0.3s ease",
+            ...flexHelper().middle(),
             $nest: {
+                "& > *": {
+                    ...paddings({ horizontal: globalVars.gutter.half }),
+                },
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
                 },

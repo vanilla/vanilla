@@ -59,7 +59,8 @@ story.add("Inputs", () => {
                 <Checkbox label="Disabled" disabled />
                 <Checkbox label="Checked & Disabled" defaultChecked disabled />
             </CheckboxGroup>
-
+            <StoryHeading>Hidden Label</StoryHeading>
+            <Checkbox label="Tooltip Label" tooltipLabel />
             <StoryHeading>Checkboxes - In a Group</StoryHeading>
             <CheckboxGroup label={"A sleuth of check boxes"}>
                 <Checkbox label="Option A" />

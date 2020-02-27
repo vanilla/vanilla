@@ -248,6 +248,14 @@ export const isValidColor = colorValue => {
 };
 
 /**
+ * Check if parsed int is the same as given value
+ * @param number
+ */
+export const isValidInteger = number => {
+    return number && number.toString() === parseInt(number).toString();
+};
+
+/**
  * Convert a color string into an instance.
  * @param colorString
  */

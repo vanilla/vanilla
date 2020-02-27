@@ -161,8 +161,8 @@ function stripUndefinedKeys(obj: any) {
     return obj;
 }
 
-const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
-const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
+const rgbRegex = /^rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)$/;
+const hslRegex = /^hsla?\((0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%)\)$/;
 const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**

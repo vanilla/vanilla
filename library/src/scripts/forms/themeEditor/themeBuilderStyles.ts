@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts, IFont } from "@library/styles/styleHelpersTypography";
-import { margins, negativeUnit, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -19,9 +19,9 @@ export const themeBuilderVariables = () => {
         },
         width: 160,
         label: {
-            family: fontFamily,
             color: textColor,
             size: 13,
+            family: fontFamily,
         },
         title: {
             family: fontFamily,
@@ -64,18 +64,37 @@ export const themeBuilderVariables = () => {
         input: {
             height: 28,
         },
+        panel: {
+            bg: color("#f5f6f7"),
+            padding: 16,
+        },
+        font: {
+            color: color("#3c4146"),
+            family: fontFamily,
+        },
     };
 };
 
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
+    // const editorVariables = themeEditorVariables();
+
+    const root = style({
+        backgroundColor: colorOut(vars.panel.bg),
+        minHeight: percent(100),
+        paddingTop: unit(vars.panel.padding),
+        fontFamily: vars.label.family,
+    });
 
     const inputBlock = style("inputBlock", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
         marginBottom: unit(8),
+        ...paddings({
+            horizontal: unit(vars.panel.padding),
+        }),
     });
 
     const label = style("label", {
@@ -110,6 +129,9 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...fonts(vars.title),
         textAlign: "center",
         marginBottom: unit(20),
+        ...paddings({
+            horizontal: unit(vars.panel.padding),
+        }),
     });
 
     const section = style("section", {
@@ -124,6 +146,9 @@ export const themeBuilderClasses = useThemeCache(() => {
             top: 6,
             bottom: 14,
         }),
+        ...paddings({
+            horizontal: unit(vars.panel.padding),
+        }),
     });
 
     const subGroupSection = style("subGroupSection", {});
@@ -132,6 +157,9 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...margins({
             top: 20,
             bottom: 12,
+        }),
+        ...paddings({
+            horizontal: unit(vars.panel.padding),
         }),
     });
 
@@ -152,6 +180,7 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     return {
+        root,
         inputBlock,
         label,
         undoWrap,

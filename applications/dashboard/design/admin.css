@@ -8948,7 +8948,7 @@ button.close {
 .table-summary td, .table-data th,
 .table-data td {
   overflow: hidden;
-  padding: 8px 12px;
+  padding: 8px 18px;
   line-height: 1.5;
   vertical-align: middle;
   border-bottom: 1px solid #f4f6fb;
@@ -8974,7 +8974,8 @@ button.close {
 .table-data-head td,
 .table-data thead td {
   width: 100px;
-  padding: 9px 13.5px;
+  padding: 9px 18px;
+  padding-left: 17px;
   border-right: 1px solid #eee;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #f4f6fb;
@@ -8982,6 +8983,11 @@ button.close {
   font-weight: 600;
   font-size: 12px;
   line-height: 1.3333333333;
+}
+.table-data-head th:first-child, .table-data thead th:first-child,
+.table-data-head td:first-child,
+.table-data thead td:first-child {
+  padding-left: 18px;
 }
 .table-data-head th:last-child, .table-data thead th:last-child,
 .table-data-head td:last-child,
@@ -9021,7 +9027,7 @@ button.close {
 .table-data-head th.column-checkbox, .table-data thead th.column-checkbox,
 .table-data-head td.column-checkbox,
 .table-data thead td.column-checkbox {
-  width: 42px;
+  width: 54px;
 }
 
 .tj-meta,
@@ -9105,7 +9111,7 @@ button.close {
   min-width: 120px;
 }
 .table-checkbox-grid tbody td {
-  padding: 9px 13.5px;
+  padding: 9px 18px;
   text-align: center;
 }
 @media screen and (max-width: 575px) {

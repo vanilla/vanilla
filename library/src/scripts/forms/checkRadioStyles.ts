@@ -178,7 +178,6 @@ export const checkRadioClasses = useThemeCache(() => {
         $nest: {
             [`&:hover:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
             [`&.focus-visible:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
-            [`&:focus:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
             [`&:checked + .${iconContainer}`]: {
                 borderColor: colorOut(vars.main.checked.border),
                 color: colorOut(vars.main.checked.fg),
@@ -191,7 +190,6 @@ export const checkRadioClasses = useThemeCache(() => {
             },
             [`&:hover:checked:not(:disabled) + .${iconContainer}`]: checkedStateStyles,
             [`&.focus-visible:checked:not(:disabled) + .${iconContainer}`]: checkedStateStyles,
-            [`&:focus:checked:not(:disabled) + .${iconContainer}`]: checkedStateStyles,
             [`&:disabled ~ .${label}`]: disabledInput(),
             [`&:disabled + .${iconContainer}`]: disabledInput(),
         },

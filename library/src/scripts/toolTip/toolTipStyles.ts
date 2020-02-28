@@ -40,6 +40,7 @@ export const toolTipClasses = useThemeCache(() => {
 
     const noPointerContent = style("content", {
         position: "relative",
+        display: "inline-flex",
         $nest: {
             "& *": {
                 pointerEvents: "none",

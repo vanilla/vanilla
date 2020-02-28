@@ -65,7 +65,7 @@ export function TabWithErrors() {
                         label: "Tab 4",
                         panelData: "",
                         disabled: true,
-                        error: (
+                        warning: (
                             <>
                                 My tab is <strong>DISABLED</strong>.
                             </>

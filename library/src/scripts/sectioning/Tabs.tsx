@@ -12,6 +12,7 @@ interface IData {
     panelData: string;
     contents: React.ReactNode;
     error?: React.ReactNode;
+    warning?: React.ReactNode;
     disabled?: boolean;
 }
 interface IProps {
@@ -40,10 +41,14 @@ export function Tabs(props: IProps) {
                             disabled={tab.disabled}
                         >
                             <div>{tab.label}</div>
-                            {tab.error && (
-                                <ToolTip label={tab.error}>
+                            {(tab.error || tab.warning) && (
+                                <ToolTip label={tab.error || tab.warning}>
                                     <ToolTipIcon>
-                                        <WarningIcon className={iconClasses().errorFgColor} />
+                                        <WarningIcon
+                                            className={
+                                                tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
+                                            }
+                                        />
                                     </ToolTipIcon>
                                 </ToolTip>
                             )}

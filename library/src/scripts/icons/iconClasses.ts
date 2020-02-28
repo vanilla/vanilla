@@ -316,11 +316,16 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.error.fg),
     });
 
+    const warningFgColor = style("warningFgColor", {
+        color: colorOut(globalVars.messageColors.warning.fg),
+    });
+
     return {
         standard,
         newFolder,
         warning,
         errorFgColor,
+        warningFgColor,
         fileType,
         attachmentError,
         vanillaLogo,

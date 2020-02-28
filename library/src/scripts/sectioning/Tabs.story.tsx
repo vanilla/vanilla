@@ -44,9 +44,11 @@ export function TabWithErrors() {
                     {
                         label: "Tab 1",
                         panelData: "",
-                        error: {
-                            message: "Name is a required field.",
-                        },
+                        error: (
+                            <>
+                                <strong>Name</strong> is a required field.
+                            </>
+                        ),
                         contents: <StoryTextContent firstTitle={"Hello Tab 1"} />,
                     },
                     {
@@ -58,6 +60,17 @@ export function TabWithErrors() {
                         label: "Tab 3",
                         panelData: "",
                         contents: <StoryTextContent firstTitle={"Hello Tab 3"} />,
+                    },
+                    {
+                        label: "Tab 4",
+                        panelData: "",
+                        disabled: true,
+                        warning: (
+                            <>
+                                My tab is <strong>DISABLED</strong>.
+                            </>
+                        ),
+                        contents: <StoryTextContent firstTitle={"Tab 4 (Disabled)"} />,
                     },
                 ]}
             />

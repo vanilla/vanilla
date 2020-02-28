@@ -29,13 +29,8 @@ import { StorySmallContent } from "@library/storybook/StorySmallContent";
 
 const story = storiesOf("Form Elements", module);
 
-// Radio as tabs
-
-const doNothing = () => {};
-
 story.add("Inputs", () => {
     let activeTab = "Tab A";
-    const classesInputBlock = inputBlockClasses();
 
     const doNothing = () => {
         return;
@@ -57,19 +52,27 @@ story.add("Inputs", () => {
         <StoryContent>
             <StoryHeading depth={1}>Form Elements</StoryHeading>
             <StoryHeading>Checkbox</StoryHeading>
-            <Checkbox label={t("Simple Checkbox")} />
+            <CheckboxGroup label={"Check Box States"}>
+                <Checkbox label="Normal" />
+                <Checkbox label="Hover/Focus" fakeFocus />
+                <Checkbox label="Checked" defaultChecked />
+                <Checkbox label="Disabled" disabled />
+                <Checkbox label="Checked & Disabled" defaultChecked disabled />
+            </CheckboxGroup>
+            <StoryHeading>Hidden Label</StoryHeading>
+            <Checkbox label="Tooltip Label" tooltipLabel />
             <StoryHeading>Checkboxes - In a Group</StoryHeading>
             <CheckboxGroup label={"A sleuth of check boxes"}>
-                <Checkbox label={t("Option A")} />
-                <Checkbox label={t("Option B")} />
-                <Checkbox label={t("Option C")} />
-                <Checkbox label={t("Option D")} />
+                <Checkbox label="Option A" />
+                <Checkbox label="Option B" />
+                <Checkbox label="Option C" />
+                <Checkbox label="Option D" />
             </CheckboxGroup>
             <StoryHeading>Radio Buttons - In a Group</StoryHeading>
             <RadioButtonGroup label={"Gaggle of radio buttons"}>
-                <RadioButton label={"Option A"} name={radioButtonGroup1} />
+                <RadioButton label={"Option A"} name={radioButtonGroup1} defaultChecked />
                 <RadioButton label={"Option B"} name={radioButtonGroup1} />
-                <RadioButton label={"Option C"} name={radioButtonGroup1} />
+                <RadioButton label={"Option C (hovered)"} name={radioButtonGroup1} fakeFocus />
                 <RadioButton label={"Option D"} name={radioButtonGroup1} />
                 <RadioButton label={"Option E"} name={radioButtonGroup1} />
             </RadioButtonGroup>

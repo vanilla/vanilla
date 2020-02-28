@@ -11,7 +11,9 @@ interface IData {
     label: string;
     panelData: string;
     contents: React.ReactNode;
-    error?: IError;
+    error?: React.ReactNode;
+    warning?: React.ReactNode;
+    disabled?: boolean;
 }
 interface IProps {
     data: IData[];
@@ -33,12 +35,20 @@ export function Tabs(props: IProps) {
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
-                        <Tab key={index} className={classNames(classes.tab, { [classes.isActive]: isActive })}>
+                        <Tab
+                            key={index}
+                            className={classNames(classes.tab, { [classes.isActive]: isActive })}
+                            disabled={tab.disabled}
+                        >
                             <div>{tab.label}</div>
-                            {tab.error && (
-                                <ToolTip label={tab.error.message}>
+                            {(tab.error || tab.warning) && (
+                                <ToolTip label={tab.error || tab.warning}>
                                     <ToolTipIcon>
-                                        <WarningIcon className={iconClasses().errorFgColor} />
+                                        <WarningIcon
+                                            className={
+                                                tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
+                                            }
+                                        />
                                     </ToolTipIcon>
                                 </ToolTip>
                             )}

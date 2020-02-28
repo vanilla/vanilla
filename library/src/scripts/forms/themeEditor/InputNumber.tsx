@@ -46,9 +46,9 @@ export default function InputNumber(props: IInputNumber) {
      * Check if is valid number, respecting parameters.
      * @param number
      */
-    const isNumber = (number: Number | string) => {
-        if (isValidInteger(number)) {
-            const validatedNumber = parseInt(number.toString());
+    const isNumber = (numberVal: number | string) => {
+        if (isValidInteger(numberVal)) {
+            const validatedNumber = parseInt(numberVal.toString());
             return (
                 validatedNumber % validatedStep === 0 &&
                 validatedNumber >= min &&
@@ -117,24 +117,26 @@ export default function InputNumber(props: IInputNumber) {
                     min={validatedMin}
                     max={validatedMax}
                 />
-            </span>
-            <span className={classes.spinner}>
-                <Button
-                    onClick={stepUp}
-                    disabled={!max && number.value && number.value >= max!}
-                    className={classes.stepUp}
-                    baseClass={ButtonTypes.CUSTOM}
-                >
-                    +
-                </Button>
-                <Button
-                    onClick={stepDown}
-                    disabled={number.value === min}
-                    className={classes.stepDown}
-                    baseClass={ButtonTypes.CUSTOM}
-                >
-                    -
-                </Button>
+                <span className={classes.spinner}>
+                    <span className={classes.spinnerSpacer}>
+                        <Button
+                            onClick={stepUp}
+                            disabled={!max && number.value && number.value >= max!}
+                            className={classes.stepUp}
+                            baseClass={ButtonTypes.CUSTOM}
+                        >
+                            +
+                        </Button>
+                        <Button
+                            onClick={stepDown}
+                            disabled={number.value === min}
+                            className={classes.stepDown}
+                            baseClass={ButtonTypes.CUSTOM}
+                        >
+                            -
+                        </Button>
+                    </span>
+                </span>
             </span>
             {numberMeta.error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>

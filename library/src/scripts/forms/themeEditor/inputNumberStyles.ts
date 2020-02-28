@@ -5,8 +5,9 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, translateX, translateY } from "csx";
+import { calc, percent, translateX, translateY } from "csx";
 import {
+    absolutePosition,
     borders,
     colorOut,
     fonts,
@@ -22,9 +23,11 @@ export const inputNumberVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
     const builderVars = themeBuilderVariables();
     return {
+        label: builderVars.label,
         sizing: {
             height: builderVars.input.height,
         },
+        input: builderVars.label.fonts.size,
         spinner: {
             width: 18,
             fonts: {
@@ -40,16 +43,37 @@ export const inputNumberClasses = useThemeCache(() => {
     const style = styleFactory("numberInput");
     const builderVariables = themeBuilderVariables();
 
+    const spinner = style("spinner", {
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "stretch",
+        alignItems: "stretch",
+        height: unit(vars.sizing.height),
+        width: unit(vars.spinner.width + builderVariables.border.width),
+        flexBasis: unit(vars.spinner.width + builderVariables.border.width),
+        transform: translateX(negativeUnit(builderVariables.border.width)),
+    });
+
     const root = style({
         display: "flex",
         flexWrap: "nowrap",
+        justifyContent: "stretch",
         alignItems: "stretch",
+        width: builderVariables.input.width - vars.spinner.width,
     });
 
     const textInput = style("textInput", {
         position: "relative",
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.sizing.height, 2, vars.sizing.height),
-        width: unit(builderVariables.input.width),
+        ...textInputSizingFromFixedHeight(
+            vars.sizing.height,
+            vars.label.fonts.size,
+            builderVariables.border.width * 2, // 2
+            vars.sizing.height,
+        ),
+        height: unit(vars.sizing.height),
+        width: unit(builderVariables.input.width - vars.spinner.width),
+        maxWidth: unit(builderVariables.input.width - vars.spinner.width),
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(builderVariables.input.width),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
@@ -63,15 +87,8 @@ export const inputNumberClasses = useThemeCache(() => {
         },
     });
 
-    const spinner = style("spinner", {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "stretch",
-        height: calc(`100% + ${unit(builderVariables.border.width)}`), // To offset the margin top on "stepDown"
-        width: unit(vars.spinner.width + builderVariables.border.width),
-        transform: translateX(negativeUnit(builderVariables.border.width)),
-    });
     const stepUp = style("stepUp", {
+        ...absolutePosition.topRight(),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
         ...userSelect(),
         borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
@@ -79,6 +96,8 @@ export const inputNumberClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         padding: 0,
+        height: unit(Math.ceil(vars.sizing.height / 2)),
+        width: percent(100),
         ...fonts(vars.spinner.fonts),
         $nest: {
             "&:hover, &:focus, &:active, &.focus-visible": {
@@ -87,21 +106,31 @@ export const inputNumberClasses = useThemeCache(() => {
         },
     });
     const stepDown = style("stepDown", {
+        ...absolutePosition.bottomRight(),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
         ...userSelect(),
         borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
-        transform: translateY(negativeUnit(builderVariables.border.width)),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 0,
         ...fonts(vars.spinner.fonts),
+        height: unit(Math.ceil(vars.sizing.height / 2)),
+        width: percent(100),
         $nest: {
-            "&:hover, &:focus, &:active, &.focus-visible": {
+            "&:hover, &:focus, &:active, &.focus-accessible": {
                 zIndex: 1,
             },
         },
-        width: unit(vars.spinner.width),
+    });
+
+    const spinnerSpacer = style("spinnerSpacer", {
+        display: "block",
+        position: "relative",
+        height: unit(vars.sizing.height),
+        minHeight: unit(vars.sizing.height),
+        width: unit(vars.spinner.width + builderVariables.border.width),
+        flexBasis: unit(vars.spinner.width + builderVariables.border.width),
     });
 
     return {
@@ -110,5 +139,6 @@ export const inputNumberClasses = useThemeCache(() => {
         spinner,
         stepUp,
         stepDown,
+        spinnerSpacer,
     };
 });

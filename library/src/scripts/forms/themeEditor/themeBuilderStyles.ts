@@ -29,6 +29,7 @@ export const themeBuilderVariables = () => {
         fonts: {
             ...defaultFont,
             size: 13,
+            weight: 600,
         },
     };
     const title = {
@@ -86,8 +87,12 @@ export const themeBuilderVariables = () => {
         width: themeEditorVariables().panel.width,
     };
     const input = {
-        height: 28,
-        width: panel.width - undo.width - label.width - 2 * panel.padding,
+        height: 29, // Odd to allow perfect centring of spinner buttons.
+        width: panel.width - 2 * panel.padding - undo.width - label.width,
+        fonts: {
+            ...defaultFont,
+            size: 13,
+        },
     };
 
     return {

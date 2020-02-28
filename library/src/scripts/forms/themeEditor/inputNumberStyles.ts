@@ -124,8 +124,11 @@ export const inputNumberClasses = useThemeCache(() => {
         height: unit(Math.ceil(vars.sizing.height / 2)),
         width: percent(100),
         $nest: {
-            "&:hover, &:focus, &:active, &.focus-accessible": {
+            "&:hover": {
                 zIndex: 1,
+            },
+            "&:focus, &:active, &.focus-accessible": {
+                zIndex: 2,
             },
         },
     });

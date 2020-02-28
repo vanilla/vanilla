@@ -8,7 +8,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { percent, translateX } from "csx";
 import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
 import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
-import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.

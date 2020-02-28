@@ -8,7 +8,6 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
-import { themeEditorVariables } from "@themingapi/theme/themeEditorStyles";
 import { TextTransformProperty } from "csstype";
 
 export const themeBuilderVariables = () => {
@@ -107,6 +106,22 @@ export const themeBuilderVariables = () => {
         border,
         wrap,
         input,
+        panel,
+    };
+};
+
+// Intentionally not overwritable.
+export const themeEditorVariables = () => {
+    const frame = {
+        width: 100,
+    };
+
+    const panel = {
+        width: 376,
+    };
+
+    return {
+        frame,
         panel,
     };
 };

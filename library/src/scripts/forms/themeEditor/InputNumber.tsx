@@ -10,7 +10,7 @@ import { useField } from "formik";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { getDefaultOrCustomErrorMessage, isValidInteger } from "@library/styles/styleUtils";
+import { getDefaultOrCustomErrorMessage, isValidColor, isValidInteger } from "@library/styles/styleUtils";
 import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -98,6 +98,8 @@ export default function InputNumber(props: IInputNumber) {
         }
     }
 
+    const hasError = numberMeta.error || !isValidInteger(number.value);
+
     return (
         <>
             <span className={classes.root}>
@@ -107,7 +109,7 @@ export default function InputNumber(props: IInputNumber) {
                     aria-describedby={props.labelID}
                     aria-hidden={true}
                     className={classNames(classes.textInput, {
-                        [builderClasses.invalidField]: numberMeta.error,
+                        [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={props.placeholder ? props.placeholder.toString() : ""}
                     value={number.value}

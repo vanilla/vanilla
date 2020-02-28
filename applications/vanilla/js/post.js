@@ -167,6 +167,7 @@ jQuery(document).ready(function($) {
                     }
                 }
                 gdn.inform(json);
+                gdn.enable(btn);
             }
         });
         $(frm).triggerHandler('submit');

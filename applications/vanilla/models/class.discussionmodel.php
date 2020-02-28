@@ -1147,9 +1147,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             // If the category was marked explicitly read at some point, see if that applies here
             if ($category && !is_null($category['DateMarkedRead'])) {
                 // If the discussion was created after the category was marked read and hasn't been viewed, reset DateLastViewed to null
-                if ($category['DateMarkedRead'] <= $discussion->DateInserted && is_null($discussion->CountCommentWatch)) {
-                    $discussion->DateLastViewed = null;
-                } else {
+                if (!is_null($discussion->CountCommentWatch)) {
                     // If it's not a newly created discussion, set DateLastViewed to whichever is most recent.
                     $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
                 }
@@ -1258,6 +1256,32 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $result = null;
 
         if ($dateOne < $dateTwo) {
+            $result = $dateTwo;
+        } elseif (empty($dateOne) && empty($dateTwo)) {
+            $result = null;
+            return $result;
+        } else {
+            $result = $dateOne;
+        }
+
+        $maxDate = $result->format(MYSQL_DATE_FORMAT);
+        return $maxDate;
+    }
+
+    /**
+     * Decide which of two dates is older.
+     *
+     * @param string|null $dateOne
+     * @param string|null $dateTwo
+     * @return string|null Returns the older of two dates.
+     * @throws Exception Emits Exception in case of an error.
+     */
+    public static function minDate(?string $dateOne, ?string $dateTwo): ?string {
+        $dateOne = self::forceDateTime($dateOne);
+        $dateTwo = self::forceDateTime($dateTwo);
+        $result = null;
+
+        if ($dateOne > $dateTwo) {
             $result = $dateTwo;
         } elseif (empty($dateOne) && empty($dateTwo)) {
             $result = null;

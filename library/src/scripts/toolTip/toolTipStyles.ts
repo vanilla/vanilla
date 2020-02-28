@@ -18,7 +18,8 @@ export const tooltipVariables = useThemeCache(() => {
 
     // Main colors
     const sizes = makeThemeVars("sizes", {
-        default: 205,
+        min: 150,
+        max: 250,
     });
 
     const nub = makeThemeVars("nub", {
@@ -46,9 +47,10 @@ export const toolTipClasses = useThemeCache(() => {
     });
 
     const box = style("box", {
-        position: "absolute",
+        position: "fixed",
         fontSize: unit(globalVars.fonts.size.medium),
-        width: unit(vars.sizes.default),
+        minWidth: unit(vars.sizes.min),
+        maxWidth: unit(vars.sizes.max),
         color: colorOut(globalVars.mainColors.fg),
         backgroundColor: colorOut(globalVars.mainColors.bg),
         lineHeight: globalVars.lineHeights.base,
@@ -61,7 +63,7 @@ export const toolTipClasses = useThemeCache(() => {
     });
 
     const nubPosition = style("nubPosition", {
-        position: "absolute",
+        position: "fixed",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

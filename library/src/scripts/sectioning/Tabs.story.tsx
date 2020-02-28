@@ -61,6 +61,17 @@ export function TabWithErrors() {
                         panelData: "",
                         contents: <StoryTextContent firstTitle={"Hello Tab 3"} />,
                     },
+                    {
+                        label: "Tab 4",
+                        panelData: "",
+                        disabled: true,
+                        error: (
+                            <>
+                                My tab is <strong>DISABLED</strong>.
+                            </>
+                        ),
+                        contents: <StoryTextContent firstTitle={"Tab 4 (Disabled)"} />,
+                    },
                 ]}
             />
         </>

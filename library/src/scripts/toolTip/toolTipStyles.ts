@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { borders, paddings, singleBorder, unit, userSelect } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { translateX } from "csx";
+import { translateX, percent, px, important } from "csx";
 import { modalVariables } from "@library/modal/modalStyles";
 
 export const tooltipVariables = useThemeCache(() => {
@@ -39,11 +39,23 @@ export const toolTipClasses = useThemeCache(() => {
     const shadow = shadowHelper();
 
     const noPointerContent = style("content", {
+        position: "relative",
         $nest: {
             "& *": {
                 pointerEvents: "none",
             },
         },
+    });
+
+    const noPointerTrigger = style("noPointerTrigger", {
+        pointerEvents: important("initial"),
+        position: "absolute",
+        top: percent(50),
+        left: percent(50),
+        minWidth: px(45),
+        minHeight: px(45),
+        transform: "translate(-50%, -50%)",
+        zIndex: 1,
     });
 
     const box = style("box", {
@@ -106,5 +118,6 @@ export const toolTipClasses = useThemeCache(() => {
         nub,
         nubPosition,
         noPointerContent,
+        noPointerTrigger,
     };
 });

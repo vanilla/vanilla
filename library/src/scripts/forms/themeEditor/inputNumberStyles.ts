@@ -27,7 +27,12 @@ export const inputNumberVariables = useThemeCache(() => {
         sizing: {
             height: builderVars.input.height,
         },
-        input: builderVars.label.fonts.size,
+        input: {
+            font: {
+                size: builderVars.label.fonts.size,
+            },
+            width: 80,
+        },
         spinner: {
             width: 18,
             fonts: {
@@ -60,7 +65,8 @@ export const inputNumberClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         justifyContent: "stretch",
         alignItems: "stretch",
-        width: builderVariables.input.width - vars.spinner.width,
+        maxWidth: unit(vars.input.width),
+        width: unit(vars.input.width),
     });
 
     const textInput = style("textInput", {
@@ -72,8 +78,8 @@ export const inputNumberClasses = useThemeCache(() => {
             vars.sizing.height,
         ),
         height: unit(vars.sizing.height),
-        width: unit(builderVariables.input.width - vars.spinner.width),
-        maxWidth: unit(builderVariables.input.width - vars.spinner.width),
+        width: unit(vars.input.width - vars.spinner.width),
+        maxWidth: unit(vars.input.width - vars.spinner.width),
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(builderVariables.input.width),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
@@ -133,6 +139,11 @@ export const inputNumberClasses = useThemeCache(() => {
         flexBasis: unit(vars.spinner.width + builderVariables.border.width),
     });
 
+    const inputWrap = style("inputWrap", {
+        width: unit(vars.input.width),
+        flexBasis: unit(vars.input.width),
+    });
+
     return {
         root,
         textInput,
@@ -140,5 +151,6 @@ export const inputNumberClasses = useThemeCache(() => {
         stepUp,
         stepDown,
         spinnerSpacer,
+        inputWrap,
     };
 });

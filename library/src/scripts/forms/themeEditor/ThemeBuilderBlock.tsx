@@ -6,12 +6,14 @@
 
 import React, { useMemo } from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import classNames from "classnames";
 
 export interface IThemeBuilderBlock {
     label: string;
     labelID: string;
     undo?: boolean;
     children: React.ReactChild;
+    inputWrapClass?: string;
 }
 
 export default function ThemeBuilderBlock(props: IThemeBuilderBlock) {
@@ -22,7 +24,7 @@ export default function ThemeBuilderBlock(props: IThemeBuilderBlock) {
                 {props.label}
             </label>
             {props.undo && <span className={classes.undoWrap}>{/*TODO: undo button*/}</span>}
-            <span className={classes.inputWrap}>{props.children}</span>
+            <span className={classNames(classes.inputWrap, props.inputWrapClass)}>{props.children}</span>
         </div>
     );
 }

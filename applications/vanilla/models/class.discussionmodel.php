@@ -1269,32 +1269,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
     }
 
     /**
-     * Decide which of two dates is older.
-     *
-     * @param string|null $dateOne
-     * @param string|null $dateTwo
-     * @return string|null Returns the older of two dates.
-     * @throws Exception Emits Exception in case of an error.
-     */
-    public static function minDate(?string $dateOne, ?string $dateTwo): ?string {
-        $dateOne = self::forceDateTime($dateOne);
-        $dateTwo = self::forceDateTime($dateTwo);
-        $result = null;
-
-        if ($dateOne > $dateTwo) {
-            $result = $dateTwo;
-        } elseif (empty($dateOne) && empty($dateTwo)) {
-            $result = null;
-            return $result;
-        } else {
-            $result = $dateOne;
-        }
-
-        $maxDate = $result->format(MYSQL_DATE_FORMAT);
-        return $maxDate;
-    }
-
-    /**
      * Add SQL Where to account for archive date.
      *
      * @param Gdn_SQLDriver $sql

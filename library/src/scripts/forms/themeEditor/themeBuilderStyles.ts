@@ -116,10 +116,13 @@ export const themeBuilderClasses = useThemeCache(() => {
     const vars = themeBuilderVariables();
 
     const root = style({
+        maxWidth: unit(themeEditorVariables().panel.width),
         backgroundColor: colorOut(vars.panel.bg),
         minHeight: percent(100),
-        paddingTop: unit(vars.panel.padding),
         ...fonts(vars.defaultFont),
+        ...paddings({
+            vertical: unit(vars.panel.padding),
+        }),
     });
 
     const inputBlock = style("inputBlock", {

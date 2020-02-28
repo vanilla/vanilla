@@ -4,22 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useRef, useState } from "react";
-import { visibility } from "@library/styles/styleHelpersVisibility";
-import classNames from "classnames";
-import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
-import { color, ColorHelper } from "csx";
-import { useField } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { t } from "@vanilla/i18n/src";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { visibility } from "@library/styles/styleHelpersVisibility";
 import { isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
-import { string } from "prop-types";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n/src";
+import classNames from "classnames";
+import { color, ColorHelper } from "csx";
+import { useField } from "formik";
+import React, { useMemo, useRef, useState } from "react";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
-
+type VoidFunction = () => void;
 export interface IColorPicker {
     inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex">;
     inputID: string;
@@ -27,7 +26,8 @@ export interface IColorPicker {
     labelID: string;
     defaultValue?: ColorHelper;
     inputClass?: string;
-    errors?: IErrorWithDefault[]; // Uses default message if true
+    errors?: IErrorWithDefault[]; // Uses default message if true;
+    handleChange?: VoidFunction;
 }
 
 export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
@@ -64,8 +64,10 @@ export default function ColorPicker(props: IColorPicker) {
     const onTextChange = e => {
         const colorString = e.target.value;
         helpers.setTouched(true);
+        console.log("props.handleChange", props.handleChange);
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
+            props.handleChange?.();
         }
         helpers.setValue(colorString); // Text is unchanged
     };
@@ -73,6 +75,7 @@ export default function ColorPicker(props: IColorPicker) {
     const onPickerChange = e => {
         // Will always be valid color, since it's a real picker
         const newColor: string = e.target.value;
+
         if (newColor) {
             helpers.setTouched(true);
             helpers.setValue(newColor);
@@ -81,6 +84,7 @@ export default function ColorPicker(props: IColorPicker) {
                     .toRGB()
                     .toString(),
             );
+            props.handleChange?.();
         }
     };
 

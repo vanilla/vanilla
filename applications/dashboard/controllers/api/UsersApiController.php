@@ -485,7 +485,7 @@ class UsersApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     protected function normalizeOutput(array $dbRecord) {
-        $normalizedRow = $this->userModel->normalizeRow($dbRecord, []);
+        $result = $this->userModel->normalizeRow($dbRecord, []);
         return $result;
     }
 

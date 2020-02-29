@@ -947,7 +947,7 @@ if (!function_exists('getRecord')) {
                         if (!$discussionModel->canView($discussion)) {
                             throw permissionException();
                         }
-                        $discussion->Url = discussionUrl($discussion);
+                        $discussion['Url'] = discussionUrl($discussion);
                         $row['ShareUrl'] = $row['Url'];
                         $row['Name'] = $discussion['Name'];
                         $row['Discussion'] = $discussion;

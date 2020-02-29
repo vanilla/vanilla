@@ -486,13 +486,6 @@ class UsersApiController extends AbstractApiController {
      */
     protected function normalizeOutput(array $dbRecord) {
         $normalizedRow = $this->userModel->normalizeRow($dbRecord, []);
-        $options = [];
-        $result = $this->getEventManager()->fireFilter(
-            'usersApiController_normalizeOutput',
-            $normalizedRow,
-            $this,
-            $options
-        );
         return $result;
     }
 

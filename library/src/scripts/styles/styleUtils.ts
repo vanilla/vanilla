@@ -249,23 +249,6 @@ export const isValidColor = colorValue => {
 };
 
 /**
- * Check if parsed int is the same as given value
- * @param number
- */
-export const isValidInteger = number => {
-    console.log("");
-    console.log("number: ", number);
-    console.log("number.toString(): ", number !== undefined && number.toString());
-    console.log("parseInt(number).toString(): ", parseInt(number).toString());
-    console.log(
-        "!!number && number.toString() === parseInt(number).toString(): ",
-        !!number && number.toString() === parseInt(number).toString(),
-    );
-
-    return number !== undefined && number.toString() === parseInt(number).toString();
-};
-
-/**
  * Takes either a custome error message string or a boolean, true gives default message
  * @param error
  * @param defaultMessage

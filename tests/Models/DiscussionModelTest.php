@@ -40,6 +40,11 @@ class DiscussionModelTest extends TestCase {
     private $session;
 
     /**
+     * @var \CategoryModel
+     */
+    private $category;
+
+    /**
      * A test listener that increments the counter.
      *
      * @param TestEvent $e
@@ -57,6 +62,7 @@ class DiscussionModelTest extends TestCase {
         parent::setUp();
 
         $this->model = $this->container()->get(\DiscussionModel::class);
+        $this->category = $this->container()->get(\CategoryModel::class);
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
         $this->backupSession();
@@ -660,5 +666,62 @@ class DiscussionModelTest extends TestCase {
             $discussionSecondVisit->CountCommentWatch,
             "Updating comment watch status failed."
         );
+    }
+
+    /**
+     * Test calculate() with various category marked read discussion dates.
+     */
+    public function testDiscussionCategoryMarkedRead() {
+        // Set up a CategoryModel instance to test.
+        \CategoryModel::$Categories = [100 => [
+            'Name' => 'foo',
+            'UrlCode' => 'foo',
+            'PermissionCategoryID' => 1,
+            'DateMarkedRead' => null,
+        ]];
+
+        // Set up a DiscussionModel instance to test.
+        $this->model->DiscussionID = 0;
+        $this->model->CategoryID = 100;
+        $this->model->Name = 'test';
+        $this->model->Body = 'discuss';
+        $this->model->InsertUserID = 123;
+        $this->model->DateInserted = '2010-01-01-16:22:42';
+        $this->model->DateLastViewed = '2019-01-09 16:22:42';
+        $this->model->Url = 'bar';
+        $this->model->Attributes = [];
+        $this->model->Tags = [];
+        $this->model->LastCommentUserID = 234;
+        $this->model->DateLastComment = '2020-01-01 16:22:42';
+        $this->model->CountComments = 5;
+        $this->model->CountCommentWatch = 5;
+
+        //Category hasn't been marked read.
+        $this->model->calculate($this->model);
+
+        $expected = '2019-01-09 16:22:42';
+        $actual = $this->model->DateLastViewed;
+        $this->assertSame($expected, $actual);
+
+        // Category was marked read after discussion was created.
+        \CategoryModel::setLocalField(100, 'DateMarkedRead', '2020-01-09 16:22:42');
+
+        $this->model->calculate($this->model);
+
+        $expected = '2020-01-09 16:22:42';
+        $actual = $this->model->DateLastViewed;
+        $this->assertSame($expected, $actual);
+
+        // Discussion was created after the category was marked read.
+        $this->model->DateInserted = '2020-03-02 16:22:42';
+        $this->model->DateLasComment = '2020-03-02 16:23:42';
+        $this->model->DateLastViewed = null;
+        $this->model->CountCommentWatch = null;
+
+        $this->model->calculate($this->model);
+
+        $expected = null;
+        $actual = $this->model->DateLastViewed;
+        $this->assertSame($expected, $actual);
     }
 }

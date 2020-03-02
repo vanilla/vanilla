@@ -7,10 +7,12 @@
 
 namespace VanillaTests\Models;
 
+use CategoryModel;
 use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
@@ -670,58 +672,79 @@ class DiscussionModelTest extends TestCase {
 
     /**
      * Test calculate() with various category marked read discussion dates.
+     *
+     * @param string|null $discussionMarkedRead
+     * @param string|null $categoryMarkedRead
+     * @param string|null $expected
+     * @dataProvider provideMarkedRead
      */
-    public function testDiscussionCategoryMarkedRead() {
+    public function testDiscussionCategoryMarkedRead(
+        string $discussionInserted,
+        ?string $discussionMarkedRead,
+        ?string $categoryMarkedRead,
+        ?string $expected
+    ): void {
         // Set up a CategoryModel instance to test.
-        \CategoryModel::$Categories = [100 => [
-            'Name' => 'foo',
-            'UrlCode' => 'foo',
-            'PermissionCategoryID' => 1,
-            'DateMarkedRead' => null,
-        ]];
+        CategoryModel::$Categories = [
+            100 => [
+                "Name" => "foo",
+                "UrlCode" => "foo",
+                "PermissionCategoryID" => 1,
+                "DateMarkedRead" => $categoryMarkedRead,
+            ]
+        ];
 
-        // Set up a DiscussionModel instance to test.
-        $this->model->DiscussionID = 0;
-        $this->model->CategoryID = 100;
-        $this->model->Name = 'test';
-        $this->model->Body = 'discuss';
-        $this->model->InsertUserID = 123;
-        $this->model->DateInserted = '2010-01-01-16:22:42';
-        $this->model->DateLastViewed = '2019-01-09 16:22:42';
-        $this->model->Url = 'bar';
-        $this->model->Attributes = [];
-        $this->model->Tags = [];
-        $this->model->LastCommentUserID = 234;
-        $this->model->DateLastComment = '2020-01-01 16:22:42';
-        $this->model->CountComments = 5;
-        $this->model->CountCommentWatch = 5;
+        $discussion = (object)[
+            "DiscussionID" => 0,
+            "CategoryID" => 100,
+            "Name" => "test",
+            "Body" => "discuss",
+            "InsertUserID" => 123,
+            "DateInserted" => $discussionInserted,
+            "Url" => "bar",
+            "Attributes" => [],
+            "Tags" => [],
+            "LastCommentUserID" => 234,
+            "CountComments" => 5,
+            "DateLastComment" => "2020-01-01 16:22:42",
+            "DateLastViewed" => $discussionMarkedRead,
+            "CountCommentWatch" => $discussionMarkedRead ? 5 : null,
+        ];
 
-        //Category hasn't been marked read.
-        $this->model->calculate($this->model);
+        $this->model->calculate($discussion);
 
-        $expected = '2019-01-09 16:22:42';
-        $actual = $this->model->DateLastViewed;
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $discussion->DateLastViewed);
 
-        // Category was marked read after discussion was created.
-        \CategoryModel::setLocalField(100, 'DateMarkedRead', '2020-01-09 16:22:42');
+        // Reset that static property.
+        CategoryModel::$Categories = null;
+    }
 
-        $this->model->calculate($this->model);
-
-        $expected = '2020-01-09 16:22:42';
-        $actual = $this->model->DateLastViewed;
-        $this->assertSame($expected, $actual);
-
-        // Discussion was created after the category was marked read.
-        $this->model->DateInserted = '2020-03-02 16:22:42';
-        $this->model->DateLasComment = '2020-03-02 16:23:42';
-        $this->model->DateLastViewed = null;
-        $this->model->CountCommentWatch = null;
-
-        $this->model->calculate($this->model);
-
-        $expected = null;
-        $actual = $this->model->DateLastViewed;
-        $this->assertSame($expected, $actual);
+    /**
+     * Provide data for testing date-marked-read calculations.
+     *
+     * @return array
+     */
+    public function provideMarkedRead(): array {
+        $result = [
+            "Category has not been marked read." => [
+                "2010-01-01-16:22:42",
+                "2019-01-09 16:22:42",
+                null,
+                "2019-01-09 16:22:42",
+            ],
+            "Category was marked read after discussion was created." => [
+                "2010-01-01-16:22:42",
+                "2020-01-09 16:22:42",
+                "2019-01-09 16:22:42",
+                "2020-01-09 16:22:42",
+            ],
+            "Discussion was created after the category was marked read." => [
+                "2020-03-02 16:22:42",
+                null,
+                "2020-01-09 16:22:42",
+                null,
+            ],
+        ];
+        return $result;
     }
 }

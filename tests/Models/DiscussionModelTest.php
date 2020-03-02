@@ -12,7 +12,6 @@ use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
@@ -42,11 +41,6 @@ class DiscussionModelTest extends TestCase {
     private $session;
 
     /**
-     * @var \CategoryModel
-     */
-    private $category;
-
-    /**
      * A test listener that increments the counter.
      *
      * @param TestEvent $e
@@ -64,7 +58,6 @@ class DiscussionModelTest extends TestCase {
         parent::setUp();
 
         $this->model = $this->container()->get(\DiscussionModel::class);
-        $this->category = $this->container()->get(\CategoryModel::class);
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
         $this->backupSession();
@@ -673,6 +666,7 @@ class DiscussionModelTest extends TestCase {
     /**
      * Test calculate() with various category marked read discussion dates.
      *
+     * @param string $discussionInserted
      * @param string|null $discussionMarkedRead
      * @param string|null $categoryMarkedRead
      * @param string|null $expected

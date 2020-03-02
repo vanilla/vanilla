@@ -31,17 +31,20 @@ export const selectOneClasses = useThemeCache(() => {
                     color: globalVars.mainColors.primary,
                 }),
             },
-            ".inputBlock-inputText": {
+            "& .inputBlock-inputText": {
                 paddingRight: unit(vars.padding.right),
                 position: "relative",
             },
-            ".SelectOne__indicators": {
+            "& .SelectOne__indicators": {
                 position: "absolute",
                 top: 0,
                 right: 6,
                 bottom: 0,
             },
-            ".SelectOne__indicator": {
+            "& .SelectOne__indicator-separator": {
+                display: "none",
+            },
+            "& .SelectOne__indicator": {
                 cursor: "pointer",
             },
             "& .SelectOne__single-value": {

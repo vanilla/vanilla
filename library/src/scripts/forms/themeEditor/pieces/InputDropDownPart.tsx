@@ -3,17 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import React, { useMemo } from "react";
 import classNames from "classnames";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import Select from "react-select";
+import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
+import { FieldHelperProps, FieldInputProps, FieldMetaProps, useField } from "formik";
 
-interface IProps extends IMenuPlacement {
+export interface IInputDropDownPart extends IMenuPlacement {
+    variableID?: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
+    inputID: string;
+    labelID: string;
     options: IComboBoxOption[];
     onChange: (newValue: IComboBoxOption | null) => void;
     value?: IComboBoxOption;
@@ -24,15 +27,15 @@ interface IProps extends IMenuPlacement {
     selectRef?: React.RefObject<Select>;
 }
 
-export const InputDropDown: React.FC<IProps> = (props: IProps) => {
-    const { inputID, labelType, labelID } = useFormGroup();
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+// This component is meant to be extended, because it may or may not be using formik directly.
+export const InputDropDownPart: React.FC<IInputDropDownPart> = (props: IInputDropDownPart) => {
+    // const [value = undefined, valueMeta = undefined, helpers = undefined] = useField(props.variableID);
     return (
-        <div className={classNames(rootClass)}>
+        <div className={classNames("input-wrap-right")}>
             <SelectOne
                 label={null}
-                labelID={labelID}
-                inputID={inputID}
+                labelID={props.labelID}
+                inputID={props.inputID}
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}

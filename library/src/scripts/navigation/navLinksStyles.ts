@@ -224,14 +224,14 @@ export const navLinksClasses = useThemeCache(() => {
         "linksWithHeadings",
         {
             ...paddings(vars.linksWithHeadings.paddings),
-            ...extendItemContainer(vars.item.padding.horizontal),
+            ...extendItemContainer(vars.item.padding.horizontal + vars.linksWithHeadings.paddings.horizontal),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            ...extendItemContainer(vars.item.paddingMobile.horizontal),
+            ...extendItemContainer(vars.item.paddingMobile.horizontal + vars.linksWithHeadings.paddings.horizontal),
         }),
     );
 

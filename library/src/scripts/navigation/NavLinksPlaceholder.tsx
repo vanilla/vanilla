@@ -19,7 +19,7 @@ interface IProps {
     showTitle?: boolean;
 }
 
-export function NavLinksPlaceholder(props: IProps) {
+export const NavLinksPlaceholder = React.memo(function NavLinksPlaceholder(props: IProps) {
     const { sectionsCount = 6 } = props;
     const classes = navLinksClasses();
 
@@ -51,7 +51,7 @@ export function NavLinksPlaceholder(props: IProps) {
             </nav>
         </Container>
     );
-}
+});
 
 function SingleNavLinksPlaceholder(props: { itemCount: number }) {
     const classes = navLinksClasses();

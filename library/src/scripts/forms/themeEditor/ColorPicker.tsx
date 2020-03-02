@@ -9,13 +9,14 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { visibility } from "@library/styles/styleHelpersVisibility";
-import { isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import { color, ColorHelper } from "csx";
 import { useField } from "formik";
 import React, { useMemo, useRef, useState } from "react";
+import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
+import { number } from "prop-types";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 type VoidFunction = () => void;
@@ -30,14 +31,9 @@ export interface IColorPicker {
     handleChange?: VoidFunction;
 }
 
-export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
-    return typeof error === "string" ? error : defaultMessage;
-};
-
 export const ensureColorHelper = (colorValue: string | ColorHelper) => {
     return typeof colorValue === "string" ? color(colorValue) : colorValue;
 };
-
 export default function ColorPicker(props: IColorPicker) {
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -119,10 +115,10 @@ export default function ColorPicker(props: IColorPicker) {
                     aria-describedby={props.labelID}
                     aria-hidden={true}
                     className={classNames(classes.textInput, {
-                        [classes.invalidColor]: hasError,
+                        [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={textValue}
+                    value={selectedColor.value}
                     onChange={onTextChange}
                     auto-correct="false"
                 />

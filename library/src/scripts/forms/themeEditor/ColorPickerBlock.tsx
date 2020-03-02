@@ -10,7 +10,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
 import React, { useMemo } from "react";
 
-export interface IPresetColorPicker extends Omit<Omit<IColorPicker, "inputID">, "labelID"> {
+export interface IPresetColorPicker extends Omit<IColorPicker, "inputID" | "labelID"> {
     defaultValue?: ColorHelper;
 }
 
@@ -32,6 +32,7 @@ export default function ColorPickerBlock(props: IColorPickerBlock) {
 
     return (
         <ThemeBuilderBlock
+            undo={true}
             {...{
                 ...props.inputBlock,
                 inputID,

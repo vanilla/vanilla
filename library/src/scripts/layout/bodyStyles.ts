@@ -84,6 +84,21 @@ export const bodyCSS = useThemeCache(() => {
         flexDirection: "column",
     });
 
+    cssRule(`input[type="number"]`, {
+        [`-webkit-appearance`]: "none",
+        [`-moz-appearance`]: "textfield",
+        $nest: {
+            [`&::-webkit-inner-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+            [`&::-webkit-outer-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+        },
+    });
+
     cssRule(
         `input::-webkit-search-decoration,
         input::-webkit-search-cancel-button,

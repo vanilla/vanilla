@@ -167,7 +167,9 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...paddings({
             vertical: vars.itemSpacing.vertical,
         }),
-        ...(vars.options.borderType === "navLinks" ? {} : extendItemContainer(vars.itemSpacing.horizontal)),
+        ...(vars.options.borderType === "navLinks"
+            ? extendItemContainer(navLinksVariables().linksWithHeadings.paddings.horizontal)
+            : extendItemContainer(vars.itemSpacing.horizontal)),
     };
 
     const verticalContainer = style("verticalContainer", {

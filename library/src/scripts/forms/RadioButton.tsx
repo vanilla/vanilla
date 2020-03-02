@@ -20,6 +20,8 @@ interface IProps extends IOptionalComponentID {
     name?: string;
     isHorizontal?: boolean;
     note?: string;
+    defaultChecked?: boolean;
+    fakeFocus?: boolean;
 }
 
 interface IState {
@@ -40,23 +42,22 @@ export default function RadioButton(props: IProps) {
         <>
             <label className={classNames(classes.root, props.className, { isHorizontal })}>
                 <input
-                    className={classNames(classes.input, "exclude-icheck")}
+                    className={classNames(classes.input, "exclude-icheck", props.fakeFocus && "focus-visible")}
                     onChange={props.onChange}
                     aria-disabled={props.disabled}
                     name={props.name}
                     disabled={props.disabled}
                     type="radio"
                     checked={props.checked}
+                    defaultChecked={props.defaultChecked}
                     tabIndex={0}
                     aria-describedby={note ? noteID : undefined}
                 />
                 <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
-                    <span className={classes.state}>
-                        <svg className={classes.diskIcon}>
-                            <title>{t("Radio Button")}</title>
-                            <circle fill="currentColor" cx="3" cy="3" r="3" />
-                        </svg>
-                    </span>
+                    <svg className={classes.diskIcon}>
+                        <title>{t("Radio Button")}</title>
+                        <circle fill="currentColor" cx="3" cy="3" r="3" />
+                    </svg>
                 </span>
                 {props.label && (
                     <span id={labelID} className={classes.label}>

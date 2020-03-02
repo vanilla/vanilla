@@ -66,6 +66,10 @@ export function slugify(
         .toLocaleLowerCase(); // Convert to locale aware lowercase.
 }
 
+export function normalizeString(str: string): string {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 /**
  * Split a string in multiple pieces similar to String.prototype.split but ignore most acccent characters.
  *
@@ -75,8 +79,8 @@ export function slugify(
  * @param splitWith The string to split with.
  */
 export function splitStringLoosely(toSplit: string, splitWith: string): string[] {
-    const normalizedName = toSplit.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const normalizedSplitTerm = splitWith.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalizedName = normalizeString(toSplit);
+    const normalizedSplitTerm = normalizeString(splitWith);
     const normalizedPieces = normalizedName.split(new RegExp(`(${normalizedSplitTerm})`, "i"));
 
     let charactersUsed = 0;

@@ -16,6 +16,7 @@ import {
     IFont,
     sticky,
     extendItemContainer,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -29,7 +30,7 @@ export const tabsVariables = useThemeCache(() => {
     const makeVars = variableFactory("onlineTabs");
 
     const colors = makeVars("colors", {
-        bg: globalVars.mainColors.bg,
+        bg: globalVars.mixBgAndFg(0.05),
         fg: globalVars.mainColors.fg,
         state: {
             border: {
@@ -115,12 +116,16 @@ export const tabClasses = useThemeCache(() => {
             textAlign: "center",
             border: "1px solid #bfcbd8",
             padding: "2px 0",
-            color: colorOut("#48576a"),
-            backgroundColor: colorOut("#f5f6f7"),
+            color: colorOut(vars.colors.fg),
+            backgroundColor: colorOut(vars.colors.bg),
             minHeight: unit(28),
             fontSize: unit(13),
             transition: "color 0.3s ease",
+            ...flexHelper().middle(),
             $nest: {
+                "& > *": {
+                    ...paddings({ horizontal: globalVars.gutter.half }),
+                },
                 "& + &": {
                     marginLeft: unit(negative(vars.border.width)),
                 },
@@ -131,6 +136,11 @@ export const tabClasses = useThemeCache(() => {
                 },
                 "&&:not(.focus-visible)": {
                     outline: 0,
+                },
+                "&[disabled]": {
+                    pointerEvents: "initial",
+                    color: colorOut(vars.colors.fg),
+                    backgroundColor: colorOut(vars.colors.bg),
                 },
             },
         },

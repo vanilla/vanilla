@@ -5,7 +5,7 @@
 
 import React, { useMemo } from "react";
 import { IInputDropDown, InputDropDown } from "@library/forms/themeEditor/InputDropDown";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
 import { useField } from "formik";
@@ -20,12 +20,8 @@ export interface IDropDownBlock {
 }
 
 export const InputDropDownBlock = (props: IDropDownBlock) => {
-    const inputID = useMemo(() => {
-        return uniqueIDFromPrefix("dropDownInput");
-    }, []);
-    const labelID = useMemo(() => {
-        return uniqueIDFromPrefix("dropDownLabel");
-    }, []);
+    const inputID = useUniqueID("dropDownInput");
+    const labelID = useUniqueID("dropDownLabel");
 
     return (
         <ThemeBuilderBlock

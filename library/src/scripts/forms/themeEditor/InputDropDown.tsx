@@ -5,15 +5,26 @@
 
 import React, { useState } from "react";
 import classNames from "classnames";
-import SelectOne from "@library/forms/select/SelectOne";
+import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useField } from "formik";
-import { IInputDropDownPart } from "@library/forms/themeEditor/pieces/InputDropDownPart";
-import InputHidden from "@library/forms/themeEditor/InputHidden";
 
-export interface IInputDropDown extends Omit<IInputDropDownPart, "onChange"> {
-    variableID: string;
+import InputHidden from "@library/forms/themeEditor/InputHidden";
+import { IFieldError } from "@library/@types/api/core";
+import Select from "react-select";
+
+export interface IInputDropDown extends IMenuPlacement {
+    variableID: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
+    inputID: string;
+    labelID: string;
+    options: IComboBoxOption[];
+    value?: IComboBoxOption;
+    inputClassName?: string;
+    disabled?: boolean;
+    isClearable?: boolean;
+    errors?: IFieldError[];
+    selectRef?: React.RefObject<Select>;
     defaultValue?: string;
 }
 
@@ -48,7 +59,7 @@ export const InputDropDown: React.FC<IInputDropDown> = (props: IInputDropDown) =
                 inputClassName={classNames("form-control", props.inputClassName)}
                 disabled={props.disabled}
                 menuPlacement={props.menuPlacement}
-                isClearable={props.isClearable}
+                isClearable={props.isClearable ?? false}
                 selectRef={props.selectRef}
                 onChange={onChange}
             />

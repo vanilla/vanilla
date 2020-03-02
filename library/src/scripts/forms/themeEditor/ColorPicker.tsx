@@ -15,8 +15,8 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
-import { string } from "prop-types";
+import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
+import { number } from "prop-types";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
@@ -29,14 +29,6 @@ export interface IColorPicker {
     inputClass?: string;
     errors?: IErrorWithDefault[]; // Uses default message if true
 }
-
-export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
-    return typeof error === "string" ? error : defaultMessage;
-};
-
-export const ensureColorHelper = (colorValue: string | ColorHelper) => {
-    return typeof colorValue === "string" ? color(colorValue) : colorValue;
-};
 
 export default function ColorPicker(props: IColorPicker) {
     const classes = colorPickerClasses();
@@ -115,10 +107,10 @@ export default function ColorPicker(props: IColorPicker) {
                     aria-describedby={props.labelID}
                     aria-hidden={true}
                     className={classNames(classes.textInput, {
-                        [classes.invalidColor]: hasError,
+                        [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={textValue}
+                    value={selectedColor.value}
                     onChange={onTextChange}
                     auto-correct="false"
                 />

@@ -7,8 +7,8 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, translateX } from "csx";
 import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
-import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
-import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -26,7 +26,8 @@ export const colorPickerClasses = useThemeCache(() => {
     const vars = colorPickerVariables();
     const style = styleFactory("colorPicker");
     const builderVariables = themeBuilderVariables();
-    const inputWidth = builderVariables.width - vars.swatch.width;
+    const builderClasses = themeBuilderClasses();
+    const inputWidth = builderVariables.input.width - vars.swatch.width;
 
     const root = style({
         display: "flex",
@@ -34,12 +35,11 @@ export const colorPickerClasses = useThemeCache(() => {
         alignItems: "stretch",
     });
 
-    const invalidColor = style("invalidColor", {});
     const textInput = style("textInput", {
         position: "relative",
-        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.label.size, 2, vars.sizing.height),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size, 2, vars.sizing.height),
         width: unit(inputWidth),
-        color: colorOut(builderVariables.font.color),
+        color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(inputWidth),
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
@@ -47,7 +47,7 @@ export const colorPickerClasses = useThemeCache(() => {
         zIndex: 1,
         transition: `color .2s ease-out, background .2s ease-out`,
         $nest: {
-            [`&.${invalidColor}`]: {
+            [`&.${builderClasses.invalidField}`]: {
                 color: colorOut(builderVariables.error.color),
                 background: colorOut(builderVariables.error.backgroundColor),
             },
@@ -93,6 +93,5 @@ export const colorPickerClasses = useThemeCache(() => {
         textInput,
         swatch,
         realInput,
-        invalidColor,
     };
 });

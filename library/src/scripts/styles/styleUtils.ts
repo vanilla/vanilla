@@ -14,6 +14,7 @@ import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
+import { string } from "prop-types";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -245,6 +246,23 @@ export function stringIsValidColor(colorValue) {
  */
 export const isValidColor = colorValue => {
     return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
+};
+
+/**
+ * Check if parsed int is the same as given value
+ * @param number
+ */
+export const isValidInteger = number => {
+    return number && number.toString() === parseInt(number).toString();
+};
+
+/**
+ * Takes either a custome error message string or a boolean, true gives default message
+ * @param error
+ * @param defaultMessage
+ */
+export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
+    return typeof error === "string" ? error : defaultMessage;
 };
 
 /**

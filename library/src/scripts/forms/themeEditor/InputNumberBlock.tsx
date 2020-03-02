@@ -6,27 +6,28 @@
 
 import React, { useMemo } from "react";
 import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
-import ColorPicker, { IColorPicker } from "@library/forms/themeEditor/ColorPicker";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { ColorHelper } from "csx";
+import { IInputNumber } from "@library/forms/themeEditor/InputNumber";
+import InputNumber from "@library/forms/themeEditor/InputNumber";
+import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
 
-export interface IPresetColorPicker extends Omit<IColorPicker, "inputID" | "labelID"> {
-    defaultValue?: ColorHelper;
+export interface IPresetInputNumber extends Omit<IInputNumber, "inputID" | "labelID"> {
+    defaultValue?: number;
 }
 
-export interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}
+export interface IPresetThemeEditorInputBlock extends Omit<IThemeBuilderBlock, "children" | "labelID" | "inputID"> {}
 
-export interface IColorPickerBlock {
-    colorPicker: IPresetColorPicker;
+export interface INumberInputBlock {
+    inputNumber: IPresetInputNumber;
     inputBlock: IPresetThemeEditorInputBlock;
 }
 
-export default function ColorPickerBlock(props: IColorPickerBlock) {
+export default function InputNumberBlock(props: INumberInputBlock) {
     const inputID = useMemo(() => {
-        return uniqueIDFromPrefix("themeBuilderColorPickerInput");
+        return uniqueIDFromPrefix("numberPickerInput");
     }, []);
     const labelID = useMemo(() => {
-        return uniqueIDFromPrefix("themeBuilderColorPickerLabel");
+        return uniqueIDFromPrefix("numberPickerLabel");
     }, []);
 
     return (
@@ -34,13 +35,14 @@ export default function ColorPickerBlock(props: IColorPickerBlock) {
             undo={true}
             {...{
                 ...props.inputBlock,
+                inputWrapClass: inputNumberClasses().inputWrap,
                 inputID,
                 labelID,
             }}
         >
-            <ColorPicker
+            <InputNumber
                 {...{
-                    ...props.colorPicker,
+                    ...props.inputNumber,
                     inputID,
                     labelID,
                 }}

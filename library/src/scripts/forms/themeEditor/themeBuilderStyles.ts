@@ -6,85 +6,138 @@
 
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
-import { fonts, IFont } from "@library/styles/styleHelpersTypography";
+import { fonts } from "@library/styles/styleHelpersTypography";
 import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
+import { TextTransformProperty } from "csstype";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
     const fontFamily = ["Open Sans"];
-    const textColor = color("#48576a");
-    return {
-        outline: {
-            color: color("#0291db"),
-        },
+
+    const outline = {
+        color: color("#0291db"),
+    };
+
+    const defaultFont = {
+        color: color("#48576a"),
+        family: fontFamily,
+    };
+
+    const label = {
         width: 160,
-        label: {
-            color: textColor,
+        fonts: {
+            ...defaultFont,
             size: 13,
-            family: fontFamily,
+            weight: 600,
         },
-        title: {
-            family: fontFamily,
-            color: textColor,
+    };
+    const title = {
+        fonts: {
+            ...defaultFont,
             size: 16,
             weight: 700,
-            transform: "uppercase",
-        } as IFont,
-        sectionTitle: {
+            transform: "uppercase" as TextTransformProperty,
+        },
+    };
+    const sectionTitle = {
+        fonts: {
             family: fontFamily,
             color: color("#757e8c"),
             size: 12,
-            transform: "uppercase",
+            transform: "uppercase" as TextTransformProperty,
             weight: 600,
-        } as IFont,
-        sectionGroupTitle: {
+        },
+    };
+    const sectionGroupTitle = {
+        fonts: {
             family: fontFamily,
             color: color("#2d343f"),
             size: 14,
             weight: 700,
         },
-        errorMessage: {
+    };
+    const errorMessage = {
+        fonts: {
             family: fontFamily,
             color: color("#d0021b"),
             size: 12,
             weight: 600,
         },
-        border: {
-            color: color("#bfcbd8"),
-            width: 1,
-            style: "solid",
+    };
+    const border = {
+        color: color("#bfcbd8"),
+        width: 1,
+        style: "solid",
+    };
+    const wrap = {
+        borderRadius: 3,
+    };
+    const error = {
+        color: color("#d0021b"),
+        backgroundColor: color("#FFF3D4"),
+    };
+    const undo = {
+        width: 24,
+    };
+
+    const panel = {
+        bg: color("#f5f6f7"),
+        padding: 16,
+        width: themeEditorVariables().panel.width,
+    };
+    const input = {
+        height: 29, // Odd to allow perfect centring of spinner buttons.
+        width: panel.width - 2 * panel.padding - undo.width - label.width,
+        fonts: {
+            ...defaultFont,
+            size: 13,
         },
-        wrap: {
-            borderRadius: 3,
-        },
-        error: {
-            color: color("#d0021b"),
-            backgroundColor: color("#FFF3D4"),
-        },
-        input: {
-            height: 28,
-        },
-        panel: {
-            bg: color("#f5f6f7"),
-            padding: 16,
-        },
-        font: {
-            color: color("#3c4146"),
-            family: fontFamily,
-        },
+    };
+
+    return {
+        defaultFont,
+        outline,
+        label,
+        title,
+        sectionTitle,
+        sectionGroupTitle,
+        errorMessage,
+        error,
+        border,
+        wrap,
+        input,
+        panel,
+    };
+};
+
+// Intentionally not overwritable.
+export const themeEditorVariables = () => {
+    const frame = {
+        width: 100,
+    };
+
+    const panel = {
+        width: 376,
+    };
+
+    return {
+        frame,
+        panel,
     };
 };
 
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
-    // const editorVariables = themeEditorVariables();
 
     const root = style({
+        maxWidth: unit(themeEditorVariables().panel.width),
         backgroundColor: colorOut(vars.panel.bg),
         minHeight: percent(100),
-        paddingTop: unit(vars.panel.padding),
-        fontFamily: vars.label.family,
+        ...fonts(vars.defaultFont),
+        ...paddings({
+            vertical: unit(vars.panel.padding),
+        }),
     });
 
     const inputBlock = style("inputBlock", {
@@ -98,14 +151,14 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const label = style("label", {
-        width: unit(vars.width),
+        width: unit(vars.label.width),
         display: "flex",
         alignItems: "center",
-        flexBasis: unit(vars.width),
+        flexBasis: unit(vars.label.width),
         flexGrow: 1,
         fontWeight: 600,
         height: unit(vars.input.height),
-        ...fonts(vars.label),
+        ...fonts(vars.label.fonts),
     });
 
     const undoWrap = style("undoWrap", {
@@ -121,12 +174,12 @@ export const themeBuilderClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "stretch",
-        width: unit(vars.width),
-        flexBasis: unit(vars.width),
+        width: unit(vars.input.width),
+        flexBasis: unit(vars.input.width),
     });
 
     const title = style("title", {
-        ...fonts(vars.title),
+        ...fonts(vars.title.fonts),
         textAlign: "center",
         marginBottom: unit(20),
         ...paddings({
@@ -140,7 +193,7 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const sectionTitle = style("sectionTitle", {
-        ...fonts(vars.sectionTitle),
+        ...fonts(vars.sectionTitle.fonts),
         textAlign: "center",
         ...margins({
             top: 6,
@@ -153,7 +206,7 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const subGroupSection = style("subGroupSection", {});
     const subGroupSectionTitle = style("subGroupSectionTitle", {
-        ...fonts(vars.sectionGroupTitle),
+        ...fonts(vars.sectionGroupTitle.fonts),
         ...margins({
             top: 20,
             bottom: 12,
@@ -173,11 +226,13 @@ export const themeBuilderClasses = useThemeCache(() => {
     const error = style("error", {
         width: percent(100),
         display: "block",
-        ...fonts(vars.errorMessage),
+        ...fonts(vars.errorMessage.fonts),
         ...margins({
             vertical: 4,
         }),
     });
+
+    const invalidField = style("invalidField", {}); // To be implemented by each input
 
     return {
         root,
@@ -192,5 +247,6 @@ export const themeBuilderClasses = useThemeCache(() => {
         errorContainer,
         subGroupSection,
         subGroupSectionTitle,
+        invalidField,
     };
 });

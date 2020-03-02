@@ -35,7 +35,7 @@ export function NavLinksPlaceholder(props: IProps) {
                     return (
                         <React.Fragment key={i}>
                             <SingleNavLinksPlaceholder itemCount={4} />
-                            {(i + 1) % 2 === 0 ? evenSeparator : oddSeparator}
+                            {i !== sectionsCount - 1 && ((i + 1) % 2 === 0 ? evenSeparator : oddSeparator)}
                         </React.Fragment>
                     );
                 })}

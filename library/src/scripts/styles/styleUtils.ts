@@ -14,7 +14,7 @@ import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
-import { string } from "prop-types";
+import isNumeric from "validator/lib/isNumeric";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -253,7 +253,16 @@ export const isValidColor = colorValue => {
  * @param number
  */
 export const isValidInteger = number => {
-    return number && number.toString() === parseInt(number).toString();
+    console.log("");
+    console.log("number: ", number);
+    console.log("number.toString(): ", number !== undefined && number.toString());
+    console.log("parseInt(number).toString(): ", parseInt(number).toString());
+    console.log(
+        "!!number && number.toString() === parseInt(number).toString(): ",
+        !!number && number.toString() === parseInt(number).toString(),
+    );
+
+    return number !== undefined && number.toString() === parseInt(number).toString();
 };
 
 /**

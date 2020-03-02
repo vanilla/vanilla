@@ -46,7 +46,10 @@ export default function InputNumber(props: IInputNumber) {
      * Check if is valid number, respecting parameters.
      * @param number
      */
-    const isNumber = (numberVal: number | string) => {
+    const isValidValue = (numberVal: number | string) => {
+        if (numberVal === "") {
+            return true;
+        }
         if (isValidInteger(numberVal)) {
             const validatedNumber = parseInt(numberVal.toString());
             return (
@@ -69,7 +72,7 @@ export default function InputNumber(props: IInputNumber) {
     const onTextChange = e => {
         const number = e.target.value;
         helpers.setTouched(true);
-        if (isNumber(number)) {
+        if (isValidValue(number)) {
             helpers.setValue(number); // Only set valid color if passes validation
         }
         helpers.setValue(number); // Text is unchanged
@@ -90,15 +93,15 @@ export default function InputNumber(props: IInputNumber) {
         helpers.setValue(newValue);
     };
 
-    if (number.value === undefined) {
-        if (isValidInteger(props.defaultValue)) {
-            helpers.setValue(props.defaultValue);
-        } else {
-            helpers.setValue("");
-        }
-    }
+    // if (number.value === undefined) {
+    //     if (isValidInteger(props.defaultValue)) {
+    //         helpers.setValue(props.defaultValue);
+    //     } else {
+    //         helpers.setValue("");
+    //     }
+    // }
 
-    const hasError = numberMeta.error || !isValidInteger(number.value);
+    const hasError = numberMeta.error || (!isValidValue(number.value) && number.value !== "");
 
     return (
         <>

@@ -13,9 +13,13 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Container from "@library/layout/components/Container";
 import random from "lodash/random";
 
-interface IProps {}
+interface IProps {
+    sectionsCount?: number;
+    className?: string;
+}
 
 export function NavLinksPlaceholder(props: IProps) {
+    const { sectionsCount = 6 } = props;
     const classes = navLinksClasses();
 
     const evenSeparator = <hr className={classNames(classes.separator)} aria-hidden={true} role="presentation" />;
@@ -24,21 +28,17 @@ export function NavLinksPlaceholder(props: IProps) {
     );
 
     return (
-        <Container fullGutter narrow>
+        <Container fullGutter narrow className={props.className}>
             <h2>NavLinks Placeholder</h2>
             <nav className={classNames(classes.linksWithHeadings)}>
-                <SingleNavLinksPlaceholder itemCount={4} />
-                {oddSeparator}
-                <SingleNavLinksPlaceholder itemCount={5} />
-                {evenSeparator}
-                <SingleNavLinksPlaceholder itemCount={3} />
-                {oddSeparator}
-                <SingleNavLinksPlaceholder itemCount={4} />
-                {evenSeparator}
-                <SingleNavLinksPlaceholder itemCount={2} />
-                {oddSeparator}
-                <SingleNavLinksPlaceholder itemCount={3} />
-                {evenSeparator}
+                {Array.from(Array(sectionsCount)).map((_, i) => {
+                    return (
+                        <React.Fragment key={i}>
+                            <SingleNavLinksPlaceholder itemCount={4} />
+                            {(i + 1) % 2 === 0 ? evenSeparator : oddSeparator}
+                        </React.Fragment>
+                    );
+                })}
             </nav>
         </Container>
     );
@@ -54,7 +54,7 @@ function SingleNavLinksPlaceholder(props: { itemCount: number }) {
                 width={random(30, 75, false) + "%"}
             ></LoadingRectange>
             <div className={classes.items}>
-                {Array.from(Array(props.itemCount)).map(i => {
+                {Array.from(Array(props.itemCount)).map((_, i) => {
                     return (
                         <React.Fragment key={i}>
                             <LoadingRectange height={12} className={classes.item} width={random(70, 98, false) + "%"} />

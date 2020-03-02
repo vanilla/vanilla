@@ -3,19 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import Container from "@library/layout/components/Container";
 import Heading from "@library/layout/Heading";
 import { LoadingRectange } from "@library/loaders/LoadingRectangle";
+import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import { classes } from "typestyle";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import Container from "@library/layout/components/Container";
 import random from "lodash/random";
+import React from "react";
 
 interface IProps {
     sectionsCount?: number;
     className?: string;
+    title: string;
+    showTitle?: boolean;
 }
 
 export function NavLinksPlaceholder(props: IProps) {
@@ -29,8 +30,16 @@ export function NavLinksPlaceholder(props: IProps) {
 
     return (
         <Container fullGutter narrow className={props.className}>
-            <h2>NavLinks Placeholder</h2>
             <nav className={classNames(classes.linksWithHeadings)}>
+                <Heading
+                    title={props.title}
+                    depth={2}
+                    className={classNames(
+                        classes.title,
+                        classes.topTitle,
+                        !props.showTitle && visibility().visuallyHidden,
+                    )}
+                />
                 {Array.from(Array(sectionsCount)).map((_, i) => {
                     return (
                         <React.Fragment key={i}>

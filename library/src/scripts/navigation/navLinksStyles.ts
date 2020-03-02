@@ -178,6 +178,11 @@ export const navLinksClasses = useThemeCache(() => {
         },
     });
 
+    const topTitle = style("topTitle", {
+        ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
+        width: "100%",
+    });
+
     const linkColors = setAllLinkColors({
         default: globalVars.mainColors.fg,
     });
@@ -257,6 +262,7 @@ export const navLinksClasses = useThemeCache(() => {
         items,
         item,
         title,
+        topTitle,
         link,
         viewAllItem,
         viewAll,

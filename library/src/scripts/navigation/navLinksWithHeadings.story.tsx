@@ -31,5 +31,5 @@ StandardNavLinksStory.story = {
 };
 
 export function Placeholder() {
-    return <NavLinksPlaceholder />;
+    return <NavLinksPlaceholder title="Navigation Placeholder" showTitle />;
 }

@@ -14,9 +14,11 @@ import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
 import NavLinks from "@library/navigation/NavLinks";
 import Container from "@library/layout/components/Container";
+import { visibility } from "@library/styles/styleHelpers";
 
 interface IProps {
     title: string; // For accessibility, title of group
+    showTitle?: boolean;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     classNames?: string;
     data: ILinkListData;
@@ -66,9 +68,15 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                     <nav
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
                     >
-                        <ScreenReaderContent>
-                            <Heading title={this.props.title} depth={this.props.depth} />
-                        </ScreenReaderContent>
+                        <Heading
+                            title={this.props.title}
+                            depth={this.props.depth}
+                            className={classNames(
+                                classes.title,
+                                classes.topTitle,
+                                !this.props.showTitle && visibility().visuallyHidden,
+                            )}
+                        />
                         {groupedContent}
                         {ungroupedContent}
                     </nav>

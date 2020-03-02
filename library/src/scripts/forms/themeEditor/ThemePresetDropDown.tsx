@@ -7,22 +7,16 @@ import React, { useState } from "react";
 import classNames from "classnames";
 import SelectOne from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import { useField } from "formik";
-import { IInputDropDownPart } from "@library/forms/themeEditor/pieces/InputDropDownPart";
 import InputHidden from "@library/forms/themeEditor/InputHidden";
-import { IInputDropDown } from "@library/forms/themeEditor/InputDropDown";
 import { t } from "@vanilla/i18n/src";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { color } from "csx";
 import { useUniqueID } from "@library/utility/idUtils";
-import InputBlock from "@library/forms/InputBlock";
 import ThemeBuilderBlock from "@library/forms/themeEditor/ThemeBuilderBlock";
-import InputNumber from "@library/forms/themeEditor/InputNumber";
 import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
 
 export const ThemePresetDropDown = () => {
-    const globalVars = globalVariables();
     const options: IComboBoxOption[] = [
         {
             label: t("Light"),

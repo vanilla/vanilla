@@ -24,7 +24,7 @@ interface IProps extends IMenuPlacement {
     selectRef?: React.RefObject<Select>;
 }
 
-export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
+export const InputDropDown: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType, labelID } = useFormGroup();
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
     return (

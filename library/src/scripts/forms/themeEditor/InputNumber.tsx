@@ -40,7 +40,7 @@ export default function InputNumber(props: IInputNumber) {
 
     const validatedStep = Number.isInteger(step) ? step : 1;
     const validatedMin = Number.isInteger(min) ? min : 0;
-    const validatedMax = Number.isInteger(max) ? max : undefined;
+    const validatedMax = max && Number.isInteger(max) ? max : undefined;
 
     /**
      * Check if is valid number, respecting parameters.

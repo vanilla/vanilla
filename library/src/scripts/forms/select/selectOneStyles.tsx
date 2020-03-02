@@ -54,6 +54,10 @@ export const selectOneClasses = useThemeCache(() => {
             "& .SelectOne__value-container > *": {
                 width: percent(100),
             },
+            "& .SelectOne--is-disabled": {
+                cursor: "pointer",
+                opacity: 0.5,
+            },
         },
     });
 

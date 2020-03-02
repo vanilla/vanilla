@@ -6,7 +6,7 @@
 
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { fonts, unit } from "@library/styles/styleHelpers";
 import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
 
 export const inputDropDownClasses = useThemeCache(() => {
@@ -26,6 +26,9 @@ export const inputDropDownClasses = useThemeCache(() => {
             },
             "& .SelectOne__indicators": {
                 height: unit(builderVariables.input.height),
+            },
+            "& .SelectOne__single-value": {
+                ...fonts(builderVariables.input.fonts),
             },
         },
     });

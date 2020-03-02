@@ -26,13 +26,21 @@ export interface IInputDropDown extends IMenuPlacement {
     errors?: IFieldError[];
     selectRef?: React.RefObject<Select>;
     defaultValue?: string;
+    selectedIndex?: number;
 }
 
 export const InputDropDown: React.FC<IInputDropDown> = (props: IInputDropDown) => {
     const [value, valueMeta, valueHelpers] = useField(props.variableID);
 
     let defaultValue;
-    if (!value.value && props.options && props.options.length > 0 && props.defaultValue) {
+
+    if (
+        props.selectedIndex !== undefined &&
+        Number.isInteger(props.selectedIndex) &&
+        props.selectedIndex <= props.options.length
+    ) {
+        defaultValue = props.options[props.selectedIndex];
+    } else if (!value.value && props.options && props.options.length > 0 && props.defaultValue) {
         props.options.forEach(option => {
             if (!defaultValue && option.value === props.defaultValue) {
                 defaultValue = option;
@@ -57,7 +65,7 @@ export const InputDropDown: React.FC<IInputDropDown> = (props: IInputDropDown) =
                 options={props.options}
                 value={currentOption as any}
                 inputClassName={classNames("form-control", props.inputClassName)}
-                disabled={props.disabled}
+                disabled={props.disabled ?? props.options.length === 1}
                 menuPlacement={props.menuPlacement}
                 isClearable={props.isClearable ?? false}
                 selectRef={props.selectRef}

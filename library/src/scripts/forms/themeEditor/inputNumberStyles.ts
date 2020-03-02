@@ -89,6 +89,9 @@ export const inputNumberClasses = useThemeCache(() => {
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
         transition: `color .2s ease-out, background .2s ease-out`,
         $nest: {
+            ":not(.focus-visible)": {
+                outline: 0,
+            },
             "&:hover, &:focus, &:active, &.focus-visible": {
                 zIndex: 1,
             },

@@ -9,6 +9,7 @@ import {
     borders,
     colorOut,
     EMPTY_BORDER,
+    IBorderRadiusValue,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,

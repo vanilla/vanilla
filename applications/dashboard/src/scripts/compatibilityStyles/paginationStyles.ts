@@ -18,7 +18,10 @@ export const paginationCSS = () => {
         .Pager > span,
         .Pager > a`,
         {
-            ...borders({ radius: 0 }),
+            ...borders({
+                ...globalVars.borderType.formElements.buttons,
+                radius: 0,
+            }),
             backgroundColor: colorOut(globalVars.mainColors.bg),
             color: colorOut(globalVars.mainColors.fg),
         },

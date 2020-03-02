@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -24,7 +25,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
     use StaticInitializer;
 
@@ -791,9 +792,8 @@ class DiscussionModel extends Gdn_Model {
         $sql = $this->SQL;
 
         // Build up the base query. Self-join for optimization.
-        $sql->select('d2.*')
+        $sql->select('d.DiscussionID')
             ->from('Discussion d')
-            ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($limit, $offset);
 
         foreach ($orderBy as $field => $direction) {
@@ -840,6 +840,12 @@ class DiscussionModel extends Gdn_Model {
             $safeWheres[$this->addFieldPrefix($key)] = $value;
         }
         $sql->where($safeWheres);
+        $subQuery = $sql->getSelect(true);
+
+        $sql->reset();
+        $sql->select('d2.*')
+            ->from('Discussion d2')
+            ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
 
         // Add the UserDiscussion query.
         if (($userID = Gdn::session()->UserID) > 0) {
@@ -851,7 +857,14 @@ class DiscussionModel extends Gdn_Model {
                 ->select('w.Participated');
         }
 
-        $data = $sql->get();
+        $outerQuery = $sql->getSelect();
+        $finalQuery = str_replace(
+            '`'.$this->Database->DatabasePrefix.'_TBL_`',
+            '('.$subQuery.')',
+            $outerQuery
+        );
+
+        $data = $sql->query($finalQuery);
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -2083,8 +2096,8 @@ class DiscussionModel extends Gdn_Model {
             $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'plainTextLength');
             }
 
             if ($minCommentLength && is_numeric($minCommentLength)) {
@@ -3046,11 +3059,12 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
-        $dataObject = (object)$data;
-        $this->calculate($dataObject);
-        $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
-        $this->getEventManager()->dispatch($discussionEvent);
-
+        if ($data) {
+            $dataObject = (object)$data;
+            $this->calculate($dataObject);
+            $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($discussionEvent);
+        }
         return true;
     }
 

@@ -8,6 +8,7 @@ import NavLinksWithHeadingsComponent from "@library/navigation/NavLinksWithHeadi
 import { navLinksWithHeadingsData } from "@library/navigation/navLinksWithHeadings.storyData";
 import { t } from "@library/utility/appUtils";
 import React from "react";
+import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
 
 export default {
     title: "NavLinksWithHeadings",
@@ -25,7 +26,10 @@ export function StandardNavLinksStory() {
         />
     );
 }
-
 StandardNavLinksStory.story = {
     name: "Standard",
 };
+
+export function Placeholder() {
+    return <NavLinksPlaceholder title="Navigation Placeholder" showTitle />;
+}

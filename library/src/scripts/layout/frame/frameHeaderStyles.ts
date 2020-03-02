@@ -39,6 +39,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
+    const rootBorderLess = style("rootBorderless", {
+        borderBottom: "none",
+    });
+
     const rootMinimal = style("rootMinimal", {
         display: "block",
     });
@@ -151,6 +155,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         closeMinimal,
         root,
         rootMinimal,
+        rootBorderLess,
         backButton,
         heading,
         left,

@@ -67,7 +67,7 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
     return assetImage;
 };
 
-export const background = (props: IBackground) => {
+export const backgroundHelper = (props: IBackground) => {
     const image = getBackgroundImage(props.image, props.fallbackImage);
     return {
         backgroundColor: props.color ? colorOut(props.color) : undefined,

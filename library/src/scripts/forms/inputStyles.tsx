@@ -8,6 +8,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     borders,
     colorOut,
+    EMPTY_BORDER,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
@@ -16,6 +17,7 @@ import {
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { percent } from "csx";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -39,7 +41,10 @@ export const inputVariables = useThemeCache(() => {
         size: globalVars.fonts.size.large,
     });
 
-    const border: IBordersWithRadius = makeThemeVars("borders", globalVars.border);
+    const border: IBordersWithRadius = makeThemeVars("borders", {
+        ...EMPTY_BORDER,
+        ...globalVars.borderType.formElements.default,
+    });
 
     return {
         colors,
@@ -56,7 +61,7 @@ export const inputClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const inputMixin: NestedCSSProperties = {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.width * 2),
         backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),
@@ -66,6 +71,9 @@ export const inputClasses = useThemeCache(() => {
             ...placeholderStyles({
                 color: colorOut(vars.colors.placeholder),
             }),
+            "&. .SelectOne__input": {
+                width: percent(100),
+            },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
                     color: vars.colors.state.fg,
@@ -78,9 +86,10 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", inputMixin);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText", inputMixin);
+    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin);
 
     const inputText = style("inputText", {
+        ...inputMixin,
         marginBottom: 0,
         $nest: {
             "&&": {

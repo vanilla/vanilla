@@ -12,7 +12,6 @@ import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyl
 import merge from "lodash/merge";
 import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
-import produce from "immer";
 
 export enum BorderType {
     BORDER = "border",
@@ -66,6 +65,8 @@ export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
     left?: ISimpleBorderStyle & IRadiusFlex;
     right?: ISimpleBorderStyle & IRadiusFlex;
 }
+
+export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
 
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
     if (variable != null) {
@@ -319,7 +320,7 @@ const singleBorderStyle = (
 };
 
 export const borders = (
-    detailedStyles?: IBorderStyles | ISimpleBorderStyle | undefined,
+    detailedStyles?: IBorderStyles | ISimpleBorderStyle | IMixedBorderStyles | undefined,
     fallbackBorderVariables: IGlobalBorderStyles = globalVariables().border,
     debug = false,
 ): NestedCSSProperties => {
@@ -339,6 +340,14 @@ export const borders = (
         detailedStyles = fallbackBorderVariables;
     }
 
+    const all = getValueIfItExists(detailedStyles, "all");
+    if (all !== undefined) {
+        const allStyles = singleBorderStyle(all, fallbackBorderVariables);
+        if (allStyles !== undefined) {
+            merge(output, setAllBorders(color, width, style, radius, debug));
+        }
+    }
+
     const top = getValueIfItExists(detailedStyles, "top");
     if (top !== undefined) {
         const topStyles = singleBorderStyle(top, fallbackBorderVariables);
@@ -346,6 +355,8 @@ export const borders = (
             output.borderTopWidth = getValueIfItExists(topStyles, "width", width);
             output.borderTopStyle = getValueIfItExists(topStyles, "style", style);
             output.borderTopColor = getValueIfItExists(topStyles, "color", color);
+            output.borderTopLeftRadius = getValueIfItExists(topStyles, "radius", radius);
+            output.borderTopRightRadius = getValueIfItExists(topStyles, "radius", radius);
         }
     }
 
@@ -356,6 +367,8 @@ export const borders = (
             output.borderRightWidth = getValueIfItExists(rightStyles, "width", width);
             output.borderRightStyle = getValueIfItExists(rightStyles, "style", style);
             output.borderRightColor = getValueIfItExists(rightStyles, "color", color);
+            output.borderBottomRightRadius = getValueIfItExists(rightStyles, "radius", radius);
+            output.borderTopRightRadius = getValueIfItExists(rightStyles, "radius", radius);
         }
     }
 
@@ -366,6 +379,8 @@ export const borders = (
             output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", width);
             output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", style);
             output.borderBottomColor = getValueIfItExists(bottomStyles, "color", color);
+            output.borderBottomLeftRadius = getValueIfItExists(bottomStyles, "radius", radius);
+            output.borderBottomRightRadius = getValueIfItExists(bottomStyles, "radius", radius);
         }
     }
 
@@ -376,6 +391,8 @@ export const borders = (
             output.borderLeftWidth = getValueIfItExists(leftStyles, "width", width);
             output.borderLeftStyle = getValueIfItExists(leftStyles, "style", style);
             output.borderLeftColor = getValueIfItExists(leftStyles, "color", color);
+            output.borderBottomLeftRadius = getValueIfItExists(leftStyles, "radius", radius);
+            output.borderTopLeftRadius = getValueIfItExists(leftStyles, "radius", radius);
         }
     }
 

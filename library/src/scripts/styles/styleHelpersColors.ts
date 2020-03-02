@@ -5,19 +5,25 @@
  */
 
 import { color, ColorHelper, important } from "csx";
-import { throwError } from "rxjs";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThrowError } from "@vanilla/react-utils/src/useThrowError";
 import { logError } from "@vanilla/utils/src/debugUtils";
 
-export type ColorValues = ColorHelper | "transparent" | undefined;
+export type ColorValues = ColorHelper | undefined;
 
 export const colorOut = (colorValue: ColorValues | string, makeImportant = false) => {
     if (!colorValue) {
         return undefined;
     } else {
-        const output = typeof colorValue === "string" ? colorValue : colorValue.toString();
-        return makeImportant ? important(output) : output;
+        if (
+            colorValue
+                .toString()
+                .trim()
+                .startsWith("linear-gradient(")
+        ) {
+            return colorValue.toString();
+        } else {
+            const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
+            return makeImportant ? important(output.toString()) : output.toString();
+        }
     }
 };
 
@@ -86,15 +92,11 @@ export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, 
  * @param flipIfMax - Modify in the opposite direction if we're darker than black or whiter than white.
  */
 export const offsetLightness = (
-    colorValue: ColorHelper | "transparent",
+    colorValue: ColorHelper,
     weight: number,
     flipIfMax: boolean = true,
     debug: boolean = false,
 ) => {
-    if (colorValue === "transparent") {
-        return colorValue;
-    }
-
     const colorLightness = colorValue.lightness();
     let weightOffset = 1;
     if (!isLightColor(colorValue)) {

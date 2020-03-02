@@ -14,6 +14,7 @@ import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
+import { string } from "prop-types";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -161,8 +162,9 @@ function stripUndefinedKeys(obj: any) {
     return obj;
 }
 
-const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
-const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
+const rgbRegex = /^rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)$/;
+const hslRegex = /^hsla?\((0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%)\)$/;
+const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -204,14 +206,74 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
 }
 
 /**
+ * Check if string is valid color in hex format
+ * @param colorString
+ */
+export function stringIsHexColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hexRegex);
+}
+
+/**
+ * Check if string is valid color in rgb or rgba format
+ * @param colorString
+ */
+export function stringIsRgbColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbRegex);
+}
+
+/**
+ * Check if string is valid color in hsl or hsla format
+ * @param colorString
+ */
+export function stringIsHslColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslRegex);
+}
+
+/**
+ * Check if string is supported color format
+ * @param colorString
+ */
+export function stringIsValidColor(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
+    );
+}
+
+/**
+ * Check if string or ColorHelper is valid
+ * @param colorString
+ */
+export const isValidColor = colorValue => {
+    return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
+};
+
+/**
+ * Check if parsed int is the same as given value
+ * @param number
+ */
+export const isValidInteger = number => {
+    return number && number.toString() === parseInt(number).toString();
+};
+
+/**
+ * Takes either a custome error message string or a boolean, true gives default message
+ * @param error
+ * @param defaultMessage
+ */
+export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
+    return typeof error === "string" ? error : defaultMessage;
+};
+
+/**
  * Convert a color string into an instance.
  * @param colorString
  */
 export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
-    if (colorString.startsWith("#")) {
+    if (stringIsHexColor(colorString)) {
         // It's a colour.
         return color(colorString);
-    } else if (colorString.match(rgbRegex)) {
+    } else if (stringIsRgbColor(colorString)) {
         const result = rgbRegex.exec(colorString)!;
 
         const r = parseInt(result[1], 10);
@@ -224,7 +286,7 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         } else {
             return rgb(r, g, b);
         }
-    } else if (colorString.match(hslRegex)) {
+    } else if (stringIsHslColor(colorString)) {
         const result = hslRegex.exec(colorString)!;
 
         const h = parseInt(result[1], 10);

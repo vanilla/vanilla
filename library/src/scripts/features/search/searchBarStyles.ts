@@ -8,12 +8,13 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
-import { calc, important, percent, px } from "csx";
+import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,6 +52,9 @@ export const searchBarVariables = useThemeCache(() => {
         height: 13,
         width: 14,
         fg: input.fg.fade(0.7),
+        padding: {
+            right: 5,
+        },
     });
 
     const results = themeVars("results", {
@@ -81,7 +85,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
 
-    const independantRoot = style("independantRoot", {
+    const independentRoot = style("independentRoot", {
         position: "relative",
     });
 
@@ -98,6 +102,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     $nest: {
                         [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
+                        },
+                        "& > *": {
+                            width: percent(100),
                         },
                     },
                 },
@@ -154,7 +161,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
@@ -234,6 +241,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
         cursor: "text",
+        transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
         ...borderRadii({
             right: 0,
             left: vars.border.radius,
@@ -245,6 +253,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 alignItems: "center",
                 justifyContent: "flex-start",
                 paddingLeft: unit(vars.searchIcon.gap),
+                paddingRight: unit(vars.searchIcon.padding.right),
             },
             "&.noSearchButton": {
                 ...borderRadii({
@@ -258,8 +267,8 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const compoundValueContainer = style("compoundValueContainer", {
         $nest: {
             "&&": {
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                borderTopRightRadius: important(0),
+                borderBottomRightRadius: important(0),
             },
         },
     });
@@ -281,6 +290,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.height),
         color: colorOut(globalVars.mixBgAndFg(0.78)),
+        transform: translateX(`${unit(8)}`),
         $nest: {
             "&, &.buttonIcon": {
                 border: "none",
@@ -388,7 +398,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     return {
         root,
-        independantRoot,
+        independentRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

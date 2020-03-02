@@ -10,6 +10,10 @@ namespace Vanilla\Formatting;
  * Add basic field formatting with fallback render result.
  */
 trait FormatFieldTrait {
+
+    /** @var bool */
+    private $doFieldFormatting = true;
+
     /**
      * Format a specific field.
      *
@@ -18,8 +22,17 @@ trait FormatFieldTrait {
      * @param string $format The source format.
      */
     public function formatField(array &$row, $field, $format) {
-        if (array_key_exists($field, $row)) {
+        if ($this->doFieldFormatting && array_key_exists($field, $row)) {
             $row[$field] = \Gdn::formatService()->renderHTML($row[$field], $format) ?: '<!-- empty -->';
         }
+    }
+
+    /**
+     * Enable/disable field formatting.
+     *
+     * @param bool $doFieldFormatting Enable/disable field formatting.
+     */
+    public function enableFieldFormatting(bool $doFieldFormatting) {
+        $this->doFieldFormatting = $doFieldFormatting;
     }
 }

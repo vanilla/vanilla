@@ -2096,8 +2096,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'plainTextLength');
             }
 
             if ($minCommentLength && is_numeric($minCommentLength)) {

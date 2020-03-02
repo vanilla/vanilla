@@ -86,7 +86,7 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", inputMixin);
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText", inputMixin);
+    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin);
 
     const inputText = style("inputText", {
         ...inputMixin,

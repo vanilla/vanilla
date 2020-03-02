@@ -7304,17 +7304,31 @@ select + select {
   position: relative;
 }
 .search-wrap .form-control, .search-wrap .ac_input {
-  border-radius: 288px;
-  padding-left: 45px;
-  padding-right: 45px;
+  padding-left: 36px;
+  padding-right: 36px;
 }
 .search-wrap .form-control[placeholder], .search-wrap [placeholder].ac_input {
   text-overflow: ellipsis;
 }
 .search-wrap .search-icon-wrap {
+  display: -webkit-flex !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 36px;
   padding: 6px 12px;
   position: absolute;
   top: 0;
+}
+.search-wrap .search-icon-wrap .icon, .search-wrap .search-icon-wrap .btn-icon, .search-wrap .search-icon-wrap .bookmark, .search-wrap .search-icon-wrap .search-icon-wrap {
+  height: 14px;
+  width: 14px;
+  color: rgba(85, 90, 98, 0.7);
 }
 .search-wrap .search-icon-wrap:first-child {
   margin-left: 0;
@@ -8948,7 +8962,7 @@ button.close {
 .table-summary td, .table-data th,
 .table-data td {
   overflow: hidden;
-  padding: 8px 12px;
+  padding: 8px 18px;
   line-height: 1.5;
   vertical-align: middle;
   border-bottom: 1px solid #f4f6fb;
@@ -8974,7 +8988,8 @@ button.close {
 .table-data-head td,
 .table-data thead td {
   width: 100px;
-  padding: 9px 13.5px;
+  padding: 9px 18px;
+  padding-left: 17px;
   border-right: 1px solid #eee;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #f4f6fb;
@@ -8982,6 +8997,11 @@ button.close {
   font-weight: 600;
   font-size: 12px;
   line-height: 1.3333333333;
+}
+.table-data-head th:first-child, .table-data thead th:first-child,
+.table-data-head td:first-child,
+.table-data thead td:first-child {
+  padding-left: 18px;
 }
 .table-data-head th:last-child, .table-data thead th:last-child,
 .table-data-head td:last-child,
@@ -9021,7 +9041,7 @@ button.close {
 .table-data-head th.column-checkbox, .table-data thead th.column-checkbox,
 .table-data-head td.column-checkbox,
 .table-data thead td.column-checkbox {
-  width: 42px;
+  width: 54px;
 }
 
 .tj-meta,
@@ -9105,7 +9125,7 @@ button.close {
   min-width: 120px;
 }
 .table-checkbox-grid tbody td {
-  padding: 9px 13.5px;
+  padding: 9px 18px;
   text-align: center;
 }
 @media screen and (max-width: 575px) {

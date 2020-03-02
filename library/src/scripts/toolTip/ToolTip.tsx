@@ -140,7 +140,8 @@ export const ToolTipIcon = React.forwardRef(function ToolTipIcon(
 ) {
     const classes = toolTipClasses();
     return (
-        <span {...props} ref={ref} className={classes.noPointerContent}>
+        <span {...props} ref={ref} tabIndex={0} className={classes.noPointerContent}>
+            <span className={classes.noPointerTrigger}></span>
             {props.children}
         </span>
     );

@@ -6,8 +6,11 @@
 
 import React from "react";
 
-export interface IInputHidden extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {}
+export interface IInputHidden extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value"> {
+    variableID: string;
+    value: string;
+}
 
 export default function InputHidden(props: IInputHidden) {
-    return <input type="hidden" {...props} />;
+    return <input type="hidden" name={props.variableID} value={props.value} />;
 }

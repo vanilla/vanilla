@@ -10,8 +10,6 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import Select from "react-select";
-import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
-import { FieldHelperProps, FieldInputProps, FieldMetaProps, useField } from "formik";
 
 export interface IInputDropDownPart extends IMenuPlacement {
     variableID?: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
@@ -29,7 +27,6 @@ export interface IInputDropDownPart extends IMenuPlacement {
 
 // This component is meant to be extended, because it may or may not be using formik directly.
 export const InputDropDownPart: React.FC<IInputDropDownPart> = (props: IInputDropDownPart) => {
-    // const [value = undefined, valueMeta = undefined, helpers = undefined] = useField(props.variableID);
     return (
         <div className={classNames("input-wrap-right")}>
             <SelectOne

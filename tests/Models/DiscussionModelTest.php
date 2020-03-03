@@ -720,22 +720,46 @@ class DiscussionModelTest extends TestCase {
      */
     public function provideMarkedRead(): array {
         $result = [
-            "Category has not been marked read." => [
-                "2010-01-01-16:22:42",
-                "2019-01-09 16:22:42",
-                null,
-                "2019-01-09 16:22:42",
+            "Discussion unread, category unread" => [
+                "2020-01-01 00:00:00", // Discussion.DateInserted
+                null, // Discussion.DateLastViewed
+                null, // Category.DateMarkedRead
+                null, // Expected value.
             ],
-            "Category was marked read after discussion was created." => [
-                "2010-01-01-16:22:42",
-                "2020-01-09 16:22:42",
-                "2019-01-09 16:22:42",
-                "2020-01-09 16:22:42",
-            ],
-            "Discussion was created after the category was marked read." => [
-                "2020-03-02 16:22:42",
+            "Discussion read, category unread." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
                 null,
-                "2020-01-09 16:22:42",
+                "2020-01-08 00:00:00",
+            ],
+            "Discussion read, category read more recently." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
+                "2020-01-10 00:00:00",
+                "2020-01-10 00:00:00",
+            ],
+            "Discussion read, category read prior." => [
+                "2020-01-01 00:00:00",
+                "2020-01-22 00:00:00",
+                "2020-01-08 00:00:00",
+                "2020-01-22 00:00:00",
+            ],
+            "Discussion read, category read before discussion created." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
+                "2019-12-25 00:00:00",
+                "2020-01-08 00:00:00",
+            ],
+            "Discussion unread, category read after discussion created." => [
+                "2020-01-01 00:00:00",
+                null,
+                "2020-01-15 00:00:00",
+                "2020-01-15 00:00:00",
+            ],
+            "Discussion unread, category read before discussion created." => [
+                "2020-01-22 00:00:00",
+                null,
+                "2020-01-15 00:00:00",
                 null,
             ],
         ];

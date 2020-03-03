@@ -71,6 +71,7 @@ export default function ColorPicker(props: IColorPicker) {
             errorHelpers.setValue("Invalid Color");
             helpers.setValue(colorString);
         }
+        helpers.setValue(colorString);
     };
 
     const onPickerChange = e => {

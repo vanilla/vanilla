@@ -29,7 +29,9 @@ export interface IColorPicker {
     inputClass?: string;
     errors?: IErrorWithDefault[]; // Uses default message if true
 }
-
+export const ensureColorHelper = (colorValue: string | ColorHelper) => {
+    return typeof colorValue === "string" ? color(colorValue) : colorValue;
+};
 export default function ColorPicker(props: IColorPicker) {
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);

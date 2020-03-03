@@ -13,7 +13,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import { color, ColorHelper } from "csx";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import React, { useMemo, useRef, useState } from "react";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 import { number } from "prop-types";
@@ -49,7 +49,10 @@ export default function ColorPicker(props: IColorPicker) {
         props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : "#000";
 
     const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
+    const { setFieldError } = useFormikContext();
+
     const [validColor, setValidColor] = useState(initialValidColor);
+    const [errorField, _, errorHelpers] = useField("errors." + props.variableID);
 
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
@@ -60,12 +63,14 @@ export default function ColorPicker(props: IColorPicker) {
     const onTextChange = e => {
         const colorString = e.target.value;
         helpers.setTouched(true);
-        console.log("props.handleChange", props.handleChange);
+
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
-            props.handleChange?.();
+            errorHelpers.setValue(undefined);
+        } else {
+            errorHelpers.setValue("Invalid Color");
+            helpers.setValue(colorString);
         }
-        helpers.setValue(colorString); // Text is unchanged
     };
 
     const onPickerChange = e => {
@@ -80,7 +85,7 @@ export default function ColorPicker(props: IColorPicker) {
                     .toRGB()
                     .toString(),
             );
-            props.handleChange?.();
+            errorHelpers.setValue(undefined);
         }
     };
 
@@ -95,6 +100,8 @@ export default function ColorPicker(props: IColorPicker) {
     return (
         <>
             <span className={classes.root}>
+                <input className={visibility().displayNone} {...errorField} />
+
                 {/*"Real" color input*/}
                 <input
                     {...props.inputProps}
@@ -118,7 +125,7 @@ export default function ColorPicker(props: IColorPicker) {
                         [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={selectedColor.value}
+                    value={textValue}
                     onChange={onTextChange}
                     auto-correct="false"
                 />

@@ -1146,7 +1146,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         } else {
             // If the category was marked explicitly read at some point, see if that applies here
             if ($category && !is_null($category['DateMarkedRead'])) {
-                // If the discussion was created after the category was marked read and hasn't been viewed, reset DateLastViewed to null
+                // If the discussion was created after the category was marked read and it hasn't been viewed,
+                // leave CountCountCommentWatch and DateLastViewed null.
                 if (!is_null($discussion->CountCommentWatch)) {
                     // If it's not a newly created discussion, set DateLastViewed to whichever is most recent.
                     $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);

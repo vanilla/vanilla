@@ -151,5 +151,13 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
         }),
     );
 
-    return { root, items, item };
+    const title = style("title", {
+        marginTop: globalVars.gutter.size,
+        marginBottom: 0,
+        fontSize: globalVars.fonts.size.title,
+        fontWeight: globalVars.fonts.weights.bold,
+        lineHeight: globalVars.lineHeights.condensed,
+    });
+
+    return { root, items, item, title };
 });

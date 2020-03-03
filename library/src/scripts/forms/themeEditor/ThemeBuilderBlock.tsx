@@ -23,7 +23,6 @@ export default function ThemeBuilderBlock(props: IThemeBuilderBlock) {
             <label htmlFor={props.labelID} className={classes.label}>
                 {props.label}
             </label>
-            {props.undo && <span className={classes.undoWrap}>{/*TODO: undo button*/}</span>}
             <span className={classNames(classes.inputWrap, props.inputWrapClass)}>{props.children}</span>
         </div>
     );

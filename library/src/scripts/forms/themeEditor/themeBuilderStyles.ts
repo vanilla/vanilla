@@ -174,6 +174,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "stretch",
+        justifyContent: "flex-end",
         width: unit(vars.input.width),
         flexBasis: unit(vars.input.width),
     });

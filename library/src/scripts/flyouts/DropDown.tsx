@@ -36,7 +36,7 @@ interface IOpenDirectionProps {
     renderLeft?: boolean; // @deprecated
 }
 
-export interface IProps extends IOpenDirectionProps {
+export interface IDropDownProps extends IOpenDirectionProps {
     name?: string;
     children: React.ReactNode;
     className?: string;
@@ -74,7 +74,7 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-export default function DropDown(props: IProps) {
+export default function DropDown(props: IDropDownProps) {
     const ownID = useUniqueID("dropDown");
     const id = props.id || ownID;
     const device = useDevice();

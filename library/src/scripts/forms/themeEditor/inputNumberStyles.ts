@@ -16,7 +16,7 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const inputNumberVariables = useThemeCache(() => {
@@ -47,6 +47,7 @@ export const inputNumberClasses = useThemeCache(() => {
     const vars = inputNumberVariables();
     const style = styleFactory("numberInput");
     const builderVariables = themeBuilderVariables();
+    const builderClasses = themeBuilderClasses();
 
     const spinner = style("spinner", {
         position: "relative",
@@ -86,9 +87,17 @@ export const inputNumberClasses = useThemeCache(() => {
         borderRight: 0,
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
+        transition: `color .2s ease-out, background .2s ease-out`,
         $nest: {
+            ":not(.focus-visible)": {
+                outline: 0,
+            },
             "&:hover, &:focus, &:active, &.focus-visible": {
                 zIndex: 1,
+            },
+            [`&.${builderClasses.invalidField}`]: {
+                color: colorOut(builderVariables.error.color),
+                background: colorOut(builderVariables.error.backgroundColor),
             },
         },
     });

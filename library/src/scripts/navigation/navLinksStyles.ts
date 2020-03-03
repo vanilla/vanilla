@@ -179,8 +179,17 @@ export const navLinksClasses = useThemeCache(() => {
     });
 
     const topTitle = style("topTitle", {
-        ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
-        width: "100%",
+        $nest: {
+            "&&": {
+                ...margins({
+                    vertical: vars.item.padding.vertical,
+                    top: vars.item.padding.top,
+                    bottom: 0,
+                }),
+                ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
+                width: "100%",
+            },
+        },
     });
 
     const linkColors = setAllLinkColors({
@@ -247,6 +256,21 @@ export const navLinksClasses = useThemeCache(() => {
         mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
     );
 
+    const separatorIndependant = style(
+        "separatorIndependant",
+        {
+            display: "block",
+            ...extendItemContainer(vars.item.padding.horizontal),
+
+            // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
+            borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
+        },
+        mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
+        mediaQueries.oneColumn({
+            ...extendItemContainer(vars.item.paddingMobile.horizontal),
+        }),
+    );
+
     const separatorOdd = style(
         "separatorOdd",
         {
@@ -269,5 +293,6 @@ export const navLinksClasses = useThemeCache(() => {
         linksWithHeadings,
         separator,
         separatorOdd,
+        separatorIndependant,
     };
 });

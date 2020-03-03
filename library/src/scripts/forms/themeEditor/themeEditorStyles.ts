@@ -24,17 +24,17 @@ export const themeEditorVariables = () => {
         width: 376,
         mobile: {
             margin: {
-                top: 12
-            }
+                top: 12,
+            },
         },
-        borderRaduis: 6
+        borderRaduis: 6,
     };
 
     return {
         frame,
         panel,
         frameContainer,
-        styleOptions
+        styleOptions,
     };
 };
 
@@ -100,6 +100,6 @@ export const themeEditorClasses = useThemeCache(() => {
         frame,
         wrapper,
         styleOptions,
-        frameContainer
+        frameContainer,
     };
 });

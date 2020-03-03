@@ -235,6 +235,17 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const invalidField = style("invalidField", {}); // To be implemented by each input
 
+    const colorErrorMessage = style("colorErrorMessage", {
+        width: percent(100),
+        display: "block",
+        ...fonts(vars.errorMessage.fonts),
+        ...margins({
+            vertical: 4,
+        }),
+        paddingRight: percent(27),
+        textAlign: "right",
+    })
+
     return {
         root,
         inputBlock,
@@ -249,5 +260,6 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSection,
         subGroupSectionTitle,
         invalidField,
+        colorErrorMessage
     };
 });

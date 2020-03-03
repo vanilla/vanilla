@@ -48,6 +48,9 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var \Throwable */
     private $themeFetchError;
 
+    /** @var string|int */
+    private $forcedThemeKey;
+
     /**
      * DI.
      *
@@ -72,6 +75,20 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     }
 
     /**
+     * @param int|string $forcedThemeKey
+     */
+    public function setForcedThemeKey($forcedThemeKey): void {
+        $this->forcedThemeKey = $forcedThemeKey;
+    }
+
+    /**
+     * @return string|int
+     */
+    private function getThemeKeyToPreload() {
+        return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
+    }
+
+    /**
      * Get a script asset for the theme.
      * If the theme doesn't define a script asset, return null.
      *
@@ -85,7 +102,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
 
         return new ThemeScriptAsset(
             $this->request,
-            $this->siteMeta->getActiveThemeKey(),
+            $this->getThemeKeyToPreload(),
             // Use both the theme version and the deployment to make a more robust cache buster.
             // People often forget to increment their theme version in file based themes
             // so adding the deployment cache buster to the theme version handles this case.
@@ -100,7 +117,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function getThemeData(): ?array {
         if (!$this->themeData) {
-            $themeKey = $this->siteMeta->getActiveThemeKey();
+            $themeKey = $this->getThemeKeyToPreload();
             try {
                 $this->themeData = $this->themesApi->get($themeKey);
             } catch (\Throwable $e) {
@@ -152,7 +169,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             if (!$themeData) {
                 return '';
             }
-            $themeKey = $this->siteMeta->getActiveThemeKey();
+            $themeKey = $this->getThemeKeyToPreload();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {
                 $style = $this->themesApi->get_assets($themeKey, 'styles.css');

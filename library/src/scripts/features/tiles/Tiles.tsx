@@ -10,6 +10,10 @@ import classNames from "classnames";
 import Tile from "@library/features/tiles/Tile";
 import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
 import Container from "@library/layout/components/Container";
+import { Title } from "@themingapi/theme/ThemeEditorPage";
+import Heading from "@library/layout/Heading";
+import { visibility } from "@library/styles/styleHelpers";
+import { navLinksClasses } from "@library/navigation/navLinksStyles";
 
 interface ITile {
     icon: string;
@@ -45,18 +49,20 @@ export default function Tiles(props: IProps) {
     const { columns } = options;
     const classes = tilesClasses(optionOverrides);
 
-    if (items.length === 0) {
-        return (
-            <Container fullGutter>
+    return (
+        <Container fullGutter>
+            {items.length === 0 ? (
                 <div className={classNames(className, "isEmpty", classes.root)}>
                     <Paragraph>{props.emptyMessage}</Paragraph>
                 </div>
-            </Container>
-        );
-    } else {
-        return (
-            <Container fullGutter>
+            ) : (
                 <div className={classNames(className, classes.root)}>
+                    <Heading
+                        depth={props.titleLevel}
+                        className={classNames(classes.title, props.hiddenTitle && visibility().visuallyHidden)}
+                    >
+                        {props.title}
+                    </Heading>
                     <ul className={classNames(classes.items)}>
                         {items.map((tile, i) => (
                             <li key={i} className={classNames(classes.item)}>
@@ -72,7 +78,7 @@ export default function Tiles(props: IProps) {
                         ))}
                     </ul>
                 </div>
-            </Container>
-        );
-    }
+            )}
+        </Container>
+    );
 }

@@ -9,6 +9,9 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import Tile from "@library/features/tiles/Tile";
 import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
+import Container from "@library/layout/components/Container";
+import Heading from "@library/layout/Heading";
+import { visibility } from "@library/styles/styleHelpers";
 
 interface ITile {
     icon: string;
@@ -44,30 +47,36 @@ export default function Tiles(props: IProps) {
     const { columns } = options;
     const classes = tilesClasses(optionOverrides);
 
-    if (items.length === 0) {
-        return (
-            <div className={classNames(className, "isEmpty", classes.root)}>
-                <Paragraph>{props.emptyMessage}</Paragraph>
-            </div>
-        );
-    } else {
-        return (
-            <div className={classNames(className, classes.root)}>
-                <ul className={classNames(classes.items)}>
-                    {items.map((tile, i) => (
-                        <li key={i} className={classNames(classes.item)}>
-                            <Tile
-                                icon={tile.icon}
-                                fallbackIcon={props.fallbackIcon}
-                                title={tile.name}
-                                description={tile.description}
-                                url={tile.url}
-                                columns={columns}
-                            />
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    }
+    return (
+        <Container fullGutter>
+            {items.length === 0 ? (
+                <div className={classNames(className, "isEmpty", classes.root)}>
+                    <Paragraph>{props.emptyMessage}</Paragraph>
+                </div>
+            ) : (
+                <div className={classNames(className, classes.root)}>
+                    <Heading
+                        depth={props.titleLevel}
+                        className={classNames(classes.title, props.hiddenTitle && visibility().visuallyHidden)}
+                    >
+                        {props.title}
+                    </Heading>
+                    <ul className={classNames(classes.items)}>
+                        {items.map((tile, i) => (
+                            <li key={i} className={classNames(classes.item)}>
+                                <Tile
+                                    icon={tile.icon}
+                                    fallbackIcon={props.fallbackIcon}
+                                    title={tile.name}
+                                    description={tile.description}
+                                    url={tile.url}
+                                    columns={columns}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </Container>
+    );
 }

@@ -7,7 +7,15 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
+import {
+    borderRadii,
+    borders,
+    colorOut,
+    unit,
+    paddings,
+    importantUnit,
+    IBorderRadiusValue,
+} from "@library/styles/styleHelpers";
 import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";

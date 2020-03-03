@@ -10,7 +10,7 @@ import { useField } from "formik";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { getDefaultOrCustomErrorMessage, isValidColor, isValidInteger } from "@library/styles/styleUtils";
+import { getDefaultOrCustomErrorMessage } from "@library/styles/styleUtils";
 import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -38,67 +38,73 @@ export default function InputNumber(props: IInputNumber) {
 
     const { step = 1, min = 0, max } = props;
 
-    const validatedStep = isValidInteger(step) ? step : 1;
-    const validatedMin = isValidInteger(min) ? min : 0;
-    const validatedMax = isValidInteger(max) ? max : undefined;
+    const validatedStep = Number.isInteger(step) ? step : 1;
+    const validatedMin = Number.isInteger(min) ? min : 0;
+    const validatedMax = max && Number.isInteger(max) ? max : undefined;
 
     /**
      * Check if is valid number, respecting parameters.
      * @param number
      */
-    const isNumber = (numberVal: number | string) => {
-        if (isValidInteger(numberVal)) {
+    const isValidValue = (numberVal: number | string) => {
+        if (numberVal.toString() && Number.isInteger(ensureInteger(numberVal))) {
             const validatedNumber = parseInt(numberVal.toString());
             return (
                 validatedNumber % validatedStep === 0 &&
                 validatedNumber >= min &&
                 (!validatedMax ? validatedNumber <= validatedMax! : true)
             );
-        } else {
-            return false;
         }
+        return false;
     };
 
     const errorID = useMemo(() => {
         return uniqueIDFromPrefix("inputNumberError");
     }, []);
 
-    // String
+    const ensureInteger = (val: number | string) => {
+        return parseInt(val.toString());
+    };
+
     const [number, numberMeta, helpers] = useField(props.variableID);
 
-    const onTextChange = e => {
-        const number = e.target.value;
-        helpers.setTouched(true);
-        if (isNumber(number)) {
-            helpers.setValue(number); // Only set valid color if passes validation
-        }
-        helpers.setValue(number); // Text is unchanged
-    };
-
-    const stepUp = () => {
-        let newValue = (number.value || 0) + validatedStep;
-        if (validatedMax && newValue > validatedMax) {
-            newValue = validatedMax;
-        }
-        helpers.setValue(newValue);
-    };
-    const stepDown = () => {
-        let newValue = (number.value || 0) - validatedStep;
-        if (validatedMax && newValue > validatedMax) {
-            newValue = validatedMax;
-        }
-        helpers.setValue(newValue);
-    };
-
     if (number.value === undefined) {
-        if (isValidInteger(props.defaultValue)) {
+        if (props.defaultValue && Number.isInteger(ensureInteger(props.defaultValue))) {
             helpers.setValue(props.defaultValue);
         } else {
             helpers.setValue("");
         }
     }
 
-    const hasError = numberMeta.error || !isValidInteger(number.value);
+    const onTextChange = e => {
+        helpers.setTouched(true);
+        let newVal = e.target.value;
+
+        if (Number.isInteger(newVal)) {
+            newVal = ensureInteger(newVal);
+            helpers.setValue(newVal);
+        } else {
+            e.preventDefault();
+        }
+    };
+
+    const stepUp = () => {
+        let newValue = ensureInteger(number.value || 0) + validatedStep;
+        if (validatedMax !== undefined && newValue > validatedMax) {
+            newValue = validatedMax;
+        }
+        helpers.setValue(newValue);
+    };
+
+    const stepDown = () => {
+        let newValue = ensureInteger(number.value || 0) - validatedStep;
+        if (validatedMin !== undefined && newValue < validatedMin) {
+            newValue = validatedMin;
+        }
+        helpers.setValue(newValue.toString());
+    };
+
+    const hasError = number.value ? numberMeta.error || (!isValidValue(number.value) && number.value === "") : false;
 
     return (
         <>
@@ -112,12 +118,13 @@ export default function InputNumber(props: IInputNumber) {
                         [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={props.placeholder ? props.placeholder.toString() : ""}
-                    value={number.value}
+                    value={number.value || ""}
                     onChange={onTextChange}
                     auto-correct="false"
                     step={validatedStep}
                     min={validatedMin}
                     max={validatedMax}
+                    // defaultValue={props.defaultValue}
                 />
                 <span className={classes.spinner}>
                     <span className={classes.spinnerSpacer}>

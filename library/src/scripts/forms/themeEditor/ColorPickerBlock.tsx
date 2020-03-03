@@ -7,7 +7,7 @@
 import React, { useMemo } from "react";
 import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import ColorPicker, { IColorPicker } from "@library/forms/themeEditor/ColorPicker";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
 
 export interface IPresetColorPicker extends Omit<IColorPicker, "inputID" | "labelID"> {
@@ -22,9 +22,7 @@ export interface IColorPickerBlock {
 }
 
 export default function ColorPickerBlock(props: IColorPickerBlock) {
-    const inputID = useMemo(() => {
-        return uniqueIDFromPrefix("themeBuilderColorPickerInput");
-    }, []);
+    const inputID = useUniqueID("themeBuilderColorPickerInput");
     const labelID = useMemo(() => {
         return uniqueIDFromPrefix("themeBuilderColorPickerLabel");
     }, []);

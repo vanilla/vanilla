@@ -10,6 +10,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IInputNumber } from "@library/forms/themeEditor/InputNumber";
 import InputNumber from "@library/forms/themeEditor/InputNumber";
 import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
 export interface IPresetInputNumber extends Omit<IInputNumber, "inputID" | "labelID"> {
     defaultValue?: number;
@@ -35,7 +36,6 @@ export default function InputNumberBlock(props: INumberInputBlock) {
             undo={true}
             {...{
                 ...props.inputBlock,
-                inputWrapClass: inputNumberClasses().inputWrap,
                 inputID,
                 labelID,
             }}

@@ -9,6 +9,7 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import Tile from "@library/features/tiles/Tile";
 import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
+import Container from "@library/layout/components/Container";
 
 interface ITile {
     icon: string;
@@ -46,28 +47,32 @@ export default function Tiles(props: IProps) {
 
     if (items.length === 0) {
         return (
-            <div className={classNames(className, "isEmpty", classes.root)}>
-                <Paragraph>{props.emptyMessage}</Paragraph>
-            </div>
+            <Container fullGutter>
+                <div className={classNames(className, "isEmpty", classes.root)}>
+                    <Paragraph>{props.emptyMessage}</Paragraph>
+                </div>
+            </Container>
         );
     } else {
         return (
-            <div className={classNames(className, classes.root)}>
-                <ul className={classNames(classes.items)}>
-                    {items.map((tile, i) => (
-                        <li key={i} className={classNames(classes.item)}>
-                            <Tile
-                                icon={tile.icon}
-                                fallbackIcon={props.fallbackIcon}
-                                title={tile.name}
-                                description={tile.description}
-                                url={tile.url}
-                                columns={columns}
-                            />
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <Container fullGutter>
+                <div className={classNames(className, classes.root)}>
+                    <ul className={classNames(classes.items)}>
+                        {items.map((tile, i) => (
+                            <li key={i} className={classNames(classes.item)}>
+                                <Tile
+                                    icon={tile.icon}
+                                    fallbackIcon={props.fallbackIcon}
+                                    title={tile.name}
+                                    description={tile.description}
+                                    url={tile.url}
+                                    columns={columns}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </Container>
         );
     }
 }

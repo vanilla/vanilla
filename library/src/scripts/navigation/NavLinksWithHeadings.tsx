@@ -68,13 +68,14 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                     <nav
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
                     >
+                        {this.props.showTitle && <hr className={classes.separator}></hr>}
                         <Heading
                             title={this.props.title}
                             depth={this.props.depth}
                             className={classNames(
                                 classes.title,
-                                classes.topTitle,
                                 !this.props.showTitle && visibility().visuallyHidden,
+                                this.props.showTitle && classes.topTitle,
                             )}
                         />
                         {groupedContent}

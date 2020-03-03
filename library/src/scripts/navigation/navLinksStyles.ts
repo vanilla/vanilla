@@ -179,8 +179,17 @@ export const navLinksClasses = useThemeCache(() => {
     });
 
     const topTitle = style("topTitle", {
-        ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
-        width: "100%",
+        $nest: {
+            "&&": {
+                ...margins({
+                    vertical: vars.item.padding.vertical,
+                    top: vars.item.padding.top,
+                    bottom: 0,
+                }),
+                ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
+                width: "100%",
+            },
+        },
     });
 
     const linkColors = setAllLinkColors({

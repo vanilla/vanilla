@@ -15,6 +15,8 @@ import {
     paddings,
     importantUnit,
     IBorderRadiusValue,
+    getVerticalPaddingForTextInput,
+    textInputSizingFromFixedHeight,
 } from "@library/styles/styleHelpers";
 import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -23,6 +25,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { inputVariables } from "@library/forms/inputStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -92,10 +95,18 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
+    const inputVars = inputVariables();
 
     const independentRoot = style("independentRoot", {
         position: "relative",
     });
+
+    const verticalPadding = getVerticalPaddingForTextInput(
+        vars.sizing.height,
+        inputVars.font.size,
+        formElementVars.border.width * 2,
+    );
+    const calculatedHeight = vars.sizing.height - verticalPadding * 2 - formElementVars.border.width * 2;
 
     const root = style(
         {
@@ -104,6 +115,11 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 "& .searchBar__placeholder": {
                     color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",
+                    height: unit(calculatedHeight),
+                    lineHeight: unit(calculatedHeight),
+                    top: 0,
+                    bottom: 0,
+                    transform: "none",
                 },
 
                 "& .suggestedTextInput-valueContainer": {
@@ -130,11 +146,12 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
-                    display: "flex",
-                    flex: 1,
+                    // display: "flex",
+                    // flex: 1,
                     border: 0,
                     backgroundColor: "transparent",
                     height: percent(100),
+                    width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {
                         "&.searchBar__control--is-focused": {
@@ -150,8 +167,16 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     },
                 },
                 "& .searchBar__value-container": {
+                    position: "relative",
+                    top: 0,
                     overflow: "auto",
                     cursor: "text",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                    fontSize: unit(inputVars.font.size),
+                    height: unit(calculatedHeight),
                     $nest: {
                         "& > div": {
                             width: percent(100),

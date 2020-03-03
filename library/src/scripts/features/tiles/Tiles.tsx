@@ -10,10 +10,8 @@ import classNames from "classnames";
 import Tile from "@library/features/tiles/Tile";
 import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
 import Container from "@library/layout/components/Container";
-import { Title } from "@themingapi/theme/ThemeEditorPage";
 import Heading from "@library/layout/Heading";
 import { visibility } from "@library/styles/styleHelpers";
-import { navLinksClasses } from "@library/navigation/navLinksStyles";
 
 interface ITile {
     icon: string;

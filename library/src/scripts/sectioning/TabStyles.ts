@@ -169,7 +169,8 @@ export const tabClasses = useThemeCache(() => {
     });
 
     const isActive = style("isActive", {
-        backgroundColor: colorOut(globalVars.elementaryColors.white),
+        color: colorOut(vars.colors.bg),
+        backgroundColor: colorOut(vars.colors.fg),
     });
 
     return {

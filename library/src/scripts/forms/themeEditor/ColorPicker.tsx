@@ -66,12 +66,13 @@ export default function ColorPicker(props: IColorPicker) {
 
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
-            errorHelpers.setValue(undefined);
+            errorHelpers.setValue("");
+            props.handleChange?.();
         } else {
             errorHelpers.setValue("Invalid Color");
-            helpers.setValue(colorString);
+            props.handleChange?.();
         }
-        helpers.setValue(colorString);
+        helpers.setValue(colorString); //Text is unchange
     };
 
     const onPickerChange = e => {

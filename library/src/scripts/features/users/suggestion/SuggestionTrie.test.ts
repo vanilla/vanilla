@@ -6,12 +6,13 @@
 import { LoadStatus } from "@library/@types/api/core";
 import SuggestionTrie, { ISuggestionNode, ISuggestionValue } from "@library/features/users/suggestion/SuggestionTrie";
 import { expect } from "chai";
+import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 
-const LOADING_VALUE: ISuggestionValue = {
+const LOADING_VALUE: ISuggestionValue<IUserSuggestion> = {
     status: LoadStatus.LOADING,
 };
 
-const SUCCESSFUL_VALUE: ISuggestionValue = {
+const SUCCESSFUL_VALUE: ISuggestionValue<IUserSuggestion> = {
     status: LoadStatus.SUCCESS,
     data: [],
 };
@@ -20,7 +21,7 @@ describe("SuggestionTrie", () => {
     describe("insert", () => {
         it("can insert values", () => {
             const trie = new SuggestionTrie();
-            const expected: ISuggestionNode = {
+            const expected: ISuggestionNode<IUserSuggestion> = {
                 children: {
                     t: {
                         children: {

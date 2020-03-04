@@ -3643,7 +3643,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $row['DateLastComment'] = $row['DateInserted'];
         }
 
-        $scheme = new CamelCaseScheme;
+        $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
 

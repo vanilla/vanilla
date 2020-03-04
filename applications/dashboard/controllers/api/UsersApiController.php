@@ -134,43 +134,16 @@ class UsersApiController extends AbstractApiController {
 
         $this->userModel->removePicture($id);
     }
+
     /**
      * Get a schema instance comprised of all available user fields.
      *
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        $schema = Schema::parse([
-            'userID:i' => 'ID of the user.',
-            'name:s' => 'Name of the user.',
-            'password:s' => 'Password of the user.',
-            'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => [
-                'description' => 'Email address of the user.',
-                'minLength' => 0,
-            ],
-            'photo:s|n' => [
-                'minLength' => 0,
-                'description' => 'Raw photo field value from the user record.'
-            ],
-            'photoUrl:s|n' => [
-                'minLength' => 0,
-                'description' => 'URL to the user photo.'
-            ],
-            'points:i',
-            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
-            'showEmail:b' => 'Is the email address visible to other users?',
-            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
-            'banned:i' => 'Is the user banned?',
-            'dateInserted:dt' => 'When the user was created.',
-            'dateLastActive:dt|n' => 'Time the user was last active.',
-            'dateUpdated:dt|n' => 'When the user was last updated.',
-            'roles:a?' => $this->schema([
-                'roleID:i' => 'ID of the role.',
-                'name:s' => 'Name of the role.'
-            ], 'RoleFragment'),
-        ]);
-        return $schema;
+        $result = $this->userModel
+            ->schema();
+        return $result;
     }
 
     /**
@@ -512,32 +485,8 @@ class UsersApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     protected function normalizeOutput(array $dbRecord) {
-        if (array_key_exists('UserID', $dbRecord)) {
-            $userID = $dbRecord['UserID'];
-            $roles = $this->userModel->getRoles($userID, false)->resultArray();
-            $dbRecord['roles'] = $roles;
-        }
-        if (array_key_exists('Photo', $dbRecord)) {
-            $photo = userPhotoUrl($dbRecord);
-            $dbRecord['Photo'] = $photo;
-            $dbRecord['PhotoUrl'] = $photo;
-        }
-        if (array_key_exists('Verified', $dbRecord)) {
-            $dbRecord['bypassSpam'] = $dbRecord['Verified'];
-            unset($dbRecord['Verified']);
-        }
-        if (array_key_exists('Confirmed', $dbRecord)) {
-            $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
-            unset($dbRecord['Confirmed']);
-        }
-        if (array_key_exists('Admin', $dbRecord)) {
-            // The site creator is 1, System is 2.
-            $dbRecord['isAdmin'] = in_array($dbRecord['Admin'], [1, 2]);
-            unset($dbRecord['Admin']);
-        }
-
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        $result = $this->userModel->normalizeRow($dbRecord, []);
+        return $result;
     }
 
     /**

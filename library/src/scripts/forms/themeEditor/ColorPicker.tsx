@@ -16,7 +16,6 @@ import { color, ColorHelper } from "csx";
 import { useField, useFormikContext } from "formik";
 import React, { useMemo, useRef, useState } from "react";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
-import { number } from "prop-types";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 type VoidFunction = () => void;

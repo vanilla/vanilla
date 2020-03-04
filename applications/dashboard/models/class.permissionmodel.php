@@ -425,6 +425,7 @@ class PermissionModel extends Gdn_Model {
             if ($foreignKey && $foreignID) {
                 $this->SQL
                     ->join("$junctionTable j", "j.$junctionColumn = p.JunctionID")
+                    ->where("p.JunctionTable", $junctionTable)
                     ->where("j.$foreignKey", $foreignID);
             }
         } else {

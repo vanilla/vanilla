@@ -4,24 +4,23 @@
  * @license GPL-2.0-only
  */
 
-import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import { ILoadable } from "@library/@types/api/core";
 
-export type ISuggestionValue = ILoadable<IUserSuggestion[]>;
+export type ISuggestionValue<T> = ILoadable<T[]>;
 
-export interface ISuggestionNode {
+export interface ISuggestionNode<T> {
     children?: {
-        [key: string]: ISuggestionNode;
+        [key: string]: ISuggestionNode<T>;
     };
-    value?: ISuggestionValue;
+    value?: ISuggestionValue<T>;
 }
 
 /**
  * A trie for storage of mention data.
  */
-export default class SuggestionTrie {
+export default class SuggestionTrie<T> {
     public MAX_PARTIAL_LOOKUP_ITERATIONS = 10;
-    private root: ISuggestionNode = {};
+    private root: ISuggestionNode<T> = {};
 
     /**
      * Insert a value into a node for the word. This will overwrite whatever value the node already has
@@ -29,7 +28,7 @@ export default class SuggestionTrie {
      * @param word - The location in the trie.
      * @param value - The value for the node.
      */
-    public insert(word: string, value: ISuggestionValue): void {
+    public insert(word: string, value: ISuggestionValue<T>): void {
         let current = this.root;
 
         for (let i = 0; i < word.length; i++) {
@@ -39,7 +38,7 @@ export default class SuggestionTrie {
             }
 
             if (!(letter in current.children)) {
-                const contents: ISuggestionNode = i !== word.length - 1 ? {} : { children: {} };
+                const contents: ISuggestionNode<T> = i !== word.length - 1 ? {} : { children: {} };
                 current.children[letter] = contents;
             }
 
@@ -56,7 +55,7 @@ export default class SuggestionTrie {
      *
      * @param word - The word to lookup.
      */
-    public getNode(word?: string): ISuggestionNode | null {
+    public getNode(word?: string): ISuggestionNode<T> | null {
         let node = this.root;
         if (word === undefined) {
             return node;
@@ -78,7 +77,7 @@ export default class SuggestionTrie {
      *
      * @param word - The word to lookup.
      */
-    public getValue(word: string): ISuggestionValue | null {
+    public getValue(word: string): ISuggestionValue<T> | null {
         const node = this.getNode(word);
         return (node && node.value) || null;
     }
@@ -96,7 +95,7 @@ export default class SuggestionTrie {
      *
      * And return immediately if it finds a result.
      */
-    public getValueFromPartialsOfWord(word: string): ISuggestionValue | null {
+    public getValueFromPartialsOfWord(word: string): ISuggestionValue<T> | null {
         const startingLength = Math.min(this.MAX_PARTIAL_LOOKUP_ITERATIONS, word.length);
         for (let x = startingLength; x > 0; x--) {
             const substring = word.substring(0, x);

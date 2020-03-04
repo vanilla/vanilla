@@ -16,7 +16,7 @@ import { IUserFragment } from "@library/@types/api/users";
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;
     currentUsername: string | null;
-    trie: SuggestionTrie;
+    trie: SuggestionTrie<IUserSuggestion>;
     activeSuggestionID: string;
     activeSuggestionIndex: number;
 }
@@ -52,7 +52,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         };
     }
 
-    public static selectSuggestionsTrie(state: IUsersStoreState): SuggestionTrie {
+    public static selectSuggestionsTrie(state: IUsersStoreState): SuggestionTrie<IUserSuggestion> {
         return UserSuggestionModel.stateSlice(state).trie;
     }
 
@@ -152,7 +152,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     public readonly initialState: IUserSuggestionState = {
         lastSuccessfulUsername: null,
         currentUsername: null,
-        trie: new SuggestionTrie(),
+        trie: new SuggestionTrie<IUserSuggestion>(),
         activeSuggestionID: "",
         activeSuggestionIndex: 0,
     };

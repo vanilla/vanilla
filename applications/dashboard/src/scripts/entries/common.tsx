@@ -12,9 +12,9 @@ import { themePreviewToastReducer } from "@library/features/toaster/themePreview
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { AppContext } from "@library/AppContext";
 import { mountPortal } from "@vanilla/react-utils";
-import {authReducer} from "@dashboard/auth/authReducer";
+import { authReducer } from "@dashboard/auth/authReducer";
 import RoleSuggestionModel from "@library/features/users/suggestion/RoleSuggestionModel";
-import {combineReducers} from "redux";
+import { combineReducers } from "redux";
 
 const PREVIEW_CONTAINER = "previewContainer";
 
@@ -31,4 +31,4 @@ onReady(() => {
     );
 });
 
-registerReducer("roles", combineReducers({"suggestions": new RoleSuggestionModel().reducer}));
+registerReducer("roles", combineReducers({ suggestions: new RoleSuggestionModel().reducer }));

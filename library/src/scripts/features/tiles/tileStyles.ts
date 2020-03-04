@@ -170,7 +170,7 @@ export const tileClasses = useThemeCache(() => {
                     ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
                         borders({
-                            color: offsetLightness(globalVars.border.color, 0.05),
+                            color: offsetLightness(globalVars.border.color, -0.05),
                             radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                         }),
                         shadow.embedHover(),

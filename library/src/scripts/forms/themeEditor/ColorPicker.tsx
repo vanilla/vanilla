@@ -16,7 +16,6 @@ import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
-import { ensureColorHelper } from "@library/styles/styleHelpersColors";
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
 export interface IColorPicker {
@@ -59,16 +58,14 @@ export default function ColorPicker(props: IColorPicker) {
 
     const onTextChange = e => {
         const colorString = e.target.value;
+        helpers.setValue(colorString); //Text is unchanged
         helpers.setTouched(true);
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
             errorHelpers.setValue(undefined);
         } else {
-            errorHelpers.setValue(props.variableID);
+            errorHelpers.setValue(true);
         }
-        helpers.setValue(colorString); //Text is unchanged
-
-        console.log("text change!");
     };
 
     const onPickerChange = e => {
@@ -98,11 +95,11 @@ export default function ColorPicker(props: IColorPicker) {
     // Check initial value for errors
     useEffect(() => {
         if (hasError) {
-            helpers.setError(errorMessage);
+            helpers.setError(true);
         } else {
             helpers.setError(false);
         }
-    }, [textValue, selectedColor.value]);
+    }, []);
 
     return (
         <>
@@ -133,6 +130,7 @@ export default function ColorPicker(props: IColorPicker) {
                     })}
                     placeholder={"#0291DB"}
                     value={textValue}
+                    // onKeyDown={onTextChange}
                     onChange={onTextChange}
                     auto-correct="false"
                 />

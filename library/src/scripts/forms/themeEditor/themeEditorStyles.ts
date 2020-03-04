@@ -62,7 +62,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const frame = style(
         "frame",
         {
-
             flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.panel.width)}`),
             height: percent(100),
         },
@@ -86,7 +85,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const frameContainer = style(
         "frameContainer",
         {
-
             flexBasis: calc(`${percent(vars.frameContainer.width)} - ${unit(vars.styleOptions.width)}`),
             height: percent(100),
         },

@@ -30,7 +30,6 @@ export interface IColorPicker {
     errors?: IErrorWithDefault[]; // Uses default message if true;
     handleChange?: VoidFunction;
 }
-
 export const ensureColorHelper = (colorValue: string | ColorHelper) => {
     return typeof colorValue === "string" ? color(colorValue) : colorValue;
 };

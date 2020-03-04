@@ -244,7 +244,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         }),
         paddingRight: percent(27),
         textAlign: "right",
-    })
+    });
 
     return {
         root,
@@ -260,6 +260,6 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSection,
         subGroupSectionTitle,
         invalidField,
-        colorErrorMessage
+        colorErrorMessage,
     };
 });

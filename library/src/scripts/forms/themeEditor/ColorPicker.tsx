@@ -62,7 +62,7 @@ export default function ColorPicker(props: IColorPicker) {
         helpers.setTouched(true);
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
-            errorHelpers.setValue(undefined);
+            errorHelpers.setValue(false);
         } else {
             errorHelpers.setValue(true);
         }

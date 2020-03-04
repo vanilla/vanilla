@@ -16,11 +16,10 @@ export interface IPresetColorPicker extends Omit<IColorPicker, "inputID" | "labe
 }
 
 export interface IPresetThemeEditorInputBlock extends Omit<Omit<IThemeBuilderBlock, "children">, "labelID"> {}
-type VoidFunction = () => void;
+
 export interface IColorPickerBlock {
     colorPicker: IPresetColorPicker;
     inputBlock: IPresetThemeEditorInputBlock;
-    handleChange?: VoidFunction;
 }
 
 export default function ColorPickerBlock(props: IColorPickerBlock) {

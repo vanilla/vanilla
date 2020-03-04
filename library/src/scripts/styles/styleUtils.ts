@@ -253,7 +253,7 @@ export const isValidColor = colorValue => {
  * @param error
  * @param defaultMessage
  */
-export const getDefaultOrCustomErrorMessage = (error: string | true, defaultMessage: string) => {
+export const getDefaultOrCustomErrorMessage = (error, defaultMessage: string) => {
     return typeof error === "string" ? error : defaultMessage;
 };
 

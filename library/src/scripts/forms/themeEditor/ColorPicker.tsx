@@ -18,7 +18,7 @@ import React, { useMemo, useRef, useState } from "react";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
-type VoidFunction = () => void;
+
 export interface IColorPicker {
     inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex">;
     inputID: string;
@@ -27,7 +27,7 @@ export interface IColorPicker {
     defaultValue?: ColorHelper;
     inputClass?: string;
     errors?: IErrorWithDefault[]; // Uses default message if true;
-    handleChange?: VoidFunction;
+    defaultErrorMessage?: string;
 }
 export const ensureColorHelper = (colorValue: string | ColorHelper) => {
     return typeof colorValue === "string" ? color(colorValue) : colorValue;
@@ -47,10 +47,10 @@ export default function ColorPicker(props: IColorPicker) {
         props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : "#000";
 
     const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
-    const { setFieldError } = useFormikContext();
+    // const { setFieldError } = useFormikContext();
 
     const [validColor, setValidColor] = useState(initialValidColor);
-    const [errorField, _, errorHelpers] = useField("errors." + props.variableID);
+    // const [errorField, errorHelpers] = useField("errors." + props.variableID);
 
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
@@ -64,11 +64,11 @@ export default function ColorPicker(props: IColorPicker) {
 
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
-            errorHelpers.setValue("");
-            props.handleChange?.();
+            helpers.setError(getDefaultOrCustomErrorMessage(props.defaultErrorMessage, t("Invalid Color")));
+            // errorHelpers.setValue("");
+            // props.handleChange?.();
         } else {
-            errorHelpers.setValue("Invalid Color");
-            props.handleChange?.();
+            // errorHelpers.setValue("Invalid Color");
         }
         helpers.setValue(colorString); //Text is unchange
     };
@@ -85,7 +85,7 @@ export default function ColorPicker(props: IColorPicker) {
                     .toRGB()
                     .toString(),
             );
-            errorHelpers.setValue(undefined);
+            // errorHelpers.setValue(undefined);
         }
     };
 
@@ -97,10 +97,13 @@ export default function ColorPicker(props: IColorPicker) {
             : "";
     const hasError = !isValidColor(textValue);
 
+    console.log("selectedColorMeta.error: ", selectedColorMeta.error);
+
     return (
         <>
             <span className={classes.root}>
-                <input className={visibility().displayNone} {...errorField} />
+                {/*<input className={visibility().displayNone} {...errorField} />*/}
+                <input className={visibility().displayNone} />
 
                 {/*"Real" color input*/}
                 <input
@@ -144,9 +147,7 @@ export default function ColorPicker(props: IColorPicker) {
             </span>
             {selectedColorMeta.error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    <li className={builderClasses.error}>
-                        {getDefaultOrCustomErrorMessage(builderClasses.error, t("Invalid color"))}
-                    </li>
+                    <li className={builderClasses.error}>{builderClasses.error}</li>
                 </ul>
             )}
         </>

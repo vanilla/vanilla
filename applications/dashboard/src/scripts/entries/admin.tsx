@@ -13,11 +13,14 @@ import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUpload
 import { mountReact, applySharedPortalContext } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import "@library/theming/reset";
+import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { roleReducer } from "@dashboard/roles/roleReducer";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
+registerReducer("roles", roleReducer);
 
 applySharedPortalContext(props => {
     return (

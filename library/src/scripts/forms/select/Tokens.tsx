@@ -15,7 +15,7 @@ import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
-interface IProps extends IOptionalComponentID {
+export interface ITokenProps extends IOptionalComponentID {
     label: string;
     labelNote?: string;
     disabled?: boolean;
@@ -25,7 +25,7 @@ interface IProps extends IOptionalComponentID {
     isLoading?: boolean;
     value: IComboBoxOption[];
     onChange: (tokens: IComboBoxOption[]) => void;
-    onInputChange: (value: string) => void;
+    onInputChange?: (value: string) => void;
 }
 
 interface IState {
@@ -36,7 +36,7 @@ interface IState {
 /**
  * Implements the search bar component
  */
-export default class Tokens extends React.Component<IProps, IState> {
+export default class Tokens extends React.Component<ITokenProps, IState> {
     private prefix = "tokens";
     private id: string = getRequiredID(this.props, this.prefix);
     private inputID: string = this.id + "-tokenInput";
@@ -98,7 +98,7 @@ export default class Tokens extends React.Component<IProps, IState> {
 
     private handleInputChange = val => {
         this.setState({ inputValue: val });
-        this.props.onInputChange(val);
+        this.props.onInputChange?.(val);
     };
 
     /*
@@ -109,7 +109,10 @@ export default class Tokens extends React.Component<IProps, IState> {
             ClearIndicator: selectOverrides.NullComponent,
             DropdownIndicator: selectOverrides.NullComponent,
             LoadingMessage: selectOverrides.OptionLoader,
-            Menu: this.state.inputValue.length > 0 ? selectOverrides.Menu : selectOverrides.NullComponent,
+            Menu:
+                !this.props.options || this.props.options?.length > 0
+                    ? selectOverrides.Menu
+                    : selectOverrides.NullComponent,
             MenuList: selectOverrides.MenuList,
             Option: selectOverrides.SelectOption,
             ValueContainer: selectOverrides.ValueContainer,

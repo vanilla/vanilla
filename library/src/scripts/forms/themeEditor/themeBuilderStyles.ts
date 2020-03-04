@@ -14,12 +14,18 @@ export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
     const fontFamily = ["Open Sans"];
 
+    const mainColors = {
+        primary: color("#0291db"),
+        fg: color("#48576a"),
+        bg: color("#f5f6f7"),
+    };
+
     const outline = {
-        color: color("#0291db"),
+        color: mainColors.primary,
     };
 
     const defaultFont = {
-        color: color("#48576a"),
+        color: mainColors.fg,
         family: fontFamily,
     };
 
@@ -81,7 +87,7 @@ export const themeBuilderVariables = () => {
     };
 
     const panel = {
-        bg: color("#f5f6f7"),
+        bg: mainColors.bg,
         padding: 16,
         width: themeEditorVariables().panel.width,
     };
@@ -95,6 +101,7 @@ export const themeBuilderVariables = () => {
     };
 
     return {
+        mainColors,
         defaultFont,
         outline,
         label,

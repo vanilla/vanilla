@@ -112,18 +112,6 @@ export default function InputNumber(props: IInputNumber) {
 
     const hasError = number.value ? !!errorField.value || (!isValidValue(number.value) && number.value === "") : false;
 
-    console.log("=== hasError ===");
-    console.log("number.value: ", number.value);
-    console.log("numberMeta.error: ", errorField.value);
-    console.log(
-        '(!isValidValue(number.value) && number.value === ""): ',
-        !isValidValue(number.value) && number.value === "",
-    );
-    console.log("!isValidValue(number.value): ", !isValidValue(number.value));
-    console.log('number.value === "": ', number.value === "");
-
-    console.log("================");
-
     // Check initial value for errors
     useEffect(() => {
         if (hasError) {

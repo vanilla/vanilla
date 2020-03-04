@@ -118,7 +118,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     height: unit(calculatedHeight),
                     lineHeight: unit(calculatedHeight),
                     top: 0,
-                    bottom: 0,
                     transform: "none",
                 },
 
@@ -146,8 +145,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
-                    // display: "flex",
-                    // flex: 1,
                     border: 0,
                     backgroundColor: "transparent",
                     height: percent(100),
@@ -167,8 +164,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     },
                 },
                 "& .searchBar__value-container": {
-                    position: "relative",
-                    top: 0,
+                    position: "static",
                     overflow: "auto",
                     cursor: "text",
                     display: "flex",

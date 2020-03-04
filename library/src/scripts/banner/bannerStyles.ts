@@ -404,6 +404,7 @@ export const bannerClasses = useThemeCache(() => {
             },
             ".searchBar__control": {
                 cursor: "text",
+                position: "relative",
             },
             "& .searchBar__placeholder": {
                 color: colorOut(vars.searchBar.font.color),

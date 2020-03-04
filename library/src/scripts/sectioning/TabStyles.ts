@@ -17,6 +17,7 @@ import {
     sticky,
     extendItemContainer,
     flexHelper,
+    modifyColorBasedOnLightness,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -169,8 +170,7 @@ export const tabClasses = useThemeCache(() => {
     });
 
     const isActive = style("isActive", {
-        color: colorOut(vars.colors.bg),
-        backgroundColor: colorOut(vars.colors.fg),
+        backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.bg, 0.65, true, true)),
     });
 
     return {

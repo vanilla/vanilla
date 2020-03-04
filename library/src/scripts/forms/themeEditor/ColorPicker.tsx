@@ -9,7 +9,7 @@ import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
 import { color, ColorHelper } from "csx";
-import { useField } from "formik";
+import { ErrorMessage, useField, useFormikContext } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
@@ -35,7 +35,7 @@ export default function ColorPicker(props: IColorPicker) {
     const colorInput = useRef<HTMLInputElement>(null);
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
-    const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid color"));
+    const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid Color"));
 
     const errorID = useMemo(() => {
         return uniqueIDFromPrefix("colorPickerError");
@@ -46,7 +46,10 @@ export default function ColorPicker(props: IColorPicker) {
         props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : undefined;
 
     const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
+    const { setFieldError } = useFormikContext();
+
     const [validColor, setValidColor] = useState(initialValidColor);
+    const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
 
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
@@ -54,34 +57,24 @@ export default function ColorPicker(props: IColorPicker) {
         }
     };
 
-    // Check initial value for errors
-    useEffect(() => {
-        if (!stringIsValidColor(selectedColor)) {
-            if (validColor) {
-                helpers.setValue(ensureColorHelper(validColor).toHexString());
-            } else {
-                helpers.setError(errorMessage);
-            }
-        }
-    }, []);
-
     const onTextChange = e => {
         const colorString = e.target.value;
         helpers.setTouched(true);
         if (stringIsValidColor(colorString)) {
             setValidColor(colorString); // Only set valid color if passes validation
-            helpers.setError(false);
+            errorHelpers.setValue(undefined);
         } else {
-            helpers.setError(errorMessage);
+            errorHelpers.setValue(props.variableID);
         }
-        helpers.setValue(colorString); // Text is unchanged
+        helpers.setValue(colorString); //Text is unchanged
+
+        console.log("text change!");
     };
 
     const onPickerChange = e => {
         // Will always be valid color, since it's a real picker
         const newColor: string = e.target.value;
         if (newColor) {
-            helpers.setError(false);
             helpers.setTouched(true);
             helpers.setValue(newColor);
             setValidColor(
@@ -89,6 +82,7 @@ export default function ColorPicker(props: IColorPicker) {
                     .toRGB()
                     .toString(),
             );
+            errorHelpers.setValue(undefined);
         }
     };
 
@@ -101,9 +95,20 @@ export default function ColorPicker(props: IColorPicker) {
 
     const hasError = !isValidColor(textValue);
 
+    // Check initial value for errors
+    useEffect(() => {
+        if (hasError) {
+            helpers.setError(errorMessage);
+        } else {
+            helpers.setError(false);
+        }
+    }, [textValue, selectedColor.value]);
+
     return (
         <>
             <span className={classes.root}>
+                <input className={visibility().displayNone} value={errorField.value} />
+
                 {/*"Real" color input*/}
                 <input
                     {...props.inputProps}
@@ -127,7 +132,7 @@ export default function ColorPicker(props: IColorPicker) {
                         [builderClasses.invalidField]: hasError,
                     })}
                     placeholder={"#0291DB"}
-                    value={selectedColor.value}
+                    value={textValue}
                     onChange={onTextChange}
                     auto-correct="false"
                 />
@@ -144,7 +149,7 @@ export default function ColorPicker(props: IColorPicker) {
                     <span className={visibility().visuallyHidden}>{color(validColor ?? "#000").toHexString()}</span>
                 </Button>
             </span>
-            {selectedColorMeta.error && (
+            {hasError && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
                     <li className={builderClasses.error}>{errorMessage}</li>
                 </ul>
